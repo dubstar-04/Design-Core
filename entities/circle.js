@@ -1,5 +1,5 @@
 // Register this command with the scene
-commands.push({
+commandManager.registerCommand({
     command: "Circle",
     shortcut: "C"
 });
@@ -177,7 +177,8 @@ Circle.prototype.trim = function (points) {
             lineWidth: this.lineWidth
         }
 
-        addToScene("Arc", data, false, items.indexOf(this))
+        //TODO: Can't call scene from here
+        scene.addToScene("Arc", data, false, items.indexOf(this))
 
     }
 }

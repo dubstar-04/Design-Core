@@ -1,4 +1,4 @@
-commands.push({
+commandManager.registerCommand({
     command: "Erase",
     shortcut: "E"
 });
@@ -25,7 +25,7 @@ Erase.prototype.prompt = function (inputArray) {
     prompt[0] = "Select Items To " + this.type;
  
     expectedType[1] = ["object"];   
-    prompt[1] = selectionSet.length + " Item(s) selected: Add more or press Enter to Erase";
+    prompt[1] = scene.selectionSet.length + " Item(s) selected: Add more or press Enter to Erase";
  
     expectedType[2] = ["boolean"];    
     prompt[2] = "";
@@ -44,12 +44,12 @@ Erase.prototype.prompt = function (inputArray) {
 
 Erase.prototype.action = function (points, items) {
 
-    selectionSet.sort();
+    scene.selectionSet.sort();
 
-    console.log("erase.js - selectionset: " + selectionSet);
+    console.log("erase.js - scene.selectionSet: " + scene.selectionSet);
 
-    for (var i = 0; i < selectionSet.length; i++) {
-        //console.log("Erase: " + selectionSet[i]);
-        items.splice((selectionSet[i] - i), 1)
+    for (var i = 0; i < scene.selectionSet.length; i++) {
+        //console.log("Erase: " + scene.selectionSet[i]);
+        items.splice((scene.selectionSet[i] - i), 1)
     }
 }

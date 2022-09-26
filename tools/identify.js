@@ -1,4 +1,4 @@
-commands.push({command: "Identify", shortcut: "ID"});
+commandManager.registerCommand({command: "Identify", shortcut: "ID"});
 function Identify()
 {
     //Define Properties

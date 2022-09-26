@@ -1,5 +1,5 @@
 // Register this command with the scene
-commands.push({
+commandManager.registerCommand({
     command: "Line",
     shortcut: "L"
 });
@@ -210,7 +210,8 @@ Line.prototype.trim = function(points) {
                 lineWidth: line.lineWidth
             }
 
-            addToScene("Line", data, false)
+            //TODO: Can't call scene from here
+            scene.addToScene("Line", data, false)
 
             if (a < b) {
                 line.points[1] = pnts[0];

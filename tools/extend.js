@@ -1,5 +1,5 @@
-commands.push({command: "Extend", shortcut: "EX"});
-function Extend(items)
+commandManager.registerCommand({command: "Extend", shortcut: "EX"});
+function Extend()
 {
     //Define Properties
     this.type = "Extend";
@@ -22,7 +22,7 @@ Extend.prototype.prompt = function (inputArray) {
     prompt[0] = "Select boundary edges:";
 
     expectedType[1] = ["object"];   
-    prompt[1] = selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
+    prompt[1] = scene.selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
  
     expectedType[2] = ["boolean"];   
     prompt[2] = "Select object to extend:";
@@ -51,18 +51,18 @@ Extend.prototype.action = function(){
 
     console.log("Extend.js: Extend.prototype.action")
 
-    console.log("Extend.js: selectionset length:", selectionSet.length)
+    console.log("Extend.js: scene.selectionSet length:", scene.selectionSet.length)
 
-    var item = findClosestItem();
+    var item = scene.findClosestItem();
 
     if (item !== undefined){
 
         var intersectPoints = [];
 
-        for (var i = 0; i < selectionSet.length; i++){
-            if (selectionSet[i] !== item){
-                var boundaryItem = items[selectionSet[i]];
-                var extendItem = items[item];
+        for (var i = 0; i < scene.selectionSet.length; i++){
+            if (scene.selectionSet[i] !== item){
+                var boundaryItem = scene.items[scene.selectionSet[i]];
+                var extendItem = scene.items[item];
 
                 console.log("boundary.type:", boundaryItem.type, "extend.type:", extendItem.type)
 

@@ -1,5 +1,5 @@
 // Register this command with the scene
-commands.push({
+commandManager.registerCommand({
     command: "Ellipse",
     shortcut: "EL"
 });

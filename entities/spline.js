@@ -1,7 +1,7 @@
 //https://github.com/Tagussan/BSpline/blob/master/BSpline.js
 
 // Register this command with the scene
-commands.push({
+commandManager.registerCommand({
     command: "",
     shortcut: "SP"
 });

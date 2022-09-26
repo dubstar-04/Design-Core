@@ -1,4 +1,4 @@
-commands.push({command: "Distance", shortcut: "DI"});
+commandManager.registerCommand({command: "Distance", shortcut: "DI"});
 function Distance()
 {
     //Define Properties

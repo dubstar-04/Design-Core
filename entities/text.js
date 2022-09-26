@@ -1,5 +1,5 @@
 // Register this command with the scene
-commands.push({
+commandManager.registerCommand({
     command: "Text",
     shortcut: "DT"
 });
@@ -40,7 +40,7 @@ function Text(data) //startX, startY, endX, endY)
 
         if (data.input) {
             //TODO: Find a better way of providing this data
-            // This comes from design-engine
+            // This comes from designEngine
             this.height = data.input[1];
             this.string = data.input[2];
         }

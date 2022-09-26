@@ -1,5 +1,5 @@
-commands.push({command: "Trim", shortcut: "TR"});
-function Trim(items)
+commandManager.registerCommand({command: "Trim", shortcut: "TR"});
+function Trim()
 {
     //Define Properties
     this.type = "Trim";
@@ -22,7 +22,7 @@ Trim.prototype.prompt = function (inputArray) {
     prompt[0] = "Select boundary edges:";
 
     expectedType[1] = ["object"];   
-    prompt[1] = selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
+    prompt[1] = scene.selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
  
     expectedType[2] = ["boolean"];   
     prompt[2] = "Select object to Trim:";
@@ -51,18 +51,18 @@ Trim.prototype.action = function(){
 
     console.log("Trim.js: Trim.prototype.action")
 
-    console.log("Trim.js: selectionset length:", selectionSet.length)
+    console.log("Trim.js: scene.selectionSet length:", scene.selectionSet.length)
 
-    var item = findClosestItem();
+    var item = scene.findClosestItem();
 
     if (item !== undefined){
 
         var intersectPoints = [];
 
-        for (var i = 0; i < selectionSet.length; i++){
-            if (selectionSet[i] !== item){
-                var boundaryItem = items[selectionSet[i]];
-                var TrimItem = items[item];
+        for (var i = 0; i < scene.selectionSet.length; i++){
+            if (scene.selectionSet[i] !== item){
+                var boundaryItem = scene.items[scene.selectionSet[i]];
+                var TrimItem = scene.items[item];
 
                 console.log("boundary.type:", boundaryItem.type, "Trim.type:", TrimItem.type)
 
