@@ -1,11 +1,9 @@
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "Dimension",
-    shortcut: "DIM"
-});
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-function Dimension(data) //startX, startY, endX, endY)
-{
+export class Dimension {
+    constructor(data) {
     //Define Properties         //Associated DXF Value
     this.type = "Dimension";
     this.family = "Geometry";
@@ -66,7 +64,12 @@ function Dimension(data) //startX, startY, endX, endY)
     }
 }
 
-Dimension.prototype.prompt = function(inputArray) {
+static register() {
+    var command = {command: "Dimension", shortcut: "DIM"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -102,7 +105,7 @@ Dimension.prototype.prompt = function(inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Dimension.prototype.getBaseDimType = function() {
+getBaseDimType() {
 
     //0 = Rotated, horizontal, or vertical
     //1 = Aligned
@@ -128,7 +131,7 @@ Dimension.prototype.getBaseDimType = function() {
     return type
 }
 
-Dimension.prototype.length = function() {
+length() {
     var A = (this.points[0].x - this.points[1].x)
     var B = (this.points[0].y - this.points[1].y)
     var ASQ = Math.pow(A, 2)
@@ -139,7 +142,7 @@ Dimension.prototype.length = function() {
 }
 
 
-Dimension.prototype.getExtensionPoints = function() {
+getExtensionPoints() {
     // return p1 and p2 for the dimension arrows
 
     Pt1 = this.points[0];
@@ -200,7 +203,7 @@ Dimension.prototype.getExtensionPoints = function() {
 
 
 
-Dimension.prototype.getBoundingRect = function() {
+getBoundingRect() {
 
     extPnts = this.getExtensionPoints()
 
@@ -221,7 +224,7 @@ Dimension.prototype.getBoundingRect = function() {
     return rect
 }
 
-Dimension.prototype.getDimensionPoints = function() {
+getDimensionPoints() {
 
     // Return the points required to draw the dimension
     // Pt1 = Dimension Start point
@@ -260,7 +263,7 @@ Dimension.prototype.getDimensionPoints = function() {
 }
 
 
-Dimension.prototype.getBlockEntities = function() {
+getBlockEntities() {
 
     entities = [];
     var extPnts = this.getExtensionPoints();
@@ -276,7 +279,7 @@ Dimension.prototype.getBlockEntities = function() {
     }
 
     if (typeof(extPnts.dimAngle) === "number") {
-        var angle = radians2degrees(extPnts.dimAngle)
+        var angle = Utils.radians2degrees(extPnts.dimAngle)
         console.log("text angle", angle)
         this.text.rotation = angle //TODO: Honor the style
     }
@@ -322,7 +325,7 @@ Dimension.prototype.getBlockEntities = function() {
 
 }
 
-Dimension.prototype.draw = function(ctx, scale) {
+draw(ctx, scale) {
 
     var rect = this.getBoundingRect()
 
@@ -400,13 +403,13 @@ Dimension.prototype.draw = function(ctx, scale) {
 
 }
 
-Dimension.prototype.SVG = function(file) {
+SVG(file) {
     //<Text x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
     //"<Text x1=" + this.startX  + "y1=" + this.startY + "x2=" + this.endX + "y2=" + this.endY + "style=" + this.colour + ";stroke-width:" + this.TextWidth + "/>"
 }
 
 
-Dimension.prototype.dxf = function() {
+dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(
             "0",
@@ -454,7 +457,7 @@ Dimension.prototype.dxf = function() {
     return data
 }
 
-Dimension.prototype.snaps = function(mousePoint, delta) {
+snaps(mousePoint, delta) {
 
 
     var snaps = []
@@ -468,28 +471,29 @@ Dimension.prototype.snaps = function(mousePoint, delta) {
     return snaps;
 }
 
-Dimension.prototype.closestPoint = function(P) {
+closestPoint(P) {
 
     return this.block.closestPoint(P)
 }
 
-Dimension.prototype.extremes = function() {
+extremes() {
 
     return this.block.extremes()
 }
 
-Dimension.prototype.within = function(selection_extremes) {
+within(selection_extremes) {
 
     return this.block.within(selection_extremes)
 }
 
-Dimension.prototype.intersectPoints = function() {
+intersectPoints() {
 
     return this.block.intersectPoints()
 }
 
-Dimension.prototype.touched = function(selection_extremes) {
+touched(selection_extremes) {
 
     return this.block.touched(selection_extremes)
 
+}
 }

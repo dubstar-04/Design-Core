@@ -1,11 +1,9 @@
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "Ellipse",
-    shortcut: "EL"
-});
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-function Ellipse(data) //centre_x, centre_y, endX, endY)
-{
+export class Ellipse {
+    constructor(data) {
     //Define Properties         //Associated DXF Value
     this.type = "Ellipse";
     this.family = "Geometry";
@@ -47,7 +45,12 @@ function Ellipse(data) //centre_x, centre_y, endX, endY)
     }
 }
 
-Ellipse.prototype.prompt = function (inputArray) {
+static register() {
+    var command = {command: "Ellipse", shortcut: "EL"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -81,7 +84,7 @@ Ellipse.prototype.prompt = function (inputArray) {
 
 
 
-Ellipse.prototype.draw = function (ctx, scale) {
+draw(ctx, scale) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -114,7 +117,7 @@ Ellipse.prototype.draw = function (ctx, scale) {
         //var x = this.points[0].x + (this.width/2) * Math.cos(degrees2radians(i));
         //var y = this.points[0].y + (this.height/2) * Math.sin(degrees2radians(i));
 
-        var j = degrees2radians(i);
+        var j = Utils.degrees2radians(i);
 
         var x = this.points[0].x + (this.width / 2) * Math.cos(j) * Math.cos(theta) - (this.height / 2) * Math.sin(j) * Math.sin(theta)
         var y = this.points[0].y + (this.height / 2) * Math.sin(j) * Math.cos(theta) + (this.width / 2) * Math.cos(j) * Math.sin(theta)
@@ -132,7 +135,7 @@ Ellipse.prototype.draw = function (ctx, scale) {
     //ctx.restore();
 }
 
-Ellipse.prototype.svg = function () {
+svg() {
     //<Ellipse cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
     var svgstr = ""
     var data = svgstr.concat("<Ellipse",
@@ -146,7 +149,7 @@ Ellipse.prototype.svg = function () {
     return data
 }
 
-Ellipse.prototype.dxf = function () {
+dxf() {
     var dxfitem = ""
     var major_axis_x = (this.width > this.height ? this.width / 2 : 0);
     var major_axis_y = (this.width > this.height ? 0 : this.height / 2);
@@ -173,15 +176,15 @@ Ellipse.prototype.dxf = function () {
         "\n", "40", //RATIO BETWEEN MAJOR AND MINOR AXIS
         "\n", ratio,
         "\n", "41", //START ANGLE RADIANS
-        "\n", degrees2radians(0),
+        "\n", Utils.degrees2radians(0),
         "\n", "42", //END ANGLE RADIANS
-        "\n", degrees2radians(360)
+        "\n", Utils.degrees2radians(360)
     )
     console.log(" ellipse.js - DXF Data:" + data)
     return data
 }
 
-Ellipse.prototype.intersectPoints = function () {
+intersectPoints() {
 
     var A = this.points[1].x - this.points[0].x;
     var O = this.points[1].y - this.points[0].y;
@@ -196,7 +199,7 @@ Ellipse.prototype.intersectPoints = function () {
 
 }
 
-Ellipse.prototype.snaps = function (mousePoint, delta) {
+snaps(mousePoint, delta) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -215,17 +218,17 @@ Ellipse.prototype.snaps = function (mousePoint, delta) {
         var A = this.points[0].x - this.points[1].x;
         var O = this.points[0].y - this.points[1].y;
         var theta = Math.atan2(O, A) + Math.PI;
-        var j = degrees2radians(0);
+        var j = Utils.degrees2radians(0);
 
         var angle0 = new Point(this.points[0].x + (this.width / 2) * Math.cos(j) * Math.cos(theta) - (this.height / 2) * Math.sin(j) * Math.sin(theta),
             this.points[0].y + (this.height / 2) * Math.sin(j) * Math.cos(theta) + (this.width / 2) * Math.cos(j) * Math.sin(theta));
-        j = degrees2radians(90);
+        j = Utils.degrees2radians(90);
         var angle90 = new Point(this.points[0].x + (this.width / 2) * Math.cos(j) * Math.cos(theta) - (this.height / 2) * Math.sin(j) * Math.sin(theta),
             this.points[0].y + (this.height / 2) * Math.sin(j) * Math.cos(theta) + (this.width / 2) * Math.cos(j) * Math.sin(theta));
-        j = degrees2radians(180);
+        j = Utils.degrees2radians(180);
         var angle180 = new Point(this.points[0].x + (this.width / 2) * Math.cos(j) * Math.cos(theta) - (this.height / 2) * Math.sin(j) * Math.sin(theta),
             this.points[0].y + (this.height / 2) * Math.sin(j) * Math.cos(theta) + (this.width / 2) * Math.cos(j) * Math.sin(theta));
-        j = degrees2radians(270);
+        j = Utils.degrees2radians(270);
         var angle270 = new Point(this.points[0].x + (this.width / 2) * Math.cos(j) * Math.cos(theta) - (this.height / 2) * Math.sin(j) * Math.sin(theta),
             this.points[0].y + (this.height / 2) * Math.sin(j) * Math.cos(theta) + (this.width / 2) * Math.cos(j) * Math.sin(theta));
 
@@ -245,7 +248,7 @@ Ellipse.prototype.snaps = function (mousePoint, delta) {
     return snaps;
 }
 
-Ellipse.prototype.closestPoint = function (P) {
+closestPoint(P) {
     //find the closest point on the Ellipse
 
     var closest = new Point();
@@ -256,11 +259,11 @@ Ellipse.prototype.closestPoint = function (P) {
     var theta = Math.atan2(O, A) + Math.PI;
     for (var i = 0; i < 361; i++) {
 
-        var j = degrees2radians(i);
+        var j = Utils.degrees2radians(i);
         var x = this.points[0].x + (this.width / 2) * Math.cos(j) * Math.cos(theta) - (this.height / 2) * Math.sin(j) * Math.sin(theta);
         var y = this.points[0].y + (this.height / 2) * Math.sin(j) * Math.cos(theta) + (this.width / 2) * Math.cos(j) * Math.sin(theta)
 
-        var dist = distBetweenPoints(P.x, P.y, x, y);
+        var dist = Utils.distBetweenPoints(P.x, P.y, x, y);
         //console.log(" ellipse.js - Dist: " + dist);
         if (dist < distance) {
             distance = dist;
@@ -273,13 +276,13 @@ Ellipse.prototype.closestPoint = function (P) {
 }
 
 
-Ellipse.prototype.area = function () {
+area() {
     var area = Math.pow((Math.PI * this.radius), 2);
     return area
 }
 
 
-Ellipse.prototype.extremes = function () {
+extremes() {
 
     var x_values = [];
     var y_values = [];
@@ -290,7 +293,7 @@ Ellipse.prototype.extremes = function () {
 
     for (var i = 0; i < 361; i++) {
 
-        var j = degrees2radians(i);
+        var j = Utils.degrees2radians(i);
         x_values.push(this.points[0].x + (this.width / 2) * Math.cos(j) * Math.cos(theta) - (this.height / 2) * Math.sin(j) * Math.sin(theta));
         y_values.push(this.points[0].y + (this.height / 2) * Math.sin(j) * Math.cos(theta) + (this.width / 2) * Math.cos(j) * Math.sin(theta));
     }
@@ -305,7 +308,7 @@ Ellipse.prototype.extremes = function () {
 
 }
 
-Ellipse.prototype.within = function (selection_extremes) {
+within(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -326,7 +329,7 @@ Ellipse.prototype.within = function (selection_extremes) {
 
 }
 
-Ellipse.prototype.touched = function (selection_extremes) {
+touched(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -347,5 +350,5 @@ Ellipse.prototype.touched = function (selection_extremes) {
     } else {
         return false
     }
-
+}
 }

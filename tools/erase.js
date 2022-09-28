@@ -1,9 +1,5 @@
-commandManager.registerCommand({
-    command: "Erase",
-    shortcut: "E"
-});
-
-function Erase() {
+export class Erase { 
+    constructor(){
     //Define Properties
     this.type = "Erase";
     this.family = "Tools";
@@ -14,7 +10,12 @@ function Erase() {
     this.showPreview = false;
 }
 
-Erase.prototype.prompt = function (inputArray) {
+static register() {
+    var command = {command: "Erase", shortcut: "E"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -42,7 +43,7 @@ Erase.prototype.prompt = function (inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Erase.prototype.action = function (points, items) {
+action(points, items) {
 
     scene.selectionSet.sort();
 
@@ -52,4 +53,5 @@ Erase.prototype.action = function (points, items) {
         //console.log("Erase: " + scene.selectionSet[i]);
         items.splice((scene.selectionSet[i] - i), 1)
     }
+}
 }

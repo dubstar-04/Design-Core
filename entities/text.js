@@ -1,11 +1,9 @@
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "Text",
-    shortcut: "DT"
-});
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-function Text(data) //startX, startY, endX, endY)
-{
+export class Text {
+    constructor(data) {
     //Define Properties         //Associated DXF Value
     this.type = "Text";
     this.family = "Geometry";
@@ -96,7 +94,12 @@ function Text(data) //startX, startY, endX, endY)
     }
 }
 
-Text.prototype.prompt = function(inputArray) {
+static register() {
+    var command = {command: "Text", shortcut: "DT"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -131,7 +134,8 @@ Text.prototype.prompt = function(inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Text.prototype.width = function() {
+width() {
+    //TODO: How to access the canva element from here? Better way to do text width?
     var oldFont = canvas.context.font;
     canvas.context.font = this.height + "pt " + SM.getStyleByName(this.styleName).font.toString();
     var width = (canvas.context.measureText(this.string.toString()).width);
@@ -139,7 +143,7 @@ Text.prototype.width = function() {
     return width
 }
 
-Text.prototype.getHorizontalAlignment = function() {
+getHorizontalAlignment() {
 
     /* DXF Data
     0 = Left; 1= Center; 2 = Right
@@ -166,7 +170,7 @@ Text.prototype.getHorizontalAlignment = function() {
     }
 }
 
-Text.prototype.getVerticalAlignment = function() {
+getVerticalAlignment() {
 
     /* DXF Data
     Vertical text justification type (optional, default = 0): integer codes (not bit- coded):
@@ -188,14 +192,14 @@ Text.prototype.getVerticalAlignment = function() {
     }
 }
 
-Text.prototype.getBoundingRect = function() {
+getBoundingRect() {
 
     var rect = { width: Number(this.width()), height: Number(this.height), x: this.points[0].x, y: this.points[0].y }
         //console.log("text.js - Rect height: ", rect.height, " width: ", rect.width, " x: ", rect.x, " y: ", rect.y)
     return rect
 }
 
-Text.prototype.draw = function(ctx, scale) {
+draw(ctx, scale) {
 
     var rect = this.getBoundingRect()
 
@@ -227,9 +231,9 @@ Text.prototype.draw = function(ctx, scale) {
     }
 
     if (this.backwards || this.upsideDown) {
-        ctx.rotate(degrees2radians(this.rotation));
+        ctx.rotate(Utils.degrees2radians(this.rotation));
     } else {
-        ctx.rotate(degrees2radians(-this.rotation));
+        ctx.rotate(Utils.degrees2radians(-this.rotation));
     }
 
     ctx.fillText(this.string, 0, 0)
@@ -250,13 +254,13 @@ Text.prototype.draw = function(ctx, scale) {
     */
 }
 
-Text.prototype.SVG = function(file) {
+SVG(file) {
     //<Text x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
     //"<Text x1=" + this.startX  + "y1=" + this.startY + "x2=" + this.endX + "y2=" + this.endY + "style=" + this.colour + ";stroke-width:" + this.TextWidth + "/>"
 }
 
 
-Text.prototype.dxf = function() {
+dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(
             "0",
@@ -290,7 +294,7 @@ Text.prototype.dxf = function() {
     return data
 }
 
-Text.prototype.snaps = function(mousePoint, delta) {
+snaps(mousePoint, delta) {
 
     var rect = this.getBoundingRect()
 
@@ -307,14 +311,14 @@ Text.prototype.snaps = function(mousePoint, delta) {
     return snaps;
 }
 
-Text.prototype.closestPoint = function(P) {
+closestPoint(P) {
 
     var rect = this.getBoundingRect()
     var botLeft = new Point(rect.x, rect.y);
     var topRight = new Point(rect.x + rect.width, rect.y + rect.height);
     var mid = new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
 
-    var distance = distBetweenPoints(P.x, P.y, mid.x, mid.y)
+    var distance = Utils.distBetweenPoints(P.x, P.y, mid.x, mid.y)
 
     // if P is inside the bounding box return distance 0  
     if (P.x > botLeft.x &&
@@ -328,7 +332,7 @@ Text.prototype.closestPoint = function(P) {
     return [mid, distance]
 }
 
-Text.prototype.extremes = function() {
+extremes() {
     var rect = this.getBoundingRect()
     var xmin = rect.x;
     var xmax = rect.x + rect.width;
@@ -338,7 +342,7 @@ Text.prototype.extremes = function() {
     return [xmin, xmax, ymin, ymax]
 }
 
-Text.prototype.within = function(selection_extremes) {
+within(selection_extremes) {
 
     // determin if this entities is within a the window specified by selection_extremes
     var extremePoints = this.extremes()
@@ -355,7 +359,7 @@ Text.prototype.within = function(selection_extremes) {
 
 }
 
-Text.prototype.intersectPoints = function() {
+intersectPoints() {
 
     var rect = this.getBoundingRect()
 
@@ -368,7 +372,7 @@ Text.prototype.intersectPoints = function() {
     }
 }
 
-Text.prototype.touched = function(selection_extremes) {
+touched(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -390,5 +394,5 @@ Text.prototype.touched = function(selection_extremes) {
     }
     //no intersection found. return false
     return false
-
+}
 }

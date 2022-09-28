@@ -1,6 +1,8 @@
-commandManager.registerCommand({command: "Copy", shortcut: "CO"});
-function Copy()
-{
+import { Utils } from '../lib/utils.js'
+
+export class Copy { 
+    constructor(){
+
     //Define Properties
     this.type = "Copy";
     this.family = "Tools";
@@ -11,7 +13,12 @@ function Copy()
     this.showPreview = true;
 }
 
-Copy.prototype.prompt = function (inputArray) {
+static register() {
+    var command = {command: "Copy", shortcut: "CO"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -45,7 +52,7 @@ Copy.prototype.prompt = function (inputArray) {
     return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-Copy.prototype.action = function(points, items){
+action = function(points, items){
 
     //console.log("Copy Stuff")
 
@@ -55,7 +62,7 @@ Copy.prototype.action = function(points, items){
     for (var i = 0; i < scene.selectionSet.length; i++){
         //console.log("selectionset.type: " + selectionSet[i].type);
 
-        var copyofitem = cloneObject(scene.items[scene.selectionSet[i]]);
+        var copyofitem = Utils.cloneObject(scene.items[scene.selectionSet[i]]);
 
         for (var j = 0; j < copyofitem.points.length; j++){
             copyofitem.points[j].x = scene.items[scene.selectionSet[i]].points[j].x + xDelta;
@@ -67,7 +74,7 @@ Copy.prototype.action = function(points, items){
 
 }
 
-Copy.prototype.preview = function(points, selectedItems, items){
+preview = function(points, selectedItems, items){
 
     //console.log("Copy Stuff")
 
@@ -81,6 +88,6 @@ Copy.prototype.preview = function(points, selectedItems, items){
             scene.selectedItems[i].points[j].y = scene.items[scene.selectionSet[i]].points[j].y + yDelta;
         }
     }
-
+}
 }
 

@@ -1,11 +1,9 @@
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "Arc",
-    shortcut: "A"
-});
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-function Arc(data) //centreX, centreY, endX, endY)
-{
+export class Arc {
+    constructor(data) {
     //Define Properties         //Associated DXF Value
     this.type = "Arc";
     this.family = "Geometry";
@@ -42,16 +40,21 @@ function Arc(data) //centreX, centreY, endX, endY)
     }
 }
 
-Arc.prototype.startAngle = function () {
+static register() {
+    var command = {command: "Arc", shortcut: "A"};
+    return command
+}
+
+startAngle() {
     return this.points[0].angle(this.points[1])
 }
 
-Arc.prototype.endAngle = function () {
+endAngle() {
     return this.points[0].angle(this.points[2])
 }
 
 
-Arc.prototype.direction = function () {
+direction() {
 
     var start = this.startAngle();
     var end = this.endAngle();
@@ -71,7 +74,7 @@ Arc.prototype.direction = function () {
 
 }
 
-Arc.prototype.prompt = function (inputArray) {
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -105,7 +108,7 @@ Arc.prototype.prompt = function (inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Arc.prototype.draw = function (ctx, scale) {
+draw(ctx, scale) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -126,7 +129,7 @@ Arc.prototype.draw = function (ctx, scale) {
     ctx.stroke()
 }
 
-Arc.prototype.properties = function () {
+properties() {
 
     return { //type: this.type,
         colour: this.colour,
@@ -137,7 +140,7 @@ Arc.prototype.properties = function () {
 
 }
 
-Arc.prototype.svg = function () {
+svg() {
     //<Arc cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
     var svgstr = ""
     var data = svgstr.concat("<Arc",
@@ -153,7 +156,7 @@ Arc.prototype.svg = function () {
 
 
 
-Arc.prototype.dxf = function () {
+dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(
         "0",
@@ -169,19 +172,19 @@ Arc.prototype.dxf = function () {
         "\n", "40",
         "\n", this.radius, //Radius
         "\n", "50", //START ANGLE
-        "\n", radians2degrees(this.startAngle()), //Radians
+        "\n", Utils.radians2degrees(this.startAngle()), //Radians
         "\n", "51", //END ANGLE
-        "\n", radians2degrees(this.endAngle()) //Radians
+        "\n", Utils.radians2degrees(this.endAngle()) //Radians
     )
     console.log(" arc.js - DXF Data:" + data)
     return data
 }
 
-Arc.prototype.trim = function (points) {
+trim(points) {
     console.log("arc.js - Points:", points.length)
 }
 
-Arc.prototype.intersectPoints = function () {
+intersectPoints() {
 
     return {
         centre: this.points[0],
@@ -192,7 +195,7 @@ Arc.prototype.intersectPoints = function () {
 
 }
 
-Arc.prototype.snaps = function (mousePoint, delta) {
+snaps(mousePoint, delta) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -229,7 +232,7 @@ Arc.prototype.snaps = function (mousePoint, delta) {
     return snaps;
 }
 
-Arc.prototype.closestPoint = function (P) {
+closestPoint(P) {
     //find the closest point on the Arc
     var length = this.points[0].distance(P); //distBetweenPoints(this.points[0].x, this.points[0].y, P.x, P.y)
     var Cx = this.points[0].x + this.radius * (P.x - this.points[0].x) / length
@@ -250,25 +253,25 @@ Arc.prototype.closestPoint = function (P) {
 
 }
 
-Arc.prototype.diameter = function () {
+diameter() {
     var diameter = 2 * this.radius
     return diameter
 }
 
 
-Arc.prototype.area = function () {
+area() {
     var area = Math.pow((Math.PI * this.radius), 2); //not valid for an arc
     return area
 }
 
-Arc.prototype.extremes = function () {
+extremes() {
 
     var x_values = [];
     var y_values = [];
 
     //var midAngle = (this.endAngle() - this.startAngle()) / 2 + this.startAngle();
 
-    //console.log(" arc.js - [info] (Arc.prototype.extremes) radius: " + this.radius + " startAngle: " + this.startAngle() + " endAngle: " + this.endAngle())// + " midAngle: " + midAngle);
+    //console.log(" arc.js - [info] (extremes) radius: " + this.radius + " startAngle: " + this.startAngle() + " endAngle: " + this.endAngle())// + " midAngle: " + midAngle);
 
     x_values.push(this.radius * Math.cos(this.startAngle()) + this.points[0].x);
     y_values.push(this.radius * Math.sin(this.startAngle()) + this.points[0].y);
@@ -290,7 +293,7 @@ Arc.prototype.extremes = function () {
 
 }
 
-Arc.prototype.within = function (selection_extremes) {
+within(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -311,7 +314,7 @@ Arc.prototype.within = function (selection_extremes) {
 
 }
 
-Arc.prototype.touched = function (selection_extremes) {
+touched(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -332,5 +335,5 @@ Arc.prototype.touched = function (selection_extremes) {
     } else {
         return false
     }
-
+  }
 }

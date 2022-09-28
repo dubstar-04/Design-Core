@@ -1,4 +1,9 @@
-function Insert(data) {
+import { Point } from './point.js'
+//import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
+
+export class Insert {
+    constructor(data) {
     //Define Properties
     this.type = "Insert";
     this.block = "";
@@ -27,7 +32,12 @@ function Insert(data) {
     }
 }
 
-Insert.prototype.dxf = function() {
+static register() {
+    var command = {command: "Insert"};
+    return command
+}
+
+dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(
         "0",
@@ -47,18 +57,18 @@ Insert.prototype.dxf = function() {
     return data
 }
 
-Insert.prototype.draw = function(ctx, scale) {
+draw(ctx, scale) {
 
     return
 }
 
-Insert.prototype.snaps = function(mousePoint, delta) {
+snaps(mousePoint, delta) {
 
     snaps = [];
     return snaps;
 }
 
-Insert.prototype.within = function(selection_extremes) {
+within(selection_extremes) {
 
     // determin if this entities is within a the window specified by selection_extremes
     var extremePoints = this.extremes()
@@ -75,7 +85,7 @@ Insert.prototype.within = function(selection_extremes) {
 
 }
 
-Insert.prototype.intersectPoints = function() {
+intersectPoints() {
 
     return {
         start: this.points[0],
@@ -83,7 +93,7 @@ Insert.prototype.intersectPoints = function() {
     }
 }
 
-Insert.prototype.closestPoint = function(P) {
+closestPoint(P) {
 
     var distance = P.distance(this.points[0]);
     var minPnt = this.points[0];
@@ -91,11 +101,11 @@ Insert.prototype.closestPoint = function(P) {
     return [minPnt, distance]
 }
 
-Insert.prototype.extremes = function() {
+extremes() {
     return []
 }
 
-Insert.prototype.touched = function(selection_extremes) {
+touched(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -117,5 +127,5 @@ Insert.prototype.touched = function(selection_extremes) {
     }
     //no intersection found. return false
     return false
-
+}
 }

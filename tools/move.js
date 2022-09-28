@@ -1,6 +1,5 @@
-commandManager.registerCommand({ command: "Move", shortcut: "M" });
-
-function Move(items) {
+export class Move { 
+    constructor(){
     //Define Properties
     this.type = "Move";
     this.family = "Tools";
@@ -11,8 +10,12 @@ function Move(items) {
     this.showPreview = true;
 }
 
+static register() {
+    var command = {command: "Move", shortcut: "M"};
+    return command
+}
 
-Move.prototype.prompt = function(inputArray) {
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -48,9 +51,9 @@ Move.prototype.prompt = function(inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Move.prototype.action = function(points, items) {
+action(points, items) {
 
-    console.log("move.js: Move.prototype.action")
+    console.log("move.js: action")
     console.log("move.js: points length: " + points.length)
     console.log("move.js: items length: " + items.length)
 
@@ -69,9 +72,9 @@ Move.prototype.action = function(points, items) {
 
 }
 
-Move.prototype.preview = function(points, selectedItems, items) {
+preview(points, selectedItems, items) {
 
-    //console.log("move.js: Move.prototype.preview")
+    //console.log("move.js: preview")
     //console.log("move.js: points length: " + points.length)
     //console.log("move.js: selectedItems length: " + selectedItems.length)
     //console.log("move.js: items length: " + items.length)
@@ -86,5 +89,5 @@ Move.prototype.preview = function(points, selectedItems, items) {
             selectedItems[i].points[j].y = items[scene.selectionSet[i]].points[j].y + yDelta;
         }
     }
-
+  }
 }

@@ -1,6 +1,5 @@
-commandManager.registerCommand({command: "Rotate", shortcut: "RO"});
-function Rotate(items)
-{
+export class Rotate { 
+    constructor(){
     //Define Properties
     this.type = "Rotate";
     this.family = "Tools";
@@ -11,7 +10,12 @@ function Rotate(items)
     this.showPreview = true;
 }
 
-Rotate.prototype.prompt = function (inputArray) {
+static register() {
+    var command = {command: "Rotate", shortcut: "RO"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -49,7 +53,7 @@ Rotate.prototype.prompt = function (inputArray) {
     return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-Rotate.prototype.preview = function(points, selectedItems, items){
+preview = function(points, selectedItems, items){
 
     if (points.length > 2){
 
@@ -65,9 +69,9 @@ Rotate.prototype.preview = function(points, selectedItems, items){
         var theta = ang2 - ang1;
 
         for (var i = 0; i < scene.selectionSet.length; i++){
-            //console.log( "(Rotate.prototype.preview) item: " + selectedItems[i].type + " Points length: " + selectedItems[i].points.length);
+            //console.log( "(preview) item: " + selectedItems[i].type + " Points length: " + selectedItems[i].points.length);
             for (var j = 0; j < selectedItems[i].points.length; j++){
-               //console.log( "(Rotate.prototype.preview) point: " + j + " length: " + selectedItems[i].points.length)
+               //console.log( "(preview) point: " + j + " length: " + selectedItems[i].points.length)
                 var x = points[0].x + (items[scene.selectionSet[i]].points[j].x - points[0].x)*Math.cos(theta) - (items[scene.selectionSet[i]].points[j].y-points[0].y)*Math.sin(theta);
                 var y = points[0].y + (items[scene.selectionSet[i]].points[j].x - points[0].x)*Math.sin(theta) + (items[scene.selectionSet[i]].points[j].y-points[0].y)*Math.cos(theta);
 
@@ -79,7 +83,7 @@ Rotate.prototype.preview = function(points, selectedItems, items){
 }
 
 
-Rotate.prototype.action = function(points, items){
+action = function(points, items){
 
     console.log("Rotate Stuff")
 
@@ -107,4 +111,5 @@ Rotate.prototype.action = function(points, items){
             items[scene.selectionSet[i]].points[j].y = y;
         }
     }
+  }
 }

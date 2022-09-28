@@ -1,10 +1,9 @@
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "Polyline",
-    shortcut: "PL"
-});
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-function Polyline(data) {
+export class Polyline {
+    constructor(data) {
     //Define Properties         //Associated DXF Value
     this.type = "Polyline";
     this.family = "Geometry";
@@ -37,7 +36,12 @@ function Polyline(data) {
     }
 }
 
-Polyline.prototype.prompt = function (inputArray) {
+static register() {
+    var command = {command: "Polyline", shortcut: "PL"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -70,7 +74,7 @@ Polyline.prototype.prompt = function (inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Polyline.prototype.draw = function (ctx, scale) {
+draw(ctx, scale) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -94,7 +98,7 @@ Polyline.prototype.draw = function (ctx, scale) {
     ctx.stroke()
 }
 
-Polyline.prototype.svg = function () {
+svg() {
     //<Polyline x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
     //<Polyline x1="20" y1="100" x2="100" y2="100" stroke-width="2" stroke="black"/>
     var quote = "\""
@@ -110,7 +114,7 @@ Polyline.prototype.svg = function () {
     return data
 }
 
-Polyline.prototype.dxf = function () {
+dxf() {
 
     var closed = (this.points[0].x === this.points[this.points.length - 1].x && this.points[0].y === this.points[this.points.length - 1].y);
     var vertices = this.vertices();
@@ -146,7 +150,7 @@ Polyline.prototype.dxf = function () {
     return data
 }
 
-Polyline.prototype.intersectPoints = function () {
+intersectPoints() {
 
     return {
         points: this.points
@@ -154,7 +158,7 @@ Polyline.prototype.intersectPoints = function () {
 
 }
 
-Polyline.prototype.vertices = function () {
+vertices() {
 
     var vertices_data = "";
     for (var i = 0; i < this.points.length; i++) {
@@ -184,9 +188,9 @@ Polyline.prototype.vertices = function () {
     return vertices_data;
 }
 
-Polyline.prototype.length = function () {}
+length() {}
 
-Polyline.prototype.midPoint = function (x, x1, y, y1) {
+midPoint(x, x1, y, y1) {
 
     var midX = (x + x1) / 2
     var midY = (y + y1) / 2
@@ -196,7 +200,7 @@ Polyline.prototype.midPoint = function (x, x1, y, y1) {
 }
 
 
-Polyline.prototype.snaps = function (mousePoint, delta) {
+snaps(mousePoint, delta) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -234,7 +238,7 @@ Polyline.prototype.snaps = function (mousePoint, delta) {
     return snaps;
 }
 
-Polyline.prototype.closestPoint = function (P) {
+closestPoint(P) {
 
     var distance = Infinity;
     var minPnt = P;
@@ -246,7 +250,7 @@ Polyline.prototype.closestPoint = function (P) {
         var pnt = P.perpendicular(A, B);
     
         if (pnt !== null){
-            pntDist = distBetweenPoints(P.x, P.y, pnt.x, pnt.y)
+            var pntDist = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y)
 
             if(pntDist < distance){
                 distance = pntDist;
@@ -259,7 +263,7 @@ Polyline.prototype.closestPoint = function (P) {
     return [minPnt, distance]
 }
 
-Polyline.prototype.extremes = function () {
+extremes() {
 
     var x_values = [];
     var y_values = [];
@@ -277,7 +281,7 @@ Polyline.prototype.extremes = function () {
     return [xmin, xmax, ymin, ymax]
 }
 
-Polyline.prototype.within = function (selection_extremes) {
+within(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -297,7 +301,7 @@ Polyline.prototype.within = function (selection_extremes) {
     }
 }
 
-Polyline.prototype.touched = function (selection_extremes) {
+touched(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -322,4 +326,5 @@ Polyline.prototype.touched = function (selection_extremes) {
     } else {
         return false
     }
+}
 }

@@ -1,50 +1,55 @@
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "Line",
-    shortcut: "L"
-});
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-function Line(data) {
-    //Define Properties         //Associated DXF Value
-    this.type = "Line";
-    this.family = "Geometry";
-    this.minPoints = 2;
-    this.showPreview = true; //show preview of item as its being created
-    //this.limitPoints = false;
-    //this.allowMultiple = true;
-    this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
-    this.points = [];
-    this.lineWidth = 2; //Thickness
-    this.colour = "BYLAYER";
-    this.layer = "0";
-    this.alpha = 1.0 //Transparancy
-        //this.lineType
-        //this.LinetypeScale
-        //this.PlotStyle
-        //this.LineWeight
+export class Line {
+    constructor(data) { 
+        //Define Properties         //Associated DXF Value
+        this.type = "Line";
+        this.family = "Geometry";
+        this.minPoints = 2;
+        this.showPreview = true; //show preview of item as its being created
+        //this.limitPoints = false;
+        //this.allowMultiple = true;
+        this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
+        this.points = [];
+        this.lineWidth = 2; //Thickness
+        this.colour = "BYLAYER";
+        this.layer = "0";
+        this.alpha = 1.0 //Transparancy
+            //this.lineType
+            //this.LinetypeScale
+            //this.PlotStyle
+            //this.LineWeight
 
-    if (data) {
+        if (data) {
 
-        //console.log(data.points, data.colour, data.layer)
+            //console.log(data.points, data.colour, data.layer)
 
-        var startPoint = new Point(data.points[data.points.length - 2].x, data.points[data.points.length - 2].y);
-        var endPoint = new Point(data.points[data.points.length - 1].x, data.points[data.points.length - 1].y);
+            var startPoint = new Point(data.points[data.points.length - 2].x, data.points[data.points.length - 2].y);
+            var endPoint = new Point(data.points[data.points.length - 1].x, data.points[data.points.length - 1].y);
 
-        this.points.push(startPoint);
-        this.points.push(endPoint);
-        //this.points = [points[points.length-2], points[points.length-1]];
+            this.points.push(startPoint);
+            this.points.push(endPoint);
+            //this.points = [points[points.length-2], points[points.length-1]];
 
-        if (data.colour) {
-            this.colour = data.colour;
-        }
+            if (data.colour) {
+                this.colour = data.colour;
+            }
 
-        if (data.layer) {
-            this.layer = data.layer;
+            if (data.layer) {
+                this.layer = data.layer;
+            }
         }
     }
+
+
+static register() {
+    var command = {command: "Line", shortcut: "L"};
+    return command
 }
 
-Line.prototype.prompt = function(inputArray) {
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -80,16 +85,16 @@ Line.prototype.prompt = function(inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Line.prototype.draw = function(ctx, scale) {
+draw(ctx, scale, designEngine) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = LM.getLayerByName(this.layer).colour
+        colour = designEngine.LM.getLayerByName(this.layer).colour
     }
 
     ctx.strokeStyle = colour;
@@ -100,7 +105,7 @@ Line.prototype.draw = function(ctx, scale) {
     ctx.stroke()
 }
 
-Line.prototype.svg = function() {
+svg() {
     //<line x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
     //<line x1="20" y1="100" x2="100" y2="100" stroke-width="2" stroke="black"/>
     var quote = "\""
@@ -116,7 +121,7 @@ Line.prototype.svg = function() {
     return data
 }
 
-Line.prototype.dxf = function() {
+dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(
         "0",
@@ -142,7 +147,7 @@ Line.prototype.dxf = function() {
     return data
 }
 
-Line.prototype.trim = function(points) {
+trim(points) {
 
     console.log("line.js - Points:", points.length)
 
@@ -162,8 +167,9 @@ Line.prototype.trim = function(points) {
 
         for (var i = 0; i < line.points.length; i++) {
             for (var j = 0; j < intersectPnts.length; j++) {
-                if (betweenPoints(mouse, [intersectPnts[j], line.points[i]], false)) {
-                    console.log("Trimmed Length:", Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100, "Line length: ", Math.round(line.points[0].distance(line.points[1]) * 100) / 100)
+                //TODO: Pass in the mouse location rather than needing a ref to designEngine
+                if (betweenPoints(designEngine.mouse, [intersectPnts[j], line.points[i]], false)) {
+                    //console.log("Trimmed Length:", Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100, "Line length: ", Math.round(line.points[0].distance(line.points[1]) * 100) / 100)
                     if (Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100 < Math.round(line.points[0].distance(line.points[1]) * 100) / 100) {
                         originPoint = i;
                         validPoints.push(j)
@@ -257,13 +263,14 @@ Line.prototype.trim = function(points) {
 
 }
 
-Line.prototype.extend = function(points) {
+extend(points) {
 
     var originPoint;
     var destinationPoint;
 
     //Find which end is closer to the mouse
-    if (this.points[0].distance(mouse) < this.points[1].distance(mouse)) {
+    //ToDo: Pass the mouse location in rather than needing a ref to designEngine.
+    if (this.points[0].distance(designEngine.mouse) < this.points[1].distance(designEngine.mouse)) {
         originPoint = 0;
     } else {
         originPoint = 1;
@@ -311,7 +318,7 @@ Line.prototype.extend = function(points) {
 
 }
 
-Line.prototype.intersectPoints = function() {
+intersectPoints() {
 
     return {
         start: this.points[0],
@@ -320,7 +327,7 @@ Line.prototype.intersectPoints = function() {
 
 }
 
-Line.prototype.length = function() {
+length() {
     var A = (this.points[0].x - this.points[1].x)
     var B = (this.points[0].y - this.points[1].y)
     var ASQ = Math.pow(A, 2)
@@ -330,7 +337,7 @@ Line.prototype.length = function() {
     return dist
 }
 
-Line.prototype.midPoint = function() {
+midPoint() {
     //var midX = (this.points[0].x + this.points[1].x) / 2
     //var midY = (this.points[0].y + this.points[1].y) / 2
 
@@ -339,12 +346,12 @@ Line.prototype.midPoint = function() {
     return midPoint;
 }
 
-Line.prototype.angle = function() {
+angle() {
     var angle = 180;
     return angle
 }
 
-Line.prototype.snaps = function(mousePoint, delta) {
+snaps(mousePoint, delta) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -374,7 +381,7 @@ Line.prototype.snaps = function(mousePoint, delta) {
     return snaps;
 }
 
-Line.prototype.closestPoint = function(P) {
+closestPoint(P) {
 
     //find the closest point on the straight line
     var A = new Point(this.points[0].x, this.points[0].y);
@@ -385,13 +392,13 @@ Line.prototype.closestPoint = function(P) {
         return [P, Infinity]
     }
 
-    var distance = distBetweenPoints(P.x, P.y, pnt.x, pnt.y)
+    var distance = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y)
         // console.log(distance);
     return [pnt, distance]
 
 }
 
-Line.prototype.extremes = function() {
+extremes() {
 
     var xmin = Math.min(this.points[0].x, this.points[1].x);
     var xmax = Math.max(this.points[0].x, this.points[1].x);
@@ -402,7 +409,7 @@ Line.prototype.extremes = function() {
 
 }
 
-Line.prototype.within = function(selection_extremes) {
+within(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -423,7 +430,7 @@ Line.prototype.within = function(selection_extremes) {
 
 }
 
-Line.prototype.touched = function(selection_extremes) {
+touched(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -448,5 +455,5 @@ Line.prototype.touched = function(selection_extremes) {
     } else {
         return false
     }
-
+  }
 }

@@ -1,6 +1,6 @@
-commandManager.registerCommand({command: "Identify", shortcut: "ID"});
-function Identify()
-{
+export class Identify { 
+  constructor(){
+
     //Define Properties
     this.type = "Identify";
     this.family = "Tools";
@@ -11,7 +11,12 @@ function Identify()
     this.showPreview = false;
 }
 
-Identify.prototype.prompt = function(inputArray) {
+static register() {
+  var command = {command: "Identify", shortcut: "ID"};
+  return command
+}
+
+prompt(inputArray) {
   var num = inputArray.length;
   var expectedType = [];
   var reset = false;
@@ -36,14 +41,15 @@ Identify.prototype.prompt = function(inputArray) {
   return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Identify.prototype.preview = function(num) {
+preview(num) {
 //no preview required
 return;
 
 }
 
-Identify.prototype.action = function(points, items){
+action(points, items){
 	
   var id = (" X: " + points[0].x.toFixed(1) + " Y:" + points[0].y.toFixed(1));		
 	notify(id)
+}
 }

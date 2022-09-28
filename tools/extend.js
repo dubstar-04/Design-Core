@@ -1,6 +1,8 @@
-commandManager.registerCommand({command: "Extend", shortcut: "EX"});
-function Extend()
-{
+import { Intersection } from '../lib/intersect.js'
+
+export class Extend { 
+    constructor(){
+
     //Define Properties
     this.type = "Extend";
     this.family = "Tools";
@@ -11,7 +13,12 @@ function Extend()
     this.showPreview = false;
 }
 
-Extend.prototype.prompt = function (inputArray) {
+static register() {
+    var command = {command: "Extend", shortcut: "EX"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -47,9 +54,9 @@ Extend.prototype.prompt = function (inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Extend.prototype.action = function(){
+action(){
 
-    console.log("Extend.js: Extend.prototype.action")
+    console.log("Extend.js: action")
 
     console.log("Extend.js: scene.selectionSet length:", scene.selectionSet.length)
 
@@ -86,9 +93,8 @@ Extend.prototype.action = function(){
 
 }
 
-Extend.prototype.preview = function(){
-
+preview(){
    // console.log("extend.js - preview")
-
+}
 }
 

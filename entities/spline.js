@@ -1,13 +1,10 @@
 //https://github.com/Tagussan/BSpline/blob/master/BSpline.js
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "",
-    shortcut: "SP"
-});
-
-function Spline(data) //startX, startY, endX, endY)
-{
+export class Spline {
+    constructor(data) {
     //Define Properties         //Associated DXF Value
     this.type = "Spline";
     this.family = "Geometry";
@@ -59,8 +56,13 @@ function Spline(data) //startX, startY, endX, endY)
     }
 }
 
+static register() {
+    var command = {command: "Spline", shortcut: "SP"};
+    return command
+}
 
-Spline.prototype.prompt = function (inputArray) {
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -88,7 +90,7 @@ Spline.prototype.prompt = function (inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Spline.prototype.draw = function (ctx, scale) {
+draw(ctx, scale) {
 
     if (this.points.length > 2) {
 
@@ -138,7 +140,7 @@ Spline.prototype.draw = function (ctx, scale) {
 }
 }
 
-Spline.prototype.svg = function () {
+svg() {
     //<Spline x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
     //<Spline x1="20" y1="100" x2="100" y2="100" stroke-width="2" stroke="black"/>
     var quote = "\""
@@ -154,7 +156,7 @@ Spline.prototype.svg = function () {
     return data
 }
 
-Spline.prototype.dxf = function () {
+dxf() {
 
     var closed = (this.points[0].x === this.points[this.points.length - 1].x && this.points[0].y === this.points[this.points.length - 1].y);
     var control_points = this.controlPoints();
@@ -193,7 +195,7 @@ Spline.prototype.dxf = function () {
     return data
 }
 
-Spline.prototype.controlPoints = function () {
+controlPoints() {
 
     var control_point_data = "";
     for (var i = 0; i < this.points.length; i++) {
@@ -213,9 +215,9 @@ Spline.prototype.controlPoints = function () {
     return control_point_data;
 }
 
-Spline.prototype.length = function () {}
+length() {}
 
-Spline.prototype.midPoint = function (x, x1, y, y1) {
+midPoint(x, x1, y, y1) {
 
     var midX = (x + x1) / 2
     var midY = (y + y1) / 2
@@ -227,7 +229,7 @@ Spline.prototype.midPoint = function (x, x1, y, y1) {
 }
 
 
-Spline.prototype.snaps = function (mousePoint, delta) {
+snaps(mousePoint, delta) {
 
     var snaps = [];
 
@@ -260,7 +262,7 @@ Spline.prototype.snaps = function (mousePoint, delta) {
     return snaps;
 }
 
-Spline.prototype.closestPoint = function (P, A, B) {
+closestPoint(P, A, B) {
     //find the closest point on the straight line
     var APx = P.x - A.x;
     var APy = P.y - A.y;
@@ -281,14 +283,14 @@ Spline.prototype.closestPoint = function (P, A, B) {
     }
 
     var closest = new Point(x, y);
-    var distance = distBetweenPoints(P.x, P.y, x, y)
+    var distance = Utils.distBetweenPoints(P.x, P.y, x, y)
         //console.log(distance);
 
     return [closest, distance]
 
 }
 
-Spline.prototype.extremes = function () {
+extremes() {
 
     var x_values;
     var y_values;
@@ -308,7 +310,7 @@ Spline.prototype.extremes = function () {
 }
 
 
-Spline.prototype.seqAt = function (dim) {
+seqAt(dim) {
     var points = this.points;
     var margin = this.degree + 1;
 
@@ -324,7 +326,7 @@ Spline.prototype.seqAt = function (dim) {
 
 };
 
-Spline.prototype.basisDeg2 = function (x) {
+basisDeg2(x) {
     if (-0.5 <= x && x < 0.5) {
         return 0.75 - x * x;
     } else if (0.5 <= x && x <= 1.5) {
@@ -336,7 +338,7 @@ Spline.prototype.basisDeg2 = function (x) {
     }
 };
 
-Spline.prototype.basisDeg3 = function (x) {
+basisDeg3(x) {
     if (-1 <= x && x < 0) {
         return 2.0 / 3.0 + (-1.0 - x / 2.0) * x * x;
     } else if (1 <= x && x <= 2) {
@@ -350,7 +352,7 @@ Spline.prototype.basisDeg3 = function (x) {
     }
 };
 
-Spline.prototype.basisDeg4 = function (x) {
+basisDeg4(x) {
     if (-1.5 <= x && x < -0.5) {
         return 55.0 / 96.0 + x * (-(5.0 / 24.0) + x * (-(5.0 / 4.0) + (-(5.0 / 6.0) - x / 6.0) * x));
     } else if (0.5 <= x && x < 1.5) {
@@ -366,7 +368,7 @@ Spline.prototype.basisDeg4 = function (x) {
     }
 };
 
-Spline.prototype.basisDeg5 = function (x) {
+basisDeg5(x) {
     if (-2 <= x && x < -1) {
         return 17.0 / 40.0 + x * (-(5.0 / 8.0) + x * (-(7.0 / 4.0) + x * (-(5.0 / 4.0) + (-(3.0 / 8.0) - x / 24.0) * x)));
     } else if (0 <= x && x < 1) {
@@ -384,7 +386,7 @@ Spline.prototype.basisDeg5 = function (x) {
     }
 };
 
-Spline.prototype.getInterpol = function (seq, t) {
+getInterpol(seq, t) {
     var f = this.baseFunc;
     var rangeInt = this.baseFuncRangeInt;
     var tInt = Math.floor(t);
@@ -395,7 +397,7 @@ Spline.prototype.getInterpol = function (seq, t) {
     return result;
 };
 
-Spline.prototype.calcAt = function (t) {
+calcAt(t) {
     t = t * ((this.degree + 1) * 2 + this.points.length); //t must be in [0,1]
     if (this.dimension === 2) {
         return [this.getInterpol(this.seqAt(0), t), this.getInterpol(this.seqAt(1), t)];
@@ -411,12 +413,13 @@ Spline.prototype.calcAt = function (t) {
 };
 
 
-Spline.prototype.within = function (selection_extremes) {
+within(selection_extremes) {
 
     return false;
 }
 
-Spline.prototype.touched = function (selection_extremes) {
+touched(selection_extremes) {
 
     return false;
+}
 }

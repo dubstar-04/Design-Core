@@ -1,11 +1,9 @@
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "Rectangle",
-    shortcut: "REC"
-});
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-function Rectangle(data) //startX, startY, endX, endY)
-{
+export class Rectangle {
+    constructor(data) {
     //Define Properties         //Associated DXF Value
     this.type = "Rectangle";
     this.family = "Geometry";
@@ -51,7 +49,12 @@ function Rectangle(data) //startX, startY, endX, endY)
     }
 }
 
-Rectangle.prototype.prompt = function (inputArray) {
+static register() {
+    var command = {command: "Rectangle", shortcut: "REC"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -79,7 +82,7 @@ Rectangle.prototype.prompt = function (inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Rectangle.prototype.draw = function (ctx, scale) {
+draw(ctx, scale) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -102,7 +105,7 @@ Rectangle.prototype.draw = function (ctx, scale) {
     ctx.stroke()
 }
 
-Rectangle.prototype.svg = function () {
+svg() {
     //<Rectangle x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
     //<Rectangle x1="20" y1="100" x2="100" y2="100" stroke-width="2" stroke="black"/>
     var quote = "\""
@@ -118,7 +121,7 @@ Rectangle.prototype.svg = function () {
     return data
 }
 
-Rectangle.prototype.dxf = function () {
+dxf() {
 
     //Save the rectangle as a polyline as there is no rectangle DXF code
     var closed = (this.points[0].x === this.points[this.points.length - 1].x && this.points[0].y === this.points[this.points.length - 1].y);
@@ -155,7 +158,7 @@ Rectangle.prototype.dxf = function () {
     return data
 }
 
-Rectangle.prototype.vertices = function () {
+vertices() {
  
     var vertices_data = "";
     for (var i = 0; i < this.points.length; i++) {
@@ -185,7 +188,7 @@ Rectangle.prototype.vertices = function () {
     return vertices_data;
 }
 
-Rectangle.prototype.intersectPoints = function () {
+intersectPoints() {
 
     return {
         start: this.points[0],
@@ -194,7 +197,7 @@ Rectangle.prototype.intersectPoints = function () {
 }
 
 
-Rectangle.prototype.midPoint = function (x, x1, y, y1) {
+midPoint(x, x1, y, y1) {
 
     var midX = (x + x1) / 2
     var midY = (y + y1) / 2
@@ -205,7 +208,7 @@ Rectangle.prototype.midPoint = function (x, x1, y, y1) {
 }
 
 
-Rectangle.prototype.snaps = function (mousePoint, delta) {
+snaps(mousePoint, delta) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -243,7 +246,7 @@ Rectangle.prototype.snaps = function (mousePoint, delta) {
     return snaps;
 }
 
-Rectangle.prototype.closestPoint = function (P) {
+closestPoint(P) {
 
     var closest = new Point();
     var distance = 1.65;
@@ -269,7 +272,7 @@ Rectangle.prototype.closestPoint = function (P) {
             closest.x = A.x + ABx * t
             closest.y = A.y + ABy * t
 
-            var dist = distBetweenPoints(P.x, P.y, closest.x, closest.y);
+            var dist = Utils.distBetweenPoints(P.x, P.y, closest.x, closest.y);
             //console.log(" rectangle.js - Dist: " + dist);
             if (dist < distance) {
                 distance = dist;
@@ -280,7 +283,7 @@ Rectangle.prototype.closestPoint = function (P) {
     return [closest, distance]
 }
 
-Rectangle.prototype.extremes = function () {
+extremes() {
 
     var x_values = [];
     var y_values = [];
@@ -298,7 +301,7 @@ Rectangle.prototype.extremes = function () {
     return [xmin, xmax, ymin, ymax]
 }
 
-Rectangle.prototype.within = function (selection_extremes) {
+within(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -318,7 +321,7 @@ Rectangle.prototype.within = function (selection_extremes) {
     }
 }
 
-Rectangle.prototype.touched = function (selection_extremes) {
+touched(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -340,4 +343,5 @@ Rectangle.prototype.touched = function (selection_extremes) {
     }
     //no intersection found. return false
     return false
+}
 }

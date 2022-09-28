@@ -1,4 +1,5 @@
-function DimStyle(data) {
+export class DimStyle { 
+    constructor(data){
     //Define Properties
     this.type = "DimStyle";
     this.name = "";
@@ -49,7 +50,7 @@ function DimStyle(data) {
     }
 }
 
-DimStyle.prototype.getStandardFlags = function () {
+getStandardFlags() {
 
     //Standard flags (bit-coded values):
     //1 = This entry describes as shape
@@ -67,7 +68,7 @@ DimStyle.prototype.getStandardFlags = function () {
     return flags
 }
 
-DimStyle.prototype.dxf = function () {
+dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(
         "0",
@@ -157,4 +158,5 @@ DimStyle.prototype.dxf = function () {
     )
     console.log(" dimStyle.js - DXF Data:" + data)
     return data
+}
 }

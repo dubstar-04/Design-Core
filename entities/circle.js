@@ -1,11 +1,9 @@
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "Circle",
-    shortcut: "C"
-});
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-function Circle(data) //centreX, centreY, endX, endY)
-{
+export class Circle { 
+    constructor(data){
     //Define Properties         //Associated DXF Value
     this.type = "Circle";
     this.family = "Geometry";
@@ -45,11 +43,16 @@ function Circle(data) //centreX, centreY, endX, endY)
     }
 }
 
-Circle.prototype.calculateRadius = function () {
-    this.radius = distBetweenPoints(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y);
+static register() {
+    var command = {command: "Circle", shortcut: "C"};
+    return command
 }
 
-Circle.prototype.prompt = function (inputArray) {
+calculateRadius () {
+    this.radius = Utils.distBetweenPoints(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y);
+}
+
+prompt (inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -77,7 +80,7 @@ Circle.prototype.prompt = function (inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Circle.prototype.draw = function (ctx, scale) {
+draw (ctx, scale) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -96,12 +99,12 @@ Circle.prototype.draw = function (ctx, scale) {
     ctx.beginPath()
 
     //ctx.moveTo(this.points[0].x , this.points[0].y);
-    ctx.arc(this.points[0].x, this.points[0].y, this.radius, radians2degrees(0), radians2degrees(360), false);
+    ctx.arc(this.points[0].x, this.points[0].y, this.radius, Utils.radians2degrees(0), Utils.radians2degrees(360), false);
 
     ctx.stroke()
 }
 
-/*Circle.prototype.properties = function(){
+/*properties(){
 
     return {  //type: this.type,
         colour: this.colour,
@@ -111,7 +114,7 @@ Circle.prototype.draw = function (ctx, scale) {
 }
 */
 
-Circle.prototype.svg = function () {
+svg () {
     //<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
     var svgstr = ""
     var data = svgstr.concat("<circle",
@@ -125,7 +128,7 @@ Circle.prototype.svg = function () {
     return data
 }
 
-Circle.prototype.dxf = function () {
+dxf () {
     var dxfitem = ""
     var data = dxfitem.concat(
         "0",
@@ -147,7 +150,7 @@ Circle.prototype.dxf = function () {
     return data
 }
 
-Circle.prototype.trim = function (points) {
+trim (points) {
     console.log("circle.js - Points:", points.length)
 
     if (points.length > 1) {
@@ -183,14 +186,14 @@ Circle.prototype.trim = function (points) {
     }
 }
 
-Circle.prototype.intersectPoints = function () {
+intersectPoints () {
     return {
         centre: this.points[0],
         radius: this.radius
     }
 }
 
-Circle.prototype.snaps = function (mousePoint, delta) {
+snaps (mousePoint, delta) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -225,33 +228,33 @@ Circle.prototype.snaps = function (mousePoint, delta) {
     return snaps;
 }
 
-Circle.prototype.closestPoint = function (P) {
+closestPoint (P) {
     //find the closest point on the circle
-    var length = distBetweenPoints(this.points[0].x, this.points[0].y, P.x, P.y)
+    var length = Utils.distBetweenPoints(this.points[0].x, this.points[0].y, P.x, P.y)
     var Cx = this.points[0].x + this.radius * (P.x - this.points[0].x) / length
     var Cy = this.points[0].y + this.radius * (P.y - this.points[0].y) / length
     var closest = new Point(Cx, Cy);
-    var distance = distBetweenPoints(closest.x, closest.y, P.x, P.y)
+    var distance = Utils.distBetweenPoints(closest.x, closest.y, P.x, P.y)
 
     return [closest, distance]
 }
 
-Circle.prototype.diameter = function () {
+diameter () {
     var diameter = 2 * this.radius
     return diameter
 }
 
-Circle.prototype.circumference = function () {
+circumference () {
     var circumference = Math.PI * 2 * this.radius;
     return circumference
 }
 
-Circle.prototype.area = function () {
+area () {
     var area = Math.pow((Math.PI * this.radius), 2);
     return area
 }
 
-Circle.prototype.extremes = function () {
+extremes () {
 
     var xmin = this.points[0].x - this.radius;
     var xmax = this.points[0].x + this.radius;
@@ -262,7 +265,7 @@ Circle.prototype.extremes = function () {
 
 }
 
-Circle.prototype.within = function (selection_extremes) {
+within (selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -283,7 +286,7 @@ Circle.prototype.within = function (selection_extremes) {
 
 }
 
-Circle.prototype.touched = function (selection_extremes) {
+touched (selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -304,5 +307,5 @@ Circle.prototype.touched = function (selection_extremes) {
     } else {
         return false
     }
-
+  }
 }

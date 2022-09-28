@@ -1,6 +1,7 @@
-commandManager.registerCommand({command: "Trim", shortcut: "TR"});
-function Trim()
-{
+import { Intersection } from '../lib/intersect.js'
+
+export class Trim { 
+    constructor(){
     //Define Properties
     this.type = "Trim";
     this.family = "Tools";
@@ -11,7 +12,12 @@ function Trim()
     this.showPreview = false;
 }
 
-Trim.prototype.prompt = function (inputArray) {
+static register() {
+    var command = {command: "Trim", shortcut: "TR"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -47,9 +53,9 @@ Trim.prototype.prompt = function (inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Trim.prototype.action = function(){
+action(){
 
-    console.log("Trim.js: Trim.prototype.action")
+    console.log("Trim.js: action")
 
     console.log("Trim.js: scene.selectionSet length:", scene.selectionSet.length)
 
@@ -87,9 +93,8 @@ Trim.prototype.action = function(){
 
 }
 
-Trim.prototype.preview = function(){
-
+preview(){
    // console.log("Trim.js - preview")
-
+}
 }
 

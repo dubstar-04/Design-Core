@@ -1,11 +1,9 @@
-// Register this command with the scene
-commandManager.registerCommand({
-    command: "FilledRectangle",
-    shortcut: "FR"
-});
+import { Point } from './point.js'
+import { Utils } from '../lib/utils.js'
+import { Intersection } from '../lib/intersect.js'
 
-function FilledRectangle(data) //startX, startY, endX, endY)
-{
+export class FilledRectangle {
+    constructor(data) {
     //Define Properties         //Associated DXF Value
     this.type = "FilledRectangle";
     this.family = "Geometry";
@@ -56,7 +54,12 @@ function FilledRectangle(data) //startX, startY, endX, endY)
     }
 }
 
-FilledRectangle.prototype.prompt = function (inputArray) {
+static register() {
+    var command = {command: "FilledRectangle", shortcut: "FR"};
+    return command
+}
+
+prompt(inputArray) {
     var num = inputArray.length;
     var expectedType = [];
     var reset = false;
@@ -84,7 +87,7 @@ FilledRectangle.prototype.prompt = function (inputArray) {
     return [prompt[inputArray.length], reset, action, validInput]
 }
 
-FilledRectangle.prototype.draw = function (ctx, scale) {
+draw(ctx, scale) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -115,7 +118,7 @@ FilledRectangle.prototype.draw = function (ctx, scale) {
     ctx.stroke()
 }
 
-FilledRectangle.prototype.svg = function () {
+svg() {
     //<Rectangle x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
     //<Rectangle x1="20" y1="100" x2="100" y2="100" stroke-width="2" stroke="black"/>
     var quote = "\""
@@ -131,7 +134,7 @@ FilledRectangle.prototype.svg = function () {
     return data
 }
 
-FilledRectangle.prototype.dxf = function () {
+dxf() {
 
     //Save the rectangle as a polyline as there is no rectangle DXF code
     var closed = (this.points[0].x === this.points[this.points.length - 1].x && this.points[0].y === this.points[this.points.length - 1].y);
@@ -163,7 +166,7 @@ FilledRectangle.prototype.dxf = function () {
     return data
 }
 
-FilledRectangle.prototype.vertices = function () {
+vertices() {
 
     //var rectangle_points = [];
 
@@ -206,7 +209,7 @@ FilledRectangle.prototype.vertices = function () {
     return vertices_data;
 }
 
-FilledRectangle.prototype.intersectPoints = function () {
+intersectPoints() {
 
     return {
         start: this.points[0],
@@ -216,7 +219,7 @@ FilledRectangle.prototype.intersectPoints = function () {
 }
 
 
-FilledRectangle.prototype.midPoint = function (x, x1, y, y1) {
+midPoint(x, x1, y, y1) {
 
     var midX = (x + x1) / 2
     var midY = (y + y1) / 2
@@ -228,7 +231,7 @@ FilledRectangle.prototype.midPoint = function (x, x1, y, y1) {
 }
 
 
-FilledRectangle.prototype.snaps = function (mousePoint, delta) {
+snaps(mousePoint, delta) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -266,7 +269,7 @@ FilledRectangle.prototype.snaps = function (mousePoint, delta) {
     return snaps;
 }
 
-FilledRectangle.prototype.closestPoint = function (P) {
+closestPoint(P) {
 
     var closest = new Point();
     var distance = 1.65;
@@ -292,7 +295,7 @@ FilledRectangle.prototype.closestPoint = function (P) {
             closest.x = A.x + ABx * t
             closest.y = A.y + ABy * t
 
-            var dist = distBetweenPoints(P.x, P.y, closest.x, closest.y);
+            var dist = Utils.distBetweenPoints(P.x, P.y, closest.x, closest.y);
             //console.log(" rectangle.js - Dist: " + dist);
             if (dist < distance) {
                 distance = dist;
@@ -304,7 +307,7 @@ FilledRectangle.prototype.closestPoint = function (P) {
 
 }
 
-FilledRectangle.prototype.extremes = function () {
+extremes() {
 
     var x_values = [];
     var y_values = [];
@@ -323,7 +326,7 @@ FilledRectangle.prototype.extremes = function () {
 
 }
 
-FilledRectangle.prototype.within = function (selection_extremes) {
+within(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -344,7 +347,7 @@ FilledRectangle.prototype.within = function (selection_extremes) {
 
 }
 
-FilledRectangle.prototype.touched = function (selection_extremes) {
+touched(selection_extremes) {
 
     if (!LM.layerVisible(this.layer)) {
         return
@@ -392,5 +395,5 @@ FilledRectangle.prototype.touched = function (selection_extremes) {
     }
     //no intersection found. return false
     return false
-
+}
 }

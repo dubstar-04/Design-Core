@@ -1,4 +1,7 @@
-function Layer(data) {
+import { Colours } from '../lib/colours.js'
+
+export class Layer { 
+    constructor(data){
     //Define Properties
     this.type = "Layer";
     this.name = "";
@@ -53,7 +56,7 @@ function Layer(data) {
     }
 }
 
-Layer.prototype.getFlags = function () {
+getFlags() {
 
     //Standard flags (bit-coded values):
     //1 = Layer is frozen; otherwise layer is thawed.
@@ -75,7 +78,7 @@ Layer.prototype.getFlags = function () {
 
 }
 
-Layer.prototype.dxf = function () {
+dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(
         "0",
@@ -85,7 +88,7 @@ Layer.prototype.dxf = function () {
         "\n", "70", //Flags
         "\n", this.getFlags(),
         "\n", "62", //Colour: Negative if layer is off
-        "\n", this.on ? getACADColour(this.colour) : (0 - getACADColour(this.colour)),
+        "\n", this.on ? Colours.getACADColour(this.colour) : (0 - Colours.getACADColour(this.colour)),
         "\n", "6", //Linetype
         "\n", this.lineType,
         // "\n", "290", //plotting               |
@@ -95,4 +98,5 @@ Layer.prototype.dxf = function () {
     )
     console.log(" layer.js - DXF Data:" + data)
     return data
+}
 }

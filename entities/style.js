@@ -1,4 +1,5 @@
-function Style(data) {
+export class Style { 
+    constructor(data){
     //Define Properties
     this.type = "Style";
     this.name = "";
@@ -71,7 +72,7 @@ function Style(data) {
     }
 }
 
-Style.prototype.getFlags = function () {
+getFlags() {
 
     //Standard flags (bit-coded values):
     //2 = Text is backward (mirrored in x).
@@ -91,7 +92,7 @@ Style.prototype.getFlags = function () {
 
 }
 
-Style.prototype.getStandardFlags = function () {
+getStandardFlags() {
 
     //Standard flags (bit-coded values):
     //1 = This entry describes as shape
@@ -109,7 +110,7 @@ Style.prototype.getStandardFlags = function () {
     return flags
 }
 
-Style.prototype.dxf = function () {
+dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(
         "0",
@@ -135,4 +136,5 @@ Style.prototype.dxf = function () {
     )
     console.log(" Style.js - DXF Data:" + data)
     return data
+}
 }

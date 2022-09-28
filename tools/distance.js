@@ -1,6 +1,6 @@
-commandManager.registerCommand({command: "Distance", shortcut: "DI"});
-function Distance()
-{
+export class Distance { 
+    constructor(){
+
     //Define Properties
     this.type = "Distance";
     this.family = "Tools";
@@ -11,7 +11,12 @@ function Distance()
     this.showPreview = false;
 }
 
-Distance.prototype.prompt = function(inputArray) {
+static register() {
+    var command = {command: "Distance", shortcut: "DI"};
+    return command
+}
+
+prompt(inputArray) {
   var num = inputArray.length;
   var expectedType = [];
   var reset = false;
@@ -39,19 +44,20 @@ Distance.prototype.prompt = function(inputArray) {
   return [prompt[inputArray.length], reset, action, validInput]
 }
 
-Distance.prototype.preview = function(num) {
+preview(num) {
 
 console.log("TO DO: Draw a preview of the measurement")
 
 }
 
-Distance.prototype.action = function(points, items){
+action(points, items){
 
     //var point1 = new Point(points[0].x, points[0].y)
     //var point2 = new Point(points[1].x, points[1].y)
 
-    var di = (" Length: " + distBetweenPoints(points[0].x, points[0].y, points[1].x, points[1].y).toFixed(1)
+    var di = (" Length: " + Utils.distBetweenPoints(points[0].x, points[0].y, points[1].x, points[1].y).toFixed(1)
                 + " X: " + (points[1].x - points[0].x).toFixed(1) + " Y:" + (points[1].y - points[0].y).toFixed(1));
 				
 	notify(di)
+}
 }
