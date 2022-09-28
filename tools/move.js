@@ -15,14 +15,14 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
     var prompt = [];
 
-    console.log("inputArray: ", inputArray)
+    console.log("inputArray: ", scene.inputArray)
 
     expectedType[0] = ["undefined"];
     prompt[0] = "Select Items To " + this.type;
@@ -39,54 +39,54 @@ prompt(inputArray) {
     expectedType[4] = ["object", "number"];
     prompt[4] = "";
 
-    var validInput = expectedType[num].includes(typeof inputArray[num - 1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num - 1])
 
     if (!validInput) {
-        inputArray.pop()
-    } else if (inputArray.length === 4) {
+        scene.inputArray.pop()
+    } else if (scene.inputArray.length === 4) {
         action = true;
         reset = true
     }
 
-    return [prompt[inputArray.length], reset, action, validInput]
+    return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-action(points, items) {
+action(scene) {
 
     console.log("move.js: action")
-    console.log("move.js: points length: " + points.length)
-    console.log("move.js: items length: " + items.length)
+    console.log("move.js: points length: " + scene.points.length)
+    console.log("move.js: items length: " + scene.items.length)
 
-    var xDelta = points[1].x - points[0].x
-    var yDelta = points[1].y - points[0].y
+    var xDelta = scene.points[1].x - scene.points[0].x
+    var yDelta = scene.points[1].y - scene.points[0].y
 
     console.log("move.js: X: " + xDelta + " Y: " + yDelta)
 
     for (var i = 0; i < scene.selectionSet.length; i++) {
         //console.log("scene.selectionSet.type: " + scene.selectionSet[i].type);
         for (var j = 0; j < scene.selectedItems[i].points.length; j++) {
-            items[scene.selectionSet[i]].points[j].x = items[scene.selectionSet[i]].points[j].x + xDelta;
-            items[scene.selectionSet[i]].points[j].y = items[scene.selectionSet[i]].points[j].y + yDelta;
+            scene.items[scene.selectionSet[i]].points[j].x = scene.items[scene.selectionSet[i]].points[j].x + xDelta;
+            scene.items[scene.selectionSet[i]].points[j].y = scene.items[scene.selectionSet[i]].points[j].y + yDelta;
         }
     }
 
 }
 
-preview(points, selectedItems, items) {
+preview(scene) {
 
     //console.log("move.js: preview")
     //console.log("move.js: points length: " + points.length)
     //console.log("move.js: selectedItems length: " + selectedItems.length)
     //console.log("move.js: items length: " + items.length)
 
-    var xDelta = points[1].x - points[0].x
-    var yDelta = points[1].y - points[0].y
+    var xDelta = scene.tempPoints[1].x - scene.tempPoints[0].x
+    var yDelta = scene.tempPoints[1].y - scene.tempPoints[0].y
 
     for (var i = 0; i < scene.selectionSet.length; i++) {
         //console.log("scene.selectionSet.type: " + selectedItems[i].type);
-        for (var j = 0; j < selectedItems[i].points.length; j++) {
-            selectedItems[i].points[j].x = items[scene.selectionSet[i]].points[j].x + xDelta;
-            selectedItems[i].points[j].y = items[scene.selectionSet[i]].points[j].y + yDelta;
+        for (var j = 0; j < scene.selectedItems[i].points.length; j++) {
+            scene.selectedItems[i].points[j].x = scene.items[scene.selectionSet[i]].points[j].x + xDelta;
+            scene.selectedItems[i].points[j].y = scene.items[scene.selectionSet[i]].points[j].y + yDelta;
         }
     }
   }

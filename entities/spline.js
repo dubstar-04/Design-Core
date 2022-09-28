@@ -62,8 +62,8 @@ static register() {
 }
 
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -78,30 +78,30 @@ prompt(inputArray) {
     expectedType[2] = ["object"];   
     prompt[2] = prompt[1];
             
-    var validInput = expectedType[num].includes(typeof inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
             
     if(!validInput || num > this.minPoints){
-        inputArray.pop()
-    }else if (inputArray.length === this.minPoints){
+        scene.inputArray.pop()
+    }else if (scene.inputArray.length === this.minPoints){
         action = true;
         //reset = true
     }
     
-    return [prompt[inputArray.length], reset, action, validInput]
+    return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-draw(ctx, scale) {
+draw(ctx, scale, designEngine) {
 
     if (this.points.length > 2) {
 
-        if (!LM.layerVisible(this.layer)) {
+        if (!designEngine.LM.layerVisible(this.layer)) {
             return
         }
 
         var colour = this.colour;
 
         if (this.colour === "BYLAYER") {
-            colour = LM.getLayerByName(this.layer).colour
+            colour = designEngine.LM.getLayerByName(this.layer).colour
         }
 
     ctx.strokeStyle = colour;

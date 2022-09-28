@@ -74,8 +74,8 @@ direction() {
 
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -93,31 +93,31 @@ prompt(inputArray) {
     expectedType[3] = ["object"];   
     prompt[3] = "";
     
-    var validInput = expectedType[num].includes(typeof inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
             
     if(!validInput){
-        inputArray.pop()
+        scene.inputArray.pop()
     }
     
-   if (inputArray.length === this.minPoints){
+   if (scene.inputArray.length === this.minPoints){
         action = true;
         reset = true;
         this.helper_geometry = false;
     }
     
-    return [prompt[inputArray.length], reset, action, validInput]
+    return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-draw(ctx, scale) {
+draw(ctx, scale, designEngine) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = LM.getLayerByName(this.layer).colour
+        colour = designEngine.LM.getLayerByName(this.layer).colour
     }
 
     ctx.strokeStyle = colour;
@@ -197,7 +197,7 @@ intersectPoints() {
 
 snaps(mousePoint, delta) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -295,7 +295,7 @@ extremes() {
 
 within(selection_extremes) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -316,7 +316,7 @@ within(selection_extremes) {
 
 touched(selection_extremes) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 

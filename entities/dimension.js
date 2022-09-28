@@ -69,15 +69,15 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
     var prompt = [];
 
     console.log("dimension inputArray: ", inputArray)
-    console.log("type: ", typeof inputArray[num - 1])
+    console.log("type: ", typeof scene.inputArray[num - 1])
 
     expectedType[0] = ["undefined"];
     prompt[0] = "Pick start point:"; //TODO: allow selecting entites, line / arc / circle
@@ -91,18 +91,18 @@ prompt(inputArray) {
     expectedType[3] = ["object"];
     prompt[3] = prompt[1];
 
-    var validInput = expectedType[num].includes(typeof inputArray[num - 1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num - 1])
 
     if (!validInput || num > this.minPoints) {
-        inputArray.pop()
+        scene.inputArray.pop()
     }
 
-    if (inputArray.length === this.minPoints) {
+    if (scene.inputArray.length === this.minPoints) {
         action = true;
         reset = true
     }
 
-    return [prompt[inputArray.length], reset, action, validInput]
+    return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
 getBaseDimType() {
@@ -325,18 +325,18 @@ getBlockEntities() {
 
 }
 
-draw(ctx, scale) {
+draw(ctx, scale, designEngine) {
 
     var rect = this.getBoundingRect()
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = LM.getLayerByName(this.layer).colour
+        colour = designEngine.LM.getLayerByName(this.layer).colour
     }
 
     entities = this.getBlockEntities();
@@ -350,7 +350,7 @@ draw(ctx, scale) {
         this.block.addItem(this.text);
     }
 
-    this.block.draw(ctx, scale);
+    this.block.draw(ctx, scale, designEngine);
 
     function drawArrowHead(point, angle, height) {
         //console.log("arrow head height:", height)

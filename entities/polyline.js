@@ -41,8 +41,8 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -62,28 +62,28 @@ prompt(inputArray) {
     expectedType[3] = ["object","number"];   
     prompt[3] = prompt[1];
 
-    var validInput = expectedType[num].includes(typeof inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
             
     if(!validInput || num > this.minPoints){
-        inputArray.pop()
-    }else if (inputArray.length === this.minPoints){
+        scene.inputArray.pop()
+    }else if (scene.inputArray.length === this.minPoints){
         action = true;
         //reset = true
     }
     
-    return [prompt[inputArray.length], reset, action, validInput]
+    return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-draw(ctx, scale) {
+draw(ctx, scale, designEngine) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = LM.getLayerByName(this.layer).colour
+        colour = designEngine.LM.getLayerByName(this.layer).colour
     }
 
     ctx.strokeStyle = colour;
@@ -202,7 +202,7 @@ midPoint(x, x1, y, y1) {
 
 snaps(mousePoint, delta) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -255,7 +255,7 @@ closestPoint(P) {
             if(pntDist < distance){
                 distance = pntDist;
                 minPnt = pnt;
-                console.log("distance:" , distance)
+                //console.log("distance:" , distance)
             }
         }
     }
@@ -283,7 +283,7 @@ extremes() {
 
 within(selection_extremes) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -303,7 +303,7 @@ within(selection_extremes) {
 
 touched(selection_extremes) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 

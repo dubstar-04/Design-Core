@@ -1,3 +1,5 @@
+import { Utils } from '../lib/utils.js'
+
 export class Distance { 
     constructor(){
 
@@ -16,8 +18,8 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-  var num = inputArray.length;
+prompt(scene) {
+  var num = scene.inputArray.length;
   var expectedType = [];
   var reset = false;
   var action = false;
@@ -32,16 +34,16 @@ prompt(inputArray) {
   expectedType[2] = ["object"];    
   prompt[2] = "";
 
-  var validInput = expectedType[num].includes(typeof inputArray[num-1])
+  var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
             
   if(!validInput){
-      inputArray.pop()
-  }else if (inputArray.length === this.minPoints){
+      scene.inputArray.pop()
+  }else if (scene.inputArray.length === this.minPoints){
       action = true;
       reset = true
   }
   
-  return [prompt[inputArray.length], reset, action, validInput]
+  return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
 preview(num) {
@@ -50,13 +52,13 @@ console.log("TO DO: Draw a preview of the measurement")
 
 }
 
-action(points, items){
+action(scene){
 
     //var point1 = new Point(points[0].x, points[0].y)
     //var point2 = new Point(points[1].x, points[1].y)
 
-    var di = (" Length: " + Utils.distBetweenPoints(points[0].x, points[0].y, points[1].x, points[1].y).toFixed(1)
-                + " X: " + (points[1].x - points[0].x).toFixed(1) + " Y:" + (points[1].y - points[0].y).toFixed(1));
+    var di = (" Length: " + Utils.distBetweenPoints(scene.points[0].x, scene.points[0].y, scene.points[1].x, scene.points[1].y).toFixed(1)
+                + " X: " + (scene.points[1].x - scene.points[0].x).toFixed(1) + " Y:" + (scene.points[1].y - scene.points[0].y).toFixed(1));
 				
 	notify(di)
 }

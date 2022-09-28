@@ -49,8 +49,8 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -71,18 +71,18 @@ prompt(inputArray) {
     expectedType[3] = ["object", "number"];
     prompt[3] = prompt[1];
 
-    validInput = expectedType[num].includes(typeof inputArray[num - 1])
+    validInput = expectedType[num].includes(typeof scene.inputArray[num - 1])
 
     if (!validInput || num > this.minPoints) {
-        inputArray.pop()
+        scene.inputArray.pop()
     }
 
-    if (inputArray.length === this.minPoints) {
+    if (scene.inputArray.length === this.minPoints) {
         action = true;
         //reset = true
     }
 
-    return [prompt[inputArray.length], reset, action, validInput]
+    return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
 draw(ctx, scale, designEngine) {
@@ -353,7 +353,7 @@ angle() {
 
 snaps(mousePoint, delta) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -411,7 +411,7 @@ extremes() {
 
 within(selection_extremes) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -432,7 +432,7 @@ within(selection_extremes) {
 
 touched(selection_extremes) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 

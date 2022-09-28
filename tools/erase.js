@@ -15,8 +15,8 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -31,19 +31,19 @@ prompt(inputArray) {
     expectedType[2] = ["boolean"];    
     prompt[2] = "";
 
-    var validInput = expectedType[num].includes(typeof inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
             
     if(!validInput){
-        inputArray.pop()
-    }else if (inputArray.length === 2){
+        scene.inputArray.pop()
+    }else if (scene.inputArray.length === 2){
         action = true;
         reset = true
     }
     
-    return [prompt[inputArray.length], reset, action, validInput]
+    return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-action(points, items) {
+action(scene) {
 
     scene.selectionSet.sort();
 
@@ -51,7 +51,7 @@ action(points, items) {
 
     for (var i = 0; i < scene.selectionSet.length; i++) {
         //console.log("Erase: " + scene.selectionSet[i]);
-        items.splice((scene.selectionSet[i] - i), 1)
+        scene.items.splice((scene.selectionSet[i] - i), 1)
     }
 }
 }

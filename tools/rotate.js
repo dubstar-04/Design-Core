@@ -15,8 +15,8 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -40,10 +40,10 @@ prompt(inputArray) {
     expectedType[5] = ["object"];   
     prompt[5] = "";
             
-    var validInput = expectedType[num].includes(typeof inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
             
     if(!validInput){
-        scene.inputArray.pop()
+        scene.scene.inputArray.pop()
     }
     if (scene.inputArray.length === 5){
         action = true;
@@ -53,15 +53,15 @@ prompt(inputArray) {
     return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-preview = function(points, selectedItems, items){
+preview = function(scene){
 
-    if (points.length > 2){
+    if (scene.tempPoints.length > 2){
 
-        var A = points[0].x - points[1].x;
-        var O = points[0].y - points[1].y;
+        var A = scene.tempPoints[0].x - scene.tempPoints[1].x;
+        var O = scene.tempPoints[0].y - scene.tempPoints[1].y;
 
-        var A1 = points[0].x - points[2].x;
-        var O1 = points[0].y - points[2].y;
+        var A1 = scene.tempPoints[0].x - scene.tempPoints[2].x;
+        var O1 = scene.tempPoints[0].y - scene.tempPoints[2].y;
 
         var ang1 = Math.atan2(O,A);
         var ang2 = Math.atan2(O1,A1);
@@ -70,28 +70,28 @@ preview = function(points, selectedItems, items){
 
         for (var i = 0; i < scene.selectionSet.length; i++){
             //console.log( "(preview) item: " + selectedItems[i].type + " Points length: " + selectedItems[i].points.length);
-            for (var j = 0; j < selectedItems[i].points.length; j++){
+            for (var j = 0; j < scene.selectedItems[i].points.length; j++){
                //console.log( "(preview) point: " + j + " length: " + selectedItems[i].points.length)
-                var x = points[0].x + (items[scene.selectionSet[i]].points[j].x - points[0].x)*Math.cos(theta) - (items[scene.selectionSet[i]].points[j].y-points[0].y)*Math.sin(theta);
-                var y = points[0].y + (items[scene.selectionSet[i]].points[j].x - points[0].x)*Math.sin(theta) + (items[scene.selectionSet[i]].points[j].y-points[0].y)*Math.cos(theta);
+                var x = scene.tempPoints[0].x + (scene.items[scene.selectionSet[i]].points[j].x - scene.tempPoints[0].x)*Math.cos(theta) - (scene.items[scene.selectionSet[i]].points[j].y-scene.tempPoints[0].y)*Math.sin(theta);
+                var y = scene.tempPoints[0].y + (scene.items[scene.selectionSet[i]].points[j].x - scene.tempPoints[0].x)*Math.sin(theta) + (scene.items[scene.selectionSet[i]].points[j].y-scene.tempPoints[0].y)*Math.cos(theta);
 
-                selectedItems[i].points[j].x = x;
-                selectedItems[i].points[j].y = y;
+                scene.selectedItems[i].points[j].x = x;
+                scene.selectedItems[i].points[j].y = y;
             }
         }
     }
 }
 
 
-action = function(points, items){
+action = function(scene){
 
     console.log("Rotate Stuff")
 
-    var A = points[0].x - points[1].x;
-    var O = points[0].y - points[1].y;
+    var A = scene.points[0].x - scene.points[1].x;
+    var O = scene.points[0].y - scene.points[1].y;
 
-    var A1 = points[0].x - points[2].x;
-    var O1 = points[0].y - points[2].y;
+    var A1 = scene.points[0].x - scene.points[2].x;
+    var O1 = scene.points[0].y - scene.points[2].y;
 
     var ang1 = Math.atan2(O,A);
     var ang2 = Math.atan2(O1,A1);
@@ -104,11 +104,11 @@ action = function(points, items){
 
         for (var j = 0; j < scene.selectedItems[i].points.length; j++){
 
-            var x = points[0].x + (items[scene.selectionSet[i]].points[j].x - points[0].x)*Math.cos(theta) - (items[scene.selectionSet[i]].points[j].y-points[0].y)*Math.sin(theta);
-            var y = points[0].y + (items[scene.selectionSet[i]].points[j].x - points[0].x)*Math.sin(theta) + (items[scene.selectionSet[i]].points[j].y-points[0].y)*Math.cos(theta);
+            var x = scene.points[0].x + (scene.items[scene.selectionSet[i]].points[j].x - scene.points[0].x)*Math.cos(theta) - (scene.items[scene.selectionSet[i]].points[j].y-scene.points[0].y)*Math.sin(theta);
+            var y = scene.points[0].y + (scene.items[scene.selectionSet[i]].points[j].x - scene.points[0].x)*Math.sin(theta) + (scene.items[scene.selectionSet[i]].points[j].y-scene.points[0].y)*Math.cos(theta);
 
-            items[scene.selectionSet[i]].points[j].x = x;
-            items[scene.selectionSet[i]].points[j].y = y;
+            scene.items[scene.selectionSet[i]].points[j].x = x;
+            scene.items[scene.selectionSet[i]].points[j].y = y;
         }
     }
   }

@@ -99,15 +99,15 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
     var prompt = [];
 
     console.log("inputArray: ", inputArray)
-    console.log("type: ", typeof inputArray[num - 1])
+    console.log("type: ", typeof scene.inputArray[num - 1])
 
     expectedType[0] = ["undefined"];
     prompt[0] = "Pick start point:";
@@ -121,17 +121,17 @@ prompt(inputArray) {
     expectedType[3] = ["string", "number"];
     prompt[3] = "";
 
-    var validInput = expectedType[num].includes(typeof inputArray[num - 1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num - 1])
 
     if (!validInput) {
         console.log("invalid")
-        inputArray.pop()
-    } else if (inputArray.length === 3) {
+        scene.inputArray.pop()
+    } else if (scene.inputArray.length === 3) {
         action = true;
         reset = true
     }
 
-    return [prompt[inputArray.length], reset, action, validInput]
+    return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
 width() {
@@ -199,22 +199,22 @@ getBoundingRect() {
     return rect
 }
 
-draw(ctx, scale) {
+draw(ctx, scale, designEngine) {
 
-    var rect = this.getBoundingRect()
+    //var rect = this.getBoundingRect()
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = LM.getLayerByName(this.layer).colour
+        colour = designEngine.LM.getLayerByName(this.layer).colour
     }
 
     //ctx.strokeStyle = colour; // Text doesn't require a stroke, see fill.
-    ctx.font = this.height + "pt " + SM.getStyleByName(this.styleName).font.toString();
+    ctx.font = this.height + "pt " + designEngine.SM.getStyleByName(this.styleName).font.toString();
     ctx.fillStyle = colour;
     ctx.textAlign = this.getHorizontalAlignment();
     ctx.textBaseline = this.getVerticalAlignment();
@@ -374,7 +374,7 @@ intersectPoints() {
 
 touched(selection_extremes) {
 
-    if (!LM.layerVisible(this.layer)) {
+    if (!designEngine.LM.layerVisible(this.layer)) {
         return
     }
 

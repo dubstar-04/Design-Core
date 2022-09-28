@@ -16,8 +16,8 @@ static register() {
   return command
 }
 
-prompt(inputArray) {
-  var num = inputArray.length;
+prompt(scene) {
+  var num = scene.inputArray.length;
   var expectedType = [];
   var reset = false;
   var action = false;
@@ -29,27 +29,27 @@ prompt(inputArray) {
   expectedType[1] = ["object"];    
   prompt[1] = "";
 
-  var validInput = expectedType[num].includes(typeof inputArray[num-1])
+  var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
             
   if(!validInput){
-      inputArray.pop()
-  }else if (inputArray.length === this.minPoints){
+      scene.inputArray.pop()
+  }else if (scene.inputArray.length === this.minPoints){
       action = true;
       reset = true
   }
   
-  return [prompt[inputArray.length], reset, action, validInput]
+  return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-preview(num) {
+preview() {
 //no preview required
 return;
 
 }
 
-action(points, items){
+action(scene){
 	
-  var id = (" X: " + points[0].x.toFixed(1) + " Y:" + points[0].y.toFixed(1));		
+  var id = (" X: " + scene.points[0].x.toFixed(1) + " Y:" + scene.points[0].y.toFixed(1));		
 	notify(id)
 }
 }

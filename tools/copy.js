@@ -18,8 +18,8 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -40,10 +40,10 @@ prompt(inputArray) {
     expectedType[4] = ["object"];   
     prompt[4] = "";
             
-    var validInput = expectedType[num].includes(typeof inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
             
     if(!validInput){
-        scene.inputArray.pop()
+        scene.scene.inputArray.pop()
     }else if (scene.inputArray.length === 4){
         action = true;
         reset = true
@@ -52,17 +52,17 @@ prompt(inputArray) {
     return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-action = function(points, items){
+action = function(scene){
 
     //console.log("Copy Stuff")
 
-    var xDelta =  points[1].x - points[0].x
-    var yDelta =  points[1].y - points[0].y
+    var xDelta =  scene.points[1].x - scene.points[0].x
+    var yDelta =  scene.points[1].y - scene.points[0].y
 
     for (var i = 0; i < scene.selectionSet.length; i++){
         //console.log("selectionset.type: " + selectionSet[i].type);
 
-        var copyofitem = Utils.cloneObject(scene.items[scene.selectionSet[i]]);
+        var copyofitem = Utils.cloneObject(scene, scene.items[scene.selectionSet[i]]);
 
         for (var j = 0; j < copyofitem.points.length; j++){
             copyofitem.points[j].x = scene.items[scene.selectionSet[i]].points[j].x + xDelta;
@@ -74,16 +74,16 @@ action = function(points, items){
 
 }
 
-preview = function(points, selectedItems, items){
+preview = function(scene){
 
     //console.log("Copy Stuff")
 
-    var xDelta =  points[1].x - points[0].x
-    var yDelta =  points[1].y - points[0].y
+    var xDelta =  scene.tempPoints[1].x - scene.tempPoints[0].x
+    var yDelta =  scene.tempPoints[1].y - scene.tempPoints[0].y
 
     for (var i = 0; i < scene.selectionSet.length; i++){
         //console.log("selectionset.type: " + selectionSet[i].type);
-        for (var j = 0; j < selectedItems[i].points.length; j++){
+        for (var j = 0; j < scene.selectedItems[i].points.length; j++){
             scene.selectedItems[i].points[j].x = scene.items[scene.selectionSet[i]].points[j].x + xDelta;
             scene.selectedItems[i].points[j].y = scene.items[scene.selectionSet[i]].points[j].y + yDelta;
         }

@@ -18,8 +18,8 @@ static register() {
     return command
 }
 
-prompt(inputArray) {
-    var num = inputArray.length;
+prompt(scene) {
+    var num = scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -40,21 +40,21 @@ prompt(inputArray) {
     expectedType[4] = expectedType[3];    
     prompt[4] = prompt[3];
  
-    var validInput = expectedType[num].includes(typeof inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
             
     if(!validInput || num > 3){
-        inputArray.pop()
+        scene.inputArray.pop()
     }
     
-    if (inputArray.length === 3){
+    if (scene.inputArray.length === 3){
         action = true;
         //reset = true
     }
     
-    return [prompt[inputArray.length], reset, action, validInput]
+    return [prompt[scene.inputArray.length], reset, action, validInput]
 }
 
-action(){
+action(scene){
 
     console.log("Extend.js: action")
 
