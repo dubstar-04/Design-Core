@@ -57,7 +57,7 @@ dxf() {
     return data
 }
 
-draw(ctx, scale, designEngine) {
+draw(ctx, scale, core) {
 
     return
 }
@@ -107,7 +107,7 @@ extremes() {
 
 touched(selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 

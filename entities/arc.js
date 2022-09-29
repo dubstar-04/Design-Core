@@ -46,6 +46,8 @@ static register() {
 }
 
 startAngle() {
+
+    var p0 = this.points[0];
     return this.points[0].angle(this.points[1])
 }
 
@@ -74,8 +76,8 @@ direction() {
 
 }
 
-prompt(scene) {
-    var num = scene.inputArray.length;
+prompt(core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -93,31 +95,31 @@ prompt(scene) {
     expectedType[3] = ["object"];   
     prompt[3] = "";
     
-    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num-1])
             
     if(!validInput){
-        scene.inputArray.pop()
+        core.scene.inputArray.pop()
     }
     
-   if (scene.inputArray.length === this.minPoints){
+   if (core.scene.inputArray.length === this.minPoints){
         action = true;
         reset = true;
         this.helper_geometry = false;
     }
     
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
-draw(ctx, scale, designEngine) {
+draw(ctx, scale, core) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = designEngine.LM.getLayerByName(this.layer).colour
+        colour = core.LM.getLayerByName(this.layer).colour
     }
 
     ctx.strokeStyle = colour;
@@ -180,7 +182,7 @@ dxf() {
     return data
 }
 
-trim(points) {
+trim(points, core) {
     console.log("arc.js - Points:", points.length)
 }
 
@@ -197,7 +199,7 @@ intersectPoints() {
 
 snaps(mousePoint, delta) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -295,7 +297,7 @@ extremes() {
 
 within(selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -316,7 +318,7 @@ within(selection_extremes) {
 
 touched(selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 

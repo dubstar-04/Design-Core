@@ -49,8 +49,8 @@ static register() {
     return command
 }
 
-prompt(scene) {
-    var num = scene.inputArray.length;
+prompt(core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -71,30 +71,30 @@ prompt(scene) {
     expectedType[3] = ["object", "number"];
     prompt[3] = prompt[1];
 
-    validInput = expectedType[num].includes(typeof scene.inputArray[num - 1])
+    validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1])
 
     if (!validInput || num > this.minPoints) {
-        scene.inputArray.pop()
+        core.scene.inputArray.pop()
     }
 
-    if (scene.inputArray.length === this.minPoints) {
+    if (core.scene.inputArray.length === this.minPoints) {
         action = true;
         //reset = true
     }
 
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
-draw(ctx, scale, designEngine) {
+draw(ctx, scale, core) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = designEngine.LM.getLayerByName(this.layer).colour
+        colour = core.LM.getLayerByName(this.layer).colour
     }
 
     ctx.strokeStyle = colour;
@@ -147,7 +147,7 @@ dxf() {
     return data
 }
 
-trim(points) {
+trim(points, core) {
 
     console.log("line.js - Points:", points.length)
 
@@ -167,8 +167,8 @@ trim(points) {
 
         for (var i = 0; i < line.points.length; i++) {
             for (var j = 0; j < intersectPnts.length; j++) {
-                //TODO: Pass in the mouse location rather than needing a ref to designEngine
-                if (betweenPoints(designEngine.mouse, [intersectPnts[j], line.points[i]], false)) {
+                //TODO: Pass in the mouse location rather than needing a ref to core
+                if (betweenPoints(core.mouse, [intersectPnts[j], line.points[i]], false)) {
                     //console.log("Trimmed Length:", Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100, "Line length: ", Math.round(line.points[0].distance(line.points[1]) * 100) / 100)
                     if (Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100 < Math.round(line.points[0].distance(line.points[1]) * 100) / 100) {
                         originPoint = i;
@@ -217,7 +217,7 @@ trim(points) {
             }
 
             //TODO: Can't call scene from here
-            scene.addToScene("Line", data, false)
+            core.scene.addToScene("Line", data, false)
 
             if (a < b) {
                 line.points[1] = pnts[0];
@@ -246,7 +246,7 @@ trim(points) {
 
     if (points.length > 1) {
         //is the mouse between two points
-        var pnts = betweenPoints(mouse, points, true)
+        var pnts = betweenPoints(core.mouse, points, true)
 
         if (typeof pnts !== "undefined") {
             trimBetween(pnts, this);
@@ -269,8 +269,8 @@ extend(points) {
     var destinationPoint;
 
     //Find which end is closer to the mouse
-    //ToDo: Pass the mouse location in rather than needing a ref to designEngine.
-    if (this.points[0].distance(designEngine.mouse) < this.points[1].distance(designEngine.mouse)) {
+    //ToDo: Pass the mouse location in rather than needing a ref to core.
+    if (this.points[0].distance(core.mouse) < this.points[1].distance(core.mouse)) {
         originPoint = 0;
     } else {
         originPoint = 1;
@@ -353,7 +353,7 @@ angle() {
 
 snaps(mousePoint, delta) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -411,7 +411,7 @@ extremes() {
 
 within(selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -432,7 +432,7 @@ within(selection_extremes) {
 
 touched(selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 

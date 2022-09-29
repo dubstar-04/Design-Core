@@ -17,8 +17,8 @@ static register() {
     return command
 }
 
-prompt(scene) {
-    var num = scene.inputArray.length;
+prompt(core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -28,7 +28,7 @@ prompt(scene) {
     prompt[0] = "Select boundary edges:";
 
     expectedType[1] = ["object"];   
-    prompt[1] = scene.selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
+    prompt[1] = core.scene.selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
  
     expectedType[2] = ["boolean"];   
     prompt[2] = "Select object to Trim:";
@@ -39,36 +39,36 @@ prompt(scene) {
     expectedType[4] = expectedType[3];    
     prompt[4] = prompt[3];
  
-    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num-1])
             
     if(!validInput || num > 3){
-        scene.inputArray.pop()
+        core.scene.inputArray.pop()
     }
     
-    if (scene.inputArray.length === 3){
+    if (core.scene.inputArray.length === 3){
         action = true;
         //reset = true
     }
 
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
-action(scene){
+action(core){
 
     console.log("Trim.js: action")
 
-    console.log("Trim.js: scene.selectionSet length:", scene.selectionSet.length)
+    console.log("Trim.js: core.scene.selectionSet length:", core.scene.selectionSet.length)
 
-    var item = scene.findClosestItem();
+    var item = core.scene.findClosestItem();
 
     if (item !== undefined){
 
         var intersectPoints = [];
 
-        for (var i = 0; i < scene.selectionSet.length; i++){
-            if (scene.selectionSet[i] !== item){
-                var boundaryItem = scene.items[scene.selectionSet[i]];
-                var TrimItem = scene.items[item];
+        for (var i = 0; i < core.scene.selectionSet.length; i++){
+            if (core.scene.selectionSet[i] !== item){
+                var boundaryItem = core.scene.items[core.scene.selectionSet[i]];
+                var TrimItem = core.scene.items[item];
 
                 console.log("boundary.type:", boundaryItem.type, "Trim.type:", TrimItem.type)
 
@@ -88,7 +88,7 @@ action(scene){
         }
 
         if(intersectPoints)
-        TrimItem.trim(intersectPoints)
+        TrimItem.trim(intersectPoints, core)
     }
 
 }

@@ -69,15 +69,15 @@ static register() {
     return command
 }
 
-prompt(scene) {
-    var num = scene.inputArray.length;
+prompt(core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
     var prompt = [];
 
     console.log("dimension inputArray: ", inputArray)
-    console.log("type: ", typeof scene.inputArray[num - 1])
+    console.log("type: ", typeof core.scene.inputArray[num - 1])
 
     expectedType[0] = ["undefined"];
     prompt[0] = "Pick start point:"; //TODO: allow selecting entites, line / arc / circle
@@ -91,18 +91,18 @@ prompt(scene) {
     expectedType[3] = ["object"];
     prompt[3] = prompt[1];
 
-    var validInput = expectedType[num].includes(typeof scene.inputArray[num - 1])
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1])
 
     if (!validInput || num > this.minPoints) {
-        scene.inputArray.pop()
+        core.scene.inputArray.pop()
     }
 
-    if (scene.inputArray.length === this.minPoints) {
+    if (core.scene.inputArray.length === this.minPoints) {
         action = true;
         reset = true
     }
 
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
 getBaseDimType() {
@@ -325,18 +325,18 @@ getBlockEntities() {
 
 }
 
-draw(ctx, scale, designEngine) {
+draw(ctx, scale, core) {
 
     var rect = this.getBoundingRect()
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = designEngine.LM.getLayerByName(this.layer).colour
+        colour = core.LM.getLayerByName(this.layer).colour
     }
 
     entities = this.getBlockEntities();
@@ -350,7 +350,7 @@ draw(ctx, scale, designEngine) {
         this.block.addItem(this.text);
     }
 
-    this.block.draw(ctx, scale, designEngine);
+    this.block.draw(ctx, scale, core);
 
     function drawArrowHead(point, angle, height) {
         //console.log("arrow head height:", height)

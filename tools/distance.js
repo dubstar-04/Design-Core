@@ -18,8 +18,8 @@ static register() {
     return command
 }
 
-prompt(scene) {
-  var num = scene.inputArray.length;
+prompt(core) {
+  var num = core.scene.inputArray.length;
   var expectedType = [];
   var reset = false;
   var action = false;
@@ -34,16 +34,16 @@ prompt(scene) {
   expectedType[2] = ["object"];    
   prompt[2] = "";
 
-  var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
+  var validInput = expectedType[num].includes(typeof core.scene.inputArray[num-1])
             
   if(!validInput){
-      scene.inputArray.pop()
-  }else if (scene.inputArray.length === this.minPoints){
+      core.scene.inputArray.pop()
+  }else if (core.scene.inputArray.length === this.minPoints){
       action = true;
       reset = true
   }
   
-  return [prompt[scene.inputArray.length], reset, action, validInput]
+  return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
 preview(num) {
@@ -52,13 +52,13 @@ console.log("TO DO: Draw a preview of the measurement")
 
 }
 
-action(scene){
+action(core){
 
     //var point1 = new Point(points[0].x, points[0].y)
     //var point2 = new Point(points[1].x, points[1].y)
 
-    var di = (" Length: " + Utils.distBetweenPoints(scene.points[0].x, scene.points[0].y, scene.points[1].x, scene.points[1].y).toFixed(1)
-                + " X: " + (scene.points[1].x - scene.points[0].x).toFixed(1) + " Y:" + (scene.points[1].y - scene.points[0].y).toFixed(1));
+    var di = (" Length: " + Utils.distBetweenPoints(core.scene.points[0].x, core.scene.points[0].y, core.scene.points[1].x, core.scene.points[1].y).toFixed(1)
+                + " X: " + (core.scene.points[1].x - core.scene.points[0].x).toFixed(1) + " Y:" + (core.scene.points[1].y - core.scene.points[0].y).toFixed(1));
 				
 	notify(di)
 }

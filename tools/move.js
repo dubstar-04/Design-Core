@@ -15,20 +15,20 @@ static register() {
     return command
 }
 
-prompt(scene) {
-    var num = scene.inputArray.length;
+prompt(core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
     var prompt = [];
 
-    console.log("inputArray: ", scene.inputArray)
+    console.log("inputArray: ", core.scene.inputArray)
 
     expectedType[0] = ["undefined"];
     prompt[0] = "Select Items To " + this.type;
 
     expectedType[1] = ["object"];
-    prompt[1] = scene.selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
+    prompt[1] = core.scene.selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
 
     expectedType[2] = ["boolean"];
     prompt[2] = "Select Base Point:";
@@ -39,54 +39,60 @@ prompt(scene) {
     expectedType[4] = ["object", "number"];
     prompt[4] = "";
 
-    var validInput = expectedType[num].includes(typeof scene.inputArray[num - 1])
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1])
 
     if (!validInput) {
-        scene.inputArray.pop()
-    } else if (scene.inputArray.length === 4) {
+        core.scene.inputArray.pop()
+    } else if (core.scene.inputArray.length === 4) {
         action = true;
         reset = true
     }
 
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
-action(scene) {
+action(core) {
 
     console.log("move.js: action")
-    console.log("move.js: points length: " + scene.points.length)
-    console.log("move.js: items length: " + scene.items.length)
+    console.log("move.js: points length: " + core.scene.points.length)
+    console.log("move.js: items length: " + core.scene.items.length)
 
-    var xDelta = scene.points[1].x - scene.points[0].x
-    var yDelta = scene.points[1].y - scene.points[0].y
+    var xDelta = core.scene.points[1].x - core.scene.points[0].x
+    var yDelta = core.scene.points[1].y - core.scene.points[0].y
 
     console.log("move.js: X: " + xDelta + " Y: " + yDelta)
 
-    for (var i = 0; i < scene.selectionSet.length; i++) {
-        //console.log("scene.selectionSet.type: " + scene.selectionSet[i].type);
-        for (var j = 0; j < scene.selectedItems[i].points.length; j++) {
-            scene.items[scene.selectionSet[i]].points[j].x = scene.items[scene.selectionSet[i]].points[j].x + xDelta;
-            scene.items[scene.selectionSet[i]].points[j].y = scene.items[scene.selectionSet[i]].points[j].y + yDelta;
+    for (var i = 0; i < core.scene.selectionSet.length; i++) {
+        //console.log("core.scene.selectionSet.type: " + core.scene.selectionSet[i].type);
+        for (var j = 0; j < core.scene.selectedItems[i].points.length; j++) {
+            core.scene.items[core.scene.selectionSet[i]].points[j].x = core.scene.items[core.scene.selectionSet[i]].points[j].x + xDelta;
+            core.scene.items[core.scene.selectionSet[i]].points[j].y = core.scene.items[core.scene.selectionSet[i]].points[j].y + yDelta;
         }
     }
 
 }
 
-preview(scene) {
+preview(core) {
 
     //console.log("move.js: preview")
     //console.log("move.js: points length: " + points.length)
     //console.log("move.js: selectedItems length: " + selectedItems.length)
     //console.log("move.js: items length: " + items.length)
 
-    var xDelta = scene.tempPoints[1].x - scene.tempPoints[0].x
-    var yDelta = scene.tempPoints[1].y - scene.tempPoints[0].y
+    var xDelta = core.scene.tempPoints[1].x - core.scene.tempPoints[0].x
+    var yDelta = core.scene.tempPoints[1].y - core.scene.tempPoints[0].y
 
-    for (var i = 0; i < scene.selectionSet.length; i++) {
-        //console.log("scene.selectionSet.type: " + selectedItems[i].type);
-        for (var j = 0; j < scene.selectedItems[i].points.length; j++) {
-            scene.selectedItems[i].points[j].x = scene.items[scene.selectionSet[i]].points[j].x + xDelta;
-            scene.selectedItems[i].points[j].y = scene.items[scene.selectionSet[i]].points[j].y + yDelta;
+    console.log("delta", xDelta, yDelta);
+    console.log(core.scene.tempPoints[0].x, core.scene.tempPoints[0].y)
+    console.log(core.scene.tempPoints[1].x, core.scene.tempPoints[1].y)
+    console.log(core.scene.items[core.scene.selectionSet[0]].points[0].x, core.scene.items[core.scene.selectionSet[0]].points[0].y)
+
+    for (var i = 0; i < core.scene.selectionSet.length; i++) {
+        //console.log("core.scene.selectionSet.type: " + selectedItems[i].type);
+        for (var j = 0; j < core.scene.selectedItems[i].points.length; j++) {
+            
+            core.scene.selectedItems[i].points[j].x = core.scene.items[core.scene.selectionSet[i]].points[j].x + xDelta;
+            core.scene.selectedItems[i].points[j].y = core.scene.items[core.scene.selectionSet[i]].points[j].y + yDelta;
         }
     }
   }

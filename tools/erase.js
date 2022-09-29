@@ -15,8 +15,8 @@ static register() {
     return command
 }
 
-prompt(scene) {
-    var num = scene.inputArray.length;
+prompt(core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -26,32 +26,32 @@ prompt(scene) {
     prompt[0] = "Select Items To " + this.type;
  
     expectedType[1] = ["object"];   
-    prompt[1] = scene.selectionSet.length + " Item(s) selected: Add more or press Enter to Erase";
+    prompt[1] = core.scene.selectionSet.length + " Item(s) selected: Add more or press Enter to Erase";
  
     expectedType[2] = ["boolean"];    
     prompt[2] = "";
 
-    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num-1])
             
     if(!validInput){
-        scene.inputArray.pop()
-    }else if (scene.inputArray.length === 2){
+        core.scene.inputArray.pop()
+    }else if (core.scene.inputArray.length === 2){
         action = true;
         reset = true
     }
     
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
-action(scene) {
+action(core) {
 
-    scene.selectionSet.sort();
+    core.scene.selectionSet.sort();
 
-    console.log("erase.js - scene.selectionSet: " + scene.selectionSet);
+    console.log("erase.js - core.scene.selectionSet: " + core.scene.selectionSet);
 
-    for (var i = 0; i < scene.selectionSet.length; i++) {
-        //console.log("Erase: " + scene.selectionSet[i]);
-        scene.items.splice((scene.selectionSet[i] - i), 1)
+    for (var i = 0; i < core.scene.selectionSet.length; i++) {
+        //console.log("Erase: " + core.scene.selectionSet[i]);
+        core.scene.items.splice((core.scene.selectionSet[i] - i), 1)
     }
 }
 }

@@ -52,8 +52,8 @@ calculateRadius () {
     this.radius = Utils.distBetweenPoints(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y);
 }
 
-prompt (scene) {
-    var num = scene.inputArray.length;
+prompt (core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -68,28 +68,28 @@ prompt (scene) {
     expectedType[2] = ["object", "number"];   
     prompt[2] = prompt[1];
             
-    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num-1])
             
     if(!validInput){
-        scene.inputArray.pop()
-    }else if (scene.inputArray.length === this.minPoints){
+        core.scene.inputArray.pop()
+    }else if (core.scene.inputArray.length === this.minPoints){
         action = true;
         reset = true
     }
 
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
-draw(ctx, scale, designEngine) {
+draw(ctx, scale, core) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = designEngine.LM.getLayerByName(this.layer).colour
+        colour = core.LM.getLayerByName(this.layer).colour
     }
 
     this.calculateRadius(); //is this the most efficient way to update the radius?
@@ -150,13 +150,13 @@ dxf () {
     return data
 }
 
-trim (points) {
+trim(points, core) {
     console.log("circle.js - Points:", points.length)
 
     if (points.length > 1) {
 
         var start = points[0];
-        var cen = mouse;
+        var cen = core.mouse.currentPoint();
         var end = points[1];
 
         //console.log("Angle:", a-a, " Angle2: ", b, " centre: ", c)
@@ -181,7 +181,7 @@ trim (points) {
         }
 
         //TODO: Can't call scene from here
-        scene.addToScene("Arc", data, false, items.indexOf(this))
+        core.scene.addToScene("Arc", data, false, core.scene.items.indexOf(this))
 
     }
 }
@@ -195,7 +195,7 @@ intersectPoints () {
 
 snaps (mousePoint, delta) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -267,7 +267,7 @@ extremes () {
 
 within (selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -288,7 +288,7 @@ within (selection_extremes) {
 
 touched (selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 

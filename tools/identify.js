@@ -16,8 +16,8 @@ static register() {
   return command
 }
 
-prompt(scene) {
-  var num = scene.inputArray.length;
+prompt(core) {
+  var num = core.scene.inputArray.length;
   var expectedType = [];
   var reset = false;
   var action = false;
@@ -29,16 +29,16 @@ prompt(scene) {
   expectedType[1] = ["object"];    
   prompt[1] = "";
 
-  var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
+  var validInput = expectedType[num].includes(typeof core.scene.inputArray[num-1])
             
   if(!validInput){
-      scene.inputArray.pop()
-  }else if (scene.inputArray.length === this.minPoints){
+      core.scene.inputArray.pop()
+  }else if (core.scene.inputArray.length === this.minPoints){
       action = true;
       reset = true
   }
   
-  return [prompt[scene.inputArray.length], reset, action, validInput]
+  return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
 preview() {
@@ -47,9 +47,9 @@ return;
 
 }
 
-action(scene){
+action(core){
 	
-  var id = (" X: " + scene.points[0].x.toFixed(1) + " Y:" + scene.points[0].y.toFixed(1));		
+  var id = (" X: " + core.scene.points[0].x.toFixed(1) + " Y:" + core.scene.points[0].y.toFixed(1));		
 	notify(id)
 }
 }

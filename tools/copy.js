@@ -18,8 +18,8 @@ static register() {
     return command
 }
 
-prompt(scene) {
-    var num = scene.inputArray.length;
+prompt(core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -29,7 +29,7 @@ prompt(scene) {
     prompt[0] = "Select Items To " + this.type;
  
     expectedType[1] = ["object"];   
-    prompt[1] = scene.selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
+    prompt[1] = core.scene.selectionSet.length + " Item(s) selected: Add more or press Enter to accept";
  
     expectedType[2] = ["boolean"];    
     prompt[2] = "Select Base Point:";
@@ -40,52 +40,52 @@ prompt(scene) {
     expectedType[4] = ["object"];   
     prompt[4] = "";
             
-    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num-1])
             
     if(!validInput){
-        scene.scene.inputArray.pop()
-    }else if (scene.inputArray.length === 4){
+        core.scene.inputArray.pop()
+    }else if (core.scene.inputArray.length === 4){
         action = true;
         reset = true
     }
     
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
-action = function(scene){
+action = function(core){
 
     //console.log("Copy Stuff")
 
-    var xDelta =  scene.points[1].x - scene.points[0].x
-    var yDelta =  scene.points[1].y - scene.points[0].y
+    var xDelta =  core.scene.points[1].x - core.scene.points[0].x
+    var yDelta =  core.scene.points[1].y - core.scene.points[0].y
 
-    for (var i = 0; i < scene.selectionSet.length; i++){
+    for (var i = 0; i < core.scene.selectionSet.length; i++){
         //console.log("selectionset.type: " + selectionSet[i].type);
 
-        var copyofitem = Utils.cloneObject(scene, scene.items[scene.selectionSet[i]]);
+        var copyofitem = Utils.cloneObject(core, core.scene.items[core.scene.selectionSet[i]]);
 
         for (var j = 0; j < copyofitem.points.length; j++){
-            copyofitem.points[j].x = scene.items[scene.selectionSet[i]].points[j].x + xDelta;
-            copyofitem.points[j].y = scene.items[scene.selectionSet[i]].points[j].y + yDelta;
+            copyofitem.points[j].x = core.scene.items[core.scene.selectionSet[i]].points[j].x + xDelta;
+            copyofitem.points[j].y = core.scene.items[core.scene.selectionSet[i]].points[j].y + yDelta;
         }
 
-          scene.items.push(copyofitem);
+          core.scene.items.push(copyofitem);
     }
 
 }
 
-preview = function(scene){
+preview = function(core){
 
     //console.log("Copy Stuff")
 
-    var xDelta =  scene.tempPoints[1].x - scene.tempPoints[0].x
-    var yDelta =  scene.tempPoints[1].y - scene.tempPoints[0].y
+    var xDelta =  core.scene.tempPoints[1].x - core.scene.tempPoints[0].x
+    var yDelta =  core.scene.tempPoints[1].y - core.scene.tempPoints[0].y
 
-    for (var i = 0; i < scene.selectionSet.length; i++){
+    for (var i = 0; i < core.scene.selectionSet.length; i++){
         //console.log("selectionset.type: " + selectionSet[i].type);
-        for (var j = 0; j < scene.selectedItems[i].points.length; j++){
-            scene.selectedItems[i].points[j].x = scene.items[scene.selectionSet[i]].points[j].x + xDelta;
-            scene.selectedItems[i].points[j].y = scene.items[scene.selectionSet[i]].points[j].y + yDelta;
+        for (var j = 0; j < core.scene.selectedItems[i].points.length; j++){
+            core.scene.selectedItems[i].points[j].x = core.scene.items[core.scene.selectionSet[i]].points[j].x + xDelta;
+            core.scene.selectedItems[i].points[j].y = core.scene.items[core.scene.selectionSet[i]].points[j].y + yDelta;
         }
     }
 }

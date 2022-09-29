@@ -97,21 +97,21 @@ addInsert(data) {
     this.points[0] = point;
 }
 
-draw(ctx, scale, designEngine) {
+draw(ctx, scale, core) {
 
     if (!this.items.length) {
         // nothing to draw
         return
     }
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = designEngine.LM.getLayerByName(this.layer).colour
+        colour = core.LM.getLayerByName(this.layer).colour
     }
 
     ctx.save();
@@ -135,7 +135,7 @@ draw(ctx, scale, designEngine) {
                 tempColour = this.items[item].colour
                 this.items[item].colour = this.colour;
             }
-            this.items[item].draw(ctx, scale, designEngine);
+            this.items[item].draw(ctx, scale, core);
             // reset item colour
             this.items[item].colour = itemColour;
         } else {
@@ -168,7 +168,7 @@ snaps(mousePoint, delta) {
         return snaps;
     }
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -276,7 +276,7 @@ touched(selection_extremes) {
         return false
     }
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 

@@ -38,7 +38,7 @@ export class Text {
 
         if (data.input) {
             //TODO: Find a better way of providing this data
-            // This comes from designEngine
+            // This comes from core
             this.height = data.input[1];
             this.string = data.input[2];
         }
@@ -99,15 +99,15 @@ static register() {
     return command
 }
 
-prompt(scene) {
-    var num = scene.inputArray.length;
+prompt(core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
     var prompt = [];
 
-    console.log("inputArray: ", inputArray)
-    console.log("type: ", typeof scene.inputArray[num - 1])
+    console.log("inputArray: ", core.scene.inputArray)
+    console.log("type: ", typeof core.scene.inputArray[num - 1])
 
     expectedType[0] = ["undefined"];
     prompt[0] = "Pick start point:";
@@ -121,17 +121,17 @@ prompt(scene) {
     expectedType[3] = ["string", "number"];
     prompt[3] = "";
 
-    var validInput = expectedType[num].includes(typeof scene.inputArray[num - 1])
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1])
 
     if (!validInput) {
         console.log("invalid")
-        scene.inputArray.pop()
-    } else if (scene.inputArray.length === 3) {
+        core.scene.inputArray.pop()
+    } else if (core.scene.inputArray.length === 3) {
         action = true;
         reset = true
     }
 
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
 width() {
@@ -199,22 +199,22 @@ getBoundingRect() {
     return rect
 }
 
-draw(ctx, scale, designEngine) {
+draw(ctx, scale, core) {
 
     //var rect = this.getBoundingRect()
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = designEngine.LM.getLayerByName(this.layer).colour
+        colour = core.LM.getLayerByName(this.layer).colour
     }
 
     //ctx.strokeStyle = colour; // Text doesn't require a stroke, see fill.
-    ctx.font = this.height + "pt " + designEngine.SM.getStyleByName(this.styleName).font.toString();
+    ctx.font = this.height + "pt " + core.SM.getStyleByName(this.styleName).font.toString();
     ctx.fillStyle = colour;
     ctx.textAlign = this.getHorizontalAlignment();
     ctx.textBaseline = this.getVerticalAlignment();
@@ -374,7 +374,7 @@ intersectPoints() {
 
 touched(selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 

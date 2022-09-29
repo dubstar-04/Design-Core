@@ -41,8 +41,8 @@ static register() {
     return command
 }
 
-prompt(scene) {
-    var num = scene.inputArray.length;
+prompt(core) {
+    var num = core.scene.inputArray.length;
     var expectedType = [];
     var reset = false;
     var action = false;
@@ -62,28 +62,28 @@ prompt(scene) {
     expectedType[3] = ["object","number"];   
     prompt[3] = prompt[1];
 
-    var validInput = expectedType[num].includes(typeof scene.inputArray[num-1])
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num-1])
             
     if(!validInput || num > this.minPoints){
-        scene.inputArray.pop()
-    }else if (scene.inputArray.length === this.minPoints){
+        core.scene.inputArray.pop()
+    }else if (core.scene.inputArray.length === this.minPoints){
         action = true;
         //reset = true
     }
     
-    return [prompt[scene.inputArray.length], reset, action, validInput]
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
 }
 
-draw(ctx, scale, designEngine) {
+draw(ctx, scale, core) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
     var colour = this.colour;
 
     if (this.colour === "BYLAYER") {
-        colour = designEngine.LM.getLayerByName(this.layer).colour
+        colour = core.LM.getLayerByName(this.layer).colour
     }
 
     ctx.strokeStyle = colour;
@@ -202,7 +202,7 @@ midPoint(x, x1, y, y1) {
 
 snaps(mousePoint, delta) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -283,7 +283,7 @@ extremes() {
 
 within(selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
@@ -303,7 +303,7 @@ within(selection_extremes) {
 
 touched(selection_extremes) {
 
-    if (!designEngine.LM.layerVisible(this.layer)) {
+    if (!core.LM.layerVisible(this.layer)) {
         return
     }
 
