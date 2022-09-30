@@ -140,22 +140,6 @@ draw(ctx, scale, core) {
 }
 }
 
-svg() {
-    //<Spline x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
-    //<Spline x1="20" y1="100" x2="100" y2="100" stroke-width="2" stroke="black"/>
-    var quote = "\""
-    var svgstr = ""
-    var data = svgstr.concat("<Spline x1=", "\"", this.startX, "\"",
-            " y1=", "\"", this.startY, "\"",
-            " x2=", "\"", this.endX, "\"",
-            " y2=", "\"", this.endY, "\"",
-            " stroke=", "\"", this.colour, "\"",
-            " stroke-width=", "\"", this.SplineWidth, "\"", "/>"
-        )
-        //console.log(data)
-    return data
-}
-
 dxf() {
 
     var closed = (this.points[0].x === this.points[this.points.length - 1].x && this.points[0].y === this.points[this.points.length - 1].y);

@@ -254,12 +254,6 @@ draw(ctx, scale, core) {
     */
 }
 
-SVG(file) {
-    //<Text x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
-    //"<Text x1=" + this.startX  + "y1=" + this.startY + "x2=" + this.endX + "y2=" + this.endY + "style=" + this.colour + ";stroke-width:" + this.TextWidth + "/>"
-}
-
-
 dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(

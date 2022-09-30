@@ -135,20 +135,6 @@ draw(ctx, scale, core) {
     //ctx.restore();
 }
 
-svg() {
-    //<Ellipse cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
-    var svgstr = ""
-    var data = svgstr.concat("<Ellipse",
-        " cx=", "\"", this.points[0].x, "\"",
-        " cy=", "\"", this.points[0].y, "\"",
-        " r=", "\"", this.radius, "\"",
-        " stroke=", "\"", this.colour, "\"",
-        " stroke-width=", "\"", this.lineWidth, "\"", "/>"
-    )
-    //console.log(data)
-    return data
-}
-
 dxf() {
     var dxfitem = ""
     var major_axis_x = (this.width > this.height ? this.width / 2 : 0);

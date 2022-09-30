@@ -140,22 +140,6 @@ properties() {
 
 }
 
-svg() {
-    //<Arc cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
-    var svgstr = ""
-    var data = svgstr.concat("<Arc",
-        " cx=", "\"", this.points[0].x, "\"",
-        " cy=", "\"", this.points[0].y, "\"",
-        " r=", "\"", this.radius, "\"",
-        " stroke=", "\"", this.colour, "\"",
-        " stroke-width=", "\"", this.lineWidth, "\"", "/>"
-    )
-    //console.log(data)
-    return data
-}
-
-
-
 dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(

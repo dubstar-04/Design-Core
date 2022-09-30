@@ -105,22 +105,6 @@ draw(ctx, scale, core) {
     ctx.stroke()
 }
 
-svg() {
-    //<line x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
-    //<line x1="20" y1="100" x2="100" y2="100" stroke-width="2" stroke="black"/>
-    var quote = "\""
-    var svgstr = ""
-    var data = svgstr.concat("<line x1=", "\"", this.points[0].x, "\"",
-            " y1=", "\"", this.points[0].y, "\"",
-            " x2=", "\"", this.points[1].x, "\"",
-            " y2=", "\"", this.points[1].y, "\"",
-            " stroke=", "\"", this.colour, "\"",
-            " stroke-width=", "\"", this.lineWidth, "\"", "/>"
-        )
-        //console.log(data)
-    return data
-}
-
 dxf() {
     var dxfitem = ""
     var data = dxfitem.concat(

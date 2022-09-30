@@ -98,21 +98,6 @@ draw(ctx, scale, core) {
     ctx.stroke()
 }
 
-svg() {
-    //<Polyline x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
-    //<Polyline x1="20" y1="100" x2="100" y2="100" stroke-width="2" stroke="black"/>
-    var quote = "\""
-    var svgstr = ""
-    var data = svgstr.concat("<Polyline x1=", "\"", this.startX, "\"",
-        " y1=", "\"", this.startY, "\"",
-        " x2=", "\"", this.endX, "\"",
-        " y2=", "\"", this.endY, "\"",
-        " stroke=", "\"", this.colour, "\"",
-        " stroke-width=", "\"", this.PolylineWidth, "\"", "/>"
-    )
-    //console.log(data)
-    return data
-}
 
 dxf() {
 
