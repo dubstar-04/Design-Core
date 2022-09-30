@@ -3,7 +3,7 @@ import { Utils } from '../lib/utils.js'
 import { Intersection } from '../lib/intersect.js'
 
 export class Line {
-    constructor(data) { 
+    constructor(data) {
         //Define Properties         //Associated DXF Value
         this.type = "Line";
         this.family = "Geometry";
@@ -17,10 +17,10 @@ export class Line {
         this.colour = "BYLAYER";
         this.layer = "0";
         this.alpha = 1.0 //Transparancy
-            //this.lineType
-            //this.LinetypeScale
-            //this.PlotStyle
-            //this.LineWeight
+        //this.lineType
+        //this.LinetypeScale
+        //this.PlotStyle
+        //this.LineWeight
 
         if (data) {
 
@@ -44,400 +44,400 @@ export class Line {
     }
 
 
-static register() {
-    var command = {command: "Line", shortcut: "L"};
-    return command
-}
-
-prompt(core) {
-    var num = core.scene.inputArray.length;
-    var expectedType = [];
-    var reset = false;
-    var action = false;
-    var validInput = true
-    var prompt = [];
-
-    //console.log("inputArray: ", inputArray)
-
-    expectedType[0] = ["undefined"];
-    prompt[0] = "Pick start point:";
-
-    expectedType[1] = ["object"];
-    prompt[1] = "Pick another point or press ESC to quit:";
-
-    expectedType[2] = ["object", "number"];
-    prompt[2] = prompt[1];
-
-    expectedType[3] = ["object", "number"];
-    prompt[3] = prompt[1];
-
-    validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1])
-
-    if (!validInput || num > this.minPoints) {
-        core.scene.inputArray.pop()
+    static register() {
+        var command = { command: "Line", shortcut: "L" };
+        return command
     }
 
-    if (core.scene.inputArray.length === this.minPoints) {
-        action = true;
-        //reset = true
+    prompt(core) {
+        var num = core.scene.inputArray.length;
+        var expectedType = [];
+        var reset = false;
+        var action = false;
+        var validInput = true
+        var prompt = [];
+
+        //console.log("inputArray: ", inputArray)
+
+        expectedType[0] = ["undefined"];
+        prompt[0] = "Pick start point:";
+
+        expectedType[1] = ["object"];
+        prompt[1] = "Pick another point or press ESC to quit:";
+
+        expectedType[2] = ["object", "number"];
+        prompt[2] = prompt[1];
+
+        expectedType[3] = ["object", "number"];
+        prompt[3] = prompt[1];
+
+        validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1])
+
+        if (!validInput || num > this.minPoints) {
+            core.scene.inputArray.pop()
+        }
+
+        if (core.scene.inputArray.length === this.minPoints) {
+            action = true;
+            //reset = true
+        }
+
+        return [prompt[core.scene.inputArray.length], reset, action, validInput]
     }
 
-    return [prompt[core.scene.inputArray.length], reset, action, validInput]
-}
+    draw(ctx, scale, core) {
 
-draw(ctx, scale, core) {
+        if (!core.LM.layerVisible(this.layer)) {
+            return
+        }
 
-    if (!core.LM.layerVisible(this.layer)) {
-        return
+        var colour = this.colour;
+
+        if (this.colour === "BYLAYER") {
+            colour = core.LM.getLayerByName(this.layer).colour
+        }
+
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = this.lineWidth / scale;
+        ctx.beginPath()
+        ctx.moveTo(this.points[0].x, this.points[0].y);
+        ctx.lineTo(this.points[1].x, this.points[1].y);
+        ctx.stroke()
     }
 
-    var colour = this.colour;
-
-    if (this.colour === "BYLAYER") {
-        colour = core.LM.getLayerByName(this.layer).colour
+    dxf() {
+        var dxfitem = ""
+        var data = dxfitem.concat(
+            "0",
+            "\n", "LINE",
+            //"\n", "5", //HANDLE
+            //"\n", "DA",
+            "\n", "8", //LAYERNAME
+            "\n", this.layer,
+            "\n", "10", //X
+            "\n", this.points[0].x,
+            "\n", "20", //Y
+            "\n", this.points[0].y,
+            "\n", "30", //Z
+            "\n", "0.0",
+            "\n", "11", //X
+            "\n", this.points[1].x,
+            "\n", "21", //Y
+            "\n", this.points[1].y, //Y
+            "\n", "31", //Z
+            "\n", "0.0"
+        )
+        console.log(" line.js - DXF Data:" + data)
+        return data
     }
 
-    ctx.strokeStyle = colour;
-    ctx.lineWidth = this.lineWidth / scale;
-    ctx.beginPath()
-    ctx.moveTo(this.points[0].x, this.points[0].y);
-    ctx.lineTo(this.points[1].x, this.points[1].y);
-    ctx.stroke()
-}
+    trim(points, core) {
 
-dxf() {
-    var dxfitem = ""
-    var data = dxfitem.concat(
-        "0",
-        "\n", "LINE",
-        //"\n", "5", //HANDLE
-        //"\n", "DA",
-        "\n", "8", //LAYERNAME
-        "\n", this.layer,
-        "\n", "10", //X
-        "\n", this.points[0].x,
-        "\n", "20", //Y
-        "\n", this.points[0].y,
-        "\n", "30", //Z
-        "\n", "0.0",
-        "\n", "11", //X
-        "\n", this.points[1].x,
-        "\n", "21", //Y
-        "\n", this.points[1].y, //Y
-        "\n", "31", //Z
-        "\n", "0.0"
-    )
-    console.log(" line.js - DXF Data:" + data)
-    return data
-}
+        console.log("line.js - Points:", points.length)
 
-trim(points, core) {
+        function trimOneEnd(intersectPnts, line) {
+            console.log("line.js - trimOneEnd")
 
-    console.log("line.js - Points:", points.length)
+            var originPoint;
+            var destinationPoint;
+            var validPoints = []
 
-    function trimOneEnd(intersectPnts, line) {
-        console.log("line.js - trimOneEnd")
+            //Find which end is closer to the mouse
+            // if(line.points[0].distance(mouse) < line.points[1].distance(mouse)){
+            //     originPoint = 0;
+            // }else{
+            //     originPoint = 1;
+            // }
 
-        var originPoint;
-        var destinationPoint;
-        var validPoints = []
-
-        //Find which end is closer to the mouse
-        // if(line.points[0].distance(mouse) < line.points[1].distance(mouse)){
-        //     originPoint = 0;
-        // }else{
-        //     originPoint = 1;
-        // }
-
-        for (var i = 0; i < line.points.length; i++) {
-            for (var j = 0; j < intersectPnts.length; j++) {
-                //TODO: Pass in the mouse location rather than needing a ref to core
-                if (betweenPoints(core.mouse, [intersectPnts[j], line.points[i]], false)) {
-                    //console.log("Trimmed Length:", Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100, "Line length: ", Math.round(line.points[0].distance(line.points[1]) * 100) / 100)
-                    if (Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100 < Math.round(line.points[0].distance(line.points[1]) * 100) / 100) {
-                        originPoint = i;
-                        validPoints.push(j)
+            for (var i = 0; i < line.points.length; i++) {
+                for (var j = 0; j < intersectPnts.length; j++) {
+                    //TODO: Pass in the mouse location rather than needing a ref to core
+                    if (betweenPoints(core.mouse, [intersectPnts[j], line.points[i]], false)) {
+                        //console.log("Trimmed Length:", Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100, "Line length: ", Math.round(line.points[0].distance(line.points[1]) * 100) / 100)
+                        if (Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100 < Math.round(line.points[0].distance(line.points[1]) * 100) / 100) {
+                            originPoint = i;
+                            validPoints.push(j)
+                        }
                     }
                 }
             }
+
+            if (typeof validPoints !== "undefined") {
+                var dist = Number.POSITIVE_INFINITY;
+
+                for (var j = 0; j < validPoints.length; j++) {
+                    if (line.points[originPoint].distance(intersectPnts[validPoints[j]]) < dist) {
+                        dist = line.points[originPoint].distance(intersectPnts[validPoints[j]]);
+                        destinationPoint = validPoints[j]
+                        console.log("line.js - trim - Valid Point:", validPoints[j], "distance:", dist)
+                    }
+                }
+            }
+
+            if (typeof destinationPoint !== "undefined") {
+                console.log("destination point:", destinationPoint)
+                line.points[originPoint] = intersectPnts[destinationPoint];
+            }
         }
 
-        if (typeof validPoints !== "undefined") {
-            var dist = Number.POSITIVE_INFINITY;
+        function trimBetween(pnts, line) {
+            console.log("line.js - trimBetween")
 
-            for (var j = 0; j < validPoints.length; j++) {
-                if (line.points[originPoint].distance(intersectPnts[validPoints[j]]) < dist) {
-                    dist = line.points[originPoint].distance(intersectPnts[validPoints[j]]);
-                    destinationPoint = validPoints[j]
-                    console.log("line.js - trim - Valid Point:", validPoints[j], "distance:", dist)
+            var a = Math.round(line.points[0].distance(pnts[0]));
+            var b = Math.round(line.points[0].distance(pnts[1]));
+            var c = Math.round(line.points[1].distance(pnts[0]));
+            var d = Math.round(line.points[1].distance(pnts[1]));
+
+            if (a === 0 && d === 0 || b === 0 && c === 0) {
+
+                console.log("line.js -  trim() - Line Already Trimmed")
+            } else {
+
+                var data = {
+                    points: [pnts[a < b ? 1 : 0], line.points[1]],
+                    colour: line.colour,
+                    layer: line.layer,
+                    lineWidth: line.lineWidth
+                }
+
+                //TODO: Can't call scene from here
+                core.scene.addToScene("Line", data, false)
+
+                if (a < b) {
+                    line.points[1] = pnts[0];
+                } else {
+                    line.points[1] = pnts[1];
                 }
             }
         }
 
-        if (typeof destinationPoint !== "undefined") {
-            console.log("destination point:", destinationPoint)
-            line.points[originPoint] = intersectPnts[destinationPoint];
-        }
-    }
+        function betweenPoints(mousePnt, pntsArray, returnPoints) {
 
-    function trimBetween(pnts, line) {
-        console.log("line.js - trimBetween")
+            for (var i = 0; i < pntsArray.length - 1; i++) {
+                var a = pntsArray[i].distance(mousePnt)
+                var b = pntsArray[i + 1].distance(mousePnt)
+                var c = pntsArray[i].distance(pntsArray[i + 1])
 
-        var a = Math.round(line.points[0].distance(pnts[0]));
-        var b = Math.round(line.points[0].distance(pnts[1]));
-        var c = Math.round(line.points[1].distance(pnts[0]));
-        var d = Math.round(line.points[1].distance(pnts[1]));
+                if (Math.round(a + b) === Math.round(c)) {
+                    console.log("line.js - trim() - mouse is between two other points")
+                    if (returnPoints)
+                        return [pntsArray[i], pntsArray[i + 1]];
 
-        if (a === 0 && d === 0 || b === 0 && c === 0) {
-
-            console.log("line.js -  trim() - Line Already Trimmed")
-        } else {
-
-            var data = {
-                points: [pnts[a < b ? 1 : 0], line.points[1]],
-                colour: line.colour,
-                layer: line.layer,
-                lineWidth: line.lineWidth
+                    return true;
+                }
             }
+        }
 
-            //TODO: Can't call scene from here
-            core.scene.addToScene("Line", data, false)
+        if (points.length > 1) {
+            //is the mouse between two points
+            var pnts = betweenPoints(core.mouse, points, true)
 
-            if (a < b) {
-                line.points[1] = pnts[0];
+            if (typeof pnts !== "undefined") {
+                trimBetween(pnts, this);
             } else {
-                line.points[1] = pnts[1];
+                console.log("line.js - trim() - multiple intersection & mouse is at one end")
+                trimOneEnd(points, this)
             }
-        }
-    }
 
-    function betweenPoints(mousePnt, pntsArray, returnPoints) {
 
-        for (var i = 0; i < pntsArray.length - 1; i++) {
-            var a = pntsArray[i].distance(mousePnt)
-            var b = pntsArray[i + 1].distance(mousePnt)
-            var c = pntsArray[i].distance(pntsArray[i + 1])
-
-            if (Math.round(a + b) === Math.round(c)) {
-                console.log("line.js - trim() - mouse is between two other points")
-                if (returnPoints)
-                    return [pntsArray[i], pntsArray[i + 1]];
-
-                return true;
-            }
-        }
-    }
-
-    if (points.length > 1) {
-        //is the mouse between two points
-        var pnts = betweenPoints(core.mouse, points, true)
-
-        if (typeof pnts !== "undefined") {
-            trimBetween(pnts, this);
         } else {
-            console.log("line.js - trim() - multiple intersection & mouse is at one end")
+            console.log("line.js - trim() - single intersection & mouse is at one end")
             trimOneEnd(points, this)
         }
 
-
-    } else {
-        console.log("line.js - trim() - single intersection & mouse is at one end")
-        trimOneEnd(points, this)
     }
 
-}
+    extend(points) {
 
-extend(points) {
+        var originPoint;
+        var destinationPoint;
 
-    var originPoint;
-    var destinationPoint;
-
-    //Find which end is closer to the mouse
-    //ToDo: Pass the mouse location in rather than needing a ref to core.
-    if (this.points[0].distance(core.mouse) < this.points[1].distance(core.mouse)) {
-        originPoint = 0;
-    } else {
-        originPoint = 1;
-    }
-
-    // check if any of the points are valid
-    var validPoints = [];
-
-    for (var i = 0; i < points.length; i++) {
-
-        console.log("line.js - extend - intersection point:", i)
-
-        console.log("line.js - extend - origin to dest:", Math.round(this.points[originPoint].angle(points[i])))
-        console.log("line.js - extend - origin angle:", Math.round(this.points[originPoint ? 0 : 1].angle(this.points[originPoint])))
-
-        if (Math.round(this.points[originPoint].angle(points[i])) === Math.round(this.points[originPoint ? 0 : 1].angle(this.points[originPoint])))
-
-        // if the destination point is different than the origin add it to the array of valid points
-            if (Math.round(this.points[originPoint].distance(points[i])) !== 0) {
-            validPoints.push(i)
+        //Find which end is closer to the mouse
+        //ToDo: Pass the mouse location in rather than needing a ref to core.
+        if (this.points[0].distance(core.mouse) < this.points[1].distance(core.mouse)) {
+            originPoint = 0;
+        } else {
+            originPoint = 1;
         }
+
+        // check if any of the points are valid
+        var validPoints = [];
+
+        for (var i = 0; i < points.length; i++) {
+
+            console.log("line.js - extend - intersection point:", i)
+
+            console.log("line.js - extend - origin to dest:", Math.round(this.points[originPoint].angle(points[i])))
+            console.log("line.js - extend - origin angle:", Math.round(this.points[originPoint ? 0 : 1].angle(this.points[originPoint])))
+
+            if (Math.round(this.points[originPoint].angle(points[i])) === Math.round(this.points[originPoint ? 0 : 1].angle(this.points[originPoint])))
+
+                // if the destination point is different than the origin add it to the array of valid points
+                if (Math.round(this.points[originPoint].distance(points[i])) !== 0) {
+                    validPoints.push(i)
+                }
+        }
+
+        console.log("line.js - extend - Valid Points:", validPoints.length);
+
+        if (validPoints.length > 1) {
+            var dist = Number.POSITIVE_INFINITY;
+
+            for (var j = 0; j < validPoints.length; j++) {
+                if (this.points[originPoint].distance(points[validPoints[j]]) < dist) {
+                    dist = this.points[originPoint].distance(points[validPoints[j]]);
+                    destinationPoint = validPoints[j]
+                    console.log("line.js - extend - Valid Point:", validPoints[j], "distance:", dist)
+                }
+            }
+        } else if (validPoints.length === 1) {
+            //only one valid point
+            destinationPoint = validPoints[0]
+        }
+
+        if (destinationPoint !== undefined) {
+            console.log("destination point:", destinationPoint)
+            this.points[originPoint] = points[destinationPoint];
+        }
+
     }
 
-    console.log("line.js - extend - Valid Points:", validPoints.length);
+    intersectPoints() {
 
-    if (validPoints.length > 1) {
-        var dist = Number.POSITIVE_INFINITY;
+        return {
+            start: this.points[0],
+            end: this.points[1]
+        }
 
-        for (var j = 0; j < validPoints.length; j++) {
-            if (this.points[originPoint].distance(points[validPoints[j]]) < dist) {
-                dist = this.points[originPoint].distance(points[validPoints[j]]);
-                destinationPoint = validPoints[j]
-                console.log("line.js - extend - Valid Point:", validPoints[j], "distance:", dist)
+    }
+
+    length() {
+        var A = (this.points[0].x - this.points[1].x)
+        var B = (this.points[0].y - this.points[1].y)
+        var ASQ = Math.pow(A, 2)
+        var BSQ = Math.pow(B, 2)
+        var dist = Math.sqrt(ASQ + BSQ)
+
+        return dist
+    }
+
+    midPoint() {
+        //var midX = (this.points[0].x + this.points[1].x) / 2
+        //var midY = (this.points[0].y + this.points[1].y) / 2
+
+        var midPoint = this.points[0].midPoint(this.points[1]); //new Point(midX, midY);
+
+        return midPoint;
+    }
+
+    angle() {
+        var angle = 180;
+        return angle
+    }
+
+    snaps(mousePoint, delta) {
+
+        if (!core.LM.layerVisible(this.layer)) {
+            return
+        }
+
+        var snaps = [];
+
+        if (settings.endSnap) {
+            var start = new Point(this.points[0].x, this.points[0].y);
+            var end = new Point(this.points[1].x, this.points[1].y);
+            snaps.push(start, end);
+        }
+
+        if (settings.midSnap) {
+            snaps.push(this.midPoint())
+        }
+
+        if (settings.nearestSnap) {
+            var closest = this.closestPoint(mousePoint, start, end)
+
+            // Crude way to snap to the closest point or a node
+            if (closest[1] < delta / 10) {
+                snaps.push(closest[0])
             }
         }
-    } else if (validPoints.length === 1) {
-        //only one valid point
-        destinationPoint = validPoints[0]
+
+        return snaps;
     }
 
-    if (destinationPoint !== undefined) {
-        console.log("destination point:", destinationPoint)
-        this.points[originPoint] = points[destinationPoint];
+    closestPoint(P) {
+
+        //find the closest point on the straight line
+        var A = new Point(this.points[0].x, this.points[0].y);
+        var B = new Point(this.points[1].x, this.points[1].y);
+
+        var pnt = P.perpendicular(A, B)
+        if (pnt === null) {
+            return [P, Infinity]
+        }
+
+        var distance = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y)
+        // console.log(distance);
+        return [pnt, distance]
+
     }
 
-}
+    extremes() {
 
-intersectPoints() {
+        var xmin = Math.min(this.points[0].x, this.points[1].x);
+        var xmax = Math.max(this.points[0].x, this.points[1].x);
+        var ymin = Math.min(this.points[0].y, this.points[1].y);
+        var ymax = Math.max(this.points[0].y, this.points[1].y);
 
-    return {
-        start: this.points[0],
-        end: this.points[1]
+        return [xmin, xmax, ymin, ymax]
+
     }
 
-}
+    within(selection_extremes) {
 
-length() {
-    var A = (this.points[0].x - this.points[1].x)
-    var B = (this.points[0].y - this.points[1].y)
-    var ASQ = Math.pow(A, 2)
-    var BSQ = Math.pow(B, 2)
-    var dist = Math.sqrt(ASQ + BSQ)
+        if (!core.LM.layerVisible(this.layer)) {
+            return
+        }
 
-    return dist
-}
+        // determin if this entities is within a the window specified by selection_extremes
+        var extremePoints = this.extremes()
+        if (extremePoints[0] > selection_extremes[0] &&
+            extremePoints[1] < selection_extremes[1] &&
+            extremePoints[2] > selection_extremes[2] &&
+            extremePoints[3] < selection_extremes[3]
+        ) {
 
-midPoint() {
-    //var midX = (this.points[0].x + this.points[1].x) / 2
-    //var midY = (this.points[0].y + this.points[1].y) / 2
+            return true
+        } else {
+            return false
+        }
 
-    var midPoint = this.points[0].midPoint(this.points[1]); //new Point(midX, midY);
-
-    return midPoint;
-}
-
-angle() {
-    var angle = 180;
-    return angle
-}
-
-snaps(mousePoint, delta) {
-
-    if (!core.LM.layerVisible(this.layer)) {
-        return
     }
 
-    var snaps = [];
+    touched(selection_extremes) {
 
-    if (settings.endSnap) {
-        var start = new Point(this.points[0].x, this.points[0].y);
-        var end = new Point(this.points[1].x, this.points[1].y);
-        snaps.push(start, end);
-    }
+        if (!core.LM.layerVisible(this.layer)) {
+            return
+        }
 
-    if (settings.midSnap) {
-        snaps.push(this.midPoint())
-    }
+        var rP1 = new Point(selection_extremes[0], selection_extremes[2]);
+        var rP2 = new Point(selection_extremes[1], selection_extremes[3]);
 
-    if (settings.nearestSnap) {
-        var closest = this.closestPoint(mousePoint, start, end)
+        var rectPoints = {
+            start: rP1,
+            end: rP2
+        }
 
-        // Crude way to snap to the closest point or a node
-        if (closest[1] < delta / 10) {
-            snaps.push(closest[0])
+        //var lP1 = new Point(this.points[0].x, this.points[0].y);
+        //var lP2 = new Point(this.points[1].x, this.points[1].y);
+
+        var output = Intersection.intersectLineRectangle(this.intersectPoints(), rectPoints);
+        console.log(output.status)
+
+        if (output.status === "Intersection") {
+            return true
+        } else {
+            return false
         }
     }
-
-    return snaps;
-}
-
-closestPoint(P) {
-
-    //find the closest point on the straight line
-    var A = new Point(this.points[0].x, this.points[0].y);
-    var B = new Point(this.points[1].x, this.points[1].y);
-
-    var pnt = P.perpendicular(A, B)
-    if (pnt === null) {
-        return [P, Infinity]
-    }
-
-    var distance = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y)
-        // console.log(distance);
-    return [pnt, distance]
-
-}
-
-extremes() {
-
-    var xmin = Math.min(this.points[0].x, this.points[1].x);
-    var xmax = Math.max(this.points[0].x, this.points[1].x);
-    var ymin = Math.min(this.points[0].y, this.points[1].y);
-    var ymax = Math.max(this.points[0].y, this.points[1].y);
-
-    return [xmin, xmax, ymin, ymax]
-
-}
-
-within(selection_extremes) {
-
-    if (!core.LM.layerVisible(this.layer)) {
-        return
-    }
-
-    // determin if this entities is within a the window specified by selection_extremes
-    var extremePoints = this.extremes()
-    if (extremePoints[0] > selection_extremes[0] &&
-        extremePoints[1] < selection_extremes[1] &&
-        extremePoints[2] > selection_extremes[2] &&
-        extremePoints[3] < selection_extremes[3]
-    ) {
-
-        return true
-    } else {
-        return false
-    }
-
-}
-
-touched(selection_extremes) {
-
-    if (!core.LM.layerVisible(this.layer)) {
-        return
-    }
-
-    var rP1 = new Point(selection_extremes[0], selection_extremes[2]);
-    var rP2 = new Point(selection_extremes[1], selection_extremes[3]);
-
-    var rectPoints = {
-        start: rP1,
-        end: rP2
-    }
-
-    //var lP1 = new Point(this.points[0].x, this.points[0].y);
-    //var lP2 = new Point(this.points[1].x, this.points[1].y);
-
-    var output = Intersection.intersectLineRectangle(this.intersectPoints(), rectPoints);
-    console.log(output.status)
-
-    if (output.status === "Intersection") {
-        return true
-    } else {
-        return false
-    }
-  }
 }
