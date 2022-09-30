@@ -451,7 +451,7 @@ export class Dimension {
         return data
     }
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
 
         var snaps = []
@@ -475,9 +475,9 @@ export class Dimension {
         return this.block.extremes()
     }
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
-        return this.block.within(selection_extremes)
+        return this.block.within(selection_extremes, core)
     }
 
     intersectPoints() {
@@ -485,9 +485,9 @@ export class Dimension {
         return this.block.intersectPoints()
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
-        return this.block.touched(selection_extremes)
+        return this.block.touched(selection_extremes, core)
 
     }
 }

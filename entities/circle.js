@@ -178,7 +178,7 @@ export class Circle {
         }
     }
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -186,12 +186,12 @@ export class Circle {
 
         var snaps = [];
 
-        if (settings.centreSnap) {
+        if (core.settings.centreSnap) {
             var centre = new Point(this.points[0].x, this.points[0].y);
             snaps.push(centre)
         }
 
-        if (settings.quadrantSnap) {
+        if (core.settings.quadrantSnap) {
             var angle0 = new Point(this.points[0].x + this.radius, this.points[0].y);
             var angle90 = new Point(this.points[0].x, this.points[0].y + this.radius);
             var angle180 = new Point(this.points[0].x - this.radius, this.points[0].y);
@@ -201,7 +201,7 @@ export class Circle {
 
         }
 
-        if (settings.nearestSnap) {
+        if (core.settings.nearestSnap) {
             var closest = this.closestPoint(mousePoint)
 
             // Crude way to snap to the closest point or a node
@@ -250,7 +250,7 @@ export class Circle {
 
     }
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -271,7 +271,7 @@ export class Circle {
 
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return

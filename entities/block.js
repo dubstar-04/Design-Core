@@ -159,7 +159,7 @@ export class Block {
         */
     }
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
         var snaps = [];
 
@@ -176,7 +176,7 @@ export class Block {
 
         for (var item = 0; item < this.items.length; item++) {
             // collect the child item snaps
-            itemSnaps = this.items[item].snaps(mousePoint, delta);
+            itemSnaps = this.items[item].snaps(mousePoint, delta, core);
 
             for (snap = 0; snap < itemSnaps.length; snap++) {
                 //offset the item snap point by the block insert location
@@ -193,7 +193,7 @@ export class Block {
         return snaps;
     }
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
         if (!this.items.length) {
             // nothing to draw
@@ -269,7 +269,7 @@ export class Block {
         return [xmin, xmax, ymin, ymax]
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
         if (!this.items.length) {
             // nothing to draw

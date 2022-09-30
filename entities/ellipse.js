@@ -185,7 +185,7 @@ export class Ellipse {
 
     }
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -193,13 +193,13 @@ export class Ellipse {
 
         var snaps = [];
 
-        if (settings.centreSnap) {
+        if (core.settings.centreSnap) {
             var centre = new Point(this.points[0].x, this.points[0].y);
             snaps.push(centre)
         }
 
 
-        if (settings.quadrantSnap) {
+        if (core.settings.quadrantSnap) {
 
             var A = this.points[0].x - this.points[1].x;
             var O = this.points[0].y - this.points[1].y;
@@ -221,7 +221,7 @@ export class Ellipse {
             snaps.push(angle0, angle90, angle180, angle270)
         }
 
-        if (settings.nearestSnap) {
+        if (core.settings.nearestSnap) {
 
             var closest = this.closestPoint(mousePoint);
 
@@ -294,7 +294,7 @@ export class Ellipse {
 
     }
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -315,7 +315,7 @@ export class Ellipse {
 
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return

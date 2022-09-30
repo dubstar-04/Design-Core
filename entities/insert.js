@@ -62,13 +62,13 @@ export class Insert {
         return
     }
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
         snaps = [];
         return snaps;
     }
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
         // determin if this entities is within a the window specified by selection_extremes
         var extremePoints = this.extremes()
@@ -105,7 +105,7 @@ export class Insert {
         return []
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return

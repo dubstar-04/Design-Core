@@ -213,18 +213,18 @@ export class Spline {
     }
 
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
         var snaps = [];
 
-        if (settings.endSnap) {
+        if (core.settings.endSnap) {
             // End points for each segment
             for (var i = 0; i < this.points.length; i++) {
                 snaps.push(this.points[i]);
             }
         }
 
-        if (settings.midSnap) {
+        if (core.settings.midSnap) {
             for (var i = 1; i < this.points.length; i++) {
 
                 var start = this.points[i - 1];
@@ -234,7 +234,7 @@ export class Spline {
             }
         }
 
-        if (settings.nearestSnap) {
+        if (core.settings.nearestSnap) {
             var closest = this.closestPoint(mousePoint, this.points[i - 1], this.points[i])
 
             // Crude way to snap to the closest point or a node
@@ -397,12 +397,12 @@ export class Spline {
     };
 
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
         return false;
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
         return false;
     }

@@ -215,7 +215,7 @@ export class FilledRectangle {
     }
 
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -223,14 +223,14 @@ export class FilledRectangle {
 
         var snaps = [];
 
-        if (settings.endSnap) {
+        if (core.settings.endSnap) {
             // End points for each segment
             for (var i = 0; i < this.points.length; i++) {
                 snaps.push(this.points[i]);
             }
         }
 
-        if (settings.midSnap) {
+        if (core.settings.midSnap) {
             for (var i = 1; i < this.points.length; i++) {
 
                 var start = this.points[i - 1];
@@ -240,7 +240,7 @@ export class FilledRectangle {
             }
         }
 
-        if (settings.nearestSnap) {
+        if (core.settings.nearestSnap) {
 
             var closest = this.closestPoint(mousePoint)
 
@@ -310,7 +310,7 @@ export class FilledRectangle {
 
     }
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -331,7 +331,7 @@ export class FilledRectangle {
 
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return

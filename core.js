@@ -9,6 +9,7 @@ import { StyleManager } from './styles/styleManager.js'
 import { DimStyleManager } from './styles/dimStyleManager.js'
 
 import { FileIO } from './lib/fileio.js'
+import { Settings } from './lib/settings.js'
 
 //TODO: Add debugging class
 //TODO: use inheritance for the tools & entities 
@@ -27,6 +28,8 @@ export class Core {
         this.LM = new LayerManager(this);
         this.SM = new StyleManager(this);
         this.DSM = new DimStyleManager(this);
+
+        this.settings = new Settings();
     }
 
 

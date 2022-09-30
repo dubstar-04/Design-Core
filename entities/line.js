@@ -333,7 +333,7 @@ export class Line {
         return angle
     }
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -341,17 +341,17 @@ export class Line {
 
         var snaps = [];
 
-        if (settings.endSnap) {
+        if (core.settings.endSnap) {
             var start = new Point(this.points[0].x, this.points[0].y);
             var end = new Point(this.points[1].x, this.points[1].y);
             snaps.push(start, end);
         }
 
-        if (settings.midSnap) {
+        if (core.settings.midSnap) {
             snaps.push(this.midPoint())
         }
 
-        if (settings.nearestSnap) {
+        if (core.settings.nearestSnap) {
             var closest = this.closestPoint(mousePoint, start, end)
 
             // Crude way to snap to the closest point or a node
@@ -391,7 +391,7 @@ export class Line {
 
     }
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -412,7 +412,7 @@ export class Line {
 
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return

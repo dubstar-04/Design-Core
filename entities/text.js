@@ -288,7 +288,7 @@ export class Text {
         return data
     }
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
         var rect = this.getBoundingRect()
 
@@ -336,7 +336,7 @@ export class Text {
         return [xmin, xmax, ymin, ymax]
     }
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
         // determin if this entities is within a the window specified by selection_extremes
         var extremePoints = this.extremes()
@@ -366,7 +366,7 @@ export class Text {
         }
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return

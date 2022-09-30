@@ -179,7 +179,7 @@ export class Arc {
 
     }
 
-    snaps(mousePoint, delta) {
+    snaps(mousePoint, delta, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -187,7 +187,7 @@ export class Arc {
 
         var snaps = [];
 
-        if (settings.endSnap) {
+        if (core.settings.endSnap) {
             //Speed this up by generating the proper start and end points when the arc is initialised
             var start_point = new Point(this.points[0].x + (this.radius * Math.cos(this.startAngle())),
                 this.points[0].y + (this.radius * Math.sin(this.startAngle())));
@@ -197,12 +197,12 @@ export class Arc {
             snaps.push(start_point, end_point);
         }
 
-        if (settings.centreSnap) {
+        if (core.settings.centreSnap) {
             var centre = this.points[0];
             snaps.push(centre)
         }
 
-        if (settings.nearestSnap) {
+        if (core.settings.nearestSnap) {
             var closest = this.closestPoint(mousePoint)
             //var snaps = [center, start_point, end_point];
 
@@ -277,7 +277,7 @@ export class Arc {
 
     }
 
-    within(selection_extremes) {
+    within(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
@@ -298,7 +298,7 @@ export class Arc {
 
     }
 
-    touched(selection_extremes) {
+    touched(selection_extremes, core) {
 
         if (!core.LM.layerVisible(this.layer)) {
             return
