@@ -14,28 +14,28 @@ import { FileIO } from './lib/fileio.js'
 //TODO: use inheritance for the tools & entities 
 //TODO: Use better error checking: consider using try and throw
 
-export class Core { 
-    constructor(){
-    this.scene = new Scene(this);
-    this.commandManager = new CommandManager(this);
-    this.canvas = new Canvas(this);
-    this.designEngine = new DesignEngine(this);
+export class Core {
+    constructor() {
+        this.scene = new Scene(this);
+        this.commandManager = new CommandManager(this);
+        this.canvas = new Canvas(this);
+        this.designEngine = new DesignEngine(this);
 
-    this.mouse = new Mouse(this);
-    this.commandLine = new CommandLine(cmd_Line, this);
+        this.mouse = new Mouse(this);
+        this.commandLine = new CommandLine(cmd_Line, this);
 
-    this.LM = new LayerManager(this);
-    this.SM = new StyleManager(this);
-    this.DSM = new DimStyleManager(this);
+        this.LM = new LayerManager(this);
+        this.SM = new StyleManager(this);
+        this.DSM = new DimStyleManager(this);
     }
 
 
-    openFile(file){
+    openFile(file) {
         FileIO.openFile(this, file)
     }
-    
-    saveFile(){
+
+    saveFile() {
         return FileIO.saveDxf(this);
     }
-    
+
 }
