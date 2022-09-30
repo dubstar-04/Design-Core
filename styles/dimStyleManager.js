@@ -1,14 +1,14 @@
-import { Style } from "../entities/style.js"
+import { DimStyle } from "./dimStyle.js"
 
-export class StyleManager { 
+export class DimStyleManager { 
     constructor(core){
+    //TODO: Can dimstylemanager and style manager be merged?
 
-        this.styles = new Array();
+    this.styles = new Array();
     this.currentstyle = "STANDARD";
     this.core = core;
     this.addStandardStyles()
 }
-
 
 getStyles() {
     return this.styles;
@@ -25,9 +25,9 @@ newStyle() {
     });
 }
 
-getUniqueName = function(name){
-	
-	var count = 0;
+getUniqueName(name) {
+
+    var count = 0;
     var styStr = name.replace(/ /g, "_").toUpperCase();
     console.log("New style Name:" + styStr)
     for (var i = 0; i < this.styleCount(); i++) {
@@ -39,12 +39,12 @@ getUniqueName = function(name){
         styStr = styStr + "_" + count;
     }
 
-	return styStr;
+    return styStr;
 }
 
 addStyle(style) {
-    console.log(" StyleManager.js - addstyle() - New style Added:" + style.name)
-    var newstyle = new Style(style);
+    console.log(" DimStyleManager.js - addstyle() - New style Added:" + style.name)
+    var newstyle = new DimStyle(style);
     if (!this.styleExists(style)) {
         this.styles.push(newstyle);
         this.core.scene.saveRequired();
@@ -62,7 +62,7 @@ deleteStyle(styleIndex) {
 
     var selectionSet = [];
 
-    for (var i = 0; i < this.core.scene.items.length; i++) {
+    for (var i = 0; i < items.length; i++) {
         if (items[i].style === styleToDelete) {
             selectionSet.push(i)
         }
@@ -92,7 +92,7 @@ styleExists(style) {
     while (i--) {
         //console.log("styleExists:", this.styles[i].name)
         if (this.styles[i].name === style.name) {
-            //console.log("StyleManager.js styleExist: " + style.name)
+            //console.log("DimStyleManager.js styleExist: " + style.name)
             return true;
         }
     }
@@ -103,11 +103,11 @@ styleExists(style) {
 checkStyles() {
 
     if (!this.styleCount()) {
-        console.log("StyleManager.js - Check styles -> Add Standard styles")
+        console.log("DimStyleManager.js - Check styles -> Add Standard styles")
         this.addStandardStyles();
     }
 
-    for (var i = 0; i < this.core.scene.items.length; i++) {
+    for (var i = 0; i < items.length; i++) {
         var style = (items[i].style)
         this.addstyle({
             "name": style
@@ -118,9 +118,6 @@ checkStyles() {
 addStandardStyles() {
     this.addStyle({
         "name": "STANDARD"
-    });
-    this.addStyle({
-        "name": "ANNOTATIVE"
     });
     this.core.scene.saveRequired();
 }
@@ -142,16 +139,16 @@ getStyleByIndex(styleIndex) {
 
 
 renameStyle(styleIndex, newName) {
-	
-	var newName = this.getUniqueName(newName)
+
+    var newName = this.getUniqueName(newName)
 
     if (this.getStyleByIndex(styleIndex).name.toUpperCase() !== "STANDARD") {
-        
-        if (this.getStyleByIndex(styleIndex).name === this.getCStyle()) {	
+
+        if (this.getStyleByIndex(styleIndex).name === this.getCStyle()) {
             this.setCStyle(newName);
-            console.log("[stylenamanger.renamestyle] - set new Cstyle name")
+            console.log("[DimStyleManager.renamestyle] - set new Cstyle name")
         }
-        
+
         this.styles[styleIndex].name = newName;
     }
 }

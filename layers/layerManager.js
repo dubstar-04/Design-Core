@@ -1,5 +1,5 @@
 
-import { Layer } from '../entities/layer.js'
+import { Layer } from './layer.js'
 
 export class LayerManager { 
     constructor(core){
