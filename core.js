@@ -23,7 +23,7 @@ export class Core {
         this.designEngine = new DesignEngine(this);
 
         this.mouse = new Mouse(this);
-        this.commandLine = new CommandLine(cmd_Line, this);
+        this.commandLine = new CommandLine(this);
 
         this.LM = new LayerManager(this);
         this.SM = new StyleManager(this);
