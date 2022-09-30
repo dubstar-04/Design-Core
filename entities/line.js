@@ -151,7 +151,6 @@ export class Line {
 
             for (var i = 0; i < line.points.length; i++) {
                 for (var j = 0; j < intersectPnts.length; j++) {
-                    //TODO: Pass in the mouse location rather than needing a ref to core
                     if (betweenPoints(core.mouse, [intersectPnts[j], line.points[i]], false)) {
                         //console.log("Trimmed Length:", Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100, "Line length: ", Math.round(line.points[0].distance(line.points[1]) * 100) / 100)
                         if (Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100 < Math.round(line.points[0].distance(line.points[1]) * 100) / 100) {
@@ -200,7 +199,6 @@ export class Line {
                     lineWidth: line.lineWidth
                 }
 
-                //TODO: Can't call scene from here
                 core.scene.addToScene("Line", data, false)
 
                 if (a < b) {

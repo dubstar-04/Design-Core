@@ -166,7 +166,6 @@ export class Circle {
                 lineWidth: this.lineWidth
             }
 
-            //TODO: Can't call scene from here
             core.scene.addToScene("Arc", data, false, core.scene.items.indexOf(this))
 
         }
