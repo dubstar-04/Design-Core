@@ -46,8 +46,6 @@ static register() {
 }
 
 startAngle() {
-
-    var p0 = this.points[0];
     return this.points[0].angle(this.points[1])
 }
 
