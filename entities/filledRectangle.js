@@ -101,15 +101,17 @@ export class FilledRectangle {
 
         var alpha = ctx.globalAlpha
 
+        console.log("drawing filled rect!!")
+
         ctx.fillStyle = colour;
         ctx.globalAlpha = 0.2;
-        ctx.fillRect(this.points[0].x, this.points[0].y, this.width, this.height);
+        //ctx.fillRect(this.points[0].x, this.points[0].y, this.width, this.height);
 
         ctx.globalAlpha = 1.0;
 
         ctx.strokeStyle = colour;
         ctx.lineWidth = this.lineWidth / scale;
-        ctx.beginPath()
+        //ctx.beginPath()
         ctx.moveTo(this.points[0].x, this.points[0].y);
         ctx.lineTo(this.points[1].x, this.points[1].y);
         ctx.lineTo(this.points[2].x, this.points[2].y);
@@ -339,27 +341,27 @@ export class FilledRectangle {
 
         /* var lP1 = new Point();
          var lP2 = new Point();
-    
+
          var linePoints = {};
-    
+
          var rP1 = new Point(selection_extremes[0], selection_extremes[2]);
          var rP2 = new Point(selection_extremes[1], selection_extremes[3]);
-    
+
          var rectPoints = {start: rP1, end: rP2};
-    
+
          var output = "";
-    
+
          for(var i = 1; i < this.points.length; i++) {
-    
+
              linePoints = {start: this.points[i-1], end: this.points[i]};
-    
+
              output = Intersection.intersectLineRectangle(linePoints, rectPoints);
              console.log(output.status)
-    
+
              if (  output.status === "Intersection"  ){
                  return true
              }
-    
+
          }
          */
 

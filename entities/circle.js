@@ -1,6 +1,7 @@
 import { Point } from './point.js'
 import { Utils } from '../lib/utils.js'
 import { Intersection } from '../lib/intersect.js'
+import { Colours } from '../lib/colours.js'
 
 export class Circle {
     constructor(data) {
@@ -94,18 +95,22 @@ export class Circle {
 
         this.calculateRadius(); //is this the most efficient way to update the radius?
 
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = this.lineWidth / scale;
-        ctx.beginPath()
+        try{ // HTML Canvas
+          ctx.strokeStyle = colour;
+          ctx.lineWidth = this.lineWidth / scale;
+          ctx.beginPath()
+        }catch{ // Cairo
+          ctx.setLineWidth(this.lineWidth / scale);
+          var rgbColour = Colours.getRGBColour(colour)
+          ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+        }
 
-        //ctx.moveTo(this.points[0].x , this.points[0].y);
-        ctx.arc(this.points[0].x, this.points[0].y, this.radius, Utils.radians2degrees(0), Utils.radians2degrees(360), false);
-
+        ctx.arc(this.points[0].x, this.points[0].y, this.radius, 0, 6.283);
         ctx.stroke()
     }
 
     /*properties(){
-    
+
         return {  //type: this.type,
             colour: this.colour,
             layer: this.layer,

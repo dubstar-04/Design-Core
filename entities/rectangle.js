@@ -94,9 +94,15 @@ export class Rectangle {
             colour = core.LM.getLayerByName(this.layer).colour
         }
 
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = this.lineWidth / scale;
-        ctx.beginPath()
+        try{ // HTML Canvas
+          ctx.strokeStyle = colour;
+          ctx.lineWidth = this.lineWidth / scale;
+          ctx.beginPath()
+        }catch{ // Cairo
+          ctx.setLineWidth(this.lineWidth / scale);
+          ctx.setSourceRGB(0.8, 0.0, 0.0);
+        }
+
         ctx.moveTo(this.points[0].x, this.points[0].y);
         ctx.lineTo(this.points[1].x, this.points[1].y);
         ctx.lineTo(this.points[2].x, this.points[2].y);

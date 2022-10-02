@@ -122,7 +122,7 @@ export class Arc {
 
         ctx.strokeStyle = colour;
         ctx.lineWidth = this.lineWidth / scale;
-        ctx.beginPath()
+        //ctx.beginPath()
 
         ctx.arc(this.points[0].x, this.points[0].y, this.radius, this.startAngle(), this.endAngle(), false) //this.direction())
 
