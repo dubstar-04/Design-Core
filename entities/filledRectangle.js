@@ -96,18 +96,15 @@ export class FilledRectangle {
 
         var colour = this.colour;
 
-        console.log(colour)
-
         if (this.colour === "BYLAYER") {
             colour = core.LM.getLayerByName(this.layer).colour
         }
 
         var alpha = ctx.globalAlpha
 
-        console.log("drawing filled rect!!")
-
         ctx.fillStyle = colour;
         ctx.globalAlpha = 0.2;
+        //TODO: Fix the filled rectangle for cairo
         //ctx.fillRect(this.points[0].x, this.points[0].y, this.width, this.height);
 
         ctx.globalAlpha = 1.0;
