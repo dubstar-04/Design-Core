@@ -1,6 +1,7 @@
 import { Point } from './point.js'
 import { Utils } from '../lib/utils.js'
 import { Intersection } from '../lib/intersect.js'
+import { Colours } from '../lib/colours.js'
 
 export class Ellipse {
     constructor(data) {
@@ -107,10 +108,10 @@ export class Ellipse {
           }
 
         /*
-    
+
         var x = this.points[0].x - 0.5 * this.width;
         var y = this.points[0].y - 0.5 * this.height;
-    
+
         ctx.ellipse(x, y, this.width, this.height);
         */
 

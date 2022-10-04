@@ -1,6 +1,7 @@
 import { Point } from './point.js'
 import { Utils } from '../lib/utils.js'
 import { Intersection } from '../lib/intersect.js'
+import { Colours } from '../lib/colours.js'
 
 export class Dimension {
     constructor(data) {
@@ -112,9 +113,9 @@ export class Dimension {
         //2 = Angular
         //3 = Diameter
         //4 = Radius
-        //5 = Angular 3-point 
+        //5 = Angular 3-point
         //6 = Ordinate
-        //64 = Ordinate type. This is a bit value (bit 7) used only with integer value 6. If set, ordinate is X-type; if not set, ordinate is Y-type 
+        //64 = Ordinate type. This is a bit value (bit 7) used only with integer value 6. If set, ordinate is X-type; if not set, ordinate is Y-type
         //128 = This is a bit value (bit 8) added to the other group 70 values if the dimension text has been positioned at a user-defined location rather than at the default location
 
         var type = this.dimType;
@@ -151,7 +152,7 @@ export class Dimension {
 
         var dimension = 0;
 
-        // invalid points  
+        // invalid points
         if (Pt1.isSame(Pt2) || Pt1.isSame(Pt3) || Pt2.isSame(Pt3)) {
             return null //[Pt1, Pt2, Pt1.midPoint(Pt2)]
         }
@@ -412,11 +413,11 @@ export class Dimension {
             "\n", this.layer,
             "\n", "2", //BLOCKNAME
             "\n", this.blockName,
-            "\n", "10", //X - DEFINITION / ARROW POINT 
+            "\n", "10", //X - DEFINITION / ARROW POINT
             "\n", this.points[0].x,
-            "\n", "20", //Y - DEFINITION / ARROW POINT 
+            "\n", "20", //Y - DEFINITION / ARROW POINT
             "\n", this.points[0].y,
-            "\n", "30", //Z - DEFINITION / ARROW POINT 
+            "\n", "30", //Z - DEFINITION / ARROW POINT
             "\n", "0.0",
             "\n", "11", //X - TEXT MIDPOINT
             "\n", this.points[2].x,

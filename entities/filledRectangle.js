@@ -1,6 +1,7 @@
 import { Point } from './point.js'
 import { Utils } from '../lib/utils.js'
 import { Intersection } from '../lib/intersect.js'
+import { Colours } from '../lib/colours.js'
 
 export class FilledRectangle {
     constructor(data) {
@@ -95,6 +96,8 @@ export class FilledRectangle {
 
         var colour = this.colour;
 
+        console.log(colour)
+
         if (this.colour === "BYLAYER") {
             colour = core.LM.getLayerByName(this.layer).colour
         }
@@ -118,7 +121,7 @@ export class FilledRectangle {
             var rgbColour = Colours.getRGBColour(colour)
             ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
           }
-          
+
         ctx.moveTo(this.points[0].x, this.points[0].y);
         ctx.lineTo(this.points[1].x, this.points[1].y);
         ctx.lineTo(this.points[2].x, this.points[2].y);
