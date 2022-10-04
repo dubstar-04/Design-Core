@@ -147,7 +147,7 @@ export class Circle {
         if (points.length > 1) {
 
             var start = points[0];
-            var cen = core.mouse.currentPoint();
+            var cen = core.mouse.pointOnScene();
             var end = points[1];
 
             //console.log("Angle:", a-a, " Angle2: ", b, " centre: ", c)
