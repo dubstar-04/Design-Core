@@ -115,8 +115,16 @@ export class Block {
         }
 
         ctx.save();
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = 1 / scale;
+
+        try { // HTML Canvas
+            ctx.strokeStyle = colour;
+            ctx.lineWidth = this.lineWidth / scale;
+            ctx.beginPath()
+        } catch { // Cairo
+            ctx.setLineWidth(this.lineWidth / scale);
+            var rgbColour = Colours.getRGBColour(colour)
+            ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+        }
 
         //if (this.points[1]) {
         // blocks are associated with an insert point.

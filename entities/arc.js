@@ -120,11 +120,18 @@ export class Arc {
             colour = core.LM.getLayerByName(this.layer).colour
         }
 
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = this.lineWidth / scale;
-        //ctx.beginPath()
 
-        ctx.arc(this.points[0].x, this.points[0].y, this.radius, this.startAngle(), this.endAngle(), false) //this.direction())
+        try{ // HTML Canvas
+            ctx.strokeStyle = colour;
+            ctx.lineWidth = this.lineWidth / scale;
+            ctx.beginPath()
+          }catch{ // Cairo
+            ctx.setLineWidth(this.lineWidth / scale);
+            var rgbColour = Colours.getRGBColour(colour)
+            ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+          }
+
+        ctx.arc(this.points[0].x, this.points[0].y, this.radius, this.startAngle(), this.endAngle())
 
         ctx.stroke()
     }

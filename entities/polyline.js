@@ -86,9 +86,15 @@ export class Polyline {
             colour = core.LM.getLayerByName(this.layer).colour
         }
 
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = this.lineWidth / scale;
-        ctx.beginPath()
+        try { // HTML Canvas
+            ctx.strokeStyle = colour;
+            ctx.lineWidth = this.lineWidth / scale;
+            ctx.beginPath()
+        } catch { // Cairo
+            ctx.setLineWidth(this.lineWidth / scale);
+            ctx.setSourceRGB(0.8, 0.0, 0.0);
+        }
+
         ctx.moveTo(this.points[0].x, this.points[0].y);
 
         for (var i = 1; i < this.points.length; i++) {

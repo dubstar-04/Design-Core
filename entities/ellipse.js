@@ -96,9 +96,15 @@ export class Ellipse {
             colour = core.LM.getLayerByName(this.layer).colour
         }
 
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = this.lineWidth / scale;
-        ctx.beginPath()
+        try{ // HTML Canvas
+            ctx.strokeStyle = colour;
+            ctx.lineWidth = this.lineWidth / scale;
+            ctx.beginPath()
+          }catch{ // Cairo
+            ctx.setLineWidth(this.lineWidth / scale);
+            var rgbColour = Colours.getRGBColour(colour)
+            ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+          }
 
         /*
     
