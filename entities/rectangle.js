@@ -1,6 +1,7 @@
 import { Point } from './point.js'
 import { Utils } from '../lib/utils.js'
 import { Intersection } from '../lib/intersect.js'
+import { Colours } from '../lib/colours.js'
 
 export class Rectangle {
     constructor(data) {
@@ -100,7 +101,8 @@ export class Rectangle {
           ctx.beginPath()
         }catch{ // Cairo
           ctx.setLineWidth(this.lineWidth / scale);
-          ctx.setSourceRGB(0.8, 0.0, 0.0);
+          var rgbColour = Colours.getRGBColour(colour)
+          ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
         }
 
         ctx.moveTo(this.points[0].x, this.points[0].y);
