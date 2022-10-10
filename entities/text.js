@@ -1,6 +1,7 @@
 import { Point } from './point.js'
 import { Utils } from '../lib/utils.js'
 import { Intersection } from '../lib/intersect.js'
+import { Colours } from '../lib/colours.js'
 
 export class Text {
     constructor(data) {
@@ -78,7 +79,7 @@ export class Text {
                 switch (data.flags) {
                     // DXF Data
                     //2 = Text is backward (mirrored in X).
-                    // 4 = Text is upside down (mirrored in Y). 
+                    // 4 = Text is upside down (mirrored in Y).
                     case 2:
                         this.backwards = true;
                         break;
@@ -135,7 +136,7 @@ export class Text {
     }
 
     width() {
-        //TODO: How to access the canva element from here? Better way to do text width?
+        //TODO: How to access the canvas element from here? Better way to do text width?
         var oldFont = canvas.context.font;
         canvas.context.font = this.height + "pt " + SM.getStyleByName(this.styleName).font.toString();
         var width = (canvas.context.measureText(this.string.toString()).width);
@@ -213,11 +214,6 @@ export class Text {
             colour = core.LM.getLayerByName(this.layer).colour
         }
 
-        //ctx.strokeStyle = colour; // Text doesn't require a stroke, see fill.
-        ctx.font = this.height + "pt " + core.SM.getStyleByName(this.styleName).font.toString();
-        ctx.fillStyle = colour;
-        ctx.textAlign = this.getHorizontalAlignment();
-        ctx.textBaseline = this.getVerticalAlignment();
         ctx.save();
         ctx.scale(1, -1);
         ctx.translate(this.points[0].x, -this.points[0].y);
@@ -236,8 +232,21 @@ export class Text {
             ctx.rotate(Utils.degrees2radians(-this.rotation));
         }
 
-        ctx.fillText(this.string, 0, 0)
-        //ctx.stroke() // Text doesn't require a stroke
+        console.log("Text not implimented")
+
+        try{ //HTML
+          ctx.fillStyle = colour;
+          ctx.textAlign = this.getHorizontalAlignment();
+          ctx.textBaseline = this.getVerticalAlignment();
+          ctx.font = this.height + "pt " + core.SM.getStyleByName(this.styleName).font.toString();
+          ctx.fillText(this.string, 0, 0)
+        } catch { //Cairo
+          var rgbColour = Colours.getRGBColour(colour)
+          ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+          ctx.moveTo(0, 0);
+          ctx.setFontSize(this.height)
+          ctx.showText(this.string);
+        }
         ctx.restore();
 
         //// Draw Bounding Box to test the getBoundingRect()
@@ -314,7 +323,7 @@ export class Text {
 
         var distance = Utils.distBetweenPoints(P.x, P.y, mid.x, mid.y)
 
-        // if P is inside the bounding box return distance 0  
+        // if P is inside the bounding box return distance 0
         if (P.x > botLeft.x &&
             P.x < topRight.x &&
             P.y > botLeft.y &&
