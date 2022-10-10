@@ -45,9 +45,12 @@ export class LayerManager {
     }
 
     addLayer(layer) {
-        console.log(" layermanager.js - addlayer() - New Layer Added:" + layer.name)
-        var newLayer = new Layer(layer);
+        //TODO: investigate why this gets called so many times when loading drawings
+        //console.log(" layermanager.js - addlayer() - New Layer Added:" + layer.name)
+
         if (!this.layerExists(layer)) {
+            console.log(" layermanager.js - addlayer() - New Layer Added:" + layer.name)
+            var newLayer = new Layer(layer);
             this.layers.push(newLayer);
             this.core.scene.saveRequired();
         }
