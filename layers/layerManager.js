@@ -56,8 +56,13 @@ export class LayerManager {
         }
     }
 
-    deleteLayer(layerIndex) {
+    deleteLayerName(layerName){
+        //delete layer for layerName
+        this.deleteLayer(this.getLayerIndex(layerName))
+    }
 
+    deleteLayer(layerIndex) {
+        // delete layer for layerIndex
         var layerToDelete = this.getLayerByIndex(layerIndex).name;
 
         if (layerToDelete.toUpperCase() === "DEFPOINTS") {
@@ -65,18 +70,10 @@ export class LayerManager {
             return;
         }
 
-        /*
-          for (var i = 0; i < items.length; i++) {
-              if (items[i].layer === layerToDelete) {
-                  count++
-              }
-          }
-          */
-
         var selectionSet = [];
 
         for (var i = 0; i < this.core.scene.items.length; i++) {
-            if (items[i].layer === layerToDelete) {
+            if (this.core.scene.items[i].layer === layerToDelete) {
                 selectionSet.push(i)
             }
         }
@@ -85,7 +82,7 @@ export class LayerManager {
 
         selectionSet.sort();
         for (var j = 0; j < selectionSet.length; j++) {
-            items.splice((selectionSet[j] - j), 1)
+            this.core.scene.items.splice((selectionSet[j] - j), 1)
         }
 
         //Delete The Layer
@@ -156,19 +153,21 @@ export class LayerManager {
 
     }
 
-    getLayerByName(layerName) {
-
-        for (var i = 0; i < this.layerCount(); i++) {
-            if (this.layers[i].name === layerName) {
-
-                return this.layers[i];
-                break;
-            }
+    getLayerIndex(layerName){
+    // return the layer index for layerName
+      for (var i = 0; i < this.layerCount(); i++) {
+      if (this.layers[i].name === layerName) {
+          return i;
+          break;
         }
+      }
+    }
+
+    getLayerByName(layerName) {
+      return this.layers[this.getLayerIndex(layerName)];
     }
 
     getLayerByIndex(layerIndex) {
-
         return this.layers[layerIndex];
     }
 
