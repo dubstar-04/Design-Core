@@ -241,7 +241,7 @@ export class Text {
           ctx.font = this.height + "pt " + core.SM.getStyleByName(this.styleName).font.toString();
           ctx.fillText(this.string, 0, 0)
         } catch { //Cairo
-          var rgbColour = Colours.getRGBColour(colour)
+          var rgbColour = Colours.hexToScaledRGB(colour)
           ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
           ctx.moveTo(0, 0);
           ctx.setFontSize(this.height)

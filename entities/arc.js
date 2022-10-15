@@ -128,7 +128,7 @@ export class Arc {
             ctx.beginPath()
           }catch{ // Cairo
             ctx.setLineWidth(this.lineWidth / scale);
-            var rgbColour = Colours.getRGBColour(colour)
+            var rgbColour = Colours.hexToScaledRGB(colour)
             ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
           }
 
