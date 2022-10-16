@@ -7,6 +7,7 @@ import { CommandLine } from './lib/commandLine.js'
 import { LayerManager } from './layers/layerManager.js'
 import { StyleManager } from './styles/styleManager.js'
 import { DimStyleManager } from './styles/dimStyleManager.js'
+import { PropertyManager } from './properties/propertyManager.js'
 
 import { FileIO } from './lib/fileio.js'
 import { Settings } from './lib/settings.js'
@@ -28,6 +29,7 @@ export class Core {
         this.layerManager = new LayerManager(this);
         this.styleManager = new StyleManager(this);
         this.dimStyleManager = new DimStyleManager(this);
+        this.propertyManager = new PropertyManager(this)
 
         this.settings = new Settings();
     }
