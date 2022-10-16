@@ -12,7 +12,7 @@ import { PropertyManager } from './properties/propertyManager.js'
 import { FileIO } from './lib/fileio.js'
 import { Settings } from './lib/settings.js'
 
-//TODO: Add debugging class
+//TODO: Add debugging / logging class
 //TODO: use inheritance for the tools & entities 
 //TODO: Use better error checking: consider using try and throw
 
