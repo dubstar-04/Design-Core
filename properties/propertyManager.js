@@ -61,7 +61,7 @@ getItemProperties(itemType) {
                     //console.log("Property: " + prop)
                     if (propertiesList.indexOf(prop, 0) === -1) {
                         if (typeof properties[prop] !== "function") {
-                            var excludeProps = ["type", "family", "minPoints", "limitPoints", "helper_geometry", "points", "alpha"];
+                            var excludeProps = ["type", "family", "minPoints", "limitPoints", "helper_geometry", "points", "alpha", "showPreview"];
                             if (excludeProps.indexOf(prop) === -1) {
                                 propertiesList.push(prop)
                             }
