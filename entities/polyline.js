@@ -77,14 +77,14 @@ export class Polyline {
 
     draw(ctx, scale, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
         var colour = this.colour;
 
         if (this.colour === "BYLAYER") {
-            colour = core.LM.getLayerByName(this.layer).colour
+            colour = core.layerManager.getLayerByName(this.layer).colour
         }
 
         try { // HTML Canvas
@@ -195,7 +195,7 @@ export class Polyline {
 
     snaps(mousePoint, delta, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
@@ -276,7 +276,7 @@ export class Polyline {
 
     within(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
@@ -296,7 +296,7 @@ export class Polyline {
 
     touched(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 

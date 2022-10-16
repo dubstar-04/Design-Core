@@ -111,14 +111,14 @@ export class Arc {
 
     draw(ctx, scale, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
         var colour = this.colour;
 
         if (this.colour === "BYLAYER") {
-            colour = core.LM.getLayerByName(this.layer).colour
+            colour = core.layerManager.getLayerByName(this.layer).colour
         }
 
 
@@ -189,7 +189,7 @@ export class Arc {
 
     snaps(mousePoint, delta, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
@@ -287,7 +287,7 @@ export class Arc {
 
     within(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
@@ -308,7 +308,7 @@ export class Arc {
 
     touched(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 

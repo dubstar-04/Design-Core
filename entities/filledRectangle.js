@@ -90,14 +90,14 @@ export class FilledRectangle {
 
     draw(ctx, scale, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
         var colour = this.colour;
 
         if (this.colour === "BYLAYER") {
-            colour = core.LM.getLayerByName(this.layer).colour
+            colour = core.layerManager.getLayerByName(this.layer).colour
         }
 
         var alpha = ctx.globalAlpha
@@ -226,7 +226,7 @@ export class FilledRectangle {
 
     snaps(mousePoint, delta, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
@@ -321,7 +321,7 @@ export class FilledRectangle {
 
     within(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
@@ -342,7 +342,7 @@ export class FilledRectangle {
 
     touched(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 

@@ -83,14 +83,14 @@ export class Circle {
 
     draw(ctx, scale, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
         var colour = this.colour;
 
         if (this.colour === "BYLAYER") {
-            colour = core.LM.getLayerByName(this.layer).colour
+            colour = core.layerManager.getLayerByName(this.layer).colour
         }
 
         this.calculateRadius(); //is this the most efficient way to update the radius?
@@ -185,7 +185,7 @@ export class Circle {
 
     snaps(mousePoint, delta, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
@@ -257,7 +257,7 @@ export class Circle {
 
     within(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
@@ -278,7 +278,7 @@ export class Circle {
 
     touched(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 

@@ -105,14 +105,14 @@ export class Block {
             return
         }
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
         var colour = this.colour;
 
         if (this.colour === "BYLAYER") {
-            colour = core.LM.getLayerByName(this.layer).colour
+            colour = core.layerManager.getLayerByName(this.layer).colour
         }
 
         ctx.save();
@@ -177,7 +177,7 @@ export class Block {
             return snaps;
         }
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
@@ -285,7 +285,7 @@ export class Block {
             return false
         }
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 

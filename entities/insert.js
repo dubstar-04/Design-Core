@@ -108,7 +108,7 @@ export class Insert {
 
     touched(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 

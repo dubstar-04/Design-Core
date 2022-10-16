@@ -204,14 +204,14 @@ export class Text {
 
         //var rect = this.getBoundingRect()
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 
         var colour = this.colour;
 
         if (this.colour === "BYLAYER") {
-            colour = core.LM.getLayerByName(this.layer).colour
+            colour = core.layerManager.getLayerByName(this.layer).colour
         }
 
         ctx.save();
@@ -238,7 +238,7 @@ export class Text {
           ctx.fillStyle = colour;
           ctx.textAlign = this.getHorizontalAlignment();
           ctx.textBaseline = this.getVerticalAlignment();
-          ctx.font = this.height + "pt " + core.SM.getStyleByName(this.styleName).font.toString();
+          ctx.font = this.height + "pt " + core.styleManager.getStyleByName(this.styleName).font.toString();
           ctx.fillText(this.string, 0, 0)
         } catch { //Cairo
           var rgbColour = Colours.hexToScaledRGB(colour)
@@ -377,7 +377,7 @@ export class Text {
 
     touched(selection_extremes, core) {
 
-        if (!core.LM.layerVisible(this.layer)) {
+        if (!core.layerManager.layerVisible(this.layer)) {
             return
         }
 

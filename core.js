@@ -25,9 +25,9 @@ export class Core {
         this.mouse = new Mouse(this);
         this.commandLine = new CommandLine(this);
 
-        this.LM = new LayerManager(this);
-        this.SM = new StyleManager(this);
-        this.DSM = new DimStyleManager(this);
+        this.layerManager = new LayerManager(this);
+        this.styleManager = new StyleManager(this);
+        this.dimStyleManager = new DimStyleManager(this);
 
         this.settings = new Settings();
     }

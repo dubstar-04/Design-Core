@@ -94,14 +94,14 @@ export class Spline {
 
         if (this.points.length > 2) {
 
-            if (!core.LM.layerVisible(this.layer)) {
+            if (!core.layerManager.layerVisible(this.layer)) {
                 return
             }
 
             var colour = this.colour;
 
             if (this.colour === "BYLAYER") {
-                colour = core.LM.getLayerByName(this.layer).colour
+                colour = core.layerManager.getLayerByName(this.layer).colour
             }
 
             try { // HTML Canvas
