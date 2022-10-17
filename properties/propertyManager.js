@@ -38,6 +38,7 @@ getItemTypes() {
             }
         }
 
+        // if there is more that one type add an option for all
         if (itemTypes.length > 1) {
             itemTypes.unshift("All")
         }
