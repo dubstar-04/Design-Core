@@ -1,49 +1,55 @@
-commands.push({command: "Identify", shortcut: "ID"});
-function Identify()
-{
+export class Identify {
+  constructor() {
+
     //Define Properties
     this.type = "Identify";
     this.family = "Tools";
     this.movement = "None";
     this.minPoints = 1;
-	  this.selectionRequired = false;
+    this.selectionRequired = false;
     this.helper_geometry = false;
     this.showPreview = false;
-}
+  }
 
-Identify.prototype.prompt = function(inputArray) {
-  var num = inputArray.length;
-  var expectedType = [];
-  var reset = false;
-  var action = false;
-  var prompt = [];
+  static register() {
+    var command = { command: "Identify", shortcut: "ID" };
+    return command
+  }
 
-  expectedType[0] = ["undefined"];
-  prompt[0] = "Select Point:";
+  prompt(core) {
+    var num = core.scene.inputArray.length;
+    var expectedType = [];
+    var reset = false;
+    var action = false;
+    var prompt = [];
 
-  expectedType[1] = ["object"];    
-  prompt[1] = "";
+    expectedType[0] = ["undefined"];
+    prompt[0] = "Select Point:";
 
-  var validInput = expectedType[num].includes(typeof inputArray[num-1])
-            
-  if(!validInput){
-      inputArray.pop()
-  }else if (inputArray.length === this.minPoints){
+    expectedType[1] = ["object"];
+    prompt[1] = "";
+
+    var validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1])
+
+    if (!validInput) {
+      core.scene.inputArray.pop()
+    } else if (core.scene.inputArray.length === this.minPoints) {
       action = true;
       reset = true
+    }
+
+    return [prompt[core.scene.inputArray.length], reset, action, validInput]
   }
-  
-  return [prompt[inputArray.length], reset, action, validInput]
-}
 
-Identify.prototype.preview = function(num) {
-//no preview required
-return;
+  preview() {
+    //no preview required
+    return;
 
-}
+  }
 
-Identify.prototype.action = function(points, items){
-	
-  var id = (" X: " + points[0].x.toFixed(1) + " Y:" + points[0].y.toFixed(1));		
-	notify(id)
+  action(core) {
+
+    var id = (" X: " + core.scene.points[0].x.toFixed(1) + " Y:" + core.scene.points[0].y.toFixed(1));
+    notify(id)
+  }
 }

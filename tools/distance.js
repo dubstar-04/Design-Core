@@ -1,57 +1,65 @@
-commands.push({command: "Distance", shortcut: "DI"});
-function Distance()
-{
-    //Define Properties
-    this.type = "Distance";
-    this.family = "Tools";
-    this.movement = "None";
-    this.minPoints = 2;
-	this.selectionRequired = false;
-    this.helper_geometry = false;
-    this.showPreview = false;
-}
+import { Utils } from '../lib/utils.js'
 
-Distance.prototype.prompt = function(inputArray) {
-  var num = inputArray.length;
-  var expectedType = [];
-  var reset = false;
-  var action = false;
-  var prompt = [];
+export class Distance {
+    constructor() {
 
-  expectedType[0] = ["undefined"];
-  prompt[0] = "Select Start Point:";
+        //Define Properties
+        this.type = "Distance";
+        this.family = "Tools";
+        this.movement = "None";
+        this.minPoints = 2;
+        this.selectionRequired = false;
+        this.helper_geometry = false;
+        this.showPreview = false;
+    }
 
-  expectedType[1] = ["object"];   
-  prompt[1] = "Select End Point:";
+    static register() {
+        var command = { command: "Distance", shortcut: "DI" };
+        return command
+    }
 
-  expectedType[2] = ["object"];    
-  prompt[2] = "";
+    prompt(core) {
+        var num = core.scene.inputArray.length;
+        var expectedType = [];
+        var reset = false;
+        var action = false;
+        var prompt = [];
 
-  var validInput = expectedType[num].includes(typeof inputArray[num-1])
-            
-  if(!validInput){
-      inputArray.pop()
-  }else if (inputArray.length === this.minPoints){
-      action = true;
-      reset = true
-  }
-  
-  return [prompt[inputArray.length], reset, action, validInput]
-}
+        expectedType[0] = ["undefined"];
+        prompt[0] = "Select Start Point:";
 
-Distance.prototype.preview = function(num) {
+        expectedType[1] = ["object"];
+        prompt[1] = "Select End Point:";
 
-console.log("TO DO: Draw a preview of the measurement")
+        expectedType[2] = ["object"];
+        prompt[2] = "";
 
-}
+        var validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1])
 
-Distance.prototype.action = function(points, items){
+        if (!validInput) {
+            core.scene.inputArray.pop()
+        } else if (core.scene.inputArray.length === this.minPoints) {
+            action = true;
+            reset = true
+        }
 
-    //var point1 = new Point(points[0].x, points[0].y)
-    //var point2 = new Point(points[1].x, points[1].y)
+        return [prompt[core.scene.inputArray.length], reset, action, validInput]
+    }
 
-    var di = (" Length: " + distBetweenPoints(points[0].x, points[0].y, points[1].x, points[1].y).toFixed(1)
-                + " X: " + (points[1].x - points[0].x).toFixed(1) + " Y:" + (points[1].y - points[0].y).toFixed(1));
-				
-	notify(di)
+    preview(num) {
+
+        console.log("TO DO: Draw a preview of the measurement")
+
+    }
+
+    action(core) {
+
+        //var point1 = new Point(points[0].x, points[0].y)
+        //var point2 = new Point(points[1].x, points[1].y)
+
+        var di = (" Length: " + Utils.distBetweenPoints(core.scene.points[0].x, core.scene.points[0].y, core.scene.points[1].x, core.scene.points[1].y).toFixed(1)
+            + " X: " + (core.scene.points[1].x - core.scene.points[0].x).toFixed(1) + " Y:" + (core.scene.points[1].y - core.scene.points[0].y).toFixed(1));
+
+        notify(di)
+    }
 }
