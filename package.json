@@ -1,0 +1,10 @@
+{
+  "name": "Design-Core",
+  "type": "module",
+  "scripts": {
+      "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },  
+  "devDependencies": {
+    "jest": "^29.2.2"
+  }
+}
