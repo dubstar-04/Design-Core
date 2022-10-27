@@ -130,27 +130,25 @@ export class DesignEngine {
   }
 
   actionInput() {
-    // let prompt; let resetBool; let actionBool; let validInput;
+     //promptData: {promptInput, resetBool, actionBool, validInput}
+    const promptData = this.core.scene.activeCommand.prompt(this.core);
+    this.core.commandLine.setPrompt(promptData.promptInput);
 
-    [promptInput, resetBool, actionBool, validInput] = this.core.scene.activeCommand.prompt(this.core);
-    console.log('prompt: ', promptInput, ' reset: ', resetBool, ' action: ' + actionBool);
-    this.core.commandLine.setPrompt(promptInput);
-
-    if (!validInput) {
+    if (!promptData.validInput) {
       // notify('Invalid Input');
       // TODO: Enable GTK toast
       console.log(' ######## Invalid Input ######## ');
     }
 
-    if (actionBool) {
+    if (promptData.actionBool) {
       if (this.core.scene.activeCommand.family === 'Tools') {
         this.core.scene.activeCommand.action(this.core);
       } else {
-        this.core.scene.addToScene(null, null, resetBool);
+        this.core.scene.addToScene(null, null, promptData.resetBool);
       }
     }
 
-    if (resetBool) {
+    if (promptData.resetBool) {
       this.core.scene.reset();
     }
   }

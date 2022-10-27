@@ -40,7 +40,7 @@ export class Erase {
       reset = true;
     }
 
-    return [prompt[core.scene.inputArray.length], reset, action, validInput];
+    return {promptInput:prompt[core.scene.inputArray.length], resetBool:reset, actionBool:action, validInput:validInput};
   }
 
   action(core) {

@@ -50,7 +50,7 @@ export class Extend {
       // reset = true
     }
 
-    return [prompt[core.scene.inputArray.length], reset, action, validInput];
+    return {promptInput:prompt[core.scene.inputArray.length], resetBool:reset, actionBool:action, validInput:validInput};
   }
 
   action(core) {
@@ -62,11 +62,12 @@ export class Extend {
 
     if (item !== undefined) {
       const intersectPoints = [];
+      let extendItem;
 
       for (let i = 0; i < core.scene.selectionSet.length; i++) {
         if (core.scene.selectionSet[i] !== item) {
           const boundaryItem = core.scene.items[core.scene.selectionSet[i]];
-          const extendItem = core.scene.items[item];
+          extendItem = core.scene.items[item];
 
           console.log('boundary.type:', boundaryItem.type, 'extend.type:', extendItem.type);
 
@@ -85,7 +86,7 @@ export class Extend {
       }
 
       if (intersectPoints) {
-        extendItem.extend(intersectPoints);
+        extendItem.extend(intersectPoints, core);
       }
     }
   }

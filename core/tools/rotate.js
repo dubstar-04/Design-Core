@@ -50,7 +50,7 @@ export class Rotate {
       reset = true;
     }
 
-    return [prompt[core.scene.inputArray.length], reset, action, validInput];
+    return {promptInput:prompt[core.scene.inputArray.length], resetBool:reset, actionBool:action, validInput:validInput};
   }
 
   preview = function(core) {

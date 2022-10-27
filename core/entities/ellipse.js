@@ -79,7 +79,7 @@ export class Ellipse {
       this.helper_geometry = false;
     }
 
-    return [prompt[core.scene.inputArray.length], reset, action, validInput];
+    return {promptInput:prompt[core.scene.inputArray.length], resetBool:reset, actionBool:action, validInput:validInput};
   }
 
 
