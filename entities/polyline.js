@@ -1,323 +1,306 @@
-import { Point } from './point.js'
-import { Utils } from '../lib/utils.js'
-import { Intersection } from '../lib/intersect.js'
-import { Colours } from '../lib/colours.js'
+import {Point} from './point.js';
+import {Utils} from '../lib/utils.js';
+import {Intersection} from '../lib/intersect.js';
+import {Colours} from '../lib/colours.js';
 
 export class Polyline {
-    constructor(data) {
-        //Define Properties         //Associated DXF Value
-        this.type = "Polyline";
-        this.family = "Geometry";
-        this.minPoints = 2;
-        this.showPreview = true; //show preview of item as its being created
-        //this.limitPoints = false;
-        //this.allowMultiple = false;
-        this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
-        this.points = [];
-        this.lineWidth = 2; //Thickness
-        this.colour = "BYLAYER";
-        this.layer = "0";
-        this.alpha = 1.0 //Transparancy
+  constructor(data) {
+    // Define Properties         //Associated DXF Value
+    this.type = 'Polyline';
+    this.family = 'Geometry';
+    this.minPoints = 2;
+    this.showPreview = true; // show preview of item as its being created
+    // this.limitPoints = false;
+    // this.allowMultiple = false;
+    this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
+    this.points = [];
+    this.lineWidth = 2; // Thickness
+    this.colour = 'BYLAYER';
+    this.layer = '0';
+    this.alpha = 1.0; // Transparancy
 
 
-        if (data) {
+    if (data) {
+      if (data.points) {
+        this.points = data.points;
+      }
 
-            if (data.points) {
-                this.points = data.points
-            }
+      if (data.colour) {
+        this.colour = data.colour;
+      }
 
-            if (data.colour) {
-                this.colour = data.colour;
-            }
+      if (data.layer) {
+        // console.log("Polyline.js Layer data:" + data.layer)
+        this.layer = data.layer;
+      }
+    }
+  }
 
-            if (data.layer) {
-                //console.log("Polyline.js Layer data:" + data.layer)
-                this.layer = data.layer;
-            }
-        }
+  static register() {
+    const command = {command: 'Polyline', shortcut: 'PL'};
+    return command;
+  }
+
+  prompt(core) {
+    const num = core.scene.inputArray.length;
+    const expectedType = [];
+    const reset = false;
+    let action = false;
+    const prompt = [];
+
+    // console.log("inputArray: ", inputArray)
+
+    expectedType[0] = ['undefined'];
+    prompt[0] = 'Pick start point:';
+
+    expectedType[1] = ['object'];
+    prompt[1] = 'Pick another point or press ESC to quit:';
+
+    expectedType[2] = ['object', 'number'];
+    prompt[2] = prompt[1];
+
+    expectedType[3] = ['object', 'number'];
+    prompt[3] = prompt[1];
+
+    const validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
+
+    if (!validInput || num > this.minPoints) {
+      core.scene.inputArray.pop();
+    } else if (core.scene.inputArray.length === this.minPoints) {
+      action = true;
+      // reset = true
     }
 
-    static register() {
-        var command = { command: "Polyline", shortcut: "PL" };
-        return command
+    return [prompt[core.scene.inputArray.length], reset, action, validInput];
+  }
+
+  draw(ctx, scale, core) {
+    if (!core.layerManager.layerVisible(this.layer)) {
+      return;
     }
 
-    prompt(core) {
-        var num = core.scene.inputArray.length;
-        var expectedType = [];
-        var reset = false;
-        var action = false;
-        var prompt = [];
+    let colour = this.colour;
 
-        //console.log("inputArray: ", inputArray)
-
-        expectedType[0] = ["undefined"];
-        prompt[0] = "Pick start point:";
-
-        expectedType[1] = ["object"];
-        prompt[1] = "Pick another point or press ESC to quit:";
-
-        expectedType[2] = ["object", "number"];
-        prompt[2] = prompt[1];
-
-        expectedType[3] = ["object", "number"];
-        prompt[3] = prompt[1];
-
-        var validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1])
-
-        if (!validInput || num > this.minPoints) {
-            core.scene.inputArray.pop()
-        } else if (core.scene.inputArray.length === this.minPoints) {
-            action = true;
-            //reset = true
-        }
-
-        return [prompt[core.scene.inputArray.length], reset, action, validInput]
+    if (this.colour === 'BYLAYER') {
+      colour = core.layerManager.getLayerByName(this.layer).colour;
     }
 
-    draw(ctx, scale, core) {
-
-        if (!core.layerManager.layerVisible(this.layer)) {
-            return
-        }
-
-        var colour = this.colour;
-
-        if (this.colour === "BYLAYER") {
-            colour = core.layerManager.getLayerByName(this.layer).colour
-        }
-
-        try { // HTML Canvas
-            ctx.strokeStyle = colour;
-            ctx.lineWidth = this.lineWidth / scale;
-            ctx.beginPath()
-        } catch { // Cairo
-            ctx.setLineWidth(this.lineWidth / scale);
-            var rgbColour = Colours.hexToScaledRGB(colour)
-            ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-        }
-
-        ctx.moveTo(this.points[0].x, this.points[0].y);
-
-        for (var i = 1; i < this.points.length; i++) {
-            ctx.lineTo(this.points[i].x, this.points[i].y);
-        }
-
-        ctx.stroke()
+    try { // HTML Canvas
+      ctx.strokeStyle = colour;
+      ctx.lineWidth = this.lineWidth / scale;
+      ctx.beginPath();
+    } catch { // Cairo
+      ctx.setLineWidth(this.lineWidth / scale);
+      const rgbColour = Colours.hexToScaledRGB(colour);
+      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
+    ctx.moveTo(this.points[0].x, this.points[0].y);
 
-    dxf() {
-
-        var closed = (this.points[0].x === this.points[this.points.length - 1].x && this.points[0].y === this.points[this.points.length - 1].y);
-        var vertices = this.vertices();
-        var dxfitem = ""
-        var data = dxfitem.concat(
-            "0",
-            "\n", "POLYLINE",
-            //"\n", "5", //HANDLE
-            //"\n", "DA",
-            "\n", "8", //LAYERNAME
-            "\n", this.layer,
-            "\n", "66",
-            "\n", "1",
-            "\n", "10", //X
-            "\n", "0",
-            "\n", "20", //Y
-            "\n", "0",
-            "\n", "30", //Z
-            "\n", "0",
-            "\n", "39", //Line Width
-            "\n", this.lineWidth,
-            "\n", "70", //Flags
-            "\n", closed ? "1" : "0",
-            //"\n", "100", //Subclass marker
-            //"\n", "AcDb2dPolyline",
-            vertices, //Dont use a new line here as the vertex data will start with a new line.
-            "\n", "0",
-            "\n", "SEQEND", //END OF SEQUENCE
-            "\n", "8", //LAYERNAME
-            "\n", this.layer
-        )
-        console.log(" polyline.js - DXF Data:" + data)
-        return data
+    for (let i = 1; i < this.points.length; i++) {
+      ctx.lineTo(this.points[i].x, this.points[i].y);
     }
 
-    intersectPoints() {
+    ctx.stroke();
+  }
 
-        return {
-            points: this.points
-        }
 
+  dxf() {
+    const closed = (this.points[0].x === this.points[this.points.length - 1].x && this.points[0].y === this.points[this.points.length - 1].y);
+    const vertices = this.vertices();
+    const dxfitem = '';
+    const data = dxfitem.concat(
+        '0',
+        '\n', 'POLYLINE',
+        // "\n", "5", //HANDLE
+        // "\n", "DA",
+        '\n', '8', // LAYERNAME
+        '\n', this.layer,
+        '\n', '66',
+        '\n', '1',
+        '\n', '10', // X
+        '\n', '0',
+        '\n', '20', // Y
+        '\n', '0',
+        '\n', '30', // Z
+        '\n', '0',
+        '\n', '39', // Line Width
+        '\n', this.lineWidth,
+        '\n', '70', // Flags
+        '\n', closed ? '1' : '0',
+        // "\n", "100", //Subclass marker
+        // "\n", "AcDb2dPolyline",
+        vertices, // Dont use a new line here as the vertex data will start with a new line.
+        '\n', '0',
+        '\n', 'SEQEND', // END OF SEQUENCE
+        '\n', '8', // LAYERNAME
+        '\n', this.layer,
+    );
+    console.log(' polyline.js - DXF Data:' + data);
+    return data;
+  }
+
+  intersectPoints() {
+    return {
+      points: this.points,
+    };
+  }
+
+  vertices() {
+    let verticesData = '';
+    for (let i = 0; i < this.points.length; i++) {
+      verticesData = verticesData.concat(
+          '\n', '0',
+          '\n', 'VERTEX',
+          // "\n", "5", //HANDLE
+          // "\n", "DA",
+          '\n', '8', // LAYERNAME
+          '\n', '0',
+          // "\n", "100",
+          // "\n", "AcDbVertex",
+          // "\n", "100",
+          // "\n", "AcDb2dVertex",
+          '\n', '10', // X
+          '\n', this.points[i].x,
+          '\n', '20', // Y
+          '\n', this.points[i].y,
+          '\n', '30', // Z
+          // "\n", "0",
+          // "\n", "0",
+          '\n', '0',
+      );
     }
 
-    vertices() {
+    return verticesData;
+  }
 
-        var vertices_data = "";
-        for (var i = 0; i < this.points.length; i++) {
+  length() { }
 
-            vertices_data = vertices_data.concat(
-                "\n", "0",
-                "\n", "VERTEX",
-                //"\n", "5", //HANDLE
-                //"\n", "DA",
-                "\n", "8", //LAYERNAME
-                "\n", "0",
-                //"\n", "100",
-                //"\n", "AcDbVertex",
-                //"\n", "100",
-                //"\n", "AcDb2dVertex",
-                "\n", "10", //X
-                "\n", this.points[i].x,
-                "\n", "20", //Y
-                "\n", this.points[i].y,
-                "\n", "30", //Z
-                //"\n", "0",
-                //"\n", "0",
-                "\n", "0"
-            )
-        }
+  midPoint(x, x1, y, y1) {
+    const midX = (x + x1) / 2;
+    const midY = (y + y1) / 2;
+    const midPoint = new Point(midX, midY);
 
-        return vertices_data;
+    return midPoint;
+  }
+
+
+  snaps(mousePoint, delta, core) {
+    if (!core.layerManager.layerVisible(this.layer)) {
+      return;
     }
 
-    length() { }
+    const snaps = [];
 
-    midPoint(x, x1, y, y1) {
-
-        var midX = (x + x1) / 2
-        var midY = (y + y1) / 2
-        var midPoint = new Point(midX, midY);
-
-        return midPoint;
+    if (core.settings.endSnap) {
+      // End points for each segment
+      for (let i = 0; i < this.points.length; i++) {
+        snaps.push(this.points[i]);
+      }
     }
 
+    if (core.settings.midSnap) {
+      for (let i = 1; i < this.points.length; i++) {
+        const start = this.points[i - 1];
+        const end = this.points[i];
 
-    snaps(mousePoint, delta, core) {
-
-        if (!core.layerManager.layerVisible(this.layer)) {
-            return
-        }
-
-        var snaps = [];
-
-        if (core.settings.endSnap) {
-            // End points for each segment
-            for (var i = 0; i < this.points.length; i++) {
-                snaps.push(this.points[i]);
-            }
-        }
-
-        if (core.settings.midSnap) {
-
-            for (var i = 1; i < this.points.length; i++) {
-
-                var start = this.points[i - 1];
-                var end = this.points[i]
-
-                snaps.push(this.midPoint(start.x, end.x, start.y, end.y));
-            }
-        }
-
-        if (core.settings.nearestSnap) {
-            var closest = this.closestPoint(mousePoint)
-
-            // Crude way to snap to the closest point or a node
-            if (closest[1] < delta / 10) {
-                snaps.push(closest[0])
-            }
-        }
-
-        return snaps;
+        snaps.push(this.midPoint(start.x, end.x, start.y, end.y));
+      }
     }
 
-    closestPoint(P) {
+    if (core.settings.nearestSnap) {
+      const closest = this.closestPoint(mousePoint);
 
-        var distance = Infinity;
-        var minPnt = P;
-
-        for (var i = 1; i < this.points.length; i++) {
-
-            var A = this.points[i - 1];
-            var B = this.points[i];
-            var pnt = P.perpendicular(A, B);
-
-            if (pnt !== null) {
-                var pntDist = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y)
-
-                if (pntDist < distance) {
-                    distance = pntDist;
-                    minPnt = pnt;
-                    //console.log("distance:" , distance)
-                }
-            }
-        }
-
-        return [minPnt, distance]
+      // Crude way to snap to the closest point or a node
+      if (closest[1] < delta / 10) {
+        snaps.push(closest[0]);
+      }
     }
 
-    extremes() {
+    return snaps;
+  }
 
-        var x_values = [];
-        var y_values = [];
+  closestPoint(P) {
+    let distance = Infinity;
+    let minPnt = P;
 
-        for (var i = 0; i < this.points.length; i++) {
-            x_values.push(this.points[i].x);
-            y_values.push(this.points[i].y);
+    for (let i = 1; i < this.points.length; i++) {
+      const A = this.points[i - 1];
+      const B = this.points[i];
+      const pnt = P.perpendicular(A, B);
+
+      if (pnt !== null) {
+        const pntDist = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y);
+
+        if (pntDist < distance) {
+          distance = pntDist;
+          minPnt = pnt;
+          // console.log("distance:" , distance)
         }
-
-        var xmin = Math.min.apply(Math, x_values)
-        var xmax = Math.max.apply(Math, x_values)
-        var ymin = Math.min.apply(Math, y_values)
-        var ymax = Math.max.apply(Math, y_values)
-
-        return [xmin, xmax, ymin, ymax]
+      }
     }
 
-    within(selection_extremes, core) {
+    return [minPnt, distance];
+  }
 
-        if (!core.layerManager.layerVisible(this.layer)) {
-            return
-        }
+  extremes() {
+    const xValues = [];
+    const yValues = [];
 
-        // determin if this entity is within a the window specified by selection_extremes
-        var extremePoints = this.extremes()
-        if (extremePoints[0] > selection_extremes[0] &&
-            extremePoints[1] < selection_extremes[1] &&
-            extremePoints[2] > selection_extremes[2] &&
-            extremePoints[3] < selection_extremes[3]
-        ) {
-
-            return true
-        } else {
-            return false
-        }
+    for (let i = 0; i < this.points.length; i++) {
+      xValues.push(this.points[i].x);
+      yValues.push(this.points[i].y);
     }
 
-    touched(selection_extremes, core) {
+    const xmin = Math.min(...xValues);
+    const xmax = Math.max(...xValues);
+    const ymin = Math.min(...yValues);
+    const ymax = Math.max(...yValues);
 
-        if (!core.layerManager.layerVisible(this.layer)) {
-            return
-        }
+    return [xmin, xmax, ymin, ymax];
+  }
 
-        var lP1 = new Point();
-        var lP2 = new Point();
-
-        var rP1 = new Point(selection_extremes[0], selection_extremes[2]);
-        var rP2 = new Point(selection_extremes[1], selection_extremes[3]);
-
-        var rectPoints = {
-            start: rP1,
-            end: rP2
-        };
-
-        var output = Intersection.intersectPolylineRectangle(this.intersectPoints(), rectPoints);
-        //console.log("polyline.js - touched - status:",output.status)
-
-        if (output.status === "Intersection") {
-            return true
-        } else {
-            return false
-        }
+  within(selectionExtremes, core) {
+    if (!core.layerManager.layerVisible(this.layer)) {
+      return;
     }
+
+    // determin if this entity is within a the window specified by selectionExtremes
+    const extremePoints = this.extremes();
+    if (extremePoints[0] > selectionExtremes[0] &&
+            extremePoints[1] < selectionExtremes[1] &&
+            extremePoints[2] > selectionExtremes[2] &&
+            extremePoints[3] < selectionExtremes[3]
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  touched(selectionExtremes, core) {
+    if (!core.layerManager.layerVisible(this.layer)) {
+      return;
+    }
+
+    // const lP1 = new Point();
+    // const lP2 = new Point();
+
+    const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
+    const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
+
+    const rectPoints = {
+      start: rP1,
+      end: rP2,
+    };
+
+    const output = Intersection.intersectPolylineRectangle(this.intersectPoints(), rectPoints);
+    // console.log("polyline.js - touched - status:",output.status)
+
+    if (output.status === 'Intersection') {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
