@@ -62,11 +62,12 @@ export class Trim {
 
     if (item !== undefined) {
       const intersectPoints = [];
+      let TrimItem;
 
       for (let i = 0; i < core.scene.selectionSet.length; i++) {
         if (core.scene.selectionSet[i] !== item) {
           const boundaryItem = core.scene.items[core.scene.selectionSet[i]];
-          const TrimItem = core.scene.items[item];
+          TrimItem = core.scene.items[item];
 
           console.log('boundary.type:', boundaryItem.type, 'Trim.type:', TrimItem.type);
 
