@@ -325,12 +325,6 @@ export class Dimension {
       return;
     }
 
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
-    }
-
     entities = this.getBlockEntities();
 
     if (entities) {
@@ -343,7 +337,7 @@ export class Dimension {
     }
 
     this.block.draw(ctx, scale, core);
-
+    /*
     function drawArrowHead(point, angle, height) {
       // console.log("arrow head height:", height)
       triangleWidth = height;
@@ -366,6 +360,7 @@ export class Dimension {
       ctx.stroke();
       ctx.restore();
     }
+    */
 
     // ////////////////////////////////////////
     // draw test point for perpendicular
