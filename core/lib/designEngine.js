@@ -130,16 +130,16 @@ export class DesignEngine {
   }
 
   actionInput() {
-    let prompt; let resetBool; let actionBool; let validInput;
+    // let prompt; let resetBool; let actionBool; let validInput;
 
-    [prompt, resetBool, actionBool, validInput] = this.core.scene.activeCommand.prompt(this.core);
-    console.log('prompt: ', prompt, ' reset: ', resetBool, ' action: ' + actionBool);
-    this.core.commandLine.setPrompt(prompt);
+    [promptInput, resetBool, actionBool, validInput] = this.core.scene.activeCommand.prompt(this.core);
+    console.log('prompt: ', promptInput, ' reset: ', resetBool, ' action: ' + actionBool);
+    this.core.commandLine.setPrompt(promptInput);
 
     if (!validInput) {
-      //notify('Invalid Input');
-      //TODO: Enable GTK toast
-      console.log(" ######## Invalid Input ######## ")
+      // notify('Invalid Input');
+      // TODO: Enable GTK toast
+      console.log(' ######## Invalid Input ######## ');
     }
 
     if (actionBool) {

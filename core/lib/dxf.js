@@ -3,18 +3,20 @@ import {Utils} from './utils.js';
 import {Point} from '../entities/point.js';
 
 // Turn off debugging messages
-const debug = false;
+// const debug = false;
 
 // TODO: Move Debugging to a seperate class in design-core
+/*
 function debugLog(msg) {
   if (debug) {
     console.log('DXF.js: ' + msg);
   }
 }
+*/
 
 export class DXF {
   // constructor(){
-  // debugLog("fileio.js - processDXF")
+  // debugLog("fileio.js - processDXF");
 
   static line = '';
   static lines = [];
@@ -866,8 +868,8 @@ export class DXF {
 
 
   static readPoint() {
-    let colour = 'BYLAYER';
-    let layer = '0';
+    // let colour = 'BYLAYER';
+    // const layer = '0';
 
     while (this.lineNum < this.lines.length) {
       this.getDXFLine();
@@ -889,7 +891,7 @@ export class DXF {
         case 8: // Layer name follows
           this.getDXFLine();
           // debugLog("Layer name: " + this.line);
-          layer = this.line;
+          // layer = this.line;
           break;
         case 10:
           // start x
@@ -1208,8 +1210,8 @@ export class DXF {
   static readVertex() {
     const vertex = new Point();
     // debugLog("In VERTEX");
-    let colour = 'BYLAYER';
-    let layer = '0';
+    // let colour = 'BYLAYER';
+    // const layer = '0';
 
     while (this.lineNum < this.lines.length) {
       this.getDXFLine();
@@ -1227,7 +1229,7 @@ export class DXF {
         case 8: // Layer name follows
           this.getDXFLine();
           // debugLog("Layer: " + this.line);
-          layer = this.line;
+          // layer = this.line;
           break;
         case 10:
           // x
@@ -1270,7 +1272,7 @@ export class DXF {
           // color index
           this.getDXFLine();
           // debugLog("Colour: ACAD:" + this.line + " HEX: " + Colours.getHexColour(Number(this.line)));
-          colour = Colours.getHexColour(Number(this.line));
+          // colour = Colours.getHexColour(Number(this.line));
           break;
         case 70:
           this.getDXFLine();
@@ -1537,13 +1539,13 @@ export class DXF {
     const points = [];
     const xCtrlPoints = [];
     const yCtrlPoints = [];
-    let xFitPoints = [];
-    let yFitPoints = [];
+    // let xFitPoints = [];
+    // let yFitPoints = [];
     const knotValues = [];
-    const vertices = 0; // store the number of points contained in the Spline
-    let knots = 0;
+    // const vertices = 0; // store the number of points contained in the Spline
+    // let knots = 0;
     let controlPoints = 0;
-    let fitPoints = 0;
+    // let fitPoints = 0;
     let colour = 'BYLAYER';
     let layer = '0';
     let flags;
@@ -2309,7 +2311,7 @@ export class DXF {
 
   static readVPort() {
     const centre = new Point();
-    let width = 0;
+    // const width = 0;
     let height = 0;
     let ratio = 0;
 
@@ -2323,7 +2325,7 @@ export class DXF {
         case 0:
 
           if (height !== 0 && ratio !== 0) {
-            width = height * ratio;
+            // width = height * ratio;
             // ////console.log("Vport Width: ", width)
           }
 
