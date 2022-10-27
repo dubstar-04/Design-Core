@@ -31,7 +31,7 @@ jobs:
     - run: npm test -- --coverage
 
     - name: Run ESLint
-      run: eslint . --ext .js
+      run: npx run eslint . --ext .js
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
