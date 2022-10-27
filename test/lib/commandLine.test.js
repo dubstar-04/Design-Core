@@ -1,6 +1,6 @@
 
-import {CommandLine} from '../../lib/commandLine.js';
-import {Core} from '../../core.js';
+import {CommandLine} from '../../core/lib/commandLine.js';
+import {Core} from '../../core/core.js';
 
 const core = new Core();
 const commandline = new CommandLine(core);
