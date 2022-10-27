@@ -104,7 +104,7 @@ export class Arc {
       this.helper_geometry = false;
     }
 
-    return {promptInput:prompt[core.scene.inputArray.length], resetBool:reset, actionBool:action, validInput:validInput};
+    return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
   }
 
   draw(ctx, scale, core) {
