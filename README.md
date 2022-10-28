@@ -1,4 +1,4 @@
-# Design-Core [![Tests](https://github.com/dubstar-04/Design-Core/workflows/DesignCoreQA/badge.svg?branch=main)](https://github.com/dubstar-04/Design-Core/actions) [![codecov](https://codecov.io/gh/dubstar-04/Design-Core/branch/main/graph/badge.svg?token=SH2E690AT0)](https://codecov.io/gh/dubstar-04/Design-Core)
+# Design-Core [![Design-Core QA](https://github.com/dubstar-04/Design-Core/actions/workflows/DesignCoreQA.yml/badge.svg)](https://github.com/dubstar-04/Design-Core/actions/workflows/DesignCoreQA.yml)[![codecov](https://codecov.io/gh/dubstar-04/Design-Core/branch/main/graph/badge.svg?token=SH2E690AT0)](https://codecov.io/gh/dubstar-04/Design-Core)
 
 
 Design Core is a dependancy free opensource javascript library for two dimensional computer aided design (CAD).
