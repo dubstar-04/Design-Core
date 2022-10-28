@@ -477,7 +477,7 @@ export class Intersection {
 
     let result;
     const origin = new Point(a1.x, a1.y);
-    const dir = Point.fromPoints(a1, a2);
+    const dir = a2.subtract(a1);
     const center = new Point(cen.x, cen.y);
     const diff = origin.subtract(center);
     const mDir = new Point(dir.x / (rx * rx), dir.y / (ry * ry));

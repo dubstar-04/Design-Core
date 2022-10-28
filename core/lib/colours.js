@@ -1,13 +1,17 @@
 export class Colours {
+  /**
+   * Convert an AutoCAD colour index (ACI) to a hex colour
+   * @param  {Number} acadColour
+   */
   static getHexColour(acadColour) {
-    // Convert an AutoCAD colour index (ACI) to a hex colour
-    // console.log("getHexColour");
     return this.conversion_table[acadColour];
   };
 
+  /**
+   * Convert a hex colour to an AutoCAD colour index (ACI)
+   * @param  {String} hexColour
+   */
   static getACADColour(hexColour) {
-    // Convert a hex colour to an AutoCAD colour index (ACI)
-    // console.log("getACADColour");
     for (const acadColour in this.conversion_table) {
       if (this.conversion_table[acadColour] === hexColour) {
         return acadColour;
@@ -15,17 +19,29 @@ export class Colours {
     }
   };
 
+  /**
+   * Get hex component from r, g or b value
+   * @param  {Number} c
+   */
   static componentToHex(c) {
-    // get hex component from r, g or b value
     const hex = Math.abs(c).toString(16);
     return hex.length == 1 ? '0' + hex : hex;
   }
 
+  /**
+   * Get hex colour from RGB
+   * @param  {Number} r - red value
+   * @param  {Number} g - green value
+   * @param  {Number} b - blue value
+   */
   static rgbToHex(r, g, b) {
-    // get hex code from r, g, and b
     return '#' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
   }
 
+  /**
+   *  Get RGB colour components from hex colour
+   * @param  {String} hexColour
+   */
   static hexToRGB(hexColour) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColour);
 
@@ -40,13 +56,17 @@ export class Colours {
     return null;
   }
 
+  /**
+   *  Get RGB colour components scaled 0 - 1 from hex colour
+   * @param  {String} hexColour
+   */
   static hexToScaledRGB(hexColour) {
     const rgb = this.hexToRGB(hexColour);
 
     if (rgb) {
       return {
         r: rgb.r / 255,
-        g: rgb.g / 225,
+        g: rgb.g / 255,
         b: rgb.b / 255,
       };
     }
