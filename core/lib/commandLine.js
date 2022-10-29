@@ -1,4 +1,8 @@
 export class CommandLine {
+  /**
+   * Commandline Constructor
+   * @param {object} core - Design Core Object
+   */
   constructor(core) {
     this.cmdLine = ''; // display string
     this.prompt = 'Command:';
@@ -9,20 +13,19 @@ export class CommandLine {
     this.updateCallbackFunction; // set to external callback function
   }
 
+  /**
+   * Sets the commandline callback to an external function
+   * @param {function} callback
+   */
   setUpdateFunction(callback) {
     // set the call
     this.updateCallbackFunction = callback;
     this.update();
   }
 
-  clearPrompt() {
-    const currentPrompt = this.prompt;
-    this.prompt = '';
-    this.prompt = currentPrompt;
-    this.command = '';
-    this.update();
-  }
-
+  /**
+   * Resets the commandline prompt
+   */
   resetPrompt() {
     this.prompt = '';
     this.prompt = 'Command:';
@@ -31,29 +34,31 @@ export class CommandLine {
     this.update();
   }
 
+  /**
+   * Sets the commandline prompt
+   * @param {string} prompt
+   */
   setPrompt(prompt) {
-    this.prompt = this.core.scene.activeCommand.type + ': ' + prompt;
+    this.prompt = prompt;
     this.command = '';
     this.update();
   }
 
-  setPromptText(promptString) {
-    this.prompt = this.core.scene.activeCommand.type + ': ' + promptString;
-    this.command = '';
-    this.update();
-  }
-
+  /**
+   * Update the commandline prompt and trigger the callback
+   */
   update() {
-    // console.log("Command: ", this.command)
-    // console.log("Prompt: ", this.prompt)
     this.cmdLine = this.prompt + this.command;
-
     // run the callback to update external functions
     if (this.updateCallbackFunction) {
       this.updateCallbackFunction(this.cmdLine);
     }
   }
 
+  /**
+   * Handles keypresses at the commandline
+   * @param {string} key
+   */
   handleKeys(key) {
     console.log('commandLine.js - handle keys - key:', key);
 
@@ -67,13 +72,13 @@ export class CommandLine {
         this.enterPressed();
         break;
       case 'Escape':
+        // TODO: Horrible: Change this for a reset function in sceneControl
         this.core.designEngine.sceneControl('RightClick', []);
         break;
       case 'Space': // space
         this.enterPressed();
         break;
       case 'Left-Arrow': // Left-Arrow
-        this.leftPressed();
         break;
       case 'Up-Arrow': // Up-Arrow
         this.previousCommand('up');
@@ -128,31 +133,61 @@ export class CommandLine {
     }
   }
 
+  /**
+   * Handles presses of the delete key
+   */
   deletePressed() {
-    if (this.cmdLine.length === this.prompt.length) {
-
-    }
     this.core.designEngine.sceneControl('Enter', ['E']);
     console.log('[CommandLine.deletePressed]');
   }
 
+  /**
+   * Handles presses of the backspace key
+   */
   backPressed() {
     if (this.cmdLine.length === this.prompt.length) {
       this.command = '';
     } else {
-      // console.log("[CommandLine.backPressed]")
-
       this.command = this.command.substring(0, this.command.length - 1);
       this.update();
     }
   }
 
-  leftPressed() {
-    if (this.cmdLine.slice(0, this.cmdLine.selectionStart).length === this.prompt.length) {
-
+  /**
+   * Handles presses of the enter key
+   */
+  enterPressed() {
+    if (this.cmdLine.length > this.prompt.length) {
+      // get the inputprompt and remove the prompt text
+      const inputCommand = this.cmdLine.slice(this.prompt.length);
+      console.log('[CommandLine.enterPressed] - Command:', inputCommand);
+      const data = [inputCommand];
+      // console.log(data[0])
+      this.core.designEngine.sceneControl('Enter', data);
+    } else {
+      this.core.designEngine.sceneControl('Enter', []);
     }
   }
 
+  /**
+   * Adds commands to the command history
+   * @param {string} item
+   */
+  addToCommandHistory(item) {
+    // add the command to the commandline history stored in last command
+    if (this.lastCommand.indexOf(item) !== -1) { // only store command once
+      this.lastCommand.splice(this.lastCommand.indexOf(item), 1); // if the command is already in the array, Erase it
+    }
+    this.lastCommand.unshift(item); // add the command to the Array
+    while (this.lastCommand.length > 10) { // check if we have more than 10 command in history
+      this.lastCommand.pop();
+    }
+  }
+
+  /**
+   * Handles cycling the command history
+   * @param {string} direction - up/down
+   */
   previousCommand(direction) {
     if (direction === 'up') {
       if (this.lastCommand.length > 0 && this.lastCommandPosition < (this.lastCommand.length - 1)) {
@@ -171,44 +206,5 @@ export class CommandLine {
         console.log('[CommandLine.previousCommand] this.lastCommandPosition: ' + this.lastCommandPosition);
       }
     }
-  }
-
-  addToCommandHistory(item) {
-    // add the command to the commandline history stored in last command
-    if (this.core.commandLine.lastCommand.indexOf(item) !== -1) { // only store command once
-      this.core.commandLine.lastCommand.splice(this.core.commandLine.lastCommand.indexOf(item), 1); // if the command is already in the array, Erase it
-    }
-    this.core.commandLine.lastCommand.unshift(item); // add the command to the Array
-    while (this.core.commandLine.lastCommand.length > 10) { // check if we have more than 10 command in history
-      this.core.commandLine.lastCommand.pop();
-    }
-  }
-
-  enterPressed() {
-    // console.log(" UI_Scene.js - Return Pressed")
-
-    if (this.cmdLine.length > this.prompt.length) {
-      // get the inputprompt and remove the prompt text
-      const inputCommand = this.cmdLine.slice(this.prompt.length);
-      console.log('[CommandLine.enterPressed] - Command:', inputCommand);
-      const data = [inputCommand];
-      // console.log(data[0])
-      this.core.designEngine.sceneControl('Enter', data);
-    } else {
-      const data = [];
-      this.core.designEngine.sceneControl('Enter', data);
-    }
-  }
-
-  mouseup() {
-    console.log('[CommandLine.mousedown]');
-    this.cmdLine.selectionStart = this.cmdLine.selectionEnd = this.cmdLine.length;
-  }
-
-  disableSnaps() {
-    toggleSnap('endSnap');
-    toggleSnap('midSnap');
-    toggleSnap('centreSnap');
-    toggleSnap('nearestSnap');
   }
 }
