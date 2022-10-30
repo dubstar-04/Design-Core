@@ -51,6 +51,9 @@ const classes = {
 };
 
 export class CommandManager {
+  /**
+   * CommandManager constructor
+   */
   constructor() {
     // store a list of the available commands
     this.commands = [];
@@ -63,18 +66,37 @@ export class CommandManager {
     }
   }
 
+  /**
+   * Resgister each of the available commands
+   * @param {string} command
+   */
   registerCommand(command) {
     this.commands.push(command);
   };
 
+  /**
+   * Create a new instance of type using data
+   * @param {string} type
+   * @param {array} data
+   * @returns instance of type
+   */
   createNew = function(type, data) {
+    let newItem;
     if (this.isCommand(type)) {
-      return new classes[type](data);
+      newItem = new classes[type](data);
     } else {
+      // TODO: return undefined or null and notify of error
       console.log('commandManager.js - createNew: Command Not Recognised');
     }
+
+    return newItem;
   };
 
+  /**
+   * Check if command is valid
+   * @param {string} command
+   * @returns boolean
+   */
   isCommand(command) {
     if (typeof command !== 'undefined') {
       for (let i = 0; i < this.commands.length; i++) {
@@ -86,6 +108,11 @@ export class CommandManager {
     return false;
   }
 
+  /**
+   * Returns the command for a valid shortcut
+   * @param {string} shortcut
+   * @returns valid type
+   */
   getCommandFromShortcut(shortcut) {
     let commandFromShortcut = shortcut;
     if (typeof shortcut !== 'undefined') {
