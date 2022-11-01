@@ -29,7 +29,7 @@ export class DesignEngine {
     // console.log("sceneControl - is Point " + isPoint)
     // console.log("sceneControl - is Undefined " + isUndefined)
 
-    if (action === 'RightClick') {
+    if (action === 'Reset') {
       this.core.scene.reset();
       return;
     }

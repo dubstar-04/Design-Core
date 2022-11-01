@@ -72,8 +72,7 @@ export class CommandLine {
         this.enterPressed();
         break;
       case 'Escape':
-        // TODO: Horrible: Change this for a reset function in sceneControl
-        this.core.designEngine.sceneControl('RightClick', []);
+        this.core.designEngine.sceneControl('Reset', []);
         break;
       case 'Space': // space
         this.enterPressed();

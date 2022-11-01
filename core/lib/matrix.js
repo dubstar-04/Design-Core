@@ -1,6 +1,9 @@
 import {Point} from '../entities/point.js';
 
 export class Matrix {
+  /**
+   * Matrix constructor
+   */
   constructor() {
     this.a = 1; // x scale
     this.b = 0; // x skew
@@ -10,11 +13,19 @@ export class Matrix {
     this.f = 0; // y translate
   }
 
+  /**
+   * Returns the current scale
+   * @returns
+   */
   getScale() {
     // return the x scale
     return this.a;
   }
 
+  /**
+   * Returns inverted matrix
+   * @returns
+   */
   invert() {
     const d = 1 / (this.a * this.d - this.b * this.c);
     const invertedMatrix = new Matrix();
@@ -27,11 +38,21 @@ export class Matrix {
     return invertedMatrix;
   };
 
+  /**
+   * Apply tranlation to matrix
+   * @param {number} x - translation in x
+   * @param {number} y - translation in y
+   */
   translate(x, y) {
     this.e += this.a * x + this.c * y;
     this.f += this.b * x + this.d * y;
   };
 
+  /**
+   * Apply scale to matrix
+   * @param {number} sx - scale in x
+   * @param {number} sy - scale in x
+   */
   scale(sx, sy) {
     this.a *= sx;
     this.b *= sx;
@@ -39,6 +60,12 @@ export class Matrix {
     this.d *= sy;
   };
 
+  /**
+   * Returns px and py transformed to matrix (scene) co-ordinates
+   * @param {number} px
+   * @param {number} py
+   * @returns
+   */
   transformPoint(px, py) {
     const tpx = px * this.a + py * this.c + this.e;
     const tpy = px * this.b + py * this.d + this.f;
