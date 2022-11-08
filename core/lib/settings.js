@@ -1,4 +1,7 @@
 export class Settings {
+  /**
+   * Settings Constructor
+   */
   constructor() {
     this.canvasBackgroundColour = '#1e1e1e'; // "#000000";
     this.selectedItemsColour = '#00FF00';
@@ -22,11 +25,20 @@ export class Settings {
     this.drawGrid = true;
   }
 
-
+  /**
+   * Sets the value of the setting
+   * @param {string} setting
+   * @param {any} value
+   */
   setSetting(setting, value) {
     this[setting] = value;
   }
 
+  /**
+   * Returns the value of the setting
+   * @param {string} setting
+   * @returns
+   */
   getSetting(setting) {
     // TODO: Validate setting exists
     return this[setting];

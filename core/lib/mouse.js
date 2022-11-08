@@ -2,6 +2,10 @@ import {Point} from '../entities/point.js';
 import {Utils} from './utils.js';
 
 export class Mouse {
+  /**
+   * Mouse Constructor
+   * @param {object} core
+   */
   constructor(core) {
     this.x = 0;
     this.y = 0;
@@ -14,8 +18,11 @@ export class Mouse {
     this.lastButton = 0; // last button for double click check
   }
 
+  /**
+   * Calculates the angle between the last mouse point and current position
+   * @returns
+   */
   inputAngle() {
-    // return the angle between the last input point and the current position
     const previousPoint = this.core.scene.lastSelectedPoint();
     if (previousPoint) {
       const angle = Utils.radians2degrees(previousPoint.angle(this.pointOnScene()));
@@ -25,8 +32,11 @@ export class Mouse {
     return undefined;
   }
 
+  /**
+   * Calculates the distance between the last mouse point and current position
+   * @returns
+   */
   inputLength() {
-    // return the length between the last input point  and the current position
     if (this.core.scene.lastSelectedPoint()) {
       const len = Utils.distBetweenPoints(this.core.scene.lastSelectedPoint().x, this.core.scene.lastSelectedPoint().y, this.pointOnScene().x, this.pointOnScene().y);
       return len;
@@ -35,27 +45,48 @@ export class Mouse {
     return undefined;
   }
 
+  /**
+   * Returns the point on the design canvas
+   * @returns
+   */
   pointOnCanvas() {
     return new Point(this.x, this.y);
   }
 
+  /**
+   * Returns the point on the scene
+   * @returns
+   */
   pointOnScene() {
     return this.transformToScene(this.pointOnCanvas());
   }
 
+  /**
+   * Transforms the point location from canvas to scene space
+   * @param {point} point
+   * @returns
+   */
   transformToScene(point) {
-    // transform point from canvas coordinates to scene coordinates
     const scenePoint = this.core.canvas.matrix.invert().transformPoint(point.x, 0 - point.y + this.core.canvas.height);
     return scenePoint;
   }
 
+  /**
+   * Transforms the point location from scene to canvas space
+   * @param {point} point
+   * @returns
+   */
   transformToCanvas(point) {
-    // transform point from canvas coordinates to scene coordinates
     const canvasPoint = this.core.canvas.matrix.transformPoint(point.x, point.y);
     canvasPoint.y = 0 - canvasPoint.y + this.core.canvas.height;
     return canvasPoint;
   }
 
+  // TODO: This should be done outside of core in the ui.
+  /**
+   * Calculates the mouse position and angle string.
+   * @returns
+   */
   positionString() {
     // return a string showing the position of the mouse on the canvas
 
@@ -74,6 +105,11 @@ export class Mouse {
     return str;
   }
 
+  /**
+   * Sets the mouse position to x and y
+   * @param {number} x
+   * @param {number} y
+   */
   mouseMoved(x, y) {
     // x: mouse x pos
     // y: mouse y pos
@@ -85,8 +121,11 @@ export class Mouse {
     this.core.canvas.mouseMoved();
   }
 
+  /**
+   * Handles mouse down
+   * @param {number} button - 0 = left, 1 = wheel, 2 = right;
+   */
   mouseDown(button) {
-    // button: 0 = left, 1 = wheel, 2 = right;
     this.mouseDownCanvasPoint = this.pointOnCanvas();
 
     switch (button) {
@@ -106,6 +145,11 @@ export class Mouse {
     }
   }
 
+  /**
+   * Timer function for recognising double clicks
+   * @param {*} button  - 0 = left, 1 = wheel, 2 = right;
+   * @returns
+   */
   isDoubleClick(button) {
     // measure time between clicks to check for double clicks in a generic way
     const doubleClickThreshold = 250;
@@ -123,9 +167,11 @@ export class Mouse {
     return false;
   }
 
+  /**
+   * Handles mouse down
+   * @param {number} button - 0 = left, 1 = wheel, 2 = right;
+   */
   mouseUp(button) {
-    // button: 0 = left, 1 = wheel, 2 = right;
-
     switch (button) {
       case 0:
         this.buttonOneDown = false;
@@ -141,33 +187,29 @@ export class Mouse {
     this.core.canvas.mouseUp(button);
   }
 
+  /**
+   * Handles double clicks
+   * @param {number} button - 0 = left, 1 = wheel, 2 = right;
+   */
   doubleClick(button) {
     this.core.canvas.doubleClick(button);
   }
 
+  /**
+   * Handles house wheel input for zoom action
+   * @param {number} delta - +/- 1 for zoom in / out
+   */
   wheel(delta) {
-    // delta = +/- 1 for zoom in / out
     this.core.canvas.wheel(delta);
   }
 
-  setX(x) {
-    this.x = x;
-  }
-
-  setY(y) {
-    this.y = y;
-  }
-
+  /**
+   * set mouse position from scene coordinates
+   * @param {point} point
+   */
   setPosFromScenePoint(point) {
-    // convert point to canvas coordinates and set mouse position
     const mousePos = this.transformToCanvas(point);
     this.x = mousePos.x;
     this.y = mousePos.y;
-  }
-
-  setPos(point) {
-    // set mouse position to point
-    this.x = point.x;
-    this.y = point.y;
   }
 }
