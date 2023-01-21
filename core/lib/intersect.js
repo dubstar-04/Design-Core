@@ -212,8 +212,9 @@ export class Intersection {
     // TODO: Remove unused variables
     // const c = arc.centre;
     // const r = arc.radius;
-    // const sa = arc.startAngle;
+    // const sa = arc.e;
     // const ea = arc.endAngle;
+
     const r1 = rectangle.start;
     const r2 = rectangle.end;
 
@@ -260,33 +261,23 @@ export class Intersection {
    */
   static intersectArcLine(arc, line, extend) {
     const c = arc.centre;
-    // const r = arc.radius;
     const sa = arc.startAngle;
     const ea = arc.endAngle;
 
     const inter1 = this.intersectCircleLine(arc, line, extend);
     const result = new Intersection('No Intersection');
 
-    result.appendPoints(inter1.points);
-
-
     if (!extend) {
-      let points = [];
-
-      for (let i = 0; i < result.points.length; i++) {
-        if (c.angle(result.points[i]) > sa && c.angle(result.points[i]) < ea) {
-          // console.log("(intersectArcRectangle) [STATUS] point found")
-          console.log('Angles: ' + c.angle(result.points[i]) + ' Start: ' + sa + ' End: ' + ea);
-
-          // result.points.splice(i, 1);
-          points.push(result.points[i]);
+      for (let i = 0; i < inter1.points.length; i++) {
+        if (c.angle(inter1.points[i]) > sa && c.angle(inter1.points[i]) < ea) {
+          // console.log('Angles: ' + c.angle(inter1.points[i]) + ' Start: ' + sa + ' End: ' + ea + ' x:' + inter1.points[i].x, ' y:' + inter1.points[i].y);
+          result.appendPoints(inter1.points[i]);
         }
       }
 
-      if (points.length > 0) {
-        console.log('Actual points: ' + points.length);
+      if (result.points.length > 0) {
+        // console.log('Actual points: ' + result.length);
         result.status = 'Intersection';
-        points = [];
       }
     }
 
@@ -301,38 +292,7 @@ export class Intersection {
    * @returns
    */
   static intersectLineArc(line, arc, extend) {
-    const c = arc.centre;
-    // const r = arc.radius;
-    const sa = arc.startAngle;
-    const ea = arc.endAngle;
-
-    const inter1 = this.intersectCircleLine(arc, line);
-    const result = new Intersection('No Intersection');
-
-    result.appendPoints(inter1.points);
-
-
-    if (!extend) {
-      let points = [];
-
-      for (let i = 0; i < result.points.length; i++) {
-        if (c.angle(result.points[i]) > sa && c.angle(result.points[i]) < ea) {
-          // console.log("(intersectArcRectangle) [STATUS] point found")
-          console.log('Angles: ' + c.angle(result.points[i]) + ' Start: ' + sa + ' End: ' + ea);
-
-          // result.points.splice(i, 1);
-          points.push(result.points[i]);
-        }
-      }
-
-      if (points.length > 0) {
-        console.log('Actual points: ' + points.length);
-        result.status = 'Intersection';
-        points = [];
-      }
-    }
-
-    return result;
+    return this.intersectArcLine(arc, line, extend);
   }
 
   /**
@@ -351,26 +311,19 @@ export class Intersection {
     const inter1 = this.intersectCircleCircle(circle, arc, extend);
     const result = new Intersection('No Intersection');
 
-    result.appendPoints(inter1.points);
-
-
     if (!extend) {
-      let points = [];
-
-      for (let i = 0; i < result.points.length; i++) {
-        if (c.angle(result.points[i]) > sa && c.angle(result.points[i]) < ea) {
-          // console.log("(intersectArcRectangle) [STATUS] point found")
-          console.log('Angles: ' + c.angle(result.points[i]) + ' Start: ' + sa + ' End: ' + ea);
+      for (let i = 0; i < inter1.points.length; i++) {
+        if (c.angle(inter1.points[i]) > sa && c.angle(inter1.points[i]) < ea) {
+          // console.log('Angles: ' + c.angle(inter1.points[i]) + ' Start: ' + sa + ' End: ' + ea);
 
           // result.points.splice(i, 1);
-          points.push(result.points[i]);
+          result.points.push(inter1.points[i]);
         }
       }
 
-      if (points.length > 0) {
-        console.log('Actual points: ' + points.length);
+      if (result.points.length > 0) {
+        // console.log('Actual points: ' + result.points.length);
         result.status = 'Intersection';
-        points = [];
       }
     }
 
@@ -384,7 +337,7 @@ export class Intersection {
    * @param {boolean} extend
    * @returns
    */
-  intersectArcCircle(arc, circle, extend) {
+  static intersectArcCircle(arc, circle, extend) {
     return this.intersectCircleArc(circle, arc, extend);
   }
 
@@ -719,9 +672,7 @@ export class Intersection {
     const result = new Intersection('No Intersection');
     const length = polyline.points.length;
 
-    // console.log("Intersect.js - polyline length:", length)
-
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < length - 1; i++) {
       const b1 = polyline.points[i];
       const b2 = polyline.points[(i + 1) % length];
 
@@ -831,8 +782,6 @@ export class Intersection {
    * @returns
    */
   static intersectRectangleLine(rectangle, line, extend) {
-    console.log('intersect.js - intersectRectangleLine:', rectangle.start.x, rectangle.start.y);
-
     return this.intersectLineRectangle(line, rectangle, extend);
   }
 
@@ -889,43 +838,6 @@ export class Intersection {
 
     if (result.points.length > 0) {
       result.status = 'Intersection';
-    }
-
-    return result;
-  };
-
-
-  /**
-   * Find intersections between two rays
-   * @param {point} a1 - ray 1 start
-   * @param {point} a2 - ray 1 end
-   * @param {point} b1 - ray 2 start
-   * @param {point} b2 - ray 2 emd
-   * @returns
-   */
-  static intersectRayRay(a1, a2, b1, b2) {
-    let result;
-
-    const uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x);
-    const ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x);
-    const uB = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
-
-    if (uB != 0) {
-      const ua = uaT / uB;
-
-      result = new Intersection('Intersection');
-      result.points.push(
-          new Point(
-              a1.x + ua * (a2.x - a1.x),
-              a1.y + ua * (a2.y - a1.y),
-          ),
-      );
-    } else {
-      if (uaT == 0 || ubT == 0) {
-        result = new Intersection('Coincident');
-      } else {
-        result = new Intersection('Parallel');
-      }
     }
 
     return result;

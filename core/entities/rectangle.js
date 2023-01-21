@@ -26,6 +26,7 @@ export class Rectangle {
 
     if (data) {
       if (data.points) {
+        // TODO: Rectangles should only store two points.
         const point1 = new Point(data.points[0].x, data.points[0].y);
         const point2 = new Point(data.points[1].x, data.points[0].y);
         const point3 = new Point(data.points[1].x, data.points[1].y);
