@@ -1,37 +1,58 @@
 import {Point} from '../entities/point.js';
 
 /** ***
-*
-*   js
-*
 *   Based on work js Kevin Lindsey
 *   additions by Daniel Wood 2016, 2017, 2018
 *****/
 
+// TODO: Remove unused functions, rays, polygons
+
 export class Intersection {
+  /**
+   * Intersection constructor
+   * @param {string} status - defined status of the intersection i.e inside or outside of shape
+   */
   constructor(status) {
     this.status = status;
     this.points = [];
   }
 
+  /**
+   * Append point to suggested intersecting points
+   * @param {point} point
+   */
   appendPoint(point) {
     this.points.push(point);
   };
 
+  /**
+   * Append points to suggested intersecting points
+   * @param {array} points
+   */
   appendPoints(points) {
     this.points = this.points.concat(points);
   };
 
+  /**
+   * Find intersections between circle and ellipse
+   * @param {point} cc - centre of the circle
+   * @param {float} r - radius of the circle
+   * @param {point} ec - centre of the ellipse
+   * @param {float} rx - radius of ellipse in x direction
+   * @param {float} ry- radius of ellipse in x direction
+   * @returns
+   */
   static intersectCircleEllipse(cc, r, ec, rx, ry) {
     return this.intersectEllipseEllipse(cc, r, r, ec, rx, ry);
   };
 
-
-  /** ***
-    *
-    *   intersectCircleLine
-    *
-    *****/
+  /**
+   * Find intersections between circle and line
+   * @param {circle} circle
+   * @param {line} line
+   * @param {boolean} extend - extend the line as a ray
+   * @returns
+   */
   static intersectCircleLine(circle, line, extend) {
     const c = circle.centre;
     const r = circle.radius;
@@ -89,22 +110,24 @@ export class Intersection {
     return result;
   };
 
-
-  /** ***
-    *
-    *   intersectLineCircle
-    *
-    *****/
+  /**
+   * Find intersections between circle and line
+   * @param {line} line
+   * @param {circle} circle
+   * @param {boolean} extend - extend the line as a ray
+   * @returns
+   */
   static intersectLineCircle(line, circle, extend) {
     return this.intersectCircleLine(circle, line, extend);
   }
 
-
-  /** ***
-    *
-    *   intersectCircleCircle
-    *
-    *****/
+  /**
+   * Find intersections between two circles
+   * @param {circle} circle1
+   * @param {circle} circle2
+   * @param {boolean} extend  - unused
+   * @returns
+   */
   static intersectCircleCircle(circle1, circle2, extend) {
     const c1 = circle1.centre;
     const r1 = circle1.radius;
@@ -149,11 +172,13 @@ export class Intersection {
   };
 
 
-  /** ***
-    *
-    *   intersectCirclePolygon
-    *
-    *****/
+  /**
+   * Find intersections between circle and polygon
+   * @param {point} c  - centre point
+   * @param {float} r  - radius
+   * @param {array} points
+   * @returns
+   */
   static intersectCirclePolygon(c, r, points) {
     const result = new Intersection('No Intersection');
     const length = points.length;
@@ -176,17 +201,20 @@ export class Intersection {
     return result;
   };
 
-  /** ***
-    *
-    *   intersectArcRectangle
-    *
-    *****/
+  /**
+   * Find intersections between arc segment and rectangle
+   * @param {arc} arc
+   * @param {rectangle} rectangle
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectArcRectangle(arc, rectangle, extend) {
     // TODO: Remove unused variables
     // const c = arc.centre;
     // const r = arc.radius;
-    // const sa = arc.startAngle;
+    // const sa = arc.e;
     // const ea = arc.endAngle;
+
     const r1 = rectangle.start;
     const r2 = rectangle.end;
 
@@ -224,91 +252,56 @@ export class Intersection {
     return result;
   }
 
-  /** ***
-    *
-    *   intersectArcLine
-    *
-    *****/
+  /**
+   * Find intersections between arc segment and line
+   * @param {arc} arc
+   * @param {line} line
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectArcLine(arc, line, extend) {
     const c = arc.centre;
-    // const r = arc.radius;
     const sa = arc.startAngle;
     const ea = arc.endAngle;
 
     const inter1 = this.intersectCircleLine(arc, line, extend);
     const result = new Intersection('No Intersection');
 
-    result.appendPoints(inter1.points);
-
-
     if (!extend) {
-      let points = [];
-
-      for (let i = 0; i < result.points.length; i++) {
-        if (c.angle(result.points[i]) > sa && c.angle(result.points[i]) < ea) {
-          // console.log("(intersectArcRectangle) [STATUS] point found")
-          console.log('Angles: ' + c.angle(result.points[i]) + ' Start: ' + sa + ' End: ' + ea);
-
-          // result.points.splice(i, 1);
-          points.push(result.points[i]);
+      for (let i = 0; i < inter1.points.length; i++) {
+        if (c.angle(inter1.points[i]) > sa && c.angle(inter1.points[i]) < ea) {
+          // console.log('Angles: ' + c.angle(inter1.points[i]) + ' Start: ' + sa + ' End: ' + ea + ' x:' + inter1.points[i].x, ' y:' + inter1.points[i].y);
+          result.appendPoints(inter1.points[i]);
         }
       }
 
-      if (points.length > 0) {
-        console.log('Actual points: ' + points.length);
+      if (result.points.length > 0) {
+        // console.log('Actual points: ' + result.length);
         result.status = 'Intersection';
-        points = [];
       }
     }
 
     return result;
   }
 
-  /** ***
-    *
-    *   intersectLineArc
-    *
-    *****/
+  /**
+   * Find intersections between line and arc segment
+   * @param {line} line
+   * @param {arc} arc
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectLineArc(line, arc, extend) {
-    const c = arc.centre;
-    // const r = arc.radius;
-    const sa = arc.startAngle;
-    const ea = arc.endAngle;
-
-    const inter1 = this.intersectCircleLine(arc, line);
-    const result = new Intersection('No Intersection');
-
-    result.appendPoints(inter1.points);
-
-
-    if (!extend) {
-      let points = [];
-
-      for (let i = 0; i < result.points.length; i++) {
-        if (c.angle(result.points[i]) > sa && c.angle(result.points[i]) < ea) {
-          // console.log("(intersectArcRectangle) [STATUS] point found")
-          console.log('Angles: ' + c.angle(result.points[i]) + ' Start: ' + sa + ' End: ' + ea);
-
-          // result.points.splice(i, 1);
-          points.push(result.points[i]);
-        }
-      }
-
-      if (points.length > 0) {
-        console.log('Actual points: ' + points.length);
-        result.status = 'Intersection';
-        points = [];
-      }
-    }
-
-    return result;
+    return this.intersectArcLine(arc, line, extend);
   }
 
-  /** ***
-    *
-    *   intersectLineArc
-    *
-    *****/
+  /**
+   * Find intersections between circle and arc segment
+   * @param {circle} circle
+   * @param {arc} arc
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectCircleArc(circle, arc, extend) {
     const c = arc.centre;
     // const r = arc.radius;
@@ -318,42 +311,43 @@ export class Intersection {
     const inter1 = this.intersectCircleCircle(circle, arc, extend);
     const result = new Intersection('No Intersection');
 
-    result.appendPoints(inter1.points);
-
-
     if (!extend) {
-      let points = [];
-
-      for (let i = 0; i < result.points.length; i++) {
-        if (c.angle(result.points[i]) > sa && c.angle(result.points[i]) < ea) {
-          // console.log("(intersectArcRectangle) [STATUS] point found")
-          console.log('Angles: ' + c.angle(result.points[i]) + ' Start: ' + sa + ' End: ' + ea);
+      for (let i = 0; i < inter1.points.length; i++) {
+        if (c.angle(inter1.points[i]) > sa && c.angle(inter1.points[i]) < ea) {
+          // console.log('Angles: ' + c.angle(inter1.points[i]) + ' Start: ' + sa + ' End: ' + ea);
 
           // result.points.splice(i, 1);
-          points.push(result.points[i]);
+          result.points.push(inter1.points[i]);
         }
       }
 
-      if (points.length > 0) {
-        console.log('Actual points: ' + points.length);
+      if (result.points.length > 0) {
+        // console.log('Actual points: ' + result.points.length);
         result.status = 'Intersection';
-        points = [];
       }
     }
 
     return result;
   }
 
-  intersectArcCircle(arc, circle, extend) {
+  /**
+   * Find intersections between
+   * @param {arc} arc
+   * @param {circle} circle
+   * @param {boolean} extend
+   * @returns
+   */
+  static intersectArcCircle(arc, circle, extend) {
     return this.intersectCircleArc(circle, arc, extend);
   }
 
-
-  /** ***
-    *
-    *   intersectCircleRectangle
-    *
-    *****/
+  /**
+   * Find intersections between circle and rectangle
+   * @param {circle} circle
+   * @param {rectangle} rectangle
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectCircleRectangle(circle, rectangle, extend) {
     // var c = circle.centre
     // var r = circle.radius
@@ -395,18 +389,23 @@ export class Intersection {
   };
 
 
-  /** ***
-    *
-    *   intersectEllipseEllipse
-    *
-    *   This code is based on MgcIntr2DElpElp.cpp written by David Eberly.  His
-    *   code along with many other excellent examples are avaiable at his site:
-    *   http://www.magic-software.com
-    *
-    *   NOTE: Rotation will need to be added to this function
-    *
-    *****/
+  /**
+  * Find intersections between two ellipse
+  *
+  * This code is based on MgcIntr2DElpElp.cpp written by David Eberly.  His
+  * code along with many other excellent examples are available at his site:
+  * http://www.magic-software.com
+  *
+  * @param {point} c1 - centre point
+  * @param {float} rx1 - radius in x direction
+  * @param {float} ry1 - radius in y direction
+  * @param {point} c2 - centre point
+  * @param {float} rx2 - radius in x direction
+  * @param {float} ry2 - radius in y direction
+  * @returns
+  */
   static intersectEllipseEllipse(c1, rx1, ry1, c2, rx2, ry2) {
+    // TODO: Rotation will need to be added to this function
     const a = [
       ry1 * ry1, 0, rx1 * rx1, -2 * ry1 * ry1 * c1.x, -2 * rx1 * rx1 * c1.y,
       ry1 * ry1 * c1.x * c1.x + rx1 * rx1 * c1.y * c1.y - rx1 * rx1 * ry1 * ry1,
@@ -452,14 +451,13 @@ export class Intersection {
   };
 
 
-  /** ***
-    *
-    *   intersectEllipseLine
-    *
-    *   Rotation calculations added by Daniel Wood
-    *
-    *****/
-
+  /**
+   * Find intersections between ellipse and line
+   * @param {ellipse} ellipse
+   * @param {line} line
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectEllipseLine(ellipse, line, extend) {
     const cen = ellipse.centre;
     const rx = ellipse.radiusX;
@@ -478,8 +476,8 @@ export class Intersection {
     let result;
     const origin = new Point(a1.x, a1.y);
     const dir = a2.subtract(a1);
-    const center = new Point(cen.x, cen.y);
-    const diff = origin.subtract(center);
+    const centre = new Point(cen.x, cen.y);
+    const diff = origin.subtract(centre);
     const mDir = new Point(dir.x / (rx * rx), dir.y / (ry * ry));
     const mDiff = new Point(diff.x / (rx * rx), diff.y / (ry * ry));
 
@@ -540,11 +538,14 @@ export class Intersection {
     return result;
   };
 
-  /** ***
-    *
-    *   intersectEllipsePolygon
-    *
-    *****/
+  /**
+   * Find intersections between ellipse and polygon
+   * @param {point} c - centre point
+   * @param {float} rx - radius in x direction
+   * @param {float} ry - radius in y direction
+   * @param {array} points
+   * @returns
+   */
   static intersectEllipsePolygon(c, rx, ry, points) {
     const result = new Intersection('No Intersection');
     const length = points.length;
@@ -565,11 +566,13 @@ export class Intersection {
   };
 
 
-  /** ***
-    *
-    *   intersectEllipseRectangle
-    *
-    *****/
+  /**
+   * Find intersections between ellipse and rectangle
+   * @param {ellipse} ellipse
+   * @param {rectangle} rectangle
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectEllipseRectangle(ellipse, rectangle, extend) {
     const r1 = rectangle.start;
     const r2 = rectangle.end;
@@ -612,11 +615,13 @@ export class Intersection {
   };
 
 
-  /** ***
-    *
-    *   intersectLineLine
-    *
-    *****/
+  /**
+   * Find intersections between two lines
+   * @param {line} line1
+   * @param {line} line2
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectLineLine(line1, line2, extend) {
     const a1 = line1.start;
     const a2 = line1.end;
@@ -656,18 +661,18 @@ export class Intersection {
     return result;
   };
 
-  /** ***
-    *
-    *   intersectPolyLineLine
-    *
-    *****/
+  /**
+   * Find intersections between polyline and line
+   * @param {polyline} polyline
+   * @param {line} line
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectPolylineLine(polyline, line, extend) {
     const result = new Intersection('No Intersection');
     const length = polyline.points.length;
 
-    // console.log("Intersect.js - polyline length:", length)
-
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < length - 1; i++) {
       const b1 = polyline.points[i];
       const b2 = polyline.points[(i + 1) % length];
 
@@ -682,11 +687,13 @@ export class Intersection {
   };
 
 
-  /** ***
-    *
-    *   intersectLineRectangle
-    *
-    *****/
+  /**
+   * Find intersections between polyline and rectangle
+   * @param {polyline} polyline
+   * @param {rectangle} rectangle
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectPolylineRectangle(polyline, rectangle, extend) {
     const r1 = rectangle.start;
     const r2 = rectangle.end;
@@ -724,11 +731,13 @@ export class Intersection {
   };
 
 
-  /** ***
-    *
-    *   intersectLineRectangle
-    *
-    *****/
+  /**
+   * Find intersections between line and rectangle
+   * @param {line} line
+   * @param {rectangle} rectangle
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectLineRectangle(line, rectangle, extend) {
     const r1 = rectangle.start;
     const r2 = rectangle.end;
@@ -765,18 +774,23 @@ export class Intersection {
     return result;
   };
 
+  /**
+   * Find intersections between rectangle and line
+   * @param {rectangle} rectangle
+   * @param {line} line
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectRectangleLine(rectangle, line, extend) {
-    console.log('intersect.js - intersectRectangleLine:', rectangle.start.x, rectangle.start.y);
-
     return this.intersectLineRectangle(line, rectangle, extend);
   }
 
-
-  /** ***
-    *
-    *   intersectPolygonPolygon
-    *
-    *****/
+  /**
+   * Find intersections between two polygons
+   * @param {array} points1
+   * @param {array} points2
+   * @returns
+   */
   static intersectPolygonPolygon(points1, points2) {
     const result = new Intersection('No Intersection');
     const length = points1.length;
@@ -797,11 +811,13 @@ export class Intersection {
   };
 
 
-  /** ***
-    *
-    *   intersectPolygonRectangle
-    *
-    *****/
+  /**
+   * Find intersections between polygon and rectangle
+   * @param {array} points
+   * @param {float} r1
+   * @param {float} r2
+   * @returns
+   */
   static intersectPolygonRectangle(points, r1, r2) {
     const min = r1.min(r2);
     const max = r1.max(r2);
@@ -827,46 +843,13 @@ export class Intersection {
     return result;
   };
 
-
-  /** ***
-    *
-    *   intersectRayRay
-    *
-    *****/
-  static intersectRayRay(a1, a2, b1, b2) {
-    let result;
-
-    const uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x);
-    const ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x);
-    const uB = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
-
-    if (uB != 0) {
-      const ua = uaT / uB;
-
-      result = new Intersection('Intersection');
-      result.points.push(
-          new Point(
-              a1.x + ua * (a2.x - a1.x),
-              a1.y + ua * (a2.y - a1.y),
-          ),
-      );
-    } else {
-      if (uaT == 0 || ubT == 0) {
-        result = new Intersection('Coincident');
-      } else {
-        result = new Intersection('Parallel');
-      }
-    }
-
-    return result;
-  };
-
-
-  /** ***
-    *
-    *   intersectRectangleRectangle
-    *
-    *****/
+  /**
+   * Find intersections between two rectangles
+   * @param {rectangle} rectangle1
+   * @param {rectangle} rectangle2
+   * @param {boolean} extend
+   * @returns
+   */
   static intersectRectangleRectangle(rectangle1, rectangle2, extend) {
     const a1 = rectangle1.start;
     const a2 = rectangle1.end;
