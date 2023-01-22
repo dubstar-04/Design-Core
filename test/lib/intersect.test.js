@@ -7,6 +7,7 @@ test('Test Intersection.intersectCircleEllipse()', () => {
 });
 
 test('Test Intersection.intersectCircleLine()', () => {
+  // Intersection
   const circle = {centre: new Point(10, 10), radius: 5};
   const line = {start: new Point(), end: new Point(10, 10)};
   const result = Intersection.intersectCircleLine(circle, line, false);
@@ -14,10 +15,24 @@ test('Test Intersection.intersectCircleLine()', () => {
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(6.46);
   expect(result.points[0].y).toBeCloseTo(6.46);
-  // TODO: No Intersection
+
+  // No Intersection - Outside
+  const circle1 = {centre: new Point(10, 10), radius: 2};
+  const line1 = {start: new Point(), end: new Point(0, 10)};
+  const result1 = Intersection.intersectCircleLine(circle1, line1, false);
+  expect(result1.status).toBe('Outside');
+  expect(result1.points.length).toBe(0);
+
+  // No Intersection - Inside
+  const circle2 = {centre: new Point(), radius: 20};
+  const line2 = {start: new Point(), end: new Point(0, 10)};
+  const result2 = Intersection.intersectCircleLine(circle2, line2, false);
+  expect(result2.status).toBe('Inside');
+  expect(result2.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectLineCircle()', () => {
+  // Intersection
   const circle = {centre: new Point(10, 10), radius: 5};
   const line = {start: new Point(), end: new Point(10, 10)};
   const result = Intersection.intersectLineCircle(line, circle, false);
@@ -25,10 +40,24 @@ test('Test Intersection.intersectLineCircle()', () => {
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(6.46);
   expect(result.points[0].y).toBeCloseTo(6.46);
-  // TODO: No Intersection
+
+  // No Intersection - Outside
+  const circle1 = {centre: new Point(10, 10), radius: 2};
+  const line1 = {start: new Point(), end: new Point(0, 10)};
+  const result1 = Intersection.intersectLineCircle(line1, circle1, false);
+  expect(result1.status).toBe('Outside');
+  expect(result1.points.length).toBe(0);
+
+  // No Intersection - Inside
+  const circle2 = {centre: new Point(), radius: 20};
+  const line2 = {start: new Point(), end: new Point(0, 10)};
+  const result2 = Intersection.intersectLineCircle(line2, circle2, false);
+  expect(result2.status).toBe('Inside');
+  expect(result2.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectCircleCircle()', () => {
+  // Intersection
   const circle1 = {centre: new Point(10, 10), radius: 5};
   const circle2 = {centre: new Point(15, 10), radius: 5};
   const result = Intersection.intersectCircleCircle(circle1, circle2, false);
@@ -36,7 +65,20 @@ test('Test Intersection.intersectCircleCircle()', () => {
   expect(result.points.length).toBe(2);
   expect(result.points[0].x).toBeCloseTo(12.5);
   expect(result.points[0].y).toBeCloseTo(14.33);
-  // TODO: No Intersection
+
+  // No Intersection - Inside
+  const circle3 = {centre: new Point(10, 10), radius: 5};
+  const circle4 = {centre: new Point(10, 10), radius: 2};
+  const result1 = Intersection.intersectCircleCircle(circle3, circle4, false);
+  expect(result1.status).toBe('Inside');
+  expect(result1.points.length).toBe(0);
+
+  // No Intersection - Outside
+  const circle5 = {centre: new Point(10, 10), radius: 5};
+  const circle6 = {centre: new Point(-10, 10), radius: 2};
+  const result2 = Intersection.intersectCircleCircle(circle5, circle6, false);
+  expect(result2.status).toBe('Outside');
+  expect(result2.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectCirclePolygon()', () => {
@@ -46,6 +88,7 @@ test('Test Intersection.intersectCirclePolygon()', () => {
 });
 
 test('Test Intersection.intersectArcRectangle()', () => {
+  // Intersection
   const arc = {centre: new Point(), radius: 14.14, startAngle: 0.785398, endAngle: 2.35619};
   const rectangle = {start: new Point(), end: new Point(25, 25)};
   const result = Intersection.intersectArcRectangle(arc, rectangle, false);
@@ -53,10 +96,17 @@ test('Test Intersection.intersectArcRectangle()', () => {
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(0);
   expect(result.points[0].y).toBeCloseTo(14.14);
-  // TODO: No Intersection
+
+  // No Intersection
+  const arc1 = {centre: new Point(), radius: 14.14, startAngle: 3.14159, endAngle: 4.71239};
+  const rectangle1 = {start: new Point(), end: new Point(25, 25)};
+  const result1 = Intersection.intersectArcRectangle(arc1, rectangle1, false);
+  expect(result1.status).toBe('No Intersection');
+  expect(result1.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectArcLine()', () => {
+  // Intersection
   const arc = {centre: new Point(), radius: 14.14, startAngle: 0.785398, endAngle: 2.35619};
   const line = {start: new Point(), end: new Point(0, 25)};
   const result = Intersection.intersectArcLine(arc, line, false);
@@ -64,10 +114,17 @@ test('Test Intersection.intersectArcLine()', () => {
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(0);
   expect(result.points[0].y).toBeCloseTo(14.14);
-  // TODO: No Intersection
+
+  // No Intersection
+  const arc1 = {centre: new Point(), radius: 14.14, startAngle: 3.14159, endAngle: 4.71239};
+  const line1 = {start: new Point(), end: new Point(0, 25)};
+  const result1 = Intersection.intersectArcLine(arc1, line1, false);
+  expect(result1.status).toBe('No Intersection');
+  expect(result1.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectLineArc()', () => {
+  // Intersection
   const arc = {centre: new Point(), radius: 14.14, startAngle: 0.785398, endAngle: 2.35619};
   const line = {start: new Point(), end: new Point(0, 25)};
   const result = Intersection.intersectLineArc(line, arc, false);
@@ -75,10 +132,17 @@ test('Test Intersection.intersectLineArc()', () => {
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(0);
   expect(result.points[0].y).toBeCloseTo(14.14);
-  // TODO: No Intersection
+
+  // No Intersection
+  const arc1 = {centre: new Point(), radius: 14.14, startAngle: 3.14159, endAngle: 4.71239};
+  const line1 = {start: new Point(), end: new Point(0, 25)};
+  const result1 = Intersection.intersectLineArc(line1, arc1, false);
+  expect(result1.status).toBe('No Intersection');
+  expect(result1.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectCircleArc()', () => {
+  // Intersection
   const arc = {centre: new Point(), radius: 14.14, startAngle: 0.785398, endAngle: 2.35619};
   const circle = {centre: new Point(10, 10), radius: 5};
   const result = Intersection.intersectCircleArc(circle, arc, false);
@@ -86,10 +150,17 @@ test('Test Intersection.intersectCircleArc()', () => {
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(5.894);
   expect(result.points[0].y).toBeCloseTo(12.853);
-  // TODO: No Intersection
+
+  // No Intersection
+  const arc1 = {centre: new Point(), radius: 14.14, startAngle: 3.14159, endAngle: 4.71239};
+  const circle1 = {centre: new Point(10, 10), radius: 5};
+  const result1 = Intersection.intersectCircleArc(circle1, arc1, false);
+  expect(result1.status).toBe('No Intersection');
+  expect(result1.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectArcCircle()', () => {
+  // Intersection
   const arc = {centre: new Point(), radius: 14.14, startAngle: 0.785398, endAngle: 2.35619};
   const circle = {centre: new Point(10, 10), radius: 5};
   const result = Intersection.intersectArcCircle(arc, circle, false);
@@ -97,18 +168,38 @@ test('Test Intersection.intersectArcCircle()', () => {
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(5.894);
   expect(result.points[0].y).toBeCloseTo(12.853);
-  // TODO: No Intersection
+
+  // No Intersection
+  const arc1 = {centre: new Point(), radius: 14.14, startAngle: 3.14159, endAngle: 4.71239};
+  const circle1 = {centre: new Point(10, 10), radius: 5};
+  const result1 = Intersection.intersectArcCircle(arc1, circle1, false);
+  expect(result1.status).toBe('No Intersection');
+  expect(result1.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectCircleRectangle()', () => {
-  const arc = {centre: new Point(), radius: 14.14, startAngle: 0.785398, endAngle: 2.35619};
+  // Intersection
+  const circle = {centre: new Point(), radius: 14.14};
   const rectangle = {start: new Point(), end: new Point(25, 25)};
-  const result = Intersection.intersectCircleRectangle(arc, rectangle, false);
+  const result = Intersection.intersectCircleRectangle(circle, rectangle, false);
   expect(result.status).toBe('Intersection');
   expect(result.points.length).toBe(2);
   expect(result.points[0].x).toBeCloseTo(14.14);
   expect(result.points[0].y).toBeCloseTo(0);
-  // TODO: No Intersection
+
+  // No Intersection - Outside
+  const circle1 = {centre: new Point(12.5, 12.5), radius: 10};
+  const rectangle1 = {start: new Point(), end: new Point(25, 25)};
+  const result1 = Intersection.intersectCircleRectangle(circle1, rectangle1, false);
+  expect(result1.status).toBe('Outside');
+  expect(result1.points.length).toBe(0);
+
+  // No Intersection - Inside
+  const circle2 = {centre: new Point(12.5, 12.5), radius: 100};
+  const rectangle2 = {start: new Point(), end: new Point(25, 25)};
+  const result2 = Intersection.intersectCircleRectangle(circle2, rectangle2, false);
+  expect(result2.status).toBe('Inside');
+  expect(result2.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectEllipseEllipse()', () => {
@@ -136,6 +227,7 @@ test('Test Intersection.intersectEllipseRectangle()', () => {
 });
 
 test('Test Intersection.intersectLineLine()', () => {
+  // Intersection
   const line1 = {start: new Point(), end: new Point(0, 10)};
   const line2 = {start: new Point(-5, 5), end: new Point(5, 5)};
   const result = Intersection.intersectLineLine(line1, line2, false);
@@ -143,10 +235,30 @@ test('Test Intersection.intersectLineLine()', () => {
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(0);
   expect(result.points[0].y).toBeCloseTo(5);
-  // TODO: No Intersection
+
+  // Intersection - Extend
+  const line3 = {start: new Point(1, 5), end: new Point(5, 5)};
+  const result1 = Intersection.intersectLineLine(line1, line3, true);
+  expect(result1.status).toBe('Intersection');
+  expect(result1.points.length).toBe(1);
+  expect(result1.points[0].x).toBeCloseTo(0);
+  expect(result1.points[0].y).toBeCloseTo(5);
+
+  // No Intersection - Parallel
+  const line4 = {start: new Point(1, 0), end: new Point(1, 10)};
+  const result2 = Intersection.intersectLineLine(line1, line4, false);
+  expect(result2.status).toBe('Parallel');
+  expect(result2.points.length).toBe(0);
+
+  // No Intersection - Coincident
+  const line5 = {start: new Point(0, 1), end: new Point(0, 8)};
+  const result3 = Intersection.intersectLineLine(line1, line5, false);
+  expect(result3.status).toBe('Coincident');
+  expect(result3.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectPolylineLine()', () => {
+  // Intersection
   const points = [new Point(), new Point(0, 10)];
   const polyline = {points: points};
   const line = {start: new Point(-5, 5), end: new Point(5, 5)};
@@ -165,7 +277,12 @@ test('Test Intersection.intersectPolylineLine()', () => {
   expect(result2.points.length).toBe(2);
   expect(result2.points[1].x).toBeCloseTo(2);
   expect(result2.points[1].y).toBeCloseTo(5);
-  // TODO: No Intersection
+
+  // No Intersection
+  const line2 = {start: new Point(5, 0), end: new Point(5, 10)};
+  const result3 = Intersection.intersectPolylineLine(polyline, line2, false);
+  expect(result3.status).toBe('No Intersection');
+  expect(result3.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectPolylineRectangle()', () => {
@@ -187,7 +304,13 @@ test('Test Intersection.intersectPolylineRectangle()', () => {
   expect(result2.points.length).toBe(2);
   expect(result2.points[0].x).toBeCloseTo(25);
   expect(result2.points[0].y).toBeCloseTo(20);
-  // TODO: No Intersection
+
+  // No Intersection
+  const points2 = [new Point(5, 5), new Point(20, 20)];
+  const polyline2 = {points: points2};
+  const result3 = Intersection.intersectPolylineLine(polyline2, rectangle, false);
+  expect(result3.status).toBe('No Intersection');
+  expect(result3.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectLineRectangle()', () => {
@@ -210,7 +333,12 @@ test('Test Intersection.intersectLineRectangle()', () => {
   expect(result2.points[0].y).toBeCloseTo(17.857);
   expect(result2.points[1].x).toBeCloseTo(0);
   expect(result2.points[1].y).toBeCloseTo(7.14);
-  // TODO: No Intersection
+
+  // No Intersection
+  const line3 = {start: new Point(5, 5), end: new Point(20, 20)};
+  const result3 = Intersection.intersectLineRectangle(line3, rectangle, false);
+  expect(result3.status).toBe('No Intersection');
+  expect(result3.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectRectangleLine()', () => {
@@ -233,7 +361,12 @@ test('Test Intersection.intersectRectangleLine()', () => {
   expect(result2.points[0].y).toBeCloseTo(17.857);
   expect(result2.points[1].x).toBeCloseTo(0);
   expect(result2.points[1].y).toBeCloseTo(7.14);
-  // TODO: No Intersection
+
+  // No Intersection
+  const line3 = {start: new Point(5, 5), end: new Point(20, 20)};
+  const result3 = Intersection.intersectRectangleLine(rectangle, line3, false);
+  expect(result3.status).toBe('No Intersection');
+  expect(result3.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectPolygonPolygon()', () => {
@@ -259,5 +392,10 @@ test('Test Intersection.intersectRectangleRectangle()', () => {
   expect(result.points[0].y).toBeCloseTo(10);
   expect(result.points[1].x).toBeCloseTo(10);
   expect(result.points[1].y).toBeCloseTo(25);
-  // TODO: No Intersection
+
+  // No Intersection
+  const rectangle3 = {start: new Point(10, 10), end: new Point(20, 20)};
+  const result2 = Intersection.intersectRectangleRectangle(rectangle1, rectangle3, false);
+  expect(result2.status).toBe('No Intersection');
+  expect(result2.points.length).toBe(0);
 });
