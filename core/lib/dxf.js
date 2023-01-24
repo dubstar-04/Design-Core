@@ -64,10 +64,7 @@ export class DXF {
           // Current layer name
           // debugLog("Found " + this.line)
           const clayer = this.readHeader(8);
-          if (clayer) {
-            // ////console.log("clayer:" + clayer)
-            clayer = clayer;
-          }
+          this.core.layerManager.setCLayer(clayer);
           break;
 
         case '$LIMMIN':
