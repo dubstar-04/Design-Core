@@ -138,7 +138,7 @@ export class Scene {
     }
 
     // delete any blocks that have been merged with the parent dimension
-    for (idx = this.items.length - 1; idx > 0; idx--) {
+    for (let idx = this.items.length - 1; idx > 0; idx--) {
       if (blocksNamesToDelete.includes(this.items[idx].name)) {
         // console.log("found name at:", idx)
         this.items.splice(idx, 1);
