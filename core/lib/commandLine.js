@@ -136,6 +136,7 @@ export class CommandLine {
    * Handles presses of the delete key
    */
   deletePressed() {
+    // TODO: Janky way to initiate commands - fit it
     this.core.designEngine.sceneControl('Enter', ['E']);
     console.log('[CommandLine.deletePressed]');
   }
@@ -162,8 +163,10 @@ export class CommandLine {
       console.log('[CommandLine.enterPressed] - Command:', inputCommand);
       const data = [inputCommand];
       // console.log(data[0])
+      // TODO: Janky way to initiate commands - fix it
       this.core.designEngine.sceneControl('Enter', data);
     } else {
+      // TODO: Janky way to initiate commands - fix it
       this.core.designEngine.sceneControl('Enter', []);
     }
   }
