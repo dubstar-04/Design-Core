@@ -37,7 +37,7 @@ export class Polyline {
   }
 
   static register() {
-    const command = {command: 'Polyline', shortcut: 'PL'};
+    const command = {command: 'Polyline', shortcut: 'PL', type: 'Entity'};
     return command;
   }
 

@@ -44,7 +44,7 @@ export class Circle {
   }
 
   static register() {
-    const command = {command: 'Circle', shortcut: 'C'};
+    const command = {command: 'Circle', shortcut: 'C', type: 'Entity'};
     return command;
   }
 

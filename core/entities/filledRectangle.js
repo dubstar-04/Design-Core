@@ -55,7 +55,7 @@ export class FilledRectangle {
   }
 
   static register() {
-    const command = {command: 'FilledRectangle', shortcut: 'FR'};
+    const command = {command: 'FilledRectangle'}; // , shortcut: 'FR', type: 'Entity'};
     return command;
   }
 

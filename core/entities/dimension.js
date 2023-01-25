@@ -65,7 +65,7 @@ export class Dimension {
   }
 
   static register() {
-    const command = {command: 'Dimension', shortcut: 'DIM'};
+    const command = {command: 'Dimension'}; // , shortcut: 'DIM', type: 'Entity'};
     return command;
   }
 

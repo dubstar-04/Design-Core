@@ -45,7 +45,7 @@ export class Line {
 
 
   static register() {
-    const command = {command: 'Line', shortcut: 'L'};
+    const command = {command: 'Line', shortcut: 'L', type: 'Entity'};
     return command;
   }
 

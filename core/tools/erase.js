@@ -11,7 +11,7 @@ export class Erase {
   }
 
   static register() {
-    const command = {command: 'Erase', shortcut: 'E'};
+    const command = {command: 'Erase', shortcut: 'E', type: 'Tool'};
     return command;
   }
 

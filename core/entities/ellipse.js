@@ -46,7 +46,7 @@ export class Ellipse {
   }
 
   static register() {
-    const command = {command: 'Ellipse', shortcut: 'EL'};
+    const command = {command: 'Ellipse'}; // , shortcut: 'EL', type: 'Entity'};
     return command;
   }
 

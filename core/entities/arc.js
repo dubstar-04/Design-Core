@@ -42,7 +42,7 @@ export class Arc {
   }
 
   static register() {
-    const command = {command: 'Arc', shortcut: 'A'};
+    const command = {command: 'Arc', shortcut: 'A', type: 'Entity'};
     return command;
   }
 
