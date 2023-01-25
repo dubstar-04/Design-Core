@@ -11,7 +11,7 @@ export class Rotate {
   }
 
   static register() {
-    const command = {command: 'Rotate', shortcut: 'RO'};
+    const command = {command: 'Rotate', shortcut: 'RO', type: 'Tool'};
     return command;
   }
 

@@ -11,7 +11,7 @@ export class Move {
   }
 
   static register() {
-    const command = {command: 'Move', shortcut: 'M'};
+    const command = {command: 'Move', shortcut: 'M', type: 'Tool'};
     return command;
   }
 

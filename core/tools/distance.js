@@ -13,7 +13,7 @@ export class Distance {
   }
 
   static register() {
-    const command = {command: 'Distance', shortcut: 'DI'};
+    const command = {command: 'Distance', shortcut: 'DI'}; // , type: 'Tool'};
     return command;
   }
 

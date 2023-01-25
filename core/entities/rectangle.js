@@ -51,7 +51,7 @@ export class Rectangle {
   }
 
   static register() {
-    const command = {command: 'Rectangle', shortcut: 'REC'};
+    const command = {command: 'Rectangle', shortcut: 'REC', type: 'Entity'};
     return command;
   }
 

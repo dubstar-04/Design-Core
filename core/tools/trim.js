@@ -13,7 +13,7 @@ export class Trim {
   }
 
   static register() {
-    const command = {command: 'Trim', shortcut: 'TR'};
+    const command = {command: 'Trim', shortcut: 'TR', type: 'Tool'};
     return command;
   }
 

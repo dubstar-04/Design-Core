@@ -13,7 +13,7 @@ export class Extend {
   }
 
   static register() {
-    const command = {command: 'Extend', shortcut: 'EX'};
+    const command = {command: 'Extend', shortcut: 'EX', type: 'Tool'};
     return command;
   }
 

@@ -95,7 +95,7 @@ export class Text {
   }
 
   static register() {
-    const command = {command: 'Text', shortcut: 'DT'};
+    const command = {command: 'Text', shortcut: 'DT', type: 'Entity'};
     return command;
   }
 

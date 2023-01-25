@@ -56,7 +56,7 @@ export class Spline {
   }
 
   static register() {
-    const command = {command: 'Spline', shortcut: 'SP'};
+    const command = {command: 'Spline'}; // , shortcut: 'SP', type: 'Entity'};
     return command;
   }
 

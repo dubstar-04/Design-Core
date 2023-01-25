@@ -13,7 +13,7 @@ export class Copy {
   }
 
   static register() {
-    const command = {command: 'Copy', shortcut: 'CO'};
+    const command = {command: 'Copy', shortcut: 'CO', type: 'Tool'};
     return command;
   }
 
