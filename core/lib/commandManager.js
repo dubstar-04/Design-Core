@@ -67,12 +67,20 @@ export class CommandManager {
   }
 
   /**
-   * Resgister each of the available commands
+   * Register each of the available commands
    * @param {string} command
    */
   registerCommand(command) {
     this.commands.push(command);
   };
+
+  /**
+   * Return a list of available commands
+   *  @returns array of commands
+   */
+  getCommands() {
+    return this.commands;
+  }
 
   /**
    * Create a new instance of type using data
