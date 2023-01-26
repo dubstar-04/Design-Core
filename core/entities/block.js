@@ -178,11 +178,11 @@ export class Block {
 
     for (let item = 0; item < this.items.length; item++) {
       // collect the child item snaps
-      itemSnaps = this.items[item].snaps(mousePoint, delta, core);
+      const itemSnaps = this.items[item].snaps(mousePoint, delta, core);
 
-      for (snap = 0; snap < itemSnaps.length; snap++) {
+      for (let snap = 0; snap < itemSnaps.length; snap++) {
         // offset the item snap point by the block insert location
-        snapPoint = itemSnaps[snap];
+        let snapPoint = itemSnaps[snap];
         // if (this.points[1]) {
         snapPoint = snapPoint.add(this.points[0]);
         // }
@@ -236,8 +236,8 @@ export class Block {
 
     for (let idx = 0; idx < this.items.length; idx++) {
       const itemClosestPoint = this.items[idx].closestPoint(adjustedPoint);
-      itemPnt = itemClosestPoint[0].add(this.points[0]); // adjust by the block insert position
-      itemDist = itemClosestPoint[1];
+      const itemPnt = itemClosestPoint[0].add(this.points[0]); // adjust by the block insert position
+      const itemDist = itemClosestPoint[1];
 
       if (itemDist < distance) {
         distance = itemDist;

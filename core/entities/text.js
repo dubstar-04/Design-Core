@@ -25,6 +25,7 @@ export class Text {
     this.colour = 'BYLAYER';
     this.layer = '0';
     this.styleName = 'STANDARD';
+    this.boundingRect = {width: 0, height: 0};
     // this.alpha = 1.0            //Transparancy
     // this.TextType
     // this.TexttypeScale
@@ -191,7 +192,7 @@ export class Text {
   }
 
   getBoundingRect() {
-    const rect = {width: Number(this.width()), height: Number(this.height), x: this.points[0].x, y: this.points[0].y};
+    const rect = {width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y};
     // console.log("text.js - Rect height: ", rect.height, " width: ", rect.width, " x: ", rect.x, " y: ", rect.y)
     return rect;
   }
@@ -227,8 +228,6 @@ export class Text {
       ctx.rotate(Utils.degrees2radians(-this.rotation));
     }
 
-    console.log('Text not implimented');
-
     try { // HTML
       ctx.fillStyle = colour;
       ctx.textAlign = this.getHorizontalAlignment();
@@ -241,7 +240,9 @@ export class Text {
       ctx.moveTo(0, 0);
       ctx.setFontSize(this.height);
       ctx.showText(this.string);
+      this.boundingRect = ctx.textExtents(this.string);
     }
+    ctx.stroke();
     ctx.restore();
 
     // // Draw Bounding Box to test the getBoundingRect()
