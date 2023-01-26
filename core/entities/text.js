@@ -228,8 +228,6 @@ export class Text {
       ctx.rotate(Utils.degrees2radians(-this.rotation));
     }
 
-    console.log('Text not implimented');
-
     try { // HTML
       ctx.fillStyle = colour;
       ctx.textAlign = this.getHorizontalAlignment();
@@ -244,6 +242,7 @@ export class Text {
       ctx.showText(this.string);
       this.boundingRect = ctx.textExtents(this.string);
     }
+    ctx.stroke();
     ctx.restore();
 
     // // Draw Bounding Box to test the getBoundingRect()
