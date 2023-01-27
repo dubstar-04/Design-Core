@@ -60,13 +60,13 @@ export class Arc {
     let end = this.endAngle();
     // var direction;
 
-    console.log('Start angle: ', start, ' end angle: ', end);
+    // console.log('Start angle: ', start, ' end angle: ', end);
     end = end - start;
     start = start - start;
-    console.log('Start angle adjusted to zero: ', start, ' end angle: ', end);
+    // console.log('Start angle adjusted to zero: ', start, ' end angle: ', end);
     /* if(end < 0){
             end = end + 2 * Math.PI
-            console.log("Start angle corrected for minus: ", start, " end angle: ", end)
+            // console.log("Start angle corrected for minus: ", start, " end angle: ", end)
         }
         */
 
@@ -162,12 +162,12 @@ export class Arc {
         '\n', '51', // END ANGLE
         '\n', Utils.radians2degrees(this.endAngle()), // Radians
     );
-    console.log(' arc.js - DXF Data:' + data);
+    // console.log(' arc.js - DXF Data:' + data);
     return data;
   }
 
   trim(points, core) {
-    console.log('arc.js - Points:', points.length);
+    // console.log('arc.js - Points:', points.length);
   }
 
   intersectPoints() {

@@ -26,7 +26,7 @@ export class StyleManager {
   getUniqueName = function(name) {
     let count = 0;
     let styStr = name.replace(/ /g, '_').toUpperCase();
-    console.log('New style Name:' + styStr);
+    // console.log('New style Name:' + styStr);
     for (let i = 0; i < this.styleCount(); i++) {
       if (this.styles[i].name.includes(styStr)) {
         count = count + 1;
@@ -40,7 +40,7 @@ export class StyleManager {
   };
 
   addStyle(style) {
-    console.log(' StyleManager.js - addstyle() - New style Added:' + style.name);
+    // console.log(' StyleManager.js - addstyle() - New style Added:' + style.name);
     const newstyle = new Style(style);
     if (!this.styleExists(style)) {
       this.styles.push(newstyle);
@@ -52,7 +52,7 @@ export class StyleManager {
     const styleToDelete = this.getStyleByIndex(styleIndex).name;
 
     if (styleToDelete.toUpperCase() === 'STANDARD') {
-      console.log('Warning: STANDARD style cannot be deleted');
+      // console.log('Warning: STANDARD style cannot be deleted');
       return;
     }
 
@@ -64,7 +64,7 @@ export class StyleManager {
       }
     }
 
-    console.log(selectionSet.length, ' Item(s) to be deleted from ', styleToDelete);
+    // console.log(selectionSet.length, ' Item(s) to be deleted from ', styleToDelete);
 
     selectionSet.sort();
     for (let j = 0; j < selectionSet.length; j++) {
@@ -98,7 +98,7 @@ export class StyleManager {
 
   checkStyles() {
     if (!this.styleCount()) {
-      console.log('StyleManager.js - Check styles -> Add Standard styles');
+      // console.log('StyleManager.js - Check styles -> Add Standard styles');
       this.addStandardStyles();
     }
 
@@ -139,7 +139,7 @@ export class StyleManager {
     if (this.getStyleByIndex(styleIndex).name.toUpperCase() !== 'STANDARD') {
       if (this.getStyleByIndex(styleIndex).name === this.getCStyle()) {
         this.setCStyle(newUniqueName);
-        console.log('[stylenamanger.renamestyle] - set new Cstyle name');
+        // console.log('[stylenamanger.renamestyle] - set new Cstyle name');
       }
 
       this.styles[styleIndex].name = newUniqueName;

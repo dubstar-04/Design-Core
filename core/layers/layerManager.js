@@ -28,7 +28,7 @@ export class LayerManager {
   getUniqueName = function(name) {
     let count = 0;
     let layStr = name.replace(/ /g, '_').toUpperCase();
-    console.log('New Layer Name:' + layStr);
+    // console.log('New Layer Name:' + layStr);
     for (let i = 0; i < this.layerCount(); i++) {
       if (this.layers[i].name.includes(layStr)) {
         count = count + 1;
@@ -46,7 +46,7 @@ export class LayerManager {
     // console.log(" layermanager.js - addlayer() - New Layer Added:" + layer.name)
 
     if (!this.layerExists(layer)) {
-      console.log(' layermanager.js - addlayer() - New Layer Added:' + layer.name);
+      // console.log(' layermanager.js - addlayer() - New Layer Added:' + layer.name);
       const newLayer = new Layer(layer);
       this.layers.push(newLayer);
       this.core.scene.saveRequired();
@@ -63,7 +63,7 @@ export class LayerManager {
     const layerToDelete = this.getLayerByIndex(layerIndex).name;
 
     if (layerToDelete.toUpperCase() === 'DEFPOINTS') {
-      console.log('Warning: DEFPOINTS layer cannot be deleted');
+      // console.log('Warning: DEFPOINTS layer cannot be deleted');
       return;
     }
 
@@ -75,7 +75,7 @@ export class LayerManager {
       }
     }
 
-    console.log(selectionSet.length, ' Item(s) to be deleted from ', layerToDelete);
+    // console.log(selectionSet.length, ' Item(s) to be deleted from ', layerToDelete);
 
     selectionSet.sort();
     for (let j = 0; j < selectionSet.length; j++) {
@@ -109,7 +109,7 @@ export class LayerManager {
 
   checkLayers() {
     if (!this.layerCount()) {
-      console.log('layermanager.js - Check Layers -> Add Standard Layers');
+      // console.log('layermanager.js - Check Layers -> Add Standard Layers');
       this.addStandardLayers();
     }
 
@@ -172,7 +172,7 @@ export class LayerManager {
     if (this.getLayerByIndex(layerIndex).name.toUpperCase() !== 'DEFPOINTS') {
       if (this.getLayerByIndex(layerIndex).name === this.getCLayer()) {
         this.setCLayer(newUniqueName);
-        console.log('[Layernamanger.renameLayer] - set new Clayer name');
+        // console.log('[Layernamanger.renameLayer] - set new Clayer name');
       }
 
       this.layers[layerIndex].name = newUniqueName;

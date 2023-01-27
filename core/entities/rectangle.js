@@ -144,7 +144,7 @@ export class Rectangle {
         '\n', '8', // LAYERNAME
         '\n', this.layer,
     );
-    console.log(' rectangle.js - DXF Data:' + data);
+    // console.log(' rectangle.js - DXF Data:' + data);
     return data;
   }
 
@@ -313,7 +313,7 @@ export class Rectangle {
     };
 
     const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-    console.log(output.status);
+    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;

@@ -82,7 +82,7 @@ export class Rotate {
 
 
   action = function(core) {
-    console.log('Rotate Stuff');
+    // console.log('Rotate Stuff');
 
     const A = core.scene.points[0].x - core.scene.points[1].x;
     const O = core.scene.points[0].y - core.scene.points[1].y;

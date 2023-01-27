@@ -94,7 +94,7 @@ export class CommandManager {
       newItem = new classes[type](data);
     } else {
       // TODO: return undefined or null and notify of error
-      console.log('commandManager.js - createNew: Command Not Recognised');
+      // console.log('commandManager.js - createNew: Command Not Recognised');
     }
 
     return newItem;

@@ -135,12 +135,12 @@ export class Circle {
         '\n', '40',
         '\n', this.radius, // DIAMETER
     );
-    console.log(' circle.js - DXF Data:' + data);
+    // console.log(' circle.js - DXF Data:' + data);
     return data;
   }
 
   trim(points, core) {
-    console.log('circle.js - Points:', points.length);
+    // console.log('circle.js - Points:', points.length);
 
     if (points.length > 1) {
       const start = points[0];
@@ -153,10 +153,10 @@ export class Circle {
 
       const dir = (start.x - cen.x) * (end.y - cen.y) - (start.y - cen.y) * (end.x - cen.x);
       if (dir > 0) {
-        console.log('Clockwise');
+        // console.log('Clockwise');
         arcPoints.push(points[0], points[1]);
       } else if (dir < 0) {
-        console.log('Counterclockwise');
+        // console.log('Counterclockwise');
         arcPoints.push(points[1], points[0]);
       }
 
@@ -278,7 +278,7 @@ export class Circle {
       end: rP2,
     };
     const output = Intersection.intersectCircleRectangle(this.intersectPoints(), rectPoints);
-    console.log(output.status);
+    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;

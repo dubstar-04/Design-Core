@@ -133,15 +133,15 @@ export class Line {
         '\n', '31', // Z
         '\n', '0.0',
     );
-    console.log(' line.js - DXF Data:' + data);
+    // console.log(' line.js - DXF Data:' + data);
     return data;
   }
 
   trim(points, core) {
-    console.log('line.js - Points:', points.length);
+    // console.log('line.js - Points:', points.length);
 
     function trimOneEnd(intersectPnts, line) {
-      console.log('line.js - trimOneEnd');
+      // console.log('line.js - trimOneEnd');
 
       let originPoint;
       let destinationPoint;
@@ -173,19 +173,19 @@ export class Line {
           if (line.points[originPoint].distance(intersectPnts[validPoints[j]]) < dist) {
             dist = line.points[originPoint].distance(intersectPnts[validPoints[j]]);
             destinationPoint = validPoints[j];
-            console.log('line.js - trim - Valid Point:', validPoints[j], 'distance:', dist);
+            // console.log('line.js - trim - Valid Point:', validPoints[j], 'distance:', dist);
           }
         }
       }
 
       if (typeof destinationPoint !== 'undefined') {
-        console.log('destination point:', destinationPoint);
+        // console.log('destination point:', destinationPoint);
         line.points[originPoint] = intersectPnts[destinationPoint];
       }
     }
 
     function trimBetween(pnts, line) {
-      console.log('line.js - trimBetween');
+      // console.log('line.js - trimBetween');
 
       const a = Math.round(line.points[0].distance(pnts[0]));
       const b = Math.round(line.points[0].distance(pnts[1]));
@@ -193,7 +193,7 @@ export class Line {
       const d = Math.round(line.points[1].distance(pnts[1]));
 
       if (a === 0 && d === 0 || b === 0 && c === 0) {
-        console.log('line.js -  trim() - Line Already Trimmed');
+        // console.log('line.js -  trim() - Line Already Trimmed');
       } else {
         const data = {
           points: [pnts[a < b ? 1 : 0], line.points[1]],
@@ -219,7 +219,7 @@ export class Line {
         const c = pntsArray[i].distance(pntsArray[i + 1]);
 
         if (Math.round(a + b) === Math.round(c)) {
-          console.log('line.js - trim() - mouse is between two other points');
+          // console.log('line.js - trim() - mouse is between two other points');
           if (returnPoints) {
             return [pntsArray[i], pntsArray[i + 1]];
           }
@@ -236,11 +236,11 @@ export class Line {
       if (typeof pnts !== 'undefined') {
         trimBetween(pnts, this);
       } else {
-        console.log('line.js - trim() - multiple intersection & mouse is at one end');
+        // console.log('line.js - trim() - multiple intersection & mouse is at one end');
         trimOneEnd(points, this);
       }
     } else {
-      console.log('line.js - trim() - single intersection & mouse is at one end');
+      // console.log('line.js - trim() - single intersection & mouse is at one end');
       trimOneEnd(points, this);
     }
   }
@@ -261,10 +261,10 @@ export class Line {
     const validPoints = [];
 
     for (let i = 0; i < points.length; i++) {
-      console.log('line.js - extend - intersection point:', i);
+      // console.log('line.js - extend - intersection point:', i);
 
-      console.log('line.js - extend - origin to dest:', Math.round(this.points[originPoint].angle(points[i])));
-      console.log('line.js - extend - origin angle:', Math.round(this.points[originPoint ? 0 : 1].angle(this.points[originPoint])));
+      // console.log('line.js - extend - origin to dest:', Math.round(this.points[originPoint].angle(points[i])));
+      // console.log('line.js - extend - origin angle:', Math.round(this.points[originPoint ? 0 : 1].angle(this.points[originPoint])));
 
       if (Math.round(this.points[originPoint].angle(points[i])) === Math.round(this.points[originPoint ? 0 : 1].angle(this.points[originPoint]))) {
         // if the destination point is different than the origin add it to the array of valid points
@@ -274,7 +274,7 @@ export class Line {
       }
     }
 
-    console.log('line.js - extend - Valid Points:', validPoints.length);
+    // console.log('line.js - extend - Valid Points:', validPoints.length);
 
     if (validPoints.length > 1) {
       let dist = Number.POSITIVE_INFINITY;
@@ -283,7 +283,7 @@ export class Line {
         if (this.points[originPoint].distance(points[validPoints[j]]) < dist) {
           dist = this.points[originPoint].distance(points[validPoints[j]]);
           destinationPoint = validPoints[j];
-          console.log('line.js - extend - Valid Point:', validPoints[j], 'distance:', dist);
+          // console.log('line.js - extend - Valid Point:', validPoints[j], 'distance:', dist);
         }
       }
     } else if (validPoints.length === 1) {
@@ -292,7 +292,7 @@ export class Line {
     }
 
     if (destinationPoint !== undefined) {
-      console.log('destination point:', destinationPoint);
+      // console.log('destination point:', destinationPoint);
       this.points[originPoint] = points[destinationPoint];
     }
   }
@@ -416,7 +416,7 @@ export class Line {
     // var lP2 = new Point(this.points[1].x, this.points[1].y);
 
     const output = Intersection.intersectLineRectangle(this.intersectPoints(), rectPoints);
-    console.log(output.status);
+    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;

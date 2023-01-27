@@ -76,8 +76,8 @@ export class Dimension {
     let action = false;
     const prompt = [];
 
-    console.log('dimension inputArray: ', inputArray);
-    console.log('type: ', typeof core.scene.inputArray[num - 1]);
+    // console.log('dimension inputArray: ', inputArray);
+    // console.log('type: ', typeof core.scene.inputArray[num - 1]);
 
     expectedType[0] = ['undefined'];
     prompt[0] = 'Pick start point:'; // TODO: allow selecting entites, line / arc / circle
@@ -232,25 +232,25 @@ export class Dimension {
 
     switch (this.getBaseDimType()) {
       case 0:
-        console.log('Dimension.getDimensionPoints() - Rotated, horizontal, or vertical Dimension Type Not Handled');
+        // console.log('Dimension.getDimensionPoints() - Rotated, horizontal, or vertical Dimension Type Not Handled');
         break;
       case 1:
-        console.log('Dimension.getDimensionPoints() - Aligned Dimension Type Not Handled');
+        // console.log('Dimension.getDimensionPoints() - Aligned Dimension Type Not Handled');
         break;
       case 2:
-        console.log('Dimension.getDimensionPoints() - Angular Dimension Type Not Handled');
+        // console.log('Dimension.getDimensionPoints() - Angular Dimension Type Not Handled');
         break;
       case 3:
-        console.log('Dimension.getDimensionPoints() - Diameter Dimension Type Not Handled');
+        // console.log('Dimension.getDimensionPoints() - Diameter Dimension Type Not Handled');
         break;
       case 4:
-        console.log('Dimension.getDimensionPoints() - Radius Dimension Type Not Handled');
+        // console.log('Dimension.getDimensionPoints() - Radius Dimension Type Not Handled');
         break;
       case 5:
-        console.log('Dimension.getDimensionPoints() - Anglar 3-Point Dimension Type Not Handled');
+        // console.log('Dimension.getDimensionPoints() - Anglar 3-Point Dimension Type Not Handled');
         break;
       case 6:
-        console.log('Dimension.getDimensionPoints() - Ordinate Dimension Type Not Handled');
+        // console.log('Dimension.getDimensionPoints() - Ordinate Dimension Type Not Handled');
         break;
     }
 
@@ -274,7 +274,7 @@ export class Dimension {
 
     if (typeof (extPnts.dimAngle) === 'number') {
       const angle = Utils.radians2degrees(extPnts.dimAngle);
-      console.log('text angle', angle);
+      // console.log('text angle', angle);
       this.text.rotation = angle; // TODO: Honor the style
     }
 
@@ -291,13 +291,13 @@ export class Dimension {
         break;
 
       case 1:
-        console.log('Dimension Type Not Handled');
+        // console.log('Dimension Type Not Handled');
         break;
       case 2:
-        console.log('Aligned Dimension Type Not Handled');
+        // console.log('Aligned Dimension Type Not Handled');
         break;
       case 3:
-        console.log('Diameter Dimension Type Not Handled');
+        // console.log('Diameter Dimension Type Not Handled');
         // console.log("Diameter Dimension Type Not Handled")
         // line1 = new Line({ points: [this.points[3], this.points[4]] });
         // this.block.addItem(line1);
@@ -305,13 +305,13 @@ export class Dimension {
         // drawArrowHead(this.points[4], this.points[4].angle(this.points[3]), this.text.height / 2)
         break;
       case 4:
-        console.log('Radius Dimension Type Not Handled');
+        // console.log('Radius Dimension Type Not Handled');
         break;
       case 5:
-        console.log('Anglar 3-Point Dimension Type Not Handled');
+        // console.log('Anglar 3-Point Dimension Type Not Handled');
         break;
       case 6:
-        console.log('Ordinate Dimension Type Not Handled');
+        // console.log('Ordinate Dimension Type Not Handled');
         break;
     }
 
@@ -374,7 +374,7 @@ export class Dimension {
         */
     // ////////////////////////////////////////
 
-    // // Draw Bounding Box to test the getBoundingRect() /
+    // Draw Bounding Box to test the getBoundingRect() /
     /*
         ctx.strokeStyle = colour;
         ctx.lineWidth = 1 / scale;

@@ -46,7 +46,7 @@ export class Erase {
   action(core) {
     core.scene.selectionSet.sort();
 
-    console.log('erase.js - core.scene.selectionSet: ' + core.scene.selectionSet);
+    // console.log('erase.js - core.scene.selectionSet: ' + core.scene.selectionSet);
 
     for (let i = 0; i < core.scene.selectionSet.length; i++) {
       // console.log("Erase: " + core.scene.selectionSet[i]);
