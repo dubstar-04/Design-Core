@@ -12,14 +12,14 @@ export class Insert {
     this.colour = 'BYLAYER';
     this.layer = '0';
 
-    console.log('can we access items?', items);
+    // console.log('can we access items?', items);
 
     if (data) {
       this.block = data.block;
 
       if (data.points) {
         this.points = data.points;
-        console.log('Insert Point Data:', data.points);
+        // console.log('Insert Point Data:', data.points);
       }
 
       if (data.colour) {
@@ -53,7 +53,7 @@ export class Insert {
         '\n', '30', // Z
         '\n', '0.0',
     );
-    console.log(' insert.js - DXF Data:' + data);
+    // console.log(' insert.js - DXF Data:' + data);
     return data;
   }
 
@@ -112,7 +112,7 @@ export class Insert {
     };
 
     const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-    console.log(output.status);
+    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;

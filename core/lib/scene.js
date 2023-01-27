@@ -19,7 +19,7 @@ export class Scene {
   }
 
   reset() {
-    console.log(' scene.js - Reset: In Reset');
+    // console.log(' scene.js - Reset: In Reset');
     this.points = []; // clear array
     this.minPoints = 0; // reset minimum required points
     this.activeCommand = undefined; // reset the active command
@@ -40,7 +40,7 @@ export class Scene {
 
   /*
     centreVPORT(centre, width, height) {
-        console.log(centre.x, centre.y, width, height)
+        // console.log(centre.x, centre.y, width, height)
         if (height !== 0 && width !== 0) {
             var xmin = centre.x - width / 2
             var xmax = centre.x + width / 2
@@ -83,15 +83,15 @@ export class Scene {
   // add item to block
   // TODO: fix this mess
   addItemToBlock(type, data, name) {
-    console.log('block name:', name);
+    // console.log('block name:', name);
 
     if (this.items[this.items.length - 1].name === name) {
-      console.log('Add Item to Block:', type, name);
+      // console.log('Add Item to Block:', type, name);
       // TODO: This is a bad hack
       if (type === 'Insert') {
         this.items[this.items.length - 1].addInsert(data);
         this.items[this.items.length - 1].colour = data.colour;
-        console.log('Set Block colour:', data.colour);
+        // console.log('Set Block colour:', data.colour);
       } else {
         const item = this.core.commandManager.createNew(type, data);
         this.items[this.items.length - 1].addItem(item);
@@ -188,7 +188,7 @@ export class Scene {
       if (distance < delta) {
         delta = distance;
         closestItem = i;
-        console.log(' scene.js - Distance: ' + distance);
+        // console.log(' scene.js - Distance: ' + distance);
       }
     }
 
@@ -223,7 +223,7 @@ export class Scene {
   selecting() {
     this.tempItems = [];
 
-    console.log('selecting');
+    // console.log('selecting');
 
     if (this.core.mouse.buttonOneDown) {
       const selectionPoints = [];

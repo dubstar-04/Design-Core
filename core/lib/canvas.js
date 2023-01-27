@@ -115,7 +115,7 @@ export class Canvas {
   }
 
   zoomExtents() {
-    console.log('zoom all ');
+    // console.log('zoom all ');
     const extents = this.core.scene.getExtents();
     if (extents) {
       // calculate the center of all items

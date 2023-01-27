@@ -176,7 +176,7 @@ export class Spline {
         controlPoints,
         '\n', '0',
     );
-    console.log(' spline.js - DXF Data:' + data);
+    // console.log(' spline.js - DXF Data:' + data);
     return data;
   }
 

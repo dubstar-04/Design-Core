@@ -152,7 +152,7 @@ export class FilledRectangle {
         vertices, // Dont use a new line here as the vertix data will start with a new line.
         '\n', '0',
     );
-    console.log(' rectangle.js - DXF Data:' + data);
+    // console.log(' rectangle.js - DXF Data:' + data);
     return data;
   }
 
@@ -342,7 +342,7 @@ export class FilledRectangle {
              linePoints = {start: this.points[i-1], end: this.points[i]};
 
              output = Intersection.intersectLineRectangle(linePoints, rectPoints);
-             console.log(output.status)
+             // console.log(output.status)
 
              if (  output.status === "Intersection"  ){
                  return true
@@ -360,7 +360,7 @@ export class FilledRectangle {
     };
 
     const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-    console.log(output.status);
+    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;

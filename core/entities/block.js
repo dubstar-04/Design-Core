@@ -22,7 +22,7 @@ export class Block {
 
       if (data.points) {
         this.location = data.points[0];
-        console.log('Block Point Data:', data.points);
+        // console.log('Block Point Data:', data.points);
       }
 
       if (data.flags) {
@@ -78,7 +78,7 @@ export class Block {
         '\n', '3', // name again
         '\n', this.name,
     );
-    console.log(' Block.js - DXF Data:' + data);
+    // console.log(' Block.js - DXF Data:' + data);
     return data;
   }
 
@@ -143,7 +143,7 @@ export class Block {
         // reset item colour
         this.items[item].colour = itemColour;
       } else {
-        console.log('block.js - [draw] [INFO]:Item has no draw function - Item:', this.items[item]);
+        // console.log('block.js - [draw] [INFO]:Item has no draw function - Item:', this.items[item]);
       }
     }
 
@@ -285,7 +285,7 @@ export class Block {
     };
 
     const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-    console.log(output.status);
+    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;

@@ -54,9 +54,9 @@ export class Trim {
   }
 
   action(core) {
-    console.log('Trim.js: action');
+    // console.log('Trim.js: action');
 
-    console.log('Trim.js: core.scene.selectionSet length:', core.scene.selectionSet.length);
+    // console.log('Trim.js: core.scene.selectionSet length:', core.scene.selectionSet.length);
 
     const item = core.scene.findClosestItem();
 
@@ -69,15 +69,15 @@ export class Trim {
           const boundaryItem = core.scene.items[core.scene.selectionSet[i]];
           TrimItem = core.scene.items[item];
 
-          console.log('boundary.type:', boundaryItem.type, 'Trim.type:', TrimItem.type);
+          // console.log('boundary.type:', boundaryItem.type, 'Trim.type:', TrimItem.type);
 
           const functionName = 'intersect' + boundaryItem.type + TrimItem.type;
-          console.log('Trim.js - call function:', functionName);
+          // console.log('Trim.js - call function:', functionName);
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), TrimItem.intersectPoints());
 
-          console.log(intersect.status);
+          // console.log(intersect.status);
           if (intersect.points.length) {
-            console.log('intersect points:', intersect.points.length);
+            // console.log('intersect points:', intersect.points.length);
             for (let point = 0; point < intersect.points.length; point++) {
               intersectPoints.push(intersect.points[point]);
             }

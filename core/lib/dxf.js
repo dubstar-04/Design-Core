@@ -9,7 +9,7 @@ import {Point} from '../entities/point.js';
 /*
 function debugLog(msg) {
   if (debug) {
-    console.log('DXF.js: ' + msg);
+    // console.log('DXF.js: ' + msg);
   }
 }
 */
@@ -37,7 +37,7 @@ export class DXF {
     this.lineNum = this.lineNum + 1;
     if (Math.round((this.lineNum / this.lines.length) * 100) > this.processed) {
       this.processed = Math.round((this.lineNum / this.lines.length) * 100);
-      // //console.log("Progress:" + this.processed + "%")
+      // //// console.log("Progress:" + this.processed + "%")
     }
   }
 
@@ -135,7 +135,7 @@ export class DXF {
           break;
 
         case 'LAYER':
-          // ////console.log("Found " + this.line)
+          // ////// console.log("Found " + this.line)
           this.readLayer();
           break;
 
@@ -153,7 +153,7 @@ export class DXF {
           break;
 
         case 'ENDBLK':
-          // //console.log("Close Block:", this.blockName);
+          // //// console.log("Close Block:", this.blockName);
           this.blockName = '';
           break;
 
@@ -307,7 +307,7 @@ export class DXF {
 
           // set the current block name to add to preceeding elements;
           this.blockName = name;
-          // //console.log("Open Block:", this.blockName)
+          // //// console.log("Open Block:", this.blockName)
 
           return;
         case 2: // name follows
@@ -431,7 +431,7 @@ export class DXF {
         case 0:
           // next item found, so finish with line
 
-          // ////console.log(name, colour)
+          // ////// console.log(name, colour)
           const layer = {
             name: name,
             flags: flags,
@@ -834,7 +834,7 @@ export class DXF {
         case 15: // X
           this.getDXFLine();
           point152535.x = Number(this.line);
-          // //console.log("pt 15", this.line)
+          // //// console.log("pt 15", this.line)
           break;
         case 25: // Y
           this.getDXFLine();
@@ -1856,7 +1856,7 @@ export class DXF {
           // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
           this.getDXFLine();
           verticalAlignment = Number(this.line);
-          // //console.log("dxf vertical align:", verticalAlignment)
+          // //// console.log("dxf vertical align:", verticalAlignment)
           break;
         default:
           // skip the next line
@@ -2316,14 +2316,14 @@ export class DXF {
       this.getDXFLine();
       const n = parseInt(this.line);
       // debugLog("Group Code: " + n)
-      // ////console.log("Group Code: " + n)
+      // ////// console.log("Group Code: " + n)
 
       switch (n) {
         case 0:
 
           if (height !== 0 && ratio !== 0) {
             // width = height * ratio;
-            // ////console.log("Vport Width: ", width)
+            // ////// console.log("Vport Width: ", width)
           }
 
           /*   const vport = {
@@ -2331,68 +2331,68 @@ export class DXF {
                            height: height,
                            width: width
                        }*/
-          // ////console.log("TODO: Implement Centring the data")
+          // ////// console.log("TODO: Implement Centring the data")
           // centreVPORT(centre, width, height);
 
           return true;
         case 2:
           // name
           this.getDXFLine();
-          // ////console.log("VPORT Name: " + this.line);
+          // ////// console.log("VPORT Name: " + this.line);
           break;
         case 10:
           // x
           this.getDXFLine();
-          // ////console.log("Bottom Left X: " + this.line);
+          // ////// console.log("Bottom Left X: " + this.line);
           break;
         case 20:
           // y
           this.getDXFLine();
-          // ////console.log("Bottom Left Y: " + this.line);
+          // ////// console.log("Bottom Left Y: " + this.line);
           break;
         case 11:
           // x
           this.getDXFLine();
-          // ////console.log("Top Right X: " + this.line);
+          // ////// console.log("Top Right X: " + this.line);
           break;
         case 21:
           // y
           this.getDXFLine();
-          // ////console.log("Top Right Y: " + this.line);
+          // ////// console.log("Top Right Y: " + this.line);
           break;
         case 12:
           // x
           this.getDXFLine();
-          // ////console.log("Centre X: " + this.line);
+          // ////// console.log("Centre X: " + this.line);
           centre.x = Number(this.line);
           break;
         case 22:
           // y
           this.getDXFLine();
-          // ////console.log("Centre Y: " + this.line);
+          // ////// console.log("Centre Y: " + this.line);
           centre.y = Number(this.line);
           break;
         case 40:
           // View Height
           this.getDXFLine();
-          // ////console.log("Viewport Height: " + this.line);
+          // ////// console.log("Viewport Height: " + this.line);
           height = Number(this.line);
           break;
         case 41:
           // Viewport ratio
           this.getDXFLine();
-          // ////console.log("Viewport ratio: " + this.line);
+          // ////// console.log("Viewport ratio: " + this.line);
           ratio = this.line;
           break;
         case 70:
           // flags
           this.getDXFLine();
-          // ////console.log("Viewport Flags: " + this.line);
+          // ////// console.log("Viewport Flags: " + this.line);
           break;
         case 76:
           // grid on/off
           this.getDXFLine();
-          // ////console.log("Grid ON/OFF: " + this.line);
+          // ////// console.log("Grid ON/OFF: " + this.line);
           break;
         default:
           // skip the next line

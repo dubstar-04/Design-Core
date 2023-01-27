@@ -130,7 +130,7 @@ export class Style {
         '\n', '71', // Flags
         '\n', this.getFlags(),
     );
-    console.log(' Style.js - DXF Data:' + data);
+    // console.log(' Style.js - DXF Data:' + data);
     return data;
   }
 }

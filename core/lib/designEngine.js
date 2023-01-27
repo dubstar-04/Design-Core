@@ -47,7 +47,7 @@ export class DesignEngine {
     }
 
     if (isPoint) {
-      console.log('design engine - comma seperated point - create new point ');
+      // console.log('design engine - comma seperated point - create new point ');
 
       const isRelative = input.includes('@');
       const isAbsolute = input.includes('#');
@@ -71,7 +71,7 @@ export class DesignEngine {
     }
 
     if (action === 'LeftClick') {
-      console.log('design engine - left click- create new point ');
+      // console.log('design engine - left click- create new point ');
 
       if (this.core.scene.activeCommand === undefined) {
         this.core.scene.selectClosestItem(data);
@@ -90,16 +90,15 @@ export class DesignEngine {
     }
 
     if (isNumber) {
-      console.log('design engine - Numbers Recieved');
-      // inputData = Number(input);
-      point = this.convertInputToPoint(Number(input));
+      // console.log('design engine - Numbers Recieved');
+      const point = this.convertInputToPoint(Number(input));
       inputData = Number(input);
       this.core.scene.points.push(point);
-      console.log('Number Input Data: ', inputData);
+      // console.log('Number Input Data: ', inputData);
     }
 
     if (isLetters && !isUndefined) {
-      console.log('core - Letters Recieved');
+      // console.log('core - Letters Recieved');
       inputData = String(input);
     }
 
@@ -121,7 +120,7 @@ export class DesignEngine {
       }
       this.actionInput();
     } else {
-      console.log('End of core');
+      // console.log('End of core');
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -139,7 +138,7 @@ export class DesignEngine {
     if (!promptData.validInput) {
       // notify('Invalid Input');
       // TODO: Enable GTK toast
-      console.log(' ######## Invalid Input ######## ');
+      // console.log(' ######## Invalid Input ######## ');
     }
 
     if (promptData.actionBool) {
@@ -156,7 +155,7 @@ export class DesignEngine {
   }
 
   initialiseItem(item) {
-    console.log(' core - Item To Process: ' + item);
+    // console.log(' core - Item To Process: ' + item);
     this.core.scene.saveRequired();
 
     if (!this.core.commandManager.isCommand(item)) {

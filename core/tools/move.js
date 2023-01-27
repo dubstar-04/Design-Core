@@ -22,7 +22,7 @@ export class Move {
     let action = false;
     const prompt = [];
 
-    console.log('inputArray: ', core.scene.inputArray);
+    // console.log('inputArray: ', core.scene.inputArray);
 
     expectedType[0] = ['undefined'];
     prompt[0] = 'Select Items To ' + this.type;
@@ -52,14 +52,14 @@ export class Move {
   }
 
   action(core) {
-    console.log('move.js: action');
-    console.log('move.js: points length: ' + core.scene.points.length);
-    console.log('move.js: items length: ' + core.scene.items.length);
+    // console.log('move.js: action');
+    // console.log('move.js: points length: ' + core.scene.points.length);
+    // console.log('move.js: items length: ' + core.scene.items.length);
 
     const xDelta = core.scene.points[1].x - core.scene.points[0].x;
     const yDelta = core.scene.points[1].y - core.scene.points[0].y;
 
-    console.log('move.js: X: ' + xDelta + ' Y: ' + yDelta);
+    // console.log('move.js: X: ' + xDelta + ' Y: ' + yDelta);
 
     for (let i = 0; i < core.scene.selectionSet.length; i++) {
       // console.log("core.scene.selectionSet.type: " + core.scene.selectionSet[i].type);
@@ -79,10 +79,10 @@ export class Move {
     const xDelta = core.scene.tempPoints[1].x - core.scene.tempPoints[0].x;
     const yDelta = core.scene.tempPoints[1].y - core.scene.tempPoints[0].y;
 
-    console.log('delta', xDelta, yDelta);
-    console.log(core.scene.tempPoints[0].x, core.scene.tempPoints[0].y);
-    console.log(core.scene.tempPoints[1].x, core.scene.tempPoints[1].y);
-    console.log(core.scene.items[core.scene.selectionSet[0]].points[0].x, core.scene.items[core.scene.selectionSet[0]].points[0].y);
+    // console.log('delta', xDelta, yDelta);
+    // console.log(core.scene.tempPoints[0].x, core.scene.tempPoints[0].y);
+    // console.log(core.scene.tempPoints[1].x, core.scene.tempPoints[1].y);
+    // console.log(core.scene.items[core.scene.selectionSet[0]].points[0].x, core.scene.items[core.scene.selectionSet[0]].points[0].y);
 
     for (let i = 0; i < core.scene.selectionSet.length; i++) {
       // console.log("core.scene.selectionSet.type: " + selectedItems[i].type);

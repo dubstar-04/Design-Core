@@ -107,8 +107,8 @@ export class Text {
     let action = false;
     const prompt = [];
 
-    console.log('inputArray: ', core.scene.inputArray);
-    console.log('type: ', typeof core.scene.inputArray[num - 1]);
+    // console.log('inputArray: ', core.scene.inputArray);
+    // console.log('type: ', typeof core.scene.inputArray[num - 1]);
 
     expectedType[0] = ['undefined'];
     prompt[0] = 'Pick start point:';
@@ -125,7 +125,7 @@ export class Text {
     const validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
 
     if (!validInput) {
-      console.log('invalid');
+      // console.log('invalid');
       core.scene.inputArray.pop();
     } else if (core.scene.inputArray.length === 3) {
       action = true;
@@ -245,7 +245,7 @@ export class Text {
     ctx.stroke();
     ctx.restore();
 
-    // // Draw Bounding Box to test the getBoundingRect()
+    // Draw Bounding Box to test the getBoundingRect()
     /*
         ctx.strokeStyle = colour;
         ctx.lineWidth = 1 / scale;
@@ -381,7 +381,7 @@ export class Text {
     };
 
     const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-    console.log(output.status);
+    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;

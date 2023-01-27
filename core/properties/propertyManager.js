@@ -12,7 +12,7 @@ export class PropertyManager {
 
 
   selectionSetChanged() {
-    console.log('Property Manager - Selection Set Changed');
+    // console.log('Property Manager - Selection Set Changed');
 
     // If a callback is set - signal that a change has been made
     if (this.updateCallbackFunction) {
@@ -46,7 +46,7 @@ export class PropertyManager {
 
   getItemProperties(itemType) {
     // Loop through the items and get a list of common properties.
-    console.log('Properties Manage - getItemProperties Item Type: ' + itemType);
+    // console.log('Properties Manage - getItemProperties Item Type: ' + itemType);
     const propertiesList = [];
 
     if (this.core.scene.selectionSet.length > 0) {
@@ -86,7 +86,7 @@ export class PropertyManager {
       }
     }
 
-    console.log('[propertiesManager.getItemProperyValue()]', propertiesValueList);
+    // console.log('[propertiesManager.getItemProperyValue()]', propertiesValueList);
     if (propertiesValueList.every(function(prop) {
       return prop === propertiesValueList[0];
     })) {

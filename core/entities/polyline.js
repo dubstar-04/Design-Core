@@ -136,7 +136,7 @@ export class Polyline {
         '\n', '8', // LAYERNAME
         '\n', this.layer,
     );
-    console.log(' polyline.js - DXF Data:' + data);
+    // console.log(' polyline.js - DXF Data:' + data);
     return data;
   }
 

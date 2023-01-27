@@ -54,9 +54,9 @@ export class Extend {
   }
 
   action(core) {
-    console.log('Extend.js: action');
+    // console.log('Extend.js: action');
 
-    console.log('Extend.js: core.scene.selectionSet length:', core.scene.selectionSet.length);
+    // console.log('Extend.js: core.scene.selectionSet length:', core.scene.selectionSet.length);
 
     const item = core.scene.findClosestItem();
 
@@ -69,15 +69,15 @@ export class Extend {
           const boundaryItem = core.scene.items[core.scene.selectionSet[i]];
           extendItem = core.scene.items[item];
 
-          console.log('boundary.type:', boundaryItem.type, 'extend.type:', extendItem.type);
+          // console.log('boundary.type:', boundaryItem.type, 'extend.type:', extendItem.type);
 
           const functionName = 'intersect' + boundaryItem.type + extendItem.type;
-          console.log('extend.js - call function:', functionName);
+          // console.log('extend.js - call function:', functionName);
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), extendItem.intersectPoints(), true);
 
-          console.log(intersect.status);
+          // console.log(intersect.status);
           if (intersect.points.length) {
-            console.log('intersect points:', intersect.points.length);
+            // console.log('intersect points:', intersect.points.length);
             for (let point = 0; point < intersect.points.length; point++) {
               intersectPoints.push(intersect.points[point]);
             }
