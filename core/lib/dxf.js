@@ -2485,7 +2485,7 @@ export class DXF {
         '\nENDTAB',
     );
 
-    const extents = this.core.scene.getSceneExtents();
+    const extents = this.core.scene.getExtents();
 
     const width = extents.xmax - extents.xmin;
     const height = extents.ymax - extents.ymin;
