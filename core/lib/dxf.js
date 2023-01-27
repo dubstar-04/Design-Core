@@ -2438,7 +2438,7 @@ export class DXF {
         '\n70',
         '\n' + this.core.layerManager.layerCount());
 
-    for (const i = 0; i < this.core.layerManager.layerCount(); i++) {
+    for (let i = 0; i < this.core.layerManager.layerCount(); i++) {
       data = data.concat('\n', this.core.layerManager.getLayerByIndex(i).dxf());
     }
 
@@ -2457,7 +2457,7 @@ export class DXF {
         '\n70',
         '\n' + this.core.styleManager.styleCount());
 
-    for (const i = 0; i < this.core.styleManager.styleCount(); i++) {
+    for (let i = 0; i < this.core.styleManager.styleCount(); i++) {
       data = data.concat('\n', this.core.styleManager.getStyleByIndex(i).dxf());
     }
 
@@ -2476,7 +2476,7 @@ export class DXF {
         '\n70',
         '\n' + this.core.dimStyleManager.styleCount());
 
-    for (const i = 0; i < this.core.dimStyleManager.styleCount(); i++) {
+    for (let i = 0; i < this.core.dimStyleManager.styleCount(); i++) {
       data = data.concat('\n', this.core.dimStyleManager.getStyleByIndex(i).dxf());
     }
 
@@ -2581,7 +2581,7 @@ export class DXF {
         '\n2',
         '\nENTITIES');
 
-    for (const i = 0; i < this.core.scene.items.length; i++) {
+    for (let i = 0; i < this.core.scene.items.length; i++) {
       data = data.concat('\n', this.core.scene.items[i].dxf());
     }
 
