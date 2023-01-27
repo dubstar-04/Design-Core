@@ -93,6 +93,7 @@ export class DesignEngine {
       console.log('design engine - Numbers Recieved');
       // inputData = Number(input);
       point = this.convertInputToPoint(Number(input));
+      const point = this.convertInputToPoint(Number(input));
       inputData = Number(input);
       this.core.scene.points.push(point);
       console.log('Number Input Data: ', inputData);
