@@ -2409,7 +2409,7 @@ export class DXF {
     data = data.concat(
         // Create Header Data
         '999',
-        '\nDXF created from www.Design-App.co.uk',
+        '\nDXF created from Design-Core',
         '\n0',
         '\nSECTION',
         '\n2',
