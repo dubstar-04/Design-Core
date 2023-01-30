@@ -186,7 +186,7 @@ export class Arc {
 
     const snaps = [];
 
-    if (core.settings.endSnap) {
+    if (core.settings.endsnap) {
       // Speed this up by generating the proper start and end points when the arc is initialised
       const startPoint = new Point(this.points[0].x + (this.radius * Math.cos(this.startAngle())),
           this.points[0].y + (this.radius * Math.sin(this.startAngle())));
@@ -196,12 +196,12 @@ export class Arc {
       snaps.push(startPoint, endPoint);
     }
 
-    if (core.settings.centreSnap) {
+    if (core.settings.centresnap) {
       const centre = this.points[0];
       snaps.push(centre);
     }
 
-    if (core.settings.nearestSnap) {
+    if (core.settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint);
       // var snaps = [center, startPoint, endPoint];
 

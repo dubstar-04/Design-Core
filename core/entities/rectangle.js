@@ -201,14 +201,14 @@ export class Rectangle {
 
     const snaps = [];
 
-    if (core.settings.endSnap) {
+    if (core.settings.endsnap) {
       // End points for each segment
       for (let i = 0; i < this.points.length; i++) {
         snaps.push(this.points[i]);
       }
     }
 
-    if (core.settings.midSnap) {
+    if (core.settings.midsnap) {
       for (let i = 1; i < this.points.length; i++) {
         const start = this.points[i - 1];
         const end = this.points[i];
@@ -217,7 +217,7 @@ export class Rectangle {
       }
     }
 
-    if (core.settings.nearestSnap) {
+    if (core.settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint);
 
       // Crude way to snap to the closest point or a node

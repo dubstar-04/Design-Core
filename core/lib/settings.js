@@ -2,27 +2,28 @@ export class Settings {
   /**
    * Settings Constructor
    */
-  constructor() {
-    this.canvasBackgroundColour = '#1e1e1e'; // "#000000";
-    this.selectedItemsColour = '#00FF00';
-    this.snapColour = '#FF0000';
-    this.gridColour = '#77767b';
-    this.helperGeometryColour = '#00BFFF';
-    this.polarSnapColour = '#38B44A';
+  constructor(core) {
+    this.core = core;
+    this.canvasbackgroundcolour = '#1e1e1e'; // "#000000";
+    this.selecteditemscolour = '#00FF00';
+    this.snapcolour = '#FF0000';
+    this.gridcolour = '#77767b';
+    this.helpergeometrycolour = '#00BFFF';
+    this.polarsnapcolour = '#38B44A';
     // fontSettings
     this.font = 'Arial';
     this.fontupsidedown = false;
     this.fontbackwards = false;
     // snapSettings
-    this.endSnap = true;
-    this.midSnap = true;
-    this.centreSnap = true;
-    this.nearestSnap = false;
-    this.quadrantSnap = false;
-    this.polarAngle = 45;
+    this.endsnap = true;
+    this.midsnap = true;
+    this.centresnap = true;
+    this.nearestsnap = false;
+    this.quadrantsnap = false;
+    this.polarangle = 45;
     this.polar = true;
     this.ortho = false;
-    this.drawGrid = true;
+    this.drawgrid = true;
   }
 
   /**

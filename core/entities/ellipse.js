@@ -193,13 +193,13 @@ export class Ellipse {
 
     const snaps = [];
 
-    if (core.settings.centreSnap) {
+    if (core.settings.centresnap) {
       const centre = new Point(this.points[0].x, this.points[0].y);
       snaps.push(centre);
     }
 
 
-    if (core.settings.quadrantSnap) {
+    if (core.settings.quadrantsnap) {
       const A = this.points[0].x - this.points[1].x;
       const O = this.points[0].y - this.points[1].y;
       const theta = Math.atan2(O, A) + Math.PI;
@@ -220,7 +220,7 @@ export class Ellipse {
       snaps.push(angle0, angle90, angle180, angle270);
     }
 
-    if (core.settings.nearestSnap) {
+    if (core.settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint);
 
       // Crude way to snap to the closest point or a node
