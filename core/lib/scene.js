@@ -206,7 +206,7 @@ export class Scene {
     if (closestItem !== undefined) {
       if (this.selectionSet.indexOf(closestItem) === -1) { // only store selections once
         const copyofitem = Utils.cloneObject(this.core, this.items[closestItem]);
-        copyofitem.colour = this.core.settings.selectedItemsColour.toString();
+        copyofitem.colour = this.core.settings.selecteditemscolour.toString();
         copyofitem.lineWidth = copyofitem.lineWidth * 2;
         this.selectedItems.push(copyofitem);
         this.selectionSet.push(closestItem);
@@ -269,7 +269,7 @@ export class Scene {
             // console.log(this.items[i].type + " at index: " + i + " is within the selection")
             if (this.selectionSet.indexOf(i) === -1) { // only store selections once
               const copyofitem = Utils.cloneObject(this.core, this.items[i]);
-              copyofitem.colour = this.core.settings.selectedItemsColour.toString();
+              copyofitem.colour = this.core.settings.selecteditemscolour.toString();
               copyofitem.lineWidth = copyofitem.lineWidth * 2;
 
               this.selectedItems.push(copyofitem);
@@ -288,7 +288,7 @@ export class Scene {
             // console.log(items[i].type + " at index: " + i + " is within the selection")
             if (this.selectionSet.indexOf(i) === -1) { // only store selections once
               const copyofitem = Utils.cloneObject(this.core, this.items[i]);
-              copyofitem.colour = this.core.settings.selectedItemsColour.toString();
+              copyofitem.colour = this.core.settings.selecteditemscolour.toString();
               copyofitem.lineWidth = copyofitem.lineWidth * 2;
 
               this.selectedItems.push(copyofitem);
@@ -337,7 +337,7 @@ export class Scene {
 
     const data = {
       points: snapCirclePoints,
-      colour: this.core.settings.snapColour.toString(),
+      colour: this.core.settings.snapcolour.toString(),
     };
     const item = this.core.commandManager.createNew('Circle', data);
     this.tempItems.push(item);
@@ -416,11 +416,11 @@ export class Scene {
         helperPoints.push(this.tempPoints[0]);
         helperPoints.push(this.core.mouse.pointOnScene());
 
-        this.addHelperGeometry('Line', helperPoints, this.core.settings.helperGeometryColour.toString());
+        this.addHelperGeometry('Line', helperPoints, this.core.settings.helpergeometrycolour.toString());
       }
 
       if (this.activeCommand !== undefined && this.activeCommand.showPreview && this.activeCommand.family === 'Geometry' && this.tempPoints.length >= this.activeCommand.minPoints) {
-        this.addHelperGeometry(this.activeCommand.type, this.tempPoints, this.core.settings.helperGeometryColour.toString());
+        this.addHelperGeometry(this.activeCommand.type, this.tempPoints, this.core.settings.helpergeometrycolour.toString());
         this.core.canvas.requestPaint(); // TODO: Improve requests to paint as it is called too often.
       }
 

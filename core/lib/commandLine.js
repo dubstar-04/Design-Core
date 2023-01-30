@@ -106,7 +106,7 @@ export class CommandLine {
       case 'F6': // F6
         break;
       case 'F7': // F7
-        toggleSnap('drawGrid');
+        toggleSnap('drawgrid');
         canvas.requestPaint();
         break;
       case 'F8': // F8

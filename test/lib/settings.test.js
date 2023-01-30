@@ -4,16 +4,16 @@ const settings = new Settings();
 
 
 test('Test Settings.setSetting', () => {
-  expect(settings.endSnap).toBe(true);
-  settings.setSetting('endSnap', false);
-  expect(settings.endSnap).toBe(false);
+  expect(settings.endsnap).toBe(true);
+  settings.setSetting('endsnap', false);
+  expect(settings.endsnap).toBe(false);
 
-  expect(settings.canvasBackgroundColour).toBe('#1e1e1e');
-  settings.setSetting('canvasBackgroundColour', '#000000');
-  expect(settings.canvasBackgroundColour).toBe('#000000');
+  expect(settings.canvasbackgroundcolour).toBe('#1e1e1e');
+  settings.setSetting('canvasbackgroundcolour', '#000000');
+  expect(settings.canvasbackgroundcolour).toBe('#000000');
 });
 
 test('Test Settings.getSetting', () => {
-  expect(settings.getSetting('endSnap')).toBe(false);
-  expect(settings.getSetting('canvasBackgroundColour')).toBe('#000000');
+  expect(settings.getSetting('endsnap')).toBe(false);
+  expect(settings.getSetting('canvasbackgroundcolour')).toBe('#000000');
 });

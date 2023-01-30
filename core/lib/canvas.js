@@ -179,12 +179,12 @@ export class Canvas {
 
     try {// HTML
       // this.clear()
-      context.fillStyle = this.core.settings.canvasBackgroundColour;
+      context.fillStyle = this.core.settings.canvasbackgroundcolour;
       context.fillRect(origin.x, origin.y, width / this.getScale(), height / this.getScale());
       // context.globalAlpha = this.cvs.alpha
     } catch { // Cairo
-      const rgbColour = Colours.hexToScaledRGB(this.core.settings.canvasBackgroundColour);
-      // console.log("Background Colour", this.core.settings.canvasBackgroundColour, rgbColour, this.getScale())
+      const rgbColour = Colours.hexToScaledRGB(this.core.settings.canvasbackgroundcolour);
+      // console.log("Background Colour", this.core.settings.canvasbackgroundcolour, rgbColour, this.getScale())
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       const scaled = new Point(width, height);
       const sc = this.core.mouse.transformToScene(scaled);
@@ -231,12 +231,12 @@ export class Canvas {
     let lineWidth = 0.75;
 
     try { // HTML Canvas
-      context.strokeStyle = this.core.settings.gridColour;
+      context.strokeStyle = this.core.settings.gridcolour;
       context.lineWidth = lineWidth / this.getScale();
       context.beginPath();
     } catch { // Cairo
       context.setLineWidth(lineWidth / this.getScale());
-      const rgbColour = Colours.hexToScaledRGB(this.core.settings.gridColour);
+      const rgbColour = Colours.hexToScaledRGB(this.core.settings.gridcolour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
@@ -256,7 +256,7 @@ export class Canvas {
     context.lineTo(0, ygridmin);
     context.stroke();
 
-    if (this.core.settings['drawGrid']) {
+    if (this.core.settings['drawgrid']) {
       // set a feint linewidth for the grid
       lineWidth = lineWidth * 0.25;
 

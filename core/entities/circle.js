@@ -186,12 +186,12 @@ export class Circle {
 
     const snaps = [];
 
-    if (core.settings.centreSnap) {
+    if (core.settings.centresnap) {
       const centre = new Point(this.points[0].x, this.points[0].y);
       snaps.push(centre);
     }
 
-    if (core.settings.quadrantSnap) {
+    if (core.settings.quadrantsnap) {
       const angle0 = new Point(this.points[0].x + this.radius, this.points[0].y);
       const angle90 = new Point(this.points[0].x, this.points[0].y + this.radius);
       const angle180 = new Point(this.points[0].x - this.radius, this.points[0].y);
@@ -200,7 +200,7 @@ export class Circle {
       snaps.push(angle0, angle90, angle180, angle270);
     }
 
-    if (core.settings.nearestSnap) {
+    if (core.settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint);
 
       // Crude way to snap to the closest point or a node

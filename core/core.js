@@ -33,7 +33,7 @@ export class Core {
     this.dimStyleManager = new DimStyleManager(this);
     this.propertyManager = new PropertyManager(this);
 
-    this.settings = new Settings();
+    this.settings = new Settings(this);
   }
 
 

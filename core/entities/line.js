@@ -335,17 +335,17 @@ export class Line {
 
     const snaps = [];
 
-    if (core.settings.endSnap) {
+    if (core.settings.endsnap) {
       const start = new Point(this.points[0].x, this.points[0].y);
       const end = new Point(this.points[1].x, this.points[1].y);
       snaps.push(start, end);
     }
 
-    if (core.settings.midSnap) {
+    if (core.settings.midsnap) {
       snaps.push(this.midPoint());
     }
 
-    if (core.settings.nearestSnap) {
+    if (core.settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint, start, end);
 
       // Crude way to snap to the closest point or a node

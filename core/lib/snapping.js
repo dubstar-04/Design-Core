@@ -29,7 +29,7 @@ export class Snapping {
     // get the angle to the mouse position
     const mouseAngle = previousPoint.angle(core.mouse.pointOnScene());
     // get the closest polar angle
-    const closestPolarAngle = core.settings.polarAngle * Math.round(Utils.radians2degrees(mouseAngle) / core.settings.polarAngle);
+    const closestPolarAngle = core.settings.polarangle * Math.round(Utils.radians2degrees(mouseAngle) / core.settings.polarangle);
     // get the angle to the closest polar angle from the mouse position
     const diff = Utils.radians2degrees(mouseAngle) - closestPolarAngle;
 
