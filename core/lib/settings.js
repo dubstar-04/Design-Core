@@ -32,7 +32,9 @@ export class Settings {
    * @param {any} value
    */
   setSetting(setting, value) {
+    // TODO: Check setting is valid
     this[setting] = value;
+    this.core.canvas.requestPaint();
   }
 
   /**
