@@ -34,7 +34,9 @@ export class Settings {
   setSetting(setting, value) {
     // TODO: Check setting is valid
     this[setting] = value;
-    this.core.canvas.requestPaint();
+    if (this.core) {
+      this.core.canvas.requestPaint();
+    }
   }
 
   /**
