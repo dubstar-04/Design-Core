@@ -39,7 +39,7 @@ export class Distance {
       core.scene.inputArray.pop();
     } else if (core.scene.inputArray.length === this.minPoints) {
       action = true;
-      reset = true;
+      reset = false;
     }
 
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
@@ -50,12 +50,9 @@ export class Distance {
   }
 
   action(core) {
-    // var point1 = new Point(points[0].x, points[0].y)
-    // var point2 = new Point(points[1].x, points[1].y)
-
     const di = (' Length: ' + Utils.distBetweenPoints(core.scene.points[0].x, core.scene.points[0].y, core.scene.points[1].x, core.scene.points[1].y).toFixed(1) +
-            ' X: ' + (core.scene.points[1].x - core.scene.points[0].x).toFixed(1) + ' Y:' + (core.scene.points[1].y - core.scene.points[0].y).toFixed(1));
+            ' - X delta: ' + (core.scene.points[1].x - core.scene.points[0].x).toFixed(1) + ' - Y delta:' + (core.scene.points[1].y - core.scene.points[0].y).toFixed(1));
 
-    notify(di);
+    core.commandLine.setPrompt(di);
   }
 }
