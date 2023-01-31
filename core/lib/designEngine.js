@@ -159,7 +159,7 @@ export class DesignEngine {
     this.core.scene.saveRequired();
 
     if (!this.core.commandManager.isCommand(item)) {
-      notify('Unknown Command');
+      // Unknown Command
       this.core.commandLine.resetPrompt();
     }
 
