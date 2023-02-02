@@ -39,7 +39,7 @@ export class Distance {
       core.scene.inputArray.pop();
     } else if (core.scene.inputArray.length === this.minPoints) {
       action = true;
-      reset = false;
+      reset = true;
     }
 
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
@@ -52,7 +52,6 @@ export class Distance {
   action(core) {
     const di = (' Length: ' + Utils.distBetweenPoints(core.scene.points[0].x, core.scene.points[0].y, core.scene.points[1].x, core.scene.points[1].y).toFixed(1) +
             ' - X delta: ' + (core.scene.points[1].x - core.scene.points[0].x).toFixed(1) + ' - Y delta:' + (core.scene.points[1].y - core.scene.points[0].y).toFixed(1));
-
-    core.commandLine.setPrompt(di);
+    core.notify(di);
   }
 }

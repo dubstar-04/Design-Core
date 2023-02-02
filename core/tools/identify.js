@@ -34,7 +34,7 @@ export class Identify {
       core.scene.inputArray.pop();
     } else if (core.scene.inputArray.length === this.minPoints) {
       action = true;
-      reset = false;
+      reset = true;
     }
 
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
@@ -47,6 +47,6 @@ export class Identify {
 
   action(core) {
     const id = (' X: ' + core.scene.points[0].x.toFixed(1) + ' Y:' + core.scene.points[0].y.toFixed(1));
-    core.commandLine.setPrompt(id);
+    core.notify(id);
   }
 }
