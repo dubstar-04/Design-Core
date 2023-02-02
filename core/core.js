@@ -34,6 +34,28 @@ export class Core {
     this.propertyManager = new PropertyManager(this);
 
     this.settings = new Settings(this);
+
+    // function to call external notification command for the ui
+    this.externalNotifyCallbackFunction;
+  }
+
+  /**
+   * Set the external notification callback
+   * @param  {object} function
+   */
+  setExternalNotifyCallbackFunction(callback) {
+    // set the callback
+    this.externalNotifyCallbackFunction = callback;
+  }
+
+  /**
+   * Call the external notification callback
+   * @param  {string} message
+   */
+  notify(message) {
+    if (this.externalNotifyCallbackFunction) {
+      this.externalNotifyCallbackFunction(message);
+    }
   }
 
 

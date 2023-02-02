@@ -8,6 +8,10 @@ export class DesignEngine {
     this.core = core;
   }
 
+  reset() {
+    this.core.scene.reset();
+  }
+
   sceneControl(action, data) {
     let input = data[0];
     let inputData = undefined;
@@ -159,7 +163,8 @@ export class DesignEngine {
     this.core.scene.saveRequired();
 
     if (!this.core.commandManager.isCommand(item)) {
-      // Unknown Command
+      // TODO: This code is unreachable 
+      this.core.notify('Unknown Command');
       this.core.commandLine.resetPrompt();
     }
 
