@@ -163,7 +163,7 @@ export class DesignEngine {
     this.core.scene.saveRequired();
 
     if (!this.core.commandManager.isCommand(item)) {
-      // TODO: This code is unreachable 
+      // TODO: This code is unreachable
       this.core.notify('Unknown Command');
       this.core.commandLine.resetPrompt();
     }
