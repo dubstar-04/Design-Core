@@ -11,13 +11,13 @@ export class Text {
     this.minPoints = 1;
     this.showPreview = false; // show preview of item as its being created
     this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
-    this.points = [new Point()];
+    this.points = [new Point(), new Point()];
 
     // this.TextWidth = 2;         //Thickness
     // this.font = "Arial"
     this.string = '';
     this.height = 2.5;
-    this.rotation = 0; // in degrees
+    // rotation - rotation calculated using getRotation() / setRotation()
     this.horizontalAlignment = 0;
     this.verticalAlignment = 0;
     this.backwards = false;
@@ -35,7 +35,9 @@ export class Text {
     if (data) {
       // console.log("Data: ", data)
       // console.log("text.js - string:", data.string, "rotation: ", data.rotation, " hAlign: ", data.horizontalAlignment, " vAlign: ", data.verticalAlignment)
-      this.points = data.points;
+      this.points[0] = data.points[0];
+      // create points[1] used to determin the text rotation
+      this.points[1] = data.points[0].add(new Point(this.height, 0));
 
       if (data.input) {
         // TODO: Find a better way of providing this data
@@ -61,7 +63,9 @@ export class Text {
       }
 
       if (data.rotation) {
-        this.rotation = data.rotation;
+        // if we get rotation data store this as a point[1] at an angle from point[0]
+        // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
+        this.points[1] = data.points[0].project(Utils.degrees2radians(data.rotation), this.height);
       }
       if (data.horizontalAlignment) {
         this.horizontalAlignment = data.horizontalAlignment;
@@ -144,6 +148,18 @@ export class Text {
     return width;
   }
 
+  setRotation(angle) {
+    // angle in radians
+    // This overwrites the rotation rather than add to it.
+    // i.e. angle = 3.14159 rad will be a rotation of 180 degs.
+    this.points[1] = this.points[0].project(angle, this.height);
+  }
+
+  getRotation() {
+    // return the rotation angle in radians
+    return this.points[0].angle(this.points[1]);
+  }
+
   getHorizontalAlignment() {
     /* DXF Data
         0 = Left; 1= Center; 2 = Right
@@ -223,9 +239,9 @@ export class Text {
     }
 
     if (this.backwards || this.upsideDown) {
-      ctx.rotate(Utils.degrees2radians(this.rotation));
+      ctx.rotate(this.getRotation());
     } else {
-      ctx.rotate(Utils.degrees2radians(-this.rotation));
+      ctx.rotate(-this.getRotation());
     }
 
     try { // HTML
@@ -282,6 +298,8 @@ export class Text {
         '\n', this.string,
         '\n', '40', // STRING
         '\n', this.height,
+        '\n', '50', // ROTATION
+        '\n', Utils.radians2degrees(this.getRotation()),
         // "\n", "7", // TEXT STYLE
         // "\n", "STANDARD",
         // "\n", "72", //HORIZONTAL ALIGNMENT
