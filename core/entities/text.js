@@ -35,7 +35,9 @@ export class Text {
     if (data) {
       // console.log("Data: ", data)
       // console.log("text.js - string:", data.string, "rotation: ", data.rotation, " hAlign: ", data.horizontalAlignment, " vAlign: ", data.verticalAlignment)
-      this.points = data.points;
+      this.points[0] = data.points[0];
+      // create points[1] used to determin the text rotation
+      this.points[1] = data.points[0].add(new Point(this.height, 0));
 
       if (data.input) {
         // TODO: Find a better way of providing this data
@@ -61,7 +63,9 @@ export class Text {
       }
 
       if (data.rotation) {
-        this.rotation = data.rotation;
+        // if we get rotation data store this as a point[1] at an angle from point[0]
+        // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
+        this.points[1] = data.points[0].project(Utils.degrees2radians(data.rotation), this.height);
       }
       if (data.horizontalAlignment) {
         this.horizontalAlignment = data.horizontalAlignment;
