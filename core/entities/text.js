@@ -11,7 +11,7 @@ export class Text {
     this.minPoints = 1;
     this.showPreview = false; // show preview of item as its being created
     this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
-    this.points = [new Point()];
+    this.points = [new Point(), new Point()];
 
     // this.TextWidth = 2;         //Thickness
     // this.font = "Arial"
