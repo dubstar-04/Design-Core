@@ -1,5 +1,8 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
+import {Block} from './block.js';
+import {Text} from './text.js';
+import {Line} from './line.js';
 // import {Intersection} from '../lib/intersect.js';
 // import {Colours} from '../lib/colours.js';
 
@@ -144,9 +147,9 @@ export class Dimension {
   getExtensionPoints() {
     // return p1 and p2 for the dimension arrows
 
-    Pt1 = this.points[0];
-    Pt2 = this.points[1];
-    Pt3 = this.points[2];
+    const Pt1 = this.points[0];
+    const Pt2 = this.points[1];
+    const Pt3 = this.points[2];
 
     let dimension = 0;
 
@@ -163,8 +166,8 @@ export class Dimension {
     const pntPerp = Pt3.perpendicular(Pt1, Pt2);
 
     if (pntPerp !== null) {
-      projectionAngle = pntPerp.angle(Pt3);
-      distance = Pt3.distance(pntPerp);
+      const projectionAngle = pntPerp.angle(Pt3);
+      const distance = Pt3.distance(pntPerp);
       P1e = Pt1.project(projectionAngle, distance);
       P2e = Pt2.project(projectionAngle, distance);
       dimension = Pt1.distance(Pt2);
@@ -192,7 +195,7 @@ export class Dimension {
       }
     }
 
-    midPoint = P1e.midPoint(P2e);
+    const midPoint = P1e.midPoint(P2e);
     P3e = midPoint; // TODO: Offset text from baseline
     const dimAngle = P1e.angle(P2e);
 
@@ -259,7 +262,7 @@ export class Dimension {
 
 
   getBlockEntities() {
-    entities = [];
+    const entities = [];
     const extPnts = this.getExtensionPoints();
 
     if (!extPnts) {
@@ -267,9 +270,10 @@ export class Dimension {
     }
 
     this.text.points = [extPnts.textPoint];
+    this.text.setRotation(extPnts.dimAngle);
 
     if (typeof (extPnts.dimension) === 'number') {
-      this.text.string = Math.abs(extPnts.dimension.toFixed(2)); // TODO: Honor the precision from the style
+      this.text.string = Math.abs(extPnts.dimension.toFixed(2)).toString(); // TODO: Honor the precision from the style
     }
 
     if (typeof (extPnts.dimAngle) === 'number') {
@@ -280,9 +284,9 @@ export class Dimension {
 
     switch (this.getBaseDimType()) {
       case 0:
-        line1 = new Line({points: [this.points[0], extPnts.startPoint]});
-        line2 = new Line({points: [this.points[1], extPnts.endPoint]});
-        baseLine = new Line({points: [extPnts.startPoint, extPnts.endPoint]});
+        const line1 = new Line({points: [this.points[0], extPnts.startPoint]});
+        const line2 = new Line({points: [this.points[1], extPnts.endPoint]});
+        const baseLine = new Line({points: [extPnts.startPoint, extPnts.endPoint]});
 
         entities.push(line1, line2, baseLine);
 
@@ -325,7 +329,7 @@ export class Dimension {
       return;
     }
 
-    entities = this.getBlockEntities();
+    const entities = this.getBlockEntities();
 
     if (entities) {
       this.block.clearItems();
@@ -439,7 +443,7 @@ export class Dimension {
 
   snaps(mousePoint, delta, core) {
     const snaps = [];
-    extPnts = this.getExtensionPoints();
+    const extPnts = this.getExtensionPoints();
     snaps.push(extPnts.startPoint);
     snaps.push(extPnts.endPoint);
     snaps.push(extPnts.textPoint);
