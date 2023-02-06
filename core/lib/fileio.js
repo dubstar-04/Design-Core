@@ -8,11 +8,15 @@ export class FileIO {
   }
 
   static openFile(core, data) {
-    core.scene.linkBlockData();
-    core.layerManager.checkLayers();
-    core.canvas.requestPaint();
-    // notify("File Opened")
+    try {
       const dxfReader = new DXF();
       dxfReader.readDxf(core, data);
+      core.scene.linkBlockData();
+      core.layerManager.checkLayers();
+      core.canvas.requestPaint();
+      core.notify('File Opened');
+    } catch (error) {
+      core.notify('Error Opening File');
+    }
   }
 }
