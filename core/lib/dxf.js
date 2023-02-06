@@ -950,8 +950,8 @@ export class DXF {
     // const point_start = new Point();
     // const point_end = new Point();
 
-    const startAngle = 0;
-    const endAngle = 0;
+    let startAngle = 0;
+    let endAngle = 0;
     let radius = 0;
 
     while (this.lineNum < this.lines.length) {
