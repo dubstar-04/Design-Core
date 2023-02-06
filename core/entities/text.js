@@ -298,6 +298,8 @@ export class Text {
         '\n', this.string,
         '\n', '40', // STRING
         '\n', this.height,
+        '\n', '50', // ROTATION
+        '\n', Utils.radians2degrees(this.getRotation()),
         // "\n", "7", // TEXT STYLE
         // "\n", "STANDARD",
         // "\n", "72", //HORIZONTAL ALIGNMENT
