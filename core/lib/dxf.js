@@ -15,33 +15,31 @@ function debugLog(msg) {
 */
 
 export class DXF {
-  // constructor(){
-  // debugLog("fileio.js - processDXF");
+  constructor() {
+    this.line = '';
+    this.lines = [];
+    this.lineNum = 0;
+    this.core = {};
+    this.processed = 0;
+    this.blockName = '';
+  }
 
-  static line = '';
-  static lines = [];
-  static lineNum = 0;
-  static core = {};
-  static processed = 0;
-  static blockName = '';
-  // }
-
-  static readDxf(core, data) {
+  readDxf(core, data) {
     this.core = core;
     this.lines = data.split('\n');
     this.processData();
   }
 
-  static getDXFLine() {
+  getDXFLine() {
     this.line = this.lines[this.lineNum].replace(/\s+/, '');
     this.lineNum = this.lineNum + 1;
     if (Math.round((this.lineNum / this.lines.length) * 100) > this.processed) {
       this.processed = Math.round((this.lineNum / this.lines.length) * 100);
-      // //// console.log("Progress:" + this.processed + "%")
+      // console.log('Progress:' + this.processed + '%');
     }
   }
 
-  static addElementToScene(type, data) {
+  addElementToScene(type, data) {
     if (this.blockName !== '' || type == 'Insert') {
       const name = data.name ? data.name : this.blockName;
       this.core.scene.addItemToBlock(type, data, name);
@@ -50,12 +48,12 @@ export class DXF {
     }
   }
 
-  static previewNextLine() {
+  previewNextLine() {
     // Read the next available line - NOTE: getDXFLine increments this.LineNum, therefore this.lineNum is the next line.
     return this.lines[this.lineNum].replace(/\s+/, '');
   }
 
-  static processData() {
+  processData() {
     while (this.lineNum < this.lines.length) {
       this.getDXFLine();
 
@@ -255,7 +253,7 @@ export class DXF {
     // TODO: dxf shouldn't access the app, it should work as an external lib.
   }
 
-  static readHeader(groupCode) {
+  readHeader(groupCode) {
     while (this.lineNum < this.lines.length) {
       this.getDXFLine();
       const n = parseInt(this.line);
@@ -274,7 +272,7 @@ export class DXF {
     }
   }
 
-  static readBlock() {
+  readBlock() {
     // Create the points required for a circle
     const points = [];
     const point = new Point();
@@ -349,7 +347,7 @@ export class DXF {
     }
   }
 
-  static readInsert() {
+  readInsert() {
     // Create the points required for a circle
     const points = [];
     const point = new Point();
@@ -414,7 +412,7 @@ export class DXF {
   }
 
 
-  static readLayer() {
+  readLayer() {
     let name = '';
     // const handle = "";
     let flags = 0;
@@ -522,7 +520,7 @@ export class DXF {
     }
   }
 
-  static readLine() {
+  readLine() {
     // Create the points required for a line
     const points = [];
     const pointStart = new Point();
@@ -631,7 +629,7 @@ export class DXF {
   }
 
 
-  static readCircle() {
+  readCircle() {
     // Create the points required for a circle
     const points = [];
     const pointCentre = new Point();
@@ -732,7 +730,7 @@ export class DXF {
     }
   }
 
-  static readDimension() {
+  readDimension() {
     // Create the points required for a dimension
     const points = [];
     const point102030 = new Point();
@@ -864,7 +862,7 @@ export class DXF {
   }
 
 
-  static readPoint() {
+  readPoint() {
     // let colour = 'BYLAYER';
     // const layer = '0';
 
@@ -941,7 +939,7 @@ export class DXF {
     }
   }
 
-  static readArc() {
+  readArc() {
     // Create the points required for an Arc
     const points = [];
     const pointCentre = new Point();
@@ -950,8 +948,8 @@ export class DXF {
     // const point_start = new Point();
     // const point_end = new Point();
 
-    const startAngle = 0;
-    const endAngle = 0;
+    let startAngle = 0;
+    let endAngle = 0;
     let radius = 0;
 
     while (this.lineNum < this.lines.length) {
@@ -1064,7 +1062,7 @@ export class DXF {
     }
   }
 
-  static readEllipse() {
+  readEllipse() {
     const points = [];
     const pointCentre = new Point();
     let pointMajor = new Point();
@@ -1204,7 +1202,7 @@ export class DXF {
     }
   }
 
-  static readVertex() {
+  readVertex() {
     const vertex = new Point();
     // debugLog("In VERTEX");
     // let colour = 'BYLAYER';
@@ -1288,7 +1286,7 @@ export class DXF {
   }
 
 
-  static readPolyline() {
+  readPolyline() {
     const points = [];
     let colour = 'BYLAYER';
     let layer = '0';
@@ -1410,7 +1408,7 @@ export class DXF {
   }
 
 
-  static readLwpolyline() {
+  readLwpolyline() {
     const points = [];
     const xArray = [];
     const yArray = [];
@@ -1532,7 +1530,7 @@ export class DXF {
   }
 
 
-  static readSpline() {
+  readSpline() {
     const points = [];
     const xCtrlPoints = [];
     const yCtrlPoints = [];
@@ -1738,7 +1736,7 @@ export class DXF {
   }
 
 
-  static readText() {
+  readText() {
     const points = [];
 
     const firstAlignmentPoint = new Point();
@@ -1956,7 +1954,7 @@ export class DXF {
         }
     }*/
 
-  static readStyle() {
+  readStyle() {
     let name = '';
     let font = '';
     let bigFont = 0;
@@ -2038,7 +2036,7 @@ export class DXF {
     }
   }
 
-  static readDimStyle() {
+  readDimStyle() {
     let name = '';
     const standardFlags = 0;
     let DIMPOST = ''; // 3
@@ -2306,7 +2304,7 @@ export class DXF {
   }
 
 
-  static readVPort() {
+  readVPort() {
     const centre = new Point();
     // const width = 0;
     let height = 0;
@@ -2403,7 +2401,7 @@ export class DXF {
   }
 
 
-  static writeDXF(core) {
+  writeDXF(core) {
     this.core = core;
     let data = '';
     data = data.concat(
