@@ -148,6 +148,18 @@ export class Text {
     return width;
   }
 
+  setRotation(angle) {
+    // angle in radians
+    // This overwrites the rotation rather than add to it.
+    // i.e. angle = 3.14159 rad will be a rotation of 180 degs.
+    this.points[1] = this.points[0].project(angle, this.height);
+  }
+
+  getRotation() {
+    // return the rotation angle in radians
+    return this.points[0].angle(this.points[1]);
+  }
+
   getHorizontalAlignment() {
     /* DXF Data
         0 = Left; 1= Center; 2 = Right
@@ -227,9 +239,9 @@ export class Text {
     }
 
     if (this.backwards || this.upsideDown) {
-      ctx.rotate(Utils.degrees2radians(this.rotation));
+      ctx.rotate(this.getRotation());
     } else {
-      ctx.rotate(Utils.degrees2radians(-this.rotation));
+      ctx.rotate(-this.getRotation());
     }
 
     try { // HTML
