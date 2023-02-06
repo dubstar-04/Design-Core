@@ -128,6 +128,11 @@ export class Point {
    * @param  {Number} distance
    */
   project(angle, distance) {
+    if (angle === 0) {
+      const p = new Point(this.x, this.y).add(new Point(distance, 0));
+      return p;
+    }
+
     const x = this.x + Math.cos(angle) * distance;
     const y = this.y + Math.sin(angle) * distance;
     const p = new Point(x, y);
