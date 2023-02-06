@@ -17,7 +17,7 @@ export class Text {
     // this.font = "Arial"
     this.string = '';
     this.height = 2.5;
-    this.rotation = 0; // in degrees
+    // rotation - rotation calculated using getRotation() / setRotation()
     this.horizontalAlignment = 0;
     this.verticalAlignment = 0;
     this.backwards = false;
