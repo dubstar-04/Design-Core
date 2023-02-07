@@ -71,7 +71,9 @@ export class DesignEngine {
       }
 
       inputData = point;
+      // TODO: scene.points should be private
       this.core.scene.points.push(point);
+      this.core.canvas.requestPaint();
     }
 
     if (action === 'LeftClick') {
