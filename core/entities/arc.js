@@ -217,21 +217,32 @@ export class Arc {
 
   closestPoint(P) {
     // find the closest point on the Arc
-    const length = this.points[0].distance(P); // distBetweenPoints(this.points[0].x, this.points[0].y, P.x, P.y)
+    const length = this.points[0].distance(P);
     const Cx = this.points[0].x + this.radius * (P.x - this.points[0].x) / length;
     const Cy = this.points[0].y + this.radius * (P.y - this.points[0].y) / length;
     const closest = new Point(Cx, Cy);
-    const distance = closest.distance(P); // distBetweenPoints(closest.x, closest.y, P.x, P.y)
+    const distance = closest.distance(P);
 
-    // var A_end = this.points[0].x - closest.x;
-    // var O_end = this.points[0].y - closest.y;
-    const snapAngle = this.points[0].angle(P); // Math.atan2(O_end,A_end) + Math.PI;
+    const snapAngle = this.points[0].angle(P);
 
-    if (snapAngle > this.startAngle() && snapAngle < this.endAngle()) {
-      return [closest, distance, true];
-    } else {
-      return [closest, distance, false];
+    if (this.startAngle() < this.endAngle()) {
+      // Arc scenario 1 - start angle < end angle
+      // if the intersection angle is > start angle AND < end angle the point in on the arc
+      if (snapAngle > this.startAngle() && snapAngle < this.endAngle()) {
+        return [closest, distance, true];
+      }
+    } else if (this.startAngle() > this.endAngle()) {
+      // Arc scenario 2 - start angle > end angle
+      // if the intersection angle is > start angle AND < 0 radians OR
+      // the intersection angle is < end angle AND > 0 radians the point in on the arc
+      if (snapAngle > this.startAngle() && snapAngle <= (Math.PI * 2) ||
+          snapAngle < this.endAngle() && snapAngle > 0) {
+        return [closest, distance, true];
+      }
     }
+
+    // closest point not on the arc
+    return [closest, Infinity, false];
   }
 
   diameter() {
