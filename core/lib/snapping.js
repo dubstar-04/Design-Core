@@ -25,7 +25,7 @@ export class Snapping {
 
   static polarSnap(previousPoint, core) {
     let snapPoint;
-    const angleTolerance = 3;
+    const angleTolerance = 4;
     // get the angle to the mouse position
     const mouseAngle = previousPoint.angle(core.mouse.pointOnScene());
     // get the closest polar angle
