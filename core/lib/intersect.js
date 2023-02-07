@@ -269,9 +269,20 @@ export class Intersection {
 
     if (!extend) {
       for (let i = 0; i < inter1.points.length; i++) {
-        if (c.angle(inter1.points[i]) > sa && c.angle(inter1.points[i]) < ea) {
-          // console.log('Angles: ' + c.angle(inter1.points[i]) + ' Start: ' + sa + ' End: ' + ea + ' x:' + inter1.points[i].x, ' y:' + inter1.points[i].y);
-          result.appendPoints(inter1.points[i]);
+        if (sa < ea) {
+          // Arc scenario 1 - start angle < end angle
+          // if the intersection angle is > start angle AND < end angle the point in on the arc
+          if (c.angle(inter1.points[i]) > sa && c.angle(inter1.points[i]) < ea) {
+            result.appendPoints(inter1.points[i]);
+          }
+        } else if (sa > ea) {
+          // Arc scenario 2 - start angle > end angle
+          // if the intersection angle is > start angle AND < 0 radians OR
+          // the intersection angle is < end angle AND > 0 radians the point in on the arc
+          if (c.angle(inter1.points[i]) >= sa && c.angle(inter1.points[i]) <= (Math.PI * 2) ||
+              c.angle(inter1.points[i]) <= ea && c.angle(inter1.points[i]) >= 0) {
+            result.appendPoints(inter1.points[i]);
+          }
         }
       }
 

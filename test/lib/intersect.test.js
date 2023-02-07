@@ -115,12 +115,21 @@ test('Test Intersection.intersectArcLine()', () => {
   expect(result.points[0].x).toBeCloseTo(0);
   expect(result.points[0].y).toBeCloseTo(14.14);
 
-  // No Intersection
-  const arc1 = {centre: new Point(), radius: 14.14, startAngle: 3.14159, endAngle: 4.71239};
+  // Intersection - Arc straddles 0 with startAngle > endAngle
+  const arc1 = {centre: new Point(), radius: 14.14, startAngle: 6.0, endAngle: 3.14159};
   const line1 = {start: new Point(), end: new Point(0, 25)};
   const result1 = Intersection.intersectArcLine(arc1, line1, false);
-  expect(result1.status).toBe('No Intersection');
-  expect(result1.points.length).toBe(0);
+  expect(result1.status).toBe('Intersection');
+  expect(result1.points.length).toBe(1);
+  expect(result1.points[0].x).toBeCloseTo(0);
+  expect(result1.points[0].y).toBeCloseTo(14.14);
+
+  // No Intersection
+  const arc2 = {centre: new Point(), radius: 14.14, startAngle: 3.14159, endAngle: 4.71239};
+  const line2 = {start: new Point(), end: new Point(0, 25)};
+  const result2 = Intersection.intersectArcLine(arc2, line2, false);
+  expect(result2.status).toBe('No Intersection');
+  expect(result2.points.length).toBe(0);
 });
 
 test('Test Intersection.intersectLineArc()', () => {

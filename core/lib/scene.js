@@ -179,7 +179,7 @@ export class Scene {
   }
 
   findClosestItem() {
-    let delta = 1.65; // find a more suitable starting value
+    let delta = 1.65 / this.core.canvas.getScale(); // find a more suitable starting value
     let closestItem;
 
     for (let i = 0; i < this.items.length; i++) {
