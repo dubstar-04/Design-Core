@@ -23,8 +23,13 @@ export class PropertyManager {
   setItemProperties(property, newPropertyValue) {
     // console.log('Property Manager - setItemProperties');
       for (let i = 0; i < this.core.scene.selectionSet.length; i++) {
-        this.core.scene.items[this.core.scene.selectionSet[i]][property] = newPropertyValue;
-        this.core.scene.reset();
+        if (typeof(this.core.scene.items[this.core.scene.selectionSet[i]][property]) === 'number' && isNaN(newPropertyValue)) {
+          this.core.notify('Incorrect input type');
+        }
+        else {  
+          this.core.scene.items[this.core.scene.selectionSet[i]][property] = newPropertyValue;
+          this.core.scene.reset();
+        }
       }
     }
 
