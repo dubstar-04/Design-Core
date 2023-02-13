@@ -53,12 +53,14 @@ export class Scene {
     */
 
   getExtents() {
-    if (this.items.length === 0) {
-      return undefined;
-    }
-
     let xmin; let xmax; let ymin; let ymax;
 
+    if (this.items.length === 0) {
+      xmin = 0;
+      xmax = 0;
+      ymin = 0;
+      ymax = 0;
+    } else {
     for (let i = 0; i < this.items.length; i++) {
       const extremes = this.items[i].extremes();
       xmin = (xmin === undefined) ? extremes[0] : (extremes[0] < xmin) ? extremes[0] : xmin;
@@ -66,7 +68,7 @@ export class Scene {
       ymin = (ymin === undefined) ? extremes[2] : (extremes[2] < ymin) ? extremes[2] : ymin;
       ymax = (ymax === undefined) ? extremes[3] : (extremes[3] > ymax) ? extremes[3] : ymax;
     }
-
+  }
     return {
       xmin: xmin,
       xmax: xmax,
