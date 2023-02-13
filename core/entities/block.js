@@ -123,12 +123,10 @@ export class Block {
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
-    // if (this.points[1]) {
     // blocks are associated with an insert point.
     // translate ctx by the insert location
     // this allows the items to be draw without knowing the insert location of the parent block
     ctx.translate(this.points[0].x, this.points[0].y);
-    // }
 
     for (let item = 0; item < this.items.length; item++) {
       // console.log("block draw - Item:", this.items[item])
@@ -136,8 +134,7 @@ export class Block {
         // handle item colour
         const itemColour = this.items[item].colour;
         if (itemColour === 'BYBLOCK') {
-          tempColour = this.items[item].colour;
-          this.items[item].colour = this.colour;
+          this.items[item].colour = colour;
         }
         this.items[item].draw(ctx, scale, core);
         // reset item colour
