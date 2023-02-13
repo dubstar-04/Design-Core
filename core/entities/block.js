@@ -136,8 +136,7 @@ export class Block {
         // handle item colour
         const itemColour = this.items[item].colour;
         if (itemColour === 'BYBLOCK') {
-          tempColour = this.items[item].colour;
-          this.items[item].colour = this.colour;
+          this.items[item].colour = colour;
         }
         this.items[item].draw(ctx, scale, core);
         // reset item colour
