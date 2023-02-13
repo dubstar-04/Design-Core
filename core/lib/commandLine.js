@@ -75,7 +75,7 @@ export class CommandLine {
         this.core.designEngine.sceneControl('Reset', []);
         break;
       case 'Space': // space
-        this.enterPressed();
+        this.command = this.command + ' ';
         break;
       case 'Left-Arrow': // Left-Arrow
         break;

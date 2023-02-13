@@ -24,7 +24,7 @@ export class DesignEngine {
     // console.log("sceneControl - Var Input:" + input);
 
     const isNumber = /^-?\d+\.\d+$/.test(input) || /^-?\d+$/.test(input);
-    const isLetters = /^[A-Za-z]+$/.test(input);
+    const isLetters = /^[A-Za-z ]+$/.test(input);
     const isPoint = /^\d+,\d+$/.test(input) || /^@-?\d+,-?\d+$/.test(input) || /^#-?\d+,-?\d+$/.test(input);
     const isUndefined = (input === undefined);
 
