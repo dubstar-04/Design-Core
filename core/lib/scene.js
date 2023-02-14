@@ -60,7 +60,7 @@ export class Scene {
       xmax = 0;
       ymin = 0;
       ymax = 0;
-      } else {
+    } else {
       for (let i = 0; i < this.items.length; i++) {
         const extremes = this.items[i].extremes();
         xmin = (xmin === undefined) ? extremes[0] : (extremes[0] < xmin) ? extremes[0] : xmin;
