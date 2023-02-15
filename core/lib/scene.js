@@ -268,11 +268,7 @@ export class Scene {
           if (this.items[i].touched(selectionExtremes, this.core) || this.items[i].within(selectionExtremes, this.core)) {
             // console.log(this.items[i].type + " at index: " + i + " is within the selection")
             if (this.selectionSet.indexOf(i) === -1) { // only store selections once
-              const copyofitem = Utils.cloneObject(this.core, this.items[i]);
-              copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-              copyofitem.lineWidth = copyofitem.lineWidth * 2;
-
-              this.selectedItems.push(copyofitem);
+              this.addToSelectedItems(i);
               this.selectionSet.push(i);
               this.selectionSetChanged();
             }
@@ -287,11 +283,7 @@ export class Scene {
           if (this.items[i].within(selectionExtremes, this.core)) {
             // console.log(items[i].type + " at index: " + i + " is within the selection")
             if (this.selectionSet.indexOf(i) === -1) { // only store selections once
-              const copyofitem = Utils.cloneObject(this.core, this.items[i]);
-              copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-              copyofitem.lineWidth = copyofitem.lineWidth * 2;
-
-              this.selectedItems.push(copyofitem);
+              this.addToSelectedItems(i);
               this.selectionSet.push(i);
               this.selectionSetChanged();
             }
@@ -306,6 +298,14 @@ export class Scene {
     }
 
     this.core.canvas.requestPaint();
+  }
+
+  // Duplicate an item into the selected items array
+  addToSelectedItems(index) {
+    const copyofitem = Utils.cloneObject(this.core, this.items[index]);
+    copyofitem.colour = this.core.settings.selecteditemscolour.toString();
+    copyofitem.lineWidth = copyofitem.lineWidth * 2;
+    this.selectedItems.push(copyofitem);
   }
 
   addHelperGeometry(type, points, colour) {
