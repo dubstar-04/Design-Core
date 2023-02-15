@@ -32,6 +32,7 @@ export class PropertyManager {
         this.core.notify('Incorrect input type');
       } else {
         this.core.scene.items[this.core.scene.selectionSet[i]][property] = newPropertyValue;
+        this.core.scene.reloadSelectedItems();
       }
     }
   }
