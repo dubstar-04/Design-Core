@@ -308,6 +308,18 @@ export class Scene {
     this.selectedItems.push(copyofitem);
   }
 
+  // reload the selectedItems
+  // This is required following changes to selected items
+  reloadSelectedItems() {
+    this.selectedItems = [];
+
+    for (let i = 0; i < this.selectionSet.length; i++) {
+      this.addToSelectedItems(this.selectionSet[i]);
+    }
+
+    this.core.canvas.requestPaint();
+  }
+
   addHelperGeometry(type, points, colour) {
     const data = {
       points: points,
