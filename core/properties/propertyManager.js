@@ -23,6 +23,11 @@ export class PropertyManager {
   setItemProperties(property, newPropertyValue) {
     // console.log('Property Manager - setItemProperties');
     for (let i = 0; i < this.core.scene.selectionSet.length; i++) {
+      // check if the item has the selected property
+      if (!this.core.scene.items[this.core.scene.selectionSet[i]].hasOwnProperty(property)) {
+        continue;
+      }
+
       if (typeof(this.core.scene.items[this.core.scene.selectionSet[i]][property]) === 'number' && isNaN(newPropertyValue)) {
         this.core.notify('Incorrect input type');
       }
