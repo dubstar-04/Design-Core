@@ -28,7 +28,6 @@ export class PropertyManager {
       }
       else {
         this.core.scene.items[this.core.scene.selectionSet[i]][property] = newPropertyValue;
-        this.core.scene.reset();
       }
     }
     }
