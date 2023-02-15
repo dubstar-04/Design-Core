@@ -142,10 +142,11 @@ export class CommandLine {
   }
 
   spacePressed() {
-    if (this.lastCommand[0] === 'Text' && this.prompt === 'Enter text:') {
-      this.command = this.command + ' ';
-    } else {
+    const activeCommand = this.core.scene.activeCommand;
+    if (typeof(activeCommand) == 'undefined') {
       this.enterPressed();
+    } else if (activeCommand.type === 'Text') {
+      this.command = this.command + ' ';
     }
   }
 
