@@ -30,12 +30,11 @@ export class PropertyManager {
 
       if (typeof(this.core.scene.items[this.core.scene.selectionSet[i]][property]) === 'number' && isNaN(newPropertyValue)) {
         this.core.notify('Incorrect input type');
-      }
-      else {
+      } else {
         this.core.scene.items[this.core.scene.selectionSet[i]][property] = newPropertyValue;
       }
     }
-    }
+  }
 
   getItemTypes() {
     // Loop through the items and get a list of item types.
