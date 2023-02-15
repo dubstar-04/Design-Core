@@ -272,11 +272,6 @@ export class Scene {
               this.selectionSet.push(i);
               this.selectionSetChanged();
             }
-          } else if (this.selectionSet.indexOf(i) !== -1) {
-            // TODO: What is supposed to happen here?
-            // var index = this.selectionSet.indexOf(i);
-            // this.selectionSet.splice(index,1);    // if the command is already in the array, Erase it
-            // this.selectedItems.splice(index,1);
           }
         } else {
           // console.log(" scene.js - scene.js: selecting() - Select all within the selection window")
@@ -287,11 +282,6 @@ export class Scene {
               this.selectionSet.push(i);
               this.selectionSetChanged();
             }
-          } else if (this.selectionSet.indexOf(i) !== -1) {
-            // TODO: What is supposed to happen here?
-            // var index = this.selectionSet.indexOf(i);
-            // this.selectionSet.splice(index,1);    // if the command is already in the array, Erase it
-            // this.selectedItems.splice(index,1);
           }
         }
       }
