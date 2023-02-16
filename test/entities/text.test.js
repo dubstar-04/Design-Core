@@ -154,3 +154,45 @@ test('Test Text.getBoundingRect', () => {
 
   expect(text2.getBoundingRect()).toStrictEqual(expectedResult2);
 });
+
+test('Test Text.closestPoint', () => {
+  // Test for closestPoint
+  const text = new Text();
+  const pt1 = new Point(10, 10);
+  const pt2 = new Point(20, 20);
+
+  const testPoint = new Point(15, 15);
+
+  text.points = [pt1, pt2];
+
+  const expectedResult = [{'type': 'Point', 'x': 10, 'y': 10}, 7.0710678118654755];
+
+  expect(text.closestPoint(testPoint)).toEqual(expectedResult);
+
+  // Test for closestPoint
+  const text2 = new Text();
+  const pt3 = new Point(10, 10);
+  const pt4 = new Point(20, 20);
+
+  const testPoint2 = new Point(20, 15);
+
+  text2.points = [pt3, pt4];
+
+  const expectedResult2 = [{'type': 'Point', 'x': 10, 'y': 10}, 11.180339887498949];
+
+  expect(text2.closestPoint(testPoint2)).toEqual(expectedResult2);
+
+  // Test for closestPoint
+  const text3 = new Text();
+  const pt5 = new Point(10, 10);
+  const pt6 = new Point(20, 20);
+
+  const testPoint3 = new Point(0, 0);
+
+  text3.points = [pt5, pt6];
+
+  const expectedResult3 = [{'type': 'Point', 'x': 10, 'y': 10}, 14.142135623730951];
+
+  expect(text3.closestPoint(testPoint3)).toEqual(expectedResult3);
+});
+
