@@ -226,3 +226,27 @@ test('Test Text.extremes', () => {
 
   expect(text3.extremes()).toStrictEqual(expectedResult3);
 });
+
+test('Test Text.intersectPoints', () => {
+  // Test for intersectPoints
+  const text = new Text();
+  const pt1 = new Point(10, 10);
+  const pt2 = new Point(20, 20);
+
+  text.points = [pt1, pt2];
+
+  const expectedResult = {'end': {'type': 'Point', 'x': 10, 'y': 10}, 'start': {'type': 'Point', 'x': 10, 'y': 10}};
+
+  expect(text.intersectPoints()).toEqual(expectedResult);
+
+  // Test for intersectPoints
+  const text2 = new Text();
+  const pt3 = new Point(128, 110);
+  const pt4 = new Point(351, 222.1);
+
+  text2.points = [pt3, pt4];
+
+  const expectedResult2 = {'end': {'type': 'Point', 'x': 128, 'y': 110}, 'start': {'type': 'Point', 'x': 128, 'y': 110}};
+
+  expect(text2.intersectPoints()).toEqual(expectedResult2);
+});
