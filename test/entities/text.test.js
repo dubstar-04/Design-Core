@@ -1,5 +1,6 @@
 
 import {Text} from '../../core/entities/text.js';
+import {Point} from '../../core/entities/point.js';
 
 test('Test Text.getRotation', () => {
   const text = new Text();
@@ -133,4 +134,23 @@ test('Test Text.getVerticalAlignment', () => {
   const result3 = text3.getVerticalAlignment();
 
   expect(result3).toBe('top');
+});
+
+test('Test Text.getBoundingRect', () => {
+  // Test for default bounding box
+  const text = new Text();
+  const expectedResult = {'height': 0, 'width': 0, 'x': 0, 'y': 0};
+
+  expect(text.getBoundingRect()).toStrictEqual(expectedResult);
+
+  // Test for defined points
+  const text2 = new Text();
+  const pt1 = new Point(10, 10);
+  const pt2 = new Point(20, 20);
+
+  text2.points = [pt1, pt2];
+
+  const expectedResult2 = {'height': 0, 'width': 0, 'x': 10, 'y': 10};
+
+  expect(text2.getBoundingRect()).toStrictEqual(expectedResult2);
 });
