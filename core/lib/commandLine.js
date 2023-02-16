@@ -176,7 +176,6 @@ export class CommandLine {
 
       // Handle calculation in the command
       inputCommand = this.calculate(inputCommand);
-      console.log(inputCommand);
 
       const data = [inputCommand];
       // console.log(data[0])
