@@ -196,3 +196,33 @@ test('Test Text.closestPoint', () => {
   expect(text3.closestPoint(testPoint3)).toEqual(expectedResult3);
 });
 
+test('Test Text.extremes', () => {
+  // Test for extremes
+  const text = new Text();
+
+  const expectedResult = [0, 0, 0, 0];
+
+  expect(text.extremes()).toStrictEqual(expectedResult);
+
+  // Test for extremes
+  const text2 = new Text();
+  const pt1 = new Point(10, 10);
+  const pt2 = new Point(20, 20);
+
+  text2.points = [pt1, pt2];
+
+  const expectedResult2 = [10, 10, 10, 10];
+
+  expect(text2.extremes()).toStrictEqual(expectedResult2);
+
+  // Test for extremes
+  const text3 = new Text();
+  const pt3 = new Point(128, 110);
+  const pt4 = new Point(351, 222.1);
+
+  text3.points = [pt3, pt4];
+
+  const expectedResult3 = [128, 128, 110, 110];
+
+  expect(text3.extremes()).toStrictEqual(expectedResult3);
+});
