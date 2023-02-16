@@ -141,12 +141,15 @@ export class CommandLine {
     // console.log('[CommandLine.deletePressed]');
   }
 
+  /**
+   * Handles presses of the space key
+   */
   spacePressed() {
     const activeCommand = this.core.scene.activeCommand;
-    if (typeof(activeCommand) == 'undefined') {
-      this.enterPressed();
-    } else if (activeCommand.type === 'Text') {
+    if (activeCommand && activeCommand.type === 'Text') {
       this.command = this.command + ' ';
+    } else {
+      this.enterPressed();
     }
   }
 
