@@ -17,7 +17,6 @@ export class Text {
     // this.font = "Arial"
     this.string = '';
     this.height = 2.5;
-    // rotation - rotation calculated using getRotation() / setRotation()
     this.horizontalAlignment = 0;
     this.verticalAlignment = 0;
     this.backwards = false;
@@ -25,6 +24,15 @@ export class Text {
     this.colour = 'BYLAYER';
     this.layer = '0';
     this.styleName = 'STANDARD';
+
+    // add rotation property with getter and setter
+    // needs to be enumberable to appear in the object props
+    Object.defineProperty(this, 'rotation', {
+      get: this.getRotation,
+      set: this.setRotation,
+      enumerable: true,
+    });
+
     this.boundingRect = {width: 0, height: 0};
     // this.alpha = 1.0            //Transparancy
     // this.TextType
@@ -239,9 +247,9 @@ export class Text {
     }
 
     if (this.backwards || this.upsideDown) {
-      ctx.rotate(this.getRotation());
+      ctx.rotate(this.rotation);
     } else {
-      ctx.rotate(-this.getRotation());
+      ctx.rotate(-this.rotation);
     }
 
     try { // HTML
@@ -299,7 +307,7 @@ export class Text {
         '\n', '40', // STRING
         '\n', this.height,
         '\n', '50', // ROTATION
-        '\n', Utils.radians2degrees(this.getRotation()),
+        '\n', Utils.radians2degrees(this.rotation),
         // "\n", "7", // TEXT STYLE
         // "\n", "STANDARD",
         // "\n", "72", //HORIZONTAL ALIGNMENT
