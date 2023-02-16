@@ -171,8 +171,13 @@ export class CommandLine {
   enterPressed() {
     if (this.cmdLine.length > this.prompt.length) {
       // get the inputprompt and remove the prompt text
-      const inputCommand = this.cmdLine.slice(this.prompt.length);
+      let inputCommand = this.cmdLine.slice(this.prompt.length);
       // console.log('[CommandLine.enterPressed] - Command:', inputCommand);
+
+      // Handle calculation in the command
+      inputCommand = this.calculate(inputCommand);
+      console.log(inputCommand);
+
       const data = [inputCommand];
       // console.log(data[0])
       // TODO: Janky way to initiate commands - fix it
@@ -182,6 +187,51 @@ export class CommandLine {
       this.core.designEngine.sceneControl('Enter', []);
     }
   }
+
+  calculate(string) {
+    // define the regular expression to match the operators
+    const operators = /^(\d+(\.\d+)?|\((\s*\d+(\.\d+)?\s*[\+\-\*\/]\s*)+\d+(\.\d+)?\))(\s*[\+\-\*\/]\s*(\d+(\.\d+)?|\((\s*\d+(\.\d+)?\s*[\+\-\*\/]\s*)+\d+(\.\d+)?\)))*$/;
+
+    // use the test() method of the regular expression to check if the string matches the operators
+    if (!operators.test(string)) {
+      return string;
+    }
+
+    // recursively evaluate expressions inside parentheses first
+    while (/\([^\(\)]+\)/.test(string)) {
+      string = string.replace(/\(([^\(\)]+)\)/g, (_, expr) => {
+        return this.calculate(expr).toString();
+      });
+    }
+
+    let result = 0;
+    let operator = '+';
+    const matches = string.match(/(\d+(\.\d+)?|[+\-*/()])/g);
+
+    for (let i = 0; i < matches.length; i++) {
+      if (/^[+\-*/]$/.test(matches[i])) {
+        operator = matches[i];
+      } else {
+        const operand = Number(matches[i]);
+        switch (operator) {
+          case '+':
+            result += operand;
+            break;
+          case '-':
+            result -= operand;
+            break;
+          case '*':
+            result *= operand;
+            break;
+          case '/':
+            result /= operand;
+            break;
+        }
+      }
+    }
+
+    return result;
+  };
 
   /**
    * Adds commands to the command history
