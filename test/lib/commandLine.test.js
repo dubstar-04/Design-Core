@@ -84,4 +84,51 @@ test('Test CommandLine.addToCommandHistory', () => {
   commandline.lastCommand = [];
 });
 
+test('Test CommandLine.calculate', () => {
+  // Test for text in string. Should return same value
+  expect(commandline.calculate('test')).toBe('test');
+
+  // Test for text in string. Should return same value
+  expect(commandline.calculate('7 + abc')).toBe('7 + abc');
+
+  // Test just a number. Should return same number
+  expect(commandline.calculate('100')).toBe(100);
+
+  // Test addition
+  expect(commandline.calculate('2 + 3')).toBe(5);
+
+  // Test subtraction
+  expect(commandline.calculate('5 - 1')).toBe(4);
+
+  // Test divide
+  expect(commandline.calculate('6 / 2')).toBe(3);
+
+  // Test multiply
+  expect(commandline.calculate('4 * 7')).toBe(28);
+
+  // Test multiple addition
+  expect(commandline.calculate('10 + 10 + 10')).toBe(30);
+
+  // Test subtraction and addition
+  expect(commandline.calculate('10 - 5 + 3')).toBe(8);
+
+  // Test linear addition and multiply without brackets
+  expect(commandline.calculate('2 * 3 + 4 * 5')).toBe(50);
+
+  // Test many divides
+  expect(commandline.calculate('10 / 2 / 5')).toBe(1);
+
+  // Test brackets addition
+  expect(commandline.calculate('(2 + 3) * 4')).toBe(20);
+
+  // Test brackets multiply
+  expect(commandline.calculate('10 + (5 * 5)')).toBe(35);
+
+  // Test multiple brackets
+  expect(commandline.calculate('(1 + 2) * (3 + 4)')).toBe(21);
+
+  // Test layered brackets
+  expect(commandline.calculate('10 + (2 * (3 + 4))')).toBe(24);
+});
+
 
