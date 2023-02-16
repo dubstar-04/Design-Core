@@ -75,7 +75,7 @@ export class CommandLine {
         this.core.designEngine.sceneControl('Reset', []);
         break;
       case 'Space': // space
-        this.enterPressed();
+        this.spacePressed();
         break;
       case 'Left-Arrow': // Left-Arrow
         break;
@@ -139,6 +139,18 @@ export class CommandLine {
     // TODO: Janky way to initiate commands - fit it
     this.core.designEngine.sceneControl('Enter', ['E']);
     // console.log('[CommandLine.deletePressed]');
+  }
+
+  /**
+   * Handles presses of the space key
+   */
+  spacePressed() {
+    const activeCommand = this.core.scene.activeCommand;
+    if (activeCommand && activeCommand.type === 'Text') {
+      this.command = this.command + ' ';
+    } else {
+      this.enterPressed();
+    }
   }
 
   /**
