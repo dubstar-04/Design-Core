@@ -28,7 +28,7 @@ export class PropertyManager {
         continue;
       }
 
-      if (typeof(this.core.scene.items[this.core.scene.selectionSet[i]][property]) === 'number' && isNaN(newPropertyValue)) {
+      if (typeof(this.core.scene.items[this.core.scene.selectionSet[i]][property]) !== typeof(newPropertyValue)) {
         this.core.notify('Incorrect input type');
       } else {
         this.core.scene.items[this.core.scene.selectionSet[i]][property] = newPropertyValue;
