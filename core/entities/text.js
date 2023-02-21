@@ -39,6 +39,12 @@ export class Text {
     // this.TexttypeScale
     // this.PlotStyle
     // this.TextWeight
+    // needs to be non-enumberable as to not appear in the object props
+    Object.defineProperty(this, 'boundingRect', {
+      enumerable: false,
+      // value: {width: 0, height: 0},
+      writable: true,
+    });
 
     if (data) {
       // console.log("Data: ", data)
