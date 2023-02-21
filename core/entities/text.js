@@ -51,11 +51,11 @@ export class Text {
         // TODO: Find a better way of providing this data
         // This comes from core
         this.height = data.input[1];
-        this.string = data.input[2];
+        this.string = String(data.input[2]);
       }
 
       if (data.string) {
-        this.string = data.string;
+        this.string = String(data.string);
       }
 
       if (data.height) {
@@ -263,8 +263,8 @@ export class Text {
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       ctx.moveTo(0, 0);
       ctx.setFontSize(this.height);
-      ctx.showText(this.string);
-      this.boundingRect = ctx.textExtents(this.string);
+      ctx.showText(String(this.string));
+      this.boundingRect = ctx.textExtents(String(this.string));
     }
     ctx.stroke();
     ctx.restore();
