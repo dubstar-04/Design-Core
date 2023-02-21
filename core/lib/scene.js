@@ -270,41 +270,43 @@ export class Scene {
           if (this.items[i].touched(selectionExtremes, this.core) || this.items[i].within(selectionExtremes, this.core)) {
             // console.log(this.items[i].type + " at index: " + i + " is within the selection")
             if (this.selectionSet.indexOf(i) === -1) { // only store selections once
-              const copyofitem = Utils.cloneObject(this.core, this.items[i]);
-              copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-              copyofitem.lineWidth = copyofitem.lineWidth * 2;
-
-              this.selectedItems.push(copyofitem);
+              this.addToSelectedItems(i);
               this.selectionSet.push(i);
               this.selectionSetChanged();
             }
-          } else if (this.selectionSet.indexOf(i) !== -1) {
-            // TODO: What is supposed to happen here?
-            // var index = this.selectionSet.indexOf(i);
-            // this.selectionSet.splice(index,1);    // if the command is already in the array, Erase it
-            // this.selectedItems.splice(index,1);
           }
         } else {
           // console.log(" scene.js - scene.js: selecting() - Select all within the selection window")
           if (this.items[i].within(selectionExtremes, this.core)) {
             // console.log(items[i].type + " at index: " + i + " is within the selection")
             if (this.selectionSet.indexOf(i) === -1) { // only store selections once
-              const copyofitem = Utils.cloneObject(this.core, this.items[i]);
-              copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-              copyofitem.lineWidth = copyofitem.lineWidth * 2;
-
-              this.selectedItems.push(copyofitem);
+              this.addToSelectedItems(i);
               this.selectionSet.push(i);
               this.selectionSetChanged();
             }
-          } else if (this.selectionSet.indexOf(i) !== -1) {
-            // TODO: What is supposed to happen here?
-            // var index = this.selectionSet.indexOf(i);
-            // this.selectionSet.splice(index,1);    // if the command is already in the array, Erase it
-            // this.selectedItems.splice(index,1);
           }
         }
       }
+    }
+
+    this.core.canvas.requestPaint();
+  }
+
+  // Duplicate an item into the selected items array
+  addToSelectedItems(index) {
+    const copyofitem = Utils.cloneObject(this.core, this.items[index]);
+    copyofitem.colour = this.core.settings.selecteditemscolour.toString();
+    copyofitem.lineWidth = copyofitem.lineWidth * 2;
+    this.selectedItems.push(copyofitem);
+  }
+
+  // reload the selectedItems
+  // This is required following changes to selected items
+  reloadSelectedItems() {
+    this.selectedItems = [];
+
+    for (let i = 0; i < this.selectionSet.length; i++) {
+      this.addToSelectedItems(this.selectionSet[i]);
     }
 
     this.core.canvas.requestPaint();

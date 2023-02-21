@@ -20,6 +20,23 @@ export class PropertyManager {
     }
   }
 
+  setItemProperties(property, newPropertyValue) {
+    // console.log('Property Manager - setItemProperties');
+    for (let i = 0; i < this.core.scene.selectionSet.length; i++) {
+      // check if the item has the selected property
+      if (!this.core.scene.items[this.core.scene.selectionSet[i]].hasOwnProperty(property)) {
+        continue;
+      }
+
+      if (typeof(this.core.scene.items[this.core.scene.selectionSet[i]][property]) !== typeof(newPropertyValue)) {
+        this.core.notify('Incorrect input type');
+      } else {
+        this.core.scene.items[this.core.scene.selectionSet[i]][property] = newPropertyValue;
+        this.core.scene.reloadSelectedItems();
+      }
+    }
+  }
+
   getItemTypes() {
     // Loop through the items and get a list of item types.
     const itemTypes = [];
@@ -58,6 +75,7 @@ export class PropertyManager {
             // console.log("Property: " + prop)
             if (propertiesList.indexOf(prop, 0) === -1) {
               if (typeof properties[prop] !== 'function') {
+                // TODO: Make these properties non-enumerable
                 const excludeProps = ['type', 'family', 'minPoints', 'limitPoints', 'helper_geometry', 'points', 'alpha', 'showPreview'];
                 if (excludeProps.indexOf(prop) === -1) {
                   propertiesList.push(prop);

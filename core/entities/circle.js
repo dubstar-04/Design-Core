@@ -14,8 +14,16 @@ export class Circle {
     // this.allowMultiple = false;
     this.helper_geometry = true; // If true a line will be drawn between points when defining geometry
 
-    this.points = [];
-    this.radius = 0;
+    this.points = [new Point(), new Point()];
+
+
+    // add radius property with getter and setter
+    // needs to be enumberable to appear in the object props
+    Object.defineProperty(this, 'radius', {
+      get: this.getRadius,
+      set: this.setRadius,
+      enumerable: true,
+    });
 
     this.lineWidth = 2; // Thickness
     this.colour = 'BYLAYER';
@@ -30,7 +38,6 @@ export class Circle {
     if (data) {
       if (data.points) {
         this.points = data.points;
-        this.calculateRadius();
       }
 
       if (data.colour) {
@@ -46,10 +53,6 @@ export class Circle {
   static register() {
     const command = {command: 'Circle', shortcut: 'C', type: 'Entity'};
     return command;
-  }
-
-  calculateRadius() {
-    this.radius = Utils.distBetweenPoints(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y);
   }
 
   prompt(core) {
@@ -80,6 +83,14 @@ export class Circle {
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
   }
 
+  getRadius() {
+    return Utils.distBetweenPoints(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y); ;
+  }
+
+  setRadius(rad) {
+    this.points[1] = this.points[0].project(0, rad);
+  }
+
   draw(ctx, scale, core) {
     if (!core.layerManager.layerVisible(this.layer)) {
       return;
@@ -91,7 +102,7 @@ export class Circle {
       colour = core.layerManager.getLayerByName(this.layer).colour;
     }
 
-    this.calculateRadius(); // is this the most efficient way to update the radius?
+    // this.calculateRadius(); // is this the most efficient way to update the radius?
 
     try { // HTML Canvas
       ctx.strokeStyle = colour;
@@ -106,16 +117,6 @@ export class Circle {
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, 0, 6.283);
     ctx.stroke();
   }
-
-  /* properties(){
-
-        return {  //type: this.type,
-            colour: this.colour,
-            layer: this.layer,
-            lineWidth: this.lineWidth
-        }
-    }
-    */
 
   dxf() {
     const dxfitem = '';
