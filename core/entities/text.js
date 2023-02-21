@@ -33,12 +33,6 @@ export class Text {
       enumerable: true,
     });
 
-    this.boundingRect = {width: 0, height: 0};
-    // this.alpha = 1.0            //Transparancy
-    // this.TextType
-    // this.TexttypeScale
-    // this.PlotStyle
-    // this.TextWeight
     // needs to be non-enumberable as to not appear in the object props
     Object.defineProperty(this, 'boundingRect', {
       enumerable: false,
