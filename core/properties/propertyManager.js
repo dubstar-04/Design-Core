@@ -75,6 +75,7 @@ export class PropertyManager {
             // console.log("Property: " + prop)
             if (propertiesList.indexOf(prop, 0) === -1) {
               if (typeof properties[prop] !== 'function') {
+                // TODO: Make these properties non-enumerable
                 const excludeProps = ['type', 'family', 'minPoints', 'limitPoints', 'helper_geometry', 'points', 'alpha', 'showPreview'];
                 if (excludeProps.indexOf(prop) === -1) {
                   propertiesList.push(prop);
