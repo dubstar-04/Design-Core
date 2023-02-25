@@ -119,6 +119,20 @@ export class CommandManager {
   /**
    * Returns the command for a valid shortcut
    * @param {string} shortcut
+  /**
+   * Check if command is valid
+   * @param {string} command
+   * @returns boolean
+   */
+  isCommand(command) {
+    const found = this.commands.some((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
+    return found;
+  }
+
+
+  /**
+   * Returns the command for a valid input
+   * @param {string} input
    * @returns valid type
    */
   getCommand(input) {
