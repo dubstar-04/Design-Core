@@ -130,8 +130,25 @@ export class CommandManager {
             commandFromShortcut = this.commands[i].command;
           }
         }
+  /**
+   * Returns a fuzzy match to the input command
+   * @param {string} input
+   * @returns {string} fuzzy matched command
+   */
+  getFuzzyMatch(input) {
+    let score = Infinity;
+    let fuzzyMatch;
+    for (let i = 0; i < this.commands.length; i++) {
+      // convert the comparison command to uppercase and string to the input length
+      const commandSubstring = this.commands[i].command.toUpperCase().substring(0, input.length);
+
+      const newScore = Utils.getLevenshteinDistance(input.toUpperCase(), commandSubstring);
+      if (newScore < score) {
+        score = newScore;
+        fuzzyMatch = this.commands[i].command;
       }
     }
-    return commandFromShortcut;
+
+    return fuzzyMatch;
   }
 }
