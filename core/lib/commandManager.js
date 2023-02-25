@@ -26,6 +26,8 @@ import {Extend} from '../tools/extend.js';
 import {Trim} from '../tools/trim.js';
 
 
+import {Utils} from './utils.js';
+
 const classes = {
   Line,
   Polyline,
