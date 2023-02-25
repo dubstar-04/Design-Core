@@ -161,19 +161,13 @@ export class DesignEngine {
     }
   }
 
-  initialiseItem(item) {
+  initialiseItem(command) {
     // console.log(' core - Item To Process: ' + item);
     this.core.scene.saveRequired();
-
-    if (!this.core.commandManager.isCommand(item)) {
-      // TODO: This code is unreachable
-      this.core.notify('Unknown Command');
-      this.core.commandLine.resetPrompt();
-    }
-
     // add the command to the commandline history
-    this.core.commandLine.addToCommandHistory(item);
-    this.core.scene.activeCommand = this.core.commandManager.createNew(item);
+    this.core.commandLine.addToCommandHistory(command);
+    // activate a new command
+    this.core.scene.activeCommand = this.core.commandManager.createNew(command);
   };
 
   convertInputToPoint(input) {
