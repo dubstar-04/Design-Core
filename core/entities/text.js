@@ -1,5 +1,6 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
+import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
 
@@ -123,16 +124,16 @@ export class Text {
     // console.log('type: ', typeof core.scene.inputArray[num - 1]);
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Pick start point:';
+    prompt[0] = Strings.Input.START;
 
     expectedType[1] = ['object'];
-    prompt[1] = 'Enter height:';
+    prompt[1] = Strings.Input.HEIGHT;
 
     expectedType[2] = ['number'];
-    prompt[2] = 'Enter text:';
+    prompt[2] = Strings.Input.STRING;
 
     expectedType[3] = ['string', 'number'];
-    prompt[3] = '';
+    prompt[3] = Strings.Input.NONE;
 
     const validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
 

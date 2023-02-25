@@ -1,3 +1,5 @@
+import {Strings} from '../lib/strings.js';
+
 export class Identify {
   constructor() {
     // Define Properties
@@ -23,7 +25,7 @@ export class Identify {
     const prompt = [];
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Select Point:';
+    prompt[0] = Strings.Input.POINT;
 
     expectedType[1] = ['object'];
     prompt[1] = '';

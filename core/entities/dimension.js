@@ -1,5 +1,6 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
+import {Strings} from '../lib/strings.js';
 import {Block} from './block.js';
 import {Text} from './text.js';
 import {Line} from './line.js';
@@ -83,13 +84,13 @@ export class Dimension {
     // console.log('type: ', typeof core.scene.inputArray[num - 1]);
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Pick start point:'; // TODO: allow selecting entites, line / arc / circle
+    prompt[0] = Strings.Input.START; // TODO: allow selecting entites, line / arc / circle
 
     expectedType[1] = ['object'];
-    prompt[1] = 'Pick second point:';
+    prompt[1] = Strings.Input.END;
 
     expectedType[2] = ['object'];
-    prompt[2] = 'Position extension:';
+    prompt[2] = Strings.Input.POSITION;
 
     expectedType[3] = ['object'];
     prompt[3] = prompt[1];

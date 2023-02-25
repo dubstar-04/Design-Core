@@ -1,3 +1,5 @@
+import {Strings} from '../lib/strings.js';
+
 export class Rotate {
   constructor() {
     // Define Properties
@@ -23,19 +25,19 @@ export class Rotate {
     const prompt = [];
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Select Items To ' + this.type;
+    prompt[0] = Strings.Input.SELECTENTITIES + this.type;
 
     expectedType[1] = ['object'];
-    prompt[1] = core.scene.selectionSet.length + ' Item(s) selected: Add more or press Enter to accept';
+    prompt[1] = core.scene.selectionSet.length + Strings.Input.SELECTED;
 
     expectedType[2] = ['boolean'];
-    prompt[2] = 'Select Base Point:';
+    prompt[2] = Strings.Input.BASEPOINT;
 
     expectedType[3] = ['object'];
-    prompt[3] = 'Select Start Point or Enter Angle:';
+    prompt[3] = Strings.Input.START;
 
     expectedType[4] = ['object'];
-    prompt[4] = 'Select End Angle:';
+    prompt[4] = Strings.Input.END;
 
     expectedType[5] = ['object'];
     prompt[5] = '';

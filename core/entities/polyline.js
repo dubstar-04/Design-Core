@@ -1,5 +1,6 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
+import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
 
@@ -51,10 +52,10 @@ export class Polyline {
     // console.log("inputArray: ", inputArray)
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Pick start point:';
+    prompt[0] = Strings.Input.START;
 
     expectedType[1] = ['object'];
-    prompt[1] = 'Pick another point or press ESC to quit:';
+    prompt[1] = Strings.Input.POINTORQUIT;
 
     expectedType[2] = ['object', 'number'];
     prompt[2] = prompt[1];

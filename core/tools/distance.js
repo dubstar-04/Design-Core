@@ -1,4 +1,5 @@
 import {Utils} from '../lib/utils.js';
+import {Strings} from '../lib/strings.js';
 
 export class Distance {
   constructor() {
@@ -25,10 +26,10 @@ export class Distance {
     const prompt = [];
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Select Start Point:';
+    prompt[0] = Strings.Input.START;
 
     expectedType[1] = ['object'];
-    prompt[1] = 'Select End Point:';
+    prompt[1] = Strings.Input.END;
 
     expectedType[2] = ['object'];
     prompt[2] = '';
