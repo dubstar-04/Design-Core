@@ -18,13 +18,33 @@ test('Test CommandManager.createNew', () => {
   expect(typeof test).toBe('undefined');
 });
 
+test('Test CommandManager.isCommandOrShortcut', () => {
+  expect(commandManager.isCommandOrShortcut('Line')).toBe(true);
+  expect(commandManager.isCommandOrShortcut('L')).toBe(true);
+  expect(commandManager.isCommandOrShortcut('l')).toBe(true);
+  expect(commandManager.isCommandOrShortcut('li')).toBe(false);
+  expect(commandManager.isCommandOrShortcut('Test')).toBe(false);
+});
+
 test('Test CommandManager.isCommand', () => {
   expect(commandManager.isCommand('Line')).toBe(true);
   expect(commandManager.isCommand('Test')).toBe(false);
 });
 
-test('Test CommandManager.getCommandFromShortcut', () => {
-  expect(commandManager.getCommandFromShortcut('L')).toBe('Line');
-  expect(commandManager.getCommandFromShortcut('Test')).toBe('Test');
+test('Test CommandManager.isShortcut', () => {
+  expect(commandManager.isShortcut('L')).toBe(true);
+  expect(commandManager.isShortcut('li')).toBe(false);
+});
+
+test('Test CommandManager.getCommand', () => {
+  expect(commandManager.getCommand('L')).toBe('Line');
+  expect(commandManager.getCommand('line')).toBe('Line');
+  expect(commandManager.getCommand('C')).toBe('Circle');
+  expect(commandManager.getCommand('Test')).toBeUndefined();
+});
+
+test('Test CommandManager.getFuzzyMatch', () => {
+  expect(commandManager.getFuzzyMatch('li')).toBe('Line');
+  expect(commandManager.getFuzzyMatch('ci')).toBe('Circle');
 });
 
