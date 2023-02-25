@@ -4,6 +4,7 @@ export class Strings {
     ERROR: 'Error',
   };
 
+  // Warning Strings
   static Warning = {
     WARNING: 'Warning',
   };
@@ -17,13 +18,13 @@ export class Strings {
     END: 'Pick the end point:',
     POINT: 'Select a point:',
     POINTORRADIUS: 'Pick another point or Enter radius:',
-    POSITION: 'Pick position',
+    POSITION: 'Pick position:',
     POINTORQUIT: 'Pick another point or press ESC to quit:',
     HEIGHT: 'Enter height:',
     STRING: 'Enter text:',
     NONE: '',
-    SELECTENTITIES: 'Select Items To ',
-    SELECTED: ' Item(s) selected: Add more or press Enter to accept:',
+    SELECTENTITIES: 'Select Items:',
+    SELECTED: 'Item(s) selected - Add more or press Enter to accept:',
     DESTINATIONORDISTANCE: 'Select Destination or Enter Distance:',
     SELECTORQUIT: 'Select another object or press ESC to quit:',
   };

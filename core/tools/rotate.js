@@ -25,10 +25,10 @@ export class Rotate {
     const prompt = [];
 
     expectedType[0] = ['undefined'];
-    prompt[0] = Strings.Input.SELECTENTITIES + this.type;
+    prompt[0] = Strings.Input.SELECTENTITIES;
 
     expectedType[1] = ['object'];
-    prompt[1] = core.scene.selectionSet.length + Strings.Input.SELECTED;
+    prompt[1] = `${core.scene.selectionSet.length}  ${Strings.Input.SELECTED}`;
 
     expectedType[2] = ['boolean'];
     prompt[2] = Strings.Input.BASEPOINT;
