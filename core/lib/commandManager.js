@@ -121,15 +121,22 @@ export class CommandManager {
    * @param {string} shortcut
    * @returns valid type
    */
-  getCommandFromShortcut(shortcut) {
-    let commandFromShortcut = shortcut;
-    if (typeof shortcut !== 'undefined') {
-      for (let i = 0; i < this.commands.length; i++) {
-        if (typeof this.commands[i].shortcut !== 'undefined') {
-          if (this.commands[i].shortcut.toUpperCase() === shortcut.toUpperCase()) {
-            commandFromShortcut = this.commands[i].command;
-          }
-        }
+  getCommand(input) {
+    let command;
+
+    if (this.isCommand(input)) {
+      const found = this.commands.find((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === input.toUpperCase());
+      command = found.command;
+    }
+
+    if (this.isShortcut(input)) {
+      const found = this.commands.find((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === input.toUpperCase());
+      command = found.command;
+    }
+
+    return command;
+  }
+
   /**
    * Returns a fuzzy match to the input command
    * @param {string} input
