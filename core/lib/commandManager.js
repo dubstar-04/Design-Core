@@ -54,9 +54,10 @@ export class CommandManager {
   /**
    * CommandManager constructor
    */
-  constructor() {
+  constructor(core) {
     // store a list of the available commands
     this.commands = [];
+    this.core = core;
 
     for (const index in classes) {
       if (typeof classes[index].register === 'function') {
@@ -101,18 +102,25 @@ export class CommandManager {
   };
 
   /**
-   * Check if command is valid
-   * @param {string} command
+   * Check if input is valid command or shortcut
+   * @param {string} input
    * @returns boolean
    */
-  isCommand(command) {
-    if (typeof command !== 'undefined') {
-      for (let i = 0; i < this.commands.length; i++) {
-        if (this.commands[i].command.toUpperCase() === command.toUpperCase()) {
-          return true;
-        }
-      }
+  isCommandOrShortcut(input) {
+    if (input === undefined) {
+      return false;
     }
+
+    if (this.isCommand(input)) {
+      return true;
+    }
+
+    if (this.isShortcut(input)) {
+      return true;
+    }
+
+    const command = this.getFuzzyMatch(input);
+    this.core.notify(`Unknown command: Did you mean: '${command}'?`);
     return false;
   }
 
