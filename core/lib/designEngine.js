@@ -115,8 +115,9 @@ export class DesignEngine {
     if (typeof this.core.scene.activeCommand !== 'undefined') {
       this.core.scene.inputArray.push(inputData);
       this.actionInput();
-    } else if (this.core.commandManager.isCommand(this.core.commandManager.getCommandFromShortcut(input))) {
-      this.initialiseItem(this.core.commandManager.getCommandFromShortcut(input));
+    } else if (this.core.commandManager.isCommandOrShortcut(input)) {
+      this.initialiseItem(this.core.commandManager.getCommand(input));
+
       if (this.core.scene.activeCommand.family === 'Tools' && this.core.scene.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
         if (this.core.scene.activeCommand.selectionRequired) {
           this.core.scene.inputArray.push(this.core.scene.selectionSet);
@@ -160,19 +161,13 @@ export class DesignEngine {
     }
   }
 
-  initialiseItem(item) {
+  initialiseItem(command) {
     // console.log(' core - Item To Process: ' + item);
     this.core.scene.saveRequired();
-
-    if (!this.core.commandManager.isCommand(item)) {
-      // TODO: This code is unreachable
-      this.core.notify('Unknown Command');
-      this.core.commandLine.resetPrompt();
-    }
-
     // add the command to the commandline history
-    this.core.commandLine.addToCommandHistory(item);
-    this.core.scene.activeCommand = this.core.commandManager.createNew(item);
+    this.core.commandLine.addToCommandHistory(command);
+    // activate a new command
+    this.core.scene.activeCommand = this.core.commandManager.createNew(command);
   };
 
   convertInputToPoint(input) {

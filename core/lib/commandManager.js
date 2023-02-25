@@ -26,6 +26,8 @@ import {Extend} from '../tools/extend.js';
 import {Trim} from '../tools/trim.js';
 
 
+import {Utils} from './utils.js';
+
 const classes = {
   Line,
   Polyline,
@@ -54,9 +56,10 @@ export class CommandManager {
   /**
    * CommandManager constructor
    */
-  constructor() {
+  constructor(core) {
     // store a list of the available commands
     this.commands = [];
+    this.core = core;
 
     for (const index in classes) {
       if (typeof classes[index].register === 'function') {
@@ -101,37 +104,89 @@ export class CommandManager {
   };
 
   /**
+   * Check if input is valid command or shortcut
+   * @param {string} input
+   * @returns boolean
+   */
+  isCommandOrShortcut(input) {
+    if (input === undefined) {
+      return false;
+    }
+
+    if (this.isCommand(input)) {
+      return true;
+    }
+
+    if (this.isShortcut(input)) {
+      return true;
+    }
+
+    const command = this.getFuzzyMatch(input);
+    this.core.notify(`Unknown command: Did you mean: '${command}'?`);
+    return false;
+  }
+
+  /**
+   * Check if shortcut is valid
+   * @param {string} shortcut
+   * @returns boolean
+   */
+  isShortcut(shortcut) {
+    const found = this.commands.some((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === shortcut.toUpperCase());
+    return found;
+  }
+
+  /**
    * Check if command is valid
    * @param {string} command
    * @returns boolean
    */
   isCommand(command) {
-    if (typeof command !== 'undefined') {
-      for (let i = 0; i < this.commands.length; i++) {
-        if (this.commands[i].command.toUpperCase() === command.toUpperCase()) {
-          return true;
-        }
-      }
+    const found = this.commands.some((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
+    return found;
+  }
+
+
+  /**
+   * Returns the command for a valid input
+   * @param {string} input
+   * @returns valid type
+   */
+  getCommand(input) {
+    let command;
+
+    if (this.isCommand(input)) {
+      const found = this.commands.find((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === input.toUpperCase());
+      command = found.command;
     }
-    return false;
+
+    if (this.isShortcut(input)) {
+      const found = this.commands.find((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === input.toUpperCase());
+      command = found.command;
+    }
+
+    return command;
   }
 
   /**
-   * Returns the command for a valid shortcut
-   * @param {string} shortcut
-   * @returns valid type
+   * Returns a fuzzy match to the input command
+   * @param {string} input
+   * @returns {string} fuzzy matched command
    */
-  getCommandFromShortcut(shortcut) {
-    let commandFromShortcut = shortcut;
-    if (typeof shortcut !== 'undefined') {
-      for (let i = 0; i < this.commands.length; i++) {
-        if (typeof this.commands[i].shortcut !== 'undefined') {
-          if (this.commands[i].shortcut.toUpperCase() === shortcut.toUpperCase()) {
-            commandFromShortcut = this.commands[i].command;
-          }
-        }
+  getFuzzyMatch(input) {
+    let score = Infinity;
+    let fuzzyMatch;
+    for (let i = 0; i < this.commands.length; i++) {
+      // convert the comparison command to uppercase and string to the input length
+      const commandSubstring = this.commands[i].command.toUpperCase().substring(0, input.length);
+
+      const newScore = Utils.getLevenshteinDistance(input.toUpperCase(), commandSubstring);
+      if (newScore < score) {
+        score = newScore;
+        fuzzyMatch = this.commands[i].command;
       }
     }
-    return commandFromShortcut;
+
+    return fuzzyMatch;
   }
 }
