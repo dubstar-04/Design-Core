@@ -117,8 +117,15 @@ export class CommandManager {
   }
 
   /**
-   * Returns the command for a valid shortcut
+   * Check if shortcut is valid
    * @param {string} shortcut
+   * @returns boolean
+   */
+  isShortcut(shortcut) {
+    const found = this.commands.some((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === shortcut.toUpperCase());
+    return found;
+  }
+
   /**
    * Check if command is valid
    * @param {string} command
