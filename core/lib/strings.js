@@ -11,21 +11,21 @@ export class Strings {
 
   // Input Strings
   static Input = {
-    BASEPOINT: 'Select Base Point:',
+    BASEPOINT: 'Select base point:',
     BOUNDARY: 'Select boundary edges:',
-    CENTER: 'Pick the centre point:',
-    START: 'Pick the start point:',
-    END: 'Pick the end point:',
+    CENTER: 'Select centre point:',
+    START: 'Select start point:',
+    END: 'Select end point:',
     POINT: 'Select a point:',
-    POINTORRADIUS: 'Pick another point or Enter radius:',
-    POSITION: 'Pick position:',
-    POINTORQUIT: 'Pick another point or press ESC to quit:',
+    POINTORRADIUS: 'Select another point or Enter radius:',
+    POSITION: 'Select position:',
+    POINTORQUIT: 'Select another point or press ESC to quit:',
     HEIGHT: 'Enter height:',
     STRING: 'Enter text:',
     NONE: '',
     SELECTENTITIES: 'Select Items:',
     SELECTED: 'Item(s) selected - Add more or press Enter to accept:',
-    DESTINATIONORDISTANCE: 'Select Destination or Enter Distance:',
+    DESTINATIONORDISTANCE: 'Select Destination or Enter distance:',
     SELECTORQUIT: 'Select another object or press ESC to quit:',
   };
 };
