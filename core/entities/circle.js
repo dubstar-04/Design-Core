@@ -100,7 +100,8 @@ export class Circle {
     let colour = this.colour;
 
     if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
+      const layer =core.layerManager.getLayerByName(this.layer);
+      colour = layer.getColour();
     }
 
     // this.calculateRadius(); // is this the most efficient way to update the radius?
@@ -111,7 +112,7 @@ export class Circle {
       ctx.beginPath();
     } catch { // Cairo
       ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.hexToScaledRGB(colour);
+      const rgbColour = Colours.getScaledRGBColour(colour);
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 

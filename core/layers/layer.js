@@ -9,6 +9,7 @@ export class Layer {
     this.on = true;
     this.locked = false;
     this.colour = '#FFFFFF';
+    this.trueColour;
     this.lineType = 'CONTINUOUS';
     this.lineWeight = 'DEFAULT';
     this.plotting = true;
@@ -39,6 +40,10 @@ export class Layer {
       if (data.colour) {
         // console.log(" layer.js - Layer Colour: " + data.colour)
         this.colour = data.colour;
+      }
+
+      if (data.trueColour) {
+        this.trueColour = data.trueColour;
       }
 
       if (data.lineType) {
@@ -73,6 +78,14 @@ export class Layer {
     }
 
     return flags;
+  }
+
+  getColour() {
+    if (this.trueColour !== undefined) {
+      return this.trueColour;
+    }
+
+    return this.colour;
   }
 
   dxf() {
