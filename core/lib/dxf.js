@@ -417,6 +417,7 @@ export class DXF {
     // const handle = "";
     let flags = 0;
     let colour = '#ffffff';
+    let trueColour;
     let lineType = 'Continuous';
     let lineWeight = 'Default';
     let plotting = true;
@@ -434,6 +435,7 @@ export class DXF {
             name: name,
             flags: flags,
             colour: colour,
+            trueColour: trueColour,
             lineType: lineType,
             lineWeight: lineWeight,
             plotting: plotting,
@@ -511,6 +513,10 @@ export class DXF {
         case 390:
           // skip the next line
           this.getDXFLine();
+          break;
+        case 420:
+          this.getDXFLine();
+          trueColour = this.line;
           break;
         default:
           // skip the next line

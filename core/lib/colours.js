@@ -64,6 +64,18 @@ export class Colours {
     const rgb = this.hexToRGB(hexColour);
 
     if (rgb) {
+      return this.rgbToScaledRGB(rgb);
+    }
+
+    return null;
+  }
+
+  /**
+   * Get RGB colour components scaled 0 - 1 from hex colour
+   * @param  {object} object with r, g, and b values
+   */
+  static rgbToScaledRGB(rgb) {
+    if (rgb) {
       return {
         r: rgb.r / 255,
         g: rgb.g / 255,
@@ -72,6 +84,66 @@ export class Colours {
     }
 
     return null;
+  }
+
+  /**
+   *  Get RGB colour components from true colour
+   * @param  {String} trueColour
+   * A 32-bit integer representing a 24-bit color value.
+   * The high-order byte (8 bits) is 0, the low-order byte an unsigned char holding the Blue value (0-255),
+   * then the Green value, and the next-to-high order byte is the Red Value.
+   * Converting this integer value to hexadecimal yields the following bit mask: 0x00RRGGBB. For example,
+   * true color with Red==200, Green==100 and Blue==50 is 0x00C86432, and in DXF, in decimal, 13132850
+   */
+  static trueColourToRGB(trueColour) {
+    if (trueColour) {
+      return {
+        r: (trueColour & 0xff0000) >> 16,
+        g: (trueColour & 0x00ff00) >> 8,
+        b: (trueColour & 0x0000ff),
+      };
+    }
+    return null;
+  }
+
+  /**
+   *  Get RGB colour components scaled 0 - 1 from hex colour
+   * @param  {String} trueColour
+   */
+  static trueColourToScaledRGB(trueColour) {
+    if (trueColour === undefined) {
+      return null;
+    }
+
+    const rgb = this.trueColourToRGB(trueColour);
+
+    if (rgb !== null) {
+      return this.rgbToScaledRGB(rgb);
+    }
+
+    return null;
+  }
+
+  /**
+   *  Get RGB colour components scaled 0 - 1 from hex or true colour
+   * @param  {String} hex or true colour
+   */
+  static getScaledRGBColour(colour) {
+    let rgb;
+
+    if (colour === undefined) {
+      return;
+    }
+
+    if (colour.includes('#')) {
+      rgb = this.hexToRGB(colour);
+    } else {
+      rgb = this.trueColourToRGB(colour);
+    }
+
+    const scaledRGB = this.rgbToScaledRGB(rgb);
+
+    return scaledRGB;
   }
 
   static conversion_table = {

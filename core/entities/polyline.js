@@ -54,8 +54,10 @@ export class Polyline extends Entity {
     let colour = this.colour;
 
     if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
+      const layer =core.layerManager.getLayerByName(this.layer);
+      colour = layer.getColour();
     }
+
 
     try { // HTML Canvas
       ctx.strokeStyle = colour;
@@ -63,7 +65,7 @@ export class Polyline extends Entity {
       ctx.beginPath();
     } catch { // Cairo
       ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.hexToScaledRGB(colour);
+      const rgbColour = Colours.getScaledRGBColour(colour);
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
