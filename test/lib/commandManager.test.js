@@ -43,6 +43,13 @@ test('Test CommandManager.getCommand', () => {
   expect(commandManager.getCommand('Test')).toBeUndefined();
 });
 
+test('Test CommandManager.getShortcut', () => {
+  expect(commandManager.getShortcut('Line')).toBe('L');
+  expect(commandManager.getShortcut('line')).toBe('L');
+  expect(commandManager.getShortcut('Circle')).toBe('C');
+  expect(commandManager.getShortcut('Test')).toBeUndefined();
+});
+
 test('Test CommandManager.getFuzzyMatch', () => {
   expect(commandManager.getFuzzyMatch('li')).toBe('Line');
   expect(commandManager.getFuzzyMatch('ci')).toBe('Circle');
