@@ -1,4 +1,5 @@
 import {DXF} from './dxf.js';
+import {Strings} from './strings.js';
 
 export class FileIO {
   static saveDxf(core) {
@@ -14,9 +15,9 @@ export class FileIO {
       core.scene.linkBlockData();
       core.layerManager.checkLayers();
       core.canvas.requestPaint();
-      core.notify('File Opened');
+      core.notify(Strings.Message.FILEOPEN);
     } catch (error) {
-      core.notify('Error Opening File');
+      core.notify(Strings.Error.FILEOPEN);
     }
   }
 }

@@ -27,6 +27,7 @@ import {Trim} from '../tools/trim.js';
 
 
 import {Utils} from './utils.js';
+import {Strings} from './strings.js';
 
 const classes = {
   Line,
@@ -121,8 +122,11 @@ export class CommandManager {
       return true;
     }
 
+    // no matching command found
+    // get a fuzzy match and notify
     const command = this.getFuzzyMatch(input);
-    this.core.notify(`Unknown command: Did you mean: '${command}'?`);
+    const shortcut = this.getShortcut(command);
+    this.core.notify(`${Strings.Message.RECOMMEND} ${command} (${shortcut})`);
     return false;
   }
 
@@ -148,10 +152,10 @@ export class CommandManager {
 
 
   /**
-   * Returns the command for a valid input
-   * @param {string} input
-   * @returns valid type
-   */
+  * Returns the command for a valid input
+  * @param {string} input
+  * @returns valid type
+  */
   getCommand(input) {
     let command;
 
@@ -167,6 +171,24 @@ export class CommandManager {
 
     return command;
   }
+
+
+  /**
+   * Returns the shortcut for a valid command
+   * @param {string} command
+   * @returns {string} shortcut
+   */
+  getShortcut(command) {
+    let shortcut;
+
+    if (this.isCommand(command)) {
+      const found = this.commands.find((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
+      shortcut = found.shortcut;
+    }
+
+    return shortcut;
+  }
+
 
   /**
    * Returns a fuzzy match to the input command

@@ -1,5 +1,6 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
+import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
 
@@ -63,10 +64,10 @@ export class Rectangle {
     const prompt = [];
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Pick the start point:';
+    prompt[0] = Strings.Input.START;
 
     expectedType[1] = ['object'];
-    prompt[1] = 'Pick opposite corner:';
+    prompt[1] = Strings.Input.END;
 
     expectedType[2] = ['object'];
     prompt[2] = prompt[1];

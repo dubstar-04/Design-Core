@@ -1,4 +1,5 @@
 import {Utils} from '../lib/utils.js';
+import {Strings} from '../lib/strings.js';
 
 export class Distance {
   constructor() {
@@ -25,10 +26,10 @@ export class Distance {
     const prompt = [];
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Select Start Point:';
+    prompt[0] = Strings.Input.START;
 
     expectedType[1] = ['object'];
-    prompt[1] = 'Select End Point:';
+    prompt[1] = Strings.Input.END;
 
     expectedType[2] = ['object'];
     prompt[2] = '';
@@ -50,8 +51,10 @@ export class Distance {
   }
 
   action(core) {
-    const di = (' Length: ' + Utils.distBetweenPoints(core.scene.points[0].x, core.scene.points[0].y, core.scene.points[1].x, core.scene.points[1].y).toFixed(1) +
-            ' - X delta: ' + (core.scene.points[1].x - core.scene.points[0].x).toFixed(1) + ' - Y delta:' + (core.scene.points[1].y - core.scene.points[0].y).toFixed(1));
+    const length = Utils.distBetweenPoints(core.scene.points[0].x, core.scene.points[0].y, core.scene.points[1].x, core.scene.points[1].y).toFixed(1);
+    const x = (core.scene.points[1].x - core.scene.points[0].x).toFixed(1);
+    const y = (core.scene.points[1].y - core.scene.points[0].y).toFixed(1);
+    const di = (`${Strings.Strings.LENGTH}: ${length} &#916;X: ${x} &#916;Y: ${y}`);
     core.notify(di);
   }
 }

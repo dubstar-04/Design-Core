@@ -1,5 +1,6 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
+import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
 
@@ -63,10 +64,10 @@ export class Circle {
     const prompt = [];
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Pick the centre point:';
+    prompt[0] = Strings.Input.CENTER;
 
     expectedType[1] = ['object'];
-    prompt[1] = 'Pick another point or Enter radius:';
+    prompt[1] = Strings.Input.POINTORRADIUS;
 
     expectedType[2] = ['object', 'number'];
     prompt[2] = prompt[1];

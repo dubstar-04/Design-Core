@@ -1,4 +1,5 @@
 import {Intersection} from '../lib/intersect.js';
+import {Strings} from '../lib/strings.js';
 
 export class Extend {
   constructor() {
@@ -25,16 +26,16 @@ export class Extend {
     const prompt = [];
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Select boundary edges:';
+    prompt[0] = Strings.Input.BOUNDARY;
 
     expectedType[1] = ['object'];
-    prompt[1] = core.scene.selectionSet.length + ' Item(s) selected: Add more or press Enter to accept';
+    prompt[1] = `${core.scene.selectionSet.length}  ${Strings.Input.SELECTED}`;
 
     expectedType[2] = ['boolean'];
-    prompt[2] = 'Select object to extend:';
+    prompt[2] = Strings.Input.SELECTENTITIES;
 
     expectedType[3] = ['object'];
-    prompt[3] = 'Select another object to Extend or press ESC to quit:';
+    prompt[3] = Strings.Input.SELECTORQUIT;
 
     expectedType[4] = expectedType[3];
     prompt[4] = prompt[3];

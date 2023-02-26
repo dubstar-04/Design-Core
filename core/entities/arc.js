@@ -1,6 +1,7 @@
 /* eslint-disable require-jsdoc */
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
+import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
 
@@ -81,13 +82,13 @@ export class Arc {
     const prompt = [];
 
     expectedType[0] = ['undefined'];
-    prompt[0] = 'Pick the centre point:';
+    prompt[0] = Strings.Input.CENTER;
 
     expectedType[1] = ['object'];
-    prompt[1] = 'Pick start point:';
+    prompt[1] = Strings.Input.START;
 
     expectedType[2] = ['object'];
-    prompt[2] = 'Pick end point:';
+    prompt[2] = Strings.Input.END;
 
     expectedType[3] = ['object'];
     prompt[3] = '';
