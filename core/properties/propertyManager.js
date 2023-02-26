@@ -1,4 +1,4 @@
-
+import {Strings} from '../lib/strings.js';
 export class PropertyManager {
   constructor(core) {
     this.core = core;
@@ -29,7 +29,7 @@ export class PropertyManager {
       }
 
       if (typeof(this.core.scene.items[this.core.scene.selectionSet[i]][property]) !== typeof(newPropertyValue)) {
-        this.core.notify('Incorrect input type');
+        this.core.notify(Strings.Error.INPUT);
       } else {
         this.core.scene.items[this.core.scene.selectionSet[i]][property] = newPropertyValue;
         this.core.scene.reloadSelectedItems();

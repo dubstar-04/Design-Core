@@ -48,7 +48,9 @@ export class Identify {
   }
 
   action(core) {
-    const id = (' X: ' + core.scene.points[0].x.toFixed(1) + ' Y:' + core.scene.points[0].y.toFixed(1));
+    const x = core.scene.points[0].x.toFixed(1);
+    const y = core.scene.points[0].y.toFixed(1);
+    const id = (`X:${x} Y:${y}`);
     core.notify(id);
   }
 }

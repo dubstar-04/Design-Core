@@ -51,8 +51,10 @@ export class Distance {
   }
 
   action(core) {
-    const di = (' Length: ' + Utils.distBetweenPoints(core.scene.points[0].x, core.scene.points[0].y, core.scene.points[1].x, core.scene.points[1].y).toFixed(1) +
-            ' - X delta: ' + (core.scene.points[1].x - core.scene.points[0].x).toFixed(1) + ' - Y delta:' + (core.scene.points[1].y - core.scene.points[0].y).toFixed(1));
+    const length = Utils.distBetweenPoints(core.scene.points[0].x, core.scene.points[0].y, core.scene.points[1].x, core.scene.points[1].y).toFixed(1);
+    const x = (core.scene.points[1].x - core.scene.points[0].x).toFixed(1);
+    const y = (core.scene.points[1].y - core.scene.points[0].y).toFixed(1);
+    const di = (`${Strings.Strings.LENGTH}: ${length} &#916;X: ${x} &#916;Y: ${y}`);
     core.notify(di);
   }
 }

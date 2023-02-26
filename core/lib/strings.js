@@ -2,11 +2,26 @@ export class Strings {
 // Error Strings
   static Error = {
     ERROR: 'Error',
+    FILEOPEN: 'Error opening file',
+    INPUT: 'Incorrect input',
   };
 
   // Warning Strings
   static Warning = {
     WARNING: 'Warning',
+  };
+
+  // Message Strings
+  static Message = {
+
+    UNKNOWNCOMMAND: 'Unknown command:',
+    RECOMMEND: 'Did you mean:',
+    FILEOPEN: 'File opened',
+  };
+
+  // Strings
+  static Strings = {
+    LENGTH: 'Length',
   };
 
   // Input Strings
