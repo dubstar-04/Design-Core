@@ -1,7 +1,5 @@
-import {gettext as _} from 'gettext';
-
 export class Strings {
-  // Error Strings
+// Error Strings
   static Error = {
     ERROR: 'Error',
   };
@@ -13,21 +11,21 @@ export class Strings {
 
   // Input Strings
   static Input = {
-    BASEPOINT: _('Select Base Point:'),
-    BOUNDARY: _('Select boundary edges:'),
-    CENTER: _('Pick the centre point:'),
-    START: _('Pick the start point:'),
-    END: _('Pick the end point:'),
-    POINT: _('Select a point:'),
-    POINTORRADIUS: _('Pick another point or Enter radius:'),
-    POSITION: _('Pick position:'),
-    POINTORQUIT: _('Pick another point or press ESC to quit:'),
-    HEIGHT: _('Enter height:'),
-    STRING: _('Enter text:'),
+    BASEPOINT: 'Select Base Point:',
+    BOUNDARY: 'Select boundary edges:',
+    CENTER: 'Pick the centre point:',
+    START: 'Pick the start point:',
+    END: 'Pick the end point:',
+    POINT: 'Select a point:',
+    POINTORRADIUS: 'Pick another point or Enter radius:',
+    POSITION: 'Pick position:',
+    POINTORQUIT: 'Pick another point or press ESC to quit:',
+    HEIGHT: 'Enter height:',
+    STRING: 'Enter text:',
     NONE: '',
-    SELECTENTITIES: _('Select Items:'),
-    SELECTED: _('Item(s) selected - Add more or press Enter to accept:'),
-    DESTINATIONORDISTANCE: _('Select Destination or Enter Distance:'),
-    SELECTORQUIT: _('Select another object or press ESC to quit:'),
+    SELECTENTITIES: 'Select Items:',
+    SELECTED: 'Item(s) selected - Add more or press Enter to accept:',
+    DESTINATIONORDISTANCE: 'Select Destination or Enter Distance:',
+    SELECTORQUIT: 'Select another object or press ESC to quit:',
   };
 };
