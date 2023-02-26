@@ -168,6 +168,24 @@ export class CommandManager {
     return command;
   }
 
+
+  /**
+   * Returns the shortcut for a valid command
+   * @param {string} command
+   * @returns {string} shortcut
+   */
+  getShortcut(command) {
+    let shortcut;
+
+    if (this.isCommand(command)) {
+      const found = this.commands.find((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
+      shortcut = found.shortcut;
+    }
+
+    return shortcut;
+  }
+
+
   /**
    * Returns a fuzzy match to the input command
    * @param {string} input
