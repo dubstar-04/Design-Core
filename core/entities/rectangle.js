@@ -3,31 +3,19 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
+import {Entity} from './entity.js';
 
-export class Rectangle {
+export class Rectangle extends Entity {
   constructor(data) {
-    // Define Properties         //Associated DXF Value
+    super(data);
     this.type = 'Rectangle';
-    this.family = 'Geometry';
     this.minPoints = 2;
-    this.showPreview = true; // show preview of item as its being created
-    // this.limitPoints = true;
-    // this.allowMultiple = false;
-    this.helper_geometry = false; // If true a Line will be drawn between points when defining geometry
-    this.points = [];
-    this.lineWidth = 2; // Thickness
-    this.colour = 'BYLAYER';
-    this.layer = '0';
-    this.alpha = 1.0; // Transparancy
-    // this.RectangleType
-    // this.RectangletypeScale
-    // this.PlotStyle
-    // this.RectangleWeight
-
 
     if (data) {
       if (data.points) {
-        // TODO: Rectangles should only store two points.
+        // TODO: Rectangles should only store two points, but these are
+        // currently used to support rotation
+        this.points = [];
         const point1 = new Point(data.points[0].x, data.points[0].y);
         const point2 = new Point(data.points[1].x, data.points[0].y);
         const point3 = new Point(data.points[1].x, data.points[1].y);
@@ -39,14 +27,6 @@ export class Rectangle {
         this.points.push(point3);
         this.points.push(point4);
         this.points.push(point5);
-      }
-
-      if (data.colour) {
-        this.colour = data.colour;
-      }
-
-      if (data.layer) {
-        this.layer = data.layer;
       }
     }
   }
@@ -145,7 +125,6 @@ export class Rectangle {
         '\n', '8', // LAYERNAME
         '\n', this.layer,
     );
-    // console.log(' rectangle.js - DXF Data:' + data);
     return data;
   }
 
@@ -255,7 +234,6 @@ export class Rectangle {
         closest.y = A.y + ABy * t;
 
         const dist = Utils.distBetweenPoints(P.x, P.y, closest.x, closest.y);
-        // console.log(" rectangle.js - Dist: " + dist);
         if (dist < distance) {
           distance = dist;
         }
@@ -282,24 +260,6 @@ export class Rectangle {
     return [xmin, xmax, ymin, ymax];
   }
 
-  within(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    // determin if this entities is within a the window specified by selectionExtremes
-    const extremePoints = this.extremes();
-    if (extremePoints[0] > selectionExtremes[0] &&
-            extremePoints[1] < selectionExtremes[1] &&
-            extremePoints[2] > selectionExtremes[2] &&
-            extremePoints[3] < selectionExtremes[3]
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   touched(selectionExtremes, core) {
     if (!core.layerManager.layerVisible(this.layer)) {
       return;
@@ -314,7 +274,6 @@ export class Rectangle {
     };
 
     const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;
