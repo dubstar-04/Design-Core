@@ -71,11 +71,7 @@ export class Spline extends Entity {
         return;
       }
 
-      let colour = this.colour;
-
-      if (this.colour === 'BYLAYER') {
-        colour = core.layerManager.getLayerByName(this.layer).colour;
-      }
+      const colour = this.getColour(core);
 
       try { // HTML Canvas
         ctx.strokeStyle = colour;

@@ -65,12 +65,19 @@ export class Entity {
     }
   }
 
-  getColour() {
-    if (this.trueColour !== undefined) {
-      return this.trueColour;
+  getColour(core) {
+    let colour = this.colour;
+
+    if (this.colour === 'BYLAYER') {
+      const layer = core.layerManager.getLayerByName(this.layer);
+      colour = layer.getColour();
     }
 
-    return this.colour;
+    if (this.trueColour !== undefined) {
+      colour = this.trueColour;
+    }
+
+    return colour;
   }
 
 

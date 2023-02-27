@@ -220,11 +220,7 @@ export class Text extends Entity {
       return;
     }
 
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
-    }
+    const colour = this.getColour(core);
 
     ctx.save();
     ctx.scale(1, -1);

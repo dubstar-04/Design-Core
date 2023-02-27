@@ -66,12 +66,7 @@ export class Circle extends Entity {
       return;
     }
 
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      const layer =core.layerManager.getLayerByName(this.layer);
-      colour = layer.getColour();
-    }
+    const colour = this.getColour(core);
 
     try { // HTML Canvas
       ctx.strokeStyle = colour;
