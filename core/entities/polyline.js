@@ -3,38 +3,12 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
+import {Entity} from './entity.js';
 
-export class Polyline {
+export class Polyline extends Entity {
   constructor(data) {
-    // Define Properties         //Associated DXF Value
-    this.type = 'Polyline';
-    this.family = 'Geometry';
+    super(data);
     this.minPoints = 2;
-    this.showPreview = true; // show preview of item as its being created
-    // this.limitPoints = false;
-    // this.allowMultiple = false;
-    this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
-    this.points = [];
-    this.lineWidth = 2; // Thickness
-    this.colour = 'BYLAYER';
-    this.layer = '0';
-    this.alpha = 1.0; // Transparancy
-
-
-    if (data) {
-      if (data.points) {
-        this.points = data.points;
-      }
-
-      if (data.colour) {
-        this.colour = data.colour;
-      }
-
-      if (data.layer) {
-        // console.log("Polyline.js Layer data:" + data.layer)
-        this.layer = data.layer;
-      }
-    }
   }
 
   static register() {
@@ -48,8 +22,6 @@ export class Polyline {
     const reset = false;
     let action = false;
     const prompt = [];
-
-    // console.log("inputArray: ", inputArray)
 
     expectedType[0] = ['undefined'];
     prompt[0] = Strings.Input.START;
@@ -69,7 +41,6 @@ export class Polyline {
       core.scene.inputArray.pop();
     } else if (core.scene.inputArray.length === this.minPoints) {
       action = true;
-      // reset = true
     }
 
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
@@ -236,7 +207,6 @@ export class Polyline {
         if (pntDist < distance) {
           distance = pntDist;
           minPnt = pnt;
-          // console.log("distance:" , distance)
         }
       }
     }
@@ -261,31 +231,10 @@ export class Polyline {
     return [xmin, xmax, ymin, ymax];
   }
 
-  within(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    // determin if this entity is within a the window specified by selectionExtremes
-    const extremePoints = this.extremes();
-    if (extremePoints[0] > selectionExtremes[0] &&
-            extremePoints[1] < selectionExtremes[1] &&
-            extremePoints[2] > selectionExtremes[2] &&
-            extremePoints[3] < selectionExtremes[3]
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   touched(selectionExtremes, core) {
     if (!core.layerManager.layerVisible(this.layer)) {
       return;
     }
-
-    // const lP1 = new Point();
-    // const lP2 = new Point();
 
     const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
     const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
@@ -296,7 +245,6 @@ export class Polyline {
     };
 
     const output = Intersection.intersectPolylineRectangle(this.intersectPoints(), rectPoints);
-    // console.log("polyline.js - touched - status:",output.status)
 
     if (output.status === 'Intersection') {
       return true;

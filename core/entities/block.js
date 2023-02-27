@@ -1,20 +1,14 @@
 import {Point} from './point.js';
-// import { Utils } from '../lib/utils.js'
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
+import {Entity} from './entity.js';
 
-export class Block {
+export class Block extends Entity {
   constructor(data) {
-    // Define Properties
-    this.type = 'Block';
+    super(data);
     this.name = '';
-    this.points = [new Point()]; // insert location
     this.location = new Point(); // block reference location
     this.flags = 1;
-    this.colour = 'BYLAYER';
-    this.layer = '0';
-    this.showPreview = true; // show preview of item as its being created
-    // this.helper_geometry = true; // If true a line will be drawn between points when defining geometry
     this.items = []; // list of items in the block
 
     if (data) {
@@ -22,19 +16,10 @@ export class Block {
 
       if (data.points) {
         this.location = data.points[0];
-        // console.log('Block Point Data:', data.points);
       }
 
       if (data.flags) {
         this.flags = data.flags;
-      }
-
-      if (data.colour) {
-        this.colour = data.colour;
-      }
-
-      if (data.layer) {
-        this.layer = data.layer;
       }
     }
   }
@@ -57,7 +42,6 @@ export class Block {
     this.flags = 1;
   }
 
-
   dxf() {
     const dxfitem = '';
     const data = dxfitem.concat(
@@ -78,7 +62,6 @@ export class Block {
         '\n', '3', // name again
         '\n', this.name,
     );
-    // console.log(' Block.js - DXF Data:' + data);
     return data;
   }
 
@@ -180,36 +163,12 @@ export class Block {
       for (let snap = 0; snap < itemSnaps.length; snap++) {
         // offset the item snap point by the block insert location
         let snapPoint = itemSnaps[snap];
-        // if (this.points[1]) {
         snapPoint = snapPoint.add(this.points[0]);
-        // }
-        // console.log("Snap Point:", snapPoint)
         snaps.push(snapPoint);
       }
     }
 
     return snaps;
-  }
-
-  within(selectionExtremes, core) {
-    if (!this.items.length) {
-      // nothing to draw
-      return false;
-    }
-
-    // determin if this entities is within a the window specified by selectionExtremes
-    const extremePoints = this.extremes();
-
-    // console.log("block extremes:", extremePoints)
-    if (extremePoints[0] > selectionExtremes[0] &&
-            extremePoints[1] < selectionExtremes[1] &&
-            extremePoints[2] > selectionExtremes[2] &&
-            extremePoints[3] < selectionExtremes[3]
-    ) {
-      return true;
-    }
-
-    return false;
   }
 
   intersectPoints() {
@@ -282,7 +241,6 @@ export class Block {
     };
 
     const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;

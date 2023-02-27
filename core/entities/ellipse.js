@@ -3,45 +3,21 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
+import {Entity} from './entity.js';
 
-export class Ellipse {
+export class Ellipse extends Entity {
   constructor(data) {
-    // Define Properties         //Associated DXF Value
-    this.type = 'Ellipse';
-    this.family = 'Geometry';
+    super(data);
     this.minPoints = 3;
-    this.showPreview = true; // show preview of item as its being created
-    // this.limitPoints = true;
-    // this.allowMultiple = false;
     this.helper_geometry = true; // If true a line will be drawn between points when defining geometry
-    this.points = [];
     this.width = 0;
     this.height = this.width / 2 || 10;
     this.rotation = 0;
-    this.lineWidth = 2; // Thickness
-    this.colour = 'BYLAYER';
-    this.layer = '0';
-    this.alpha = 1.0; // Transparancy
-    // this.lineType
-    // this.LinetypeScale
-    // this.PlotStyle
-    // this.LineWeight
 
     if (data) {
       if (data.points) {
-        this.points = data.points;
-        this.width = this.points[0].distance(this.points[1]) * 2; // distBetweenPoints(data.points[0].x, data.points[0].y, data.points[1].x, data.points[1].y) * 2;
-        this.height = this.points[0].distance(this.points[2]) * 2; // (data.points[2].y - data.points[0].y) * 2;
-
-        // console.log(" ellipse.js - Ellipse Width: " + this.width + " Height: " + this.height)
-      }
-
-      if (data.colour) {
-        this.colour = data.colour;
-      }
-
-      if (data.layer) {
-        this.layer = data.layer;
+        this.width = this.points[0].distance(this.points[1]) * 2;
+        this.height = this.points[0].distance(this.points[2]) * 2;
       }
     }
   }
@@ -105,22 +81,11 @@ export class Ellipse {
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
-    /*
-
-        var x = this.points[0].x - 0.5 * this.width;
-        var y = this.points[0].y - 0.5 * this.height;
-
-        ctx.ellipse(x, y, this.width, this.height);
-        */
-
     const A = this.points[0].x - this.points[1].x;
     const O = this.points[0].y - this.points[1].y;
     const theta = Math.atan2(O, A) + Math.PI;
 
     for (let i = 0; i < 361; i++) {
-      // var x = this.points[0].x + (this.width/2) * Math.cos(degrees2radians(i));
-      // var y = this.points[0].y + (this.height/2) * Math.sin(degrees2radians(i));
-
       const j = Utils.degrees2radians(i);
 
       const x = this.points[0].x + (this.width / 2) * Math.cos(j) * Math.cos(theta) - (this.height / 2) * Math.sin(j) * Math.sin(theta);
@@ -136,7 +101,6 @@ export class Ellipse {
     }
 
     ctx.stroke();
-    // ctx.restore();
   }
 
   dxf() {
@@ -248,7 +212,6 @@ export class Ellipse {
       const y = this.points[0].y + (this.height / 2) * Math.sin(j) * Math.cos(theta) + (this.width / 2) * Math.cos(j) * Math.sin(theta);
 
       const dist = Utils.distBetweenPoints(P.x, P.y, x, y);
-      // console.log(" ellipse.js - Dist: " + dist);
       if (dist < distance) {
         distance = dist;
         closest.x = x;
@@ -258,13 +221,6 @@ export class Ellipse {
 
     return [closest, distance];
   }
-
-
-  area() {
-    const area = Math.pow((Math.PI * this.radius), 2);
-    return area;
-  }
-
 
   extremes() {
     const xValues = [];
@@ -287,24 +243,6 @@ export class Ellipse {
     const ymax = Math.max(...yValues);
 
     return [xmin, xmax, ymin, ymax];
-  }
-
-  within(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    // determin if this entities is within a the window specified by selectionExtremes
-    const extremePoints = this.extremes();
-    if (extremePoints[0] > selectionExtremes[0] &&
-            extremePoints[1] < selectionExtremes[1] &&
-            extremePoints[2] > selectionExtremes[2] &&
-            extremePoints[3] < selectionExtremes[3]
-    ) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   touched(selectionExtremes, core) {

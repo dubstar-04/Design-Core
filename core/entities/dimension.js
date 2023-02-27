@@ -4,40 +4,22 @@ import {Strings} from '../lib/strings.js';
 import {Block} from './block.js';
 import {Text} from './text.js';
 import {Line} from './line.js';
-// import {Intersection} from '../lib/intersect.js';
-// import {Colours} from '../lib/colours.js';
+import {Entity} from './entity.js';
 
-export class Dimension {
+export class Dimension extends Entity {
   constructor(data) {
-    // Define Properties         //Associated DXF Value
-    this.type = 'Dimension';
-    this.family = 'Geometry';
+    super(data);
     this.minPoints = 3;
-    this.showPreview = true; // show preview of item as its being created
-    this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
-    this.points = [];
-
     this.blockName = '';
     this.block = new Block();
     this.text = new Text();
     this.dimType = 0;
     this.leaderLength = 0; // 40: Leader length for radius and diameter dimensions
     this.angle = 0; // 50 Angle of rotated, horizontal or vertical linear dimensions
-
-    this.colour = 'BYLAYER';
-    this.layer = '0';
     this.styleName = 'STANDARD';
 
 
-    // this.baselineOffset = 5 //1.125;
-
     if (data) {
-      // console.log("Dimnension Data:", data)
-
-      if (data.points) {
-        this.points = data.points;
-      }
-
       if (data.blockName) {
         this.blockName = data.blockName;
       }
@@ -52,14 +34,6 @@ export class Dimension {
 
       if (data.angle) {
         this.angle = data.angle;
-      }
-
-      if (data.colour) {
-        this.colour = data.colour;
-      }
-
-      if (data.layer) {
-        this.layer = data.layer;
       }
 
       if (data.styleName) {
@@ -79,9 +53,6 @@ export class Dimension {
     let reset = false;
     let action = false;
     const prompt = [];
-
-    // console.log('dimension inputArray: ', inputArray);
-    // console.log('type: ', typeof core.scene.inputArray[num - 1]);
 
     expectedType[0] = ['undefined'];
     prompt[0] = Strings.Input.START; // TODO: allow selecting entites, line / arc / circle

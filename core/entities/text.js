@@ -3,27 +3,18 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
+import {Entity} from './entity.js';
 
-export class Text {
+export class Text extends Entity {
   constructor(data) {
-    // Define Properties         //Associated DXF Value
-    this.type = 'Text';
-    this.family = 'Geometry';
+    super(data);
     this.minPoints = 1;
-    this.showPreview = false; // show preview of item as its being created
-    this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
-    this.points = [new Point(), new Point()];
-
-    // this.TextWidth = 2;         //Thickness
-    // this.font = "Arial"
     this.string = '';
     this.height = 2.5;
     this.horizontalAlignment = 0;
     this.verticalAlignment = 0;
     this.backwards = false;
     this.upsideDown = false;
-    this.colour = 'BYLAYER';
-    this.layer = '0';
     this.styleName = 'STANDARD';
 
     // add rotation property with getter and setter
@@ -331,8 +322,6 @@ export class Text {
 
     const snaps = [botLeft, botRight, topLeft, topRight, mid];
 
-    // var closest = this.closestPoint(mousePoint)
-
     return snaps;
   }
 
@@ -364,22 +353,7 @@ export class Text {
     const xmax = rect.x + rect.width;
     const ymin = rect.y;
     const ymax = rect.y + rect.height;
-    // console.log("Rect:" + xmin + " " +  xmax + " " +  ymin + " " +  ymax)
     return [xmin, xmax, ymin, ymax];
-  }
-
-  within(selectionExtremes, core) {
-    // determin if this entities is within a the window specified by selectionExtremes
-    const extremePoints = this.extremes();
-    if (extremePoints[0] > selectionExtremes[0] &&
-            extremePoints[1] < selectionExtremes[1] &&
-            extremePoints[2] > selectionExtremes[2] &&
-            extremePoints[3] < selectionExtremes[3]
-    ) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   intersectPoints() {
@@ -408,7 +382,6 @@ export class Text {
     };
 
     const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;

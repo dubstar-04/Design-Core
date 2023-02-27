@@ -5,21 +5,16 @@ import {Intersection} from '../lib/intersect.js';
 
 export class Insert {
   constructor(data) {
-    // Define Properties
-    this.type = 'Insert';
     this.block = '';
     this.points = [];
     this.colour = 'BYLAYER';
     this.layer = '0';
-
-    // console.log('can we access items?', items);
 
     if (data) {
       this.block = data.block;
 
       if (data.points) {
         this.points = data.points;
-        // console.log('Insert Point Data:', data.points);
       }
 
       if (data.colour) {
