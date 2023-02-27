@@ -3,20 +3,14 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
+import {Entity} from './entity.js';
 
-export class Circle {
+export class Circle extends Entity {
   constructor(data) {
-    // Define Properties         //Associated DXF Value
+    super(data);
     this.type = 'Circle';
     this.family = 'Geometry';
     this.minPoints = 2;
-    this.showPreview = true; // show preview of item as its being created
-    // this.limitPoints = true;
-    // this.allowMultiple = false;
-    this.helper_geometry = true; // If true a line will be drawn between points when defining geometry
-
-    this.points = [new Point(), new Point()];
-
 
     // add radius property with getter and setter
     // needs to be enumberable to appear in the object props
@@ -25,30 +19,6 @@ export class Circle {
       set: this.setRadius,
       enumerable: true,
     });
-
-    this.lineWidth = 2; // Thickness
-    this.colour = 'BYLAYER';
-    this.layer = '0';
-    this.alpha = 1.0; // Transparancy
-    // this.lineType
-    // this.LinetypeScale
-    // this.PlotStyle
-    // this.LineWeight
-
-
-    if (data) {
-      if (data.points) {
-        this.points = data.points;
-      }
-
-      if (data.colour) {
-        this.colour = data.colour;
-      }
-
-      if (data.layer) {
-        this.layer = data.layer;
-      }
-    }
   }
 
   static register() {
@@ -103,8 +73,6 @@ export class Circle {
       colour = core.layerManager.getLayerByName(this.layer).colour;
     }
 
-    // this.calculateRadius(); // is this the most efficient way to update the radius?
-
     try { // HTML Canvas
       ctx.strokeStyle = colour;
       ctx.lineWidth = this.lineWidth / scale;
@@ -142,23 +110,17 @@ export class Circle {
   }
 
   trim(points, core) {
-    // console.log('circle.js - Points:', points.length);
-
     if (points.length > 1) {
       const start = points[0];
       const cen = core.mouse.pointOnScene();
       const end = points[1];
 
-      // console.log("Angle:", a-a, " Angle2: ", b, " centre: ", c)
-
       const arcPoints = [this.points[0]];
 
       const dir = (start.x - cen.x) * (end.y - cen.y) - (start.y - cen.y) * (end.x - cen.x);
       if (dir > 0) {
-        // console.log('Clockwise');
         arcPoints.push(points[0], points[1]);
       } else if (dir < 0) {
-        // console.log('Counterclockwise');
         arcPoints.push(points[1], points[0]);
       }
 
@@ -225,21 +187,6 @@ export class Circle {
     return [closest, distance];
   }
 
-  diameter() {
-    const diameter = 2 * this.radius;
-    return diameter;
-  }
-
-  circumference() {
-    const circumference = Math.PI * 2 * this.radius;
-    return circumference;
-  }
-
-  area() {
-    const area = Math.pow((Math.PI * this.radius), 2);
-    return area;
-  }
-
   extremes() {
     const xmin = this.points[0].x - this.radius;
     const xmax = this.points[0].x + this.radius;
@@ -247,24 +194,6 @@ export class Circle {
     const ymax = this.points[0].y + this.radius;
 
     return [xmin, xmax, ymin, ymax];
-  }
-
-  within(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    // determin if this entities is within a the window specified by selectionExtremes
-    const extremePoints = this.extremes();
-    if (extremePoints[0] > selectionExtremes[0] &&
-            extremePoints[1] < selectionExtremes[1] &&
-            extremePoints[2] > selectionExtremes[2] &&
-            extremePoints[3] < selectionExtremes[3]
-    ) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   touched(selectionExtremes, core) {
@@ -280,7 +209,6 @@ export class Circle {
       end: rP2,
     };
     const output = Intersection.intersectCircleRectangle(this.intersectPoints(), rectPoints);
-    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;
