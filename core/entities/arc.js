@@ -1,43 +1,21 @@
-/* eslint-disable require-jsdoc */
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
+import {Entity} from './entity.js';
 
-export class Arc {
+export class Arc extends Entity {
   constructor(data) {
-    // Define Properties         //Associated DXF Value
+    super(data);
     this.type = 'Arc';
-    this.family = 'Geometry';
     this.minPoints = 3; // Should match number of cases in prompt
-    this.showPreview = true; // show preview of item as its being created
-    // this.limitPoints = true;
-    // this.allowMultiple = false;
-    this.helper_geometry = true; // If true a line will be drawn between points when defining geometry
-    this.points = [];
     this.radius = 0;
-    this.lineWidth = 2; // Thickness
-    this.colour = 'BYLAYER';
-    this.layer = '0';
-    this.alpha = 1.0; // Transparancy
-    // this.lineType
-    // this.LinetypeScale
-    // this.PlotStyle
-    // this.LineWeight
+    this.helper_geometry = true;
 
     if (data) {
       if (data.points) {
-        this.points = data.points;
         this.radius = this.points[0].distance(this.points[1]);
-      }
-
-      if (data.colour) {
-        this.colour = data.colour;
-      }
-
-      if (data.layer) {
-        this.layer = data.layer;
       }
     }
   }
@@ -53,25 +31,6 @@ export class Arc {
 
   endAngle() {
     return this.points[0].angle(this.points[2]);
-  }
-
-
-  direction() {
-    let start = this.startAngle();
-    let end = this.endAngle();
-    // var direction;
-
-    // console.log('Start angle: ', start, ' end angle: ', end);
-    end = end - start;
-    start = start - start;
-    // console.log('Start angle adjusted to zero: ', start, ' end angle: ', end);
-    /* if(end < 0){
-            end = end + 2 * Math.PI
-            // console.log("Start angle corrected for minus: ", start, " end angle: ", end)
-        }
-        */
-
-    return end < start; // < end;
   }
 
   prompt(core) {
@@ -135,14 +94,6 @@ export class Arc {
     ctx.stroke();
   }
 
-  properties() {
-    return { // type: this.type,
-      colour: this.colour,
-      layer: this.layer,
-      lineWidth: this.lineWidth,
-    };
-  }
-
   dxf() {
     const dxfitem = '';
     const data = dxfitem.concat(
@@ -165,10 +116,6 @@ export class Arc {
     );
     // console.log(' arc.js - DXF Data:' + data);
     return data;
-  }
-
-  trim(points, core) {
-    // console.log('arc.js - Points:', points.length);
   }
 
   intersectPoints() {
@@ -204,7 +151,6 @@ export class Arc {
 
     if (core.settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint);
-      // var snaps = [center, startPoint, endPoint];
 
       // Crude way to snap to the closest point or a node
       if (closest[2] === true && closest[1] < delta / 10) {
@@ -246,29 +192,12 @@ export class Arc {
     return [closest, Infinity, false];
   }
 
-  diameter() {
-    const diameter = 2 * this.radius;
-    return diameter;
-  }
-
-
-  area() {
-    const area = Math.pow((Math.PI * this.radius), 2); // not valid for an arc
-    return area;
-  }
-
   extremes() {
     const xValues = [];
     const yValues = [];
 
-    // var midAngle = (this.endAngle() - this.startAngle()) / 2 + this.startAngle();
-
-    // console.log(" arc.js - [info] (extremes) radius: " + this.radius + " startAngle: " + this.startAngle() + " endAngle: " + this.endAngle())// + " midAngle: " + midAngle);
-
     xValues.push(this.radius * Math.cos(this.startAngle()) + this.points[0].x);
     yValues.push(this.radius * Math.sin(this.startAngle()) + this.points[0].y);
-    // xValues.push( this.radius * Math.cos(midAngle) + this.points[0].x);
-    // yValues.push( this.radius * Math.sin(midAngle) + this.points[0].y);
     xValues.push(this.radius * Math.cos(this.endAngle()) + this.points[0].x);
     yValues.push(this.radius * Math.sin(this.endAngle()) + this.points[0].y);
 
@@ -280,27 +209,9 @@ export class Arc {
     const ymin = Math.min(...yValues);
     const ymax = Math.max(...yValues);
 
-    // console.log(" arc.js - (Arc Extremes)" + xmin, xmax, ymin, ymax)
     return [xmin, xmax, ymin, ymax];
   }
 
-  within(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    // determin if this entities is within a the window specified by selectionExtremes
-    const extremePoints = this.extremes();
-    if (extremePoints[0] > selectionExtremes[0] &&
-            extremePoints[1] < selectionExtremes[1] &&
-            extremePoints[2] > selectionExtremes[2] &&
-            extremePoints[3] < selectionExtremes[3]
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   touched(selectionExtremes, core) {
     if (!core.layerManager.layerVisible(this.layer)) {
