@@ -1,13 +1,47 @@
 export class Entity {
   constructor(data) {
-    this.type = 'Entity';
-    this.family = 'Geometry';
-    this.showPreview = true; // show preview of item as its being created
-    this.helper_geometry = false; // If true a line will be drawn between points when defining geometry
-    this.points = [];
+    Object.defineProperty(this, 'type', {
+      enumerable: false,
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'family', {
+      enumerable: false,
+      value: 'Geometry',
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'showPreview', {
+      enumerable: false,
+      value: true,
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'helper_geometry', {
+      enumerable: false,
+      value: false,
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'points', {
+      enumerable: false,
+      value: [],
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'minPoints', {
+      enumerable: false,
+      value: [],
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'trueColour', {
+      enumerable: false,
+      writable: true,
+    });
+
     this.lineWidth = 2;
     this.colour = 'BYLAYER';
-    this.trueColour;
     this.layer = '0';
 
 
