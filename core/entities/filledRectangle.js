@@ -3,32 +3,19 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
+import {Entity} from './entity.js';
 
-export class FilledRectangle {
+export class FilledRectangle extends Entity {
   constructor(data) {
-    // Define Properties         //Associated DXF Value
+    super(data);
     this.type = 'FilledRectangle';
-    this.family = 'Geometry';
     this.minPoints = 2;
-    this.showPreview = true; // show preview of item as its being created
-    // this.limitPoints = true;
-    // this.allowMultiple = false;
-    this.helper_geometry = false; // If true a Line will be drawn between points when defining geometry
-    this.points = [];
-    this.lineWidth = 2; // Thickness
-    this.colour = 'BYLAYER';
-    this.layer = '0';
-    this.alpha = 1.0; // Transparancy
     this.width = 0.0;
     this.height = 0.0;
-    // this.RectangleType
-    // this.RectangletypeScale
-    // this.PlotStyle
-    // this.RectangleWeight
-
 
     if (data) {
       if (data.points) {
+        this.points = [];
         const point1 = new Point(data.points[0].x, data.points[0].y);
         const point2 = new Point(data.points[1].x, data.points[0].y);
         const point3 = new Point(data.points[1].x, data.points[1].y);
@@ -43,14 +30,6 @@ export class FilledRectangle {
 
         this.width = data.points[1].x - data.points[0].x;
         this.height = data.points[1].y - data.points[0].y;
-      }
-
-      if (data.colour) {
-        this.colour = data.colour;
-      }
-
-      if (data.layer) {
-        this.layer = data.layer;
       }
     }
   }
@@ -99,31 +78,35 @@ export class FilledRectangle {
       colour = core.layerManager.getLayerByName(this.layer).colour;
     }
 
-    // const alpha = ctx.globalAlpha;
-
     ctx.fillStyle = colour;
-    ctx.globalAlpha = 0.2;
-    // TODO: Fix the filled rectangle for cairo
-    // ctx.fillRect(this.points[0].x, this.points[0].y, this.width, this.height);
 
-    ctx.globalAlpha = 1.0;
 
     try { // HTML Canvas
       ctx.strokeStyle = colour;
       ctx.lineWidth = this.lineWidth / scale;
       ctx.beginPath();
+      ctx.globalAlpha = 0.2;
+      ctx.fillRect(this.points[0].x, this.points[0].y, this.width, this.height);
+      ctx.globalAlpha = 1.0;
+      drawRect(this.points);
+      ctx.stroke();
     } catch { // Cairo
       ctx.setLineWidth(this.lineWidth / scale);
       const rgbColour = Colours.hexToScaledRGB(colour);
+      ctx.setSourceRGBA(rgbColour.r, rgbColour.g, rgbColour.b, 0.2);
+      drawRect(this.points);
+      ctx.fillPreserve();
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+      ctx.stroke();
     }
 
-    ctx.moveTo(this.points[0].x, this.points[0].y);
-    ctx.lineTo(this.points[1].x, this.points[1].y);
-    ctx.lineTo(this.points[2].x, this.points[2].y);
-    ctx.lineTo(this.points[3].x, this.points[3].y);
-    ctx.lineTo(this.points[4].x, this.points[4].y);
-    ctx.stroke();
+    function drawRect(points) {
+      ctx.moveTo(points[0].x, points[0].y);
+      ctx.lineTo(points[1].x, points[1].y);
+      ctx.lineTo(points[2].x, points[2].y);
+      ctx.lineTo(points[3].x, points[3].y);
+      ctx.lineTo(points[4].x, points[4].y);
+    }
   }
 
   dxf() {
@@ -158,20 +141,6 @@ export class FilledRectangle {
   }
 
   vertices() {
-    // var rectangle_points = [];
-
-    // var point1 = new Point(this.points[0].x, this.points[0].y);
-    // var point2 = new Point(this.points[1].x, this.points[0].y);
-    // var point3 = new Point(this.points[1].x, this.points[1].y);
-    // var point4 = new Point(this.points[0].x, this.points[1].y);
-    // var point5 = new Point(this.points[0].x, this.points[0].y);
-
-    // rectangle_points.push(point1);
-    // rectangle_points.push(point2);
-    //  rectangle_points.push(point3);
-    //  rectangle_points.push(point4);
-    //  rectangle_points.push(point5);
-
     let verticesData = '';
     for (let i = 0; i < this.points.length; i++) {
       verticesData = verticesData.concat(
@@ -303,54 +272,10 @@ export class FilledRectangle {
     return [xmin, xmax, ymin, ymax];
   }
 
-  within(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    // determin if this entities is within a the window specified by selectionExtremes
-    const extremePoints = this.extremes();
-    if (extremePoints[0] > selectionExtremes[0] &&
-            extremePoints[1] < selectionExtremes[1] &&
-            extremePoints[2] > selectionExtremes[2] &&
-            extremePoints[3] < selectionExtremes[3]
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   touched(selectionExtremes, core) {
     if (!core.layerManager.layerVisible(this.layer)) {
       return;
     }
-
-    /* var lP1 = new Point();
-         var lP2 = new Point();
-
-         var linePoints = {};
-
-         var rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
-         var rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
-
-         var rectPoints = {start: rP1, end: rP2};
-
-         var output = "";
-
-         for(var i = 1; i < this.points.length; i++) {
-
-             linePoints = {start: this.points[i-1], end: this.points[i]};
-
-             output = Intersection.intersectLineRectangle(linePoints, rectPoints);
-             // console.log(output.status)
-
-             if (  output.status === "Intersection"  ){
-                 return true
-             }
-
-         }
-         */
 
     const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
     const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
@@ -361,7 +286,6 @@ export class FilledRectangle {
     };
 
     const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-    // console.log(output.status);
 
     if (output.status === 'Intersection') {
       return true;
