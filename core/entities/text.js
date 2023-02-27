@@ -16,8 +16,6 @@ export class Text extends Entity {
     this.verticalAlignment = 0;
     this.backwards = false;
     this.upsideDown = false;
-    this.colour = 'BYLAYER';
-    this.layer = '0';
     this.styleName = 'STANDARD';
 
     // add rotation property with getter and setter
