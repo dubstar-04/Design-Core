@@ -123,6 +123,7 @@ export class Scene {
       // console.log("linking blocks:", (idx / items.length).toFixed(1) * 100, "%")
 
       if (this.items[idx].type === 'Dimension') {
+        // TODO: do we need to have a specific handler for dimension here?
         // console.log("found Dimension:", idx, "blockname:", items[idx].blockName)
         const block = blocks.filter((item) => item.name === this.items[idx].blockName);
         if (block) {
@@ -163,9 +164,9 @@ export class Scene {
     if (this.activeCommand && this.activeCommand.family === 'Geometry' && !type) {
       // TODO: find a way to create a new type without window
       item = this.core.commandManager.createNew(this.activeCommand.type, data);
-      // item = new window[this.activeCommand.type](data); // Create a new item, send it the points array
     } else {
-      item = this.core.commandManager.createNew(type, data); // Create a new item, send it the points array
+      // Create a new item, send it the points array
+      item = this.core.commandManager.createNew(type, data);
     }
 
     if (typeof index === 'undefined') {
@@ -268,7 +269,7 @@ export class Scene {
         if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
           // console.log(" scene.js - scene.js: selecting() - Select all touched by selection window")
           if (this.items[i].touched(selectionExtremes, this.core) || this.items[i].within(selectionExtremes, this.core)) {
-            // console.log(this.items[i].type + " at index: " + i + " is within the selection")
+            console.log(this.items[i].type + ' at index: ' + i + ' is within the selection');
             if (this.selectionSet.indexOf(i) === -1) { // only store selections once
               this.addToSelectedItems(i);
               this.selectionSet.push(i);
