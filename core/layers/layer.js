@@ -89,7 +89,7 @@ export class Layer {
         '\n', '6', // Linetype
         '\n', this.lineType,
         // "\n", "290", //plotting               |
-        // "\n", this.plotting ? 1 : 0,          |   These items codes dont seem to be
+        // "\n", this.plotting ? 1 : 0,          |   These items codes don't seem to be
         // "\n", "370", //lineWeight             |   supported in ACAD.
         // "\n", this.lineWeight                 |
     );
