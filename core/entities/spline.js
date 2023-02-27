@@ -2,23 +2,13 @@
 import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
 import {Utils} from '../lib/utils.js';
-// import {Intersection} from '../lib/intersect.js';
+import {Entity} from './entity.js';
 
-export class Spline {
+export class Spline extends Entity {
   constructor(data) {
-    // Define Properties         //Associated DXF Value
+    super(data);
     this.type = 'Spline';
-    this.family = 'Geometry';
     this.minPoints = 3;
-    this.showPreview = true; // show preview of item as its being created
-    // this.limitPoints = false;
-    // this.allowMultiple = false;
-    this.helper_geometry = true; // If true a line will be drawn between points when defining geometry
-    this.points = [];
-    this.lineWidth = 2; // Thickness
-    this.colour = 'BYLAYER';
-    this.layer = '0';
-    this.alpha = 1.0; // Transparancy
 
     // Spline Specific
     this.degree = 3;
@@ -27,19 +17,6 @@ export class Spline {
     this.baseFuncRangeInt = 2;
 
     if (data) {
-      if (data.points) {
-        this.points = data.points;
-      }
-
-      if (data.colour) {
-        this.colour = data.colour;
-      }
-
-      if (data.layer) {
-        this.layer = data.layer;
-      }
-
-
       if (this.degree == 2) {
         this.baseFunc = this.basisDeg2;
         this.baseFuncRangeInt = 2;
@@ -84,7 +61,6 @@ export class Spline {
       core.scene.inputArray.pop();
     } else if (core.scene.inputArray.length === this.minPoints) {
       action = true;
-      // reset = true
     }
 
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
@@ -110,7 +86,6 @@ export class Spline {
         ctx.setLineWidth(this.lineWidth / scale);
         ctx.setSourceRGB(0.8, 0.0, 0.0);
       }
-      // ctx.moveTo(this.points[0].x, this.points[0].y);
 
       let oldx; let oldy; let x; let y;
       oldx = this.calcAt(0)[0];
@@ -387,11 +362,6 @@ export class Spline {
       return res;
     }
   };
-
-
-  within(selectionExtremes, core) {
-    return false;
-  }
 
   touched(selectionExtremes, core) {
     return false;
