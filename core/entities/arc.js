@@ -8,7 +8,6 @@ import {Entity} from './entity.js';
 export class Arc extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'Arc';
     this.minPoints = 3; // Should match number of cases in prompt
     this.radius = 0;
     this.helper_geometry = true;

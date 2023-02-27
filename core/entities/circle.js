@@ -8,7 +8,6 @@ import {Entity} from './entity.js';
 export class Circle extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'Circle';
     this.family = 'Geometry';
     this.minPoints = 2;
 

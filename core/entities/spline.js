@@ -7,7 +7,6 @@ import {Entity} from './entity.js';
 export class Spline extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'Spline';
     this.minPoints = 3;
 
     // Spline Specific

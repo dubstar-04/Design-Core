@@ -8,7 +8,6 @@ import {Entity} from './entity.js';
 export class Rectangle extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'Rectangle';
     this.minPoints = 2;
 
     if (data) {

@@ -8,7 +8,6 @@ import {Entity} from './entity.js';
 export class Ellipse extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'Ellipse';
     this.minPoints = 3;
     this.helper_geometry = true; // If true a line will be drawn between points when defining geometry
     this.width = 0;

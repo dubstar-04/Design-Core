@@ -2,6 +2,7 @@ export class Entity {
   constructor(data) {
     Object.defineProperty(this, 'type', {
       enumerable: false,
+      value: this.constructor.name,
       writable: true,
     });
 

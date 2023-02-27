@@ -6,7 +6,6 @@ import {Entity} from './entity.js';
 export class Block extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'Block';
     this.name = '';
     this.location = new Point(); // block reference location
     this.flags = 1;

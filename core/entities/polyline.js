@@ -8,7 +8,6 @@ import {Entity} from './entity.js';
 export class Polyline extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'Polyline';
     this.minPoints = 2;
   }
 

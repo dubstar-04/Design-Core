@@ -8,7 +8,6 @@ import {Entity} from './entity.js';
 export class FilledRectangle extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'FilledRectangle';
     this.minPoints = 2;
     this.width = 0.0;
     this.height = 0.0;

@@ -9,9 +9,7 @@ import {Entity} from './entity.js';
 export class Dimension extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'Dimension';
     this.minPoints = 3;
-
     this.blockName = '';
     this.block = new Block();
     this.text = new Text();

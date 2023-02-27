@@ -8,7 +8,6 @@ import {Entity} from './entity.js';
 export class Text extends Entity {
   constructor(data) {
     super(data);
-    this.type = 'Text';
     this.minPoints = 1;
     this.string = '';
     this.height = 2.5;
