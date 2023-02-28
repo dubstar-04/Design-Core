@@ -205,10 +205,10 @@ export class Block extends Entity {
   }
 
   extremes() {
-    let xmin = Infinity;
-    let xmax = -Infinity;
-    let ymin = Infinity;
-    let ymax = -Infinity;
+    let xmin = 0;
+    let xmax = 0;
+    let ymin = 0;
+    let ymax = 0;
 
     for (let idx = 0; idx < this.items.length; idx++) {
       const itemExtremes = this.items[idx].extremes();

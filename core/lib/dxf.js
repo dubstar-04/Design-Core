@@ -287,8 +287,8 @@ export class DXF {
       const n = parseInt(this.line);
       // debugLog("readCircle: " + n)
       switch (n) {
-        case 1:
-          // next item found, so finish with Circle
+        case 0:
+          // next item found, so finish with Block
           // Push the points to the points array and pass it to the Scene
           points.push(point); // TO DO: Check the points are valid before they are pushed.
 
@@ -2483,10 +2483,18 @@ export class DXF {
         '\nENDTAB',
     );
 
-    const extents = this.core.scene.getExtents();
+    let width = 0;
+    let height = 0;
+    let viewCenterX = 0;
+    let viewCenterY = 0;
 
-    const width = extents.xmax - extents.xmin;
-    const height = extents.ymax - extents.ymin;
+    const extents = this.core.scene.getExtents();
+    if (extents) {
+      width = extents.xmax - extents.xmin;
+      height = extents.ymax - extents.ymin;
+      viewCenterX = extents.xmin + width / 2;
+      viewCenterY = extents.ymin + height / 2;
+    }
 
     data = data.concat(
         '\n0',
@@ -2510,9 +2518,9 @@ export class DXF {
         '\n21', // upper right corner y pos
         '\n1.0',
         '\n12', // view centre x pos
-        '\n' + Number(extents.xmin + width / 2),
+        '\n' + viewCenterX,
         '\n22', // view centre y pos
-        '\n' + Number(extents.ymin + height / 2),
+        '\n' + viewCenterY,
         '\n13', // snap base point x
         '\n0.0',
         '\n23', // snap base point y
@@ -2575,12 +2583,33 @@ export class DXF {
     data = data.concat(
         '\n0',
         '\nSECTION',
+        // Create Block Data
+        '\n2',
+        '\nBLOCKS');
+
+    for (let i = 0; i < this.core.scene.items.length; i++) {
+      if (this.core.scene.items[i].type === 'Block') {
+        data = data.concat('\n', this.core.scene.items[i].dxf());
+      }
+    }
+
+    data = data.concat(
+        '\n0',
+        '\nENDSEC',
+    );
+
+
+    data = data.concat(
+        '\n0',
+        '\nSECTION',
         // Create Entity Data
         '\n2',
         '\nENTITIES');
 
     for (let i = 0; i < this.core.scene.items.length; i++) {
-      data = data.concat('\n', this.core.scene.items[i].dxf());
+      if (this.core.scene.items[i].type !== 'Block') {
+        data = data.concat('\n', this.core.scene.items[i].dxf());
+      }
     }
 
     data = data.concat(
