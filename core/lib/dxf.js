@@ -2575,12 +2575,33 @@ export class DXF {
     data = data.concat(
         '\n0',
         '\nSECTION',
+        // Create Block Data
+        '\n2',
+        '\nBLOCKS');
+
+    for (let i = 0; i < this.core.scene.items.length; i++) {
+      if (this.core.scene.items[i].type === 'Block') {
+        data = data.concat('\n', this.core.scene.items[i].dxf());
+      }
+    }
+
+    data = data.concat(
+        '\n0',
+        '\nENDSEC',
+    );
+
+
+    data = data.concat(
+        '\n0',
+        '\nSECTION',
         // Create Entity Data
         '\n2',
         '\nENTITIES');
 
     for (let i = 0; i < this.core.scene.items.length; i++) {
-      data = data.concat('\n', this.core.scene.items[i].dxf());
+      if (this.core.scene.items[i].type !== 'Block') {
+        data = data.concat('\n', this.core.scene.items[i].dxf());
+      }
     }
 
     data = data.concat(
