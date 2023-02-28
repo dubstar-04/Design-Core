@@ -2483,10 +2483,18 @@ export class DXF {
         '\nENDTAB',
     );
 
-    const extents = this.core.scene.getExtents();
+    let width = 0;
+    let height = 0;
+    let viewCenterX = 0;
+    let viewCenterY = 0;
 
-    const width = extents.xmax - extents.xmin;
-    const height = extents.ymax - extents.ymin;
+    const extents = this.core.scene.getExtents();
+    if (extents) {
+      width = extents.xmax - extents.xmin;
+      height = extents.ymax - extents.ymin;
+      viewCenterX = extents.xmin + width / 2;
+      viewCenterY = extents.ymin + height / 2;
+    }
 
     data = data.concat(
         '\n0',
@@ -2510,9 +2518,9 @@ export class DXF {
         '\n21', // upper right corner y pos
         '\n1.0',
         '\n12', // view centre x pos
-        '\n' + Number(extents.xmin + width / 2),
+        '\n' + viewCenterX,
         '\n22', // view centre y pos
-        '\n' + Number(extents.ymin + height / 2),
+        '\n' + viewCenterY,
         '\n13', // snap base point x
         '\n0.0',
         '\n23', // snap base point y
