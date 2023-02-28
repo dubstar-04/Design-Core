@@ -287,8 +287,8 @@ export class DXF {
       const n = parseInt(this.line);
       // debugLog("readCircle: " + n)
       switch (n) {
-        case 1:
-          // next item found, so finish with Circle
+        case 0:
+          // next item found, so finish with Block
           // Push the points to the points array and pass it to the Scene
           points.push(point); // TO DO: Check the points are valid before they are pushed.
 
