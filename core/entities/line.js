@@ -17,8 +17,8 @@ export class Line extends Entity {
 
         const startPoint = data.points.at(-2);
         const endPoint = data.points.at(-1);
-        this.points.push(startPoint);
-        this.points.push(endPoint);
+        this.points.push(new Point(startPoint.x, startPoint.y));
+        this.points.push(new Point(endPoint.x, endPoint.y));
       }
     }
   }
