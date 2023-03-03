@@ -272,7 +272,7 @@ export class Scene {
         if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
           // console.log(" scene.js - scene.js: selecting() - Select all touched by selection window")
           if (this.items[i].touched(selectionExtremes, this.core) || this.items[i].within(selectionExtremes, this.core)) {
-            console.log(this.items[i].type + ' at index: ' + i + ' is within the selection');
+            // console.log(this.items[i].type + ' at index: ' + i + ' is within the selection');
             if (this.selectionSet.indexOf(i) === -1) { // only store selections once
               this.addToSelectedItems(i);
               this.selectionSet.push(i);
