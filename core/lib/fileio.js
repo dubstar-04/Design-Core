@@ -1,17 +1,17 @@
-import {DXF} from './dxf.js';
+import {DXF} from './dxf/dxf.js';
 import {Strings} from './strings.js';
 
 export class FileIO {
   static saveDxf(core) {
     const dxfWriter = new DXF();
-    const data = dxfWriter.writeDXF(core);
+    const data = dxfWriter.write(core);
     return data;
   }
 
   static openFile(core, data) {
     try {
       const dxfReader = new DXF();
-      dxfReader.readDxf(core, data);
+      dxfReader.read(core, data);
       core.scene.linkBlockData();
       core.layerManager.checkLayers();
       core.canvas.requestPaint();
