@@ -18,6 +18,14 @@ export class Circle extends Entity {
       set: this.setRadius,
       enumerable: true,
     });
+
+    this.setRadius(0);
+
+    if (data) {
+      if (data.radius) {
+        this.setRadius(data.radius);
+      }
+    }
   }
 
   static register() {
