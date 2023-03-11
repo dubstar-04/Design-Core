@@ -19,6 +19,21 @@ export class Ellipse extends Entity {
         this.width = this.points[0].distance(this.points[1]) * 2;
         this.height = this.points[0].distance(this.points[2]) * 2;
       }
+
+      if (data[40]) {
+        // DXF Groupcode 40 - Ratio
+        // Ratio of minor axis to major axis
+      }
+
+      if (data[41]) {
+        // DXF Groupcode 41 - Start Parameter
+        // 0 radians for full ellipse
+      }
+
+      if (data[42]) {
+        // DXF Groupcode 42 - End Parameter
+        // 2PI radians for full ellipse
+      }
     }
   }
 

@@ -20,24 +20,77 @@ export class Dimension extends Entity {
 
 
     if (data) {
-      if (data.blockName) {
-        this.blockName = data.blockName;
+      if (data[1]) {
+        // DXF Groupcode 1 - Dimension text
+        // The string explicitly entered by the user.
+        // Optional; default is the measurement. If null or “<>”, the dimension measurement is drawn as the text,
+        // if ““ (one blank space), the text is suppressed. Anything else is drawn as the text
       }
 
-      if (data.dimType) {
-        this.dimType = data.dimType;
+      if (data.blockName || data[2]) {
+        // DXF Groupcode 2 - Blockname
+        this.blockName = data.blockName || data[2];
+      }
+
+      if (data.styleName || data[3]) {
+        // DXF Groupcode 3 - Dimension Style Name
+        this.styleName = data.styleName || data[3];
+      }
+
+      if (data[41]) {
+        // DXF Groupcode 41 - Line Spacing Factor
+        // Percentage of default (3-on-5) line spacing to be applied.
+        // Valid values range from 0.25 to 4.00
+      }
+
+      if (data[42]) {
+        // DXF Groupcode 42 - Actual Measurement
+        // Read-only
+      }
+
+      if (data[51]) {
+        // DXF Groupcode 51 - Horizontal Direction
+        // All dimension types have an optional 51 group code, which indicates the horizontal direction
+        // for the dimension entity. The dimension entity determines the orientation of dimension
+        // text and lines for horizontal, vertical, and rotated linear dimensions
+        // This group value is the negative if the angle between the OCS X axis and the UCS X axis.
+        // It is always in the XY plane of the OCS
+      }
+
+      if (data.angle || data[53]) {
+        // DXF Groupcode 53 - Rotation
+        // rotation angle of the dimension text away from its default orientation
+        this.angle = data.angle || data[53];
+      }
+
+      if (data.dimType || data[70]) {
+        // DXF Groupcode 70 - Dimension Type
+        // Values 0-6 are integer values that represent the dimension type. Values 32, 64, and 128
+        // are bit values, which are added to the integer values (value 32 is always set in R13 and later releases)
+        // 0 = Rotated, horizontal, or vertical; 1 = Aligned; 2 = Angular; 3 = Diameter; 4 = Radius; 5 = Angular 3 point;
+        // 6 = Ordinate; 32 = Indicates that the block reference (group code 2) is referenced by this dimension only
+        // 64 = Ordinate type. This is a bit value (bit 7) used only with integer value 6.
+        // If set, ordinate is X-type; if not set, ordinate is Y-type
+        // 128 = This is a bit value (bit 8) added to the other group 70 values if the dimension text
+        // has been positioned at a user-defined location rather than at the default location
+        this.dimType = data.dimType || data[70];
+      }
+
+      if (data[71]) {
+        // DXF Groupcode 71 - Attachment Point
+        // 1 = Top left; 2 = Top center; 3 = Top right
+        // 4 = Middle left; 5 = Middle center; 6 = Middle right
+        // 7 = Bottom left; 8 = Bottom center; 9 = Bottom right
+      }
+
+      if (data[72]) {
+        // DXF Groupcode 72 - Line Spacing
+        // 1 (or missing) = At least (taller characters will override)
+        // 2 = Exact (taller characters will not override)
       }
 
       if (data.leaderLength) {
         this.leaderLength = data.leaderLength;
-      }
-
-      if (data.angle) {
-        this.angle = data.angle;
-      }
-
-      if (data.styleName) {
-        this.styleName = data.styleName;
       }
     }
   }

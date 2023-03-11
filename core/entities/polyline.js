@@ -9,6 +9,28 @@ export class Polyline extends Entity {
   constructor(data) {
     super(data);
     this.minPoints = 2;
+
+    if (data) {
+      if (data[40]) {
+        // DXF Groupcode 40 - Start Width
+      }
+
+      if (data[41]) {
+        // DXF Groupcode 41 - End Width
+      }
+
+      if (data[70]) {
+        // DXF Groupcode 70 - Polyline flag (bit-coded; default = 0):
+        // 1 = This is a closed polyline (or a polygon mesh closed in the M direction)
+        // 2 = Curve-fit vertices have been added
+        // 4 = Spline-fit vertices have been added
+        // 8 = This is a 3D polyline
+        // 16 = This is a 3D polygon mesh
+        // 32 = The polygon mesh is closed in the N direction
+        // 64 = The polyline is a polyface mesh
+        // 128 = The linetype pattern is generated continuously around the vertices of this polyline
+      }
+    }
   }
 
   static register() {

@@ -9,12 +9,14 @@ export class Arc extends Entity {
   constructor(data) {
     super(data);
     this.minPoints = 3; // Should match number of cases in prompt
-    this.radius = 0;
+    this.radius = 1;
     this.helper_geometry = true;
 
     if (data) {
-      if (data.points) {
-        this.radius = this.points[0].distance(this.points[1]);
+      if (data.points || data[40]) {
+        // DXF Groupcode 40 - Radius
+        const radius = this.points[0].distance(this.points[1]) || data[40];
+        this.radius = radius;
       }
     }
   }
