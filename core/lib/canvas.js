@@ -213,8 +213,6 @@ export class Canvas {
     }
     */
 
-    // log('item length:', numOfEntities);
-
     for (i; i < numOfEntities; i++) {
       this.core.scene.items[i].draw(context, this.getScale(), this.core);
     }
