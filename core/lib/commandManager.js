@@ -146,6 +146,10 @@ export class CommandManager {
    * @returns boolean
    */
   isCommand(command) {
+    if (command === undefined) {
+      return false;
+    }
+
     const found = this.commands.some((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
     return found;
   }

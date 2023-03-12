@@ -153,6 +153,11 @@ export class Scene {
   }
 
   addToScene(type, data, end, index) {
+    // check type is a valid command
+    if (!this.core.commandManager.isCommand(type)) {
+      return;
+    }
+
     if (!data) {
       const colour = 'BYLAYER';
       data = {
