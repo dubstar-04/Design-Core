@@ -85,6 +85,7 @@ export class Scene {
     this.saved = false; // Changes have occured. A save may be required.
   }
 
+  /*
   // add item to block
   // TODO: fix this mess
   addItemToBlock(type, data, name) {
@@ -151,6 +152,7 @@ export class Scene {
       }
     }
   }
+  */
 
   addToScene(type, data, end, index) {
     // check type is a valid command
