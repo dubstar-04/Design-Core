@@ -8,57 +8,35 @@ export class Entities extends Section {
   }
 
   read(iterator) {
-    let currentEntity;
-    let currentPoint;
+    let currentEntity = {};
     while (iterator.next().trim() !== 'ENDSEC') {
       const currentValue = iterator.current().trim();
-      // log('Entity:', currentValue);
       switch (true) {
-        case (currentValue === '0'):
+        case (currentValue === '0' && !iterator.odd()):
 
-          if (currentEntity !== undefined && Object.keys(currentEntity).length) {
+          if (['VERTEX'].includes(iterator.nextValue())) {
+            console.log('VERTEX not handled');
+            const child = this.parseChild(iterator);
+            break;
+          }
+
+          if (Object.keys(currentEntity).length) {
             this.entities.push(currentEntity);
-
-            if (currentPoint !== undefined && Object.keys(currentPoint).length) {
-              currentEntity.points.push(currentPoint);
-              currentPoint = undefined;
-            }
-
-            log(currentEntity);
           }
 
-          iterator.setReferenceIndex();
-          currentEntity = {points: []};
-
+          currentEntity = {};
           // Add the current code and the next value to the entity
-          const code = currentValue.trim();
-          const value = this.getGroupValue(code, iterator.nextValue());
-          currentEntity[code] = value;
+          this.parseValue(iterator, currentEntity);
+          break;
 
-          break;
-        case (currentValue === '10'):
-          if (currentPoint !== undefined && Object.keys(currentPoint).length) {
-            currentEntity.points.push(currentPoint);
-            currentPoint = undefined;
-          }
-          currentPoint = {};
-          const gpCode = currentValue.trim();
-          const gpValue = this.getGroupValue(gpCode, iterator.next());
-          currentPoint['x'] = gpValue;
-          break;
-        case (currentValue === '20'):
-          const gCode = currentValue.trim();
-          const gValue = this.getGroupValue(gCode, iterator.next());
-          currentPoint['y'] = gValue;
-          break;
         default:
           if (!iterator.odd()) {
-            const code = currentValue.trim();
-            const value = this.getGroupValue(code, iterator.next());
-            currentEntity[code] = value;
+            this.parseValue(iterator, currentEntity);
           }
           break;
       }
     }
+
+    return this.entities;
   }
 }

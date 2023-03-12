@@ -8,24 +8,33 @@ export class Blocks extends Section {
   }
 
   read(iterator) {
-    let currentTable;
+    let currentBlock = {};
     while (iterator.next().trim() !== 'ENDSEC') {
       const currentValue = iterator.current().trim();
       switch (true) {
-        case (currentValue === 'BLOCK'):
-          iterator.setReferenceIndex();
-          currentTable = {};
-          break;
-        case (currentValue === 'ENDBLK'):
-          this.blocks.push(currentTable);
-          break;
-        default:
-          if (!iterator.odd()) {
-            const code = iterator.prevValue().trim();
-            currentTable[code] = this.getGroupValue(code, currentValue);
+        case (currentValue === '0' && !iterator.odd()):
+
+          if (['BLOCK'].includes(iterator.nextValue())) {
+            if (Object.keys(currentBlock).length) {
+              this.blocks.push(currentBlock);
+            }
+
+            currentBlock = {children: []};
+            this.parseValue(iterator, currentBlock);
+            break;
           }
+
+          if (['ENDBLK'].includes(iterator.nextValue())) {
+            currentBlock.children.push(this.parseChild(iterator));
+            break;
+          }
+
+        case (!iterator.odd()):
+          this.parseValue(iterator, currentBlock);
           break;
       }
     }
+
+    return this.blocks;
   }
 }

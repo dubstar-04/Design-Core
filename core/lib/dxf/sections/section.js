@@ -3,17 +3,99 @@ export class Section {
 
   }
 
+  parseValue(iterator, object) {
+    const code = iterator.current().trim();
+
+    // parse point values
+    if (['10', '11', '12', '13'].includes(code)) {
+      const point = this.parsePoint(iterator);
+      // check the object has a points property
+      if (object.hasOwnProperty('points') == false) {
+        object.points = [];
+      }
+      // add the point to the object
+      object.points.push(point);
+      return;
+    }
+
+    if (object.hasOwnProperty(`${code}`)) {
+      // if (['100'].includes(code) === false) {
+      console.log(`ERROR: Duplicate property: ${code} - line: ${iterator.currentIndex}`);
+      // }
+    }
+
+    // get the group value
+    const value = this.getGroupValue(code, iterator.nextValue());
+    // add group value to the object
+    object[code] = value;
+  }
+
+  parseChild(iterator) {
+    const child = {};
+
+    if (iterator.current().trim() !== '0') {
+      console.log('ERROR: child expected to start with 0 groupcode');
+    }
+
+    // iterate back an index so the next call to parseValue includes the 0 value
+    iterator.prev();
+
+    while (true) {
+      const currentValue = iterator.next().trim();
+      switch (true) {
+        case (!iterator.odd()):
+          if (currentValue === '0' && Object.keys(child).length) {
+            iterator.prev();
+            return child;
+          } else {
+            this.parseValue(iterator, child);
+            break;
+          }
+      }
+    }
+  }
+
+  parsePoint(iterator) {
+    const point = {};
+    iterator.prev();
+    while (true) {
+      const currentValue = iterator.next().trim();
+      switch (true) {
+        case (['10', '11', '12', '13'].includes(currentValue)):
+          if (Object.keys(point).length) {
+            // iterate back an index so iterator can handle the current value
+            iterator.prev();
+            return point;
+          }
+          const xCode = currentValue;
+          const xValue = this.getGroupValue(xCode, iterator.next());
+          point.x = xValue;
+          break;
+        case (['20', '21', '22', '23'].includes(currentValue)):
+          const yCode = currentValue;
+          const yValue = this.getGroupValue(yCode, iterator.next());
+          point.y = yValue;
+          break;
+        case (['30', '31', '32', '33'].includes(currentValue)):
+          const zCode = currentValue;
+          const zValue = this.getGroupValue(zCode, iterator.next());
+          point.z = zValue;
+          break;
+        case (['42'].includes(currentValue)):
+          const bulgeCode = currentValue;
+          const bulgeValue = this.getGroupValue(bulgeCode, iterator.next());
+          point.bulge = bulgeValue;
+          break;
+        default:
+          // iterate back an index so iterator can handle the current value
+          iterator.prev();
+          return point;
+      }
+    }
+  }
+
   parseBoolean(value) {
-    const _value = value.trim();
-
-    if (_value === '0') {
-      return false;
-    }
-    if (_value === '1') {
-      return true;
-    }
-
-    throw Error(`${value} not a valid Boolean`);
+    return Boolean(value.trim());
   }
 
   getGroupValue(_code, value) {
@@ -22,7 +104,7 @@ export class Section {
     switch (true) {
       // 0-9: String
       case (code <= 9):
-        returnValue = value;
+        returnValue = `${value}`;
         break;
       // 10-39: Double precision 3D point value
       // 40-59: Double precision floating-point value
@@ -127,8 +209,8 @@ export class Section {
         returnValue = parseInt(value);
         break;
       default:
-      // unknown group code
-        break;
+        // TODO: Add line numbers to errors
+        throw Error('Unknown Group Code');
     }
 
     return returnValue;

@@ -5,7 +5,7 @@ export class Header extends Section {
     super();
 
     // Properties are dynamically created during read
-
+    // TODO: add critical header values here?
     this.$ACADVER = '';
     this.$CLAYER = '0';
   }
@@ -17,15 +17,15 @@ export class Header extends Section {
       switch (true) {
         case (currentValue.at(0) === '$'):
           currentVariable = currentValue;
-          iterator.setReferenceIndex();
           this[currentVariable] = {};
           break;
         case (currentValue === '9'):
+          // TODO: Handle header values better
+          // This code currently misses the endsec and adds it to the last property
           break;
         default:
           if (!iterator.odd()) {
-            const code = iterator.prevValue().trim();
-            this[currentVariable][code] = currentValue;
+            this.parseValue(iterator, this[currentVariable]);
           }
           break;
       }

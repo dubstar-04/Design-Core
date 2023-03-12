@@ -3,9 +3,6 @@ export class DxfIterator {
   constructor() {
     this.currentIndex = 0;
     this.lines = [];
-
-    // store a reference index
-    this.referenceIndex = 0;
   }
 
   loadFile(file) {
@@ -13,16 +10,7 @@ export class DxfIterator {
   }
 
   odd() {
-    const indexDelta = this.currentIndex - this.referenceIndex;
-    return Boolean( indexDelta % 2 === 1);
-  }
-
-  setReferenceIndex() {
-    this.referenceIndex = this.currentIndex;
-  }
-
-  getReferenceIndex() {
-    return this.referenceIndex;
+    return Boolean( this.currentIndex % 2 === 1);
   }
 
   next() {

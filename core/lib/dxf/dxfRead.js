@@ -8,10 +8,10 @@ import {DxfIterator} from './dxfIterator.js';
 export class DXFReader {
   constructor() {
     this.iterator = new DxfIterator();
-    this.blocks = new Blocks();
+    this.blocks = [];
     this.header = new Header();
-    this.entities = new Entities();
-    this.tables = new Tables();
+    this.entities = [];
+    this.tables = [];
   }
 
   read(file) {
@@ -22,7 +22,6 @@ export class DXFReader {
   parseFile() {
     // TODO: check the file contains data and ends with EOF
     while (this.iterator.next().trim() !== 'EOF') {
-      // log('Parsing:', this.iterator.current());
       const currentValue = this.iterator.current().trim();
       switch (currentValue) {
         case 'HEADER':
@@ -31,15 +30,18 @@ export class DXFReader {
           break;
         case 'TABLES':
           log('read:', currentValue);
-          this.tables.read(this.iterator);
+          const tables = new Tables();
+          this.tables = tables.read(this.iterator);
           break;
         case 'BLOCKS':
           log('read:', currentValue);
-          this.blocks.read(this.iterator);
+          const blocks = new Blocks();
+          this.blocks = blocks.read(this.iterator);
           break;
         case 'ENTITIES':
           log('read:', currentValue);
-          this.entities.read(this.iterator);
+          const entities = new Entities();
+          this.entities = entities.read(this.iterator);
           break;
       }
     }

@@ -12,20 +12,29 @@ export class Tables extends Section {
     while (iterator.next().trim() !== 'ENDSEC') {
       const currentValue = iterator.current().trim();
       switch (true) {
-        case (currentValue === 'TABLE'):
-          iterator.setReferenceIndex();
-          currentTable = {};
-          break;
-        case (currentValue === 'ENDTAB'):
-          this.tables.push(currentTable);
-          break;
-        default:
-          if (!iterator.odd()) {
-            const code = iterator.prevValue().trim();
-            currentTable[code] = currentValue;
+        case (currentValue === '0' && !iterator.odd()):
+
+          if (['TABLE'].includes(iterator.nextValue())) {
+            currentTable = {children: []};
+            this.parseValue(iterator, currentTable);
+            break;
           }
+
+          if (['ENDTAB', 'ENDSEC'].includes(iterator.nextValue().trim()) === false) {
+            currentTable.children.push(this.parseChild(iterator));
+            break;
+          }
+
+          if (['ENDTAB', 'ENDSEC'].includes(iterator.nextValue().trim())) {
+            this.tables.push(currentTable);
+            break;
+          }
+        case (!iterator.odd()):
+          this.parseValue(iterator, currentTable);
           break;
       }
     }
+
+    return this.tables;
   }
 }
