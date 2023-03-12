@@ -20,7 +20,7 @@ export class Circle extends Entity {
     });
 
     // ensure a radius is set
-    this.setRadius(1);
+    // this.setRadius(1);
 
     if (data) {
       if (data.radius || data[40]) {
