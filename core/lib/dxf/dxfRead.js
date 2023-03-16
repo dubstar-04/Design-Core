@@ -45,5 +45,7 @@ export class DXFReader {
           break;
       }
     }
+
+    log(this.blocks);
   }
 }

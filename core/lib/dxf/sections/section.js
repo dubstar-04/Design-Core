@@ -13,8 +13,13 @@ export class Section {
       if (object.hasOwnProperty('points') == false) {
         object.points = [];
       }
-      // add the point to the object
-      object.points.push(point);
+      // check the point has x & y keys.
+      if (point.hasOwnProperty('x') && point.hasOwnProperty('y')) {
+        // add the point to the object
+        object.points.push(point);
+      } else {
+        console.log('ERROR: Failed to Parse Point:', point);
+      }
       return;
     }
 
