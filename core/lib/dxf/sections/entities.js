@@ -7,36 +7,38 @@ export class Entities extends Section {
     this.entities = [];
   }
 
+  addEntity(entity) {
+    if (Object.keys(entity).length) {
+      // log('currentEntity', currentEntity);
+      this.entities.push(entity);
+    }
+  }
+
   read(iterator) {
     let currentEntity = {};
-    while (iterator.next().trim() !== 'ENDSEC') {
-      const currentValue = iterator.current().trim();
+    while (iterator.nextPair().value !== 'ENDSEC') {
+      const currentPair = iterator.currentPair();
       switch (true) {
-        case (currentValue === '0' && !iterator.odd()):
+        case (currentPair.code === '0'):
 
-          if (['VERTEX'].includes(iterator.nextValue())) {
+          if (['VERTEX'].includes(currentPair.value)) {
             console.log('VERTEX not handled');
             const child = this.parseChild(iterator);
             break;
           }
 
-          if (Object.keys(currentEntity).length) {
-            this.entities.push(currentEntity);
-          }
-
+          this.addEntity(currentEntity);
           currentEntity = {};
-          // Add the current code and the next value to the entity
           this.parseValue(iterator, currentEntity);
           break;
 
         default:
-          if (!iterator.odd()) {
-            this.parseValue(iterator, currentEntity);
-          }
+          this.parseValue(iterator, currentEntity);
           break;
       }
     }
 
+    this.addEntity(currentEntity);
     return this.entities;
   }
 }

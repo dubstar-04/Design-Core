@@ -53,4 +53,36 @@ export class DxfIterator {
       return previous;
     }
   }
+
+
+  /**
+   * Find the next index of value
+   * @param {Any} value
+   */
+  indexOfValue(value) {
+    const idx = this.lines.slice(this.currentIndex).findIndex((element) => element.trim() === value);
+
+    if (idx) {
+      return this.currentIndex + idx;
+    }
+
+    return idx;
+  }
+
+  prevPair() {
+    this.prev();
+    this.prev();
+    return this.currentPair();
+  }
+
+
+  currentPair() {
+    return {code: this.current().trim(), value: this.nextValue()};
+  }
+
+  nextPair() {
+    this.next();
+    this.next();
+    return this.currentPair();
+  }
 }

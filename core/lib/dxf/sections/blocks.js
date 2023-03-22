@@ -7,34 +7,36 @@ export class Blocks extends Section {
     this.blocks = [];
   }
 
+  addBlock(block) {
+    if (Object.keys(block).length) {
+      // log('addBlock', block);
+      this.blocks.push(block);
+    }
+  }
+
   read(iterator) {
     let currentBlock = {};
-    while (iterator.next().trim() !== 'ENDSEC') {
-      const currentValue = iterator.current().trim();
+    while (iterator.nextPair().value !== 'ENDSEC') {
+      const currentPair = iterator.currentPair();
       switch (true) {
-        case (currentValue === '0' && !iterator.odd()):
+        case (currentPair.code === '0'):
 
-          if (['BLOCK'].includes(iterator.nextValue())) {
-            if (Object.keys(currentBlock).length) {
-              this.blocks.push(currentBlock);
-            }
-
+          if (['BLOCK'].includes(currentPair.value)) {
+            this.addBlock(currentBlock);
             currentBlock = {children: []};
             this.parseValue(iterator, currentBlock);
             break;
-          }
-
-          if (['ENDBLK'].includes(iterator.nextValue())) {
+          } else {
             currentBlock.children.push(this.parseChild(iterator));
             break;
           }
 
-        case (!iterator.odd()):
+        default:
           this.parseValue(iterator, currentBlock);
-          break;
       }
     }
 
+    this.addBlock(currentBlock);
     return this.blocks;
   }
 }

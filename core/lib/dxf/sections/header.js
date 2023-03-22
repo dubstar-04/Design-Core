@@ -12,21 +12,19 @@ export class Header extends Section {
 
   read(iterator) {
     let currentVariable;
-    while (iterator.next().trim() !== 'ENDSEC') {
-      const currentValue = iterator.current().trim();
+    while (iterator.nextPair().value !== 'ENDSEC') {
+      const currentPair = iterator.currentPair();
       switch (true) {
-        case (currentValue.at(0) === '$'):
-          currentVariable = currentValue;
-          this[currentVariable] = {};
-          break;
-        case (currentValue === '9'):
+        case (currentPair.code === '9'):
           // TODO: Handle header values better
           // This code currently misses the endsec and adds it to the last property
+          if (currentPair.value.at(0) === '$') {
+            currentVariable = currentPair.value;
+            this[currentVariable] = {};
+          }
           break;
         default:
-          if (!iterator.odd()) {
-            this.parseValue(iterator, this[currentVariable]);
-          }
+          this.parseValue(iterator, this[currentVariable]);
           break;
       }
     }

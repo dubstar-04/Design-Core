@@ -7,34 +7,39 @@ export class Tables extends Section {
     this.tables = [];
   }
 
+  addTable(table) {
+    if (Object.keys(table).length) {
+      // log('addTable', table);
+      this.tables.push(table);
+    }
+  }
+
   read(iterator) {
     let currentTable;
-    while (iterator.next().trim() !== 'ENDSEC') {
-      const currentValue = iterator.current().trim();
+    while (iterator.nextPair().value !== 'ENDSEC') {
+      const currentPair = iterator.currentPair();
       switch (true) {
-        case (currentValue === '0' && !iterator.odd()):
+        case (currentPair.code === '0' ):
 
-          if (['TABLE'].includes(iterator.nextValue())) {
+          if (['TABLE'].includes(currentPair.value)) {
             currentTable = {children: []};
             this.parseValue(iterator, currentTable);
             break;
-          }
-
-          if (['ENDTAB', 'ENDSEC'].includes(iterator.nextValue().trim()) === false) {
+          } else if (['ENDTAB'].includes(currentPair.value)) {
+            this.addTable(currentTable);
+            break;
+          } else {
             currentTable.children.push(this.parseChild(iterator));
             break;
           }
 
-          if (['ENDTAB', 'ENDSEC'].includes(iterator.nextValue().trim())) {
-            this.tables.push(currentTable);
-            break;
-          }
-        case (!iterator.odd()):
+        default:
           this.parseValue(iterator, currentTable);
           break;
       }
     }
 
+    this.addTable(currentTable);
     return this.tables;
   }
 }
