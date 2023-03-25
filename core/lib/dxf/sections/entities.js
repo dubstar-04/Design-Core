@@ -9,7 +9,11 @@ export class Entities extends Section {
 
   addEntity(entity) {
     if (Object.keys(entity).length) {
-      // log('currentEntity', currentEntity);
+      // log('currentEntity', entity);
+      if (!entity.hasOwnProperty('points')) {
+        console.log('ERROR: entity contains no points');
+      }
+
       this.entities.push(entity);
     }
   }
