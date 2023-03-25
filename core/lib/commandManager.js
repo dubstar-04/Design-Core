@@ -1,5 +1,6 @@
 import {Line} from '../entities/line.js';
 import {Polyline} from '../entities/polyline.js';
+import {Lwpolyline} from '../entities/lwpolyline.js';
 import {Circle} from '../entities/circle.js';
 import {Arc} from '../entities/arc.js';
 import {Rectangle} from '../entities/rectangle.js';
@@ -32,6 +33,7 @@ import {Strings} from './strings.js';
 const classes = {
   Line,
   Polyline,
+  Lwpolyline,
   Circle,
   Arc,
   Rectangle,
