@@ -17,6 +17,16 @@ export class Arc extends Entity {
         // DXF Groupcode 40 - Radius
         const radius = this.points[0].distance(this.points[1]) || data[40];
         this.radius = radius;
+      if (data.startAngle || data[50]) {
+        // DXF Groupcode 50 - Start Angle
+        const angle = Utils.degrees2radians(data.startAngle || data[50]);
+        this.points[1] = this.points[0].project(angle, this.radius);
+      }
+
+      if (data.endAngle || data[51]) {
+        // DXF Groupcode 51 - Start Angle
+        const angle = Utils.degrees2radians(data.endAngle || data[51]);
+        this.points[2] = this.points[0].project(angle, this.radius);
       }
     }
   }
