@@ -49,7 +49,7 @@ export class Lwpolyline extends BasePolyline {
         pointData,
 
     );
-    console.log(' lwpolyline.js - DXF Data:' + data);
+    // console.log(' lwpolyline.js - DXF Data:' + data);
     return data;
   }
 }
