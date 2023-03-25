@@ -30,24 +30,25 @@ export class DXF {
 
     entities.forEach((entity) => {
       if (entity.hasOwnProperty('points')) {
-        const points = [];
-        entity.points.forEach((point) => {
-          const pt = new Point(point.x, point.y);
-          points.push(pt);
-        });
-        entity.points = points;
-      }
-
-      const type = entity[0].trim().toUpperCase();
-
-      // TODO: Handle LWPOLYLINE properly
-      if (type === 'LWPOLYLINE') {
-        entity[0] = 'Polyline';
+        entity.points = this.parsePoints(entity.points);
       }
 
       const entityCommand = core.commandManager.getCommand(entity[0]);
       core.scene.addToScene(entityCommand, entity);
     });
+  }
+
+  parsePoints(dxfPoints) {
+    const points = [];
+    dxfPoints.forEach((point) => {
+      const pt = new Point(point.x, point.y);
+      if (point.hasOwnProperty('bulge')) {
+        console.log('WARNING: Bulge not handled');
+        pt.bulge = point.bulge;
+      }
+      points.push(pt);
+    });
+    return points;
   }
 
   loadTables(core) {
