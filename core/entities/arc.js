@@ -15,8 +15,15 @@ export class Arc extends Entity {
     if (data) {
       if (data.points || data[40]) {
         // DXF Groupcode 40 - Radius
-        const radius = this.points[0].distance(this.points[1]) || data[40];
-        this.radius = radius;
+
+        // get the radius from the points or the incoming dxf groupcode
+        const radius = this.points[1] ? this.points[0].distance(this.points[1]) : data[40];
+
+        if (radius !== undefined) {
+          this.radius = radius;
+        }
+      }
+
       if (data.startAngle || data[50]) {
         // DXF Groupcode 50 - Start Angle
         const angle = Utils.degrees2radians(data.startAngle || data[50]);
