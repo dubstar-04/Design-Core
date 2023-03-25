@@ -9,19 +9,6 @@ export class DxfIterator {
     this.lines = file.split('\n');
   }
 
-  odd() {
-    return Boolean( this.currentIndex % 2 === 1);
-  }
-
-  next() {
-    if (this.currentIndex < this.lines.length - 1) {
-      this.currentIndex = this.currentIndex + 1;
-      return this.current();
-    }
-
-    return undefined;
-  }
-
   current() {
     const current = this.formatted(this.lines[this.currentIndex]);
     return current;
@@ -29,15 +16,6 @@ export class DxfIterator {
 
   formatted(value) {
     return value.replace(/(\r\n|\n|\r)/gm, '');
-  }
-
-  prev() {
-    if (this.currentIndex > 0) {
-      this.currentIndex = this.currentIndex - 1;
-      return this.current();
-    }
-
-    return undefined;
   }
 
   nextValue() {
@@ -54,35 +32,25 @@ export class DxfIterator {
     }
   }
 
-
-  /**
-   * Find the next index of value
-   * @param {Any} value
-   */
-  indexOfValue(value) {
-    const idx = this.lines.slice(this.currentIndex).findIndex((element) => element.trim() === value);
-
-    if (idx) {
-      return this.currentIndex + idx;
+  prevPair() {
+    if (this.currentIndex > 2) {
+      this.currentIndex = this.currentIndex - 2;
+      return this.currentPair();
     }
 
-    return idx;
+    return;
   }
-
-  prevPair() {
-    this.prev();
-    this.prev();
-    return this.currentPair();
-  }
-
 
   currentPair() {
     return {code: this.current().trim(), value: this.nextValue()};
   }
 
   nextPair() {
-    this.next();
-    this.next();
-    return this.currentPair();
+    if (this.currentIndex < this.lines.length - 2) {
+      this.currentIndex = this.currentIndex + 2;
+      return this.currentPair();
+    }
+
+    return;
   }
 }
