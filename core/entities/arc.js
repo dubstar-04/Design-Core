@@ -31,7 +31,7 @@ export class Arc extends Entity {
       }
 
       if (data.endAngle || data[51]) {
-        // DXF Groupcode 51 - Start Angle
+        // DXF Groupcode 51 - End Angle
         const angle = Utils.degrees2radians(data.endAngle || data[51]);
         this.points[2] = this.points[0].project(angle, this.radius);
       }
