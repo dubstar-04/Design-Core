@@ -21,9 +21,15 @@ export class Entities extends Section {
       switch (true) {
         case (currentPair.code === '0'):
 
-          if (['VERTEX'].includes(currentPair.value)) {
-            console.log('VERTEX not handled');
+          if (['VERTEX', 'SEQEND'].includes(currentPair.value)) {
             const child = this.parseChild(iterator);
+
+            if (currentEntity.hasOwnProperty('children') === false) {
+              currentEntity.children = [];
+            }
+
+            // log(iterator.currentIndex, '- child:', child);
+            currentEntity.children.push(child);
             break;
           }
 
