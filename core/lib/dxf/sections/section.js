@@ -46,13 +46,15 @@ export class Section {
       console.log('ERROR: child expected to start with 0 groupcode');
     }
 
+    // add the 0 code type value to the child definition
+    this.parseValue(iterator, child);
+
     while (true) {
       const currentPair = iterator.nextPair();
       switch (true) {
         case (currentPair.code === '0'):
           if (Object.keys(child).length) {
             iterator.prevPair();
-            // log('child', currentPair, child);
             return child;
           }
         default:
