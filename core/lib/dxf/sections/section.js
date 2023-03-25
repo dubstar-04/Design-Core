@@ -5,7 +5,6 @@ export class Section {
 
   parseValue(iterator, object) {
     const currentPair = iterator.currentPair();
-    // log('parseValue', currentPair);
 
     // parse point values
     if (['10', '11', '12', '13'].includes(currentPair.code)) {
@@ -28,9 +27,7 @@ export class Section {
     }
 
     if (object.hasOwnProperty(`${currentPair.code}`)) {
-      // if (['100'].includes(code) === false) {
-      // console.log(`ERROR: Duplicate property: ${code} - line: ${iterator.currentIndex}`);
-      // }
+      console.log(`ERROR: Duplicate property: ${code} - line: ${iterator.currentIndex}`);
     }
 
     // get the group value
@@ -68,37 +65,28 @@ export class Section {
     const point = {};
     iterator.prevPair();
     while (true) {
-      // const currentValue = iterator.next().trim();
       const currentPair = iterator.nextPair();
       switch (true) {
         case (['10', '11', '12', '13'].includes(currentPair.code)):
           if (Object.keys(point).length) {
-            // iterate back an index so iterator can handle the current value
-            // iterator.prev();
             return point;
           }
-          // const xCode = currentPair.code;
           const xValue = this.getGroupValue(currentPair);
           point.x = xValue;
           break;
         case (['20', '21', '22', '23'].includes(currentPair.code)):
-          // const yCode = currentValue;
           const yValue = this.getGroupValue(currentPair);
           point.y = yValue;
           break;
         case (['30', '31', '32', '33'].includes(currentPair.code)):
-          // const zCode = currentValue;
           const zValue = this.getGroupValue(currentPair);
           point.z = zValue;
           break;
         case (['42'].includes(currentPair.code)):
-          // const bulgeCode = currentValue;
           const bulgeValue = this.getGroupValue(currentPair);
           point.bulge = bulgeValue;
           break;
         default:
-          // iterate back an index so iterator can handle the current value
-          // iterator.prev();
           return point;
       }
     }
