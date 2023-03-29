@@ -38,6 +38,19 @@ export class DXF {
     });
   }
 
+  addToScene(core, item) {
+    if (item.hasOwnProperty('0') === false) {
+      return;
+    }
+
+    const command = item[0];
+    if (core.commandManager.isCommand(command)) {
+      core.scene.addToScene(command, item);
+    } else {
+      console.log(`WARNING: Unknown command - ${command}`);
+    }
+  }
+
   parsePoints(dxfPoints) {
     const points = [];
     dxfPoints.forEach((point) => {
