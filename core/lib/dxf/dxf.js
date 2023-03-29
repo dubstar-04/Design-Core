@@ -22,7 +22,20 @@ export class DXF {
   loadDxf(core, data) {
     this.read(data);
     this.loadTables(core);
+    this.loadBlocks(core);
     this.loadEntities(core);
+  }
+
+  loadTables(core) {
+    const tables = this.reader.tables;
+
+    tables.forEach((table) => {
+      if (table[2] === 'LAYER') {
+        table.children.forEach((layer) => {
+          core.layerManager.addLayer(layer);
+        });
+      }
+    });
   }
 
   loadBlocks(core) {
@@ -75,8 +88,7 @@ export class DXF {
         entity.points = this.parsePoints(entity.points);
       }
 
-      const entityCommand = core.commandManager.getCommand(entity[0]);
-      core.scene.addToScene(entityCommand, entity);
+      this.addToScene(core, entity);
     });
   }
 
@@ -98,23 +110,11 @@ export class DXF {
     dxfPoints.forEach((point) => {
       const pt = new Point(point.x, point.y);
       if (point.hasOwnProperty('bulge')) {
-        console.log('WARNING: Bulge not handled');
+        // console.log('WARNING: Bulge not handled');
         pt.bulge = point.bulge;
       }
       points.push(pt);
     });
     return points;
-  }
-
-  loadTables(core) {
-    const tables = this.reader.tables;
-
-    tables.forEach((table) => {
-      if (table[2] === 'LAYER') {
-        table.children.forEach((layer) => {
-          core.layerManager.addLayer(layer);
-        });
-      }
-    });
   }
 }
