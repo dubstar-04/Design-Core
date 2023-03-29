@@ -96,7 +96,7 @@ export class LayerManager {
   }
 
   layerExists(layer) {
-    const layerExists = this.layers.some((el) => el.name === layer.name);
+    const layerExists = this.layers.some((el) => el.name.toUpperCase() === layer.name.toUpperCase());
     return layerExists;
   }
 
