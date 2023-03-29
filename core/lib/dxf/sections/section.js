@@ -27,7 +27,7 @@ export class Section {
     }
 
     if (object.hasOwnProperty(`${currentPair.code}`)) {
-      console.log(`ERROR: Duplicate property: ${currentPair.code} - line: ${iterator.currentIndex}`);
+      // console.log(`ERROR: Duplicate property: ${currentPair.code} - line: ${iterator.currentIndex}`);
     }
 
     // get the group value
