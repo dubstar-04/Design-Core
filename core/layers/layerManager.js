@@ -96,16 +96,8 @@ export class LayerManager {
   }
 
   layerExists(layer) {
-    let i = this.layerCount();
-    while (i--) {
-      // console.log("layerExists:", this.layers[i].name)
-      if (this.layers[i].name === layer.name) {
-        // console.log("layerManager.js LayerExist: " + layer.name)
-        return true;
-      }
-    }
-    // console.log("Layer Doesn't Exist: " + layer.name)
-    return false;
+    const layerExists = this.layers.some((el) => el.name === layer.name);
+    return layerExists;
   }
 
   checkLayers() {
