@@ -174,6 +174,10 @@ export class CommandManager {
       command = found.command;
     }
 
+    if (command === undefined) {
+      console.log(`WARNING: Unknown Command: ${input}`);
+    }
+
     return command;
   }
 
