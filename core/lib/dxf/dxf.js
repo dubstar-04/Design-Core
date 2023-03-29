@@ -25,6 +25,48 @@ export class DXF {
     this.loadEntities(core);
   }
 
+  loadBlocks(core) {
+    const blocks = this.reader.blocks;
+
+    blocks.forEach((block) => {
+      // log(block);
+      if (block.hasOwnProperty('points')) {
+        block.points = this.parsePoints(block.points);
+      }
+
+      if (block.hasOwnProperty('children')) {
+        block.children.forEach((child) => {
+          // check the child has a command type
+          if (child.hasOwnProperty('0') === false) {
+            return;
+          }
+          // Convert child points to design points
+          if (child.hasOwnProperty('points')) {
+            child.points = this.parsePoints(child.points);
+          }
+
+          const command = child[0];
+          // check if the child is a valid entity
+          if (core.commandManager.isCommand(command)) {
+            // create an instance of the child entity
+            const item = core.commandManager.createNew(command, child);
+
+            if (block.hasOwnProperty('items') === false) {
+              block.items = [];
+            }
+
+            // add the child to the block items
+            // TODO: create a block instance and add the items.
+            // check block is valid before adding to scene
+            block.items.push(item);
+          }
+        });
+      }
+
+      this.addToScene(core, block);
+    });
+  }
+
   loadEntities(core) {
     const entities = this.reader.entities;
 
