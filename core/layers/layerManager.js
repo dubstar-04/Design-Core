@@ -42,12 +42,11 @@ export class LayerManager {
   };
 
   addLayer(layer) {
+    const newLayer = new Layer(layer);
     // TODO: investigate why this gets called so many times when loading drawings
-    // console.log(" layermanager.js - addlayer() - New Layer Added:" + layer.name)
-
-    if (!this.layerExists(layer)) {
-      // console.log(' layermanager.js - addlayer() - New Layer Added:' + layer.name);
-      const newLayer = new Layer(layer);
+    // console.log(' layermanager.js - addlayer() - New Layer Added:' + layer.name);
+    if (!this.layerExists(newLayer)) {
+      // console.log(' layermanager.js - addlayer() - New Layer Added:' + newLayer.name);
       this.layers.push(newLayer);
       this.core.scene.saveRequired();
     }
