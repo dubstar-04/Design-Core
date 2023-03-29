@@ -21,10 +21,27 @@ export class DXF {
 
   loadDxf(core, data) {
     this.read(data);
+
     this.loadTables(core);
     this.loadBlocks(core);
     this.loadEntities(core);
+
+    // load headers last to ensure the elements and layers exist
+    this.loadHeader(core);
   }
+
+  loadHeader(core) {
+    const header = this.reader.header;
+
+    if (header.hasOwnProperty('$CLAYER')) {
+      const clayer = header['$CLAYER'];
+      if (clayer.hasOwnProperty('8')) {
+        const layerName = clayer['8'];
+        core.layerManager.setCLayer(layerName);
+      }
+    }
+  }
+
 
   loadTables(core) {
     const tables = this.reader.tables;
