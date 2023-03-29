@@ -141,13 +141,8 @@ export class LayerManager {
   }
 
   getLayerIndex(layerName) {
-    // return the layer index for layerName
-    for (let i = 0; i < this.layerCount(); i++) {
-      if (this.layers[i].name === layerName) {
-        return i;
-        break;
-      }
-    }
+    const index = this.layers.findIndex((el) => el.name === layerName);
+    return index;
   }
 
   getLayerByName(layerName) {
