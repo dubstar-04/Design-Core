@@ -41,7 +41,7 @@ const classes = {
   Ellipse,
   Spline,
   Text,
-  Dimension,
+  // Dimension,
   Block,
   Insert,
   Move,
