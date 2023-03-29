@@ -90,7 +90,9 @@ export class LayerManager {
   }
 
   setCLayer(clayer) {
-    this.currentLayer = clayer;
+    if (this.getLayerIndex(clayer) !== -1) {
+      this.currentLayer = clayer;
+    }
   }
 
   layerExists(layer) {
