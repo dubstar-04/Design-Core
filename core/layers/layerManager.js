@@ -146,7 +146,13 @@ export class LayerManager {
   }
 
   getLayerByName(layerName) {
-    return this.layers[this.getLayerIndex(layerName)];
+    // TODO: Add error handling
+    const index = this.getLayerIndex(layerName);
+    if (index >= 0 && index < this.layerCount()) {
+      return this.layers[index];
+    }
+
+    return;
   }
 
   getLayerByIndex(layerIndex) {
