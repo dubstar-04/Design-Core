@@ -20,7 +20,6 @@ export class DXFReader {
   }
 
   parseFile() {
-    // TODO: check the file contains data and ends with EOF
     while (this.iterator.nextPair().value !== 'EOF') {
       const currentPair = this.iterator.currentPair();
       switch (true) {
