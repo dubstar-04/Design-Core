@@ -26,6 +26,7 @@ export class DxfIterator {
    * @param  {String} file
    */
   loadFile(file) {
+    this.currentIndex = 0;
     this.lines = file.split('\n');
   }
 
