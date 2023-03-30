@@ -21,7 +21,7 @@ export class Section {
         // add the point to the object
         object.points.push(point);
       } else {
-        throw Error('Failed to Parse Point:');
+        iterator.dxfError('Failed to Parse Point');
       }
       return;
     }
@@ -40,7 +40,7 @@ export class Section {
     const child = {};
 
     if (iterator.currentPair().code !== '0') {
-      throw Error('Child expected to start with 0 groupcode');
+      iterator.dxfError('Child expected to start with 0 groupcode');
     }
 
     // add the 0 code type value to the child definition
@@ -66,7 +66,7 @@ export class Section {
 
     // first group code must be an x value for a point
     if (['10', '11', '12', '13'].includes(iterator.currentPair().code) === false) {
-      throw new Error('parsing point failed');
+      iterator.dxfError('parsing point failed');
     }
 
     while (true) {
