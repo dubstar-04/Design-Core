@@ -116,7 +116,7 @@ export class Section {
   }
 
   parseBoolean(value) {
-    return Boolean(value.trim());
+    return Boolean(parseInt(value.trim()));
   }
 
   getGroupValue(Pair) {
