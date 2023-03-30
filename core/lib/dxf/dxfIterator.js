@@ -58,6 +58,14 @@ export class DxfIterator {
     }
   }
 
+  /**
+   * Stop iteration and throw error
+   * @param  {String} value
+   */
+  dxfError(msg) {
+    throw Error(`${msg} - Line: ${this.currentIndex}`);
+  }
+
 
   /**
    * Format and return the current value
