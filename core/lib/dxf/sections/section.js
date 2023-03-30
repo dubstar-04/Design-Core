@@ -63,7 +63,6 @@ export class Section {
 
   parsePoint(iterator) {
     const point = {};
-    iterator.prevPair();
 
     // first group code must be an x value for a point
     if (['10', '11', '12', '13'].includes(iterator.currentPair().code) === false) {
@@ -71,7 +70,7 @@ export class Section {
     }
 
     while (true) {
-      const currentPair = iterator.nextPair();
+      const currentPair = iterator.currentPair();
       switch (true) {
         case (['10', '11', '12', '13'].includes(currentPair.code)):
           if (Object.keys(point).length) {
@@ -95,6 +94,9 @@ export class Section {
         default:
           return point;
       }
+      iterator.nextPair();
+    }
+  }
     }
   }
 
