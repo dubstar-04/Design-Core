@@ -59,7 +59,6 @@ export class DXF {
     const blocks = this.reader.blocks;
 
     blocks.forEach((block) => {
-      // log(block);
       if (block.hasOwnProperty('points')) {
         block.points = this.parsePoints(block.points);
       }
@@ -127,7 +126,6 @@ export class DXF {
     dxfPoints.forEach((point) => {
       const pt = new Point(point.x, point.y);
       if (point.hasOwnProperty('bulge')) {
-        // console.log('WARNING: Bulge not handled');
         pt.bulge = point.bulge;
       }
       points.push(pt);

@@ -9,9 +9,8 @@ export class Entities extends Section {
 
   addEntity(entity) {
     if (Object.keys(entity).length) {
-      // log('currentEntity', entity);
       if (!entity.hasOwnProperty('points')) {
-        console.log('ERROR: entity contains no points');
+        throw Error('entity contains no points');
       }
 
       this.entities.push(entity);
@@ -32,7 +31,6 @@ export class Entities extends Section {
               currentEntity.children = [];
             }
 
-            // log(iterator.currentIndex, '- child:', child);
             currentEntity.children.push(child);
             break;
           }

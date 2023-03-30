@@ -53,7 +53,6 @@ export class DxfIterator {
     // check the file is terminated with EOF
     const lastLine = this.formatted(this.lines.at(-1)).toUpperCase().trim();
     if (lastLine !== 'EOF') {
-      log(this.lines.at(-1).toUpperCase());
       throw Error('invalid dxf data - missing EOF tag');
     }
   }

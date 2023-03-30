@@ -27,6 +27,7 @@ export class Section {
     }
 
     if (object.hasOwnProperty(`${currentPair.code}`)) {
+      // seems to be common to have duplicated properties?
       // console.log(`ERROR: Duplicate property: ${currentPair.code} - line: ${iterator.currentIndex}`);
     }
 
@@ -120,7 +121,6 @@ export class Section {
   }
 
   getGroupValue(Pair) {
-    // log('getGroupValue', Pair.code, Pair.value);
     const code = parseInt(Pair.code);
     const value = Pair.value;
     let returnValue = value;

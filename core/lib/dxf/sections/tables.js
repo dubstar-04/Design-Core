@@ -9,7 +9,6 @@ export class Tables extends Section {
 
   addTable(table) {
     if (Object.keys(table).length) {
-      // log('addTable', table);
       this.tables.push(table);
     }
   }

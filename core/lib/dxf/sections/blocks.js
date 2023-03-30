@@ -9,7 +9,6 @@ export class Blocks extends Section {
 
   addBlock(block) {
     if (Object.keys(block).length) {
-      // log('addBlock', block);
       this.blocks.push(block);
     }
   }
