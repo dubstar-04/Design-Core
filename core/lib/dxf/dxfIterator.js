@@ -72,7 +72,7 @@ export class DxfIterator {
    * Format and return the previous groupcode and value pair
    */
   prevPair() {
-    if (this.currentIndex > 2) {
+    if (this.currentIndex >= 2) {
       this.currentIndex = this.currentIndex - 2;
       return this.currentPair();
     }
