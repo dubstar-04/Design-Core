@@ -60,7 +60,7 @@ export class DxfIterator {
 
   /**
    * Stop iteration and throw error
-   * @param  {String} value
+   * @param  {String} msg - error message
    */
   dxfError(msg) {
     throw Error(`${msg} - Line: ${this.currentIndex}`);
