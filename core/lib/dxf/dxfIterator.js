@@ -1,16 +1,22 @@
 /**
 This class is designed to iterate though an internal array of DXF groupcode and value pairs
-Example DXF Entity:
+Example DXF Entity Pairs:
+
  code:  0
  value: LWPOLYLINE  - Entity Type
+
  code:  8
  value: DEFPOINTS   - Layer name
+
  code:  6
  value: ByLayer     - Linetype name
+
  code:  70
  value: 0           - Flags
+
  code:  10
  value: 100.0       - x position
+
  code:  20
  value: 100.0       - y position
  */
