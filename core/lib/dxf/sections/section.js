@@ -105,6 +105,14 @@ export class Section {
 
     return parseFloat(value);
   }
+
+
+  parseInt(value) {
+    if (isNaN(value)) {
+      throw Error('error parsing int');
+    }
+
+    return parseInt(value);
   }
 
   parseBoolean(value) {
