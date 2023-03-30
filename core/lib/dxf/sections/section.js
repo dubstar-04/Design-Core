@@ -97,7 +97,14 @@ export class Section {
       iterator.nextPair();
     }
   }
+
+  parseFloat(value) {
+    if (isNaN(value)) {
+      throw Error('error parsing float');
     }
+
+    return parseFloat(value);
+  }
   }
 
   parseBoolean(value) {
