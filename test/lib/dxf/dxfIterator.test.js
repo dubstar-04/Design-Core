@@ -6,6 +6,27 @@ iterator.loadFile(string);
 
 test('Test DxfIterator.loadFile', () => {
   expect(iterator.lines.length).toBe(12);
+
+  // empty string
+  expect(() => {
+    iterator.loadFile(''); ;
+  }).toThrow();
+
+  // unmatched pairs
+  expect(() => {
+    iterator.loadFile('1\n2\n3\nEOF'); ;
+  }).toThrow();
+
+  // missing EOF value
+  expect(() => {
+    iterator.loadFile('1\n2\n3\n4\n'); ;
+  }).toThrow();
+});
+
+test('Test DxfIterator.dxfError', () => {
+  expect(() => {
+    section.dxfError('Test');
+  }).toThrow();
 });
 
 test('Test DxfIterator.current', () => {
