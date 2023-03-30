@@ -28,6 +28,11 @@ export class DxfIterator {
   loadFile(file) {
     this.currentIndex = 0;
     this.lines = file.split('\n');
+
+    // check there is data
+    if (!this.lines.length) {
+      throw Error('empty dxf data');
+    }
   }
 
 
