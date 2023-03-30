@@ -21,7 +21,7 @@ export class Section {
         // add the point to the object
         object.points.push(point);
       } else {
-        console.log('ERROR: Failed to Parse Point:', point);
+        throw Error('Failed to Parse Point:');
       }
       return;
     }
@@ -40,7 +40,7 @@ export class Section {
     const child = {};
 
     if (iterator.currentPair().code !== '0') {
-      console.log('ERROR: child expected to start with 0 groupcode');
+      throw Error('Child expected to start with 0 groupcode');
     }
 
     // add the 0 code type value to the child definition
