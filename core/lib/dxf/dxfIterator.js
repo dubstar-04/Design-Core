@@ -39,6 +39,11 @@ export class DxfIterator {
       this.lines.pop();
     }
 
+    // check there is an even number of lines (data is grouped in pairs)
+    if (this.lines.length % 2 !== 0) {
+      throw Error('invalid dxf data - dxf must contain groupcode value pairs');
+    }
+
   }
 
 
