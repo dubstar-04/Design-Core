@@ -64,6 +64,12 @@ export class Section {
   parsePoint(iterator) {
     const point = {};
     iterator.prevPair();
+
+    // first group code must be an x value for a point
+    if (['10', '11', '12', '13'].includes(iterator.currentPair().code) === false) {
+      throw new Error('parsing point failed');
+    }
+
     while (true) {
       const currentPair = iterator.nextPair();
       switch (true) {
