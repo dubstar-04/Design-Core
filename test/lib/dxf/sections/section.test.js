@@ -5,7 +5,7 @@ const section = new Section();
 
 test('Test Section.parseValue', () => {
   const iterator = new DxfIterator();
-  const string = '1\n2\n10\n100\n20\n200\nEOF';
+  const string = '1\n2\n10\n100\n20\n200\n0\nEOF';
   iterator.loadFile(string);
 
   const object = {};
@@ -43,7 +43,8 @@ CIRCLE
 100.0
   0
 LINE
-  `;
+0
+EOF`;
 
   const iterator = new DxfIterator();
   iterator.loadFile(string);
@@ -60,7 +61,7 @@ LINE
 
   // parse child expects that the first groupcode is 0
   // test for throw when first groupcode is not 0
-  iterator.loadFile('20\n100\n30\n100');
+  iterator.loadFile('20\n100\n30\n100\n0\nEOF');
   expect(() => {
     section.parseChild(iterator);
   }).toThrow();
@@ -76,7 +77,8 @@ test('Test Section.parsePoint', () => {
 0.0
   40
 100.0
-`;
+0
+EOF`;
 
   const iterator = new DxfIterator();
   iterator.loadFile(string);
@@ -90,7 +92,7 @@ test('Test Section.parsePoint', () => {
 
   // parse point expects that the first groupcode is 10
   // test for throw when first groupcode is not 10
-  iterator.loadFile('20\n100\n30\n100');
+  iterator.loadFile('20\n100\n30\n100\n0\nEOF');
   expect(() => {
     section.parsePoint(iterator);
   }).toThrow();

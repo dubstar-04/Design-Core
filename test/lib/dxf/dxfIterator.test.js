@@ -1,11 +1,11 @@
 import {DxfIterator} from '../../../core/lib/dxf/dxfIterator.js';
 
 const iterator = new DxfIterator();
-const string = '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\nEOF';
+const string = '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n0\nEOF';
 iterator.loadFile(string);
 
 test('Test DxfIterator.loadFile', () => {
-  expect(iterator.lines.length).toBe(11);
+  expect(iterator.lines.length).toBe(12);
 });
 
 test('Test DxfIterator.current', () => {
