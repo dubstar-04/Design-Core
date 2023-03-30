@@ -33,6 +33,12 @@ export class DxfIterator {
     if (!this.lines.length) {
       throw Error('empty dxf data');
     }
+
+    // remove empty indices from end of lines array
+    while (!this.lines.at(-1)) {
+      this.lines.pop();
+    }
+
   }
 
 
