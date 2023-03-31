@@ -22,9 +22,25 @@ Example DXF Entity Pairs:
  */
 
 export class DxfIterator {
+  static _instance;
+
   constructor() {
     this.currentIndex = 0;
     this.lines = [];
+
+    // instantiate as a singleton
+    if (DxfIterator._instance === undefined) {
+      DxfIterator._instance = this;
+    }
+
+    return DxfIterator._instance;
+  }
+
+  static get instance() {
+    if (this._instance === undefined) {
+      this._instance = new this();
+    }
+    return this._instance;
   }
 
   /**
