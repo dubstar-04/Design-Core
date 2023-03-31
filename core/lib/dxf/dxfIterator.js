@@ -32,11 +32,16 @@ export class DxfIterator {
    * @param  {String} file
    */
   loadFile(file) {
+    // check there is data
+    if (file === undefined) {
+      throw Error('no dxf data');
+    }
+
     this.currentIndex = 0;
     this.lines = file.split('\n');
 
-    // check there is data
-    if (!this.lines.length) {
+    // check there is at least one pair
+    if (this.lines.length < 2) {
       throw Error('empty dxf data');
     }
 

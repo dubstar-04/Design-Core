@@ -7,14 +7,20 @@ iterator.loadFile(string);
 test('Test DxfIterator.loadFile', () => {
   expect(iterator.lines.length).toBe(12);
 
+  // no string
+  expect(() => {
+    iterator.loadFile(); ;
+  }).toThrow();
+
   // empty string
   expect(() => {
+    console.log('test');
     iterator.loadFile(''); ;
   }).toThrow();
 
   // unmatched pairs
   expect(() => {
-    iterator.loadFile('1\n2\n3\nEOF'); ;
+    iterator.loadFile('1\n2\n3\n4\nEOF'); ;
   }).toThrow();
 
   // missing EOF value
