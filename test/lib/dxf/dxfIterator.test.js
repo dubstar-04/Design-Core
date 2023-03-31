@@ -4,6 +4,14 @@ const iterator = new DxfIterator();
 const string = '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n0\nEOF';
 iterator.loadFile(string);
 
+test('Test DxfIterator.instance', () => {
+  const secondIterator = new DxfIterator();
+  expect(iterator).toEqual(secondIterator);
+
+  const thirdIterator = DxfIterator.instance;
+  expect(iterator).toEqual(thirdIterator);
+});
+
 test('Test DxfIterator.loadFile', () => {
   expect(iterator.lines.length).toBe(12);
 
