@@ -1,4 +1,5 @@
 import {Section} from './section.js';
+import {DxfIterator} from '../dxfIterator.js';
 
 export class Entities extends Section {
   constructor() {
@@ -10,7 +11,7 @@ export class Entities extends Section {
   addEntity(entity) {
     if (Object.keys(entity).length) {
       if (!entity.hasOwnProperty('points')) {
-        throw Error('entity contains no points');
+        DxfIterator.instance.dxfError('entity contains no points');
       }
 
       this.entities.push(entity);

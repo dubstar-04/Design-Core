@@ -1,3 +1,5 @@
+
+import {DxfIterator} from '../dxfIterator.js';
 export class Section {
   constructor() {
 
@@ -101,7 +103,7 @@ export class Section {
 
   parseFloat(value) {
     if (isNaN(value)) {
-      throw Error('error parsing float');
+      DxfIterator.instance.dxfError('error parsing float');
     }
 
     return parseFloat(value);
@@ -110,7 +112,7 @@ export class Section {
 
   parseInt(value) {
     if (isNaN(value)) {
-      throw Error('error parsing int');
+      DxfIterator.instance.dxfError('error parsing int');
     }
 
     return parseInt(value);
@@ -232,8 +234,7 @@ export class Section {
         returnValue = this.parseInt(value);
         break;
       default:
-        // TODO: Add line numbers to errors
-        throw Error(`Unknown Group Code: ${code}`);
+        DxfIterator.instance.dxfError(`Unknown Group Code: ${code}`);
     }
 
     return returnValue;
