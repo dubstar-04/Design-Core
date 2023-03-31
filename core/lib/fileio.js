@@ -10,9 +10,15 @@ export class FileIO {
 
   static openFile(core, data) {
     const dxf = new DXF();
-    // TODO: Handle errors
-    dxf.loadDxf(core, data);
-    core.canvas.requestPaint();
-    core.notify(Strings.Message.FILEOPEN);
+    try {
+      dxf.loadDxf(core, data);
+      core.canvas.requestPaint();
+      core.notify(Strings.Message.FILEOPEN);
+    } catch (error) {
+      core.notify(error.toString());
+
+      // TODO: Only print stack if debugging is turned on
+      // console.log(error.stack);
+    }
   }
 }
