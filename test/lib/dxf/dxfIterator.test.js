@@ -14,7 +14,6 @@ test('Test DxfIterator.loadFile', () => {
 
   // empty string
   expect(() => {
-    console.log('test');
     iterator.loadFile(''); ;
   }).toThrow();
 
