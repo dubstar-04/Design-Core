@@ -20,6 +20,8 @@ export class Strings {
     UNKNOWNCOMMAND: 'Unknown command:',
     RECOMMEND: 'Did you mean:',
     FILEOPEN: 'File opened',
+    CLAYERDELETE: 'Currently selected layer cannot be deleted',
+    DEFPOINTSDELETE: 'Defpoints layer cannot be deleted',
   };
 
   // Strings
