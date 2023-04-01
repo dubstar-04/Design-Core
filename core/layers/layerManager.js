@@ -63,7 +63,13 @@ export class LayerManager {
 
     if (layerToDelete.toUpperCase() === 'DEFPOINTS') {
       // console.log('Warning: DEFPOINTS layer cannot be deleted');
+      // DEFPOINTS layer cannot be deleted
       this.core.notify(Strings.Message.DEFPOINTSDELETE);
+      return;
+    }
+
+    if (layerToDelete === this.currentLayer) {
+      // cLayer cannot be deleted
       this.core.notify(Strings.Message.CLAYERDELETE);
       return;
     }
