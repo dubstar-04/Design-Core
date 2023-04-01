@@ -85,6 +85,7 @@ export class Scene {
     this.saved = false; // Changes have occured. A save may be required.
   }
 
+  /*
   // add item to block
   // TODO: fix this mess
   addItemToBlock(type, data, name) {
@@ -151,6 +152,7 @@ export class Scene {
       }
     }
   }
+  */
 
   addToScene(type, data, end, index) {
     if (!data) {
@@ -168,6 +170,12 @@ export class Scene {
       // TODO: find a way to create a new type without window
       item = this.core.commandManager.createNew(this.activeCommand.type, data);
     } else {
+      // check type is a valid command
+      if (!this.core.commandManager.isCommand(type)) {
+        console.log('UNSUPPORTED TYPE:', type);
+        this.reset();
+        return;
+      }
       // Create a new item, send it the points array
       item = this.core.commandManager.createNew(type, data);
     }

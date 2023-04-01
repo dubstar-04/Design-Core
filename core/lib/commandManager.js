@@ -1,5 +1,6 @@
 import {Line} from '../entities/line.js';
 import {Polyline} from '../entities/polyline.js';
+import {Lwpolyline} from '../entities/lwpolyline.js';
 import {Circle} from '../entities/circle.js';
 import {Arc} from '../entities/arc.js';
 import {Rectangle} from '../entities/rectangle.js';
@@ -7,7 +8,7 @@ import {FilledRectangle} from '../entities/filledRectangle.js';
 import {Ellipse} from '../entities/ellipse.js';
 import {Spline} from '../entities/spline.js';
 import {Text} from '../entities/text.js';
-import {Dimension} from '../entities/dimension.js';
+// import {Dimension} from '../entities/dimension.js';
 import {Block} from '../entities/block.js';
 import {Insert} from '../entities/insert.js';
 
@@ -32,6 +33,7 @@ import {Strings} from './strings.js';
 const classes = {
   Line,
   Polyline,
+  Lwpolyline,
   Circle,
   Arc,
   Rectangle,
@@ -39,7 +41,7 @@ const classes = {
   Ellipse,
   Spline,
   Text,
-  Dimension,
+  // Dimension,
   Block,
   Insert,
   Move,
@@ -92,13 +94,14 @@ export class CommandManager {
    * @param {array} data
    * @returns instance of type
    */
-  createNew = function(type, data) {
+  createNew(type, data) {
     let newItem;
     if (this.isCommand(type)) {
-      newItem = new classes[type](data);
+      newItem = new classes[this.getCommand(type)](data);
     } else {
       // TODO: return undefined or null and notify of error
-      // console.log('commandManager.js - createNew: Command Not Recognised');
+      console.log('commandManager.js - createNew: Command Not Recognised');
+      return;
     }
 
     return newItem;
@@ -146,6 +149,10 @@ export class CommandManager {
    * @returns boolean
    */
   isCommand(command) {
+    if (command === undefined || command === null) {
+      return false;
+    }
+
     const found = this.commands.some((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
     return found;
   }
@@ -162,11 +169,13 @@ export class CommandManager {
     if (this.isCommand(input)) {
       const found = this.commands.find((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === input.toUpperCase());
       command = found.command;
-    }
-
-    if (this.isShortcut(input)) {
+    } else if (this.isShortcut(input)) {
       const found = this.commands.find((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === input.toUpperCase());
       command = found.command;
+    }
+
+    if (command === undefined) {
+      console.log(`WARNING: Unknown Command: ${input}`);
     }
 
     return command;

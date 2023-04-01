@@ -30,6 +30,38 @@ export class Spline extends Entity {
         this.baseFuncRangeInt = 3;
       }
     }
+
+    if (data[40]) {
+      // DXF Groupcode 40 - Knot value
+      // one per knot
+    }
+
+    if (data[41]) {
+      // DXF Groupcode 41 - Weight
+      // With multiple group pairs, present if all are not 1
+    }
+
+    if (data[70]) {
+      // DXF Groupcode 70 - Spline flag (bit coded):
+      // 1 = Closed spline; 2 = Periodic spline; 4 = Rational spline
+      // 8 = Planar; 16 = Linear (planar bit is also set)
+    }
+
+    if (data[71]) {
+      // DXF Groupcode 71 - Degree of the spline curve
+    }
+
+    if (data[72]) {
+      // DXF Groupcode 72 - Number of knots
+    }
+
+    if (data[73]) {
+      // DXF Groupcode 73 - Number of control points
+    }
+
+    if (data[74]) {
+      // DXF Groupcode 74 - Number of fit points
+    }
   }
 
   static register() {

@@ -42,12 +42,11 @@ export class LayerManager {
   };
 
   addLayer(layer) {
+    const newLayer = new Layer(layer);
     // TODO: investigate why this gets called so many times when loading drawings
-    // console.log(" layermanager.js - addlayer() - New Layer Added:" + layer.name)
-
-    if (!this.layerExists(layer)) {
-      // console.log(' layermanager.js - addlayer() - New Layer Added:' + layer.name);
-      const newLayer = new Layer(layer);
+    // console.log(' layermanager.js - addlayer() - New Layer Added:' + layer.name);
+    if (!this.layerExists(newLayer)) {
+      // console.log(' layermanager.js - addlayer() - New Layer Added:' + newLayer.name);
       this.layers.push(newLayer);
       this.core.scene.saveRequired();
     }
@@ -91,20 +90,14 @@ export class LayerManager {
   }
 
   setCLayer(clayer) {
-    this.currentLayer = clayer;
+    if (this.getLayerIndex(clayer) !== -1) {
+      this.currentLayer = clayer;
+    }
   }
 
   layerExists(layer) {
-    let i = this.layerCount();
-    while (i--) {
-      // console.log("layerExists:", this.layers[i].name)
-      if (this.layers[i].name === layer.name) {
-        // console.log("layerManager.js LayerExist: " + layer.name)
-        return true;
-      }
-    }
-    // console.log("Layer Doesn't Exist: " + layer.name)
-    return false;
+    const layerExists = this.layers.some((el) => el.name.toUpperCase() === layer.name.toUpperCase());
+    return layerExists;
   }
 
   checkLayers() {
@@ -148,21 +141,25 @@ export class LayerManager {
   }
 
   getLayerIndex(layerName) {
-    // return the layer index for layerName
-    for (let i = 0; i < this.layerCount(); i++) {
-      if (this.layers[i].name === layerName) {
-        return i;
-        break;
-      }
-    }
+    const index = this.layers.findIndex((el) => el.name === layerName);
+    return index;
   }
 
   getLayerByName(layerName) {
-    return this.layers[this.getLayerIndex(layerName)];
+    const index = this.getLayerIndex(layerName);
+    if (this.layers[index] !== undefined) {
+      return this.layers[index];
+    }
+
+    return;
   }
 
   getLayerByIndex(layerIndex) {
-    return this.layers[layerIndex];
+    if (this.layers[layerIndex] !== undefined) {
+      return this.layers[layerIndex];
+    }
+
+    return;
   }
 
 

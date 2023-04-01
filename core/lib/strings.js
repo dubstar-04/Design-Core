@@ -4,6 +4,10 @@ export class Strings {
     ERROR: 'Error',
     FILEOPEN: 'Error opening file',
     INPUT: 'Incorrect input',
+    INVALIDFILE: 'Invalid File',
+    INVALIDPOINT: 'Invalid Point Data',
+    INVALIDGROUPCODE: 'Invalid DXF Groupcode',
+    INVALIDNUMBER: 'Invalid Number',
   };
 
   // Warning Strings
@@ -13,7 +17,6 @@ export class Strings {
 
   // Message Strings
   static Message = {
-
     UNKNOWNCOMMAND: 'Unknown command:',
     RECOMMEND: 'Did you mean:',
     FILEOPEN: 'File opened',
@@ -22,10 +25,12 @@ export class Strings {
   // Strings
   static Strings = {
     LENGTH: 'Length',
+    LINE: 'Line',
   };
 
   // Input Strings
   static Input = {
+    // TODO: Remove all colons
     BASEPOINT: 'Select base point:',
     BOUNDARY: 'Select boundary edges:',
     CENTER: 'Select centre point:',

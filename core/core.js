@@ -13,8 +13,7 @@ import {FileIO} from './lib/fileio.js';
 import {Settings} from './lib/settings.js';
 
 // TODO: Add debugging / logging class
-// TODO: use inheritance for the tools & entities
-// TODO: Use better error checking: consider using try and throw
+// TODO: use inheritance for the tools
 
 /** Class representing design core. This is the primary entry point */
 export class Core {

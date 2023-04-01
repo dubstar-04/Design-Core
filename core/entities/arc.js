@@ -9,12 +9,31 @@ export class Arc extends Entity {
   constructor(data) {
     super(data);
     this.minPoints = 3; // Should match number of cases in prompt
-    this.radius = 0;
+    this.radius = 1;
     this.helper_geometry = true;
 
     if (data) {
-      if (data.points) {
-        this.radius = this.points[0].distance(this.points[1]);
+      if (data.points || data[40]) {
+        // DXF Groupcode 40 - Radius
+
+        // get the radius from the points or the incoming dxf groupcode
+        const radius = this.points[1] ? this.points[0].distance(this.points[1]) : data[40];
+
+        if (radius !== undefined) {
+          this.radius = radius;
+        }
+      }
+
+      if (data.startAngle || data[50]) {
+        // DXF Groupcode 50 - Start Angle
+        const angle = Utils.degrees2radians(data.startAngle || data[50]);
+        this.points[1] = this.points[0].project(angle, this.radius);
+      }
+
+      if (data.endAngle || data[51]) {
+        // DXF Groupcode 51 - End Angle
+        const angle = Utils.degrees2radians(data.endAngle || data[51]);
+        this.points[2] = this.points[0].project(angle, this.radius);
       }
     }
   }

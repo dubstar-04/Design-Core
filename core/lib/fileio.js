@@ -9,15 +9,16 @@ export class FileIO {
   }
 
   static openFile(core, data) {
+    const dxf = new DXF();
     try {
-      const dxfReader = new DXF();
-      dxfReader.read(core, data);
-      core.scene.linkBlockData();
-      core.layerManager.checkLayers();
+      dxf.loadDxf(core, data);
       core.canvas.requestPaint();
       core.notify(Strings.Message.FILEOPEN);
     } catch (error) {
-      core.notify(Strings.Error.FILEOPEN);
+      core.notify(error.toString());
+
+      // TODO: Only print stack if debugging is turned on
+      // console.log(error.stack);
     }
   }
 }

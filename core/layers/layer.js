@@ -15,42 +15,66 @@ export class Layer {
 
 
     if (data) {
-      this.name = data.name;
-
-      switch (data.flags) {
-        case 0:
-          break;
-        case 1: // 1 = Layer is frozen;
-          this.frozen = true;
-          break;
-        case 2: // 2 = Layer is frozen by default in new viewports.
-          this.frozen = true;
-          break;
-        case 4: // 4 = Layer is locked.
-          this.locked = true;
-          break;
-        case 16: // 16 = If set, table entry is externally dependent on an xref.
-          break;
-        case 32: // 32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved.
-          break;
-        case 64: // 64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited. (This flag is for the benefit of AutoCAD commands. It can be ignored by most programs that read DXF files and need not be set by programs that write DXF files.)
-          break;
-      }
-      if (data.colour) {
-        // console.log(" layer.js - Layer Colour: " + data.colour)
-        this.colour = data.colour;
+      if (data.name || data[2]) {
+        // DXF Groupcode 2 - Layer Name
+        this.name = data.name || data[2];
       }
 
-      if (data.lineType) {
-        this.lineType = data.lineType;
+
+      if (data.flags || data[70]) {
+      // DXF Groupcode 70 - Layer Flags
+      // Standard flags (bit-coded values):
+      // 1 = Layer is frozen; otherwise layer is thawed
+      // 2 = Layer is frozen by default in new viewports
+      // 4 = Layer is locked
+      // 16 = If set, table entry is externally dependent on an xref
+      // 32 = If both this bit and bit 16 are set, the externally dependent xref has been successfully resolved
+      // 64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
+
+        const flags = data.flags || data[70];
+        switch (flags) {
+          case 0:
+            break;
+          case 1:
+            this.frozen = true;
+            break;
+          case 2:
+            this.frozen = true;
+            break;
+          case 4:
+            this.locked = true;
+            break;
+          case 16:
+            break;
+          case 32:
+            break;
+          case 64: // (This flag is for the benefit of AutoCAD commands. It can be ignored by most programs that read DXF files and need not be set by programs that write DXF files.)
+            break;
+        }
       }
 
-      if (data.lineWeight) {
-        this.lineWeight = data.lineWeight;
+      if (data.colour || data[62]) {
+        // DXF Groupcode 62 - Color Number
+        // (present if not BYLAYER); zero indicates the BYBLOCK
+        // (floating) color; 256 indicates BYLAYER; a negative value indicates that
+        // the layer is turned off (optional)
+        this.colour = data.colour || Colours.getHexColour(data[62]);
       }
 
-      if (data.plotting) {
-        this.plotting = data.plotting;
+      if (data.lineType || data[6]) {
+        // DXF Groupcode 6 - Linetype Name
+        this.lineType = data.lineType || data[6];
+      }
+
+      if (data.lineWeight || data[370]) {
+        // DXF Groupcode 370 - Linetype Weight
+        this.lineWeight = data.lineWeight || data[370];
+      }
+
+      if (data.plotting || data[290]) {
+        // DXF Groupcode 290 - Plotting flag
+        // If set to 0, do not plot this layer
+        this.plotting = data.plotting || data[290];
       }
     }
   }

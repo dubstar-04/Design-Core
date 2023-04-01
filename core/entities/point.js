@@ -7,6 +7,8 @@ export class Point {
     this.type = 'Point';
     this.x = 0;
     this.y = 0;
+    this.bulge = 0;
+
     if (x !== undefined) {
       this.x = x;
       this.y = y;

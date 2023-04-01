@@ -1,3 +1,5 @@
+import {Colours} from '../lib/colours.js';
+
 export class Entity {
   constructor(data) {
     Object.defineProperty(this, 'type', {
@@ -51,16 +53,30 @@ export class Entity {
         this.points = data.points;
       }
 
-      if (data.colour) {
-        this.colour = data.colour;
+      if (data.colour || data[62]) {
+        // DXF Groupcode 62 - Color Number
+        // (present if not BYLAYER); zero indicates the BYBLOCK
+        // (floating) color; 256 indicates BYLAYER; a negative value indicates that
+        // the layer is turned off (optional)
+        this.colour = data.colour || Colours.getHexColour(data[62]);
       }
 
-      if (data.trueColour) {
+      /*
+      if (data.trueColour || data[420]) {
+      // DXF Groupcode 420 - true color
+      // A 24-bit color value that should be dealt with in terms of bytes with values
+      // of 0 to 255. The lowest byte is the blue value, the middle byte is the
+      // green value, and the third byte is the red value. The top byte is always
+      // 0. The group code cannot be used by custom entities for their own data
+      // because the group code is reserved for AcDbEntity, class-level color data
+      // and AcDbEntity, class-level transparency data
         this.trueColour = data.trueColour;
       }
+      */
 
-      if (data.layer) {
-        this.layer = data.layer;
+      if (data.layer || data[8]) {
+        // DXF Groupcode 8 - layername
+        this.layer = data.layer || data[8];
       }
     }
   }

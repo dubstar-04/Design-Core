@@ -33,10 +33,8 @@ export class Text extends Entity {
     });
 
     if (data) {
-      // console.log("Data: ", data)
-      // console.log("text.js - string:", data.string, "rotation: ", data.rotation, " hAlign: ", data.horizontalAlignment, " vAlign: ", data.verticalAlignment)
       this.points[0] = data.points[0];
-      // create points[1] used to determin the text rotation
+      // create points[1] used to determine the text rotation
       this.points[1] = data.points[0].add(new Point(this.height, 0));
 
       if (data.input) {
@@ -46,44 +44,51 @@ export class Text extends Entity {
         this.string = String(data.input[2]);
       }
 
-      if (data.string) {
-        this.string = String(data.string);
+      if (data.string || data[1]) {
+        // DXF Groupcode 1 - Default Value
+        // The string of the text entity
+        this.string = String(data.string || data[1]);
       }
 
-      if (data.height) {
-        this.height = data.height;
+      if (data.styleName || data[7]) {
+        // DXF Groupcode 7 - Text Style Name
+        this.styleName = data.styleName || data[7];
       }
 
-      if (data.colour) {
-        this.colour = data.colour;
+      if (data.height || data[40]) {
+        // DXF Groupcode 40 - Text Height
+        this.height = data.height || data[40];
       }
 
-      if (data.layer) {
-        this.layer = data.layer;
-      }
-
-      if (data.rotation) {
+      if (data.rotation || data[50]) {
+        // DXF Groupcode 50 - Text Rotation
         // if we get rotation data store this as a point[1] at an angle from point[0]
         // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
-        this.points[1] = data.points[0].project(Utils.degrees2radians(data.rotation), this.height);
-      }
-      if (data.horizontalAlignment) {
-        this.horizontalAlignment = data.horizontalAlignment;
+        const rotation = data.rotation || data[50];
+        this.points[1] = data.points[0].project(Utils.degrees2radians(rotation), this.height);
       }
 
-      if (data.verticalAlignment) {
-        this.verticalAlignment = data.verticalAlignment;
+      if (data.horizontalAlignment || data[72]) {
+        // DXF Groupcode 72 - Horizontal Alignment
+        // 0 = Left; 1= Center; 2 = Right
+        // 3 = Aligned (if vertical alignment = 0)
+        // 4 = Middle (if vertical alignment = 0)
+        // 5 = Fit (if vertical alignment = 0)
+        this.horizontalAlignment = data.horizontalAlignment || data[72];
       }
 
-      if (data.styleName) {
-        this.styleName = data.styleName;
+      if (data.verticalAlignment || data[73]) {
+        // DXF Groupcode 73 - Vertical Alignment
+        // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
+        this.verticalAlignment = data.verticalAlignment || data[73];
       }
 
-      if (data.flags) {
-        switch (data.flags) {
-          // DXF Data
-          // 2 = Text is backward (mirrored in X).
-          // 4 = Text is upside down (mirrored in Y).
+      if (data.flags || data[71]) {
+        // DXF Groupcode 71 - Text Flags
+        // 2 = Text is backward (mirrored in X).
+        // 4 = Text is upside down (mirrored in Y).
+        const flags = data.flags || data[71];
+        switch (flags) {
           case 2:
             this.backwards = true;
             break;

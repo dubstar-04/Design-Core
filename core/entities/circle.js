@@ -18,6 +18,17 @@ export class Circle extends Entity {
       set: this.setRadius,
       enumerable: true,
     });
+
+    // ensure a radius is set
+    // this.setRadius(1);
+
+    if (data) {
+      if (data.radius || data[40]) {
+        // DXF Groupcode 40 - Radius
+        const radius = data.radius || data[40];
+        this.setRadius(radius);
+      }
+    }
   }
 
   static register() {
