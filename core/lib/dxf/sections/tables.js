@@ -26,6 +26,7 @@ export class Tables extends Section {
             break;
           } else if (['ENDTAB'].includes(currentPair.value)) {
             this.addTable(currentTable);
+            currentTable = {};
             break;
           } else {
             currentTable.children.push(this.parseChild(iterator));
