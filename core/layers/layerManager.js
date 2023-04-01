@@ -1,5 +1,6 @@
 
 import {Layer} from './layer.js';
+import {Strings} from '../lib/strings.js';
 
 export class LayerManager {
   constructor(core) {
