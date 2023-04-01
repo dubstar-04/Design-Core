@@ -55,7 +55,7 @@ export class Rotate {
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
   }
 
-  preview = function(core) {
+  preview(core) {
     if (core.scene.tempPoints.length > 2) {
       const A = core.scene.tempPoints[0].x - core.scene.tempPoints[1].x;
       const O = core.scene.tempPoints[0].y - core.scene.tempPoints[1].y;
@@ -83,7 +83,7 @@ export class Rotate {
   };
 
 
-  action = function(core) {
+  action(core) {
     // console.log('Rotate Stuff');
 
     const A = core.scene.points[0].x - core.scene.points[1].x;

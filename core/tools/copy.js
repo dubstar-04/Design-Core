@@ -52,7 +52,7 @@ export class Copy {
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
   }
 
-  action = function(core) {
+  action(core) {
     // console.log("Copy Stuff")
 
     const xDelta = core.scene.points[1].x - core.scene.points[0].x;
@@ -72,7 +72,7 @@ export class Copy {
     }
   };
 
-  preview = function(core) {
+  preview(core) {
     // console.log("Copy Stuff")
 
     const xDelta = core.scene.tempPoints[1].x - core.scene.tempPoints[0].x;
