@@ -23,7 +23,7 @@ export class StyleManager {
     });
   }
 
-  getUniqueName = function(name) {
+  getUniqueName(name) {
     let count = 0;
     let styStr = name.replace(/ /g, '_').toUpperCase();
     // console.log('New style Name:' + styStr);

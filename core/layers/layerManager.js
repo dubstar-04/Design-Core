@@ -25,7 +25,7 @@ export class LayerManager {
     });
   }
 
-  getUniqueName = function(name) {
+  getUniqueName(name) {
     let count = 0;
     let layStr = name.replace(/ /g, '_').toUpperCase();
     // console.log('New Layer Name:' + layStr);
