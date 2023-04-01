@@ -1,5 +1,6 @@
 
 import {DxfIterator} from '../dxfIterator.js';
+import {Strings} from '../../strings.js';
 export class Section {
   constructor() {
 
@@ -23,7 +24,7 @@ export class Section {
         // add the point to the object
         object.points.push(point);
       } else {
-        iterator.dxfError('Failed to Parse Point');
+        iterator.dxfError(Strings.Error.INVALIDPOINT);
       }
       return;
     }
@@ -43,7 +44,7 @@ export class Section {
     const child = {};
 
     if (iterator.currentPair().code !== '0') {
-      iterator.dxfError('Child expected to start with 0 groupcode');
+      iterator.dxfError(Strings.Error.INVALIDGROUPCODE);
     }
 
     // add the 0 code type value to the child definition
@@ -69,7 +70,7 @@ export class Section {
 
     // first group code must be an x value for a point
     if (['10', '11', '12', '13'].includes(iterator.currentPair().code) === false) {
-      iterator.dxfError('parsing point failed');
+      iterator.dxfError(Strings.Error.INVALIDPOINT);
     }
 
     while (true) {
@@ -103,7 +104,7 @@ export class Section {
 
   parseFloat(value) {
     if (isNaN(value)) {
-      DxfIterator.instance.dxfError('error parsing float');
+      DxfIterator.instance.dxfError(Strings.Error.INVALIDNUMBER);
     }
 
     return parseFloat(value);
@@ -112,7 +113,7 @@ export class Section {
 
   parseInt(value) {
     if (isNaN(value)) {
-      DxfIterator.instance.dxfError('error parsing int');
+      DxfIterator.instance.dxfError(Strings.Error.INVALIDNUMBER);
     }
 
     return parseInt(value);
@@ -234,7 +235,7 @@ export class Section {
         returnValue = this.parseInt(value);
         break;
       default:
-        DxfIterator.instance.dxfError(`Unknown Group Code: ${code}`);
+        DxfIterator.instance.dxfError(`${Strings.Error.INVALIDGROUPCODE}: ${code}`);
     }
 
     return returnValue;

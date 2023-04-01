@@ -1,3 +1,5 @@
+import {Strings} from '../strings.js';
+
 /**
 This class is designed to iterate though an internal array of DXF groupcode and value pairs
 Example DXF Entity Pairs:
@@ -50,7 +52,7 @@ export class DxfIterator {
   loadFile(file) {
     // check there is data
     if (file === undefined) {
-      throw Error('no dxf data');
+      throw Error(Strings.Error.INVALIDFILE);
     }
 
     this.currentIndex = 0;
@@ -58,7 +60,7 @@ export class DxfIterator {
 
     // check there is at least one pair
     if (this.lines.length < 2) {
-      throw Error('empty dxf data');
+      throw Error(Strings.Error.INVALIDFILE);
     }
 
     // remove empty indices from end of lines array
@@ -68,13 +70,13 @@ export class DxfIterator {
 
     // check there is an even number of lines (data is grouped in pairs)
     if (this.lines.length % 2 !== 0) {
-      throw Error('invalid dxf data - dxf must contain groupcode value pairs');
+      throw Error(Strings.Error.INVALIDFILE);
     }
 
     // check the file is terminated with EOF
     const lastLine = this.formatted(this.lines.at(-1)).toUpperCase().trim();
     if (lastLine !== 'EOF') {
-      throw Error('invalid dxf data - missing EOF tag');
+      throw Error(Strings.Error.INVALIDFILE);
     }
   }
 
@@ -83,7 +85,7 @@ export class DxfIterator {
    * @param  {String} msg - error message
    */
   dxfError(msg) {
-    throw Error(`${msg} - Line: ${this.currentIndex}`);
+    throw Error(`${msg} - ${Strings.Strings.LINE}: ${this.currentIndex + 1}`);
   }
 
 
