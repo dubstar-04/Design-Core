@@ -62,7 +62,6 @@ export class LayerManager {
     const layerToDelete = this.getLayerByIndex(layerIndex).name;
 
     if (layerToDelete.toUpperCase() === 'DEFPOINTS') {
-      // console.log('Warning: DEFPOINTS layer cannot be deleted');
       // DEFPOINTS layer cannot be deleted
       this.core.notify(Strings.Message.DEFPOINTSDELETE);
       return;
@@ -143,7 +142,6 @@ export class LayerManager {
         }
 
         return false;
-        break;
       }
     }
   }
@@ -177,7 +175,6 @@ export class LayerManager {
     if (this.getLayerByIndex(layerIndex).name.toUpperCase() !== 'DEFPOINTS') {
       if (this.getLayerByIndex(layerIndex).name === this.getCLayer()) {
         this.setCLayer(newUniqueName);
-        // console.log('[Layernamanger.renameLayer] - set new Clayer name');
       }
 
       this.layers[layerIndex].name = newUniqueName;
