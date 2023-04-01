@@ -173,6 +173,10 @@ export class LayerManager {
   renameLayer(layerIndex, newName) {
     const newUniqueName = this.getUniqueName(newName);
 
+    if (this.layers[layerIndex] === undefined) {
+      return;
+    }
+
     if (this.getLayerByIndex(layerIndex).name.toUpperCase() !== 'DEFPOINTS') {
       if (this.getLayerByIndex(layerIndex).name === this.getCLayer()) {
         this.setCLayer(newUniqueName);
