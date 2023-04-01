@@ -1,5 +1,6 @@
 
 import {Layer} from './layer.js';
+import {Strings} from '../lib/strings.js';
 
 export class LayerManager {
   constructor(core) {
@@ -62,7 +63,14 @@ export class LayerManager {
     const layerToDelete = this.getLayerByIndex(layerIndex).name;
 
     if (layerToDelete.toUpperCase() === 'DEFPOINTS') {
-      // console.log('Warning: DEFPOINTS layer cannot be deleted');
+      // DEFPOINTS layer cannot be deleted
+      this.core.notify(Strings.Message.DEFPOINTSDELETE);
+      return;
+    }
+
+    if (layerToDelete === this.currentLayer) {
+      // cLayer cannot be deleted
+      this.core.notify(Strings.Message.CLAYERDELETE);
       return;
     }
 
@@ -130,12 +138,11 @@ export class LayerManager {
   layerVisible(layer) {
     for (let i = 0; i < this.layers.length; i++) {
       if (this.layers[i].name === layer) {
-        if (this.layers[i].on || this.layers[i].frozen) {
+        if (this.layers[i].on && !this.layers[i].frozen) {
           return true;
         }
 
         return false;
-        break;
       }
     }
   }
@@ -166,10 +173,13 @@ export class LayerManager {
   renameLayer(layerIndex, newName) {
     const newUniqueName = this.getUniqueName(newName);
 
+    if (this.layers[layerIndex] === undefined) {
+      return;
+    }
+
     if (this.getLayerByIndex(layerIndex).name.toUpperCase() !== 'DEFPOINTS') {
       if (this.getLayerByIndex(layerIndex).name === this.getCLayer()) {
         this.setCLayer(newUniqueName);
-        // console.log('[Layernamanger.renameLayer] - set new Clayer name');
       }
 
       this.layers[layerIndex].name = newUniqueName;
