@@ -138,7 +138,7 @@ export class LayerManager {
   layerVisible(layer) {
     for (let i = 0; i < this.layers.length; i++) {
       if (this.layers[i].name === layer) {
-        if (this.layers[i].on || this.layers[i].frozen) {
+        if (this.layers[i].on && !this.layers[i].frozen) {
           return true;
         }
 
