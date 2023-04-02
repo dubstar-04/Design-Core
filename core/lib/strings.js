@@ -28,6 +28,7 @@ export class Strings {
   static Strings = {
     LENGTH: 'Length',
     LINE: 'Line',
+    VARIES: 'Varies',
   };
 
   // Input Strings

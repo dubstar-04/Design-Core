@@ -63,37 +63,51 @@ export class PropertyManager {
 
   getItemProperties(itemType) {
     // Loop through the items and get a list of common properties.
-    // console.log('Properties Manage - getItemProperties Item Type: ' + itemType);
+
+    // check for valid itemType and selectionSet
+    if (itemType === undefined || itemType === null || this.core.scene.selectionSet.length <= 0) {
+      return;
+    }
+
+    let subset = [];
+
+    // create subset array of selectionSet
+    this.core.scene.selectionSet.forEach((index) => {
+      subset.push(this.core.scene.items[index]);
+    });
+
+    // get a subset of the selectionSet
+    if (itemType !== 'All') {
+      subset = subset.filter((el) => el.type === itemType);
+    }
+
     const propertiesList = [];
 
-    if (this.core.scene.selectionSet.length > 0) {
-      for (let i = 0; i < this.core.scene.selectionSet.length; i++) {
-        // console.log("[propertiesManager.js - getItemProperties()] type:", items[selectionSet[i]].type)
-        if (this.core.scene.items[this.core.scene.selectionSet[i]].type === itemType) {
-          const properties = this.core.scene.items[this.core.scene.selectionSet[i]];
-          for (const prop in properties) {
-            // console.log("Property: " + prop)
-            if (propertiesList.indexOf(prop, 0) === -1) {
-              if (typeof properties[prop] !== 'function') {
-                propertiesList.push(prop);
-              }
-            }
+    subset.forEach((el) => {
+      // get list of keys
+      Object.keys(el).forEach( (key) => {
+        // check if the key is already in the propertiesList
+        if (propertiesList.includes(key) === false) {
+        // check if all subset items contain the key
+          if (subset.every((el) => el.hasOwnProperty(key))) {
+            propertiesList.push(key);
           }
         }
-      }
+      });
+    });
 
-      return propertiesList;
-    }
+    return propertiesList;
   }
 
 
   getItemPropertyValue(itemType, property) {
     // Loop through the items and get a list the property values
+    // console.log('Properties Manager - getItemPropertyValue Item Type:', itemType, 'Property:', property);
     const propertiesValueList = [];
     // const propertyValue = '';
     if (this.core.scene.selectionSet.length > 0) {
       for (let i = 0; i < this.core.scene.selectionSet.length; i++) {
-        if (this.core.scene.items[this.core.scene.selectionSet[i]].type === itemType) {
+        if (this.core.scene.items[this.core.scene.selectionSet[i]].type === itemType || itemType === 'All') {
           const prop = this.core.scene.items[this.core.scene.selectionSet[i]][property];
           propertiesValueList.push(prop);
         }
@@ -106,7 +120,7 @@ export class PropertyManager {
     })) {
       return propertiesValueList[0];
     } else {
-      return 'varies';
+      return Strings.Strings.VARIES;
     }
   }
 }

@@ -16,6 +16,8 @@ const data = {
 core.scene.addToScene('Line', data, false);
 core.scene.addToScene('Circle', data, false);
 core.scene.addToScene('Text', data, false);
+// Add Arc with a different Colour
+core.scene.addToScene('Arc', {points: [point1, point2], colour: '#000000'}, false);
 
 test('Test propertyManager.getItemTypes', () => {
   // Add an item to the selectionSet
@@ -78,6 +80,10 @@ test('Test propertyManager.getItemProperties', () => {
   properties = propertiesManager.getItemProperties('Line');
   expect(properties.length).toBeGreaterThan(0);
 
+  // check properties for All itemTypes
+  properties = propertiesManager.getItemProperties('All');
+  expect(properties.length).toBeGreaterThan(0);
+
   // get circle props with a line selected - should be 0
   properties = propertiesManager.getItemProperties('Circle');
   expect(properties.length).toBe(0);
@@ -101,4 +107,9 @@ test('Test propertyManager.getItemPropertyValue', () => {
   // get circle props with a line selected - should be undefined
   propertyValues = propertiesManager.getItemPropertyValue('Circle', 'colour');
   expect(propertyValues).toBeUndefined();
+
+  // get props for all selected types - index 0 and 3 colour should be Varies
+  core.scene.selectionSet.push(3);
+  propertyValues = propertiesManager.getItemPropertyValue('All', 'colour');
+  expect(propertyValues).toBe('Varies');
 });

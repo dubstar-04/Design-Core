@@ -85,75 +85,6 @@ export class Scene {
     this.saved = false; // Changes have occured. A save may be required.
   }
 
-  /*
-  // add item to block
-  // TODO: fix this mess
-  addItemToBlock(type, data, name) {
-    // console.log('block name:', name);
-
-    if (this.items[this.items.length - 1].name === name) {
-      // console.log('Add Item to Block:', type, name);
-      // TODO: This is a bad hack
-      if (type === 'Insert') {
-        this.items[this.items.length - 1].addInsert(data);
-        this.items[this.items.length - 1].colour = data.colour;
-        // console.log('Set Block colour:', data.colour);
-      } else {
-        const item = this.core.commandManager.createNew(type, data);
-        this.items[this.items.length - 1].addItem(item);
-      }
-    }
-  }
-
-  linkBlockData() {
-    // link elements to blocks and blocks to dimensions
-
-    // console.log("linking blocks:")
-
-    const blocks = this.items.filter((item) => item.type === 'Block');
-    // console.log("blocks filter:", blocks)
-
-    // const dBlocks = blocks.filter((item) => item.name.includes('*D'));
-    // console.log("dblocks filter:", dBlocks)
-
-    const uBlocks = blocks.filter((item) => item.name.includes('*U'));
-    // console.log("text blocks filter:", uBlocks)
-
-    const blocksNamesToDelete = [];
-    let blockIndex = 0; // used to track and link blocks. Dimension > *D blocks > *U blocks
-
-    // copy the block data to the correct dimension
-    for (let idx = 0; idx < this.items.length; idx++) {
-      // console.log("linking blocks:", (idx / items.length).toFixed(1) * 100, "%")
-
-      if (this.items[idx].type === 'Dimension') {
-        // TODO: do we need to have a specific handler for dimension here?
-        // console.log("found Dimension:", idx, "blockname:", items[idx].blockName)
-        const block = blocks.filter((item) => item.name === this.items[idx].blockName);
-        if (block) {
-          // console.log("matching block", block[0], "dblock:", dBlocks[blockIndex].name, "ublock:", uBlocks[blockIndex].name)
-          // copy block data to dimension
-          this.items[idx].block = block[0];
-          // copy text data to dimension
-          this.items[idx].text = uBlocks[blockIndex].this.items[0];
-          // console.log("Text:", uBlocks[blockIndex].this.items[0])
-          blocksNamesToDelete.push(this.items[idx].blockName);
-          blocksNamesToDelete.push(uBlocks[blockIndex].name);
-          blockIndex++;
-        }
-      }
-    }
-
-    // delete any blocks that have been merged with the parent dimension
-    for (let idx = this.items.length - 1; idx > 0; idx--) {
-      if (blocksNamesToDelete.includes(this.items[idx].name)) {
-        // console.log("found name at:", idx)
-        this.items.splice(idx, 1);
-      }
-    }
-  }
-  */
-
   addToScene(type, data, end, index) {
     if (!data) {
       const colour = 'BYLAYER';
@@ -235,81 +166,73 @@ export class Scene {
 
 
   selecting() {
+    // Clear tempItems - This is here to remove the crossing window
     this.tempItems = [];
 
-    // console.log('selecting');
+    this.core.mouse.mouseDownCanvasPoint;
+    this.core.mouse.pointOnScene();
 
-    if (this.core.mouse.buttonOneDown) {
-      const selectionPoints = [];
-      selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
-      selectionPoints.push(this.core.mouse.pointOnScene());
+    const xmin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
+    const xmax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
+    const ymin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
+    const ymax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
 
-      let selectColour;
+    const selectionExtremes = [xmin, xmax, ymin, ymax];
 
+    // Loop through all the entities and see if it should be selected
+    for (let i = 0; i < this.items.length; i++) {
       if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-        // Draw a rectangle on screen
-        selectColour = '#FF0000';
-      } else if (this.core.mouse.pointOnScene().y < this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-        // Draw a rectangle on screen
-        selectColour = '#0000FF';
-      }
-
-      const data = {
-        points: selectionPoints,
-        colour: selectColour,
-      };
-
-      const tempItem = this.core.commandManager.createNew('FilledRectangle', data); // Create a new item, send it the tempPoints array
-      this.tempItems.push(tempItem); // Add it to the this.tempItems Array
-    } else {
-      // TODO: Move this repaint to one of the mouse up functions
-      this.core.canvas.requestPaint();
-
-      this.core.mouse.mouseDownCanvasPoint;
-      this.core.mouse.pointOnScene();
-
-      const xmin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-      const xmax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-      const ymin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
-      const ymax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
-
-      const selectionExtremes = [xmin, xmax, ymin, ymax];
-
-      // Loop through all the entities and see if it should be selected
-      for (let i = 0; i < this.items.length; i++) {
-        if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-          // console.log(" scene.js - scene.js: selecting() - Select all touched by selection window")
-          if (this.items[i].touched(selectionExtremes, this.core) || this.items[i].within(selectionExtremes, this.core)) {
-            // console.log(this.items[i].type + ' at index: ' + i + ' is within the selection');
-            if (this.selectionSet.indexOf(i) === -1) { // only store selections once
-              this.addToSelectedItems(i);
-              this.selectionSet.push(i);
-              this.selectionSetChanged();
-            }
-          }
-        } else {
-          // console.log(" scene.js - scene.js: selecting() - Select all within the selection window")
-          if (this.items[i].within(selectionExtremes, this.core)) {
-            // console.log(items[i].type + " at index: " + i + " is within the selection")
-            if (this.selectionSet.indexOf(i) === -1) { // only store selections once
-              this.addToSelectedItems(i);
-              this.selectionSet.push(i);
-              this.selectionSetChanged();
-            }
-          }
+        if (this.items[i].touched(selectionExtremes, this.core) || this.items[i].within(selectionExtremes, this.core)) {
+          this.addToSelectedItems(i);
+        }
+      } else {
+        if (this.items[i].within(selectionExtremes, this.core)) {
+          this.addToSelectedItems(i);
         }
       }
     }
 
     this.core.canvas.requestPaint();
+    this.selectionSetChanged();
   }
 
   // Duplicate an item into the selected items array
   addToSelectedItems(index) {
-    const copyofitem = Utils.cloneObject(this.core, this.items[index]);
-    copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-    copyofitem.lineWidth = copyofitem.lineWidth * 2;
-    this.selectedItems.push(copyofitem);
+    // only store selections once
+    if (this.selectionSet.indexOf(index) === -1) {
+      const copyofitem = Utils.cloneObject(this.core, this.items[index]);
+      copyofitem.colour = this.core.settings.selecteditemscolour.toString();
+      copyofitem.lineWidth = copyofitem.lineWidth * 2;
+      this.selectedItems.push(copyofitem);
+      // Update selectionset
+      this.selectionSet.push(index);
+    }
+  }
+
+
+  drawSelectionWindow() {
+    const selectionPoints = [];
+    selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
+    selectionPoints.push(this.core.mouse.pointOnScene());
+
+    let selectColour;
+
+    if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
+      // Draw a rectangle on screen
+      selectColour = '#FF0000';
+    } else if (this.core.mouse.pointOnScene().y < this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
+      // Draw a rectangle on screen
+      selectColour = '#0000FF';
+    }
+
+    const data = {
+      points: selectionPoints,
+      colour: selectColour,
+    };
+
+    const tempItem = this.core.commandManager.createNew('FilledRectangle', data); // Create a new item, send it the tempPoints array
+    this.tempItems.push(tempItem); // Add it to the this.tempItems Array
+    this.core.canvas.requestPaint();
   }
 
   // reload the selectedItems
@@ -393,7 +316,7 @@ export class Scene {
     this.tempPoints = [];
 
     if (this.core.mouse.buttonOneDown) {
-      this.selecting();
+      this.drawSelectionWindow();
     }
 
     if (this.activeCommand !== undefined && this.activeCommand.family === 'Geometry' || this.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
