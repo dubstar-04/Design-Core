@@ -10,6 +10,11 @@ export class Block extends Entity {
     this.location = new Point(); // block reference location
     this.flags = 1;
     this.items = []; // list of items in the block
+    Object.defineProperty(this, 'location', {
+      enumerable: false,
+      value: new Point(),
+      writable: true,
+    });
 
     if (data) {
       if (data.name || data[2]) {
