@@ -1,6 +1,6 @@
 import {Point} from '../entities/point.js';
-import {Utils} from './utils.js';
 import {Snapping} from './snapping.js';
+import {Selecting} from './selecting.js';
 
 export class Scene {
   constructor(core) {
@@ -10,9 +10,9 @@ export class Scene {
     this.points = []; // Temporary Array to store the input points
     this.tempItems = []; // Temporary Array to store items while input is being gathered
     this.tempPoints = []; // Temporary Array to store points while input is being gathered
-    this.selectedItems = []; // store a copy of selected items
-    this.selectionSet = []; // store a list of selected items indices
-    this.selectionAccepted = false; // Store a bool so we know when the selectionSet has been accepted
+
+    this.selecting = new Selecting(core);
+
     this.activeCommand = undefined; // Store the name of the active command
     this.inputArray = []; // Temporary Array to store input values.
     this.saved = false;
@@ -24,19 +24,13 @@ export class Scene {
     this.minPoints = 0; // reset minimum required points
     this.activeCommand = undefined; // reset the active command
     this.tempItems = [];
-    this.selectedItems = [];
-    this.selectionSet = [];
-    this.selectionSetChanged();
-    this.selectionAccepted = false;
+    this.selecting.reset();
+
     this.core.commandLine.resetPrompt();
     this.inputArray = [];
     this.core.canvas.requestPaint();
   }
 
-  selectionSetChanged() {
-    // signal to the properties manager that the selection set is changed
-    this.core.propertyManager.selectionSetChanged();
-  }
 
   /*
     centreVPORT(centre, width, height) {
@@ -120,92 +114,6 @@ export class Scene {
     }
     if (end) {
       this.reset();
-    }
-  }
-
-  findClosestItem() {
-    let delta = 1.65 / this.core.canvas.getScale(); // find a more suitable starting value
-    let closestItem;
-
-    for (let i = 0; i < this.items.length; i++) {
-      const distance = this.items[i].closestPoint(this.core.mouse.pointOnScene())[1]; // ClosestPoint()[1] returns a distance to the closest point
-
-      if (distance < delta) {
-        delta = distance;
-        closestItem = i;
-        // console.log(' scene.js - Distance: ' + distance);
-      }
-    }
-
-    return closestItem;
-  }
-
-  selectClosestItem(data) {
-    const closestItem = this.findClosestItem();
-
-    if (data) {
-      this.selectedItems = [];
-      this.selectionSet = [];
-    }
-
-    if (closestItem !== undefined) {
-      if (this.selectionSet.indexOf(closestItem) === -1) { // only store selections once
-        const copyofitem = Utils.cloneObject(this.core, this.items[closestItem]);
-        copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-        copyofitem.lineWidth = copyofitem.lineWidth * 2;
-        this.selectedItems.push(copyofitem);
-        this.selectionSet.push(closestItem);
-      } else {
-        const index = this.selectionSet.indexOf(closestItem);
-        this.selectionSet.splice(index, 1); // if the command is already in the array, Erase it
-        this.selectedItems.splice(index, 1);
-      }
-    }
-    this.selectionSetChanged();
-  }
-
-
-  selecting() {
-    // Clear tempItems - This is here to remove the crossing window
-    this.tempItems = [];
-
-    this.core.mouse.mouseDownCanvasPoint;
-    this.core.mouse.pointOnScene();
-
-    const xmin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-    const xmax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-    const ymin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
-    const ymax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
-
-    const selectionExtremes = [xmin, xmax, ymin, ymax];
-
-    // Loop through all the entities and see if it should be selected
-    for (let i = 0; i < this.items.length; i++) {
-      if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-        if (this.items[i].touched(selectionExtremes, this.core) || this.items[i].within(selectionExtremes, this.core)) {
-          this.addToSelectedItems(i);
-        }
-      } else {
-        if (this.items[i].within(selectionExtremes, this.core)) {
-          this.addToSelectedItems(i);
-        }
-      }
-    }
-
-    this.core.canvas.requestPaint();
-    this.selectionSetChanged();
-  }
-
-  // Duplicate an item into the selected items array
-  addToSelectedItems(index) {
-    // only store selections once
-    if (this.selectionSet.indexOf(index) === -1) {
-      const copyofitem = Utils.cloneObject(this.core, this.items[index]);
-      copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-      copyofitem.lineWidth = copyofitem.lineWidth * 2;
-      this.selectedItems.push(copyofitem);
-      // Update selectionset
-      this.selectionSet.push(index);
     }
   }
 
@@ -302,7 +210,7 @@ export class Scene {
   mouseUp(button) {
     switch (button) {
       case 0: // left button
-        this.selecting();
+        this.selecting.selecting(this.core);
         break;
       case 1: // middle button
         break;

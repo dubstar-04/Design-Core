@@ -28,7 +28,7 @@ export class Rotate {
     prompt[0] = Strings.Input.SELECTENTITIES;
 
     expectedType[1] = ['object'];
-    prompt[1] = `${core.scene.selectionSet.length}  ${Strings.Input.SELECTED}`;
+    prompt[1] = `${core.scene.selecting.selectionSet.length}  ${Strings.Input.SELECTED}`;
 
     expectedType[2] = ['boolean'];
     prompt[2] = Strings.Input.BASEPOINT;
@@ -68,15 +68,15 @@ export class Rotate {
 
       const theta = ang2 - ang1;
 
-      for (let i = 0; i < core.scene.selectionSet.length; i++) {
+      for (let i = 0; i < core.scene.selecting.selectionSet.length; i++) {
         // console.log( "(preview) item: " + selectedItems[i].type + " Points length: " + selectedItems[i].points.length);
-        for (let j = 0; j < core.scene.selectedItems[i].points.length; j++) {
+        for (let j = 0; j < core.scene.selecting.selectedItems[i].points.length; j++) {
           // console.log( "(preview) point: " + j + " length: " + selectedItems[i].points.length)
-          const x = core.scene.tempPoints[0].x + (core.scene.items[core.scene.selectionSet[i]].points[j].x - core.scene.tempPoints[0].x) * Math.cos(theta) - (core.scene.items[core.scene.selectionSet[i]].points[j].y - core.scene.tempPoints[0].y) * Math.sin(theta);
-          const y = core.scene.tempPoints[0].y + (core.scene.items[core.scene.selectionSet[i]].points[j].x - core.scene.tempPoints[0].x) * Math.sin(theta) + (core.scene.items[core.scene.selectionSet[i]].points[j].y - core.scene.tempPoints[0].y) * Math.cos(theta);
+          const x = core.scene.tempPoints[0].x + (core.scene.items[core.scene.selecting.selectionSet[i]].points[j].x - core.scene.tempPoints[0].x) * Math.cos(theta) - (core.scene.items[core.scene.selecting.selectionSet[i]].points[j].y - core.scene.tempPoints[0].y) * Math.sin(theta);
+          const y = core.scene.tempPoints[0].y + (core.scene.items[core.scene.selecting.selectionSet[i]].points[j].x - core.scene.tempPoints[0].x) * Math.sin(theta) + (core.scene.items[core.scene.selecting.selectionSet[i]].points[j].y - core.scene.tempPoints[0].y) * Math.cos(theta);
 
-          core.scene.selectedItems[i].points[j].x = x;
-          core.scene.selectedItems[i].points[j].y = y;
+          core.scene.selecting.selectedItems[i].points[j].x = x;
+          core.scene.selecting.selectedItems[i].points[j].y = y;
         }
       }
     }
@@ -99,13 +99,13 @@ export class Rotate {
 
     // console.log("Theta: " + theta + " degrees: " + radians2degrees(theta));
 
-    for (let i = 0; i < core.scene.selectionSet.length; i++) {
-      for (let j = 0; j < core.scene.selectedItems[i].points.length; j++) {
-        const x = core.scene.points[0].x + (core.scene.items[core.scene.selectionSet[i]].points[j].x - core.scene.points[0].x) * Math.cos(theta) - (core.scene.items[core.scene.selectionSet[i]].points[j].y - core.scene.points[0].y) * Math.sin(theta);
-        const y = core.scene.points[0].y + (core.scene.items[core.scene.selectionSet[i]].points[j].x - core.scene.points[0].x) * Math.sin(theta) + (core.scene.items[core.scene.selectionSet[i]].points[j].y - core.scene.points[0].y) * Math.cos(theta);
+    for (let i = 0; i < core.scene.selecting.selectionSet.length; i++) {
+      for (let j = 0; j < core.scene.selecting.selectedItems[i].points.length; j++) {
+        const x = core.scene.points[0].x + (core.scene.items[core.scene.selecting.selectionSet[i]].points[j].x - core.scene.points[0].x) * Math.cos(theta) - (core.scene.items[core.scene.selecting.selectionSet[i]].points[j].y - core.scene.points[0].y) * Math.sin(theta);
+        const y = core.scene.points[0].y + (core.scene.items[core.scene.selecting.selectionSet[i]].points[j].x - core.scene.points[0].x) * Math.sin(theta) + (core.scene.items[core.scene.selecting.selectionSet[i]].points[j].y - core.scene.points[0].y) * Math.cos(theta);
 
-        core.scene.items[core.scene.selectionSet[i]].points[j].x = x;
-        core.scene.items[core.scene.selectionSet[i]].points[j].y = y;
+        core.scene.items[core.scene.selecting.selectionSet[i]].points[j].x = x;
+        core.scene.items[core.scene.selecting.selectionSet[i]].points[j].y = y;
       }
     }
   };

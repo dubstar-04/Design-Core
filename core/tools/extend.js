@@ -29,7 +29,7 @@ export class Extend {
     prompt[0] = Strings.Input.BOUNDARY;
 
     expectedType[1] = ['object'];
-    prompt[1] = `${core.scene.selectionSet.length}  ${Strings.Input.SELECTED}`;
+    prompt[1] = `${core.scene.selecting.selectionSet.length}  ${Strings.Input.SELECTED}`;
 
     expectedType[2] = ['boolean'];
     prompt[2] = Strings.Input.SELECTENTITIES;
@@ -57,17 +57,17 @@ export class Extend {
   action(core) {
     // console.log('Extend.js: action');
 
-    // console.log('Extend.js: core.scene.selectionSet length:', core.scene.selectionSet.length);
+    // console.log('Extend.js: core.scene.selecting.selectionSet length:', core.scene.selecting.selectionSet.length);
 
-    const item = core.scene.findClosestItem();
+    const item = core.scene.selecting.findClosestItem();
 
     if (item !== undefined) {
       const intersectPoints = [];
       let extendItem;
 
-      for (let i = 0; i < core.scene.selectionSet.length; i++) {
-        if (core.scene.selectionSet[i] !== item) {
-          const boundaryItem = core.scene.items[core.scene.selectionSet[i]];
+      for (let i = 0; i < core.scene.selecting.selectionSet.length; i++) {
+        if (core.scene.selecting.selectionSet[i] !== item) {
+          const boundaryItem = core.scene.items[core.scene.selecting.selectionSet[i]];
           extendItem = core.scene.items[item];
 
           // console.log('boundary.type:', boundaryItem.type, 'extend.type:', extendItem.type);
