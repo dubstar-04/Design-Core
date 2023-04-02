@@ -241,6 +241,29 @@ export class Scene {
     copyofitem.colour = this.core.settings.selecteditemscolour.toString();
     copyofitem.lineWidth = copyofitem.lineWidth * 2;
     this.selectedItems.push(copyofitem);
+  drawSelectionWindow() {
+    const selectionPoints = [];
+    selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
+    selectionPoints.push(this.core.mouse.pointOnScene());
+
+    let selectColour;
+
+    if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
+      // Draw a rectangle on screen
+      selectColour = '#FF0000';
+    } else if (this.core.mouse.pointOnScene().y < this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
+      // Draw a rectangle on screen
+      selectColour = '#0000FF';
+    }
+
+    const data = {
+      points: selectionPoints,
+      colour: selectColour,
+    };
+
+    const tempItem = this.core.commandManager.createNew('FilledRectangle', data); // Create a new item, send it the tempPoints array
+    this.tempItems.push(tempItem); // Add it to the this.tempItems Array
+    this.core.canvas.requestPaint();
   }
 
   // reload the selectedItems
@@ -324,7 +347,7 @@ export class Scene {
     this.tempPoints = [];
 
     if (this.core.mouse.buttonOneDown) {
-      this.selecting();
+      this.drawSelectionWindow();
     }
 
     if (this.activeCommand !== undefined && this.activeCommand.family === 'Geometry' || this.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
