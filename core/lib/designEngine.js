@@ -90,7 +90,7 @@ export class DesignEngine {
         }
 
         if (this.core.scene.activeCommand.family === 'Tools' && !this.core.scene.selection.selectionAccepted) {
-          this.core.scene.selection.selecting(data);
+          this.core.scene.selection.selectClosestItem(data);
         }
       }
     }
