@@ -8,6 +8,9 @@ export class Selection {
     this.selectedItems = []; // store a copy of selected items
   }
 
+  /**
+   * Reset the selection state
+   */
   reset() {
     this.selectedItems = [];
     this.selectionSet = [];
@@ -15,12 +18,18 @@ export class Selection {
     this.selectionAccepted = false;
   }
 
+
+  /**
+   * Handle selection set changes
+   */
   selectionSetChanged() {
     // signal to the properties manager that the selection set is changed
     this.core.propertyManager.selectionSetChanged();
   }
 
-  // find closest items to mouse press
+  /**
+   * Find closest item to mouse press
+   */
   findClosestItem() {
     let delta = 1.65 / this.core.canvas.getScale(); // find a more suitable starting value
     let closestItem;
@@ -31,14 +40,15 @@ export class Selection {
       if (distance < delta) {
         delta = distance;
         closestItem = i;
-        // console.log(' scene.js - Distance: ' + distance);
       }
     }
 
     return closestItem;
   }
 
-  // find items within a selection window
+  /**
+   * Find items within a selection window
+   */
   selecting() {
     // Clear tempItems - This is here to remove the crossing window
     this.core.scene.tempItems = [];
@@ -57,11 +67,11 @@ export class Selection {
     for (let i = 0; i < this.core.scene.items.length; i++) {
       if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
         if (this.core.scene.items[i].touched(selectionExtremes, this.core) || this.core.scene.items[i].within(selectionExtremes, this.core)) {
-          this.addToSelectedItems(i);
+          this.addToSelectionSet(i);
         }
       } else {
         if (this.core.scene.items[i].within(selectionExtremes, this.core)) {
-          this.addToSelectedItems(i);
+          this.addToSelectionSet(i);
         }
       }
     }
@@ -70,6 +80,11 @@ export class Selection {
     this.core.scene.selection.selectionSetChanged();
   }
 
+
+  /**
+   * Select the closest item and add it to the selection set
+   * @param  {Object} data
+   */
   selectClosestItem(data) {
     const closestItem = this.findClosestItem(this.core);
 
@@ -94,21 +109,33 @@ export class Selection {
     this.selectionSetChanged();
   }
 
-  // Duplicate an item into the selected items array
-  addToSelectedItems(index) {
+  /**
+  * Add the item at index to the selectionSet and selectedItems
+  * @param  {Integer} index
+  */
+  addToSelectionSet(index) {
     // only store selections once
     if (this.selectionSet.indexOf(index) === -1) {
-      const copyofitem = Utils.cloneObject(this.core, this.core.scene.items[index]);
-      copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-      copyofitem.lineWidth = copyofitem.lineWidth * 2;
-      this.selectedItems.push(copyofitem);
-      // Update selectionset
       this.selectionSet.push(index);
+      this.addToSelectedItems(index);
     }
   }
 
-  // reload the selectedItems
-  // This is required following changes to selected items
+  /**
+   * Duplicate the item at index and add to selectedItems
+   * @param  {Integer} index
+   */
+  addToSelectedItems(index) {
+    const copyofitem = Utils.cloneObject(this.core, this.core.scene.items[index]);
+    copyofitem.colour = this.core.settings.selecteditemscolour.toString();
+    copyofitem.lineWidth = copyofitem.lineWidth * 2;
+    this.selectedItems.push(copyofitem);
+  }
+
+  /**
+   * Reload the selectedItems
+   * This is required following changes to selected item properties
+   */
   reloadSelectedItems() {
     this.selectedItems = [];
 
