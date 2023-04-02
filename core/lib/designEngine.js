@@ -39,8 +39,8 @@ export class DesignEngine {
     }
 
     if (action === 'Enter' && isUndefined) {
-      if (this.core.scene.activeCommand !== undefined && this.core.scene.activeCommand.family === 'Tools' && this.core.scene.selecting.selectionSet.length) {
-        this.core.scene.selecting.selectionAccepted = true;
+      if (this.core.scene.activeCommand !== undefined && this.core.scene.activeCommand.family === 'Tools' && this.core.scene.selection.selectionSet.length) {
+        this.core.scene.selection.selectionAccepted = true;
         inputData = true;
       } else if (this.core.scene.activeCommand !== undefined) {
         this.core.scene.reset();
@@ -80,17 +80,17 @@ export class DesignEngine {
       // console.log('design engine - left click- create new point ');
 
       if (this.core.scene.activeCommand === undefined) {
-        this.core.scene.selecting.selectClosestItem(data);
+        this.core.scene.selection.selectClosestItem(data);
       } else {
         const point = this.core.mouse.pointOnScene();
         inputData = point;
 
-        if (this.core.scene.activeCommand.family === 'Geometry' || this.core.scene.selecting.selectionAccepted) {
+        if (this.core.scene.activeCommand.family === 'Geometry' || this.core.scene.selection.selectionAccepted) {
           this.core.scene.points.push(inputData);
         }
 
-        if (this.core.scene.activeCommand.family === 'Tools' && !this.core.scene.selecting.selectionAccepted) {
-          this.core.scene.selecting.selecting(data);
+        if (this.core.scene.activeCommand.family === 'Tools' && !this.core.scene.selection.selectionAccepted) {
+          this.core.scene.selection.selecting(data);
         }
       }
     }
@@ -118,12 +118,12 @@ export class DesignEngine {
     } else if (this.core.commandManager.isCommandOrShortcut(input)) {
       this.initialiseItem(this.core.commandManager.getCommand(input));
 
-      if (this.core.scene.activeCommand.family === 'Tools' && this.core.scene.selecting.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
+      if (this.core.scene.activeCommand.family === 'Tools' && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
         if (this.core.scene.activeCommand.selectionRequired) {
-          this.core.scene.inputArray.push(this.core.scene.selecting.selectionSet);
+          this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
           this.core.scene.inputArray.push(true);
         }
-        this.core.scene.selecting.selectionAccepted = true;
+        this.core.scene.selection.selectionAccepted = true;
       }
       this.actionInput();
     } else {

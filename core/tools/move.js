@@ -30,7 +30,7 @@ export class Move {
     prompt[0] = Strings.Input.SELECTENTITIES;
 
     expectedType[1] = ['object'];
-    prompt[1] = `${core.scene.selecting.selectionSet.length}  ${Strings.Input.SELECTED}`;
+    prompt[1] = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
 
     expectedType[2] = ['boolean'];
     prompt[2] = Strings.Input.BASEPOINT;
@@ -63,11 +63,11 @@ export class Move {
 
     // console.log('move.js: X: ' + xDelta + ' Y: ' + yDelta);
 
-    for (let i = 0; i < core.scene.selecting.selectionSet.length; i++) {
-      // console.log("core.scene.selecting.selectionSet.type: " + core.scene.selecting.selectionSet[i].type);
-      for (let j = 0; j < core.scene.selecting.selectedItems[i].points.length; j++) {
-        core.scene.items[core.scene.selecting.selectionSet[i]].points[j].x = core.scene.items[core.scene.selecting.selectionSet[i]].points[j].x + xDelta;
-        core.scene.items[core.scene.selecting.selectionSet[i]].points[j].y = core.scene.items[core.scene.selecting.selectionSet[i]].points[j].y + yDelta;
+    for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
+      // console.log("core.scene.selection.selectionSet.type: " + core.scene.selection.selectionSet[i].type);
+      for (let j = 0; j < core.scene.selection.selectedItems[i].points.length; j++) {
+        core.scene.items[core.scene.selection.selectionSet[i]].points[j].x = core.scene.items[core.scene.selection.selectionSet[i]].points[j].x + xDelta;
+        core.scene.items[core.scene.selection.selectionSet[i]].points[j].y = core.scene.items[core.scene.selection.selectionSet[i]].points[j].y + yDelta;
       }
     }
   }
@@ -84,13 +84,13 @@ export class Move {
     // console.log('delta', xDelta, yDelta);
     // console.log(core.scene.tempPoints[0].x, core.scene.tempPoints[0].y);
     // console.log(core.scene.tempPoints[1].x, core.scene.tempPoints[1].y);
-    // console.log(core.scene.items[core.scene.selecting.selectionSet[0]].points[0].x, core.scene.items[core.scene.selecting.selectionSet[0]].points[0].y);
+    // console.log(core.scene.items[core.scene.selection.selectionSet[0]].points[0].x, core.scene.items[core.scene.selection.selectionSet[0]].points[0].y);
 
-    for (let i = 0; i < core.scene.selecting.selectionSet.length; i++) {
-      // console.log("core.scene.selecting.selectionSet.type: " + selectedItems[i].type);
-      for (let j = 0; j < core.scene.selecting.selectedItems[i].points.length; j++) {
-        core.scene.selecting.selectedItems[i].points[j].x = core.scene.items[core.scene.selecting.selectionSet[i]].points[j].x + xDelta;
-        core.scene.selecting.selectedItems[i].points[j].y = core.scene.items[core.scene.selecting.selectionSet[i]].points[j].y + yDelta;
+    for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
+      // console.log("core.scene.selection.selectionSet.type: " + selectedItems[i].type);
+      for (let j = 0; j < core.scene.selection.selectedItems[i].points.length; j++) {
+        core.scene.selection.selectedItems[i].points[j].x = core.scene.items[core.scene.selection.selectionSet[i]].points[j].x + xDelta;
+        core.scene.selection.selectedItems[i].points[j].y = core.scene.items[core.scene.selection.selectionSet[i]].points[j].y + yDelta;
       }
     }
   }

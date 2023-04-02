@@ -1,6 +1,6 @@
 import {Utils} from './utils.js';
 
-export class Selecting {
+export class Selection {
   constructor(core) {
     this.core = core;
     this.selectionSet = []; // store a list of selected items indices
@@ -67,7 +67,7 @@ export class Selecting {
     }
 
     this.core.canvas.requestPaint();
-    this.core.scene.selecting.selectionSetChanged();
+    this.core.scene.selection.selectionSetChanged();
   }
 
   selectClosestItem(data) {

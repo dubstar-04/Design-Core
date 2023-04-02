@@ -1,6 +1,6 @@
 import {Point} from '../entities/point.js';
 import {Snapping} from './snapping.js';
-import {Selecting} from './selecting.js';
+import {Selection} from './selection.js';
 
 export class Scene {
   constructor(core) {
@@ -11,7 +11,7 @@ export class Scene {
     this.tempItems = []; // Temporary Array to store items while input is being gathered
     this.tempPoints = []; // Temporary Array to store points while input is being gathered
 
-    this.selecting = new Selecting(core);
+    this.selection = new Selection(core);
 
     this.activeCommand = undefined; // Store the name of the active command
     this.inputArray = []; // Temporary Array to store input values.
@@ -24,7 +24,7 @@ export class Scene {
     this.minPoints = 0; // reset minimum required points
     this.activeCommand = undefined; // reset the active command
     this.tempItems = [];
-    this.selecting.reset();
+    this.selection.reset();
 
     this.core.commandLine.resetPrompt();
     this.inputArray = [];
@@ -198,7 +198,7 @@ export class Scene {
   mouseUp(button) {
     switch (button) {
       case 0: // left button
-        this.selecting.selecting(this.core);
+        this.selection.selecting(this.core);
         break;
       case 1: // middle button
         break;
@@ -215,7 +215,7 @@ export class Scene {
       this.drawSelectionWindow();
     }
 
-    if (this.activeCommand !== undefined && this.activeCommand.family === 'Geometry' || this.selecting.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
+    if (this.activeCommand !== undefined && this.activeCommand.family === 'Geometry' || this.selection.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
       const snapPoint = Snapping.getSnapPoint(this);
       if (snapPoint) {
         this.addSnapPoint(snapPoint);
@@ -259,7 +259,7 @@ export class Scene {
         this.core.canvas.requestPaint(); // TODO: Improve requests to paint as it is called too often.
       }
 
-      if (this.activeCommand !== undefined && this.activeCommand.showPreview && this.activeCommand.family === 'Tools' && this.selecting.selectionAccepted) {
+      if (this.activeCommand !== undefined && this.activeCommand.showPreview && this.activeCommand.family === 'Tools' && this.selection.selectionAccepted) {
         // console.log("preview")
         this.activeCommand.preview(this.core);
         this.core.canvas.requestPaint();

@@ -221,8 +221,8 @@ export class Canvas {
       this.core.scene.tempItems[j].draw(context, this.getScale(), this.core);
     }
 
-    for (k; k < this.core.scene.selecting.selectedItems.length; k++) {
-      this.core.scene.selecting.selectedItems[k].draw(context, this.getScale(), this.core);
+    for (k; k < this.core.scene.selection.selectedItems.length; k++) {
+      this.core.scene.selection.selectedItems[k].draw(context, this.getScale(), this.core);
     }
   }
 

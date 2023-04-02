@@ -26,7 +26,7 @@ export class Erase {
     prompt[0] = 'Select Items To ' + this.type;
 
     expectedType[1] = ['object'];
-    prompt[1] = core.scene.selecting.selectionSet.length + ' Item(s) selected: Add more or press Enter to Erase';
+    prompt[1] = core.scene.selection.selectionSet.length + ' Item(s) selected: Add more or press Enter to Erase';
 
     expectedType[2] = ['boolean'];
     prompt[2] = '';
@@ -44,13 +44,13 @@ export class Erase {
   }
 
   action(core) {
-    core.scene.selecting.selectionSet.sort();
+    core.scene.selection.selectionSet.sort();
 
-    // console.log('erase.js - core.scene.selecting.selectionSet: ' + core.scene.selecting.selectionSet);
+    // console.log('erase.js - core.scene.selection.selectionSet: ' + core.scene.selection.selectionSet);
 
-    for (let i = 0; i < core.scene.selecting.selectionSet.length; i++) {
-      // console.log("Erase: " + core.scene.selecting.selectionSet[i]);
-      core.scene.items.splice((core.scene.selecting.selectionSet[i] - i), 1);
+    for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
+      // console.log("Erase: " + core.scene.selection.selectionSet[i]);
+      core.scene.items.splice((core.scene.selection.selectionSet[i] - i), 1);
     }
   }
 }
