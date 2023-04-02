@@ -7,9 +7,7 @@ export class Block extends Entity {
   constructor(data) {
     super(data);
     this.name = '';
-    this.location = new Point(); // block reference location
-    this.flags = 1;
-    this.items = []; // list of items in the block
+
     Object.defineProperty(this, 'location', {
       enumerable: false,
       value: new Point(),
@@ -31,7 +29,7 @@ export class Block extends Entity {
     if (data) {
       if (data.name || data[2]) {
         // DXF Groupcode 2 - Block Name
-        this.name = data.name;
+        this.name = data.name || data[2];
       }
 
       if (data.points) {
