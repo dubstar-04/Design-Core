@@ -106,7 +106,7 @@ export class PropertyManager {
     })) {
       return propertiesValueList[0];
     } else {
-      return 'varies';
+      return Strings.Strings.VARIES;
     }
   }
 }
