@@ -64,6 +64,11 @@ export class PropertyManager {
   getItemProperties(itemType) {
     // Loop through the items and get a list of common properties.
     // console.log('Properties Manage - getItemProperties Item Type: ' + itemType);
+
+    // check for valid itemType and selectionSet
+    if (itemType === undefined || itemType === null || this.core.scene.selectionSet.length <= 0) {
+      return;
+    }
     const propertiesList = [];
 
     if (this.core.scene.selectionSet.length > 0) {
