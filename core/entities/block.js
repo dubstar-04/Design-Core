@@ -22,6 +22,12 @@ export class Block extends Entity {
       writable: true,
     });
 
+    Object.defineProperty(this, 'items', {
+      enumerable: false,
+      value: [],
+      writable: true,
+    });
+
     if (data) {
       if (data.name || data[2]) {
         // DXF Groupcode 2 - Block Name
