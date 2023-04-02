@@ -22,17 +22,17 @@ export class PropertyManager {
 
   setItemProperties(property, newPropertyValue) {
     // console.log('Property Manager - setItemProperties');
-    for (let i = 0; i < this.core.scene.selectionSet.length; i++) {
+    for (let i = 0; i < this.core.scene.selection.selectionSet.length; i++) {
       // check if the item has the selected property
-      if (!this.core.scene.items[this.core.scene.selectionSet[i]].hasOwnProperty(property)) {
+      if (!this.core.scene.items[this.core.scene.selection.selectionSet[i]].hasOwnProperty(property)) {
         continue;
       }
 
-      if (typeof(this.core.scene.items[this.core.scene.selectionSet[i]][property]) !== typeof(newPropertyValue)) {
+      if (typeof(this.core.scene.items[this.core.scene.selection.selectionSet[i]][property]) !== typeof(newPropertyValue)) {
         this.core.notify(Strings.Error.INPUT);
       } else {
-        this.core.scene.items[this.core.scene.selectionSet[i]][property] = newPropertyValue;
-        this.core.scene.reloadSelectedItems();
+        this.core.scene.items[this.core.scene.selection.selectionSet[i]][property] = newPropertyValue;
+        this.core.scene.selection.reloadSelectedItems();
       }
     }
   }
@@ -41,10 +41,10 @@ export class PropertyManager {
     // Loop through the items and get a list of item types.
     const itemTypes = [];
 
-    if (this.core.scene.selectionSet.length > 0) {
-      for (let i = 0; i < this.core.scene.selectionSet.length; i++) {
-        const itemType = this.core.scene.items[this.core.scene.selectionSet[i]].type;
-        // console.log(this.core.scene.items[this.core.scene.selectionSet[i]].type);
+    if (this.core.scene.selection.selectionSet.length > 0) {
+      for (let i = 0; i < this.core.scene.selection.selectionSet.length; i++) {
+        const itemType = this.core.scene.items[this.core.scene.selection.selectionSet[i]].type;
+        // console.log(this.core.scene.items[this.core.scene.selection.selectionSet[i]].type);
 
         if (itemTypes.indexOf(itemType, 0) === -1) {
           itemTypes.push(itemType);
@@ -65,14 +65,14 @@ export class PropertyManager {
     // Loop through the items and get a list of common properties.
 
     // check for valid itemType and selectionSet
-    if (itemType === undefined || itemType === null || this.core.scene.selectionSet.length <= 0) {
+    if (itemType === undefined || itemType === null || this.core.scene.selection.selectionSet.length <= 0) {
       return;
     }
 
     let subset = [];
 
     // create subset array of selectionSet
-    this.core.scene.selectionSet.forEach((index) => {
+    this.core.scene.selection.selectionSet.forEach((index) => {
       subset.push(this.core.scene.items[index]);
     });
 
@@ -105,10 +105,10 @@ export class PropertyManager {
     // console.log('Properties Manager - getItemPropertyValue Item Type:', itemType, 'Property:', property);
     const propertiesValueList = [];
     // const propertyValue = '';
-    if (this.core.scene.selectionSet.length > 0) {
-      for (let i = 0; i < this.core.scene.selectionSet.length; i++) {
-        if (this.core.scene.items[this.core.scene.selectionSet[i]].type === itemType || itemType === 'All') {
-          const prop = this.core.scene.items[this.core.scene.selectionSet[i]][property];
+    if (this.core.scene.selection.selectionSet.length > 0) {
+      for (let i = 0; i < this.core.scene.selection.selectionSet.length; i++) {
+        if (this.core.scene.items[this.core.scene.selection.selectionSet[i]].type === itemType || itemType === 'All') {
+          const prop = this.core.scene.items[this.core.scene.selection.selectionSet[i]][property];
           propertiesValueList.push(prop);
         }
       }

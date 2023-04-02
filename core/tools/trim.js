@@ -29,7 +29,7 @@ export class Trim {
     prompt[0] = Strings.Input.BOUNDARY;
 
     expectedType[1] = ['object'];
-    prompt[1] = `${core.scene.selectionSet.length}  ${Strings.Input.SELECTED}`;
+    prompt[1] = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
 
     expectedType[2] = ['boolean'];
     prompt[2] = Strings.Input.SELECTENTITIES;
@@ -57,17 +57,17 @@ export class Trim {
   action(core) {
     // console.log('Trim.js: action');
 
-    // console.log('Trim.js: core.scene.selectionSet length:', core.scene.selectionSet.length);
+    // console.log('Trim.js: core.scene.selection.selectionSet length:', core.scene.selection.selectionSet.length);
 
-    const item = core.scene.findClosestItem();
+    const item = core.scene.selection.findClosestItem();
 
     if (item !== undefined) {
       const intersectPoints = [];
       let TrimItem;
 
-      for (let i = 0; i < core.scene.selectionSet.length; i++) {
-        if (core.scene.selectionSet[i] !== item) {
-          const boundaryItem = core.scene.items[core.scene.selectionSet[i]];
+      for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
+        if (core.scene.selection.selectionSet[i] !== item) {
+          const boundaryItem = core.scene.items[core.scene.selection.selectionSet[i]];
           TrimItem = core.scene.items[item];
 
           // console.log('boundary.type:', boundaryItem.type, 'Trim.type:', TrimItem.type);
