@@ -143,18 +143,6 @@ export class Scene {
     this.core.canvas.requestPaint();
   }
 
-  // reload the selectedItems
-  // This is required following changes to selected items
-  reloadSelectedItems() {
-    this.selectedItems = [];
-
-    for (let i = 0; i < this.selectionSet.length; i++) {
-      this.addToSelectedItems(this.selectionSet[i]);
-    }
-
-    this.core.canvas.requestPaint();
-  }
-
   addHelperGeometry(type, points, colour) {
     const data = {
       points: points,
@@ -227,7 +215,7 @@ export class Scene {
       this.drawSelectionWindow();
     }
 
-    if (this.activeCommand !== undefined && this.activeCommand.family === 'Geometry' || this.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
+    if (this.activeCommand !== undefined && this.activeCommand.family === 'Geometry' || this.selecting.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
       const snapPoint = Snapping.getSnapPoint(this);
       if (snapPoint) {
         this.addSnapPoint(snapPoint);
@@ -271,7 +259,7 @@ export class Scene {
         this.core.canvas.requestPaint(); // TODO: Improve requests to paint as it is called too often.
       }
 
-      if (this.activeCommand !== undefined && this.activeCommand.showPreview && this.activeCommand.family === 'Tools' && this.selectionAccepted) {
+      if (this.activeCommand !== undefined && this.activeCommand.showPreview && this.activeCommand.family === 'Tools' && this.selecting.selectionAccepted) {
         // console.log("preview")
         this.activeCommand.preview(this.core);
         this.core.canvas.requestPaint();

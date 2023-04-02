@@ -32,7 +32,7 @@ export class PropertyManager {
         this.core.notify(Strings.Error.INPUT);
       } else {
         this.core.scene.items[this.core.scene.selecting.selectionSet[i]][property] = newPropertyValue;
-        this.core.scene.reloadSelectedItems();
+        this.core.scene.selecting.reloadSelectedItems();
       }
     }
   }
