@@ -193,6 +193,7 @@ export class Scene {
     }
 
     this.core.canvas.requestPaint();
+    this.selectionSetChanged();
   }
 
   // Duplicate an item into the selected items array
@@ -205,7 +206,6 @@ export class Scene {
       this.selectedItems.push(copyofitem);
       // Update selectionset
       this.selectionSet.push(index);
-      this.selectionSetChanged();
     }
   }
 
