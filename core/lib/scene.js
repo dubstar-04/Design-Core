@@ -166,68 +166,28 @@ export class Scene {
 
 
   selecting() {
+    // Clear tempItems - This is here to remove the crossing window
     this.tempItems = [];
 
-    // console.log('selecting');
+    this.core.mouse.mouseDownCanvasPoint;
+    this.core.mouse.pointOnScene();
 
-    if (this.core.mouse.buttonOneDown) {
-      const selectionPoints = [];
-      selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
-      selectionPoints.push(this.core.mouse.pointOnScene());
+    const xmin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
+    const xmax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
+    const ymin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
+    const ymax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
 
-      let selectColour;
+    const selectionExtremes = [xmin, xmax, ymin, ymax];
 
+    // Loop through all the entities and see if it should be selected
+    for (let i = 0; i < this.items.length; i++) {
       if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-        // Draw a rectangle on screen
-        selectColour = '#FF0000';
-      } else if (this.core.mouse.pointOnScene().y < this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-        // Draw a rectangle on screen
-        selectColour = '#0000FF';
-      }
-
-      const data = {
-        points: selectionPoints,
-        colour: selectColour,
-      };
-
-      const tempItem = this.core.commandManager.createNew('FilledRectangle', data); // Create a new item, send it the tempPoints array
-      this.tempItems.push(tempItem); // Add it to the this.tempItems Array
-    } else {
-      // TODO: Move this repaint to one of the mouse up functions
-      this.core.canvas.requestPaint();
-
-      this.core.mouse.mouseDownCanvasPoint;
-      this.core.mouse.pointOnScene();
-
-      const xmin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-      const xmax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-      const ymin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
-      const ymax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
-
-      const selectionExtremes = [xmin, xmax, ymin, ymax];
-
-      // Loop through all the entities and see if it should be selected
-      for (let i = 0; i < this.items.length; i++) {
-        if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-          // console.log(" scene.js - scene.js: selecting() - Select all touched by selection window")
-          if (this.items[i].touched(selectionExtremes, this.core) || this.items[i].within(selectionExtremes, this.core)) {
-            // console.log(this.items[i].type + ' at index: ' + i + ' is within the selection');
-            if (this.selectionSet.indexOf(i) === -1) { // only store selections once
-              this.addToSelectedItems(i);
-              this.selectionSet.push(i);
-              this.selectionSetChanged();
-            }
-          }
-        } else {
-          // console.log(" scene.js - scene.js: selecting() - Select all within the selection window")
-          if (this.items[i].within(selectionExtremes, this.core)) {
-            // console.log(items[i].type + " at index: " + i + " is within the selection")
-            if (this.selectionSet.indexOf(i) === -1) { // only store selections once
-              this.addToSelectedItems(i);
-              this.selectionSet.push(i);
-              this.selectionSetChanged();
-            }
-          }
+        if (this.items[i].touched(selectionExtremes, this.core) || this.items[i].within(selectionExtremes, this.core)) {
+          this.addToSelectedItems(i);
+        }
+      } else {
+        if (this.items[i].within(selectionExtremes, this.core)) {
+          this.addToSelectedItems(i);
         }
       }
     }
@@ -237,10 +197,19 @@ export class Scene {
 
   // Duplicate an item into the selected items array
   addToSelectedItems(index) {
-    const copyofitem = Utils.cloneObject(this.core, this.items[index]);
-    copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-    copyofitem.lineWidth = copyofitem.lineWidth * 2;
-    this.selectedItems.push(copyofitem);
+    // only store selections once
+    if (this.selectionSet.indexOf(index) === -1) {
+      const copyofitem = Utils.cloneObject(this.core, this.items[index]);
+      copyofitem.colour = this.core.settings.selecteditemscolour.toString();
+      copyofitem.lineWidth = copyofitem.lineWidth * 2;
+      this.selectedItems.push(copyofitem);
+      // Update selectionset
+      this.selectionSet.push(index);
+      this.selectionSetChanged();
+    }
+  }
+
+
   drawSelectionWindow() {
     const selectionPoints = [];
     selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
