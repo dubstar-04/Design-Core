@@ -1,6 +1,7 @@
 import {Point} from '../entities/point.js';
 import {Snapping} from './snapping.js';
 import {Selection} from './selection.js';
+import {SelectionWindow} from './selectionWindow.js';
 
 export class Scene {
   constructor(core) {
@@ -138,8 +139,8 @@ export class Scene {
       colour: selectColour,
     };
 
-    const tempItem = this.core.commandManager.createNew('FilledRectangle', data); // Create a new item, send it the tempPoints array
-    this.tempItems.push(tempItem); // Add it to the this.tempItems Array
+    // const tempItem = this.core.commandManager.createNew('FilledRectangle', data); // Create a new item, send it the tempPoints array
+    this.tempItems.push(new SelectionWindow(data)); // Add it to the this.tempItems Array
     this.core.canvas.requestPaint();
   }
 
