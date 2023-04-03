@@ -1,5 +1,6 @@
 import {Utils} from './utils.js';
 
+// TODO: Refactor class.
 export class Selection {
   constructor(core) {
     this.core = core;
@@ -18,7 +19,6 @@ export class Selection {
     this.selectionAccepted = false;
   }
 
-
   /**
    * Handle selection set changes
    */
@@ -28,85 +28,94 @@ export class Selection {
   }
 
   /**
-   * Find closest item to mouse press
+   * Find items within a selection window
    */
-    let delta = 1.65 / this.core.canvas.getScale(); // find a more suitable starting value
-    let closestItem;
   windowSelect() {
+    const selectionRect = this.getSelectionRect();
+
+    if (selectionRect !== undefined) {
+    // Loop through all the entities and see if it should be selected
+      for (let i = 0; i < this.core.scene.items.length; i++) {
+      // check if the item is within the selection rect
+        if (this.core.scene.items[i].within(selectionRect, this.core)) {
+          this.addToSelectionSet(i);
+        }
+
+        const crossingSelect = this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y;
+        if (crossingSelect) {
+        // check if the item is touched / crossed by the selection rect
+          if (this.core.scene.items[i].touched(selectionRect, this.core)) {
+            this.addToSelectionSet(i);
+          }
+        }
+      }
+
+      // this.core.canvas.requestPaint();
+      this.selectionSetChanged();
+    }
+  }
+
+  /**
+   * Get the rectangle points formed between mouseDown and current mouse location
+   * @return {array} selectionRect - [x1, y1, x2, y2]
+   */
+  getSelectionRect() {
+    // TODO: It would be nice if this returned an object {xmin: xmin, ymin:ymin ...}
+    const xmin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
+    const xmax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
+    const ymin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
+    const ymax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
+
+    const selectionRect = [xmin, xmax, ymin, ymax];
+
+    return selectionRect;
+  }
+
+
+  /**
+   * Select the item closest to the mouse and add it to the selection set
+   */
+  singleSelect() {
+    const closestItemIndex = this.findClosestItem();
+
+    if (closestItemIndex !== undefined) {
+      this.addToSelectionSet(closestItemIndex);
+      this.selectionSetChanged();
+    } else {
+      this.reset();
+    }
+  }
+
+  /**
+   * Find closest item to mouse press
+   * @returns {Integer} - return index of closest item or undefined
+   */
+  findClosestItem() {
+    let delta = 1.65 / this.core.canvas.getScale(); // find a more suitable starting value
+    let closestItemIndex;
 
     for (let i = 0; i < this.core.scene.items.length; i++) {
       const distance = this.core.scene.items[i].closestPoint(this.core.mouse.pointOnScene())[1]; // ClosestPoint()[1] returns a distance to the closest point
 
       if (distance < delta) {
         delta = distance;
-        closestItem = i;
+        closestItemIndex = i;
       }
     }
 
-    return closestItem;
+    return closestItemIndex;
   }
 
   /**
-   * Find items within a selection window
-   */
-    // Clear tempItems - This is here to remove the crossing window
-    this.core.scene.tempItems = [];
-
-    this.core.mouse.mouseDownCanvasPoint;
-    this.core.mouse.pointOnScene();
-
-    const xmin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-    const xmax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-    const ymin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
-    const ymax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
-
-    const selectionExtremes = [xmin, xmax, ymin, ymax];
-
-    // Loop through all the entities and see if it should be selected
-    for (let i = 0; i < this.core.scene.items.length; i++) {
-      if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-        if (this.core.scene.items[i].touched(selectionExtremes, this.core) || this.core.scene.items[i].within(selectionExtremes, this.core)) {
-          this.addToSelectionSet(i);
-        }
-      } else {
-        if (this.core.scene.items[i].within(selectionExtremes, this.core)) {
-          this.addToSelectionSet(i);
-        }
-      }
+  * Remove the item at index from the selectionSet and selectedItems
+  * @param  {Integer} index - index of the item in scene.items
+  */
+  removeFromSelectionSet(index) {
+    const itemIndex = this.selectionSet.indexOf(index);
+    if (itemIndex !== -1) {
+      this.selectionSet.splice(itemIndex, 1);
+      this.selectedItems.splice(itemIndex, 1);
     }
-
-    this.core.canvas.requestPaint();
-    this.core.scene.selection.selectionSetChanged();
-  }
-
-
-  /**
-   * Select the closest item and add it to the selection set
-   * @param  {Object} data
-   */
-  selectClosestItem(data) {
-    const closestItem = this.findClosestItem();
-
-    if (data) {
-      this.selectedItems = [];
-      this.selectionSet = [];
-  singleSelect() {
-    }
-
-    if (closestItem !== undefined) {
-      if (this.selectionSet.indexOf(closestItem) === -1) { // only store selections once
-        const copyofitem = Utils.cloneObject(this.core, this.core.scene.items[closestItem]);
-        copyofitem.colour = this.core.settings.selecteditemscolour.toString();
-        copyofitem.lineWidth = copyofitem.lineWidth * 2;
-        this.selectedItems.push(copyofitem);
-        this.selectionSet.push(closestItem);
-      } else {
-        const index = this.selectionSet.indexOf(closestItem);
-        this.selectionSet.splice(index, 1); // if the command is already in the array, Erase it
-        this.selectedItems.splice(index, 1);
-      }
-    }
-    this.selectionSetChanged();
   }
 
   /**
