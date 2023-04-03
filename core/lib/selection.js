@@ -86,7 +86,7 @@ export class Selection {
    * @param  {Object} data
    */
   selectClosestItem(data) {
-    const closestItem = this.findClosestItem(this.core);
+    const closestItem = this.findClosestItem();
 
     if (data) {
       this.selectedItems = [];
