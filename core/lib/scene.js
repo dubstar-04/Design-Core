@@ -124,23 +124,11 @@ export class Scene {
     selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
     selectionPoints.push(this.core.mouse.pointOnScene());
 
-    let selectColour;
-
-    if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-      // Draw a rectangle on screen
-      selectColour = '#FF0000';
-    } else if (this.core.mouse.pointOnScene().y < this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-      // Draw a rectangle on screen
-      selectColour = '#0000FF';
-    }
-
     const data = {
       points: selectionPoints,
-      colour: selectColour,
     };
 
-    // const tempItem = this.core.commandManager.createNew('FilledRectangle', data); // Create a new item, send it the tempPoints array
-    this.tempItems.push(new SelectionWindow(data)); // Add it to the this.tempItems Array
+    this.tempItems.push(new SelectionWindow(data));
     this.core.canvas.requestPaint();
   }
 

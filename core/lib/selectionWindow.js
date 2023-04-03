@@ -8,11 +8,13 @@ export class SelectionWindow {
     this.lineWidth = 1;
 
     if (data) {
-      if (data.colour || data[62]) {
-        this.colour = data.colour;
-      }
-
       if (data.points) {
+        if (data.points[1].y > data.points[0].y) {
+          this.colour = '#FF0000';
+        } else {
+          this.colour = '#0000FF';
+        }
+
         this.points = [];
         const point1 = new Point(data.points[0].x, data.points[0].y);
         const point2 = new Point(data.points[1].x, data.points[0].y);
