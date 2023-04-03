@@ -210,7 +210,8 @@ export class Rectangle extends Entity {
 
   closestPoint(P) {
     const closest = new Point();
-    let distance = 1.65;
+    let distance = Infinity;
+
 
     for (let i = 1; i < this.points.length; i++) {
       const A = this.points[i - 1];
