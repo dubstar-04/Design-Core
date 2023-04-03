@@ -1,6 +1,7 @@
 import {Point} from '../entities/point.js';
 import {Snapping} from './snapping.js';
 import {Selection} from './selection.js';
+import {SelectionWindow} from './selectionWindow.js';
 
 export class Scene {
   constructor(core) {
@@ -123,23 +124,11 @@ export class Scene {
     selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
     selectionPoints.push(this.core.mouse.pointOnScene());
 
-    let selectColour;
-
-    if (this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-      // Draw a rectangle on screen
-      selectColour = '#FF0000';
-    } else if (this.core.mouse.pointOnScene().y < this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y) {
-      // Draw a rectangle on screen
-      selectColour = '#0000FF';
-    }
-
     const data = {
       points: selectionPoints,
-      colour: selectColour,
     };
 
-    const tempItem = this.core.commandManager.createNew('FilledRectangle', data); // Create a new item, send it the tempPoints array
-    this.tempItems.push(tempItem); // Add it to the this.tempItems Array
+    this.tempItems.push(new SelectionWindow(data));
     this.core.canvas.requestPaint();
   }
 
