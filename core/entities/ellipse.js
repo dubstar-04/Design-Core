@@ -216,7 +216,7 @@ export class Ellipse extends Entity {
     // find the closest point on the Ellipse
 
     const closest = new Point();
-    let distance = 1.65;
+    let distance = Infinity;
 
     const A = this.points[0].x - this.points[1].x;
     const O = this.points[0].y - this.points[1].y;
