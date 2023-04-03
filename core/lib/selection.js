@@ -30,9 +30,9 @@ export class Selection {
   /**
    * Find closest item to mouse press
    */
-  findClosestItem() {
     let delta = 1.65 / this.core.canvas.getScale(); // find a more suitable starting value
     let closestItem;
+  windowSelect() {
 
     for (let i = 0; i < this.core.scene.items.length; i++) {
       const distance = this.core.scene.items[i].closestPoint(this.core.mouse.pointOnScene())[1]; // ClosestPoint()[1] returns a distance to the closest point
@@ -49,7 +49,6 @@ export class Selection {
   /**
    * Find items within a selection window
    */
-  selecting() {
     // Clear tempItems - This is here to remove the crossing window
     this.core.scene.tempItems = [];
 
@@ -91,6 +90,7 @@ export class Selection {
     if (data) {
       this.selectedItems = [];
       this.selectionSet = [];
+  singleSelect() {
     }
 
     if (closestItem !== undefined) {
