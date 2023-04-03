@@ -80,7 +80,7 @@ export class DesignEngine {
       // console.log('design engine - left click- create new point ');
 
       if (this.core.scene.activeCommand === undefined) {
-        this.core.scene.selection.selectClosestItem(data);
+        this.core.scene.selection.singleSelect();
       } else {
         const point = this.core.mouse.pointOnScene();
         inputData = point;
@@ -90,7 +90,7 @@ export class DesignEngine {
         }
 
         if (this.core.scene.activeCommand.family === 'Tools' && !this.core.scene.selection.selectionAccepted) {
-          this.core.scene.selection.selectClosestItem(data);
+          this.core.scene.selection.singleSelect();
         }
       }
     }

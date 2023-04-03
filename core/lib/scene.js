@@ -198,7 +198,9 @@ export class Scene {
   mouseUp(button) {
     switch (button) {
       case 0: // left button
-        this.selection.selecting(this.core);
+        // Clear tempItems - This is here to remove the crossing window
+        this.tempItems = [];
+        this.selection.windowSelect();
         break;
       case 1: // middle button
         break;
