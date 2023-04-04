@@ -8,6 +8,8 @@ export class Strings {
     INVALIDPOINT: 'Invalid Point Data',
     INVALIDGROUPCODE: 'Invalid DXF Groupcode',
     INVALIDNUMBER: 'Invalid Number',
+    INVALIDTYPE: 'Invalid Type',
+    INVALIDINTERSECTTYPE: 'Invalid Intersect Type',
   };
 
   // Warning Strings

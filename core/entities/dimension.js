@@ -347,13 +347,7 @@ export class Dimension extends Entity {
     return entities;
   }
 
-  draw(ctx, scale, core) {
-    // const rect = this.getBoundingRect();
-
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
+  draw(ctx, scale, core, colour) {
     const entities = this.getBlockEntities();
 
     if (entities) {
@@ -365,7 +359,7 @@ export class Dimension extends Entity {
       this.block.addItem(this.text);
     }
 
-    this.block.draw(ctx, scale, core);
+    this.block.draw(ctx, scale, core, colour);
     /*
     function drawArrowHead(point, angle, height) {
       // console.log("arrow head height:", height)

@@ -114,15 +114,8 @@ test('Test LayerManager.addStandardLayers', () => {
   expect(layers[1]).toHaveProperty('name', 'DEFPOINTS');
 });
 
-test('Test LayerManager.layerVisible', () => {
-  expect(layerManager.layerVisible('DEFPOINTS')).toBe(true);
-
-  layerManager.addLayer({'name': 'test', 'flags': 1});
-  expect(layerManager.layerVisible('test')).toBe(false);
-});
-
 test('Test LayerManager.getLayerIndex', () => {
-  layerManager.getLayerIndex('test');
+  layerManager.addLayer({'name': 'test', 'colour': '#00BFFF'});
   // get index for test layer - should be the last layer
   expect(layerManager.getLayerIndex('test')).toBe(layerManager.layerCount() - 1);
   // get index for a layer that doesn't exist

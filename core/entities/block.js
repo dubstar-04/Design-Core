@@ -1,5 +1,4 @@
 import {Point} from './point.js';
-import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 
@@ -102,20 +101,10 @@ export class Block extends Entity {
     this.points[0] = point;
   }
 
-  draw(ctx, scale, core) {
+  draw(ctx, scale, core, colour) {
     if (!this.items.length) {
       // nothing to draw
       return;
-    }
-
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
     }
 
     ctx.save();
@@ -143,7 +132,7 @@ export class Block extends Entity {
         if (itemColour === 'BYBLOCK') {
           this.items[item].colour = colour;
         }
-        this.items[item].draw(ctx, scale, core);
+        this.items[item].draw(ctx, scale, core, colour);
         // reset item colour
         this.items[item].colour = itemColour;
       } else {
@@ -172,10 +161,6 @@ export class Block extends Entity {
     if (!this.items.length) {
       // nothing to draw
       return snaps;
-    }
-
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
     }
 
     snaps = [this.points[0]];
@@ -252,24 +237,25 @@ export class Block extends Entity {
       return false;
     }
 
-    if (!core.layerManager.layerVisible(this.layer)) {
+    const layer = core.layerManager.getLayerByName(this.layer);
+
+    if (!layer.isSelectable) {
       return;
     }
 
-    const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
-    const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
+    // Offset selectionExtremes by the block insert position
+    const adjustedSelectionExtremes = [
+      selectionExtremes[0] - this.points[0].x,
+      selectionExtremes[1] - this.points[0].x,
+      selectionExtremes[2] - this.points[0].y,
+      selectionExtremes[3] - this.points[0].y,
+    ];
 
-    const rectPoints = {
-      start: rP1,
-      end: rP2,
-    };
-
-    const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-
-    if (output.status === 'Intersection') {
-      return true;
+    for (let idx = 0; idx < this.items.length; idx++) {
+      const touched = this.items[idx].touched(adjustedSelectionExtremes, core);
+      if (touched) {
+        return true;
+      }
     }
-    // no intersection found. return false
-    return false;
   }
 }

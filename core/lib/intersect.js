@@ -673,6 +673,17 @@ export class Intersection {
   };
 
   /**
+   * Find intersections between lwpolyline and line
+   * @param {polyline} polyline
+   * @param {line} line
+   * @param {boolean} extend
+   * @returns
+   */
+  static intersectLwpolylineLine(polyline, line, extend) {
+    return intersectPolylineLine(polyline, line, extend);
+  }
+
+  /**
    * Find intersections between polyline and line
    * @param {polyline} polyline
    * @param {line} line
@@ -697,6 +708,16 @@ export class Intersection {
     return result;
   };
 
+  /**
+   * Find intersections between lwpolyline and rectangle
+   * @param {polyline} polyline
+   * @param {rectangle} rectangle
+   * @param {boolean} extend
+   * @returns
+   */
+  static intersectLwpolylineRectangle(polyline, rectangle, extend) {
+    return this.intersectPolylineRectangle(polyline, rectangle, extend);
+  }
 
   /**
    * Find intersections between polyline and rectangle
@@ -853,6 +874,18 @@ export class Intersection {
 
     return result;
   };
+
+  /**
+   * Find intersections between text and rectangles
+   * Text is represented by its bounding box
+   * @param {text} text
+   * @param {rectangle} rectangle
+   * @param {boolean} extend
+   * @returns
+   */
+  static intersectTextRectangle(text, rectangle, extend) {
+    return this.intersectRectangleRectangle(text, rectangle, extend);
+  }
 
   /**
    * Find intersections between two rectangles

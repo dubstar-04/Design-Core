@@ -8,6 +8,12 @@ export class Snapping {
     let delta = 25 / scene.core.canvas.getScale(); // find a more suitable starting value
 
     for (let i = 0; i < scene.items.length; i++) {
+      const layer = scene.core.layerManager.getLayerByName(scene.items[i].layer);
+
+      if (!layer.isVisible) {
+        continue;
+      }
+
       const itemSnaps = scene.items[i].snaps(scene.core.mouse.pointOnScene(), delta, scene.core); // get an array of snap point from the item
       if (itemSnaps) {
         for (let j = 0; j < itemSnaps.length; j++) {

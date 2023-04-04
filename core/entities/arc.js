@@ -1,7 +1,6 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
-import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 
@@ -85,18 +84,7 @@ export class Arc extends Entity {
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
   }
 
-  draw(ctx, scale, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
-    }
-
-
+  draw(ctx, scale, core, colour) {
     try { // HTML Canvas
       ctx.strokeStyle = colour;
       ctx.lineWidth = this.lineWidth / scale;
@@ -146,10 +134,6 @@ export class Arc extends Entity {
   }
 
   snaps(mousePoint, delta, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
     const snaps = [];
 
     if (core.settings.endsnap) {
@@ -228,28 +212,5 @@ export class Arc extends Entity {
     const ymax = Math.max(...yValues);
 
     return [xmin, xmax, ymin, ymax];
-  }
-
-
-  touched(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
-    const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
-
-    const rectPoints = {
-      start: rP1,
-      end: rP2,
-    };
-    const output = Intersection.intersectArcRectangle(this.intersectPoints(), rectPoints);
-    // console.log(output.status)
-
-    if (output.status === 'Intersection') {
-      return true;
-    } else {
-      return false;
-    }
   }
 }

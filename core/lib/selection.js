@@ -32,6 +32,7 @@ export class Selection {
    */
   windowSelect() {
     const selectionRect = this.getSelectionRect();
+    const crossingSelect = this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y;
 
     if (selectionRect !== undefined) {
     // Loop through all the entities and see if it should be selected
@@ -41,7 +42,6 @@ export class Selection {
           this.addToSelectionSet(i);
         }
 
-        const crossingSelect = this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y;
         if (crossingSelect) {
         // check if the item is touched / crossed by the selection rect
           if (this.core.scene.items[i].touched(selectionRect, this.core)) {
@@ -57,7 +57,7 @@ export class Selection {
 
   /**
    * Get the rectangle points formed between mouseDown and current mouse location
-   * @return {array} selectionRect - [x1, y1, x2, y2]
+   * @return {array} selectionRect - [x1, x2, y1, y2]
    */
   getSelectionRect() {
     // TODO: It would be nice if this returned an object {xmin: xmin, ymin:ymin ...}

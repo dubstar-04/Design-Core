@@ -1,7 +1,6 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
-import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 
@@ -218,19 +217,7 @@ export class Text extends Entity {
     return rect;
   }
 
-  draw(ctx, scale, core) {
-    // var rect = this.getBoundingRect()
-
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
-    }
-
+  draw(ctx, scale, core, colour) {
     ctx.save();
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
@@ -371,27 +358,5 @@ export class Text extends Entity {
       start: botLeft,
       end: topRight,
     };
-  }
-
-  touched(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
-    const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
-
-    const rectPoints = {
-      start: rP1,
-      end: rP2,
-    };
-
-    const output = Intersection.intersectRectangleRectangle(this.intersectPoints(), rectPoints);
-
-    if (output.status === 'Intersection') {
-      return true;
-    }
-    // no intersection found. return false
-    return false;
   }
 }

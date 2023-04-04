@@ -79,6 +79,22 @@ export class Layer {
     }
   }
 
+  get isVisible() {
+    if (this.on && !this.frozen && !this.locked) {
+      return true;
+    }
+
+    return false;
+  }
+
+  get isSelectable() {
+    if (this.isVisible && !this.locked) {
+      return true;
+    }
+
+    return false;
+  }
+
   getFlags() {
     // Standard flags (bit-coded values):
     // 1 = Layer is frozen; otherwise layer is thawed.
