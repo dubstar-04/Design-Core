@@ -115,7 +115,7 @@ test('Test LayerManager.addStandardLayers', () => {
 });
 
 test('Test LayerManager.getLayerIndex', () => {
-  layerManager.getLayerIndex('test');
+  layerManager.addLayer({'name': 'test', 'colour': '#00BFFF'});
   // get index for test layer - should be the last layer
   expect(layerManager.getLayerIndex('test')).toBe(layerManager.layerCount() - 1);
   // get index for a layer that doesn't exist
