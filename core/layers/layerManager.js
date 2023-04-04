@@ -134,19 +134,6 @@ export class LayerManager {
     this.core.scene.saveRequired();
   }
 
-
-  layerVisible(layer) {
-    for (let i = 0; i < this.layers.length; i++) {
-      if (this.layers[i].name === layer) {
-        if (this.layers[i].on && !this.layers[i].frozen) {
-          return true;
-        }
-
-        return false;
-      }
-    }
-  }
-
   getLayerIndex(layerName) {
     const index = this.layers.findIndex((el) => el.name === layerName);
     return index;
