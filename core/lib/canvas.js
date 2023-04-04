@@ -214,15 +214,29 @@ export class Canvas {
     */
 
     for (i; i < numOfEntities; i++) {
-      this.core.scene.items[i].draw(context, this.getScale(), this.core);
+      const layer = this.core.layerManager.getLayerByName(this.core.scene.items[i].layer);
+
+      if (!layer.isVisible) {
+        continue;
+      }
+
+      let colour = this.core.scene.items[i].colour;
+
+      if (colour === 'BYLAYER') {
+        colour = layer.colour;
+      }
+
+      this.core.scene.items[i].draw(context, this.getScale(), this.core, colour);
     }
 
     for (j; j < this.core.scene.tempItems.length; j++) {
-      this.core.scene.tempItems[j].draw(context, this.getScale(), this.core);
+      const colour = this.core.scene.tempItems[j].colour;
+      this.core.scene.tempItems[j].draw(context, this.getScale(), this.core, colour);
     }
 
     for (k; k < this.core.scene.selection.selectedItems.length; k++) {
-      this.core.scene.selection.selectedItems[k].draw(context, this.getScale(), this.core);
+      const colour = this.core.scene.selection.selectedItems[k].colour;
+      this.core.scene.selection.selectedItems[k].draw(context, this.getScale(), this.core, colour);
     }
   }
 
