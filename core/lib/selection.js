@@ -57,7 +57,7 @@ export class Selection {
 
   /**
    * Get the rectangle points formed between mouseDown and current mouse location
-   * @return {array} selectionRect - [x1, y1, x2, y2]
+   * @return {array} selectionRect - [x1, x2, y1, y2]
    */
   getSelectionRect() {
     // TODO: It would be nice if this returned an object {xmin: xmin, ymin:ymin ...}
