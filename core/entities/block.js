@@ -174,10 +174,6 @@ export class Block extends Entity {
       return snaps;
     }
 
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
     snaps = [this.points[0]];
 
     for (let item = 0; item < this.items.length; item++) {

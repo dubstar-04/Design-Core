@@ -174,10 +174,6 @@ export class Rectangle extends Entity {
 
 
   snaps(mousePoint, delta, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
     const snaps = [];
 
     if (core.settings.endsnap) {
