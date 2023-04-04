@@ -80,7 +80,7 @@ export class Layer {
   }
 
   get isVisible() {
-    if (this.on && !this.frozen && !this.locked) {
+    if (this.on && !this.frozen) {
       return true;
     }
 
