@@ -52,7 +52,7 @@ export class Insert {
     return data;
   }
 
-  draw(ctx, scale, core) {
+  draw(ctx, scale, core, colour) {
     return;
   }
 

@@ -75,17 +75,7 @@ export class BasePolyline extends Entity {
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
   }
 
-  draw(ctx, scale, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
-    }
-
+  draw(ctx, scale, core, colour) {
     try { // HTML Canvas
       ctx.strokeStyle = colour;
       ctx.lineWidth = this.lineWidth / scale;

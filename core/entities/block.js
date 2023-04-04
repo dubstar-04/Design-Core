@@ -102,20 +102,10 @@ export class Block extends Entity {
     this.points[0] = point;
   }
 
-  draw(ctx, scale, core) {
+  draw(ctx, scale, core, colour) {
     if (!this.items.length) {
       // nothing to draw
       return;
-    }
-
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
     }
 
     ctx.save();
@@ -143,7 +133,7 @@ export class Block extends Entity {
         if (itemColour === 'BYBLOCK') {
           this.items[item].colour = colour;
         }
-        this.items[item].draw(ctx, scale, core);
+        this.items[item].draw(ctx, scale, core, colour);
         // reset item colour
         this.items[item].colour = itemColour;
       } else {

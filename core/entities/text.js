@@ -218,19 +218,7 @@ export class Text extends Entity {
     return rect;
   }
 
-  draw(ctx, scale, core) {
-    // var rect = this.getBoundingRect()
-
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
-    }
-
+  draw(ctx, scale, core, colour) {
     ctx.save();
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);

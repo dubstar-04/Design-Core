@@ -72,17 +72,7 @@ export class Circle extends Entity {
     this.points[1] = this.points[0].project(0, rad);
   }
 
-  draw(ctx, scale, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    let colour = this.colour;
-
-    if (this.colour === 'BYLAYER') {
-      colour = core.layerManager.getLayerByName(this.layer).colour;
-    }
-
+  draw(ctx, scale, core, colour) {
     try { // HTML Canvas
       ctx.strokeStyle = colour;
       ctx.lineWidth = this.lineWidth / scale;
