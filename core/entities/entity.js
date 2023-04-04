@@ -1,4 +1,7 @@
 import {Colours} from '../lib/colours.js';
+import {Intersection} from '../lib/intersect.js';
+import {Point} from './point.js';
+import {Strings} from '../lib/strings.js';
 
 export class Entity {
   constructor(data) {
@@ -91,7 +94,8 @@ export class Entity {
 
 
   within(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
+    const layer = core.layerManager.getLayerByName(this.layer);
+    if (!layer.isSelectable) {
       return;
     }
 
