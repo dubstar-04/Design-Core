@@ -1,7 +1,3 @@
-import {Point} from './point.js';
-// import { Utils } from '../lib/utils.js'
-import {Intersection} from '../lib/intersect.js';
-// import {Colours} from '../lib/colours.js';
 
 export class Insert {
   constructor(data) {

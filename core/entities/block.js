@@ -1,5 +1,4 @@
 import {Point} from './point.js';
-import {Intersection} from '../lib/intersect.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 
