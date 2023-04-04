@@ -108,6 +108,38 @@ export class Entity {
     }
   }
 
+  touched(selectionExtremes, core) {
+    const layer = core.layerManager.getLayerByName(this.layer);
+
+    if (!layer.isSelectable) {
+      return;
+    }
+
+    const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
+    const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
+
+    const rectPoints = {
+      start: rP1,
+      end: rP2,
+    };
+
+    const intersectFunction = `intersect${this.type}Rectangle`;
+
+    if (Intersection.hasOwnProperty(intersectFunction) === false) {
+      const msg = `${Strings.Error.INVALIDINTERSECTTYPE}: ${this.type}`;
+      core.notify(msg);
+      throw Error(msg);
+    }
+
+    const output = Intersection[intersectFunction](this.intersectPoints(), rectPoints);
+
+    if (output.status === 'Intersection') {
+      return true;
+    }
+    // no intersection found. return false
+    return false;
+  }
+
   extend(points, core) {
     // extend function to be overidden by implementation
   }
