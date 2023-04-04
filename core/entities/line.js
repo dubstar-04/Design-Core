@@ -319,27 +319,4 @@ export class Line extends Entity {
 
     return [xmin, xmax, ymin, ymax];
   }
-
-  touched(selectionExtremes, core) {
-    if (!core.layerManager.layerVisible(this.layer)) {
-      return;
-    }
-
-    const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
-    const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
-
-    const rectPoints = {
-      start: rP1,
-      end: rP2,
-    };
-
-    const output = Intersection.intersectLineRectangle(this.intersectPoints(), rectPoints);
-    // console.log(output.status);
-
-    if (output.status === 'Intersection') {
-      return true;
-    } else {
-      return false;
-    }
-  }
 }
