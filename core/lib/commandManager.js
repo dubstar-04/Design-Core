@@ -98,7 +98,7 @@ export class CommandManager {
     if (this.isCommand(type)) {
       newItem = new classes[this.getCommand(type)](data);
     } else {
-      Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${input}`);
+      Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
       return;
     }
 
