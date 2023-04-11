@@ -12,8 +12,6 @@ export class PropertyManager {
 
 
   selectionSetChanged() {
-    // console.log('Property Manager - Selection Set Changed');
-
     // If a callback is set - signal that a change has been made
     if (this.updateCallbackFunction) {
       this.updateCallbackFunction();
@@ -21,7 +19,6 @@ export class PropertyManager {
   }
 
   setItemProperties(property, newPropertyValue) {
-    // console.log('Property Manager - setItemProperties');
     for (let i = 0; i < this.core.scene.selection.selectionSet.length; i++) {
       // check if the item has the selected property
       if (!this.core.scene.items[this.core.scene.selection.selectionSet[i]].hasOwnProperty(property)) {
@@ -44,11 +41,9 @@ export class PropertyManager {
     if (this.core.scene.selection.selectionSet.length > 0) {
       for (let i = 0; i < this.core.scene.selection.selectionSet.length; i++) {
         const itemType = this.core.scene.items[this.core.scene.selection.selectionSet[i]].type;
-        // console.log(this.core.scene.items[this.core.scene.selection.selectionSet[i]].type);
 
         if (itemTypes.indexOf(itemType, 0) === -1) {
           itemTypes.push(itemType);
-          // console.log("ItemTypes: " + itemTypes.length)
         }
       }
 
@@ -102,9 +97,7 @@ export class PropertyManager {
 
   getItemPropertyValue(itemType, property) {
     // Loop through the items and get a list the property values
-    // console.log('Properties Manager - getItemPropertyValue Item Type:', itemType, 'Property:', property);
     const propertiesValueList = [];
-    // const propertyValue = '';
     if (this.core.scene.selection.selectionSet.length > 0) {
       for (let i = 0; i < this.core.scene.selection.selectionSet.length; i++) {
         if (this.core.scene.items[this.core.scene.selection.selectionSet[i]].type === itemType || itemType === 'All') {
@@ -114,7 +107,6 @@ export class PropertyManager {
       }
     }
 
-    // console.log('[propertiesManager.getItemProperyValue()]', propertiesValueList);
     if (propertiesValueList.every(function(prop) {
       return prop === propertiesValueList[0];
     })) {

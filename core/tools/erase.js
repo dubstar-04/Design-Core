@@ -49,12 +49,9 @@ export class Erase {
     // sort the selection in descending order
     selections.sort((a, b)=>b-a);
 
-    // console.log('erase.js - core.scene.selection.selectionSet:', selections);
-
     // delete each of the selections from the scene items
     // This is done in descending order to preserve the indices i.e if index 1 is deleted, index 2 becomes index 1
     for (let i = 0; i < selections.length; i++) {
-      // console.log('Erase: ' + selections[i]);
       core.scene.items.splice((selections[i]), 1);
     }
   }

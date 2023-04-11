@@ -69,9 +69,7 @@ export class Rotate {
       const theta = ang2 - ang1;
 
       for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
-        // console.log( "(preview) item: " + selectedItems[i].type + " Points length: " + selectedItems[i].points.length);
         for (let j = 0; j < core.scene.selection.selectedItems[i].points.length; j++) {
-          // console.log( "(preview) point: " + j + " length: " + selectedItems[i].points.length)
           const x = core.scene.tempPoints[0].x + (core.scene.items[core.scene.selection.selectionSet[i]].points[j].x - core.scene.tempPoints[0].x) * Math.cos(theta) - (core.scene.items[core.scene.selection.selectionSet[i]].points[j].y - core.scene.tempPoints[0].y) * Math.sin(theta);
           const y = core.scene.tempPoints[0].y + (core.scene.items[core.scene.selection.selectionSet[i]].points[j].x - core.scene.tempPoints[0].x) * Math.sin(theta) + (core.scene.items[core.scene.selection.selectionSet[i]].points[j].y - core.scene.tempPoints[0].y) * Math.cos(theta);
 
@@ -84,8 +82,6 @@ export class Rotate {
 
 
   action(core) {
-    // console.log('Rotate Stuff');
-
     const A = core.scene.points[0].x - core.scene.points[1].x;
     const O = core.scene.points[0].y - core.scene.points[1].y;
 
@@ -96,8 +92,6 @@ export class Rotate {
     const ang2 = Math.atan2(O1, A1);
 
     const theta = ang2 - ang1;
-
-    // console.log("Theta: " + theta + " degrees: " + radians2degrees(theta));
 
     for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
       for (let j = 0; j < core.scene.selection.selectedItems[i].points.length; j++) {

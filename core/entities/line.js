@@ -99,7 +99,6 @@ export class Line extends Entity {
         '\n', '31', // Z
         '\n', '0.0',
     );
-    // console.log(' line.js - DXF Data:' + data);
     return data;
   }
 
@@ -292,7 +291,6 @@ export class Line extends Entity {
     }
 
     const distance = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y);
-    // console.log(distance);
     return [pnt, distance];
   }
 

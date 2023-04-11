@@ -138,7 +138,6 @@ export class Ellipse extends Entity {
         '\n', '42', // END ANGLE RADIANS
         '\n', Utils.degrees2radians(360),
     );
-    // console.log(' ellipse.js - DXF Data:' + data);
     return data;
   }
 

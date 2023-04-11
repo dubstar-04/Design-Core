@@ -113,7 +113,6 @@ export class Spline extends Entity {
       oldy = this.calcAt(0)[1];
       for (let t = 0; t <= 1; t += 0.01) {
         ctx.moveTo(oldx, oldy);
-        // console.log(oldx, oldy)
         const interpol = this.calcAt(t);
         x = interpol[0];
         y = interpol[1];
@@ -173,7 +172,6 @@ export class Spline extends Entity {
         controlPoints,
         '\n', '0',
     );
-    // console.log(' spline.js - DXF Data:' + data);
     return data;
   }
 
@@ -260,7 +258,6 @@ export class Spline extends Entity {
 
     const closest = new Point(x, y);
     const distance = Utils.distBetweenPoints(P.x, P.y, x, y);
-    // console.log(distance);
 
     return [closest, distance];
   }

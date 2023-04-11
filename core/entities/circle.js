@@ -104,7 +104,6 @@ export class Circle extends Entity {
         '\n', '40',
         '\n', this.radius, // DIAMETER
     );
-    // console.log(' circle.js - DXF Data:' + data);
     return data;
   }
 

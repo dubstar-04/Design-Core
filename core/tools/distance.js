@@ -47,7 +47,7 @@ export class Distance {
   }
 
   preview(num) {
-    // console.log('TO DO: Draw a preview of the measurement');
+    // TODO: Draw a preview of the measurement
   }
 
   action(core) {

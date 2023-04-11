@@ -29,7 +29,6 @@ export class LayerManager {
   getUniqueName(name) {
     let count = 0;
     let layStr = name.replace(/ /g, '_').toUpperCase();
-    // console.log('New Layer Name:' + layStr);
     for (let i = 0; i < this.layerCount(); i++) {
       if (this.layers[i].name.includes(layStr)) {
         count = count + 1;
@@ -45,9 +44,7 @@ export class LayerManager {
   addLayer(layer) {
     const newLayer = new Layer(layer);
     // TODO: investigate why this gets called so many times when loading drawings
-    // console.log(' layermanager.js - addlayer() - New Layer Added:' + layer.name);
     if (!this.layerExists(newLayer)) {
-      // console.log(' layermanager.js - addlayer() - New Layer Added:' + newLayer.name);
       this.layers.push(newLayer);
       this.core.scene.saveRequired();
     }
@@ -82,8 +79,6 @@ export class LayerManager {
       }
     }
 
-    // console.log(selectionSet.length, ' Item(s) to be deleted from ', layerToDelete);
-
     selectionSet.sort();
     for (let j = 0; j < selectionSet.length; j++) {
       this.core.scene.items.splice((selectionSet[j] - j), 1);
@@ -110,7 +105,6 @@ export class LayerManager {
 
   checkLayers() {
     if (!this.layerCount()) {
-      // console.log('layermanager.js - Check Layers -> Add Standard Layers');
       this.addStandardLayers();
     }
 

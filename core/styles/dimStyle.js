@@ -154,7 +154,6 @@ export class DimStyle {
         '\n', '178', // DIMCLRT
         '\n', this.DIMCLRT,
     );
-    // console.log(' dimStyle.js - DXF Data:' + data);
     return data;
   }
 }

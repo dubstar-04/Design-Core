@@ -115,9 +115,6 @@ export class Text extends Entity {
     let action = false;
     const prompt = [];
 
-    // console.log('inputArray: ', core.scene.inputArray);
-    // console.log('type: ', typeof core.scene.inputArray[num - 1]);
-
     expectedType[0] = ['undefined'];
     prompt[0] = Strings.Input.START;
 
@@ -133,7 +130,6 @@ export class Text extends Entity {
     const validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
 
     if (!validInput) {
-      // console.log('invalid');
       core.scene.inputArray.pop();
     } else if (core.scene.inputArray.length === 3) {
       action = true;
@@ -213,7 +209,6 @@ export class Text extends Entity {
 
   getBoundingRect() {
     const rect = {width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y};
-    // console.log("text.js - Rect height: ", rect.height, " width: ", rect.width, " x: ", rect.x, " y: ", rect.y)
     return rect;
   }
 
@@ -299,7 +294,6 @@ export class Text extends Entity {
         // "\n", "73", //VERTICAL ALIGNMENT
         // "\n", this.getVerticalAlignment()
     );
-    // console.log(" line.js - DXF Data:" + data)
     return data;
   }
 
@@ -333,8 +327,6 @@ export class Text extends Entity {
     ) {
       distance = 0;
     }
-
-    // console.log(distance);
 
     return [mid, distance];
   }

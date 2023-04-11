@@ -53,14 +53,10 @@ export class Copy {
   }
 
   action(core) {
-    // console.log("Copy Stuff")
-
     const xDelta = core.scene.points[1].x - core.scene.points[0].x;
     const yDelta = core.scene.points[1].y - core.scene.points[0].y;
 
     for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
-      // console.log("selectionset.type: " + selectionSet[i].type);
-
       const copyofitem = Utils.cloneObject(core, core.scene.items[core.scene.selection.selectionSet[i]]);
 
       for (let j = 0; j < copyofitem.points.length; j++) {
@@ -73,13 +69,10 @@ export class Copy {
   };
 
   preview(core) {
-    // console.log("Copy Stuff")
-
     const xDelta = core.scene.tempPoints[1].x - core.scene.tempPoints[0].x;
     const yDelta = core.scene.tempPoints[1].y - core.scene.tempPoints[0].y;
 
     for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
-      // console.log("selectionset.type: " + selectionSet[i].type);
       for (let j = 0; j < core.scene.selection.selectedItems[i].points.length; j++) {
         core.scene.selection.selectedItems[i].points[j].x = core.scene.items[core.scene.selection.selectionSet[i]].points[j].x + xDelta;
         core.scene.selection.selectedItems[i].points[j].y = core.scene.items[core.scene.selection.selectionSet[i]].points[j].y + yDelta;

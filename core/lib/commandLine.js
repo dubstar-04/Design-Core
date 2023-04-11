@@ -60,8 +60,6 @@ export class CommandLine {
    * @param {string} key
    */
   handleKeys(key) {
-    // console.log('commandLine.js - handle keys - key:', key);
-
     switch (key) {
       case 'Backspace': // Backspace
         this.backPressed();
@@ -138,7 +136,6 @@ export class CommandLine {
   deletePressed() {
     // TODO: Janky way to initiate commands - fit it
     this.core.designEngine.sceneControl('Enter', ['E']);
-    // console.log('[CommandLine.deletePressed]');
   }
 
   /**
@@ -172,9 +169,7 @@ export class CommandLine {
     if (this.cmdLine.length > this.prompt.length) {
       // get the inputprompt and remove the prompt text
       const inputCommand = this.cmdLine.slice(this.prompt.length);
-      // console.log('[CommandLine.enterPressed] - Command:', inputCommand);
       const data = [inputCommand];
-      // console.log(data[0])
       // TODO: Janky way to initiate commands - fix it
       this.core.designEngine.sceneControl('Enter', data);
     } else {
@@ -209,7 +204,6 @@ export class CommandLine {
         this.command = this.lastCommand[this.lastCommandPosition];
         this.update();
       }
-      // console.log('[CommandLine.previousCommand] LastCommandPosition: ' + this.lastCommandPosition);
     } else if (direction === 'down') {
       if (this.lastCommandPosition > 0) {
         this.lastCommandPosition--;
@@ -217,7 +211,6 @@ export class CommandLine {
         this.update();
       } else if (this.lastCommandPosition === 0) {
         this.resetPrompt();
-        // console.log('[CommandLine.previousCommand] this.lastCommandPosition: ' + this.lastCommandPosition);
       }
     }
   }

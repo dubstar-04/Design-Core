@@ -44,7 +44,6 @@ export class Insert {
         '\n', '30', // Z
         '\n', '0.0',
     );
-    // console.log(' insert.js - DXF Data:' + data);
     return data;
   }
 

@@ -15,23 +15,12 @@ export class DesignEngine {
   sceneControl(action, data) {
     let input = data[0];
     let inputData = undefined;
-    // const expectedInputType = undefined;
-    // Create Point to hold any new position
-    // var point = new Point()
 
-    // console.log("sceneControl - InputAction:" + action);
-    // console.log("sceneControl - InputData:" + data);
-    // console.log("sceneControl - Var Input:" + input);
 
     const isNumber = /^-?\d+\.\d+$/.test(input) || /^-?\d+$/.test(input);
     const isLetters = /^[A-Za-z ]+$/.test(input);
     const isPoint = /^\d+,\d+$/.test(input) || /^@-?\d+,-?\d+$/.test(input) || /^#-?\d+,-?\d+$/.test(input);
     const isUndefined = (input === undefined);
-
-    // console.log("sceneControl - only Numbers " + isNumber)
-    // console.log("sceneControl - only Letters " + isLetters)
-    // console.log("sceneControl - is Point " + isPoint)
-    // console.log("sceneControl - is Undefined " + isUndefined)
 
     if (action === 'Reset') {
       this.core.scene.reset();
@@ -51,8 +40,6 @@ export class DesignEngine {
     }
 
     if (isPoint) {
-      // console.log('design engine - comma seperated point - create new point ');
-
       const isRelative = input.includes('@');
       const isAbsolute = input.includes('#');
 
@@ -77,8 +64,6 @@ export class DesignEngine {
     }
 
     if (action === 'LeftClick') {
-      // console.log('design engine - left click- create new point ');
-
       if (this.core.scene.activeCommand === undefined) {
         this.core.scene.selection.singleSelect();
       } else {
@@ -96,15 +81,12 @@ export class DesignEngine {
     }
 
     if (isNumber) {
-      // console.log('design engine - Numbers Recieved');
       const point = this.convertInputToPoint(Number(input));
       inputData = Number(input);
       this.core.scene.points.push(point);
-      // console.log('Number Input Data: ', inputData);
     }
 
     if (isLetters && !isUndefined) {
-      // console.log('core - Letters Recieved');
       inputData = String(input);
     }
 
@@ -126,8 +108,6 @@ export class DesignEngine {
         this.core.scene.selection.selectionAccepted = true;
       }
       this.actionInput();
-    } else {
-      // console.log('End of core');
     }
 
     // /////////////////////////////////////////////////////////////////////
@@ -144,8 +124,6 @@ export class DesignEngine {
 
     if (!promptData.validInput) {
       // notify('Invalid Input');
-      // TODO: Enable GTK toast
-      // console.log(' ######## Invalid Input ######## ');
     }
 
     if (promptData.actionBool) {

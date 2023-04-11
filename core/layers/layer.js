@@ -133,7 +133,7 @@ export class Layer {
         // "\n", "370", //lineWeight             |   supported in ACAD.
         // "\n", this.lineWeight                 |
     );
-    // console.log(' layer.js - DXF Data:' + data);
+
     return data;
   }
 }

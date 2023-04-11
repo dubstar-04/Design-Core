@@ -20,7 +20,6 @@ export class Scene {
   }
 
   reset() {
-    // console.log(' scene.js - Reset: In Reset');
     this.points = []; // clear array
     this.minPoints = 0; // reset minimum required points
     this.activeCommand = undefined; // reset the active command
@@ -31,21 +30,6 @@ export class Scene {
     this.inputArray = [];
     this.core.canvas.requestPaint();
   }
-
-
-  /*
-    centreVPORT(centre, width, height) {
-        // console.log(centre.x, centre.y, width, height)
-        if (height !== 0 && width !== 0) {
-            var xmin = centre.x - width / 2
-            var xmax = centre.x + width / 2
-            var ymin = centre.y - height / 2
-            var ymax = centre.y + height / 2
-
-            this.core.canvas.centreInScene(xmin, xmax, ymin, ymax)
-        }
-    }
-    */
 
   getExtents() {
     let xmin; let xmax; let ymin; let ymax;
@@ -251,7 +235,6 @@ export class Scene {
       }
 
       if (this.activeCommand !== undefined && this.activeCommand.showPreview && this.activeCommand.family === 'Tools' && this.selection.selectionAccepted) {
-        // console.log("preview")
         this.activeCommand.preview(this.core);
         this.core.canvas.requestPaint();
       }
