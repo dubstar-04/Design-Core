@@ -44,13 +44,18 @@ export class Erase {
   }
 
   action(core) {
-    core.scene.selection.selectionSet.sort();
+    // get a copy of the selection set
+    const selections = core.scene.selection.selectionSet.slice();
+    // sort the selection in descending order
+    selections.sort((a, b)=>b-a);
 
-    // console.log('erase.js - core.scene.selection.selectionSet: ' + core.scene.selection.selectionSet);
+    // console.log('erase.js - core.scene.selection.selectionSet:', selections);
 
-    for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
-      // console.log("Erase: " + core.scene.selection.selectionSet[i]);
-      core.scene.items.splice((core.scene.selection.selectionSet[i] - i), 1);
+    // delete each of the selections from the scene items
+    // This is done in descending order to preserve the indices i.e if index 1 is deleted, index 2 becomes index 1
+    for (let i = 0; i < selections.length; i++) {
+      // console.log('Erase: ' + selections[i]);
+      core.scene.items.splice((selections[i]), 1);
     }
   }
 }
