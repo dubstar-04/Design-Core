@@ -1,3 +1,4 @@
+import {Logging} from '../lib/logging.js';
 import {DimStyle} from './dimStyle.js';
 
 export class DimStyleManager {
@@ -51,7 +52,7 @@ export class DimStyleManager {
     const styleToDelete = this.getStyleByIndex(styleIndex).name;
 
     if (styleToDelete.toUpperCase() === 'STANDARD') {
-      // console.log('Warning: STANDARD style cannot be deleted');
+      Logging.instance.warn('STANDARD style cannot be deleted');
       return;
     }
 

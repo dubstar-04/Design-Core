@@ -1,4 +1,5 @@
 import {DXF} from './dxf/dxf.js';
+import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 
 export class FileIO {
@@ -16,9 +17,7 @@ export class FileIO {
       core.notify(Strings.Message.FILEOPEN);
     } catch (error) {
       core.notify(error.toString());
-
-      // TODO: Only print stack if debugging is turned on
-      // console.log(error.stack);
+      Logging.instance.debug(error.stack);
     }
   }
 }

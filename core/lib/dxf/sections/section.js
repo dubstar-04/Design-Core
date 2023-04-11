@@ -1,6 +1,7 @@
 
 import {DxfIterator} from '../dxfIterator.js';
 import {Strings} from '../../strings.js';
+import {Logging} from '../../logging.js';
 export class Section {
   constructor() {
 
@@ -31,7 +32,7 @@ export class Section {
 
     if (object.hasOwnProperty(`${currentPair.code}`)) {
       // seems to be common to have duplicated properties?
-      // console.log(`ERROR: Duplicate property: ${currentPair.code} - line: ${iterator.currentIndex}`);
+      Logging.instance.debug(`ERROR: Duplicate property: ${currentPair.code} - line: ${iterator.currentIndex}`);
     }
 
     // get the group value

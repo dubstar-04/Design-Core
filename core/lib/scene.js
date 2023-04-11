@@ -2,6 +2,8 @@ import {Point} from '../entities/point.js';
 import {Snapping} from './snapping.js';
 import {Selection} from './selection.js';
 import {SelectionWindow} from './selectionWindow.js';
+import {Logging} from './logging.js';
+import {Strings} from './strings.js';
 
 export class Scene {
   constructor(core) {
@@ -82,7 +84,7 @@ export class Scene {
     } else {
       // check type is a valid command
       if (!this.core.commandManager.isCommand(type)) {
-        console.log('UNSUPPORTED TYPE:', type);
+        Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
         this.reset();
         return;
       }

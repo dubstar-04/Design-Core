@@ -2,6 +2,7 @@ import {DXFReader} from './dxfRead.js';
 import {DXFWriter} from './dxfWrite.js';
 import {Point} from '../../entities/point.js';
 import {Strings} from '../strings.js';
+import {Logging} from '../logging.js';
 
 export class DXF {
   constructor() {
@@ -21,6 +22,7 @@ export class DXF {
   }
 
   loadDxf(core, data) {
+    Logging.instance.debug('Loading File');
     this.read(data);
 
     this.loadTables(core);
@@ -118,7 +120,7 @@ export class DXF {
     if (core.commandManager.isCommand(command)) {
       core.scene.addToScene(command, item);
     } else {
-      console.log(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
+      Logger.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
     }
   }
 

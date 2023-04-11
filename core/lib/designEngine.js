@@ -140,7 +140,6 @@ export class DesignEngine {
   }
 
   initialiseItem(command) {
-    // console.log(' core - Item To Process: ' + item);
     this.core.scene.saveRequired();
     // add the command to the commandline history
     this.core.commandLine.addToCommandHistory(command);
