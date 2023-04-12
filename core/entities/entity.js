@@ -11,19 +11,7 @@ export class Entity {
       writable: true,
     });
 
-    Object.defineProperty(this, 'family', {
-      enumerable: false,
-      value: 'Geometry',
-      writable: true,
-    });
-
-    Object.defineProperty(this, 'showPreview', {
-      enumerable: false,
-      value: true,
-      writable: true,
-    });
-
-    Object.defineProperty(this, 'helper_geometry', {
+    Object.defineProperty(this, 'showHelperGeometry', {
       enumerable: false,
       value: false,
       writable: true,
@@ -37,7 +25,7 @@ export class Entity {
 
     Object.defineProperty(this, 'minPoints', {
       enumerable: false,
-      value: [],
+      value: 2,
       writable: true,
     });
 

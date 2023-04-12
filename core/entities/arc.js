@@ -9,7 +9,7 @@ export class Arc extends Entity {
     super(data);
     this.minPoints = 3; // Should match number of cases in prompt
     this.radius = 1;
-    this.helper_geometry = true;
+    this.showHelperGeometry = true;
 
     if (data) {
       if (data.points || data[40]) {
@@ -78,7 +78,7 @@ export class Arc extends Entity {
     if (core.scene.inputArray.length === this.minPoints) {
       action = true;
       reset = true;
-      this.helper_geometry = false;
+      this.showHelperGeometry = false;
     }
 
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};

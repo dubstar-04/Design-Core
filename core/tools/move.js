@@ -1,15 +1,9 @@
 import {Strings} from '../lib/strings.js';
+import {Tool} from './tool.js';
 
-export class Move {
+export class Move extends Tool {
   constructor() {
-    // Define Properties
-    this.type = 'Move';
-    this.family = 'Tools';
-    this.movement = 'Linear';
-    this.minPoints = 2;
-    this.selectionRequired = true;
-    this.helper_geometry = true;
-    this.showPreview = true;
+    super();
   }
 
   static register() {

@@ -1,13 +1,8 @@
-export class Erase {
+import {Tool} from './tool.js';
+
+export class Erase extends Tool {
   constructor() {
-    // Define Properties
-    this.type = 'Erase';
-    this.family = 'Tools';
-    this.movement = 'None';
-    this.minPoints = 0;
-    this.selectionRequired = true;
-    this.helper_geometry = false;
-    this.showPreview = false;
+    super();
   }
 
   static register() {

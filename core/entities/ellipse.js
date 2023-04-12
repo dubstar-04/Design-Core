@@ -8,7 +8,7 @@ export class Ellipse extends Entity {
   constructor(data) {
     super(data);
     this.minPoints = 3;
-    this.helper_geometry = true; // If true a line will be drawn between points when defining geometry
+    this.showHelperGeometry = true; // If true a line will be drawn between points when defining geometry
     this.width = 0;
     this.height = this.width / 2 || 10;
     this.rotation = 0;
@@ -67,7 +67,7 @@ export class Ellipse extends Entity {
     } else if (core.scene.inputArray.length === this.minPoints) {
       action = true;
       reset = true;
-      this.helper_geometry = false;
+      this.showHelperGeometry = false;
     }
 
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};

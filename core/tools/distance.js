@@ -1,16 +1,11 @@
 import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
+import {Tool} from './tool.js';
 
-export class Distance {
+export class Distance extends Tool {
   constructor() {
-    // Define Properties
-    this.type = 'Distance';
-    this.family = 'Tools';
-    this.movement = 'None';
-    this.minPoints = 2;
+    super();
     this.selectionRequired = false;
-    this.helper_geometry = false;
-    this.showPreview = false;
   }
 
   static register() {
@@ -38,7 +33,7 @@ export class Distance {
 
     if (!validInput) {
       core.scene.inputArray.pop();
-    } else if (core.scene.inputArray.length === this.minPoints) {
+    } else if (core.scene.inputArray.length === 2) {
       action = true;
       reset = true;
     }

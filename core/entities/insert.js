@@ -2,9 +2,6 @@
 export class Insert {
   constructor(data) {
     this.block = '';
-    this.points = [];
-    this.colour = 'BYLAYER';
-    this.layer = '0';
 
     if (data) {
       this.block = data.block;

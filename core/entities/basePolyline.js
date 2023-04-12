@@ -7,7 +7,6 @@ import {Entity} from './entity.js';
 export class BasePolyline extends Entity {
   constructor(data) {
     super(data);
-    this.minPoints = 2;
 
     Object.defineProperty(this, 'flags', {
       enumerable: false,

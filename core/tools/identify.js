@@ -1,15 +1,10 @@
 import {Strings} from '../lib/strings.js';
+import {Tool} from './tool.js';
 
-export class Identify {
+export class Identify extends Tool {
   constructor() {
-    // Define Properties
-    this.type = 'Identify';
-    this.family = 'Tools';
-    this.movement = 'None';
-    this.minPoints = 1;
+    super();
     this.selectionRequired = false;
-    this.helper_geometry = false;
-    this.showPreview = false;
   }
 
   static register() {
@@ -34,17 +29,12 @@ export class Identify {
 
     if (!validInput) {
       core.scene.inputArray.pop();
-    } else if (core.scene.inputArray.length === this.minPoints) {
+    } else if (core.scene.inputArray.length === 1) {
       action = true;
       reset = true;
     }
 
     return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
-  }
-
-  preview() {
-    // no preview required
-    return;
   }
 
   action(core) {

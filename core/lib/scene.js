@@ -4,6 +4,9 @@ import {Selection} from './selection.js';
 import {SelectionWindow} from './selectionWindow.js';
 import {Logging} from './logging.js';
 import {Strings} from './strings.js';
+import {Entity} from '../entities/entity.js';
+import {Tool} from '../tools/tool.js';
+
 
 export class Scene {
   constructor(core) {
@@ -23,7 +26,6 @@ export class Scene {
 
   reset() {
     this.points = []; // clear array
-    this.minPoints = 0; // reset minimum required points
     this.activeCommand = undefined; // reset the active command
     this.tempItems = [];
     this.selection.reset();
@@ -78,7 +80,7 @@ export class Scene {
     }
 
     let item;
-    if (this.activeCommand && this.activeCommand.family === 'Geometry' && !type) {
+    if (this.activeCommand && this.activeCommand instanceof Entity && !type) {
       // TODO: find a way to create a new type without window
       item = this.core.commandManager.createNew(this.activeCommand.type, data);
     } else {
@@ -192,7 +194,7 @@ export class Scene {
       this.drawSelectionWindow();
     }
 
-    if (this.activeCommand !== undefined && this.activeCommand.family === 'Geometry' || this.selection.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
+    if (this.activeCommand instanceof Entity || this.selection.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
       const snapPoint = Snapping.getSnapPoint(this);
       if (snapPoint) {
         this.addSnapPoint(snapPoint);
@@ -222,7 +224,7 @@ export class Scene {
       // add the mouse position to temp points
       this.tempPoints.push(this.core.mouse.pointOnScene());
 
-      if (this.activeCommand !== undefined && this.activeCommand.helper_geometry) {
+      if (this.activeCommand !== undefined && this.activeCommand.showHelperGeometry) {
         // Make a new array of points with the base point and the current mouse position.
         const helperPoints = [];
         helperPoints.push(this.tempPoints[0]);
@@ -231,12 +233,12 @@ export class Scene {
         this.addHelperGeometry('Line', helperPoints, this.core.settings.helpergeometrycolour.toString());
       }
 
-      if (this.activeCommand !== undefined && this.activeCommand.showPreview && this.activeCommand.family === 'Geometry' && this.tempPoints.length >= this.activeCommand.minPoints) {
+      if (this.activeCommand !== undefined && this.activeCommand instanceof Entity && this.tempPoints.length >= this.activeCommand.minPoints) {
         this.addHelperGeometry(this.activeCommand.type, this.tempPoints, this.core.settings.helpergeometrycolour.toString());
         this.core.canvas.requestPaint(); // TODO: Improve requests to paint as it is called too often.
       }
 
-      if (this.activeCommand !== undefined && this.activeCommand.showPreview && this.activeCommand.family === 'Tools' && this.selection.selectionAccepted) {
+      if (this.activeCommand !== undefined && this.activeCommand instanceof Tool && this.selection.selectionAccepted) {
         this.activeCommand.preview(this.core);
         this.core.canvas.requestPaint();
       }
