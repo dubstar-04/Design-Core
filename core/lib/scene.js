@@ -23,7 +23,6 @@ export class Scene {
 
   reset() {
     this.points = []; // clear array
-    this.minPoints = 0; // reset minimum required points
     this.activeCommand = undefined; // reset the active command
     this.tempItems = [];
     this.selection.reset();
