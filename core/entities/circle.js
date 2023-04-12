@@ -7,7 +7,6 @@ import {Entity} from './entity.js';
 export class Circle extends Entity {
   constructor(data) {
     super(data);
-    this.family = 'Geometry';
 
     // add radius property with getter and setter
     // needs to be enumberable to appear in the object props
