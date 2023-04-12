@@ -29,24 +29,24 @@ export class Logging {
     }
   }
 
-  levelValue() {
+  get levelValue() {
     return this.logLevel.indexOf(this.level);
   }
 
   debug(msg) {
-    if (this.levelValue() >= 3) {
+    if (this.levelValue >= 3) {
       console.log(`Debug: ${msg}`);
     }
   }
 
   warn(msg) {
-    if (this.levelValue() >= 2) {
+    if (this.levelValue >= 2) {
       console.log(`Warning: ${msg}`);
     }
   }
 
   error(msg) {
-    if (this.levelValue() >= 1) {
+    if (this.levelValue >= 1) {
       console.log(`Error: ${msg}`);
     }
   }
