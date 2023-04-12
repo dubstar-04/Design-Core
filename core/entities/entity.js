@@ -25,7 +25,7 @@ export class Entity {
 
     Object.defineProperty(this, 'minPoints', {
       enumerable: false,
-      value: [],
+      value: 2,
       writable: true,
     });
 
