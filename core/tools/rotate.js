@@ -1,15 +1,10 @@
 import {Strings} from '../lib/strings.js';
+import {Tool} from './tool.js';
 
-export class Rotate {
+export class Rotate extends Tool {
   constructor() {
-    // Define Properties
-    this.type = 'Rotate';
-    this.family = 'Tools';
-    this.movement = 'Angular';
-    this.minPoints = 3;
-    this.selectionRequired = true;
-    this.helper_geometry = true;
-    this.showPreview = true;
+    super();
+    this.showHelperGeometry = true;
   }
 
   static register() {

@@ -1,16 +1,12 @@
 import {Intersection} from '../lib/intersect.js';
 import {Strings} from '../lib/strings.js';
+import {Tool} from './tool.js';
 
-export class Trim {
+export class Trim extends Tool {
   constructor() {
-    // Define Properties
-    this.type = 'Trim';
-    this.family = 'Tools';
+    super();
+    // remove this.movement
     this.movement = 'Modify';
-    this.minPoints = 2;
-    this.selectionRequired = true;
-    this.helper_geometry = false;
-    this.showPreview = false;
   }
 
   static register() {
@@ -81,9 +77,6 @@ export class Trim {
         TrimItem.trim(intersectPoints, core);
       }
     }
-  }
-
-  preview() {
   }
 }
 

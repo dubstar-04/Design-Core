@@ -1,16 +1,10 @@
 import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
+import {Tool} from './tool.js';
 
-export class Copy {
+export class Copy extends Tool {
   constructor() {
-    // Define Properties
-    this.type = 'Copy';
-    this.family = 'Tools';
-    this.movement = 'Linear';
-    this.minPoints = 2;
-    this.selectionRequired = true;
-    this.limitPoints = true;
-    this.showPreview = true;
+    super();
   }
 
   static register() {

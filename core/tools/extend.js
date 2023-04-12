@@ -1,16 +1,12 @@
 import {Intersection} from '../lib/intersect.js';
 import {Strings} from '../lib/strings.js';
+import {Tool} from './tool.js';
 
-export class Extend {
+export class Extend extends Tool {
   constructor() {
-    // Define Properties
-    this.type = 'Extend';
-    this.family = 'Tools';
+    super();
+    // remove this.movement
     this.movement = 'Modify';
-    this.minPoints = 2;
-    this.selectionRequired = true;
-    this.helper_geometry = false;
-    this.showPreview = false;
   }
 
   static register() {
@@ -67,7 +63,6 @@ export class Extend {
           extendItem = core.scene.items[item];
 
           const functionName = 'intersect' + boundaryItem.type + extendItem.type;
-          console.log(functionName);
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), extendItem.intersectPoints(), true);
 
           if (intersect.points.length) {
