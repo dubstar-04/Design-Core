@@ -55,10 +55,6 @@ export class Extend {
   }
 
   action(core) {
-    // console.log('Extend.js: action');
-
-    // console.log('Extend.js: core.scene.selection.selectionSet length:', core.scene.selection.selectionSet.length);
-
     const item = core.scene.selection.findClosestItem();
 
     if (item !== undefined) {
@@ -70,15 +66,11 @@ export class Extend {
           const boundaryItem = core.scene.items[core.scene.selection.selectionSet[i]];
           extendItem = core.scene.items[item];
 
-          // console.log('boundary.type:', boundaryItem.type, 'extend.type:', extendItem.type);
-
           const functionName = 'intersect' + boundaryItem.type + extendItem.type;
-          // console.log('extend.js - call function:', functionName);
+          console.log(functionName);
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), extendItem.intersectPoints(), true);
 
-          // console.log(intersect.status);
           if (intersect.points.length) {
-            // console.log('intersect points:', intersect.points.length);
             for (let point = 0; point < intersect.points.length; point++) {
               intersectPoints.push(intersect.points[point]);
             }
@@ -93,7 +85,6 @@ export class Extend {
   }
 
   preview() {
-    // console.log("extend.js - preview")
   }
 }
 

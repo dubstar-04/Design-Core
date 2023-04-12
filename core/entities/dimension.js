@@ -204,14 +204,12 @@ export class Dimension extends Entity {
       const iY = ((Math.abs(Pt3.y - Pt1.y) + Math.abs(Pt2.y - Pt3.y)) - Math.abs(dy));
 
       if (iX > iY && dy !== 0) {
-        // console.log("X Direction")
         P1e.x = Pt3.x;
         P1e.y = Pt1.y;
         P2e.x = Pt3.x;
         P2e.y = Pt2.y;
         dimension = dy;
       } else if (iX < iY && dx !== 0) {
-        // console.log("Y Direction")
         P1e.x = Pt1.x;
         P1e.y = Pt3.y;
         P2e.x = Pt2.x;
@@ -260,25 +258,18 @@ export class Dimension extends Entity {
 
     switch (this.getBaseDimType()) {
       case 0:
-        // console.log('Dimension.getDimensionPoints() - Rotated, horizontal, or vertical Dimension Type Not Handled');
         break;
       case 1:
-        // console.log('Dimension.getDimensionPoints() - Aligned Dimension Type Not Handled');
         break;
       case 2:
-        // console.log('Dimension.getDimensionPoints() - Angular Dimension Type Not Handled');
         break;
       case 3:
-        // console.log('Dimension.getDimensionPoints() - Diameter Dimension Type Not Handled');
         break;
       case 4:
-        // console.log('Dimension.getDimensionPoints() - Radius Dimension Type Not Handled');
         break;
       case 5:
-        // console.log('Dimension.getDimensionPoints() - Anglar 3-Point Dimension Type Not Handled');
         break;
       case 6:
-        // console.log('Dimension.getDimensionPoints() - Ordinate Dimension Type Not Handled');
         break;
     }
 
@@ -303,7 +294,6 @@ export class Dimension extends Entity {
 
     if (typeof (extPnts.dimAngle) === 'number') {
       const angle = Utils.radians2degrees(extPnts.dimAngle);
-      // console.log('text angle', angle);
       this.text.rotation = angle; // TODO: Honor the style
     }
 
@@ -320,27 +310,20 @@ export class Dimension extends Entity {
         break;
 
       case 1:
-        // console.log('Dimension Type Not Handled');
         break;
       case 2:
-        // console.log('Aligned Dimension Type Not Handled');
         break;
       case 3:
-        // console.log('Diameter Dimension Type Not Handled');
-        // console.log("Diameter Dimension Type Not Handled")
         // line1 = new Line({ points: [this.points[3], this.points[4]] });
         // this.block.addItem(line1);
         // drawArrowHead(this.points[3], this.points[3].angle(this.points[4]), this.text.height / 2)
         // drawArrowHead(this.points[4], this.points[4].angle(this.points[3]), this.text.height / 2)
         break;
       case 4:
-        // console.log('Radius Dimension Type Not Handled');
         break;
       case 5:
-        // console.log('Anglar 3-Point Dimension Type Not Handled');
         break;
       case 6:
-        // console.log('Ordinate Dimension Type Not Handled');
         break;
     }
 
@@ -362,7 +345,6 @@ export class Dimension extends Entity {
     this.block.draw(ctx, scale, core, colour);
     /*
     function drawArrowHead(point, angle, height) {
-      // console.log("arrow head height:", height)
       triangleWidth = height;
       triangleHeight = height * 1.5;
 
@@ -456,7 +438,6 @@ export class Dimension extends Entity {
         '\n', 'STANDARD',
 
     );
-    // console.log(" line.js - DXF Data:" + data)
     return data;
   }
 

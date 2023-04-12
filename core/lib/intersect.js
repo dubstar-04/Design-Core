@@ -287,7 +287,6 @@ export class Intersection {
       }
 
       if (result.points.length > 0) {
-        // console.log('Actual points: ' + result.length);
         result.status = 'Intersection';
       }
     }
@@ -325,15 +324,11 @@ export class Intersection {
     if (!extend) {
       for (let i = 0; i < inter1.points.length; i++) {
         if (c.angle(inter1.points[i]) > sa && c.angle(inter1.points[i]) < ea) {
-          // console.log('Angles: ' + c.angle(inter1.points[i]) + ' Start: ' + sa + ' End: ' + ea);
-
-          // result.points.splice(i, 1);
           result.points.push(inter1.points[i]);
         }
       }
 
       if (result.points.length > 0) {
-        // console.log('Actual points: ' + result.points.length);
         result.status = 'Intersection';
       }
     }

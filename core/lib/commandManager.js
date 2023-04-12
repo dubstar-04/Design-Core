@@ -28,6 +28,7 @@ import {Trim} from '../tools/trim.js';
 
 import {Utils} from './utils.js';
 import {Strings} from './strings.js';
+import {Logging} from './logging.js';
 
 const classes = {
   Line,
@@ -97,8 +98,7 @@ export class CommandManager {
     if (this.isCommand(type)) {
       newItem = new classes[this.getCommand(type)](data);
     } else {
-      // TODO: return undefined or null and notify of error
-      console.log('commandManager.js - createNew: Command Not Recognised');
+      Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
       return;
     }
 
@@ -173,7 +173,7 @@ export class CommandManager {
     }
 
     if (command === undefined) {
-      console.log(`WARNING: Unknown Command: ${input}`);
+      Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${input}`);
     }
 
     return command;

@@ -1,3 +1,4 @@
+import {Logging} from '../lib/logging.js';
 import {DimStyle} from './dimStyle.js';
 
 export class DimStyleManager {
@@ -27,7 +28,6 @@ export class DimStyleManager {
   getUniqueName(name) {
     let count = 0;
     let styStr = name.replace(/ /g, '_').toUpperCase();
-    // console.log('New style Name:' + styStr);
     for (let i = 0; i < this.styleCount(); i++) {
       if (this.styles[i].name.includes(styStr)) {
         count = count + 1;
@@ -41,7 +41,6 @@ export class DimStyleManager {
   }
 
   addStyle(style) {
-    // console.log(' DimStyleManager.js - addstyle() - New style Added:' + style.name);
     const newstyle = new DimStyle(style);
     if (!this.styleExists(style)) {
       this.styles.push(newstyle);
@@ -53,7 +52,7 @@ export class DimStyleManager {
     const styleToDelete = this.getStyleByIndex(styleIndex).name;
 
     if (styleToDelete.toUpperCase() === 'STANDARD') {
-      // console.log('Warning: STANDARD style cannot be deleted');
+      Logging.instance.warn('STANDARD style cannot be deleted');
       return;
     }
 
@@ -64,8 +63,6 @@ export class DimStyleManager {
         selectionSet.push(i);
       }
     }
-
-    // console.log(selectionSet.length, ' Item(s) to be deleted from ', styleToDelete);
 
     selectionSet.sort();
     for (let j = 0; j < selectionSet.length; j++) {
@@ -87,19 +84,15 @@ export class DimStyleManager {
   styleExists(style) {
     let i = this.styleCount();
     while (i--) {
-      // console.log("styleExists:", this.styles[i].name)
       if (this.styles[i].name === style.name) {
-        // console.log("DimStyleManager.js styleExist: " + style.name)
         return true;
       }
     }
-    // console.log("style Doesn't Exist: " + style.name)
     return false;
   }
 
   checkStyles() {
     if (!this.styleCount()) {
-      // console.log('DimStyleManager.js - Check styles -> Add Standard styles');
       this.addStandardStyles();
     }
 
@@ -137,7 +130,6 @@ export class DimStyleManager {
     if (this.getStyleByIndex(styleIndex).name.toUpperCase() !== 'STANDARD') {
       if (this.getStyleByIndex(styleIndex).name === this.getCStyle()) {
         this.setCStyle(newUniqueName);
-        // console.log('[DimStyleManager.renamestyle] - set new Cstyle name');
       }
 
       this.styles[styleIndex].name = newUniqueName;

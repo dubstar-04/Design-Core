@@ -120,7 +120,6 @@ export class Arc extends Entity {
         '\n', '51', // END ANGLE
         '\n', Utils.radians2degrees(this.endAngle()), // Radians
     );
-    // console.log(' arc.js - DXF Data:' + data);
     return data;
   }
 

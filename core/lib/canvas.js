@@ -115,7 +115,6 @@ export class Canvas {
   }
 
   zoomExtents() {
-    // console.log('zoom all ');
     const extents = this.core.scene.getExtents();
     if (extents) {
       // calculate the center of all items
@@ -184,11 +183,9 @@ export class Canvas {
       // context.globalAlpha = this.cvs.alpha
     } catch { // Cairo
       const rgbColour = Colours.hexToScaledRGB(this.core.settings.canvasbackgroundcolour);
-      // console.log("Background Colour", this.core.settings.canvasbackgroundcolour, rgbColour, this.getScale())
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       const scaled = new Point(width, height);
       const sc = this.core.mouse.transformToScene(scaled);
-      // context.rectangle(origin.x, origin.y, sc.x, sc.y);
       context.moveTo(origin.x, origin.y);
       context.lineTo(origin.x, sc.y);
       context.lineTo(sc.x, sc.y);

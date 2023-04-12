@@ -58,7 +58,6 @@ export class Polyline extends BasePolyline {
         '\n', '8', // LAYERNAME
         '\n', this.layer,
     );
-    // console.log(' polyline.js - DXF Data:' + data);
     return data;
   }
 

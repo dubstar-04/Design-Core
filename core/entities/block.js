@@ -125,7 +125,6 @@ export class Block extends Entity {
     ctx.translate(this.points[0].x, this.points[0].y);
 
     for (let item = 0; item < this.items.length; item++) {
-      // console.log("block draw - Item:", this.items[item])
       if (typeof this.items[item].draw == 'function') {
         // handle item colour
         const itemColour = this.items[item].colour;
@@ -135,8 +134,6 @@ export class Block extends Entity {
         this.items[item].draw(ctx, scale, core, colour);
         // reset item colour
         this.items[item].colour = itemColour;
-      } else {
-        // console.log('block.js - [draw] [INFO]:Item has no draw function - Item:', this.items[item]);
       }
     }
 

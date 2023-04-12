@@ -2,6 +2,8 @@ import {Point} from '../entities/point.js';
 import {Snapping} from './snapping.js';
 import {Selection} from './selection.js';
 import {SelectionWindow} from './selectionWindow.js';
+import {Logging} from './logging.js';
+import {Strings} from './strings.js';
 
 export class Scene {
   constructor(core) {
@@ -20,7 +22,6 @@ export class Scene {
   }
 
   reset() {
-    // console.log(' scene.js - Reset: In Reset');
     this.points = []; // clear array
     this.minPoints = 0; // reset minimum required points
     this.activeCommand = undefined; // reset the active command
@@ -31,21 +32,6 @@ export class Scene {
     this.inputArray = [];
     this.core.canvas.requestPaint();
   }
-
-
-  /*
-    centreVPORT(centre, width, height) {
-        // console.log(centre.x, centre.y, width, height)
-        if (height !== 0 && width !== 0) {
-            var xmin = centre.x - width / 2
-            var xmax = centre.x + width / 2
-            var ymin = centre.y - height / 2
-            var ymax = centre.y + height / 2
-
-            this.core.canvas.centreInScene(xmin, xmax, ymin, ymax)
-        }
-    }
-    */
 
   getExtents() {
     let xmin; let xmax; let ymin; let ymax;
@@ -98,7 +84,7 @@ export class Scene {
     } else {
       // check type is a valid command
       if (!this.core.commandManager.isCommand(type)) {
-        console.log('UNSUPPORTED TYPE:', type);
+        Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
         this.reset();
         return;
       }
@@ -251,7 +237,6 @@ export class Scene {
       }
 
       if (this.activeCommand !== undefined && this.activeCommand.showPreview && this.activeCommand.family === 'Tools' && this.selection.selectionAccepted) {
-        // console.log("preview")
         this.activeCommand.preview(this.core);
         this.core.canvas.requestPaint();
       }
