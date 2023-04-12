@@ -12,9 +12,6 @@ import {PropertyManager} from './properties/propertyManager.js';
 import {FileIO} from './lib/fileio.js';
 import {Settings} from './lib/settings.js';
 
-// TODO: Add debugging / logging class
-// TODO: use inheritance for the tools
-
 /** Class representing design core. This is the primary entry point */
 export class Core {
   /** Create a core object */
