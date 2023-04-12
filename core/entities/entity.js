@@ -11,7 +11,7 @@ export class Entity {
       writable: true,
     });
 
-    Object.defineProperty(this, 'helper_geometry', {
+    Object.defineProperty(this, 'showHelperGeometry', {
       enumerable: false,
       value: false,
       writable: true,
