@@ -1,4 +1,6 @@
+import {Entity} from '../entities/entity.js';
 import {Point} from '../entities/point.js';
+import {Tool} from '../tools/tool.js';
 import {Utils} from './utils.js';
 
 export class DesignEngine {
@@ -28,7 +30,7 @@ export class DesignEngine {
     }
 
     if (action === 'Enter' && isUndefined) {
-      if (this.core.scene.activeCommand !== undefined && this.core.scene.activeCommand.family === 'Tools' && this.core.scene.selection.selectionSet.length) {
+      if (this.core.scene.activeCommand !== undefined && this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length) {
         this.core.scene.selection.selectionAccepted = true;
         inputData = true;
       } else if (this.core.scene.activeCommand !== undefined) {
@@ -70,11 +72,11 @@ export class DesignEngine {
         const point = this.core.mouse.pointOnScene();
         inputData = point;
 
-        if (this.core.scene.activeCommand.family === 'Geometry' || this.core.scene.selection.selectionAccepted) {
+        if (this.core.scene.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted) {
           this.core.scene.points.push(inputData);
         }
 
-        if (this.core.scene.activeCommand.family === 'Tools' && !this.core.scene.selection.selectionAccepted) {
+        if (this.core.scene.activeCommand instanceof Tool && !this.core.scene.selection.selectionAccepted) {
           this.core.scene.selection.singleSelect();
         }
       }
@@ -100,7 +102,7 @@ export class DesignEngine {
     } else if (this.core.commandManager.isCommandOrShortcut(input)) {
       this.initialiseItem(this.core.commandManager.getCommand(input));
 
-      if (this.core.scene.activeCommand.family === 'Tools' && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
+      if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
         if (this.core.scene.activeCommand.selectionRequired) {
           this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
           this.core.scene.inputArray.push(true);
@@ -122,12 +124,13 @@ export class DesignEngine {
     // i.e. this.core.scene.activeCommand.type + ': ' + promptData.promptInput;
     this.core.commandLine.setPrompt(promptData.promptInput);
 
+
     if (!promptData.validInput) {
       // notify('Invalid Input');
     }
 
     if (promptData.actionBool) {
-      if (this.core.scene.activeCommand.family === 'Tools') {
+      if (this.core.scene.activeCommand instanceof Tool) {
         this.core.scene.activeCommand.action(this.core);
       } else {
         this.core.scene.addToScene(null, null, promptData.resetBool);
