@@ -6,12 +6,6 @@ export class Tool {
       writable: true,
     });
 
-    Object.defineProperty(this, 'family', {
-      enumerable: false,
-      value: 'Tools',
-      writable: true,
-    });
-
     Object.defineProperty(this, 'selectionRequired', {
       enumerable: false,
       value: true,
