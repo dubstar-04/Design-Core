@@ -8,7 +8,6 @@ export class Circle extends Entity {
   constructor(data) {
     super(data);
     this.family = 'Geometry';
-    this.minPoints = 2;
 
     // add radius property with getter and setter
     // needs to be enumberable to appear in the object props

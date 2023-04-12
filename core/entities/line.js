@@ -7,7 +7,6 @@ import {Entity} from './entity.js';
 export class Line extends Entity {
   constructor(data) {
     super(data);
-    this.minPoints = 2;
 
     if (data) {
       if (data.points) {

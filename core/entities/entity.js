@@ -11,18 +11,6 @@ export class Entity {
       writable: true,
     });
 
-    Object.defineProperty(this, 'family', {
-      enumerable: false,
-      value: 'Geometry',
-      writable: true,
-    });
-
-    Object.defineProperty(this, 'showPreview', {
-      enumerable: false,
-      value: true,
-      writable: true,
-    });
-
     Object.defineProperty(this, 'helper_geometry', {
       enumerable: false,
       value: false,
