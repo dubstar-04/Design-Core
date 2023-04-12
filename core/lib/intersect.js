@@ -675,7 +675,7 @@ export class Intersection {
    * @returns
    */
   static intersectLwpolylineLine(polyline, line, extend) {
-    return intersectPolylineLine(polyline, line, extend);
+    return this.intersectPolylineLine(polyline, line, extend);
   }
 
   /**
