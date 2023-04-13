@@ -17,10 +17,6 @@ export class DesignEngine {
     let inputData = undefined;
 
 
-    const isNumber = /^-?\d+\.\d+$/.test(input) || /^-?\d+$/.test(input);
-    const isLetters = /^[A-Za-z ]+$/.test(input);
-    const isPoint = /^\d+,\d+$/.test(input) || /^@-?\d+,-?\d+$/.test(input) || /^#-?\d+,-?\d+$/.test(input);
-    const isUndefined = (input === undefined);
   acceptPreselection() {
     if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
       if (this.core.scene.activeCommand.selectionRequired) {
@@ -47,6 +43,20 @@ export class DesignEngine {
         this.initialiseItem(this.core.commandLine.lastCommand[0]);
       }
     }
+  }
+
+  parseInput(input) {
+    // if we have a valid point return
+    if (input instanceof Point) {
+      return input;
+    }
+
+    let inputData;
+
+    const isNumber = /^-?\d+\.\d+$/.test(input) || /^-?\d+$/.test(input);
+    const isLetters = /^[A-Za-z ]+$/.test(input);
+    const isPoint = /^\d+,\d+$/.test(input) || /^@-?\d+,-?\d+$/.test(input) || /^#-?\d+,-?\d+$/.test(input);
+    const isUndefined = (input === undefined);
 
     if (isPoint) {
       const isRelative = input.includes('@');
@@ -61,16 +71,12 @@ export class DesignEngine {
       point.x = parseFloat(xyData[0]);
       point.y = parseFloat(xyData[1]);
 
-      if (isRelative && points.length) {
-        point.x = parseFloat(points[points.length - 1].x + point.x);
-        point.y = parseFloat(points[points.length - 1].y + point.y);
+      if (isRelative && this.core.scene.points.length) {
+        point.x = parseFloat(this.core.scene.points.at(-1).x + point.x);
+        point.y = parseFloat(this.core.scene.points.at(-1).y + point.y);
       }
 
       inputData = point;
-      // TODO: scene.points should be private
-      this.core.scene.points.push(point);
-      this.core.canvas.requestPaint();
-    }
 
     if (action === 'LeftClick') {
       if (this.core.scene.activeCommand === undefined) {
@@ -92,12 +98,17 @@ export class DesignEngine {
     if (isNumber) {
       const point = this.convertInputToPoint(Number(input));
       inputData = Number(input);
+      // TODO: parseInput should return the parsed value only
+      // don't add points to the scene here
       this.core.scene.points.push(point);
     }
 
     if (isLetters && !isUndefined) {
       inputData = String(input);
     }
+
+    return inputData;
+  }
 
 
     if (typeof this.core.scene.activeCommand !== 'undefined') {
