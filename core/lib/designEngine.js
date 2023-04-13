@@ -5,8 +5,6 @@ import {Utils} from './utils.js';
 
 export class DesignEngine {
   constructor(core) {
-    // this.core. is the main class for interaction with Design
-
     this.core = core;
   }
 
