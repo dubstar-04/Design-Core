@@ -28,19 +28,18 @@ export class DesignEngine {
   }
 
     if (action === 'Reset') {
+  onEnterPressed() {
+    if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length) {
+      this.core.scene.selection.selectionAccepted = true;
+      this.core.scene.inputArray.push(true);
+      this.actionInput();
+    } else if (this.core.scene.activeCommand === undefined) {
+      this.initialiseItem(this.core.commandLine.lastCommand[0]);
+      this.actionInput();
+    } else {
       this.core.scene.reset();
-      return;
     }
 
-    if (action === 'Enter' && isUndefined) {
-      if (this.core.scene.activeCommand !== undefined && this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length) {
-        this.core.scene.selection.selectionAccepted = true;
-        inputData = true;
-      } else if (this.core.scene.activeCommand !== undefined) {
-        this.core.scene.reset();
-        return;
-      } else if (this.core.scene.activeCommand == undefined) {
-        this.initialiseItem(this.core.commandLine.lastCommand[0]);
       }
     }
   }
