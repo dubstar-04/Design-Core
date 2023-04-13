@@ -40,6 +40,19 @@ export class DesignEngine {
       this.core.scene.reset();
     }
 
+  onLeftClick() {
+    if (this.core.scene.activeCommand === undefined) {
+      this.core.scene.selection.singleSelect();
+    } else {
+      if (this.core.scene.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted) {
+        const point = this.core.mouse.pointOnScene();
+        this.sceneControl(point);
+      }
+
+      if (this.core.scene.activeCommand instanceof Tool && !this.core.scene.selection.selectionAccepted) {
+        this.core.scene.selection.singleSelect();
+        this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
+        this.actionInput();
       }
     }
   }
@@ -76,22 +89,6 @@ export class DesignEngine {
       }
 
       inputData = point;
-
-    if (action === 'LeftClick') {
-      if (this.core.scene.activeCommand === undefined) {
-        this.core.scene.selection.singleSelect();
-      } else {
-        const point = this.core.mouse.pointOnScene();
-        inputData = point;
-
-        if (this.core.scene.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted) {
-          this.core.scene.points.push(inputData);
-        }
-
-        if (this.core.scene.activeCommand instanceof Tool && !this.core.scene.selection.selectionAccepted) {
-          this.core.scene.selection.singleSelect();
-        }
-      }
     }
 
     if (isNumber) {
