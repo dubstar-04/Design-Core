@@ -138,7 +138,7 @@ export class DesignEngine {
     }
 
     if (promptData.resetBool) {
-      this.core.scene.reset();
+      this.reset();
     }
   }
 
