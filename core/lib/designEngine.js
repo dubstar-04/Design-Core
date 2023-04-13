@@ -126,7 +126,7 @@ export class DesignEngine {
 
 
     if (!promptData.validInput) {
-      // notify('Invalid Input');
+      this.core.notify(Strings.Error.INPUT);
     }
 
     if (promptData.actionBool) {
