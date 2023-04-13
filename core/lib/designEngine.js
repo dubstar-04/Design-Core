@@ -151,12 +151,9 @@ export class DesignEngine {
   };
 
   convertInputToPoint(input) {
-    const point = new Point();
-    const x = input * Math.cos(Utils.degrees2radians(this.core.mouse.inputAngle()));
-    const y = input * Math.sin(Utils.degrees2radians(this.core.mouse.inputAngle()));
-    // generate data from the prevous point and the radius
-    point.x = this.core.scene.points[this.core.scene.points.length - 1].x + x;
-    point.y = this.core.scene.points[this.core.scene.points.length - 1].y + y;
+    const basePoint = this.core.scene.points.at(-1);
+    const angle = Utils.degrees2radians(this.core.mouse.inputAngle());
+    const point = basePoint.project( angle, input);
 
     return point;
   }
