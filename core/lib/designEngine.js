@@ -1,6 +1,7 @@
 import {Entity} from '../entities/entity.js';
 import {Point} from '../entities/point.js';
 import {Tool} from '../tools/tool.js';
+import {Strings} from './strings.js';
 import {Utils} from './utils.js';
 
 export class DesignEngine {
@@ -12,10 +13,17 @@ export class DesignEngine {
     this.core.scene.reset();
   }
 
-  sceneControl(action, data) {
-    let input = data[0];
-    let inputData = undefined;
-
+  onCommand(input) {
+    if (this.core.scene.activeCommand === undefined) {
+      if (this.core.commandManager.isCommand(input) || this.core.commandManager.isShortcut(input)) {
+        this.initialiseItem(this.core.commandManager.getCommand(input));
+        this.acceptPreselection();
+        this.actionInput();
+      }
+    } else {
+      this.sceneControl(input);
+    }
+  }
 
   acceptPreselection() {
     if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
@@ -27,7 +35,6 @@ export class DesignEngine {
     }
   }
 
-    if (action === 'Reset') {
   onEnterPressed() {
     if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length) {
       this.core.scene.selection.selectionAccepted = true;
@@ -39,6 +46,7 @@ export class DesignEngine {
     } else {
       this.core.scene.reset();
     }
+  }
 
   onLeftClick() {
     if (this.core.scene.activeCommand === undefined) {
@@ -106,11 +114,18 @@ export class DesignEngine {
     return inputData;
   }
 
+  sceneControl(input) {
+    // const input = data[0];
+    const inputData = this.parseInput(input);
+
+    if (inputData instanceof Point) {
+      this.core.scene.points.push(inputData);
+      this.core.canvas.requestPaint();
+    }
+
 
     if (typeof this.core.scene.activeCommand !== 'undefined') {
       this.core.scene.inputArray.push(inputData);
-      this.actionInput();
-      }
       this.actionInput();
     }
   }
@@ -131,6 +146,7 @@ export class DesignEngine {
       if (this.core.scene.activeCommand instanceof Tool) {
         this.core.scene.activeCommand.action(this.core);
       } else {
+        // TODO: sort this jank
         this.core.scene.addToScene(null, null, promptData.resetBool);
       }
     }
