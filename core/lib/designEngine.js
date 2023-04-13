@@ -23,6 +23,15 @@ export class DesignEngine {
     const isLetters = /^[A-Za-z ]+$/.test(input);
     const isPoint = /^\d+,\d+$/.test(input) || /^@-?\d+,-?\d+$/.test(input) || /^#-?\d+,-?\d+$/.test(input);
     const isUndefined = (input === undefined);
+  acceptPreselection() {
+    if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
+      if (this.core.scene.activeCommand.selectionRequired) {
+        this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
+        this.core.scene.inputArray.push(true);
+      }
+      this.core.scene.selection.selectionAccepted = true;
+    }
+  }
 
     if (action === 'Reset') {
       this.core.scene.reset();
@@ -96,15 +105,6 @@ export class DesignEngine {
     if (typeof this.core.scene.activeCommand !== 'undefined') {
       this.core.scene.inputArray.push(inputData);
       this.actionInput();
-    } else if (this.core.commandManager.isCommandOrShortcut(input)) {
-      this.initialiseItem(this.core.commandManager.getCommand(input));
-
-      if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
-        if (this.core.scene.activeCommand.selectionRequired) {
-          this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
-          this.core.scene.inputArray.push(true);
-        }
-        this.core.scene.selection.selectionAccepted = true;
       }
       this.actionInput();
     }
