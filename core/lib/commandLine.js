@@ -70,7 +70,7 @@ export class CommandLine {
         this.enterPressed();
         break;
       case 'Escape':
-        this.core.designEngine.sceneControl('Reset', []);
+        this.core.designEngine.reset();
         break;
       case 'Space': // space
         this.spacePressed();
@@ -135,7 +135,7 @@ export class CommandLine {
    */
   deletePressed() {
     // TODO: Janky way to initiate commands - fit it
-    this.core.designEngine.sceneControl('Enter', ['E']);
+    this.core.designEngine.onCommand('Erase');
   }
 
   /**
@@ -169,12 +169,9 @@ export class CommandLine {
     if (this.cmdLine.length > this.prompt.length) {
       // get the inputprompt and remove the prompt text
       const inputCommand = this.cmdLine.slice(this.prompt.length);
-      const data = [inputCommand];
-      // TODO: Janky way to initiate commands - fix it
-      this.core.designEngine.sceneControl('Enter', data);
+      this.core.designEngine.onCommand(inputCommand);
     } else {
-      // TODO: Janky way to initiate commands - fix it
-      this.core.designEngine.sceneControl('Enter', []);
+      this.core.designEngine.onEnterPressed();
     }
   }
 
