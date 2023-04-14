@@ -1,3 +1,4 @@
+import {Logging} from '../lib/logging.js';
 import {BasePolyline} from './basePolyline.js';
 
 export class Lwpolyline extends BasePolyline {
@@ -8,7 +9,7 @@ export class Lwpolyline extends BasePolyline {
       if (data[90]) {
         // DXF Groupcode 90 - Number of vertices
         if (this.points.length !== data[90]) {
-          log(`ERROR: LWPOLYLINE Vertices Count`);
+          Logging.instance.error(`LWPOLYLINE Vertices Count`);
         }
       }
     }

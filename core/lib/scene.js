@@ -161,13 +161,12 @@ export class Scene {
   mouseDown(button) {
     switch (button) {
       case 0: // left button
-        // TODO: Janky way to initiate commands - fix it
-        this.core.designEngine.sceneControl('LeftClick', []);
+        this.core.designEngine.onLeftClick();
         break;
       case 1: // middle button
         break;
       case 2: // right button
-        this.core.designEngine.sceneControl('Enter', []);
+        this.core.designEngine.onEnterPressed();
         break;
     }
   };

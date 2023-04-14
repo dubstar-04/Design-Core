@@ -1,12 +1,11 @@
 import {Entity} from '../entities/entity.js';
 import {Point} from '../entities/point.js';
 import {Tool} from '../tools/tool.js';
+import {Strings} from './strings.js';
 import {Utils} from './utils.js';
 
 export class DesignEngine {
   constructor(core) {
-    // this.core. is the main class for interaction with Design
-
     this.core = core;
   }
 
@@ -14,32 +13,74 @@ export class DesignEngine {
     this.core.scene.reset();
   }
 
-  sceneControl(action, data) {
-    let input = data[0];
-    let inputData = undefined;
+  onCommand(input) {
+    if (this.core.scene.activeCommand === undefined) {
+      if (this.core.commandManager.isCommand(input) || this.core.commandManager.isShortcut(input)) {
+        this.initialiseItem(this.core.commandManager.getCommand(input));
+        this.acceptPreselection();
+        this.actionInput();
+      }
+    } else {
+      const inputData = this.parseInput(input);
+      this.sceneControl(inputData);
+    }
+  }
 
+  acceptPreselection() {
+    if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
+      if (this.core.scene.activeCommand.selectionRequired) {
+        this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
+        this.core.scene.inputArray.push(true);
+      }
+      this.core.scene.selection.selectionAccepted = true;
+    }
+  }
+
+  onEnterPressed() {
+    if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length) {
+      this.core.scene.selection.selectionAccepted = true;
+      this.core.scene.inputArray.push(true);
+      this.actionInput();
+    } else if (this.core.scene.activeCommand === undefined) {
+      this.initialiseItem(this.core.commandLine.lastCommand[0]);
+      this.actionInput();
+    } else {
+      this.core.scene.reset();
+    }
+  }
+
+  onLeftClick() {
+    if (this.core.scene.activeCommand === undefined) {
+      this.core.scene.selection.singleSelect();
+    } else {
+      if (this.core.scene.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted) {
+        const point = this.core.mouse.pointOnScene();
+        this.sceneControl(point);
+      }
+
+      if (this.core.scene.activeCommand instanceof Tool && !this.core.scene.selection.selectionAccepted) {
+        this.core.scene.selection.singleSelect();
+        // if there is a selection, pass it to the activeCommand
+        if (this.core.scene.selection.selectionSet.length) {
+          // remove any previous selectionSets from inputArray
+          // TODO: this is horrible. Do better.
+          if (!this.core.scene.inputArray.some((element) => Array.isArray(element))) {
+            // TODO: Why add the selectionSet to the inputArray?
+            this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
+          }
+          this.actionInput();
+        }
+      }
+    }
+  }
+
+  parseInput(input) {
+    let inputData;
 
     const isNumber = /^-?\d+\.\d+$/.test(input) || /^-?\d+$/.test(input);
     const isLetters = /^[A-Za-z ]+$/.test(input);
     const isPoint = /^\d+,\d+$/.test(input) || /^@-?\d+,-?\d+$/.test(input) || /^#-?\d+,-?\d+$/.test(input);
     const isUndefined = (input === undefined);
-
-    if (action === 'Reset') {
-      this.core.scene.reset();
-      return;
-    }
-
-    if (action === 'Enter' && isUndefined) {
-      if (this.core.scene.activeCommand !== undefined && this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length) {
-        this.core.scene.selection.selectionAccepted = true;
-        inputData = true;
-      } else if (this.core.scene.activeCommand !== undefined) {
-        this.core.scene.reset();
-        return;
-      } else if (this.core.scene.activeCommand == undefined) {
-        this.initialiseItem(this.core.commandLine.lastCommand[0]);
-      }
-    }
 
     if (isPoint) {
       const isRelative = input.includes('@');
@@ -54,37 +95,19 @@ export class DesignEngine {
       point.x = parseFloat(xyData[0]);
       point.y = parseFloat(xyData[1]);
 
-      if (isRelative && points.length) {
-        point.x = parseFloat(points[points.length - 1].x + point.x);
-        point.y = parseFloat(points[points.length - 1].y + point.y);
+      if (isRelative && this.core.scene.points.length) {
+        point.x = parseFloat(this.core.scene.points.at(-1).x + point.x);
+        point.y = parseFloat(this.core.scene.points.at(-1).y + point.y);
       }
 
       inputData = point;
-      // TODO: scene.points should be private
-      this.core.scene.points.push(point);
-      this.core.canvas.requestPaint();
-    }
-
-    if (action === 'LeftClick') {
-      if (this.core.scene.activeCommand === undefined) {
-        this.core.scene.selection.singleSelect();
-      } else {
-        const point = this.core.mouse.pointOnScene();
-        inputData = point;
-
-        if (this.core.scene.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted) {
-          this.core.scene.points.push(inputData);
-        }
-
-        if (this.core.scene.activeCommand instanceof Tool && !this.core.scene.selection.selectionAccepted) {
-          this.core.scene.selection.singleSelect();
-        }
-      }
     }
 
     if (isNumber) {
       const point = this.convertInputToPoint(Number(input));
       inputData = Number(input);
+      // TODO: parseInput should return the parsed value only
+      // don't add points to the scene here
       this.core.scene.points.push(point);
     }
 
@@ -92,53 +115,42 @@ export class DesignEngine {
       inputData = String(input);
     }
 
-    // /////////////////////////////////////////////////////////////////////
-    // //////////////////// handle the new inputData //////////////////////
-    // ///////////////////////////////////////////////////////////////////
+    return inputData;
+  }
 
-    if (typeof this.core.scene.activeCommand !== 'undefined') {
-      this.core.scene.inputArray.push(inputData);
-      this.actionInput();
-    } else if (this.core.commandManager.isCommandOrShortcut(input)) {
-      this.initialiseItem(this.core.commandManager.getCommand(input));
-
-      if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
-        if (this.core.scene.activeCommand.selectionRequired) {
-          this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
-          this.core.scene.inputArray.push(true);
-        }
-        this.core.scene.selection.selectionAccepted = true;
-      }
-      this.actionInput();
+  sceneControl(input) {
+    // if the input is a point add it to the scene points
+    if (input instanceof Point) {
+      this.core.scene.points.push(input);
+      this.core.canvas.requestPaint();
     }
 
-    // /////////////////////////////////////////////////////////////////////
-    // //////////////////// handle the new inputData //////////////////////
-    // ///////////////////////////////////////////////////////////////////
+    // if there is an active command, pass the input to the command
+    if (typeof this.core.scene.activeCommand !== 'undefined') {
+      this.core.scene.inputArray.push(input);
+      this.actionInput();
+    }
   }
 
   actionInput() {
-    // promptData: {promptInput, resetBool, actionBool, validInput}
     const promptData = this.core.scene.activeCommand.prompt(this.core);
-    // TODO: Add the active command to the prompt value e.g. Line: promptInput
-    // i.e. this.core.scene.activeCommand.type + ': ' + promptData.promptInput;
-    this.core.commandLine.setPrompt(promptData.promptInput);
-
+    this.core.commandLine.setPrompt(`${this.core.scene.activeCommand.type} - ${promptData.promptInput}`);
 
     if (!promptData.validInput) {
-      // notify('Invalid Input');
+      this.core.notify(Strings.Error.INPUT);
     }
 
     if (promptData.actionBool) {
       if (this.core.scene.activeCommand instanceof Tool) {
         this.core.scene.activeCommand.action(this.core);
       } else {
+        // TODO: sort this jank
         this.core.scene.addToScene(null, null, promptData.resetBool);
       }
     }
 
     if (promptData.resetBool) {
-      this.core.scene.reset();
+      this.reset();
     }
   }
 
@@ -151,12 +163,9 @@ export class DesignEngine {
   };
 
   convertInputToPoint(input) {
-    const point = new Point();
-    const x = input * Math.cos(Utils.degrees2radians(this.core.mouse.inputAngle()));
-    const y = input * Math.sin(Utils.degrees2radians(this.core.mouse.inputAngle()));
-    // generate data from the prevous point and the radius
-    point.x = this.core.scene.points[this.core.scene.points.length - 1].x + x;
-    point.y = this.core.scene.points[this.core.scene.points.length - 1].y + y;
+    const basePoint = this.core.scene.points.at(-1);
+    const angle = Utils.degrees2radians(this.core.mouse.inputAngle());
+    const point = basePoint.project( angle, input);
 
     return point;
   }
