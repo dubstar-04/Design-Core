@@ -21,7 +21,8 @@ export class DesignEngine {
         this.actionInput();
       }
     } else {
-      this.sceneControl(input);
+      const inputData = this.parseInput(input);
+      this.sceneControl(inputData);
     }
   }
 
@@ -66,11 +67,6 @@ export class DesignEngine {
   }
 
   parseInput(input) {
-    // if we have a valid point return
-    if (input instanceof Point) {
-      return input;
-    }
-
     let inputData;
 
     const isNumber = /^-?\d+\.\d+$/.test(input) || /^-?\d+$/.test(input);
@@ -115,17 +111,15 @@ export class DesignEngine {
   }
 
   sceneControl(input) {
-    // const input = data[0];
-    const inputData = this.parseInput(input);
-
-    if (inputData instanceof Point) {
-      this.core.scene.points.push(inputData);
+    // if the input is a point add it to the scene points
+    if (input instanceof Point) {
+      this.core.scene.points.push(input);
       this.core.canvas.requestPaint();
     }
 
-
+    // if there is an active command, pass the input to the command
     if (typeof this.core.scene.activeCommand !== 'undefined') {
-      this.core.scene.inputArray.push(inputData);
+      this.core.scene.inputArray.push(input);
       this.actionInput();
     }
   }
