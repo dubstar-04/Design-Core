@@ -60,8 +60,12 @@ export class DesignEngine {
 
       if (this.core.scene.activeCommand instanceof Tool && !this.core.scene.selection.selectionAccepted) {
         this.core.scene.selection.singleSelect();
-        this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
-        this.actionInput();
+        // if there is a selection, pass it to the activeCommand
+        if (this.core.scene.selection.selectionSet.length) {
+            this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
+          }
+          this.actionInput();
+        }
       }
     }
   }
