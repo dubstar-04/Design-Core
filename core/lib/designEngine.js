@@ -133,10 +133,7 @@ export class DesignEngine {
   actionInput() {
     // promptData: {promptInput, resetBool, actionBool, validInput}
     const promptData = this.core.scene.activeCommand.prompt(this.core);
-    // TODO: Add the active command to the prompt value e.g. Line: promptInput
-    // i.e. this.core.scene.activeCommand.type + ': ' + promptData.promptInput;
-    this.core.commandLine.setPrompt(promptData.promptInput);
-
+    this.core.commandLine.setPrompt(`${this.core.scene.activeCommand.type} - ${promptData.promptInput}`);
 
     if (!promptData.validInput) {
       this.core.notify(Strings.Error.INPUT);
