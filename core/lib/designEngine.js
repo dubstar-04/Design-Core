@@ -131,7 +131,6 @@ export class DesignEngine {
   }
 
   actionInput() {
-    // promptData: {promptInput, resetBool, actionBool, validInput}
     const promptData = this.core.scene.activeCommand.prompt(this.core);
     this.core.commandLine.setPrompt(`${this.core.scene.activeCommand.type} - ${promptData.promptInput}`);
 
