@@ -14,15 +14,11 @@ export class DesignEngine {
   }
 
   onCommand(input) {
-    if (this.core.scene.activeCommand === undefined) {
-      if (this.core.commandManager.isCommand(input) || this.core.commandManager.isShortcut(input)) {
-        this.initialiseItem(this.core.commandManager.getCommand(input));
-        this.acceptPreselection();
-        this.actionInput();
-      }
-    } else {
-      const inputData = this.parseInput(input);
-      this.sceneControl(inputData);
+    if (this.core.scene.activeCommand !== undefined) {
+      this.actionInput(input);
+    } else if (this.core.commandManager.isCommand(input) || this.core.commandManager.isShortcut(input)) {
+      this.initialiseItem(this.core.commandManager.getCommand(input));
+      this.acceptPreselection();
     }
   }
 
