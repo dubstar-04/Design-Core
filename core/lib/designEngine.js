@@ -25,14 +25,20 @@ export class DesignEngine {
   acceptPreselection() {
     if (this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
       this.core.scene.selection.selectionAccepted = true;
+      this.core.scene.inputTracker++;
+      this.core.scene.inputTracker++;
+      this.actionInput(new SelectionAccepted());
+    } else {
+      // initial action - first call to actionInput for this command
+      this.actionInput(new Initialise());
     }
   }
 
   onEnterPressed() {
     if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length) {
       this.core.scene.selection.selectionAccepted = true;
-      this.core.scene.inputArray.push(true);
-      this.actionInput();
+      this.core.scene.inputTracker++;
+      this.actionInput(new SelectionAccepted());
     } else if (this.core.scene.activeCommand === undefined) {
       this.initialiseItem(this.core.commandLine.lastCommand[0]);
       this.actionInput();
