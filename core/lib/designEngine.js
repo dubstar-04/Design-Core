@@ -46,8 +46,7 @@ export class DesignEngine {
       this.core.scene.selection.singleSelect();
     } else {
       if (this.core.scene.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted) {
-        const point = this.core.mouse.pointOnScene();
-        this.sceneControl(point);
+        this.actionInput(point);
       }
 
       if (this.core.scene.activeCommand instanceof Tool && !this.core.scene.selection.selectionAccepted) {
@@ -60,22 +59,8 @@ export class DesignEngine {
     }
   }
 
-  sceneControl(input) {
-    // if the input is a point add it to the scene points
-    if (input instanceof Point) {
-      this.core.scene.points.push(input);
-      this.core.canvas.requestPaint();
-    }
-
-    // if there is an active command, pass the input to the command
-    if (typeof this.core.scene.activeCommand !== 'undefined') {
-      this.core.scene.inputArray.push(input);
-      this.actionInput();
-    }
-  }
-
-  actionInput() {
-    const promptData = this.core.scene.activeCommand.prompt(this.core);
+  actionInput(input = undefined) {
+    const promptData = this.prompt(input);
     this.core.commandLine.setPrompt(`${this.core.scene.activeCommand.type} - ${promptData.promptInput}`);
 
     if (!promptData.validInput) {
