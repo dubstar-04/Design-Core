@@ -4,6 +4,11 @@ import {Tool} from '../tools/tool.js';
 import {Strings} from './strings.js';
 import {Utils} from './utils.js';
 
+
+class CanvasSelection {}
+class SelectionAccepted {}
+class Initialise {}
+
 export class DesignEngine {
   constructor(core) {
     this.core = core;
