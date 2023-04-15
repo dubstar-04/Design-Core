@@ -4,8 +4,8 @@ import {Lwpolyline} from '../entities/lwpolyline.js';
 import {Circle} from '../entities/circle.js';
 import {Arc} from '../entities/arc.js';
 import {Rectangle} from '../entities/rectangle.js';
-import {Ellipse} from '../entities/ellipse.js';
-import {Spline} from '../entities/spline.js';
+// import {Ellipse} from '../entities/ellipse.js';
+// import {Spline} from '../entities/spline.js';
 import {Text} from '../entities/text.js';
 // import {Dimension} from '../entities/dimension.js';
 import {Block} from '../entities/block.js';
@@ -37,8 +37,8 @@ const classes = {
   Circle,
   Arc,
   Rectangle,
-  Ellipse,
-  Spline,
+  // Ellipse,
+  // Spline,
   Text,
   // Dimension,
   Block,
