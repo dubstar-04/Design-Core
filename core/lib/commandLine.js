@@ -1,3 +1,5 @@
+import {Point} from '../entities/point.js';
+
 export class CommandLine {
   /**
    * Commandline Constructor
@@ -169,10 +171,54 @@ export class CommandLine {
     if (this.cmdLine.length > this.prompt.length) {
       // get the inputprompt and remove the prompt text
       const inputCommand = this.cmdLine.slice(this.prompt.length);
-      this.core.designEngine.onCommand(inputCommand);
+      this.core.designEngine.onCommand(this.parseInput(inputCommand));
     } else {
       this.core.designEngine.onEnterPressed();
     }
+  }
+
+  /**
+   * Converts input to a type
+   * @param {string} input
+   */
+  parseInput(input) {
+    let inputData;
+
+    const isNumber = /^-?\d+\.\d+$/.test(input) || /^-?\d+$/.test(input);
+    const isLetters = /^[A-Za-z ]+$/.test(input);
+    const isPoint = /^\d+,\d+$/.test(input) || /^@-?\d+,-?\d+$/.test(input) || /^#-?\d+,-?\d+$/.test(input);
+    const isUndefined = (input === undefined);
+
+    if (isPoint) {
+      const isRelative = input.includes('@');
+      const isAbsolute = input.includes('#');
+
+      if (isAbsolute || isRelative) {
+        input = input.replace('@', '').replace('#', '');
+      }
+
+      const xyData = input.split(',');
+      const point = new Point();
+      point.x = parseFloat(xyData[0]);
+      point.y = parseFloat(xyData[1]);
+
+      if (isRelative && this.core.scene.points.length) {
+        point.x = parseFloat(this.core.scene.points.at(-1).x + point.x);
+        point.y = parseFloat(this.core.scene.points.at(-1).y + point.y);
+      }
+
+      inputData = point;
+    }
+
+    if (isNumber) {
+      inputData = Number(input);
+    }
+
+    if (isLetters && !isUndefined) {
+      inputData = String(input);
+    }
+
+    return inputData;
   }
 
   /**

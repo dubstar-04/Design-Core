@@ -74,50 +74,6 @@ export class DesignEngine {
     }
   }
 
-  parseInput(input) {
-    let inputData;
-
-    const isNumber = /^-?\d+\.\d+$/.test(input) || /^-?\d+$/.test(input);
-    const isLetters = /^[A-Za-z ]+$/.test(input);
-    const isPoint = /^\d+,\d+$/.test(input) || /^@-?\d+,-?\d+$/.test(input) || /^#-?\d+,-?\d+$/.test(input);
-    const isUndefined = (input === undefined);
-
-    if (isPoint) {
-      const isRelative = input.includes('@');
-      const isAbsolute = input.includes('#');
-
-      if (isAbsolute || isRelative) {
-        input = input.replace('@', '').replace('#', '');
-      }
-
-      const xyData = input.split(',');
-      const point = new Point();
-      point.x = parseFloat(xyData[0]);
-      point.y = parseFloat(xyData[1]);
-
-      if (isRelative && this.core.scene.points.length) {
-        point.x = parseFloat(this.core.scene.points.at(-1).x + point.x);
-        point.y = parseFloat(this.core.scene.points.at(-1).y + point.y);
-      }
-
-      inputData = point;
-    }
-
-    if (isNumber) {
-      const point = this.convertInputToPoint(Number(input));
-      inputData = Number(input);
-      // TODO: parseInput should return the parsed value only
-      // don't add points to the scene here
-      this.core.scene.points.push(point);
-    }
-
-    if (isLetters && !isUndefined) {
-      inputData = String(input);
-    }
-
-    return inputData;
-  }
-
   sceneControl(input) {
     // if the input is a point add it to the scene points
     if (input instanceof Point) {
