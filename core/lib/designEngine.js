@@ -27,11 +27,7 @@ export class DesignEngine {
   }
 
   acceptPreselection() {
-    if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
-      if (this.core.scene.activeCommand.selectionRequired) {
-        this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
-        this.core.scene.inputArray.push(true);
-      }
+    if (this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
       this.core.scene.selection.selectionAccepted = true;
     }
   }
@@ -62,13 +58,7 @@ export class DesignEngine {
         this.core.scene.selection.singleSelect();
         // if there is a selection, pass it to the activeCommand
         if (this.core.scene.selection.selectionSet.length) {
-          // remove any previous selectionSets from inputArray
-          // TODO: this is horrible. Do better.
-          if (!this.core.scene.inputArray.some((element) => Array.isArray(element))) {
-            // TODO: Why add the selectionSet to the inputArray?
-            this.core.scene.inputArray.push(this.core.scene.selection.selectionSet);
-          }
-          this.actionInput();
+          this.actionInput(new CanvasSelection());
         }
       }
     }
