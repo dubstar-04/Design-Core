@@ -125,4 +125,35 @@ export class DesignEngine {
 
     return point;
   }
+
+  prompt(input) {
+    const num = this.core.scene.inputTracker;
+    let inputType = 'undefined';
+
+    // get the input type
+    if (input !== undefined) {
+      inputType = (input).constructor.name;
+    }
+
+    // call the subclass
+    const data = this.core.scene.activeCommand.processInput(num, input, inputType);
+    const validInput = data.expectedType.includes(inputType);
+
+    if (validInput) {
+      if (inputType !== 'CanvasSelection') {
+        this.core.scene.inputTracker++;
+      }
+
+      if (inputType === 'Number' && data.expectedType.includes('Point')) {
+        input = this.convertInputToPoint(input);
+      }
+
+      if (input instanceof Point) {
+        this.core.scene.inputData.points.push(input);
+        this.core.scene.points.push(input);
+      }
+    }
+
+    return {promptInput: data.prompt, resetBool: data.reset, actionBool: data.action, validInput: validInput};
+  }
 }
