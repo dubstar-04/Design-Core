@@ -45,6 +45,7 @@ export class DesignEngine {
     if (this.core.scene.activeCommand === undefined) {
       this.core.scene.selection.singleSelect();
     } else {
+      const point = this.core.mouse.pointOnScene();
       if (this.core.scene.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted) {
         this.actionInput(point);
       }
