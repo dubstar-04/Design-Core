@@ -6,7 +6,7 @@ import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 import {Entity} from '../entities/entity.js';
 import {Tool} from '../tools/tool.js';
-
+import {InputManager} from './inputManager.js';
 
 export class Scene {
   constructor(core) {
@@ -19,6 +19,7 @@ export class Scene {
     this.selection = new Selection(core);
     this.saved = false;
     this.snapping = new Snapping();
+    this.inputManager = new InputManager(core);
   }
 
   reset() {
@@ -141,12 +142,12 @@ export class Scene {
   mouseDown(button) {
     switch (button) {
       case 0: // left button
-        this.core.inputManager.onLeftClick();
+        this.inputManager.onLeftClick();
         break;
       case 1: // middle button
         break;
       case 2: // right button
-        this.core.inputManager.onEnterPressed();
+        this.inputManager.onEnterPressed();
         break;
     }
   };
@@ -203,7 +204,7 @@ export class Scene {
       // add the mouse position to temp points
       this.tempPoints.push(this.core.mouse.pointOnScene());
 
-      if (this.core.inputManager.activeCommand !== undefined && this.core.inputManager.activeCommand.showHelperGeometry) {
+      if (this.inputManager.activeCommand !== undefined && this.inputManager.activeCommand.showHelperGeometry) {
         // Make a new array of points with the base point and the current mouse position.
         const helperPoints = [];
         helperPoints.push(this.tempPoints[0]);
@@ -212,13 +213,13 @@ export class Scene {
         this.addHelperGeometry('Line', helperPoints, this.core.settings.helpergeometrycolour.toString());
       }
 
-      if (this.core.inputManager.activeCommand !== undefined && this.core.inputManager.activeCommand instanceof Entity && this.tempPoints.length >= this.core.inputManager.activeCommand.minPoints) {
-        this.addHelperGeometry(this.core.inputManager.activeCommand.type, this.tempPoints, this.core.settings.helpergeometrycolour.toString());
+      if (this.inputManager.activeCommand !== undefined && this.inputManager.activeCommand instanceof Entity && this.tempPoints.length >= this.inputManager.activeCommand.minPoints) {
+        this.addHelperGeometry(this.inputManager.activeCommand.type, this.tempPoints, this.core.settings.helpergeometrycolour.toString());
         this.core.canvas.requestPaint(); // TODO: Improve requests to paint as it is called too often.
       }
 
-      if (this.core.inputManager.activeCommand !== undefined && this.core.inputManager.activeCommand instanceof Tool && this.selection.selectionAccepted) {
-        this.core.inputManager.activeCommand.preview(this.core);
+      if (this.inputManager.activeCommand !== undefined && this.inputManager.activeCommand instanceof Tool && this.selection.selectionAccepted) {
+        this.inputManager.activeCommand.preview(this.core);
         this.core.canvas.requestPaint();
       }
     }
