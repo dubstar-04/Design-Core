@@ -183,11 +183,9 @@ export class CommandLine {
    */
   parseInput(input) {
     let inputData;
+    const isNumber = /^\-?\d+\.?\d+?$/.test(input);
+    const isPoint = /^\-?\d+\.?\d+?,\-?\d+\.?\d+?$/.test(input.replace(/@|#/gi, ''));
 
-    const isNumber = /^-?\d+\.\d+$/.test(input) || /^-?\d+$/.test(input);
-    const isLetters = /^[A-Za-z ]+$/.test(input);
-    const isPoint = /^\d+,\d+$/.test(input) || /^@-?\d+,-?\d+$/.test(input) || /^#-?\d+,-?\d+$/.test(input);
-    const isUndefined = (input === undefined);
 
     if (isPoint) {
       const isRelative = input.includes('@');
