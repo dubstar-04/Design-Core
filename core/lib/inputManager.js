@@ -8,7 +8,7 @@ class CanvasSelection {}
 class SelectionAccepted {}
 // class Initialise {}
 
-export class DesignEngine {
+export class InputManager {
   constructor(core) {
     this.core = core;
     this.inputTracker = 0;

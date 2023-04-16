@@ -1,6 +1,6 @@
 import {Scene} from './lib/scene.js';
 import {CommandManager} from './lib/commandManager.js';
-import {DesignEngine} from './lib/designEngine.js';
+import {InputManager} from './lib/inputManager.js';
 import {Mouse} from './lib/mouse.js';
 import {Canvas} from './lib/canvas.js';
 import {CommandLine} from './lib/commandLine.js';
@@ -19,7 +19,7 @@ export class Core {
     this.scene = new Scene(this);
     this.commandManager = new CommandManager(this);
     this.canvas = new Canvas(this);
-    this.designEngine = new DesignEngine(this);
+    this.inputManager = new InputManager(this);
 
     this.mouse = new Mouse(this);
     this.commandLine = new CommandLine(this);
