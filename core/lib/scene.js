@@ -16,9 +16,7 @@ export class Scene {
     this.points = []; // Temporary Array to store the input points
     this.tempItems = []; // Temporary Array to store items while input is being gathered
     this.tempPoints = []; // Temporary Array to store points while input is being gathered
-
     this.selection = new Selection(core);
-
     this.saved = false;
     this.snapping = new Snapping();
   }
@@ -27,7 +25,6 @@ export class Scene {
     this.points = []; // clear array
     this.tempItems = [];
     this.selection.reset();
-
     this.core.commandLine.resetPrompt();
     this.snapping.active = false;
     this.core.canvas.requestPaint();
