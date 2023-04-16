@@ -191,7 +191,7 @@ export class CommandLine {
       const isAbsolute = input.includes('#');
 
       if (isAbsolute || isRelative) {
-        input = input.replace('@', '').replace('#', '');
+        input = input.replace(/@|#/gi, '');
       }
 
       const xyData = input.split(',');
