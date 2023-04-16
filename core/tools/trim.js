@@ -19,8 +19,6 @@ export class Trim extends Tool {
     const expectedType = [];
     const prompt = [];
 
-    log(num, inputType);
-
     const selection = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
     const noSelection = Strings.Input.BOUNDARY;
 
