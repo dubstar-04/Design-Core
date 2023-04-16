@@ -91,7 +91,7 @@ export class DesignEngine {
     this.core.commandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
   }
 
-  actionCommand(reset) {
+  actionCommand() {
     if (this.activeCommand instanceof Tool) {
       this.activeCommand.action(this.core);
     } else {
@@ -107,7 +107,7 @@ export class DesignEngine {
         Object.assign(data, this.inputData);
       }
 
-      this.core.scene.addToScene(this.activeCommand.type, data, reset);
+      this.core.scene.addToScene(this.activeCommand.type, data);
     }
   }
 
@@ -164,7 +164,7 @@ export class DesignEngine {
     this.setPrompt(data.prompt[this.inputTracker]);
 
     if (data.action) {
-      this.actionCommand(data.reset);
+      this.actionCommand();
     }
 
     if (data.reset) {

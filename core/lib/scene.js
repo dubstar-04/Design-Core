@@ -63,7 +63,7 @@ export class Scene {
     this.saved = false; // Changes have occured. A save may be required.
   }
 
-  addToScene(type, data, end, index) {
+  addToScene(type, data, index) {
     if (!data) {
       throw Error('Input data missing');
     }
@@ -83,9 +83,6 @@ export class Scene {
     } else {
       // replace item at index
       this.items.splice(index, 1, item);
-    }
-    if (end) {
-      this.reset();
     }
   }
 
