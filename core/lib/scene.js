@@ -68,33 +68,17 @@ export class Scene {
 
   addToScene(type, data, end, index) {
     if (!data) {
-      const colour = 'BYLAYER';
-      data = {
-        points: this.points,
-        colour: colour,
-        layer: this.core.layerManager.getCLayer(),
-        // input: this.inputArray,
-      };
-      if (this.inputData.points.length) {
-      // merge the input data into the data
-        Object.assign(data, this.inputData);
-      }
+      throw Error('Input data missing');
     }
 
-    let item;
-    if (this.activeCommand && this.activeCommand instanceof Entity && !type) {
-      // TODO: find a way to create a new type without window
-      item = this.core.commandManager.createNew(this.activeCommand.type, data);
-    } else {
-      // check type is a valid command
-      if (!this.core.commandManager.isCommand(type)) {
-        Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
-        this.reset();
-        return;
-      }
-      // Create a new item, send it the points array
-      item = this.core.commandManager.createNew(type, data);
+    // check type is a valid command
+    if (!this.core.commandManager.isCommand(type)) {
+      Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
+      this.reset();
+      return;
     }
+    // Create a new item, send it the points array
+    const item = this.core.commandManager.createNew(type, data);
 
     if (typeof index === 'undefined') {
       // add to end of array
