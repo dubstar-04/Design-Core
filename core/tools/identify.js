@@ -5,6 +5,7 @@ export class Identify extends Tool {
   constructor() {
     super();
     this.selectionRequired = false;
+    this.minPoints = 1;
   }
 
   static register() {
@@ -12,34 +13,19 @@ export class Identify extends Tool {
     return command;
   }
 
-  prompt(core) {
-    const num = core.scene.inputArray.length;
+  processInput(num, input, inputType, core) {
     const expectedType = [];
-    let reset = false;
-    let action = false;
     const prompt = [];
 
-    expectedType[0] = ['undefined'];
-    prompt[0] = Strings.Input.POINT;
+    prompt[1] = Strings.Input.START;
+    expectedType[1] = ['Point'];
 
-    expectedType[1] = ['object'];
-    prompt[1] = '';
-
-    const validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
-
-    if (!validInput) {
-      core.scene.inputArray.pop();
-    } else if (core.scene.inputArray.length === 1) {
-      action = true;
-      reset = true;
-    }
-
-    return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
+    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: (num === prompt.length - 1)};
   }
 
   action(core) {
-    const x = core.scene.points[0].x.toFixed(1);
-    const y = core.scene.points[0].y.toFixed(1);
+    const x = core.scene.points.at(-1).x.toFixed(1);
+    const y = core.scene.points.at(-1).y.toFixed(1);
     const id = (`X:${x} Y:${y}`);
     core.notify(id);
   }
