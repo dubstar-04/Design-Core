@@ -185,6 +185,7 @@ export class CommandLine {
     const isNumber = /^\-?\d+\.?\d+?$/.test(input);
     const isPoint = /^\-?\d+\.?\d+?,\-?\d+\.?\d+?$/.test(input.replace(/@|#/gi, ''));
 
+    // TODO: Handle angular input
 
     if (isPoint) {
       const isRelative = input.includes('@');
