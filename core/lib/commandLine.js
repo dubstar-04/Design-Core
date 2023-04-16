@@ -182,7 +182,6 @@ export class CommandLine {
    * @param {string} input
    */
   parseInput(input) {
-    let inputData;
     const isNumber = /^\-?\d+\.?\d+?$/.test(input);
     const isPoint = /^\-?\d+\.?\d+?,\-?\d+\.?\d+?$/.test(input.replace(/@|#/gi, ''));
 
@@ -205,18 +204,14 @@ export class CommandLine {
         point.y = parseFloat(this.core.scene.points.at(-1).y + point.y);
       }
 
-      inputData = point;
+      return point;
     }
 
     if (isNumber) {
-      inputData = Number(input);
+      return Number(input);
     }
 
-    if (isLetters && !isUndefined) {
-      inputData = String(input);
-    }
-
-    return inputData;
+    return String(input);
   }
 
   /**
