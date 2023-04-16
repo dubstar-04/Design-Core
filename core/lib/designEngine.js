@@ -4,10 +4,9 @@ import {Tool} from '../tools/tool.js';
 import {Strings} from './strings.js';
 import {Utils} from './utils.js';
 
-
 class CanvasSelection {}
 class SelectionAccepted {}
-class Initialise {}
+// class Initialise {}
 
 export class DesignEngine {
   constructor(core) {
@@ -28,21 +27,19 @@ export class DesignEngine {
   }
 
   acceptPreselection() {
-    if (this.core.scene.selection.selectionSet.length || this.core.scene.activeCommand.selectionRequired === false) {
+    if (this.core.scene.selection.selectionSet.length && this.core.scene.activeCommand.selectionRequired) {
       this.core.scene.selection.selectionAccepted = true;
-      this.core.scene.inputTracker++;
       this.core.scene.inputTracker++;
       this.actionInput(new SelectionAccepted());
     } else {
       // initial action - first call to actionInput for this command
-      this.actionInput(new Initialise());
+      this.actionInput();
     }
   }
 
   onEnterPressed() {
     if (this.core.scene.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length) {
       this.core.scene.selection.selectionAccepted = true;
-      this.core.scene.inputTracker++;
       this.actionInput(new SelectionAccepted());
     } else if (this.core.scene.activeCommand === undefined) {
       this.initialiseItem(this.core.commandLine.lastCommand[0]);
@@ -56,44 +53,19 @@ export class DesignEngine {
     if (this.core.scene.activeCommand === undefined) {
       this.core.scene.selection.singleSelect();
     } else {
-      const point = this.core.mouse.pointOnScene();
-      if (this.core.scene.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted) {
+      if (this.core.scene.activeCommand instanceof Tool && this.core.scene.activeCommand.selectionRequired && !this.core.scene.selection.selectionAccepted) {
+        this.core.scene.selection.singleSelect();
+        this.actionInput(new CanvasSelection());
+      } else if (this.core.scene.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted || !this.core.scene.activeCommand.selectionRequired) {
+        const point = this.core.mouse.pointOnScene();
         this.actionInput(point);
       }
-
-      if (this.core.scene.activeCommand instanceof Tool && !this.core.scene.selection.selectionAccepted) {
-        this.core.scene.selection.singleSelect();
-        // if there is a selection, pass it to the activeCommand
-        if (this.core.scene.selection.selectionSet.length) {
-          this.actionInput(new CanvasSelection());
-        }
-      }
-    }
-  }
-
-  actionInput(input = undefined) {
-    const promptData = this.prompt(input);
-    this.core.commandLine.setPrompt(`${this.core.scene.activeCommand.type} - ${promptData.promptInput}`);
-
-    if (!promptData.validInput) {
-      this.core.notify(Strings.Error.INPUT);
-    }
-
-    if (promptData.actionBool) {
-      if (this.core.scene.activeCommand instanceof Tool) {
-        this.core.scene.activeCommand.action(this.core);
-      } else {
-        // TODO: sort this jank
-        this.core.scene.addToScene(null, null, promptData.resetBool);
-      }
-    }
-
-    if (promptData.resetBool) {
-      this.reset();
     }
   }
 
   initialiseItem(command) {
+    // exit any previous commands
+    // this.reset();
     this.core.scene.saveRequired();
     // add the command to the commandline history
     this.core.commandLine.addToCommandHistory(command);
@@ -109,7 +81,20 @@ export class DesignEngine {
     return point;
   }
 
-  prompt(input) {
+  setPrompt(prompt) {
+    this.core.commandLine.setPrompt(`${this.core.scene.activeCommand.type} - ${prompt}`);
+  }
+
+  actionCommand(reset) {
+    if (this.core.scene.activeCommand instanceof Tool) {
+      this.core.scene.activeCommand.action(this.core);
+    } else {
+      // TODO: sort this jank
+      this.core.scene.addToScene(null, null, reset);
+    }
+  }
+
+  actionInput(input) {
     const num = this.core.scene.inputTracker;
     let inputType = 'undefined';
 
@@ -119,15 +104,20 @@ export class DesignEngine {
     }
 
     // call the subclass
-    const data = this.core.scene.activeCommand.processInput(num, input, inputType);
-    const validInput = data.expectedType.includes(inputType);
+    const data = this.core.scene.activeCommand.processInput(num, input, inputType, this.core);
+
+    let validInput = false;
+    // TODO: use index 0 for actual data
+    // no valid type required for index 0
+    validInput = num ? data.expectedType[num].includes(inputType) : true;
 
     if (validInput) {
       if (inputType !== 'CanvasSelection') {
         this.core.scene.inputTracker++;
+        this.core.scene.inputTracker = Math.min(this.core.scene.inputTracker, data.prompt.length - 1);
       }
 
-      if (inputType === 'Number' && data.expectedType.includes('Point')) {
+      if (inputType === 'Number' && data.expectedType[num].includes('Point')) {
         input = this.convertInputToPoint(input);
       }
 
@@ -135,13 +125,33 @@ export class DesignEngine {
         this.core.scene.inputData.points.push(input);
         this.core.scene.points.push(input);
       }
+    } else {
+      this.core.notify(Strings.Error.INPUT);
     }
 
-    return {promptInput: data.prompt, resetBool: data.reset, actionBool: data.action, validInput: validInput};
     if (data.expectedType[this.core.scene.inputTracker].includes('Point') && this.core.scene.activeCommand.minPoints) {
       this.core.scene.snapping.active = true;
     } else {
       this.core.scene.snapping.active = false;
+    }
+
+    // validate the action state
+    if (data.action) {
+      if (this.core.scene.inputData.points.length < this.core.scene.activeCommand.minPoints) {
+        const msg = `Invalid Data for command: ${this.core.scene.activeCommand.constructor.name}`;
+        this.core.notify(msg);
+        throw Error(msg);
+      }
+    }
+
+    this.setPrompt(data.prompt[this.core.scene.inputTracker]);
+
+    if (data.action) {
+      this.actionCommand(data.reset);
+    }
+
+    if (data.reset) {
+      this.reset();
     }
   }
 }
