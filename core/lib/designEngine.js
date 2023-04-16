@@ -11,10 +11,12 @@ class SelectionAccepted {}
 export class DesignEngine {
   constructor(core) {
     this.core = core;
+    this.inputTracker = 0;
   }
 
   reset() {
     this.core.scene.reset();
+    this.inputTracker = 0;
   }
 
   onCommand(input) {
@@ -29,7 +31,7 @@ export class DesignEngine {
   acceptPreselection() {
     if (this.core.scene.selection.selectionSet.length && this.core.scene.activeCommand.selectionRequired) {
       this.core.scene.selection.selectionAccepted = true;
-      this.core.scene.inputTracker++;
+      this.inputTracker++;
       this.actionInput(new SelectionAccepted());
     } else {
       // initial action - first call to actionInput for this command
@@ -95,7 +97,7 @@ export class DesignEngine {
   }
 
   actionInput(input) {
-    const num = this.core.scene.inputTracker;
+    const num = this.inputTracker;
     let inputType = 'undefined';
 
     // get the input type
@@ -113,8 +115,8 @@ export class DesignEngine {
 
     if (validInput) {
       if (inputType !== 'CanvasSelection') {
-        this.core.scene.inputTracker++;
-        this.core.scene.inputTracker = Math.min(this.core.scene.inputTracker, data.prompt.length - 1);
+        this.inputTracker++;
+        this.inputTracker = Math.min(this.inputTracker, data.prompt.length - 1);
       }
 
       if (inputType === 'Number' && data.expectedType[num].includes('Point')) {
@@ -129,7 +131,7 @@ export class DesignEngine {
       this.core.notify(Strings.Error.INPUT);
     }
 
-    if (data.expectedType[this.core.scene.inputTracker].includes('Point') && this.core.scene.activeCommand.minPoints) {
+    if (data.expectedType[this.inputTracker].includes('Point') && this.core.scene.activeCommand.minPoints) {
       this.core.scene.snapping.active = true;
     } else {
       this.core.scene.snapping.active = false;
@@ -144,7 +146,7 @@ export class DesignEngine {
       }
     }
 
-    this.setPrompt(data.prompt[this.core.scene.inputTracker]);
+    this.setPrompt(data.prompt[this.inputTracker]);
 
     if (data.action) {
       this.actionCommand(data.reset);
