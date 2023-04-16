@@ -77,8 +77,12 @@ export class Scene {
         points: this.points,
         colour: colour,
         layer: this.core.layerManager.getCLayer(),
-        input: this.inputArray,
+        // input: this.inputArray,
       };
+      if (this.inputData.points.length) {
+      // merge the input data into the data
+        Object.assign(data, this.inputData);
+      }
     }
 
     let item;

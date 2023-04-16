@@ -138,5 +138,10 @@ export class DesignEngine {
     }
 
     return {promptInput: data.prompt, resetBool: data.reset, actionBool: data.action, validInput: validInput};
+    if (data.expectedType[this.core.scene.inputTracker].includes('Point') && this.core.scene.activeCommand.minPoints) {
+      this.core.scene.snapping.active = true;
+    } else {
+      this.core.scene.snapping.active = false;
+    }
   }
 }
