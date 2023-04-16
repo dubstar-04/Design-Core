@@ -27,37 +27,17 @@ export class Line extends Entity {
     return command;
   }
 
-  prompt(core) {
-    const num = core.scene.inputArray.length;
+  processInput(num, input, inputType, core) {
     const expectedType = [];
-    const reset = false;
-    let action = false;
-    let validInput = true;
     const prompt = [];
 
-    expectedType[0] = ['undefined'];
-    prompt[0] = Strings.Input.START;
+    prompt[1] = Strings.Input.START;
+    expectedType[1] = ['Point'];
 
-    expectedType[1] = ['object'];
-    prompt[1] = Strings.Input.POINTORQUIT;
+    prompt[2] = Strings.Input.POINTORQUIT;
+    expectedType[2] = ['Point', 'Number'];
 
-    expectedType[2] = ['object', 'number'];
-    prompt[2] = prompt[1];
-
-    expectedType[3] = ['object', 'number'];
-    prompt[3] = prompt[1];
-
-    validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
-
-    if (!validInput || num > this.minPoints) {
-      core.scene.inputArray.pop();
-    }
-
-    if (core.scene.inputArray.length === this.minPoints) {
-      action = true;
-    }
-
-    return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
+    return {expectedType: expectedType, prompt: prompt, reset: false, action: num >= this.minPoints};
   }
 
   draw(ctx, scale, core, colour) {
