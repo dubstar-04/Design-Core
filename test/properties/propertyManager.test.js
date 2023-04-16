@@ -13,11 +13,11 @@ const data = {
   colour: '#FFFFFF',
 };
 
-core.scene.addToScene('Line', data, false);
-core.scene.addToScene('Circle', data, false);
-core.scene.addToScene('Text', data, false);
+core.scene.addToScene('Line', data);
+core.scene.addToScene('Circle', data);
+core.scene.addToScene('Text', data);
 // Add Arc with a different Colour
-core.scene.addToScene('Arc', {points: [point1, point2], colour: '#000000'}, false);
+core.scene.addToScene('Arc', {points: [point1, point2], colour: '#000000'});
 
 test('Test propertyManager.getItemTypes', () => {
   // Add an item to the selectionSet
