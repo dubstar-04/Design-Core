@@ -12,42 +12,26 @@ export class Rotate extends Tool {
     return command;
   }
 
-  prompt(core) {
-    const num = core.scene.inputArray.length;
+  processInput(num, input, inputType, core) {
     const expectedType = [];
-    let reset = false;
-    let action = false;
     const prompt = [];
 
-    expectedType[0] = ['undefined'];
-    prompt[0] = Strings.Input.SELECTENTITIES;
+    const selection = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
+    const noSelection = Strings.Input.SELECTENTITIES;
 
-    expectedType[1] = ['object'];
-    prompt[1] = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
+    prompt[1] = core.scene.selection.selectionSet.length ? selection : noSelection;
+    expectedType[1] = ['CanvasSelection', 'SelectionAccepted'];
 
-    expectedType[2] = ['boolean'];
     prompt[2] = Strings.Input.BASEPOINT;
+    expectedType[2] = ['Point'];
 
-    expectedType[3] = ['object'];
     prompt[3] = Strings.Input.START;
+    expectedType[3] = ['Point'];
 
-    expectedType[4] = ['object'];
     prompt[4] = Strings.Input.END;
+    expectedType[4] = ['Point'];
 
-    expectedType[5] = ['object'];
-    prompt[5] = '';
-
-    const validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
-
-    if (!validInput) {
-      core.scene.inputArray.pop();
-    }
-    if (core.scene.inputArray.length === 5) {
-      action = true;
-      reset = true;
-    }
-
-    return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
+    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: (num === prompt.length - 1)};
   }
 
   preview(core) {
