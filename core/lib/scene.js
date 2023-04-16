@@ -19,20 +19,16 @@ export class Scene {
 
     this.selection = new Selection(core);
 
-    this.activeCommand = undefined; // Store the name of the active command
-    this.inputArray = []; // Temporary Array to store input values.
     this.saved = false;
     this.snapping = new Snapping();
   }
 
   reset() {
     this.points = []; // clear array
-    this.activeCommand = undefined; // reset the active command
     this.tempItems = [];
     this.selection.reset();
 
     this.core.commandLine.resetPrompt();
-    this.inputArray = [];
     this.snapping.active = false;
     this.core.canvas.requestPaint();
   }
@@ -229,7 +225,7 @@ export class Scene {
       // add the mouse position to temp points
       this.tempPoints.push(this.core.mouse.pointOnScene());
 
-      if (this.activeCommand !== undefined && this.activeCommand.showHelperGeometry) {
+      if (this.core.designEngine.activeCommand !== undefined && this.core.designEngine.activeCommand.showHelperGeometry) {
         // Make a new array of points with the base point and the current mouse position.
         const helperPoints = [];
         helperPoints.push(this.tempPoints[0]);
@@ -238,13 +234,13 @@ export class Scene {
         this.addHelperGeometry('Line', helperPoints, this.core.settings.helpergeometrycolour.toString());
       }
 
-      if (this.activeCommand !== undefined && this.activeCommand instanceof Entity && this.tempPoints.length >= this.activeCommand.minPoints) {
-        this.addHelperGeometry(this.activeCommand.type, this.tempPoints, this.core.settings.helpergeometrycolour.toString());
+      if (this.core.designEngine.activeCommand !== undefined && this.core.designEngine.activeCommand instanceof Entity && this.tempPoints.length >= this.core.designEngine.activeCommand.minPoints) {
+        this.addHelperGeometry(this.core.designEngine.activeCommand.type, this.tempPoints, this.core.settings.helpergeometrycolour.toString());
         this.core.canvas.requestPaint(); // TODO: Improve requests to paint as it is called too often.
       }
 
-      if (this.activeCommand !== undefined && this.activeCommand instanceof Tool && this.selection.selectionAccepted) {
-        this.activeCommand.preview(this.core);
+      if (this.core.designEngine.activeCommand !== undefined && this.core.designEngine.activeCommand instanceof Tool && this.selection.selectionAccepted) {
+        this.core.designEngine.activeCommand.preview(this.core);
         this.core.canvas.requestPaint();
       }
     }
