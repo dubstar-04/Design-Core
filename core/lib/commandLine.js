@@ -136,7 +136,6 @@ export class CommandLine {
    * Handles presses of the delete key
    */
   deletePressed() {
-    // TODO: Janky way to initiate commands - fit it
     this.core.scene.inputManager.onCommand('Erase');
   }
 
