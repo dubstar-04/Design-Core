@@ -17,6 +17,12 @@ export class Tool {
       value: false,
       writable: true,
     });
+
+    Object.defineProperty(this, 'minPoints', {
+      enumerable: false,
+      value: 2,
+      writable: true,
+    });
   }
 
   action(core) {
