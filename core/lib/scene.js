@@ -22,6 +22,7 @@ export class Scene {
     this.activeCommand = undefined; // Store the name of the active command
     this.inputArray = []; // Temporary Array to store input values.
     this.saved = false;
+    this.snapping = new Snapping();
   }
 
   reset() {
@@ -32,6 +33,7 @@ export class Scene {
 
     this.core.commandLine.resetPrompt();
     this.inputArray = [];
+    this.snapping.active = false;
     this.core.canvas.requestPaint();
   }
 
@@ -193,8 +195,8 @@ export class Scene {
       this.drawSelectionWindow();
     }
 
-    if (this.activeCommand instanceof Entity || this.selection.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
-      const snapPoint = Snapping.getSnapPoint(this);
+    if (this.snapping.active) {
+      const snapPoint = this.snapping.getSnapPoint(this);
       if (snapPoint) {
         this.addSnapPoint(snapPoint);
       }
@@ -208,13 +210,13 @@ export class Scene {
 
       if (this.core.settings.polar) {
         // if polar is enabled - get the closest points
-        const polarSnap = Snapping.polarSnap(this.lastSelectedPoint(), this.core);
+        const polarSnap = this.snapping.polarSnap(this.lastSelectedPoint(), this.core);
         if (polarSnap) {
           this.core.mouse.setPosFromScenePoint(polarSnap);
         }
       } else if (this.core.settings.ortho) {
         // if ortho is enabled - get the nearest ortho point
-        const orthoSnap = Snapping.orthoSnap(this.lastSelectedPoint(), this.core);
+        const orthoSnap = this.snapping.orthoSnap(this.lastSelectedPoint(), this.core);
         if (orthoSnap) {
           this.core.mouse.setPosFromScenePoint(orthoSnap);
         }

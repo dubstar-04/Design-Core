@@ -3,7 +3,11 @@ import {Point} from '../entities/point.js';
 import {Utils} from './utils.js';
 
 export class Snapping {
-  static getSnapPoint(scene) {
+  constructor() {
+    this.active = false;
+  }
+
+  getSnapPoint(scene) {
     let snapPoint;
     let delta = 25 / scene.core.canvas.getScale(); // find a more suitable starting value
 
@@ -29,7 +33,7 @@ export class Snapping {
     return snapPoint;
   }
 
-  static polarSnap(previousPoint, core) {
+  polarSnap(previousPoint, core) {
     let snapPoint;
     const angleTolerance = 4;
     // get the angle to the mouse position
@@ -47,7 +51,7 @@ export class Snapping {
     return snapPoint;
   }
 
-  static orthoSnap(previousPoint, core) {
+  orthoSnap(previousPoint, core) {
     let snapPoint;
     const x = core.mouse.pointOnScene().x - previousPoint.x;
     const y = core.mouse.pointOnScene().y - previousPoint.y;
