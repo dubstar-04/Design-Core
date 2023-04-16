@@ -119,14 +119,14 @@ export class Text extends Entity {
     expectedType[2] = ['Number'];
 
     if (num === 2) {
-      core.scene.inputData.height = input;
+      core.scene.inputManager.inputData.height = input;
     }
 
     prompt[3] = Strings.Input.STRING;
     expectedType[3] = ['String', 'Number'];
 
     if (num === 3) {
-      core.scene.inputData.string = input;
+      core.scene.inputManager.inputData.string = input;
     }
 
     return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: (num === prompt.length - 1)};
