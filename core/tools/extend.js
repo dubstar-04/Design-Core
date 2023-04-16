@@ -7,6 +7,7 @@ export class Extend extends Tool {
     super();
     // remove this.movement
     this.movement = 'Modify';
+    this.minPoints = 0;
   }
 
   static register() {
@@ -14,40 +15,22 @@ export class Extend extends Tool {
     return command;
   }
 
-  prompt(core) {
-    const num = core.scene.inputArray.length;
+  processInput(num, input, inputType, core) {
     const expectedType = [];
-    const reset = false;
-    let action = false;
     const prompt = [];
 
-    expectedType[0] = ['undefined'];
-    prompt[0] = Strings.Input.BOUNDARY;
+    log(num, inputType);
 
-    expectedType[1] = ['object'];
-    prompt[1] = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
+    const selection = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
+    const noSelection = Strings.Input.BOUNDARY;
 
-    expectedType[2] = ['boolean'];
-    prompt[2] = Strings.Input.SELECTENTITIES;
+    prompt[1] = core.scene.selection.selectionSet.length ? selection : noSelection;
+    expectedType[1] = ['CanvasSelection', 'SelectionAccepted'];
 
-    expectedType[3] = ['object'];
-    prompt[3] = Strings.Input.SELECTORQUIT;
+    expectedType[2] = ['Point'];
+    prompt[2] = Strings.Input.SELECTORQUIT; // Strings.Input.SELECTENTITIES;
 
-    expectedType[4] = expectedType[3];
-    prompt[4] = prompt[3];
-
-    const validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
-
-    if (!validInput || num > 3) {
-      core.scene.inputArray.pop();
-    }
-
-    if (core.scene.inputArray.length === 3) {
-      action = true;
-      // reset = true
-    }
-
-    return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
+    return {expectedType: expectedType, prompt: prompt, reset: false, action: (num === prompt.length - 1)};
   }
 
   action(core) {
