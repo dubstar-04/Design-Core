@@ -231,6 +231,8 @@ export class Text extends Entity {
       ctx.font = this.height + 'pt ' + core.styleManager.getStyleByName(this.styleName).font.toString();
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
+      //TODO: find a better way to define the boundingRect
+      this.boundingRect.height = this.height;
     } catch { // Cairo
       const rgbColour = Colours.hexToScaledRGB(colour);
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
