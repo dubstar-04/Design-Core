@@ -35,8 +35,8 @@ export class SelectionWindow {
       ctx.lineWidth = this.lineWidth / scale;
       ctx.beginPath();
       ctx.globalAlpha = 0.2;
-      width = this.points[1].x - this.points[0].x;
-      height = this.points[1].y - this.points[0].y;
+      const width = this.points[1].x - this.points[0].x;
+      const height = this.points[1].y - this.points[0].y;
       ctx.fillRect(this.points[0].x, this.points[0].y, width, height);
       ctx.globalAlpha = 1.0;
       this.drawRect(ctx);

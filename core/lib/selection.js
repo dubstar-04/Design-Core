@@ -50,9 +50,10 @@ export class Selection {
         }
       }
 
-      // this.core.canvas.requestPaint();
       this.selectionSetChanged();
     }
+
+    this.core.canvas.requestPaint();
   }
 
   /**
