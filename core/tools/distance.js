@@ -13,32 +13,17 @@ export class Distance extends Tool {
     return command;
   }
 
-  prompt(core) {
-    const num = core.scene.inputArray.length;
+  processInput(num, input, inputType, core) {
     const expectedType = [];
-    let reset = false;
-    let action = false;
     const prompt = [];
 
-    expectedType[0] = ['undefined'];
-    prompt[0] = Strings.Input.START;
+    prompt[1] = Strings.Input.START;
+    expectedType[1] = ['Point'];
 
-    expectedType[1] = ['object'];
-    prompt[1] = Strings.Input.END;
+    prompt[2] = Strings.Input.END;
+    expectedType[2] = ['Point'];
 
-    expectedType[2] = ['object'];
-    prompt[2] = '';
-
-    const validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
-
-    if (!validInput) {
-      core.scene.inputArray.pop();
-    } else if (core.scene.inputArray.length === 2) {
-      action = true;
-      reset = true;
-    }
-
-    return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
+    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: (num === prompt.length - 1)};
   }
 
   preview(num) {

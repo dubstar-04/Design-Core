@@ -6,7 +6,7 @@ import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 import {Entity} from '../entities/entity.js';
 import {Tool} from '../tools/tool.js';
-
+import {InputManager} from './inputManager.js';
 
 export class Scene {
   constructor(core) {
@@ -16,22 +16,18 @@ export class Scene {
     this.points = []; // Temporary Array to store the input points
     this.tempItems = []; // Temporary Array to store items while input is being gathered
     this.tempPoints = []; // Temporary Array to store points while input is being gathered
-
     this.selection = new Selection(core);
-
-    this.activeCommand = undefined; // Store the name of the active command
-    this.inputArray = []; // Temporary Array to store input values.
     this.saved = false;
+    this.snapping = new Snapping();
+    this.inputManager = new InputManager(core);
   }
 
   reset() {
     this.points = []; // clear array
-    this.activeCommand = undefined; // reset the active command
     this.tempItems = [];
     this.selection.reset();
-
     this.core.commandLine.resetPrompt();
-    this.inputArray = [];
+    this.snapping.active = false;
     this.core.canvas.requestPaint();
   }
 
@@ -68,31 +64,19 @@ export class Scene {
     this.saved = false; // Changes have occured. A save may be required.
   }
 
-  addToScene(type, data, end, index) {
+  addToScene(type, data, index) {
     if (!data) {
-      const colour = 'BYLAYER';
-      data = {
-        points: this.points,
-        colour: colour,
-        layer: this.core.layerManager.getCLayer(),
-        input: this.inputArray,
-      };
+      throw Error('Input data missing');
     }
 
-    let item;
-    if (this.activeCommand && this.activeCommand instanceof Entity && !type) {
-      // TODO: find a way to create a new type without window
-      item = this.core.commandManager.createNew(this.activeCommand.type, data);
-    } else {
-      // check type is a valid command
-      if (!this.core.commandManager.isCommand(type)) {
-        Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
-        this.reset();
-        return;
-      }
-      // Create a new item, send it the points array
-      item = this.core.commandManager.createNew(type, data);
+    // check type is a valid command
+    if (!this.core.commandManager.isCommand(type)) {
+      Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
+      this.reset();
+      return;
     }
+    // Create a new item, send it the points array
+    const item = this.core.commandManager.createNew(type, data);
 
     if (typeof index === 'undefined') {
       // add to end of array
@@ -100,9 +84,6 @@ export class Scene {
     } else {
       // replace item at index
       this.items.splice(index, 1, item);
-    }
-    if (end) {
-      this.reset();
     }
   }
 
@@ -161,12 +142,12 @@ export class Scene {
   mouseDown(button) {
     switch (button) {
       case 0: // left button
-        this.core.designEngine.onLeftClick();
+        this.inputManager.onLeftClick();
         break;
       case 1: // middle button
         break;
       case 2: // right button
-        this.core.designEngine.onEnterPressed();
+        this.inputManager.onEnterPressed();
         break;
     }
   };
@@ -193,8 +174,8 @@ export class Scene {
       this.drawSelectionWindow();
     }
 
-    if (this.activeCommand instanceof Entity || this.selection.selectionAccepted === true && this.activeCommand.movement !== 'Modify') {
-      const snapPoint = Snapping.getSnapPoint(this);
+    if (this.snapping.active) {
+      const snapPoint = this.snapping.getSnapPoint(this);
       if (snapPoint) {
         this.addSnapPoint(snapPoint);
       }
@@ -208,13 +189,13 @@ export class Scene {
 
       if (this.core.settings.polar) {
         // if polar is enabled - get the closest points
-        const polarSnap = Snapping.polarSnap(this.lastSelectedPoint(), this.core);
+        const polarSnap = this.snapping.polarSnap(this.lastSelectedPoint(), this.core);
         if (polarSnap) {
           this.core.mouse.setPosFromScenePoint(polarSnap);
         }
       } else if (this.core.settings.ortho) {
         // if ortho is enabled - get the nearest ortho point
-        const orthoSnap = Snapping.orthoSnap(this.lastSelectedPoint(), this.core);
+        const orthoSnap = this.snapping.orthoSnap(this.lastSelectedPoint(), this.core);
         if (orthoSnap) {
           this.core.mouse.setPosFromScenePoint(orthoSnap);
         }
@@ -223,7 +204,7 @@ export class Scene {
       // add the mouse position to temp points
       this.tempPoints.push(this.core.mouse.pointOnScene());
 
-      if (this.activeCommand !== undefined && this.activeCommand.showHelperGeometry) {
+      if (this.inputManager.activeCommand !== undefined && this.inputManager.activeCommand.showHelperGeometry) {
         // Make a new array of points with the base point and the current mouse position.
         const helperPoints = [];
         helperPoints.push(this.tempPoints[0]);
@@ -232,13 +213,13 @@ export class Scene {
         this.addHelperGeometry('Line', helperPoints, this.core.settings.helpergeometrycolour.toString());
       }
 
-      if (this.activeCommand !== undefined && this.activeCommand instanceof Entity && this.tempPoints.length >= this.activeCommand.minPoints) {
-        this.addHelperGeometry(this.activeCommand.type, this.tempPoints, this.core.settings.helpergeometrycolour.toString());
+      if (this.inputManager.activeCommand !== undefined && this.inputManager.activeCommand instanceof Entity && this.tempPoints.length >= this.inputManager.activeCommand.minPoints) {
+        this.addHelperGeometry(this.inputManager.activeCommand.type, this.tempPoints, this.core.settings.helpergeometrycolour.toString());
         this.core.canvas.requestPaint(); // TODO: Improve requests to paint as it is called too often.
       }
 
-      if (this.activeCommand !== undefined && this.activeCommand instanceof Tool && this.selection.selectionAccepted) {
-        this.activeCommand.preview(this.core);
+      if (this.inputManager.activeCommand !== undefined && this.inputManager.activeCommand instanceof Tool && this.selection.selectionAccepted) {
+        this.inputManager.activeCommand.preview(this.core);
         this.core.canvas.requestPaint();
       }
     }

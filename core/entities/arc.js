@@ -50,38 +50,20 @@ export class Arc extends Entity {
     return this.points[0].angle(this.points[2]);
   }
 
-  prompt(core) {
-    const num = core.scene.inputArray.length;
+  processInput(num, input, inputType, core) {
     const expectedType = [];
-    let reset = false;
-    let action = false;
     const prompt = [];
 
-    expectedType[0] = ['undefined'];
-    prompt[0] = Strings.Input.CENTER;
+    prompt[1] = Strings.Input.CENTER;
+    expectedType[1] = ['Point'];
 
-    expectedType[1] = ['object'];
-    prompt[1] = Strings.Input.START;
+    prompt[2] = Strings.Input.START;
+    expectedType[2] = ['Point'];
 
-    expectedType[2] = ['object'];
-    prompt[2] = Strings.Input.END;
+    prompt[3] = Strings.Input.END;
+    expectedType[3] = ['Point'];
 
-    expectedType[3] = ['object'];
-    prompt[3] = '';
-
-    const validInput = expectedType[num].includes(typeof core.scene.inputArray[num - 1]);
-
-    if (!validInput) {
-      core.scene.inputArray.pop();
-    }
-
-    if (core.scene.inputArray.length === this.minPoints) {
-      action = true;
-      reset = true;
-      this.showHelperGeometry = false;
-    }
-
-    return {promptInput: prompt[core.scene.inputArray.length], resetBool: reset, actionBool: action, validInput: validInput};
+    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: num === this.minPoints};
   }
 
   draw(ctx, scale, core, colour) {

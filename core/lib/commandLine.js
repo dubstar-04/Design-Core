@@ -1,3 +1,5 @@
+import {Point} from '../entities/point.js';
+
 export class CommandLine {
   /**
    * Commandline Constructor
@@ -70,7 +72,7 @@ export class CommandLine {
         this.enterPressed();
         break;
       case 'Escape':
-        this.core.designEngine.reset();
+        this.core.scene.inputManager.reset();
         break;
       case 'Space': // space
         this.spacePressed();
@@ -134,8 +136,7 @@ export class CommandLine {
    * Handles presses of the delete key
    */
   deletePressed() {
-    // TODO: Janky way to initiate commands - fit it
-    this.core.designEngine.onCommand('Erase');
+    this.core.scene.inputManager.onCommand('Erase');
   }
 
   /**
@@ -169,10 +170,48 @@ export class CommandLine {
     if (this.cmdLine.length > this.prompt.length) {
       // get the inputprompt and remove the prompt text
       const inputCommand = this.cmdLine.slice(this.prompt.length);
-      this.core.designEngine.onCommand(inputCommand);
+      this.core.scene.inputManager.onCommand(this.parseInput(inputCommand));
     } else {
-      this.core.designEngine.onEnterPressed();
+      this.core.scene.inputManager.onEnterPressed();
     }
+  }
+
+  /**
+   * Converts input to a type
+   * @param {string} input
+   */
+  parseInput(input) {
+    const isNumber = /^\-?\d+\.?\d+?$/.test(input);
+    const isPoint = /^\-?\d+\.?\d+?,\-?\d+\.?\d+?$/.test(input.replace(/@|#/gi, ''));
+
+    // TODO: Handle angular input
+
+    if (isPoint) {
+      const isRelative = input.includes('@');
+      const isAbsolute = input.includes('#');
+
+      if (isAbsolute || isRelative) {
+        input = input.replace(/@|#/gi, '');
+      }
+
+      const xyData = input.split(',');
+      const point = new Point();
+      point.x = parseFloat(xyData[0]);
+      point.y = parseFloat(xyData[1]);
+
+      if (isRelative && this.core.scene.points.length) {
+        point.x = parseFloat(this.core.scene.points.at(-1).x + point.x);
+        point.y = parseFloat(this.core.scene.points.at(-1).y + point.y);
+      }
+
+      return point;
+    }
+
+    if (isNumber) {
+      return Number(input);
+    }
+
+    return String(input);
   }
 
   /**
