@@ -52,7 +52,7 @@ export class Selection {
 
       this.selectionSetChanged();
     }
-    
+
     this.core.canvas.requestPaint();
   }
 
