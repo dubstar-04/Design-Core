@@ -1,3 +1,4 @@
+import {Utils} from './utils.js';
 // TODO: Refactor class.
 export class SelectionManager {
   constructor(core) {
