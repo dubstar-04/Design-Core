@@ -5,8 +5,6 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 export class Identify extends Tool {
   constructor() {
     super();
-    // this.selectionRequired = false;
-    // this.minPoints = 1;
   }
 
   static register() {
