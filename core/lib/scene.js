@@ -111,17 +111,7 @@ export class Scene {
     this.tempItems.push(helper); // Add it to the tempItems Array
   }
 
-  lastSelectedPoint() {
-    if (this.points.length !== 0) {
-      const previousPoint = new Point();
-      previousPoint.x = this.points[this.points.length - 1].x;
-      previousPoint.y = this.points[this.points.length - 1].y;
-      return previousPoint;
-    }
-
-    return undefined;
-  }
-
+  // TODO: Move this to selectionManager
   addSnapPoint(snapPoint) {
     // Draw a circle to highlight the snap.
     const CentrePoint = new Point(snapPoint.x, snapPoint.y);
