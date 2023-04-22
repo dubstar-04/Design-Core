@@ -1,6 +1,5 @@
 import {Tool} from '../tools/tool.js';
 
-// class Quit {}
 export class PromptOptions {
   constructor(promptMessage = 'error', types = [], options = []) {
     this.promptMessage = promptMessage;
@@ -46,7 +45,6 @@ export class Input {
     SINGLESELECTION: 'SingleSelection',
     NUMBER: 'Number',
     STRING: 'String',
-    QUIT: 'Quit',
   };
 
   static getType(value) {
