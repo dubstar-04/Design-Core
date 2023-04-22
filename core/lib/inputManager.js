@@ -114,10 +114,6 @@ export class InputManager {
     }
   }
 
-  acceptPreselection() {
-    if (this.core.scene.selection.selectionSet.length && this.activeCommand.selectionRequired) {
-      this.core.scene.selection.selectionAccepted = true;
-      this.actionInput(new SelectionAccepted());
   onEnterPressed() {
     // log('Enter pressed - Option Types:', this.promptOption.types);
     if (this.activeCommand !== undefined) {
