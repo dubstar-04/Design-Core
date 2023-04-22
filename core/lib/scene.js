@@ -78,10 +78,20 @@ export class Scene {
     if (typeof index === 'undefined') {
       // add to end of array
       this.items.push(item); // add item to the scene
+      index = this.items.length - 1
     } else {
       // replace item at index
       this.items.splice(index, 1, item);
     }
+
+    // return the index of the added item
+    return index
+  }
+
+  addToTempItems(type, data) {
+    const helper = this.core.commandManager.createNew(type, data);
+    this.tempItems.push(helper); // Add it to the tempItems Array
+  }
   }
 
 
