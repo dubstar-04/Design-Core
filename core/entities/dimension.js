@@ -10,7 +10,6 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 export class Dimension extends Entity {
   constructor(data) {
     super(data);
-    // this.minPoints = 3;
     this.blockName = '';
     this.block = new Block();
     this.text = new Text();
