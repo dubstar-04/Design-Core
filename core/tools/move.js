@@ -1,6 +1,7 @@
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Move extends Tool {
   constructor() {
@@ -38,7 +39,7 @@ export class Move extends Tool {
 
       core.scene.inputManager.executeCommand();
     } catch (err) {
-      log(this.type, err);
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
@@ -46,7 +47,6 @@ export class Move extends Tool {
     const xDelta = this.points[1].x - this.points[0].x;
     const yDelta = this.points[1].y - this.points[0].y;
 
-    log('ss:', core.scene.selectionManager.selectionSet);
     for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
       for (let j = 0; j < core.scene.selectionManager.selectedItems[i].points.length; j++) {
         core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
