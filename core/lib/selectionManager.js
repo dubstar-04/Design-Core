@@ -6,6 +6,14 @@ export class SingleSelection {
     this.selectedPoint = point;
   }
 }
+
+export class SelectionSet {
+  constructor() {
+    this.accepted = false;
+    this.selectionSet = [];
+  }
+}
+
 // TODO: Refactor class.
 export class SelectionManager {
   constructor(core) {
