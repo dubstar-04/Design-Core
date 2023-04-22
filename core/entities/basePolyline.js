@@ -64,8 +64,6 @@ export class BasePolyline extends Entity {
       core.scene.inputManager.actionCommand(this);
     } catch (err) {
       console.log(err);
-    } finally {
-      console.log('Clean up yo!');
     }
   }
 
