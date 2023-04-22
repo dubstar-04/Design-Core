@@ -110,7 +110,6 @@ export class InputManager {
   }
 
   onEnterPressed() {
-    // log('Enter pressed - Option Types:', this.promptOption.types);
     if (this.activeCommand !== undefined) {
       if (this.promptOption.types.includes(Input.Type.SELECTIONSET) && this.core.scene.selectionManager.selectionSet.accepted !== true) {
         this.core.scene.selectionManager.selectionSet.accepted = true;
@@ -141,17 +140,12 @@ export class InputManager {
   mouseUp(button) {
     switch (button) {
       case 0: // left button
-        const point = this.core.mouse.pointOnScene();
-        this.onLeftClick(point);
-
         // Clear tempItems - This is here to remove the crossing window
         this.core.scene.tempItems = [];
 
         // check if the mouse position has changed since mousedown
         if (!this.core.mouse.mouseDownCanvasPoint.isSame(this.core.mouse.pointOnCanvas())) {
-          // const selection =
           this.core.scene.selectionManager.windowSelect();
-          // this.onSelection(selection);
         }
         break;
       case 1: // middle button
