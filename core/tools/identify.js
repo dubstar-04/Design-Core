@@ -1,6 +1,7 @@
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Identify extends Tool {
   constructor() {
@@ -20,7 +21,7 @@ export class Identify extends Tool {
 
       core.scene.inputManager.executeCommand();
     } catch (err) {
-      log(this.type, err);
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
