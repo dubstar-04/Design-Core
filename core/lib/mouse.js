@@ -23,7 +23,7 @@ export class Mouse {
    * @returns
    */
   inputAngle() {
-    const previousPoint = this.core.scene.lastSelectedPoint();
+    const previousPoint = this.transformToScene(this.mouseDownCanvasPoint);
     if (previousPoint) {
       const angle = Utils.radians2degrees(previousPoint.angle(this.pointOnScene()));
       return angle;
@@ -37,8 +37,9 @@ export class Mouse {
    * @returns
    */
   inputLength() {
-    if (this.core.scene.lastSelectedPoint()) {
-      const len = Utils.distBetweenPoints(this.core.scene.lastSelectedPoint().x, this.core.scene.lastSelectedPoint().y, this.pointOnScene().x, this.pointOnScene().y);
+    if (this.mouseDownCanvasPoint) {
+      const lastScenePoint = this.transformToScene(this.mouseDownCanvasPoint);
+      const len = Utils.distBetweenPoints(lastScenePoint.x, lastScenePoint.y, this.pointOnScene().x, this.pointOnScene().y);
       return len;
     }
 
