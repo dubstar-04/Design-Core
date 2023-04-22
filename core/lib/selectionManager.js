@@ -66,7 +66,6 @@ export class SelectionManager {
     }
     this.core.canvas.requestPaint();
     log('selection - ss:', this.selectionSet, this.selectedItems);
-    // return new SelectionSet();
   }
 
   /**
