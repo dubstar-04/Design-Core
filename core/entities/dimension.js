@@ -6,6 +6,7 @@ import {Text} from './text.js';
 import {Line} from './line.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Dimension extends Entity {
   constructor(data) {
@@ -116,7 +117,7 @@ export class Dimension extends Entity {
 
       core.scene.inputManager.executeCommand(this);
     } catch (err) {
-      log(this.type, err);
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
