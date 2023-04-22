@@ -1,4 +1,5 @@
 import {Point} from '../entities/point.js';
+import {Input} from './inputManager.js';
 
 export class CommandLine {
   /**
