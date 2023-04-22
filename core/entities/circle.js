@@ -42,11 +42,11 @@ export class Circle extends Entity {
 
       const op2 = new PromptOptions(Strings.Input.POINTORQUIT, [Input.Type.POINT, Input.Type.NUMBER]);
       const pt2 = await core.scene.inputManager.requestInput(op2);
-      if (Input.getType(pt2) === 'Point') {
+      if (Input.getType(pt2) === Input.Type.POINT) {
         this.points.push(pt2);
       }
 
-      if (Input.getType(pt2) === 'Number') {
+      if (Input.getType(pt2) === Input.Type.Number) {
         this.setRadius(pt2);
       }
       core.scene.inputManager.executeCommand(this);
