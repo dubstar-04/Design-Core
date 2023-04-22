@@ -22,6 +22,8 @@ export class Scene {
 
   reset() {
     this.tempItems = [];
+
+    this.selectionManager.reset();
     this.snapping.active = false;
     this.core.canvas.requestPaint();
   }
