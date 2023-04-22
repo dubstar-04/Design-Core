@@ -73,7 +73,8 @@ test('Test CommandLine.parseInput', () => {
   expect(relPoint1.x).toBe(101);
   expect(relPoint1.y).toBe(102);
 
-  core.scene.points.push(relPoint1);
+  core.scene.inputManager.initialiseItem('Line');
+  core.scene.inputManager.activeCommand.points.push(relPoint1);
   const relPoint2 = commandline.parseInput('@101,102');
   expect(relPoint2.constructor.name).toBe('Point');
   expect(relPoint2.x).toBe(202);
@@ -133,10 +134,11 @@ test('Test CommandLine.parseInput', () => {
 });
 
 test('Test CommandLine.addToCommandHistory', () => {
+  const commandLineLength = commandline.lastCommand.length;
   commandline.addToCommandHistory('Test');
   /* commandline should only store unique values */
   commandline.addToCommandHistory('Test');
-  expect(commandline.lastCommand.length).toBe(1);
+  expect(commandline.lastCommand.length).toBe(commandLineLength + 1);
 
   /* commandline should only store last 10 commands */
   for (let index = 0; index < 20; index++) {
