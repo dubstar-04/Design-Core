@@ -92,6 +92,16 @@ export class Scene {
     const helper = this.core.commandManager.createNew(type, data);
     this.tempItems.push(helper); // Add it to the tempItems Array
   }
+
+  // TODO: get rid of this, maybe make a class for items, temp items, selectionItems...
+  addHelperGeometry(type, points, colour) {
+    const data = {
+      points: points,
+      colour: colour, // "#00BFFF"
+    };
+
+    const helper = this.core.commandManager.createNew(type, data);
+    this.tempItems.push(helper); // Add it to the tempItems Array
   }
 
 
@@ -106,20 +116,9 @@ export class Scene {
     };
 
     this.tempItems.push(new SelectionWindow(data));
-    this.core.canvas.requestPaint();
   }
 
-  addHelperGeometry(type, points, colour) {
-    const data = {
-      points: points,
-      colour: colour, // "#00BFFF"
-    };
-
-    const helper = this.core.commandManager.createNew(type, data);
-    this.tempItems.push(helper); // Add it to the tempItems Array
-  }
-
-  // TODO: Move this to selectionManager
+  // TODO: Move this to selectionManager or canvas
   addSnapPoint(snapPoint) {
     // Draw a circle to highlight the snap.
     const CentrePoint = new Point(snapPoint.x, snapPoint.y);
