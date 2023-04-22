@@ -2,6 +2,7 @@ import {Intersection} from '../lib/intersect.js';
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Extend extends Tool {
   constructor() {
@@ -29,7 +30,7 @@ export class Extend extends Tool {
         core.scene.inputManager.actionCommand();
       }
     } catch (error) {
-      log(this.type, error);
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
