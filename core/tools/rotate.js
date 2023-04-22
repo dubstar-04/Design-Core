@@ -7,7 +7,6 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 export class Rotate extends Tool {
   constructor() {
     super();
-    // this.showHelperGeometry = true;
   }
 
   static register() {
