@@ -150,14 +150,14 @@ export class Canvas {
   paint(context, width, height) {
     // This paint request is called by an external paint function
     // some ui framework create and destroy the context for every paint
-    // context is not persistent and is not availble outside this function
+    // context is not persistent and is not available outside this function
 
-    // TODO: Should this be set external to the draw function and old called on resize of canvas?
+    // TODO: Should this be set external to the draw function and only called on resize of canvas?
     this.width = width;
     this.height = height;
 
     // TODO: Need to consider how to change the height when resizing the window
-    // maybe something like translate the differnce between the new and old height?
+    // maybe something like translate the difference between the new and old height?
     if (this.flipped === false) {
       this.matrix.translate(0, -this.height);
       this.flipped = true;
