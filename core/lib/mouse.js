@@ -119,6 +119,21 @@ export class Mouse {
     // canvas are typically origin top left. CAD is typically origin bottom left.
     // move the origin down to the bottom and invert the y position
     this.y = -y + this.core.canvas.height;
+
+    if (this.core.settings.polar) {
+      // if polar is enabled - get the closest points
+      const polarSnap = this.core.scene.snapping.polarSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
+      if (polarSnap) {
+        this.setPosFromScenePoint(polarSnap);
+      }
+    } else if (this.core.settings.ortho) {
+      // if ortho is enabled - get the nearest ortho point
+      const orthoSnap = this.snapping.orthoSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
+      if (orthoSnap) {
+        this.setPosFromScenePoint(orthoSnap);
+      }
+    }
+
     this.core.canvas.mouseMoved();
   }
 
