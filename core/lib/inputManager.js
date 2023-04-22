@@ -118,19 +118,25 @@ export class InputManager {
     if (this.core.scene.selection.selectionSet.length && this.activeCommand.selectionRequired) {
       this.core.scene.selection.selectionAccepted = true;
       this.actionInput(new SelectionAccepted());
+  onEnterPressed() {
+    // log('Enter pressed - Option Types:', this.promptOption.types);
+    if (this.activeCommand !== undefined) {
+      if (this.promptOption.types.includes(Input.Type.SELECTIONSET) && this.core.scene.selectionManager.selectionSet.accepted !== true) {
+        this.core.scene.selectionManager.selectionSet.accepted = true;
+        this.promptOption.respond(this.core.scene.selectionManager.selectionSet);
+      } else {
+        this.reset();
+      }
     } else {
-      // initial action - first call to actionInput for this command
-      this.actionInput();
+      this.initialiseItem(this.core.commandLine.lastCommand[0]);
+      this.activeCommand.execute(this.core);
     }
   }
 
-  onEnterPressed() {
-    if (this.activeCommand instanceof Tool && this.core.scene.selection.selectionSet.length) {
-      this.core.scene.selection.selectionAccepted = true;
-      this.actionInput(new SelectionAccepted());
-    } else if (this.activeCommand === undefined) {
-      this.initialiseItem(this.core.commandLine.lastCommand[0]);
-      this.actionInput();
+  onEscapePressed() {
+    this.reset();
+  }
+
   onLeftClick(point) {
     if (this.promptOption !== undefined && this.promptOption.types.includes('Point')) {
       this.core.scene.snapping.active = false;
