@@ -5,7 +5,6 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 export class Erase extends Tool {
   constructor() {
     super();
-    // this.minPoints = 0;
   }
 
   static register() {
