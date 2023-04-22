@@ -4,6 +4,7 @@ import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Text extends Entity {
   constructor(data) {
@@ -121,8 +122,7 @@ export class Text extends Entity {
 
       core.scene.inputManager.executeCommand(this);
     } catch (err) {
-      log(this.type, err);
-      console.trace();
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
