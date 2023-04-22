@@ -67,8 +67,6 @@ export class Input {
 export class InputManager {
   constructor(core) {
     this.core = core;
-    this.inputTracker = 0;
-    this.inputData = {points: []};
     this.activeCommand = undefined;
     this.promptOption = undefined;
   requestInput(promptOption) {
@@ -99,8 +97,6 @@ export class InputManager {
 
   reset() {
     this.core.scene.reset();
-    this.inputTracker = 0;
-    this.inputData = {points: []};
     this.activeCommand = undefined;
     this.promptOption = undefined;
   }
@@ -117,7 +113,6 @@ export class InputManager {
   acceptPreselection() {
     if (this.core.scene.selection.selectionSet.length && this.activeCommand.selectionRequired) {
       this.core.scene.selection.selectionAccepted = true;
-      this.inputTracker++;
       this.actionInput(new SelectionAccepted());
     } else {
       // initial action - first call to actionInput for this command
