@@ -1,5 +1,6 @@
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
 
 export class Move extends Tool {
   constructor() {
@@ -11,45 +12,71 @@ export class Move extends Tool {
     return command;
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.SELECTENTITIES, [Input.Type.SELECTIONSET]);
 
-    const selection = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
-    const noSelection = Strings.Input.SELECTENTITIES;
+      if (!core.scene.selectionManager.selectionSet.selectionSet.length) {
+        await core.scene.inputManager.requestInput(op);
+      }
 
-    prompt[1] = core.scene.selection.selectionSet.length ? selection : noSelection;
-    expectedType[1] = ['CanvasSelection', 'SelectionAccepted'];
+      const op2 = new PromptOptions(Strings.Input.BASEPOINT, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op2);
+      this.points.push(pt1);
 
-    prompt[2] = Strings.Input.BASEPOINT;
-    expectedType[2] = ['Point'];
+      const op3 = new PromptOptions(Strings.Input.DESTINATIONORDISTANCE, [Input.Type.POINT, Input.Type.NUMBER]);
+      const pt2 = await core.scene.inputManager.requestInput(op3);
 
-    prompt[3] = Strings.Input.DESTINATIONORDISTANCE;
-    expectedType[3] = ['Point', 'Number'];
+      if (Input.getType(pt2) === Input.Type.POINT) {
+        this.points.push(pt2);
+      } else if (Input.getType(pt2) === Input.Type.NUMBER) {
+        const basePoint = this.points.at(-1);
+        const angle = Utils.degrees2radians(core.mouse.inputAngle());
+        const point = basePoint.project(angle, pt2);
+        this.points.push(point);
+      }
 
-    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: (num === prompt.length - 1)};
+      core.scene.inputManager.executeCommand();
+    } catch (err) {
+      log(this.type, err);
+    }
   }
 
   action(core) {
-    const xDelta = core.scene.points[1].x - core.scene.points[0].x;
-    const yDelta = core.scene.points[1].y - core.scene.points[0].y;
+    const xDelta = this.points[1].x - this.points[0].x;
+    const yDelta = this.points[1].y - this.points[0].y;
 
-    for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
-      for (let j = 0; j < core.scene.selection.selectedItems[i].points.length; j++) {
-        core.scene.items[core.scene.selection.selectionSet[i]].points[j].x = core.scene.items[core.scene.selection.selectionSet[i]].points[j].x + xDelta;
-        core.scene.items[core.scene.selection.selectionSet[i]].points[j].y = core.scene.items[core.scene.selection.selectionSet[i]].points[j].y + yDelta;
+    log('ss:', core.scene.selectionManager.selectionSet);
+    for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      for (let j = 0; j < core.scene.selectionManager.selectedItems[i].points.length; j++) {
+        core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
+        core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
       }
     }
   }
 
   preview(core) {
-    const xDelta = core.scene.tempPoints[1].x - core.scene.tempPoints[0].x;
-    const yDelta = core.scene.tempPoints[1].y - core.scene.tempPoints[0].y;
+    if (this.points.length >= 1) {
+      const mousePoint = core.mouse.pointOnScene();
 
-    for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
-      for (let j = 0; j < core.scene.selection.selectedItems[i].points.length; j++) {
-        core.scene.selection.selectedItems[i].points[j].x = core.scene.items[core.scene.selection.selectionSet[i]].points[j].x + xDelta;
-        core.scene.selection.selectedItems[i].points[j].y = core.scene.items[core.scene.selection.selectionSet[i]].points[j].y + yDelta;
+      // Draw a line
+      const points = [this.points.at(-1), mousePoint];
+
+      const data = {
+        points: points,
+        colour: core.settings.helpergeometrycolour.toString(),
+      };
+
+      core.scene.addToTempItems('Line', data);
+
+      const xDelta = mousePoint.x - this.points[0].x;
+      const yDelta = mousePoint.y - this.points[0].y;
+
+      for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        for (let j = 0; j < core.scene.selectionManager.selectedItems[i].points.length; j++) {
+          core.scene.selectionManager.selectedItems[i].points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
+          core.scene.selectionManager.selectedItems[i].points[j].y = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
+        }
       }
     }
   }
