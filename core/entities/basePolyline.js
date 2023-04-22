@@ -52,16 +52,13 @@ export class BasePolyline extends Entity {
 
       let pt2;
       const op2 = new PromptOptions(Strings.Input.POINTORQUIT, [Input.Type.POINT]);
-      // do {
+      let index;
       while (true) {
         pt2 = await core.scene.inputManager.requestInput(op2);
-        // log('complete polyline', pt2.state);
-        // if (Input.getType(pt2) !== Input.Type.QUIT) {
         this.points.push(pt2);
-
-        // }
-      } // while (Input.getType(pt2) !== Input.Type.QUIT);
-      core.scene.inputManager.actionCommand(this);
+        // first creation will get a new index, subsequent will use the index to update teh original polyline
+        index = core.scene.inputManager.actionCommand(this, index);
+      }
     } catch (err) {
       console.log(err);
     }
