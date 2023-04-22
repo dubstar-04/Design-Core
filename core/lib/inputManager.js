@@ -96,9 +96,9 @@ export class InputManager {
   }
 
   reset() {
-    this.core.scene.reset();
     this.activeCommand = undefined;
     this.promptOption = undefined;
+    this.core.scene.reset();
   }
 
   onCommand(input) {
