@@ -8,10 +8,7 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 export class Arc extends Entity {
   constructor(data) {
     super(data);
-    // this.minPoints = 3; // Should match number of cases in prompt
     this.radius = 1;
-    // this.showHelperGeometry = true;
-
 
     if (data) {
       if (data.points || data[40]) {
