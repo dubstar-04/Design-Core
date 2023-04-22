@@ -7,6 +7,43 @@ import {Utils} from './utils.js';
 class CanvasSelection {}
 class SelectionAccepted {}
 // class Initialise {}
+export class PromptOptions {
+  constructor(promptMessage = 'error', types = [], options = []) {
+    this.promptMessage = promptMessage;
+    this.types = types;
+    this.options = options;
+    this.resolve = undefined;
+    this.reject = undefined;
+  }
+
+  respond(input) {
+    if (this.types.includes(Input.getType(input))) {
+      this.resolve(input);
+    } else {
+      throw Error('Invalid response type');
+    }
+  }
+
+  reject() {
+    this.reject();
+  }
+
+  getPrompt() {
+    let msg = `${this.promptMessage}`;
+    if (this.options.length) {
+      msg = `${this.promptMessage} [${this.options}]`;
+    }
+    return msg;
+  }
+
+  setResolve(resolve) {
+    this.resolve = resolve;
+  }
+
+  setReject(reject) {
+    this.reject = reject;
+  }
+}
 
 export class InputManager {
   constructor(core) {
