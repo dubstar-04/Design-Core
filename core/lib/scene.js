@@ -125,6 +125,9 @@ export class Scene {
   mouseMoved() {
     this.tempItems = [];
 
+    // TODO: Can't select, snap and create an item at the same time
+    // add conditionals or return to reduce the number of paint requests
+
     if (this.core.mouse.buttonOneDown) {
       this.drawSelectionWindow();
       this.core.canvas.requestPaint();
