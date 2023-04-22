@@ -70,6 +70,13 @@ export class CommandLine {
     if (this.updateCallbackFunction) {
       this.updateCallbackFunction(this.cmdLine);
     }
+
+    if (this.core.scene.inputManager.activeCommand !== undefined) {
+      // TODO: This should call a common function that is currently called mouseMove in the scene class
+      this.core.scene.tempItems = [];
+      this.core.scene.inputManager.activeCommand.preview(this.core);
+      this.core.canvas.requestPaint();
+    }
   }
 
   /**
