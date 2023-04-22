@@ -223,9 +223,11 @@ export class CommandLine {
       point.x = parseFloat(xyData[0]);
       point.y = parseFloat(xyData[1]);
 
-      if (isRelative && this.core.scene.points.length) {
-        point.x = parseFloat(this.core.scene.points.at(-1).x + point.x);
-        point.y = parseFloat(this.core.scene.points.at(-1).y + point.y);
+      const activeCommand = this.core.scene.inputManager.activeCommand;
+
+      if (isRelative && activeCommand !== undefined && activeCommand.points.length) {
+        point.x = parseFloat(activeCommand.points.at(-1).x + point.x);
+        point.y = parseFloat(activeCommand.points.at(-1).y + point.y);
       }
 
       return point;
