@@ -218,13 +218,15 @@ export class Canvas {
     }
 
     for (j; j < this.core.scene.tempItems.length; j++) {
+      // TODO: get colour from setttings
       const colour = this.core.scene.tempItems[j].colour;
       this.core.scene.tempItems[j].draw(context, this.getScale(), this.core, colour);
     }
 
-    for (k; k < this.core.scene.selection.selectedItems.length; k++) {
-      const colour = this.core.scene.selection.selectedItems[k].colour;
-      this.core.scene.selection.selectedItems[k].draw(context, this.getScale(), this.core, colour);
+    for (k; k < this.core.scene.selectionManager.selectedItems.length; k++) {
+      // TODO: get colour from setttings
+      const colour = this.core.scene.selectionManager.selectedItems[k].colour;
+      this.core.scene.selectionManager.selectedItems[k].draw(context, this.getScale(), this.core, colour);
     }
   }
 
