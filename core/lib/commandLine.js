@@ -41,9 +41,23 @@ export class CommandLine {
    * @param {string} prompt
    */
   setPrompt(prompt) {
+    // Parse default options from prompt. Defaults are enclosed in arrows <>
+    const expression = new RegExp('<.+>');
+    const promptHasDefault = expression.test(prompt);
+    const commandDefault = prompt.match(expression);
+
     this.prompt = prompt;
-    this.command = '';
+    this.command = promptHasDefault ? this.parseCommandDefault(commandDefault) : '';
     this.update();
+  }
+
+  parseCommandDefault(commandDefault) {
+    if (commandDefault && commandDefault.length > 1) {
+      throw Error('Commands can contain only a single <default>');
+    }
+
+    const defaultValue = commandDefault.at(0).replace(/<|>/gi, '');
+    return defaultValue;
   }
 
   /**
