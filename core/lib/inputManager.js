@@ -1,8 +1,4 @@
-import {Entity} from '../entities/entity.js';
-import {Point} from '../entities/point.js';
 import {Tool} from '../tools/tool.js';
-import {Strings} from './strings.js';
-import {Utils} from './utils.js';
 
 class CanvasSelection {}
 class SelectionAccepted {}
