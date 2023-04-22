@@ -2,6 +2,7 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Distance extends Tool {
   constructor() {
@@ -26,7 +27,7 @@ export class Distance extends Tool {
 
       core.scene.inputManager.executeCommand();
     } catch (err) {
-      log(this.type, err);
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
