@@ -107,10 +107,10 @@ export class InputManager {
 
   onCommand(input) {
     if (this.activeCommand !== undefined) {
-      this.actionInput(input);
+      this.promptOption.respond(input);
     } else if (this.core.commandManager.isCommand(input) || this.core.commandManager.isShortcut(input)) {
       this.initialiseItem(this.core.commandManager.getCommand(input));
-      this.acceptPreselection();
+      this.activeCommand.execute(this.core);
     }
   }
 
