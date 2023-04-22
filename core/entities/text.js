@@ -3,11 +3,12 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
 
 export class Text extends Entity {
   constructor(data) {
     super(data);
-    this.minPoints = 1;
+    // this.minPoints = 1;
     this.string = '';
     this.height = 2.5;
     this.horizontalAlignment = 0;
@@ -27,22 +28,11 @@ export class Text extends Entity {
     // needs to be non-enumberable as to not appear in the object props
     Object.defineProperty(this, 'boundingRect', {
       enumerable: false,
-      // value: {width: 0, height: 0},
+      value: {width: 10, height: 10},
       writable: true,
     });
 
     if (data) {
-      this.points[0] = data.points[0];
-      // create points[1] used to determine the text rotation
-      this.points[1] = data.points[0].add(new Point(this.height, 0));
-
-      if (data.input) {
-        // TODO: Find a better way of providing this data
-        // This comes from core
-        this.height = data.input[1];
-        this.string = String(data.input[2]);
-      }
-
       if (data.string || data[1]) {
         // DXF Groupcode 1 - Default Value
         // The string of the text entity
@@ -60,11 +50,15 @@ export class Text extends Entity {
       }
 
       if (data.rotation || data[50]) {
-        // DXF Groupcode 50 - Text Rotation
+        // DXF Groupcode 50 - Text Rotation, angle in degrees
         // if we get rotation data store this as a point[1] at an angle from point[0]
         // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
+
         const rotation = data.rotation || data[50];
-        this.points[1] = data.points[0].project(Utils.degrees2radians(rotation), this.height);
+        this.setRotation(rotation);
+      } else {
+        // create points[1] used to determine the text rotation
+        this.points[1] = data.points[0].add(new Point(this.height, 0));
       }
 
       if (data.horizontalAlignment || data[72]) {
@@ -108,49 +102,78 @@ export class Text extends Entity {
     return command;
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op);
+      this.points.push(pt1);
 
-    prompt[1] = Strings.Input.START;
-    expectedType[1] = ['Point'];
+      const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
+      const height = await core.scene.inputManager.requestInput(op2);
+      this.height = height;
 
-    prompt[2] = Strings.Input.HEIGHT;
-    expectedType[2] = ['Number'];
+      const op3 = new PromptOptions('Enter Rotation (deg) <0>:', [Input.Type.NUMBER]);
+      const rotation = await core.scene.inputManager.requestInput(op3);
+      this.setRotation(rotation);
 
-    if (num === 2) {
-      core.scene.inputManager.inputData.height = input;
+      const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
+      const string = await core.scene.inputManager.requestInput(op4);
+      this.string = String(string);
+
+      core.scene.inputManager.executeCommand(this);
+    } catch (err) {
+      log(this.type, err);
+      console.trace();
     }
-
-    prompt[3] = Strings.Input.STRING;
-    expectedType[3] = ['String', 'Number'];
-
-    if (num === 3) {
-      core.scene.inputManager.inputData.string = input;
-    }
-
-    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: (num === prompt.length - 1)};
   }
 
-  width() {
-    // TODO: How to access the canvas element from here? Better way to do text width?
-    const oldFont = canvas.context.font;
-    canvas.context.font = this.height + 'pt ' + SM.getStyleByName(this.styleName).font.toString();
-    const width = (canvas.context.measureText(this.string.toString()).width);
-    canvas.context.font = oldFont;
-    return width;
+  preview(core) {
+    if (this.points.length >= 1) {
+      if (core.scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
+        const data = {
+          points: this.points,
+          colour: core.settings.helpergeometrycolour.toString(),
+          height: this.height,
+          rotation: this.rotation,
+          string: core.commandLine.command,
+        };
+
+        core.scene.addToTempItems(this.type, data);
+      } else {
+        const mousePoint = core.mouse.pointOnScene();
+        const points = [this.points.at(-1), mousePoint];
+        core.scene.addHelperGeometry('Line', points, core.settings.helpergeometrycolour.toString());
+      }
+    }
   }
 
+  /**
+   * Set the text rotation
+   * @param {number} angle - degrees
+   */
   setRotation(angle) {
-    // angle in radians
     // This overwrites the rotation rather than add to it.
-    // i.e. angle = 3.14159 rad will be a rotation of 180 degs.
-    this.points[1] = this.points[0].project(angle, this.height);
+
+    if (angle === undefined) {
+      return;
+    }
+
+    if (this.height > 0 && angle !== 0) {
+      this.points[1] = this.points[0].project(Utils.degrees2radians(angle), this.height);
+    }
   }
 
+  /**
+   * Get the text rotation
+   * @return {number} angle - degrees
+   */
   getRotation() {
-    // return the rotation angle in radians
-    return this.points[0].angle(this.points[1]);
+    if (this.points[1] !== undefined) {
+      const angle = Utils.radians2degrees(this.points[0].angle(this.points[1]));
+      return angle;
+    }
+
+    return 0;
   }
 
   getHorizontalAlignment() {
@@ -218,10 +241,12 @@ export class Text extends Entity {
       ctx.scale(-1, 1);
     }
 
+    const rotation = Utils.degrees2radians(this.rotation);
+
     if (this.backwards || this.upsideDown) {
-      ctx.rotate(this.rotation);
+      ctx.rotate(rotation);
     } else {
-      ctx.rotate(-this.rotation);
+      ctx.rotate(-rotation);
     }
 
     try { // HTML
@@ -282,7 +307,7 @@ export class Text extends Entity {
         '\n', '40', // STRING
         '\n', this.height,
         '\n', '50', // ROTATION
-        '\n', Utils.radians2degrees(this.rotation),
+        '\n', this.rotation,
         // "\n", "7", // TEXT STYLE
         // "\n", "STANDARD",
         // "\n", "72", //HORIZONTAL ALIGNMENT
