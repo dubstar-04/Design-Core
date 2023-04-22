@@ -10,9 +10,10 @@ export class Scene {
   constructor(core) {
     // initialise the scene variables
     this.core = core;
+    this.saved = false;
+
     this.items = []; // Main array that stores all the geometry
     this.tempItems = []; // Temporary Array to store items while input is being gathered
-    this.saved = false;
     this.snapping = new Snapping();
     this.inputManager = new InputManager(core);
   }
