@@ -198,22 +198,10 @@ export class InputManager {
     if (this.activeCommand instanceof Tool) {
       this.activeCommand.action(this.core);
     } else {
-      // const copyofitem = Utils.cloneObject(core, item);
-
-      const copyofitem = this.core.commandManager.createNew(item.type, item);
-      const colour = 'BYLAYER';
-
-      const data = {
-        colour: colour,
-        layer: this.core.layerManager.getCLayer(),
-      };
-
-      if (copyofitem.points.length) {
-      // merge the input data into the data
-        Object.assign(data, copyofitem);
-      }
-
-      this.core.scene.addItemToScene(copyofitem);
+      // set the items layer to the current layer
+      item.layer = this.core.layerManager.getCLayer();
+      // return the item index
+      return this.core.scene.addToScene(item.type, item, index);
     }
   }
 }
