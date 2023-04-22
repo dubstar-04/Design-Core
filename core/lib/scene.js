@@ -83,6 +83,7 @@ export class Scene {
   }
 
 
+  // TODO: Move to selectionManager
   drawSelectionWindow() {
     const selectionPoints = [];
     selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
