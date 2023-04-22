@@ -46,7 +46,6 @@ export class Strings {
     POINTORQUIT: 'Select another point or press ESC to quit',
     HEIGHT: 'Enter height',
     STRING: 'Enter text',
-    NONE: '',
     SELECTENTITIES: 'Select Items',
     SELECTED: 'Item(s) selected - Add more or press Enter to accept',
     DESTINATIONORDISTANCE: 'Select Destination or Enter distance',
