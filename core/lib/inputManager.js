@@ -1,8 +1,5 @@
 import {Tool} from '../tools/tool.js';
 
-class CanvasSelection {}
-class SelectionAccepted {}
-// class Initialise {}
 export class PromptOptions {
   constructor(promptMessage = 'error', types = [], options = []) {
     this.promptMessage = promptMessage;
