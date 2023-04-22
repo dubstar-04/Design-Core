@@ -62,6 +62,7 @@ export class Scene {
   }
 
   addToScene(type, data, index) {
+    // TODO: validate data is valid for type
     if (!data) {
       throw Error('Input data missing');
     }
