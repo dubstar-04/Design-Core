@@ -47,7 +47,7 @@ export class CommandLine {
     const promptHasDefault = expression.test(prompt);
     const commandDefault = prompt.match(expression);
 
-    this.prompt = prompt;
+    this.prompt = `${prompt}:`;
     this.command = promptHasDefault ? this.parseCommandDefault(commandDefault) : '';
     this.update();
   }
