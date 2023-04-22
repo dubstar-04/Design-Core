@@ -1,5 +1,6 @@
 import {Point} from '../entities/point.js';
 import {Snapping} from './snapping.js';
+import {SelectionManager} from './selectionManager.js';
 import {SelectionWindow} from './selectionWindow.js';
 import {Logging} from './logging.js';
 import {Strings} from './strings.js';
