@@ -102,6 +102,7 @@ export class InputManager {
     this.inputTracker = 0;
     this.inputData = {points: []};
     this.activeCommand = undefined;
+    this.promptOption = undefined;
   }
 
   onCommand(input) {
