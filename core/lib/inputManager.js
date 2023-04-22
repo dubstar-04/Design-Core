@@ -188,13 +188,22 @@ export class InputManager {
     this.core.commandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
   }
 
-  executeCommand(item) {
-    this.actionCommand(item);
+  /**
+   * Execute the currently active command then reset
+   * @param {*} item - item to create
+   * @param {*} index - index of item in scene.items
+   */
+  executeCommand(item, index = undefined) {
+    this.actionCommand(item, index);
     this.reset();
   }
 
-
-  actionCommand(item) {
+  /**
+   * Execute the currently active command without reset
+   * @param {*} item - item to create
+   * @param {*} index - index of item in scene.items
+   */
+  actionCommand(item, index = undefined) {
     if (this.activeCommand instanceof Tool) {
       this.activeCommand.action(this.core);
     } else {
