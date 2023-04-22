@@ -13,7 +13,7 @@ test('Test Commandline.resetPrompt', () => {
 test('Test Commandline.setPrompt', () => {
   const testText = 'TestTest';
   commandline.setPrompt(testText);
-  expect(commandline.prompt).toBe(testText);
+  expect(commandline.prompt).toBe(`${testText}:`);
 });
 
 test('Test Commandline.update', () => {
