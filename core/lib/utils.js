@@ -16,6 +16,15 @@ export class Utils {
     return dist;
   }
 
+  /**
+   * Round to 5 decimal places
+   * @param {number} number
+   * @returns rounded number
+   */
+  static round(number) {
+    return Math.round(number * 100000) / 100000;
+  }
+
 
   static cloneObject(core, obj) {
     // deep clone obj and all its attributes
