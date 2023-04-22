@@ -17,10 +17,12 @@ export class Entity {
       writable: true,
     });
 
+    /*
     Object.defineProperty(this, 'trueColour', {
       enumerable: false,
       writable: true,
     });
+    */
 
     this.lineWidth = 2;
     this.colour = 'BYLAYER';
@@ -61,9 +63,9 @@ export class Entity {
   }
 
   getColour() {
-    if (this.trueColour !== undefined) {
-      return this.trueColour;
-    }
+    // if (this.trueColour !== undefined) {
+    //   return this.trueColour;
+    // }
 
     return this.colour;
   }
