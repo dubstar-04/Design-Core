@@ -143,8 +143,10 @@ export class CommandLine {
    * Handles presses of the space key
    */
   spacePressed() {
-    const activeCommand = this.core.scene.activeCommand;
-    if (activeCommand && activeCommand.type === 'Text') {
+    const activeCommand = this.core.scene.inputManager.activeCommand;
+    const promptOption = this.core.scene.inputManager.promptOption;
+
+    if (activeCommand && promptOption.types.includes(Input.Type.STRING)) {
       this.command = this.command + ' ';
     } else {
       this.enterPressed();
