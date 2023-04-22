@@ -1,5 +1,6 @@
 import {Tool} from '../tools/tool.js';
 
+// class Quit {}
 export class PromptOptions {
   constructor(promptMessage = 'error', types = [], options = []) {
     this.promptMessage = promptMessage;
