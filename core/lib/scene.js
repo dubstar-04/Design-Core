@@ -127,6 +127,9 @@ export class Scene {
 
     if (this.core.mouse.buttonOneDown) {
       this.drawSelectionWindow();
+    if (this.inputManager.activeCommand !== undefined) {
+      this.inputManager.activeCommand.preview(this.core);
+      this.core.canvas.requestPaint();
     }
 
     if (this.snapping.active) {
