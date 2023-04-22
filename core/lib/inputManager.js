@@ -180,14 +180,6 @@ export class InputManager {
     this.activeCommand = this.core.commandManager.createNew(command);
   };
 
-  convertInputToPoint(input) {
-    const basePoint = this.core.scene.points.at(-1);
-    const angle = Utils.degrees2radians(this.core.mouse.inputAngle());
-    const point = basePoint.project( angle, input);
-
-    return point;
-  }
-
   setPrompt(prompt) {
     this.core.commandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
   }
