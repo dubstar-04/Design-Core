@@ -66,6 +66,8 @@ export class InputManager {
     this.selection = undefined;
     this.promptOption = undefined;
   }
+
+
   requestInput(promptOption) {
     this.promptOption = promptOption;
     this.setPrompt(this.promptOption.getPrompt());
@@ -173,6 +175,7 @@ export class InputManager {
       // update selection set
     }
   }
+
 
   initialiseItem(command) {
     this.core.scene.saveRequired();
