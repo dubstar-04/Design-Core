@@ -183,12 +183,8 @@ export class InputManager {
   }
 
   initialiseItem(command) {
-    // exit any previous commands
-    // this.reset();
     this.core.scene.saveRequired();
-    // add the command to the commandline history
     this.core.commandLine.addToCommandHistory(command);
-    // activate a new command
     this.activeCommand = this.core.commandManager.createNew(command);
   };
 
