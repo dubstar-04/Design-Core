@@ -70,6 +70,31 @@ export class InputManager {
     this.inputTracker = 0;
     this.inputData = {points: []};
     this.activeCommand = undefined;
+    this.promptOption = undefined;
+  requestInput(promptOption) {
+    this.promptOption = promptOption;
+    this.setPrompt(this.promptOption.getPrompt());
+
+    // Check the requested input types are valid
+    promptOption.types.forEach((type) => {
+      if (type === undefined) {
+        throw Error('Undefined Input.Type');
+      }
+
+      if (!Object.values(Input.Type).includes(type)) {
+        throw Error('Invalid input type');
+      }
+    });
+
+    if (promptOption.types.includes(Input.Type.POINT)) {
+      // turn on snapping
+      this.core.scene.snapping.active = true;
+    }
+
+    return new Promise((resolve, reject) => {
+      this.promptOption.setResolve(resolve);
+      this.promptOption.setReject(reject);
+    });
   }
 
   reset() {
