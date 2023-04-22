@@ -201,15 +201,6 @@ export class Canvas {
     let j = 0;
     let k = 0;
 
-    /*
-    if (this.panning || this.zooming) {
-    //If Pan or Zoom is in progress, only draw a portion of the entities
-    if (numOfEntities > 350) {
-    i = (numOfEntities - 350)
-    }
-    }
-    */
-
     for (i; i < numOfEntities; i++) {
       const layer = this.core.layerManager.getLayerByName(this.core.scene.items[i].layer);
 
