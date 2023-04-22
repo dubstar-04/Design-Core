@@ -128,7 +128,7 @@ export class InputManager {
   }
 
   onLeftClick(point) {
-    if (this.promptOption !== undefined && this.promptOption.types.includes('Point')) {
+    if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {
       this.core.scene.snapping.active = false;
       this.promptOption.respond(point);
     } else {
