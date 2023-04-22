@@ -94,6 +94,7 @@ export class InputManager {
   reset() {
     this.core.commandLine.resetPrompt();
     this.activeCommand = undefined;
+    // this.promptOption.reject('reject');
     this.promptOption = undefined;
     this.core.scene.reset();
   }
