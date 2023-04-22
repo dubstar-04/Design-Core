@@ -72,7 +72,7 @@ export class CommandLine {
         this.enterPressed();
         break;
       case 'Escape':
-        this.core.scene.inputManager.reset();
+        this.core.scene.inputManager.onEscapePressed();
         break;
       case 'Space': // space
         this.spacePressed();
