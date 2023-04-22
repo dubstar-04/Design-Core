@@ -11,20 +11,14 @@ export class Scene {
     // initialise the scene variables
     this.core = core;
     this.items = []; // Main array that stores all the geometry
-    this.points = []; // Temporary Array to store the input points
     this.tempItems = []; // Temporary Array to store items while input is being gathered
-    this.tempPoints = []; // Temporary Array to store points while input is being gathered
-    this.selection = new Selection(core);
     this.saved = false;
     this.snapping = new Snapping();
     this.inputManager = new InputManager(core);
   }
 
   reset() {
-    this.points = []; // clear array
     this.tempItems = [];
-    this.selection.reset();
-    this.core.commandLine.resetPrompt();
     this.snapping.active = false;
     this.core.canvas.requestPaint();
   }
@@ -130,7 +124,6 @@ export class Scene {
   // TODO: Move this somewhere it makes more sense. inputManager? Canvas?
   mouseMoved() {
     this.tempItems = [];
-    this.tempPoints = [];
 
     if (this.core.mouse.buttonOneDown) {
       this.drawSelectionWindow();
