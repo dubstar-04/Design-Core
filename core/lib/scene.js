@@ -14,6 +14,8 @@ export class Scene {
 
     this.items = []; // Main array that stores all the geometry
     this.tempItems = []; // Temporary Array to store items while input is being gathered
+
+    this.selectionManager = new SelectionManager(core);
     this.snapping = new Snapping();
     this.inputManager = new InputManager(core);
   }
