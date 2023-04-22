@@ -67,7 +67,7 @@ export class PropertyManager {
     let subset = [];
 
     // create subset array of selectionSet
-    this.core.scene.selectionManager.selectionSet.forEach((index) => {
+    this.core.scene.selectionManager.selectionSet.selectionSet.forEach((index) => {
       subset.push(this.core.scene.items[index]);
     });
 
