@@ -4,6 +4,7 @@ import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Circle extends Entity {
   constructor(data) {
@@ -51,7 +52,7 @@ export class Circle extends Entity {
       }
       core.scene.inputManager.executeCommand(this);
     } catch (err) {
-      log('circle error:', err);
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
