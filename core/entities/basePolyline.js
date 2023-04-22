@@ -3,6 +3,7 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
 
 export class BasePolyline extends Entity {
   constructor(data) {
@@ -43,17 +44,37 @@ export class BasePolyline extends Entity {
     }
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op);
+      this.points.push(pt1);
 
-    prompt[1] = Strings.Input.START;
-    expectedType[1] = ['Point'];
+      let pt2;
+      const op2 = new PromptOptions(Strings.Input.POINTORQUIT, [Input.Type.POINT]);
+      // do {
+      while (true) {
+        pt2 = await core.scene.inputManager.requestInput(op2);
+        // log('complete polyline', pt2.state);
+        // if (Input.getType(pt2) !== Input.Type.QUIT) {
+        this.points.push(pt2);
 
-    prompt[2] = Strings.Input.POINTORQUIT;
-    expectedType[2] = ['Point', 'Number'];
+        // }
+      } // while (Input.getType(pt2) !== Input.Type.QUIT);
+      core.scene.inputManager.actionCommand(this);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      console.log('Clean up yo!');
+    }
+  }
 
-    return {expectedType: expectedType, prompt: prompt, reset: false, action: num >= this.minPoints};
+  preview(core) {
+    if (this.points.length >= 1) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [...this.points, mousePoint];
+      core.scene.addHelperGeometry(this.type, points, core.settings.helpergeometrycolour.toString());
+    }
   }
 
   draw(ctx, scale, core, colour) {
