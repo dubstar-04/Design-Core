@@ -4,6 +4,8 @@ import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
+
 
 export class Arc extends Entity {
   constructor(data) {
@@ -65,7 +67,7 @@ export class Arc extends Entity {
 
       core.scene.inputManager.executeCommand(this);
     } catch (err) {
-      log(this.type, err);
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
