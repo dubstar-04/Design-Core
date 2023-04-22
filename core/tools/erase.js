@@ -1,6 +1,7 @@
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Erase extends Tool {
   constructor() {
@@ -22,7 +23,7 @@ export class Erase extends Tool {
 
       core.scene.inputManager.executeCommand();
     } catch (error) {
-      log(this.type, error);
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
