@@ -1,11 +1,8 @@
 import {Point} from '../entities/point.js';
 import {Snapping} from './snapping.js';
-import {Selection} from './selection.js';
 import {SelectionWindow} from './selectionWindow.js';
 import {Logging} from './logging.js';
 import {Strings} from './strings.js';
-import {Entity} from '../entities/entity.js';
-import {Tool} from '../tools/tool.js';
 import {InputManager} from './inputManager.js';
 
 export class Scene {
