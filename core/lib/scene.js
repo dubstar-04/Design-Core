@@ -145,47 +145,5 @@ export class Scene {
       }
       this.core.canvas.requestPaint();
     }
-
-    // TODO: sort this mess out. This logic would be best in the design engine or at least tidied.
-    // If there is an activecommand and the start point exists, draw the item on screen with every mouse move
-    if (this.points.length !== 0) {
-      this.tempPoints = this.points.slice(0); // copy points to tempPoints
-
-      if (this.core.settings.polar) {
-        // if polar is enabled - get the closest points
-        const polarSnap = this.snapping.polarSnap(this.lastSelectedPoint(), this.core);
-        if (polarSnap) {
-          this.core.mouse.setPosFromScenePoint(polarSnap);
-        }
-      } else if (this.core.settings.ortho) {
-        // if ortho is enabled - get the nearest ortho point
-        const orthoSnap = this.snapping.orthoSnap(this.lastSelectedPoint(), this.core);
-        if (orthoSnap) {
-          this.core.mouse.setPosFromScenePoint(orthoSnap);
-        }
-      }
-
-      // add the mouse position to temp points
-      this.tempPoints.push(this.core.mouse.pointOnScene());
-
-      if (this.inputManager.activeCommand !== undefined && this.inputManager.activeCommand.showHelperGeometry) {
-        // Make a new array of points with the base point and the current mouse position.
-        const helperPoints = [];
-        helperPoints.push(this.tempPoints[0]);
-        helperPoints.push(this.core.mouse.pointOnScene());
-
-        this.addHelperGeometry('Line', helperPoints, this.core.settings.helpergeometrycolour.toString());
-      }
-
-      if (this.inputManager.activeCommand !== undefined && this.inputManager.activeCommand instanceof Entity && this.tempPoints.length >= this.inputManager.activeCommand.minPoints) {
-        this.addHelperGeometry(this.inputManager.activeCommand.type, this.tempPoints, this.core.settings.helpergeometrycolour.toString());
-        this.core.canvas.requestPaint(); // TODO: Improve requests to paint as it is called too often.
-      }
-
-      if (this.inputManager.activeCommand !== undefined && this.inputManager.activeCommand instanceof Tool && this.selection.selectionAccepted) {
-        this.inputManager.activeCommand.preview(this.core);
-        this.core.canvas.requestPaint();
-      }
-    }
   }
 }
