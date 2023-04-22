@@ -131,19 +131,16 @@ export class InputManager {
     } else if (this.activeCommand === undefined) {
       this.initialiseItem(this.core.commandLine.lastCommand[0]);
       this.actionInput();
+  onLeftClick(point) {
+    if (this.promptOption !== undefined && this.promptOption.types.includes('Point')) {
+      this.core.scene.snapping.active = false;
+      this.promptOption.respond(point);
     } else {
-      this.core.scene.reset();
+      const selection = this.core.scene.selectionManager.singleSelect(this.core.mouse.pointOnScene());
+      this.onSelection(selection);
     }
   }
 
-  onLeftClick() {
-    if (this.activeCommand === undefined) {
-      this.core.scene.selection.singleSelect();
-    } else {
-      if (this.activeCommand instanceof Tool && this.activeCommand.selectionRequired && !this.core.scene.selection.selectionAccepted) {
-        this.core.scene.selection.singleSelect();
-        this.actionInput(new CanvasSelection());
-      } else if (this.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted || !this.activeCommand.selectionRequired) {
   mouseUp(button) {
     switch (button) {
       case 0: // left button
