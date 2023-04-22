@@ -45,6 +45,25 @@ export class PromptOptions {
   }
 }
 
+export class Input {
+  static Type = {
+    POINT: 'Point',
+    SELECTIONSET: 'SelectionSet',
+    SINGLESELECTION: 'SingleSelection',
+    NUMBER: 'Number',
+    STRING: 'String',
+    QUIT: 'Quit',
+  };
+
+  static getType(value) {
+    if (value === undefined) {
+      throw Error('Input.Type: Undefined input type');
+    }
+
+    return value.constructor.name;
+  }
+}
+
 export class InputManager {
   constructor(core) {
     this.core = core;
