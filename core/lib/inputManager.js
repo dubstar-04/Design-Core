@@ -144,9 +144,41 @@ export class InputManager {
         this.core.scene.selection.singleSelect();
         this.actionInput(new CanvasSelection());
       } else if (this.activeCommand instanceof Entity || this.core.scene.selection.selectionAccepted || !this.activeCommand.selectionRequired) {
+  mouseUp(button) {
+    switch (button) {
+      case 0: // left button
         const point = this.core.mouse.pointOnScene();
-        this.actionInput(point);
+        this.onLeftClick(point);
+
+        // Clear tempItems - This is here to remove the crossing window
+        this.core.scene.tempItems = [];
+
+        // check if the mouse position has changed since mousedown
+        if (!this.core.mouse.mouseDownCanvasPoint.isSame(this.core.mouse.pointOnCanvas())) {
+          // const selection =
+          this.core.scene.selectionManager.windowSelect();
+          // this.onSelection(selection);
+        }
+        break;
+      case 1: // middle button
+        break;
+      case 2: // right button
+        this.onEnterPressed();
+        break;
+    }
+  };
+
+  onSelection(selection) {
+    // log('got a selection:', selection, 'type:', Input.getType(selection));
+
+    if (this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
+      this.promptOption.respond(selection);
+    } else {
+      if (Input.getType(selection) === Input.Type.SINGLESELECTION) {
+        this.core.scene.selectionManager.addToSelectionSet(selection.selectedItemIndex);
       }
+
+      // update selection set
     }
   }
 

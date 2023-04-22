@@ -139,33 +139,7 @@ export class Scene {
     this.core.mouse.setPosFromScenePoint(snapPoint);
   }
 
-  mouseDown(button) {
-    switch (button) {
-      case 0: // left button
-        this.inputManager.onLeftClick();
-        break;
-      case 1: // middle button
-        break;
-      case 2: // right button
-        this.inputManager.onEnterPressed();
-        break;
-    }
-  };
-
-  mouseUp(button) {
-    switch (button) {
-      case 0: // left button
-        // Clear tempItems - This is here to remove the crossing window
-        this.tempItems = [];
-        this.selection.windowSelect();
-        break;
-      case 1: // middle button
-        break;
-      case 2: // right button
-        break;
-    }
-  };
-
+  // TODO: Move this somewhere it makes more sense. inputManager? Canvas?
   mouseMoved() {
     this.tempItems = [];
     this.tempPoints = [];
