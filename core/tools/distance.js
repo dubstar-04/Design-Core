@@ -6,7 +6,6 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 export class Distance extends Tool {
   constructor() {
     super();
-    // this.selectionRequired = false;
   }
 
   static register() {
