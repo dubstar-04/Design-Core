@@ -6,9 +6,6 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 export class Extend extends Tool {
   constructor() {
     super();
-    // remove this.movement
-    // this.movement = 'Modify';
-    // this.minPoints = 0;
     this.selectedIndex;
   }
 
