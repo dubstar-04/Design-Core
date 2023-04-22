@@ -204,10 +204,19 @@ export class InputManager {
     this.core.commandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
   }
 
-  actionCommand() {
+  executeCommand(item) {
+    this.actionCommand(item);
+    this.reset();
+  }
+
+
+  actionCommand(item) {
     if (this.activeCommand instanceof Tool) {
       this.activeCommand.action(this.core);
     } else {
+      // const copyofitem = Utils.cloneObject(core, item);
+
+      const copyofitem = this.core.commandManager.createNew(item.type, item);
       const colour = 'BYLAYER';
 
       const data = {
@@ -215,73 +224,12 @@ export class InputManager {
         layer: this.core.layerManager.getCLayer(),
       };
 
-      if (this.inputData.points.length) {
+      if (copyofitem.points.length) {
       // merge the input data into the data
-        Object.assign(data, this.inputData);
+        Object.assign(data, copyofitem);
       }
 
-      this.core.scene.addToScene(this.activeCommand.type, data);
-    }
-  }
-
-  actionInput(input) {
-    const num = this.inputTracker;
-    let inputType = 'undefined';
-
-    // get the input type
-    if (input !== undefined) {
-      inputType = (input).constructor.name;
-    }
-
-    // call the subclass
-    const data = this.activeCommand.processInput(num, input, inputType, this.core);
-
-    let validInput = false;
-    // TODO: use index 0 for actual data
-    // no valid type required for index 0
-    validInput = num ? data.expectedType[num].includes(inputType) : true;
-
-    if (validInput) {
-      if (inputType !== 'CanvasSelection') {
-        this.inputTracker++;
-        this.inputTracker = Math.min(this.inputTracker, data.prompt.length - 1);
-      }
-
-      if (inputType === 'Number' && data.expectedType[num].includes('Point')) {
-        input = this.convertInputToPoint(input);
-      }
-
-      if (input instanceof Point) {
-        this.inputData.points.push(input);
-        this.core.scene.points.push(input);
-      }
-    } else {
-      this.core.notify(Strings.Error.INPUT);
-    }
-
-    if (data.expectedType[this.inputTracker].includes('Point') && this.activeCommand.minPoints) {
-      this.core.scene.snapping.active = true;
-    } else {
-      this.core.scene.snapping.active = false;
-    }
-
-    // validate the action state
-    if (data.action) {
-      if (this.inputData.points.length < this.activeCommand.minPoints) {
-        const msg = `Invalid Data for command: ${this.activeCommand.constructor.name}`;
-        this.core.notify(msg);
-        throw Error(msg);
-      }
-    }
-
-    this.setPrompt(data.prompt[this.inputTracker]);
-
-    if (data.action) {
-      this.actionCommand();
-    }
-
-    if (data.reset) {
-      this.reset();
+      this.core.scene.addItemToScene(copyofitem);
     }
   }
 }
