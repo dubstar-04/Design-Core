@@ -6,6 +6,13 @@ export class Tool {
       writable: true,
     });
 
+    Object.defineProperty(this, 'points', {
+      enumerable: false,
+      value: [],
+      writable: true,
+    });
+
+    /*
     Object.defineProperty(this, 'selectionRequired', {
       enumerable: false,
       value: true,
@@ -23,6 +30,7 @@ export class Tool {
       value: 2,
       writable: true,
     });
+    */
   }
 
   action(core) {
