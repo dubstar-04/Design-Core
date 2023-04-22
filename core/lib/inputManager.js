@@ -162,8 +162,6 @@ export class InputManager {
   };
 
   onSelection(selection) {
-    // log('got a selection:', selection, 'type:', Input.getType(selection));
-
     if (this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
       this.promptOption.respond(selection);
     } else {
