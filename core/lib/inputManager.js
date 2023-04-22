@@ -143,6 +143,11 @@ export class InputManager {
         // Clear tempItems - This is here to remove the crossing window
         this.core.scene.tempItems = [];
 
+        // TODO: can't select and window select at the same time
+        // This needs combining with canvas.mouseMove to define selection, snapping and window selection
+        const point = this.core.mouse.pointOnScene();
+        this.onLeftClick(point);
+
         // check if the mouse position has changed since mousedown
         if (!this.core.mouse.mouseDownCanvasPoint.isSame(this.core.mouse.pointOnCanvas())) {
           this.core.scene.selectionManager.windowSelect();
