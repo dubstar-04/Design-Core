@@ -2,6 +2,7 @@ import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
 import {Utils} from '../lib/utils.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 
 export class Rotate extends Tool {
@@ -45,7 +46,7 @@ export class Rotate extends Tool {
 
       core.scene.inputManager.executeCommand();
     } catch (err) {
-      log(this.type, err);
+      Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
