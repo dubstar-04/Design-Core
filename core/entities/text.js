@@ -8,7 +8,6 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 export class Text extends Entity {
   constructor(data) {
     super(data);
-    // this.minPoints = 1;
     this.string = '';
     this.height = 2.5;
     this.horizontalAlignment = 0;
