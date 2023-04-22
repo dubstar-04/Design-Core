@@ -3,6 +3,7 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
 
 export class Circle extends Entity {
   constructor(data) {
@@ -33,20 +34,34 @@ export class Circle extends Entity {
     return command;
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op);
+      this.points.push(pt1);
 
-    prompt[1] = Strings.Input.CENTER;
-    expectedType[1] = ['Point', 'Number'];
+      const op2 = new PromptOptions(Strings.Input.POINTORQUIT, [Input.Type.POINT, Input.Type.NUMBER]);
+      const pt2 = await core.scene.inputManager.requestInput(op2);
+      if (Input.getType(pt2) === 'Point') {
+        this.points.push(pt2);
+      }
 
-    prompt[2] = Strings.Input.POINTORRADIUS;
-    expectedType[2] = ['Point', 'Number'];
-
-
-    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: num >= this.minPoints};
+      if (Input.getType(pt2) === 'Number') {
+        this.setRadius(pt2);
+      }
+      core.scene.inputManager.executeCommand(this);
+    } catch (err) {
+      log('circle error:', err);
+    }
   }
 
+  preview(core) {
+    if (this.points.length >= 1) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [this.points.at(-1), mousePoint];
+      core.scene.addHelperGeometry(this.type, points, core.settings.helpergeometrycolour.toString());
+    }
+  }
 
   getRadius() {
     return Utils.distBetweenPoints(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y); ;
