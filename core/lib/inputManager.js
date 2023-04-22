@@ -179,6 +179,7 @@ export class InputManager {
     this.activeCommand = this.core.commandManager.createNew(command);
   };
 
+  // TODO: single line method required?
   setPrompt(prompt) {
     this.core.commandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
   }
