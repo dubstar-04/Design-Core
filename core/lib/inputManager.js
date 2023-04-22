@@ -68,7 +68,10 @@ export class InputManager {
   constructor(core) {
     this.core = core;
     this.activeCommand = undefined;
+
+    this.selection = undefined;
     this.promptOption = undefined;
+  }
   requestInput(promptOption) {
     this.promptOption = promptOption;
     this.setPrompt(this.promptOption.getPrompt());
