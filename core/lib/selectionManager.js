@@ -1,4 +1,11 @@
 import {Utils} from './utils.js';
+
+export class SingleSelection {
+  constructor(index, point) {
+    this.selectedItemIndex = index;
+    this.selectedPoint = point;
+  }
+}
 // TODO: Refactor class.
 export class SelectionManager {
   constructor(core) {
