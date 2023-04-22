@@ -1,10 +1,10 @@
 export class Utils {
   static degrees2radians(degrees) {
-    return degrees * Math.PI / 180;
+    return Utils.round(degrees * Math.PI / 180);
   };
 
   static radians2degrees(radians) {
-    return radians * 180 / Math.PI;
+    return Utils.round(radians * 180 / Math.PI);
   };
 
   static distBetweenPoints(firstPointx, firstPointy, secondPointx, secondPointy) {
