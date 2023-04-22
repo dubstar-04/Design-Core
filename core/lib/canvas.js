@@ -73,7 +73,7 @@ export class Canvas {
         break;
     }
 
-    this.core.scene.mouseUp(button);
+    this.core.scene.inputManager.mouseUp(button);
   };
 
   doubleClick(button) {
