@@ -111,7 +111,7 @@ export class Canvas {
   }
 
   zoomExtents() {
-    const extents = this.core.scene.getExtents();
+    const extents = this.core.scene.boundingRect();
     if (extents) {
       // calculate the center of all items
       const selectionCenter = new Point(extents.xmin + ((extents.xmax - extents.xmin) / 2), extents.ymin + ((extents.ymax - extents.ymin) / 2));

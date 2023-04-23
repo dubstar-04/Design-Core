@@ -22,7 +22,7 @@ export class Scene {
     this.core.canvas.requestPaint();
   }
 
-  getExtents() {
+  boundingRect() {
     let xmin; let xmax; let ymin; let ymax;
 
     if (this.items.length === 0) {
