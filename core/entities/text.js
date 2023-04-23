@@ -337,7 +337,7 @@ export class Text extends Entity {
     const topRight = new Point(rect.x + rect.width, rect.y + rect.height);
     const mid = new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
 
-    let distance = Utils.distBetweenPoints(P.x, P.y, mid.x, mid.y);
+    let distance = P.distance(mid);
 
     // if P is inside the bounding box return distance 0
     if (P.x > botLeft.x &&
