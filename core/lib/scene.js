@@ -130,12 +130,6 @@ export class Scene {
     // add conditionals or return to reduce the number of paint requests
 
     if (this.core.mouse.buttonOneDown) {
-      this.drawSelectionWindow();
-      this.core.canvas.requestPaint();
-    }
-
-    if (this.inputManager.activeCommand !== undefined) {
-      this.inputManager.activeCommand.preview(this.core);
       this.selectionManager.drawSelectionWindow();
       this.core.canvas.requestPaint();
     }
