@@ -143,6 +143,11 @@ export class InputManager {
     this.onLeftClick(point);
   }
 
+  windowSelect() {
+    log('single select');
+    this.core.scene.selectionManager.windowSelect();
+  }
+
   mouseUp(button) {
     switch (button) {
       case 0: // left button
@@ -155,8 +160,9 @@ export class InputManager {
 
         // check if the mouse position has changed since mousedown
         if (!this.core.mouse.mouseDownCanvasPoint.isSame(this.core.mouse.pointOnCanvas())) {
-          this.core.scene.selectionManager.windowSelect();
+          this.windowSelect();
         }
+
         break;
       case 1: // middle button
         break;
