@@ -1,5 +1,4 @@
 import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
@@ -215,7 +214,7 @@ export class Rectangle extends Entity {
         closest.x = A.x + ABx * t;
         closest.y = A.y + ABy * t;
 
-        const dist = Utils.distBetweenPoints(P.x, P.y, closest.x, closest.y);
+        const dist = P.distance(closest);
         if (dist < distance) {
           distance = dist;
         }
