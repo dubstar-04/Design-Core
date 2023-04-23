@@ -1,5 +1,4 @@
 import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
@@ -154,7 +153,7 @@ export class BasePolyline extends Entity {
       const pnt = P.perpendicular(A, B);
 
       if (pnt !== null) {
-        const pntDist = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y);
+        const pntDist = P.distance(pnt);
 
         if (pntDist < distance) {
           distance = pntDist;
