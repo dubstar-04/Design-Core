@@ -16,12 +16,19 @@ export class Scene {
     this.inputManager = new InputManager(core);
   }
 
+  /**
+   * Reset the scene
+   */
   reset() {
     this.tempItems = [];
     this.selectionManager.reset();
     this.core.canvas.requestPaint();
   }
 
+  /**
+   * Get the scene bounding rect
+   * @returns scene bounding rect
+   */
   boundingRect() {
     let xmin; let xmax; let ymin; let ymax;
 
@@ -50,10 +57,20 @@ export class Scene {
     };
   }
 
+  /**
+   * Sets the save state following scene changes
+   */
   saveRequired() {
     this.saved = false; // Changes have occured. A save may be required.
   }
 
+  /**
+   * Create and add new items to the scene
+   * @param {string} type - entity type
+   * @param {object} data - object of entity parameters
+   * @param {number} index - integer of item to replace
+   * @returns - index of created item
+   */
   addToScene(type, data, index) {
     // TODO: validate data is valid for type
     if (!data) {
@@ -82,10 +99,19 @@ export class Scene {
     return index;
   }
 
+  /**
+   * Add items to the scenes tempItems
+   * @param {object} item
+   */
   addToTempItems(item) {
     this.tempItems.push(item); // Add it to the tempItems Array
   }
 
+  /**
+   * Create a new temp item and add to scenes tempItems
+   * @param {string} type - entity type
+   * @param {object} data - object of entity parameters
+   */
   createTempItem(type, data) {
     const helper = this.core.commandManager.createNew(type, data);
     this.addToTempItems(helper);
