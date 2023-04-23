@@ -91,17 +91,19 @@ export class Mouse {
   positionString() {
     // return a string showing the position of the mouse on the canvas
 
-    let str = 'X: ' + this.pointOnScene().x.toFixed(1) + ' Y: ' + this.pointOnScene().y.toFixed(1);
+    const str = 'X: ' + this.pointOnScene().x.toFixed(1) + ' Y: ' + this.pointOnScene().y.toFixed(1);
 
+    /*
     // add the length to a previous when available
-    if (this.inputLength()) {
-      str = str + ', Len: ' + Math.round(this.inputLength());
-    }
+      if (this.inputLength()) {
+        str = str + ', Len: ' + Math.round(this.inputLength());
+      }
 
-    // add the angle from the previous point when available
-    if (this.inputAngle()) {
-      str = str + ', Ang: ' + Math.round(this.inputAngle());
-    }
+      // add the angle from the previous point when available
+      if (this.inputAngle()) {
+        str = str + ', Ang: ' + Math.round(this.inputAngle());
+      }
+      */
 
     return str;
   }
