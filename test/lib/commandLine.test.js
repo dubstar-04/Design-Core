@@ -1,4 +1,6 @@
 import {Core} from '../../core/core.js';
+import {Input, PromptOptions} from '../../core/lib/inputManager.js';
+import {Strings} from '../../core/lib/strings.js';
 
 const core = new Core();
 const commandline = core.commandLine; // new CommandLine(core);
@@ -51,7 +53,41 @@ test('Test CommandLine.handleKeys', () => {
   commandline.resetPrompt();
 });
 
+test('Test CommandLine.spacePressed', () => {
+  const inputManager = core.scene.inputManager;
+  const promptOption = new PromptOptions(Strings.Input.START, [Input.Type.STRING]);
+
+  inputManager.reset();
+  // With no active command
+  // Pressing space should active a command if this.command contains a valid command
+  commandline.handleKeys('L');
+  commandline.spacePressed();
+  expect(inputManager.activeCommand).not.toBeUndefined();
+
+  // with an active command
+  // pressing space should end the active command if this.command is empty
+  commandline.spacePressed();
+  expect(inputManager.activeCommand).toBeUndefined();
+
+  // pressing space should add a space to this.command if the input type is Input.Type.STRING
+  commandline.handleKeys('L');
+  commandline.spacePressed();
+  expect(inputManager.activeCommand).not.toBeUndefined();
+
+  inputManager.requestInput(promptOption);
+  commandline.handleKeys('test');
+  commandline.spacePressed();
+  // activeCommand should be defined still
+  expect(inputManager.activeCommand).not.toBeUndefined();
+  // command should have a space
+  expect(commandline.command).toBe('test ');
+
+  inputManager.reset();
+});
+
 test('Test CommandLine.backPressed', () => {
+  commandline.resetPrompt();
+
   commandline.handleKeys('123');
   expect(commandline.command).toBe('123');
 
@@ -68,11 +104,10 @@ test('Test CommandLine.backPressed', () => {
   // deleting with no command shouldn't affect the prompt value
   commandline.backPressed();
   expect(commandline.prompt.at(-1)).toBe(':');
-
-  commandline.resetPrompt();
 });
 
 test('Test CommandLine.enterPressed', () => {
+  commandline.resetPrompt();
   commandline.handleKeys('L');
   commandline.enterPressed();
   expect(commandline.lastCommand.length).toBe(1);
