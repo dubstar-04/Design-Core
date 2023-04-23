@@ -122,7 +122,7 @@ export class Mouse {
 
     if (this.core.settings.polar) {
       // if polar is enabled - get the closest points
-      const polarSnap = this.core.scene.snapping.polarSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
+      const polarSnap = this.core.scene.inputManager.snapping.polarSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
       if (polarSnap) {
         this.setPosFromScenePoint(polarSnap);
       }
