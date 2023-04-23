@@ -1,4 +1,3 @@
-import {Point} from '../entities/point.js';
 import {Snapping} from './snapping.js';
 import {SelectionManager} from './selectionManager.js';
 import {Logging} from './logging.js';
@@ -104,24 +103,6 @@ export class Scene {
     this.tempItems.push(helper); // Add it to the tempItems Array
   }
 
-  // TODO: Move this to selectionManager or canvas
-  addSnapPoint(snapPoint) {
-    // Draw a circle to highlight the snap.
-    const CentrePoint = new Point(snapPoint.x, snapPoint.y);
-    const radiusPoint = new Point(snapPoint.x, snapPoint.y + (5 / this.core.canvas.getScale()));
-    const snapCirclePoints = [CentrePoint, radiusPoint];
-
-    const data = {
-      points: snapCirclePoints,
-      colour: this.core.settings.snapcolour.toString(),
-    };
-    const item = this.core.commandManager.createNew('Circle', data);
-    this.tempItems.push(item);
-
-    // Move the mouse to the closest snap point so if the mouse if clicked the snap point is used.
-    this.core.mouse.setPosFromScenePoint(snapPoint);
-  }
-
   // TODO: Move this somewhere it makes more sense. inputManager? Canvas?
   mouseMoved() {
     this.tempItems = [];
@@ -135,10 +116,7 @@ export class Scene {
     }
 
     if (this.snapping.active) {
-      const snapPoint = this.snapping.getSnapPoint(this);
-      if (snapPoint) {
-        this.addSnapPoint(snapPoint);
-      }
+      this.snapping.snap(this);
       this.core.canvas.requestPaint();
     }
 
