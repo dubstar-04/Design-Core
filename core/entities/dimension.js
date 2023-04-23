@@ -125,13 +125,13 @@ export class Dimension extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = core.mouse.pointOnScene();
       const points = [this.points.at(0), mousePoint];
-      core.scene.addHelperGeometry('Line', points, core.settings.helpergeometrycolour.toString());
+      core.scene.createTempItem('Line', {points: points});
     }
 
     if (this.points.length >= 2) {
       const mousePoint = core.mouse.pointOnScene();
       const points = [...this.points, mousePoint];
-      core.scene.addHelperGeometry(this.type, points, core.settings.helpergeometrycolour.toString());
+      core.scene.createTempItem(this.type, {points: points});
     }
   }
 
