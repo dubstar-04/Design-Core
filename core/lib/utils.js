@@ -7,15 +7,6 @@ export class Utils {
     return Utils.round(radians * 180 / Math.PI);
   };
 
-  static distBetweenPoints(firstPointx, firstPointy, secondPointx, secondPointy) {
-    const A = (firstPointx - secondPointx);
-    const B = (firstPointy - secondPointy);
-    const ASQ = Math.pow(A, 2);
-    const BSQ = Math.pow(B, 2);
-    const dist = Math.sqrt(ASQ + BSQ);
-    return dist;
-  }
-
   /**
    * Round to 5 decimal places
    * @param {number} number
