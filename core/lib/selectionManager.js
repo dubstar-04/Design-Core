@@ -52,7 +52,7 @@ export class SelectionManager {
       points: selectionPoints,
     };
 
-    this.core.scene.tempItems.push(new SelectionWindow(data));
+    this.core.scene.addToTempItems(new SelectionWindow(data));
   }
 
   /**
