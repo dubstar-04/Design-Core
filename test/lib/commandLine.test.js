@@ -52,10 +52,23 @@ test('Test CommandLine.handleKeys', () => {
 });
 
 test('Test CommandLine.backPressed', () => {
-  commandline.handleKeys('1234');
-  expect(commandline.command).toBe('1234');
-  commandline.backPressed();
+  commandline.handleKeys('123');
   expect(commandline.command).toBe('123');
+
+  commandline.backPressed();
+  expect(commandline.command).toBe('12');
+
+  commandline.backPressed();
+  expect(commandline.command).toBe('1');
+
+  // deleting all chars resets the command
+  commandline.backPressed();
+  expect(commandline.command).toBe('');
+
+  // deleting with no command shouldn't affect the prompt value
+  commandline.backPressed();
+  expect(commandline.prompt.at(-1)).toBe(':');
+
   commandline.resetPrompt();
 });
 
