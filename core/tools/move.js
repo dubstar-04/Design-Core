@@ -62,12 +62,7 @@ export class Move extends Tool {
       // Draw a line
       const points = [this.points.at(-1), mousePoint];
 
-      const data = {
-        points: points,
-        colour: core.settings.helpergeometrycolour.toString(),
-      };
-
-      core.scene.addToTempItems('Line', data);
+      core.scene.createTempItem('Line', {points: points});
 
       const xDelta = mousePoint.x - this.points[0].x;
       const yDelta = mousePoint.y - this.points[0].y;
