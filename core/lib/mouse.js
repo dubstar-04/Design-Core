@@ -39,7 +39,7 @@ export class Mouse {
   inputLength() {
     if (this.mouseDownCanvasPoint) {
       const lastScenePoint = this.transformToScene(this.mouseDownCanvasPoint);
-      const len = Utils.distBetweenPoints(lastScenePoint.x, lastScenePoint.y, this.pointOnScene().x, this.pointOnScene().y);
+      const len = lastScenePoint.distance(this.pointOnScene());
       return len;
     }
 
