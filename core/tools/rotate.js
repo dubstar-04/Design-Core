@@ -57,12 +57,7 @@ export class Rotate extends Tool {
       // Draw a line
       const points = [this.points.at(0), mousePoint];
 
-      const data = {
-        points: points,
-        colour: core.settings.helpergeometrycolour.toString(),
-      };
-
-      core.scene.addToTempItems('Line', data);
+      core.scene.createTempItem('Line', {points: points});
     }
 
     if (this.points.length >= 2) {
