@@ -292,7 +292,7 @@ export class Line extends Entity {
       return [P, Infinity];
     }
 
-    const distance = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y);
+    const distance = P.distance(pnt);
     return [pnt, distance];
   }
 
