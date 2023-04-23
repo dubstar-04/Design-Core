@@ -59,7 +59,7 @@ export class Line extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = core.mouse.pointOnScene();
       const points = [this.points.at(-1), mousePoint];
-      core.scene.addHelperGeometry(this.type, points, core.settings.helpergeometrycolour.toString());
+      core.scene.createTempItem(this.type, {points: points});
     }
   }
 
