@@ -10,6 +10,10 @@ export class PromptOptions {
     this.reject = undefined;
   }
 
+  /**
+   * Return data to the input request
+   * @param {any} input
+   */
   respond(input) {
     if (this.types.includes(Input.getType(input))) {
       this.resolve(input);
@@ -18,10 +22,17 @@ export class PromptOptions {
     }
   }
 
+  /**
+   * Reject the input request
+   */
   reject() {
     this.reject();
   }
 
+  /**
+   * Return the prompt for the input request
+   * @returns
+   */
   getPrompt() {
     let msg = `${this.promptMessage}`;
     if (this.options.length) {
@@ -30,10 +41,18 @@ export class PromptOptions {
     return msg;
   }
 
+  /**
+   * Set the resolve callback
+   * @param {any} resolve - callback function
+   */
   setResolve(resolve) {
     this.resolve = resolve;
   }
 
+  /**
+   * Set the reject callback
+   * @param {any} reject - callback function
+   */
   setReject(reject) {
     this.reject = reject;
   }
@@ -48,6 +67,11 @@ export class Input {
     STRING: 'String',
   };
 
+  /**
+   * Return the Input.Type for value
+   * @param {any} value
+   * @returns
+   */
   static getType(value) {
     if (value === undefined) {
       throw Error('Input.Type: Undefined input type');
@@ -68,6 +92,9 @@ export class InputManager {
     this.snapping = new Snapping();
   }
 
+  /**
+   * Reset the inputManager
+   */
   reset() {
     this.snapping.active = false;
     this.core.commandLine.resetPrompt();
@@ -77,7 +104,11 @@ export class InputManager {
     this.core.scene.reset();
   }
 
-
+  /**
+ * Create input request
+ * @param {PromptOption} promptOption
+ * @returns promise
+ */
   requestInput(promptOption) {
     this.promptOption = promptOption;
     this.setPrompt(this.promptOption.getPrompt());
@@ -104,6 +135,10 @@ export class InputManager {
     });
   }
 
+  /**
+   * Handle command input
+   * @param {any} input
+   */
   onCommand(input) {
     if (this.activeCommand !== undefined) {
       this.promptOption.respond(input);
@@ -113,6 +148,9 @@ export class InputManager {
     }
   }
 
+  /**
+   * Handle enter / return presses
+   */
   onEnterPressed() {
     if (this.activeCommand !== undefined) {
       if (this.promptOption.types.includes(Input.Type.SELECTIONSET) && this.core.scene.selectionManager.selectionSet.accepted !== true) {
@@ -127,10 +165,17 @@ export class InputManager {
     }
   }
 
+  /**
+   * Handle escape presses to reset
+   */
   onEscapePressed() {
     this.reset();
   }
 
+  /**
+   * Handle left click input
+   * @param {Point} point
+   */
   onLeftClick(point) {
     if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {
       this.snapping.active = false;
@@ -141,6 +186,9 @@ export class InputManager {
     }
   }
 
+  /**
+   * Handle mouse position changes
+   */
   mouseMoved() {
     this.core.scene.tempItems = [];
 
@@ -163,17 +211,27 @@ export class InputManager {
     }
   }
 
+  /**
+   * Handle single selection
+   */
   singleSelect() {
     log('single select');
     const point = this.core.mouse.pointOnScene();
     this.onLeftClick(point);
   }
 
+  /**
+   * Handle window selection
+   */
   windowSelect() {
     log('single select');
     this.core.scene.selectionManager.windowSelect();
   }
 
+  /**
+ * Handle mouse up
+ * @param {integer} button
+ */
   mouseUp(button) {
     switch (button) {
       case 0: // left button
@@ -198,6 +256,10 @@ export class InputManager {
     }
   };
 
+  /**
+   * Handle canvas selection
+   * @param {*} selection
+   */
   onSelection(selection) {
     if (this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
       this.promptOption.respond(selection);
@@ -210,15 +272,22 @@ export class InputManager {
     }
   }
 
-
+  /**
+ * Initialise commands
+ * @param {string} command
+ */
   initialiseItem(command) {
     this.core.scene.saveRequired();
     this.core.commandLine.addToCommandHistory(command);
     this.activeCommand = this.core.commandManager.createNew(command);
   };
 
-  // TODO: single line method required?
+  /**
+   * Set the command prompt
+   * @param {string} prompt
+   */
   setPrompt(prompt) {
+    // TODO: single line method required?
     this.core.commandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
   }
 
