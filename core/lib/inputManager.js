@@ -137,6 +137,12 @@ export class InputManager {
     }
   }
 
+  singleSelect() {
+    log('single select');
+    const point = this.core.mouse.pointOnScene();
+    this.onLeftClick(point);
+  }
+
   mouseUp(button) {
     switch (button) {
       case 0: // left button
@@ -145,8 +151,7 @@ export class InputManager {
 
         // TODO: can't select and window select at the same time
         // This needs combining with canvas.mouseMove to define selection, snapping and window selection
-        const point = this.core.mouse.pointOnScene();
-        this.onLeftClick(point);
+        this.singleSelect();
 
         // check if the mouse position has changed since mousedown
         if (!this.core.mouse.mouseDownCanvasPoint.isSame(this.core.mouse.pointOnCanvas())) {

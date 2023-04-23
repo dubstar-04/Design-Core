@@ -40,7 +40,7 @@ export class Canvas {
       this.core.canvas.pan();
     }
 
-    this.core.scene.mouseMoved();
+    this.core.scene.inputManager.mouseMoved();
   }
 
   mouseDown(button) {
