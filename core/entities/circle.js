@@ -1,5 +1,4 @@
 import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
@@ -65,7 +64,7 @@ export class Circle extends Entity {
   }
 
   getRadius() {
-    return Utils.distBetweenPoints(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y); ;
+    return this.points[0].distance(this.points[1]);
   }
 
   setRadius(rad) {
@@ -173,11 +172,11 @@ export class Circle extends Entity {
 
   closestPoint(P) {
     // find the closest point on the circle
-    const length = Utils.distBetweenPoints(this.points[0].x, this.points[0].y, P.x, P.y);
+    const length = this.points[0].distance(P);
     const Cx = this.points[0].x + this.radius * (P.x - this.points[0].x) / length;
     const Cy = this.points[0].y + this.radius * (P.y - this.points[0].y) / length;
     const closest = new Point(Cx, Cy);
-    const distance = Utils.distBetweenPoints(closest.x, closest.y, P.x, P.y);
+    const distance = closest.distance(P);
 
     return [closest, distance];
   }
