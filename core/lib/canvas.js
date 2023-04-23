@@ -8,7 +8,6 @@ export class Canvas {
     this.core = core;
     this.matrix = new Matrix();
 
-    // TODO: Move scale factors to settings?
     this.minScaleFactor = 0.05;
     this.maxScaleFactor = 300;
 
@@ -17,7 +16,6 @@ export class Canvas {
 
     this.panDelta = new Point();
     this.lastDelta = new Point();
-    // this.alpha = 1.0;
     this.flipped = false;
 
     // function to call external pain command for the ui
@@ -266,7 +264,6 @@ export class Canvas {
         context.lineWidth = lineWidth / this.getScale();
         context.beginPath();
       } catch { // Cairo
-        // TODO: Move grid linewidth to settings?
         context.setLineWidth(lineWidth / this.getScale());
       }
 
@@ -304,8 +301,6 @@ export class Canvas {
         context.moveTo(xgridmin, i);
         context.lineTo(xgridmax, i);
       }
-
-      // TODO: draw offset value on gridline origin
 
       context.stroke();
     }
