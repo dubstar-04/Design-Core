@@ -14,6 +14,12 @@ test('Test Commandline.setPrompt', () => {
   const testText = 'TestTest';
   commandline.setPrompt(testText);
   expect(commandline.prompt).toBe(`${testText}:`);
+
+  // test setPrompt with default - command should be set to default value
+  const testTextWithDefault = 'TestTest <default>';
+  commandline.setPrompt(testTextWithDefault);
+  expect(commandline.prompt).toBe(`${testTextWithDefault}:`);
+  expect(commandline.command).toBe('default');
 });
 
 test('Test Commandline.parseCommandDefault', () => {
