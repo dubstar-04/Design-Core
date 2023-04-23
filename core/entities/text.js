@@ -131,17 +131,16 @@ export class Text extends Entity {
       if (core.scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
         const data = {
           points: this.points,
-          colour: core.settings.helpergeometrycolour.toString(),
           height: this.height,
           rotation: this.rotation,
           string: core.commandLine.command,
         };
 
-        core.scene.addToTempItems(this.type, data);
+        core.scene.createTempItem(this.type, data);
       } else {
         const mousePoint = core.mouse.pointOnScene();
         const points = [this.points.at(-1), mousePoint];
-        core.scene.addHelperGeometry('Line', points, core.settings.helpergeometrycolour.toString());
+        core.scene.createTempItem('Line', {points: points});
       }
     }
   }
