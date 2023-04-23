@@ -50,7 +50,6 @@ export class Scene {
     };
   }
 
-
   saveRequired() {
     this.saved = false; // Changes have occured. A save may be required.
   }
@@ -83,19 +82,12 @@ export class Scene {
     return index;
   }
 
-  addToTempItems(type, data) {
-    const helper = this.core.commandManager.createNew(type, data);
-    this.tempItems.push(helper); // Add it to the tempItems Array
+  addToTempItems(item) {
+    this.tempItems.push(item); // Add it to the tempItems Array
   }
 
-  // TODO: get rid of this, maybe make a class for items, temp items, selectionItems...
-  addHelperGeometry(type, points, colour) {
-    const data = {
-      points: points,
-      colour: colour, // "#00BFFF"
-    };
-
+  createTempItem(type, data) {
     const helper = this.core.commandManager.createNew(type, data);
-    this.tempItems.push(helper); // Add it to the tempItems Array
+    this.addToTempItems(helper);
   }
 }
