@@ -1,4 +1,3 @@
-import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
@@ -36,7 +35,7 @@ export class Distance extends Tool {
   }
 
   action(core) {
-    const length = Utils.distBetweenPoints(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y).toFixed(1);
+    const length = this.points[0].distance(this.points[1]).toFixed(1);
     const x = (this.points[1].x - this.points[0].x).toFixed(1);
     const y = (this.points[1].y - this.points[0].y).toFixed(1);
     const di = (`${Strings.Strings.LENGTH}: ${length} &#916;X: ${x} &#916;Y: ${y}`);
