@@ -118,8 +118,7 @@ export class CommandLine {
         this.deletePressed();
         break;
       case 'F1': // F1
-        // showSettings()
-        // changeTab(event, 'Help')
+        // showSettings
         break;
       case 'F2': // F2
         break;
