@@ -1,6 +1,29 @@
 
 import {Point} from '../entities/point.js';
+import {Colours} from './colours.js';
 import {Utils} from './utils.js';
+
+class SnapPoint {
+  constructor(snapPoint) {
+    this.snapPoint = snapPoint;
+  }
+
+  draw(ctx, scale, core, colour) {
+    const snapColour = core.settings.snapcolour.toString();
+    const radius = 4;
+
+    try { // HTML Canvas
+      ctx.strokeStyle = snapColour;
+      ctx.beginPath();
+    } catch { // Cairo
+      const rgbColour = Colours.hexToScaledRGB(snapColour);
+      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+    }
+
+    ctx.arc(this.snapPoint.x, this.snapPoint.y, radius / scale, 0, 6.283);
+    ctx.fill();
+  }
+}
 
 export class Snapping {
   constructor() {
@@ -24,18 +47,8 @@ export class Snapping {
    * @param {scene} scene
    */
   addSnapPoint(snapPoint, scene) {
-    // Draw a circle to highlight the snap.
-    const CentrePoint = new Point(snapPoint.x, snapPoint.y);
-    const radiusPoint = new Point(snapPoint.x, snapPoint.y + (5 / scene.core.canvas.getScale()));
-    const snapCirclePoints = [CentrePoint, radiusPoint];
-
-    const data = {
-      points: snapCirclePoints,
-      colour: scene.core.settings.snapcolour.toString(),
-    };
-
-    const item = scene.core.commandManager.createNew('Circle', data);
-    scene.tempItems.push(item);
+    // show the snap point
+    scene.addToTempItems(new SnapPoint(snapPoint));
 
     // Move the mouse to the closest snap point so if the mouse if clicked the snap point is used.
     scene.core.mouse.setPosFromScenePoint(snapPoint);
