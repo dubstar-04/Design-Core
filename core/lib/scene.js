@@ -102,27 +102,4 @@ export class Scene {
     const helper = this.core.commandManager.createNew(type, data);
     this.tempItems.push(helper); // Add it to the tempItems Array
   }
-
-  // TODO: Move this somewhere it makes more sense. inputManager? Canvas?
-  mouseMoved() {
-    this.tempItems = [];
-
-    // TODO: Can't select, snap and create an item at the same time
-    // add conditionals or return to reduce the number of paint requests
-
-    if (this.core.mouse.buttonOneDown) {
-      this.selectionManager.drawSelectionWindow();
-      this.core.canvas.requestPaint();
-    }
-
-    if (this.snapping.active) {
-      this.snapping.snap(this);
-      this.core.canvas.requestPaint();
-    }
-
-    if (this.inputManager.activeCommand !== undefined) {
-      this.inputManager.activeCommand.preview(this.core);
-      this.core.canvas.requestPaint();
-    }
-  }
 }

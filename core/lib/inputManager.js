@@ -137,6 +137,28 @@ export class InputManager {
     }
   }
 
+  mouseMoved() {
+    this.core.scene.tempItems = [];
+
+    // TODO: Can't select, snap and create an item at the same time
+    // add conditionals or return to reduce the number of paint requests
+
+    if (this.core.mouse.buttonOneDown) {
+      this.core.scene.selectionManager.drawSelectionWindow();
+      this.core.canvas.requestPaint();
+    }
+
+    if (this.snapping.active) {
+      this.snapping.snap(this.core.scene);
+      this.core.canvas.requestPaint();
+    }
+
+    if (this.activeCommand !== undefined) {
+      this.activeCommand.preview(this.core);
+      this.core.canvas.requestPaint();
+    }
+  }
+
   singleSelect() {
     log('single select');
     const point = this.core.mouse.pointOnScene();
