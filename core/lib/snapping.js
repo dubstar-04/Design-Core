@@ -18,6 +18,11 @@ export class Snapping {
     }
   }
 
+  /**
+   * Draw the snap point
+   * @param {Point} snapPoint
+   * @param {scene} scene
+   */
   addSnapPoint(snapPoint, scene) {
     // Draw a circle to highlight the snap.
     const CentrePoint = new Point(snapPoint.x, snapPoint.y);
@@ -36,6 +41,11 @@ export class Snapping {
     scene.core.mouse.setPosFromScenePoint(snapPoint);
   }
 
+  /**
+   * Get the closest snap point
+   * @param {scene} scene
+   * @returns Point or undefined
+   */
   getSnapPoint(scene) {
     let snapPoint;
     let delta = 25 / scene.core.canvas.getScale(); // find a more suitable starting value
@@ -62,6 +72,12 @@ export class Snapping {
     return snapPoint;
   }
 
+  /**
+   * Get the polar snap point from the current mouse position
+   * @param {Point} previousPoint
+   * @param {core} core
+   * @returns Point or undefined
+   */
   polarSnap(previousPoint, core) {
     let snapPoint;
     const angleTolerance = 4;
@@ -80,6 +96,12 @@ export class Snapping {
     return snapPoint;
   }
 
+  /**
+   * Get the ortho snap point from the current mouse position
+   * @param {Point} previousPoint
+   * @param {core} core
+   * @returns Point or undefined
+   */
   orthoSnap(previousPoint, core) {
     let snapPoint;
     const x = core.mouse.pointOnScene().x - previousPoint.x;
