@@ -1,4 +1,3 @@
-import {Snapping} from './snapping.js';
 import {SelectionManager} from './selectionManager.js';
 import {Logging} from './logging.js';
 import {Strings} from './strings.js';
@@ -14,15 +13,12 @@ export class Scene {
     this.tempItems = []; // Temporary Array to store items while input is being gathered
 
     this.selectionManager = new SelectionManager(core);
-    this.snapping = new Snapping();
     this.inputManager = new InputManager(core);
   }
 
   reset() {
     this.tempItems = [];
-
     this.selectionManager.reset();
-    this.snapping.active = false;
     this.core.canvas.requestPaint();
   }
 

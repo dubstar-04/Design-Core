@@ -1,4 +1,5 @@
 import {Tool} from '../tools/tool.js';
+import {Snapping} from './snapping.js';
 
 export class PromptOptions {
   constructor(promptMessage = 'error', types = [], options = []) {
@@ -63,6 +64,17 @@ export class InputManager {
 
     this.selection = undefined;
     this.promptOption = undefined;
+
+    this.snapping = new Snapping();
+  }
+
+  reset() {
+    this.snapping.active = false;
+    this.core.commandLine.resetPrompt();
+    this.activeCommand = undefined;
+    // this.promptOption.reject('reject');
+    this.promptOption = undefined;
+    this.core.scene.reset();
   }
 
 
@@ -83,21 +95,13 @@ export class InputManager {
 
     if (promptOption.types.includes(Input.Type.POINT)) {
       // turn on snapping
-      this.core.scene.snapping.active = true;
+      this.snapping.active = true;
     }
 
     return new Promise((resolve, reject) => {
       this.promptOption.setResolve(resolve);
       this.promptOption.setReject(reject);
     });
-  }
-
-  reset() {
-    this.core.commandLine.resetPrompt();
-    this.activeCommand = undefined;
-    // this.promptOption.reject('reject');
-    this.promptOption = undefined;
-    this.core.scene.reset();
   }
 
   onCommand(input) {
@@ -129,7 +133,7 @@ export class InputManager {
 
   onLeftClick(point) {
     if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {
-      this.core.scene.snapping.active = false;
+      this.snapping.active = false;
       this.promptOption.respond(point);
     } else {
       const selection = this.core.scene.selectionManager.singleSelect(this.core.mouse.pointOnScene());
