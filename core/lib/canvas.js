@@ -213,15 +213,13 @@ export class Canvas {
       this.core.scene.items[i].draw(context, this.getScale(), this.core, colour);
     }
 
+    const tempItemColour = this.core.settings.helpergeometrycolour.toString();
     for (j; j < this.core.scene.tempItems.length; j++) {
-      // TODO: get colour from setttings
-      const colour = this.core.scene.tempItems[j].colour;
-      this.core.scene.tempItems[j].draw(context, this.getScale(), this.core, colour);
+      this.core.scene.tempItems[j].draw(context, this.getScale(), this.core, tempItemColour);
     }
 
+    const colour = this.core.settings.selecteditemscolour.toString();
     for (k; k < this.core.scene.selectionManager.selectedItems.length; k++) {
-      // TODO: get colour from setttings
-      const colour = this.core.scene.selectionManager.selectedItems[k].colour;
       this.core.scene.selectionManager.selectedItems[k].draw(context, this.getScale(), this.core, colour);
     }
   }
