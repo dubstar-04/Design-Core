@@ -52,6 +52,11 @@ export class CommandLine {
     this.update();
   }
 
+  /**
+   * Checks there is only a single default value supplied and removes the <>
+   * @param {Array} commandDefault - Array containing the <default> value
+   * @returns value contained within the <>
+   */
   parseCommandDefault(commandDefault) {
     if (commandDefault && commandDefault.length > 1) {
       throw Error('Commands can contain only a single <default>');
