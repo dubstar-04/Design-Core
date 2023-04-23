@@ -1,7 +1,6 @@
 import {Point} from '../entities/point.js';
 import {Snapping} from './snapping.js';
 import {SelectionManager} from './selectionManager.js';
-import {SelectionWindow} from './selectionWindow.js';
 import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 import {InputManager} from './inputManager.js';
@@ -105,20 +104,6 @@ export class Scene {
     this.tempItems.push(helper); // Add it to the tempItems Array
   }
 
-
-  // TODO: Move to selectionManager
-  drawSelectionWindow() {
-    const selectionPoints = [];
-    selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
-    selectionPoints.push(this.core.mouse.pointOnScene());
-
-    const data = {
-      points: selectionPoints,
-    };
-
-    this.tempItems.push(new SelectionWindow(data));
-  }
-
   // TODO: Move this to selectionManager or canvas
   addSnapPoint(snapPoint) {
     // Draw a circle to highlight the snap.
@@ -151,6 +136,7 @@ export class Scene {
 
     if (this.inputManager.activeCommand !== undefined) {
       this.inputManager.activeCommand.preview(this.core);
+      this.selectionManager.drawSelectionWindow();
       this.core.canvas.requestPaint();
     }
 
@@ -159,6 +145,11 @@ export class Scene {
       if (snapPoint) {
         this.addSnapPoint(snapPoint);
       }
+      this.core.canvas.requestPaint();
+    }
+
+    if (this.inputManager.activeCommand !== undefined) {
+      this.inputManager.activeCommand.preview(this.core);
       this.core.canvas.requestPaint();
     }
   }

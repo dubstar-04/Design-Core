@@ -1,4 +1,5 @@
 import {Utils} from './utils.js';
+import {SelectionWindow} from './selectionWindow.js';
 
 export class SingleSelection {
   constructor(index, point) {
@@ -37,6 +38,21 @@ export class SelectionManager {
   selectionSetChanged() {
     // signal to the properties manager that the selection set is changed
     this.core.propertyManager.selectionSetChanged();
+  }
+
+  /**
+   * Draw the selection selection window
+   */
+  drawSelectionWindow() {
+    const selectionPoints = [];
+    selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
+    selectionPoints.push(this.core.mouse.pointOnScene());
+
+    const data = {
+      points: selectionPoints,
+    };
+
+    this.core.scene.tempItems.push(new SelectionWindow(data));
   }
 
   /**
