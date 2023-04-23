@@ -68,7 +68,7 @@ export class BasePolyline extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = core.mouse.pointOnScene();
       const points = [...this.points, mousePoint];
-      core.scene.addHelperGeometry(this.type, points, core.settings.helpergeometrycolour.toString());
+      core.scene.createTempItem(this.type, {points: points});
     }
   }
 
