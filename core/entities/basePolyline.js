@@ -51,7 +51,7 @@ export class BasePolyline extends Entity {
       this.points.push(pt1);
 
       let pt2;
-      const op2 = new PromptOptions(Strings.Input.POINTORQUIT, [Input.Type.POINT]);
+      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT]);
       let index;
       while (true) {
         pt2 = await core.scene.inputManager.requestInput(op2);
