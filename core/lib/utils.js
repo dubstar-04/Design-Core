@@ -26,7 +26,6 @@ export class Utils {
     return Math.round(number * 100000) / 100000;
   }
 
-
   /**
    * Deep clone object
    * @param {object} core
@@ -49,7 +48,6 @@ export class Utils {
 
     return clone;
   }
-
 
   /**
    * Returns a levenshtein edit distance to the input strings
