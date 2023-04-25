@@ -112,7 +112,7 @@ export class Text extends Entity {
       const height = await core.scene.inputManager.requestInput(op2);
       this.height = height;
 
-      const op3 = new PromptOptions('Enter Rotation (deg) <0>:', [Input.Type.NUMBER]);
+      const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
       const rotation = await core.scene.inputManager.requestInput(op3);
       this.setRotation(rotation);
 
