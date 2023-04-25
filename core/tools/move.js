@@ -15,7 +15,7 @@ export class Move extends Tool {
 
   async execute(core) {
     try {
-      const op = new PromptOptions(Strings.Input.SELECTENTITIES, [Input.Type.SELECTIONSET]);
+      const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
 
       if (!core.scene.selectionManager.selectionSet.selectionSet.length) {
         await core.scene.inputManager.requestInput(op);
@@ -25,7 +25,7 @@ export class Move extends Tool {
       const pt1 = await core.scene.inputManager.requestInput(op2);
       this.points.push(pt1);
 
-      const op3 = new PromptOptions(Strings.Input.DESTINATIONORDISTANCE, [Input.Type.POINT, Input.Type.NUMBER]);
+      const op3 = new PromptOptions(Strings.Input.DESTINATION, [Input.Type.POINT, Input.Type.NUMBER]);
       const pt2 = await core.scene.inputManager.requestInput(op3);
 
       if (Input.getType(pt2) === Input.Type.POINT) {
