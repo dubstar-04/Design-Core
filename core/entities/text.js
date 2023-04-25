@@ -331,6 +331,7 @@ export class Text extends Entity {
   }
 
   closestPoint(P) {
+    // TODO: Support rotation
     const rect = this.getBoundingRect();
     const botLeft = new Point(rect.x, rect.y);
     const topRight = new Point(rect.x + rect.width, rect.y + rect.height);
