@@ -220,6 +220,13 @@ test('Test Point.project', () => {
   const project6 = pt1.project(Math.PI*1.5, 10);
   expect(project6.x).toBeCloseTo(0);
   expect(project6.y).toBeCloseTo(-10);
+
+  const pt2 = new Point(100, 100);
+  /* Non-zero 45 degrees */
+  const project7 = pt2.project(Math.PI/4, 100);
+  console.log(project7);
+  expect(project7.x).toBeCloseTo(170.710);
+  expect(project7.y).toBeCloseTo(170.710);
 });
 
 
