@@ -27,6 +27,12 @@ export class Utils {
   }
 
 
+  /**
+   * Deep clone object
+   * @param {object} core
+   * @param {objec} obj - object to clone
+   * @returns - new cloned object
+   */
   static cloneObject(core, obj) {
     // deep clone obj and all its attributes
     if (obj === null || typeof obj !== 'object') {
