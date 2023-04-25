@@ -15,7 +15,7 @@ export class Erase extends Tool {
 
   async execute(core) {
     try {
-      const op = new PromptOptions(Strings.Input.SELECTENTITIES, [Input.Type.SELECTIONSET]);
+      const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
 
       if (!core.scene.selectionManager.selectionSet.selectionSet.length) {
         await core.scene.inputManager.requestInput(op);
