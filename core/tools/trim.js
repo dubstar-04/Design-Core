@@ -23,7 +23,7 @@ export class Trim extends Tool {
         await core.scene.inputManager.requestInput(op);
       }
 
-      const op2 = new PromptOptions(Strings.Input.SELECTORQUIT, [Input.Type.SINGLESELECTION]);
+      const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       while (true) {
         const selection = await core.scene.inputManager.requestInput(op2);
         this.selectedIndex = selection.selectedItemIndex;
