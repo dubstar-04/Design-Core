@@ -15,7 +15,7 @@ export class Identify extends Tool {
 
   async execute(core) {
     try {
-      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);
       const pt1 = await core.scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
