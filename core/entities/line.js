@@ -36,7 +36,7 @@ export class Line extends Entity {
       this.points.push(pt1);
 
       let pt2;
-      const op2 = new PromptOptions(Strings.Input.POINTORQUIT, [Input.Type.POINT, Input.Type.NUMBER]);
+      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.NUMBER]);
       while (true) {
         pt2 = await core.scene.inputManager.requestInput(op2);
         if (Input.getType(pt2) === Input.Type.POINT) {
