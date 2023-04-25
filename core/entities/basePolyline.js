@@ -56,7 +56,7 @@ export class BasePolyline extends Entity {
       while (true) {
         pt2 = await core.scene.inputManager.requestInput(op2);
         this.points.push(pt2);
-        // first creation will get a new index, subsequent will use the index to update teh original polyline
+        // first creation will get a new index, subsequent will use the index to update the original polyline
         index = core.scene.inputManager.actionCommand(this, index);
       }
     } catch (err) {
