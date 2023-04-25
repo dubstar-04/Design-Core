@@ -37,24 +37,22 @@ test('Test Point.angle', () => {
   const pt1 = new Point();
 
   /* 0 degrees */
-  const pt2 = new Point(10, 0);
-  expect(pt1.angle(pt2)).toBe(Math.PI*2);
+  expect(pt1.angle(new Point(10, 0))).toBe(Math.PI*2);
+
+  /* 22.5 degrees */
+  expect(pt1.angle(new Point(13.065629648764, 5.411961001462))).toBe(Math.PI/8);
 
   /* 45 degrees */
-  const pt3 = new Point(10, 10);
-  expect(pt1.angle(pt3)).toBe(Math.PI/4);
+  expect(pt1.angle(new Point(10, 10))).toBe(Math.PI/4);
 
   /* 90 degrees */
-  const pt4 = new Point(0, 10);
-  expect(pt1.angle(pt4)).toBe(Math.PI/2);
+  expect(pt1.angle(new Point(0, 10))).toBe(Math.PI/2);
 
   /* 180 degrees */
-  const pt5 = new Point(-10, 0);
-  expect(pt1.angle(pt5)).toBe(Math.PI);
+  expect(pt1.angle(new Point(-10, 0))).toBe(Math.PI);
 
   /* 270 degrees */
-  const pt6 = new Point(0, -10);
-  expect(pt1.angle(pt6)).toBe(Math.PI*1.5);
+  expect(pt1.angle(new Point(0, -10))).toBe(Math.PI*1.5);
 });
 
 test('Test Point.clone', () => {
