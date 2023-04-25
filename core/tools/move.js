@@ -43,18 +43,6 @@ export class Move extends Tool {
     }
   }
 
-  action(core) {
-    const xDelta = this.points[1].x - this.points[0].x;
-    const yDelta = this.points[1].y - this.points[0].y;
-
-    for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      for (let j = 0; j < core.scene.selectionManager.selectedItems[i].points.length; j++) {
-        core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
-        core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
-      }
-    }
-  }
-
   preview(core) {
     if (this.points.length >= 1) {
       const mousePoint = core.mouse.pointOnScene();
@@ -72,6 +60,18 @@ export class Move extends Tool {
           core.scene.selectionManager.selectedItems[i].points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
           core.scene.selectionManager.selectedItems[i].points[j].y = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
         }
+      }
+    }
+  }
+
+  action(core) {
+    const xDelta = this.points[1].x - this.points[0].x;
+    const yDelta = this.points[1].y - this.points[0].y;
+
+    for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      for (let j = 0; j < core.scene.selectionManager.selectedItems[i].points.length; j++) {
+        core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
+        core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
       }
     }
   }
