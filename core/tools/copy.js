@@ -44,22 +44,6 @@ export class Copy extends Tool {
     }
   }
 
-  action(core) {
-    const xDelta = this.points[1].x - this.points[0].x;
-    const yDelta = this.points[1].y - this.points[0].y;
-
-    for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      const copyofitem = Utils.cloneObject(core, core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]]);
-
-      for (let j = 0; j < copyofitem.points.length; j++) {
-        copyofitem.points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
-        copyofitem.points[j].y = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
-      }
-
-      core.scene.items.push(copyofitem);
-    }
-  };
-
   preview(core) {
     if (this.points.length >= 1) {
       const mousePoint = core.mouse.pointOnScene();
@@ -80,4 +64,20 @@ export class Copy extends Tool {
       }
     }
   }
+
+  action(core) {
+    const xDelta = this.points[1].x - this.points[0].x;
+    const yDelta = this.points[1].y - this.points[0].y;
+
+    for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      const copyofitem = Utils.cloneObject(core, core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]]);
+
+      for (let j = 0; j < copyofitem.points.length; j++) {
+        copyofitem.points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
+        copyofitem.points[j].y = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
+      }
+
+      core.scene.items.push(copyofitem);
+    }
+  };
 }
