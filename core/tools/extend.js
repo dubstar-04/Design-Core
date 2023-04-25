@@ -66,8 +66,5 @@ export class Extend extends Tool {
       this.selectedIndex = undefined;
     }
   }
-
-  preview() {
-  }
 }
 
