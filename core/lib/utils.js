@@ -5,7 +5,7 @@ export class Utils {
    * @returns angle in radians
    */
   static degrees2radians(degrees) {
-    return Utils.round(degrees * Math.PI / 180);
+    return degrees * Math.PI / 180;
   };
 
   /**
@@ -14,7 +14,7 @@ export class Utils {
    * @returns angle in degrees
    */
   static radians2degrees(radians) {
-    return Utils.round(radians * 180 / Math.PI);
+    return radians * 180 / Math.PI;
   };
 
   /**
