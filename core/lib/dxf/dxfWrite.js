@@ -90,7 +90,7 @@ export class DXFWriter {
     let viewCenterX = 0;
     let viewCenterY = 0;
 
-    const extents = this.core.scene.getExtents();
+    const extents = this.core.scene.boundingRect();
     if (extents) {
       width = extents.xmax - extents.xmin;
       height = extents.ymax - extents.ymin;

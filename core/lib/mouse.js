@@ -23,7 +23,7 @@ export class Mouse {
    * @returns
    */
   inputAngle() {
-    const previousPoint = this.core.scene.lastSelectedPoint();
+    const previousPoint = this.transformToScene(this.mouseDownCanvasPoint);
     if (previousPoint) {
       const angle = Utils.radians2degrees(previousPoint.angle(this.pointOnScene()));
       return angle;
@@ -37,8 +37,9 @@ export class Mouse {
    * @returns
    */
   inputLength() {
-    if (this.core.scene.lastSelectedPoint()) {
-      const len = Utils.distBetweenPoints(this.core.scene.lastSelectedPoint().x, this.core.scene.lastSelectedPoint().y, this.pointOnScene().x, this.pointOnScene().y);
+    if (this.mouseDownCanvasPoint) {
+      const lastScenePoint = this.transformToScene(this.mouseDownCanvasPoint);
+      const len = lastScenePoint.distance(this.pointOnScene());
       return len;
     }
 
@@ -90,17 +91,19 @@ export class Mouse {
   positionString() {
     // return a string showing the position of the mouse on the canvas
 
-    let str = 'X: ' + this.pointOnScene().x.toFixed(1) + ' Y: ' + this.pointOnScene().y.toFixed(1);
+    const str = 'X: ' + this.pointOnScene().x.toFixed(1) + ' Y: ' + this.pointOnScene().y.toFixed(1);
 
+    /*
     // add the length to a previous when available
-    if (this.inputLength()) {
-      str = str + ', Len: ' + Math.round(this.inputLength());
-    }
+      if (this.inputLength()) {
+        str = str + ', Len: ' + Math.round(this.inputLength());
+      }
 
-    // add the angle from the previous point when available
-    if (this.inputAngle()) {
-      str = str + ', Ang: ' + Math.round(this.inputAngle());
-    }
+      // add the angle from the previous point when available
+      if (this.inputAngle()) {
+        str = str + ', Ang: ' + Math.round(this.inputAngle());
+      }
+      */
 
     return str;
   }
@@ -118,6 +121,21 @@ export class Mouse {
     // canvas are typically origin top left. CAD is typically origin bottom left.
     // move the origin down to the bottom and invert the y position
     this.y = -y + this.core.canvas.height;
+
+    if (this.core.settings.polar) {
+      // if polar is enabled - get the closest points
+      const polarSnap = this.core.scene.inputManager.snapping.polarSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
+      if (polarSnap) {
+        this.setPosFromScenePoint(polarSnap);
+      }
+    } else if (this.core.settings.ortho) {
+      // if ortho is enabled - get the nearest ortho point
+      const orthoSnap = this.snapping.orthoSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
+      if (orthoSnap) {
+        this.setPosFromScenePoint(orthoSnap);
+      }
+    }
+
     this.core.canvas.mouseMoved();
   }
 

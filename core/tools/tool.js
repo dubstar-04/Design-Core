@@ -6,21 +6,9 @@ export class Tool {
       writable: true,
     });
 
-    Object.defineProperty(this, 'selectionRequired', {
+    Object.defineProperty(this, 'points', {
       enumerable: false,
-      value: true,
-      writable: true,
-    });
-
-    Object.defineProperty(this, 'showHelperGeometry', {
-      enumerable: false,
-      value: false,
-      writable: true,
-    });
-
-    Object.defineProperty(this, 'minPoints', {
-      enumerable: false,
-      value: 2,
+      value: [],
       writable: true,
     });
   }

@@ -1,4 +1,5 @@
 import {Tool} from '../tools/tool.js';
+import {Snapping} from './snapping.js';
 
 export class PromptOptions {
   constructor(promptMessage = 'error', types = [], options = []) {
@@ -9,6 +10,10 @@ export class PromptOptions {
     this.reject = undefined;
   }
 
+  /**
+   * Return data to the input request
+   * @param {any} input
+   */
   respond(input) {
     if (this.types.includes(Input.getType(input))) {
       this.resolve(input);
@@ -17,10 +22,17 @@ export class PromptOptions {
     }
   }
 
+  /**
+   * Reject the input request
+   */
   reject() {
     this.reject();
   }
 
+  /**
+   * Return the prompt for the input request
+   * @returns
+   */
   getPrompt() {
     let msg = `${this.promptMessage}`;
     if (this.options.length) {
@@ -29,10 +41,18 @@ export class PromptOptions {
     return msg;
   }
 
+  /**
+   * Set the resolve callback
+   * @param {any} resolve - callback function
+   */
   setResolve(resolve) {
     this.resolve = resolve;
   }
 
+  /**
+   * Set the reject callback
+   * @param {any} reject - callback function
+   */
   setReject(reject) {
     this.reject = reject;
   }
@@ -45,9 +65,13 @@ export class Input {
     SINGLESELECTION: 'SingleSelection',
     NUMBER: 'Number',
     STRING: 'String',
-    QUIT: 'Quit',
   };
 
+  /**
+   * Return the Input.Type for value
+   * @param {any} value
+   * @returns
+   */
   static getType(value) {
     if (value === undefined) {
       throw Error('Input.Type: Undefined input type');
@@ -64,7 +88,27 @@ export class InputManager {
 
     this.selection = undefined;
     this.promptOption = undefined;
+
+    this.snapping = new Snapping();
   }
+
+  /**
+   * Reset the inputManager
+   */
+  reset() {
+    this.snapping.active = false;
+    this.core.commandLine.resetPrompt();
+    this.activeCommand = undefined;
+    // this.promptOption.reject('reject');
+    this.promptOption = undefined;
+    this.core.scene.reset();
+  }
+
+  /**
+ * Create input request
+ * @param {PromptOption} promptOption
+ * @returns promise
+ */
   requestInput(promptOption) {
     this.promptOption = promptOption;
     this.setPrompt(this.promptOption.getPrompt());
@@ -82,7 +126,7 @@ export class InputManager {
 
     if (promptOption.types.includes(Input.Type.POINT)) {
       // turn on snapping
-      this.core.scene.snapping.active = true;
+      this.snapping.active = true;
     }
 
     return new Promise((resolve, reject) => {
@@ -91,13 +135,10 @@ export class InputManager {
     });
   }
 
-  reset() {
-    this.core.commandLine.resetPrompt();
-    this.activeCommand = undefined;
-    this.promptOption = undefined;
-    this.core.scene.reset();
-  }
-
+  /**
+   * Handle command input
+   * @param {any} input
+   */
   onCommand(input) {
     if (this.activeCommand !== undefined) {
       this.promptOption.respond(input);
@@ -107,8 +148,10 @@ export class InputManager {
     }
   }
 
+  /**
+   * Handle enter / return presses
+   */
   onEnterPressed() {
-    // log('Enter pressed - Option Types:', this.promptOption.types);
     if (this.activeCommand !== undefined) {
       if (this.promptOption.types.includes(Input.Type.SELECTIONSET) && this.core.scene.selectionManager.selectionSet.accepted !== true) {
         this.core.scene.selectionManager.selectionSet.accepted = true;
@@ -122,13 +165,20 @@ export class InputManager {
     }
   }
 
+  /**
+   * Handle escape presses to reset
+   */
   onEscapePressed() {
     this.reset();
   }
 
+  /**
+   * Handle left click input
+   * @param {Point} point
+   */
   onLeftClick(point) {
-    if (this.promptOption !== undefined && this.promptOption.types.includes('Point')) {
-      this.core.scene.snapping.active = false;
+    if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {
+      this.snapping.active = false;
       this.promptOption.respond(point);
     } else {
       const selection = this.core.scene.selectionManager.singleSelect(this.core.mouse.pointOnScene());
@@ -136,21 +186,67 @@ export class InputManager {
     }
   }
 
+  /**
+   * Handle mouse position changes
+   */
+  mouseMoved() {
+    this.core.scene.tempItems = [];
+
+    // TODO: Can't select, snap and create an item at the same time
+    // add conditionals or return to reduce the number of paint requests
+
+    if (this.core.mouse.buttonOneDown) {
+      this.core.scene.selectionManager.drawSelectionWindow();
+      this.core.canvas.requestPaint();
+    }
+
+    if (this.snapping.active) {
+      this.snapping.snap(this.core.scene);
+      this.core.canvas.requestPaint();
+    }
+
+    if (this.activeCommand !== undefined) {
+      this.activeCommand.preview(this.core);
+      this.core.canvas.requestPaint();
+    }
+  }
+
+  /**
+   * Handle single selection
+   */
+  singleSelect() {
+    log('single select');
+    const point = this.core.mouse.pointOnScene();
+    this.onLeftClick(point);
+  }
+
+  /**
+   * Handle window selection
+   */
+  windowSelect() {
+    log('single select');
+    this.core.scene.selectionManager.windowSelect();
+  }
+
+  /**
+ * Handle mouse up
+ * @param {integer} button
+ */
   mouseUp(button) {
     switch (button) {
       case 0: // left button
-        const point = this.core.mouse.pointOnScene();
-        this.onLeftClick(point);
-
         // Clear tempItems - This is here to remove the crossing window
         this.core.scene.tempItems = [];
 
+        // TODO: can't select and window select at the same time
+        // This needs combining with canvas.mouseMove to define selection, snapping and window selection
+        this.singleSelect();
+
         // check if the mouse position has changed since mousedown
         if (!this.core.mouse.mouseDownCanvasPoint.isSame(this.core.mouse.pointOnCanvas())) {
-          // const selection =
-          this.core.scene.selectionManager.windowSelect();
-          // this.onSelection(selection);
+          this.windowSelect();
         }
+
         break;
       case 1: // middle button
         break;
@@ -160,9 +256,11 @@ export class InputManager {
     }
   };
 
+  /**
+   * Handle canvas selection
+   * @param {*} selection
+   */
   onSelection(selection) {
-    // log('got a selection:', selection, 'type:', Input.getType(selection));
-
     if (this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
       this.promptOption.respond(selection);
     } else {
@@ -174,42 +272,48 @@ export class InputManager {
     }
   }
 
+  /**
+ * Initialise commands
+ * @param {string} command
+ */
   initialiseItem(command) {
     this.core.scene.saveRequired();
     this.core.commandLine.addToCommandHistory(command);
     this.activeCommand = this.core.commandManager.createNew(command);
   };
 
+  /**
+   * Set the command prompt
+   * @param {string} prompt
+   */
   setPrompt(prompt) {
+    // TODO: single line method required?
     this.core.commandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
   }
 
-  executeCommand(item) {
-    this.actionCommand(item);
+  /**
+   * Execute the currently active command then reset
+   * @param {*} item - item to create
+   * @param {*} index - index of item in scene.items
+   */
+  executeCommand(item, index = undefined) {
+    this.actionCommand(item, index);
     this.reset();
   }
 
-
-  actionCommand(item) {
+  /**
+   * Execute the currently active command without reset
+   * @param {*} item - item to create
+   * @param {*} index - index of item in scene.items
+   */
+  actionCommand(item, index = undefined) {
     if (this.activeCommand instanceof Tool) {
       this.activeCommand.action(this.core);
     } else {
-      // const copyofitem = Utils.cloneObject(core, item);
-
-      const copyofitem = this.core.commandManager.createNew(item.type, item);
-      const colour = 'BYLAYER';
-
-      const data = {
-        colour: colour,
-        layer: this.core.layerManager.getCLayer(),
-      };
-
-      if (copyofitem.points.length) {
-      // merge the input data into the data
-        Object.assign(data, copyofitem);
-      }
-
-      this.core.scene.addItemToScene(copyofitem);
+      // set the items layer to the current layer
+      item.layer = this.core.layerManager.getCLayer();
+      // return the item index
+      return this.core.scene.addToScene(item.type, item, index);
     }
   }
 }

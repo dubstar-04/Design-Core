@@ -1,8 +1,9 @@
 import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Circle extends Entity {
   constructor(data) {
@@ -33,23 +34,37 @@ export class Circle extends Entity {
     return command;
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op);
+      this.points.push(pt1);
 
-    prompt[1] = Strings.Input.CENTER;
-    expectedType[1] = ['Point', 'Number'];
+      const op2 = new PromptOptions(Strings.Input.RADIUS, [Input.Type.POINT, Input.Type.NUMBER]);
+      const pt2 = await core.scene.inputManager.requestInput(op2);
+      if (Input.getType(pt2) === Input.Type.POINT) {
+        this.points.push(pt2);
+      }
 
-    prompt[2] = Strings.Input.POINTORRADIUS;
-    expectedType[2] = ['Point', 'Number'];
-
-
-    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: num >= this.minPoints};
+      if (Input.getType(pt2) === Input.Type.NUMBER) {
+        this.setRadius(pt2);
+      }
+      core.scene.inputManager.executeCommand(this);
+    } catch (err) {
+      Logging.instance.error(`${this.type} - ${err}`);
+    }
   }
 
+  preview(core) {
+    if (this.points.length >= 1) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [this.points.at(-1), mousePoint];
+      core.scene.createTempItem(this.type, {points: points});
+    }
+  }
 
   getRadius() {
-    return Utils.distBetweenPoints(this.points[0].x, this.points[0].y, this.points[1].x, this.points[1].y); ;
+    return this.points[0].distance(this.points[1]);
   }
 
   setRadius(rad) {
@@ -157,11 +172,11 @@ export class Circle extends Entity {
 
   closestPoint(P) {
     // find the closest point on the circle
-    const length = Utils.distBetweenPoints(this.points[0].x, this.points[0].y, P.x, P.y);
+    const length = this.points[0].distance(P);
     const Cx = this.points[0].x + this.radius * (P.x - this.points[0].x) / length;
     const Cy = this.points[0].y + this.radius * (P.y - this.points[0].y) / length;
     const closest = new Point(Cx, Cy);
-    const distance = Utils.distBetweenPoints(closest.x, closest.y, P.x, P.y);
+    const distance = closest.distance(P);
 
     return [closest, distance];
   }

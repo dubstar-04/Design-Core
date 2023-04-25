@@ -1,4 +1,6 @@
 import {Core} from '../../core/core.js';
+import {Input, PromptOptions} from '../../core/lib/inputManager.js';
+import {Strings} from '../../core/lib/strings.js';
 
 const core = new Core();
 const commandline = core.commandLine; // new CommandLine(core);
@@ -13,7 +15,25 @@ test('Test Commandline.resetPrompt', () => {
 test('Test Commandline.setPrompt', () => {
   const testText = 'TestTest';
   commandline.setPrompt(testText);
-  expect(commandline.prompt).toBe(testText);
+  expect(commandline.prompt).toBe(`${testText}:`);
+
+  // test setPrompt with default - command should be set to default value
+  const testTextWithDefault = 'TestTest <default>';
+  commandline.setPrompt(testTextWithDefault);
+  expect(commandline.prompt).toBe(`${testTextWithDefault}:`);
+  expect(commandline.command).toBe('default');
+});
+
+test('Test Commandline.parseCommandDefault', () => {
+  const commandDefault = ['<default>'];
+  const defaultValue = commandline.parseCommandDefault(commandDefault);
+  expect(defaultValue).toBe(`default`);
+
+  // only a single default is valid
+  commandDefault.push('<second value>');
+  expect(() => {
+    commandline.parseCommandDefault(commandDefault);
+  }).toThrow();
 });
 
 test('Test Commandline.update', () => {
@@ -33,15 +53,61 @@ test('Test CommandLine.handleKeys', () => {
   commandline.resetPrompt();
 });
 
+test('Test CommandLine.spacePressed', () => {
+  const inputManager = core.scene.inputManager;
+  const promptOption = new PromptOptions(Strings.Input.START, [Input.Type.STRING]);
+
+  inputManager.reset();
+  // With no active command
+  // Pressing space should active a command if this.command contains a valid command
+  commandline.handleKeys('L');
+  commandline.spacePressed();
+  expect(inputManager.activeCommand).not.toBeUndefined();
+
+  // with an active command
+  // pressing space should end the active command if this.command is empty
+  commandline.spacePressed();
+  expect(inputManager.activeCommand).toBeUndefined();
+
+  // pressing space should add a space to this.command if the input type is Input.Type.STRING
+  commandline.handleKeys('L');
+  commandline.spacePressed();
+  expect(inputManager.activeCommand).not.toBeUndefined();
+
+  inputManager.requestInput(promptOption);
+  commandline.handleKeys('test');
+  commandline.spacePressed();
+  // activeCommand should be defined still
+  expect(inputManager.activeCommand).not.toBeUndefined();
+  // command should have a space
+  expect(commandline.command).toBe('test ');
+
+  inputManager.reset();
+});
+
 test('Test CommandLine.backPressed', () => {
-  commandline.handleKeys('1234');
-  expect(commandline.command).toBe('1234');
-  commandline.backPressed();
-  expect(commandline.command).toBe('123');
   commandline.resetPrompt();
+
+  commandline.handleKeys('123');
+  expect(commandline.command).toBe('123');
+
+  commandline.backPressed();
+  expect(commandline.command).toBe('12');
+
+  commandline.backPressed();
+  expect(commandline.command).toBe('1');
+
+  // deleting all chars resets the command
+  commandline.backPressed();
+  expect(commandline.command).toBe('');
+
+  // deleting with no command shouldn't affect the prompt value
+  commandline.backPressed();
+  expect(commandline.prompt.at(-1)).toBe(':');
 });
 
 test('Test CommandLine.enterPressed', () => {
+  commandline.resetPrompt();
   commandline.handleKeys('L');
   commandline.enterPressed();
   expect(commandline.lastCommand.length).toBe(1);
@@ -73,7 +139,8 @@ test('Test CommandLine.parseInput', () => {
   expect(relPoint1.x).toBe(101);
   expect(relPoint1.y).toBe(102);
 
-  core.scene.points.push(relPoint1);
+  core.scene.inputManager.initialiseItem('Line');
+  core.scene.inputManager.activeCommand.points.push(relPoint1);
   const relPoint2 = commandline.parseInput('@101,102');
   expect(relPoint2.constructor.name).toBe('Point');
   expect(relPoint2.x).toBe(202);
@@ -133,10 +200,11 @@ test('Test CommandLine.parseInput', () => {
 });
 
 test('Test CommandLine.addToCommandHistory', () => {
+  const commandLineLength = commandline.lastCommand.length;
   commandline.addToCommandHistory('Test');
   /* commandline should only store unique values */
   commandline.addToCommandHistory('Test');
-  expect(commandline.lastCommand.length).toBe(1);
+  expect(commandline.lastCommand.length).toBe(commandLineLength + 1);
 
   /* commandline should only store last 10 commands */
   for (let index = 0; index < 20; index++) {

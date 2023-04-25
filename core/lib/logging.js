@@ -3,7 +3,7 @@ export class Logging {
 
   constructor() {
     this.logLevel = ['OFF', 'ERROR', 'WARN', 'DEBUG'];
-    this.level = 'OFF';
+    this.level = 'ERROR';
 
     // instantiate as a singleton
     if (Logging._instance === undefined) {

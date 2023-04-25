@@ -5,11 +5,12 @@ import {Block} from './block.js';
 import {Text} from './text.js';
 import {Line} from './line.js';
 import {Entity} from './entity.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Dimension extends Entity {
   constructor(data) {
     super(data);
-    this.minPoints = 3;
     this.blockName = '';
     this.block = new Block();
     this.text = new Text();
@@ -100,20 +101,38 @@ export class Dimension extends Entity {
     return command;
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const pt = await core.scene.inputManager.requestInput(op);
+      this.points.push(pt);
 
-    prompt[1] = Strings.Input.START;
-    expectedType[1] = ['Point'];
+      const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op1);
+      this.points.push(pt1);
 
-    prompt[2] = Strings.Input.END;
-    expectedType[2] = ['Point'];
+      const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
+      const pt2 = await core.scene.inputManager.requestInput(op2);
+      this.points.push(pt2);
 
-    prompt[3] = Strings.Input.POSITION;
-    expectedType[3] = ['Point'];
+      core.scene.inputManager.executeCommand(this);
+    } catch (err) {
+      Logging.instance.error(`${this.type} - ${err}`);
+    }
+  }
 
-    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: num === this.minPoints};
+  preview(core) {
+    if (this.points.length >= 1) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [this.points.at(0), mousePoint];
+      core.scene.createTempItem('Line', {points: points});
+    }
+
+    if (this.points.length >= 2) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [...this.points, mousePoint];
+      core.scene.createTempItem(this.type, {points: points});
+    }
   }
 
   getBaseDimType() {

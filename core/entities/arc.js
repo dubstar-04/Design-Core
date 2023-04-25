@@ -3,18 +3,18 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
+
 
 export class Arc extends Entity {
   constructor(data) {
     super(data);
-    this.minPoints = 3; // Should match number of cases in prompt
     this.radius = 1;
-    this.showHelperGeometry = true;
 
     if (data) {
       if (data.points || data[40]) {
         // DXF Groupcode 40 - Radius
-
         // get the radius from the points or the incoming dxf groupcode
         const radius = this.points[1] ? this.points[0].distance(this.points[1]) : data[40];
 
@@ -23,13 +23,13 @@ export class Arc extends Entity {
         }
       }
 
-      if (data.startAngle || data[50]) {
+      if (data.hasOwnProperty('startAngle') || data[50]) {
         // DXF Groupcode 50 - Start Angle
         const angle = Utils.degrees2radians(data.startAngle || data[50]);
         this.points[1] = this.points[0].project(angle, this.radius);
       }
 
-      if (data.endAngle || data[51]) {
+      if (data.hasOwnProperty('endAngle') || data[51]) {
         // DXF Groupcode 51 - End Angle
         const angle = Utils.degrees2radians(data.endAngle || data[51]);
         this.points[2] = this.points[0].project(angle, this.radius);
@@ -42,28 +42,55 @@ export class Arc extends Entity {
     return command;
   }
 
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.CENTER, [Input.Type.POINT]);
+      const pt = await core.scene.inputManager.requestInput(op);
+      this.points.push(pt);
+
+      const op1 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op1);
+      this.points.push(pt1);
+
+      const op2 = new PromptOptions(Strings.Input.ANGLE, [Input.Type.POINT, Input.Type.NUMBER]);
+      const pt2 = await core.scene.inputManager.requestInput(op2);
+
+      if (Input.getType(pt2) === Input.Type.POINT) {
+        this.points.push(pt2);
+      } else if (Input.getType(pt2) === Input.Type.NUMBER) {
+        const basePoint = this.points.at(0);
+        const startPoint = this.points.at(1);
+        const angle = Utils.degrees2radians(pt2);
+        const point = startPoint.rotate(basePoint, angle);
+        this.points.push(point);
+      }
+
+      core.scene.inputManager.executeCommand(this);
+    } catch (err) {
+      Logging.instance.error(`${this.type} - ${err}`);
+    }
+  }
+
+  preview(core) {
+    if (this.points.length >= 1) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [this.points.at(0), mousePoint];
+      core.scene.createTempItem('Line', {points: points});
+    }
+
+    if (this.points.length >= 2) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [...this.points, mousePoint];
+      core.scene.createTempItem(this.type, {points: points});
+    }
+  }
+
   startAngle() {
     return this.points[0].angle(this.points[1]);
   }
 
   endAngle() {
     return this.points[0].angle(this.points[2]);
-  }
-
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
-
-    prompt[1] = Strings.Input.CENTER;
-    expectedType[1] = ['Point'];
-
-    prompt[2] = Strings.Input.START;
-    expectedType[2] = ['Point'];
-
-    prompt[3] = Strings.Input.END;
-    expectedType[3] = ['Point'];
-
-    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length - 1), action: num === this.minPoints};
   }
 
   draw(ctx, scale, core, colour) {

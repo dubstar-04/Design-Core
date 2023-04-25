@@ -1,13 +1,13 @@
 import {Intersection} from '../lib/intersect.js';
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Extend extends Tool {
   constructor() {
     super();
-    // remove this.movement
-    this.movement = 'Modify';
-    this.minPoints = 0;
+    this.selectedIndex;
   }
 
   static register() {
@@ -15,32 +15,37 @@ export class Extend extends Tool {
     return command;
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.BOUNDARY, [Input.Type.SELECTIONSET]);
 
-    const selection = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
-    const noSelection = Strings.Input.BOUNDARY;
+      if (!core.scene.selectionManager.selectionSet.selectionSet.length) {
+        await core.scene.inputManager.requestInput(op);
+      }
 
-    prompt[1] = core.scene.selection.selectionSet.length ? selection : noSelection;
-    expectedType[1] = ['CanvasSelection', 'SelectionAccepted'];
-
-    expectedType[2] = ['Point'];
-    prompt[2] = Strings.Input.SELECTORQUIT; // Strings.Input.SELECTENTITIES;
-
-    return {expectedType: expectedType, prompt: prompt, reset: false, action: (num === prompt.length - 1)};
+      const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
+      while (true) {
+        const selection = await core.scene.inputManager.requestInput(op2);
+        this.selectedIndex = selection.selectedItemIndex;
+        core.scene.inputManager.actionCommand();
+      }
+    } catch (error) {
+      Logging.instance.error(`${this.type} - ${err}`);
+    }
   }
 
   action(core) {
-    const item = core.scene.selection.findClosestItem();
+    // const item = core.scene.selectionManager.findClosestItem(core.mouse.pointOnScene());
+
+    const item = this.selectedIndex;
 
     if (item !== undefined) {
       const intersectPoints = [];
       let extendItem;
 
-      for (let i = 0; i < core.scene.selection.selectionSet.length; i++) {
-        if (core.scene.selection.selectionSet[i] !== item) {
-          const boundaryItem = core.scene.items[core.scene.selection.selectionSet[i]];
+      for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        if (core.scene.selectionManager.selectionSet.selectionSet[i] !== item) {
+          const boundaryItem = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]];
           extendItem = core.scene.items[item];
 
           const functionName = 'intersect' + boundaryItem.type + extendItem.type;
@@ -57,10 +62,9 @@ export class Extend extends Tool {
       if (intersectPoints) {
         extendItem.extend(intersectPoints, core);
       }
-    }
-  }
 
-  preview() {
+      this.selectedIndex = undefined;
+    }
   }
 }
 

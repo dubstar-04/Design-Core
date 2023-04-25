@@ -4,7 +4,7 @@ export class Point {
    * @param  {number} y
    */
   constructor(x, y) {
-    this.type = 'Point';
+    this.type = this.constructor.name;
     this.x = 0;
     this.y = 0;
     this.bulge = 0;

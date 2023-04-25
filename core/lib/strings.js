@@ -19,8 +19,8 @@ export class Strings {
 
   // Message Strings
   static Message = {
-    UNKNOWNCOMMAND: 'Unknown command:',
-    RECOMMEND: 'Did you mean:',
+    UNKNOWNCOMMAND: 'Unknown command',
+    RECOMMEND: 'Did you mean',
     FILEOPEN: 'File opened',
     CLAYERDELETE: 'Currently selected layer cannot be deleted',
     DEFPOINTSDELETE: 'Defpoints layer cannot be deleted',
@@ -35,22 +35,21 @@ export class Strings {
 
   // Input Strings
   static Input = {
-    // TODO: Remove all colons
-    BASEPOINT: 'Select base point:',
-    BOUNDARY: 'Select boundary edges:',
-    CENTER: 'Select centre point:',
-    START: 'Select start point:',
-    END: 'Select end point:',
-    POINT: 'Select a point:',
-    POINTORRADIUS: 'Select another point or Enter radius:',
-    POSITION: 'Select position:',
-    POINTORQUIT: 'Select another point or press ESC to quit:',
-    HEIGHT: 'Enter height:',
-    STRING: 'Enter text:',
-    NONE: '',
-    SELECTENTITIES: 'Select Items:',
-    SELECTED: 'Item(s) selected - Add more or press Enter to accept:',
-    DESTINATIONORDISTANCE: 'Select Destination or Enter distance:',
-    SELECTORQUIT: 'Select another object or press ESC to quit:',
+    BASEPOINT: 'Specify base point',
+    BOUNDARY: 'Specify boundary edges',
+    CENTER: 'Specify centre point',
+    START: 'Specify start point',
+    END: 'Specify end point',
+    POINT: 'Specify a point',
+    NEXTPOINT: 'Specify next point',
+    RADIUS: 'Specify radius',
+    POSITION: 'Specify position',
+    HEIGHT: 'Specify height',
+    STRING: 'Specify text',
+    ANGLE: 'Specify angle',
+    ROTATION: 'Specify rotation angle',
+    DESTINATION: 'Specify destination',
+    SELECT: 'Select object',
+    SELECTIONSET: 'Select Items',
   };
 };

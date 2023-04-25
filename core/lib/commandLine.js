@@ -1,4 +1,5 @@
 import {Point} from '../entities/point.js';
+import {Input} from './inputManager.js';
 
 export class CommandLine {
   /**
@@ -41,9 +42,28 @@ export class CommandLine {
    * @param {string} prompt
    */
   setPrompt(prompt) {
-    this.prompt = prompt;
-    this.command = '';
+    // Parse default options from prompt. Defaults are enclosed in arrows <>
+    const expression = new RegExp('<.+>');
+    const promptHasDefault = expression.test(prompt);
+    const commandDefault = prompt.match(expression);
+
+    this.prompt = `${prompt}:`;
+    this.command = promptHasDefault ? this.parseCommandDefault(commandDefault) : '';
     this.update();
+  }
+
+  /**
+   * Checks there is only a single default value supplied and removes the <>
+   * @param {Array} commandDefault - Array containing the <default> value
+   * @returns value contained within the <>
+   */
+  parseCommandDefault(commandDefault) {
+    if (commandDefault && commandDefault.length > 1) {
+      throw Error('Commands can contain only a single <default>');
+    }
+
+    const defaultValue = commandDefault.at(0).replace(/<|>/gi, '');
+    return defaultValue;
   }
 
   /**
@@ -54,6 +74,13 @@ export class CommandLine {
     // run the callback to update external functions
     if (this.updateCallbackFunction) {
       this.updateCallbackFunction(this.cmdLine);
+    }
+
+    if (this.core.scene.inputManager.activeCommand !== undefined) {
+      // TODO: This should call a common function that is currently called mouseMove in the scene class
+      this.core.scene.tempItems = [];
+      this.core.scene.inputManager.activeCommand.preview(this.core);
+      this.core.canvas.requestPaint();
     }
   }
 
@@ -72,7 +99,7 @@ export class CommandLine {
         this.enterPressed();
         break;
       case 'Escape':
-        this.core.scene.inputManager.reset();
+        this.core.scene.inputManager.onEscapePressed();
         break;
       case 'Space': // space
         this.spacePressed();
@@ -91,8 +118,7 @@ export class CommandLine {
         this.deletePressed();
         break;
       case 'F1': // F1
-        // showSettings()
-        // changeTab(event, 'Help')
+        // showSettings
         break;
       case 'F2': // F2
         break;
@@ -143,8 +169,10 @@ export class CommandLine {
    * Handles presses of the space key
    */
   spacePressed() {
-    const activeCommand = this.core.scene.activeCommand;
-    if (activeCommand && activeCommand.type === 'Text') {
+    const activeCommand = this.core.scene.inputManager.activeCommand;
+    const promptOption = this.core.scene.inputManager.promptOption;
+
+    if (activeCommand && promptOption.types.includes(Input.Type.STRING)) {
       this.command = this.command + ' ';
     } else {
       this.enterPressed();
@@ -181,8 +209,8 @@ export class CommandLine {
    * @param {string} input
    */
   parseInput(input) {
-    const isNumber = /^\-?\d+\.?\d+?$/.test(input);
-    const isPoint = /^\-?\d+\.?\d+?,\-?\d+\.?\d+?$/.test(input.replace(/@|#/gi, ''));
+    const isNumber = /^[-]?\d+(?:\.\d+)?$/.test(input);
+    const isPoint = /^[-]?\d+(?:\.\d+)?,[-]?\d+(?:\.\d+)?$/.test(input.replace(/@|#/gi, ''));
 
     // TODO: Handle angular input
 
@@ -199,9 +227,11 @@ export class CommandLine {
       point.x = parseFloat(xyData[0]);
       point.y = parseFloat(xyData[1]);
 
-      if (isRelative && this.core.scene.points.length) {
-        point.x = parseFloat(this.core.scene.points.at(-1).x + point.x);
-        point.y = parseFloat(this.core.scene.points.at(-1).y + point.y);
+      const activeCommand = this.core.scene.inputManager.activeCommand;
+
+      if (isRelative && activeCommand !== undefined && activeCommand.points.length) {
+        point.x = parseFloat(activeCommand.points.at(-1).x + point.x);
+        point.y = parseFloat(activeCommand.points.at(-1).y + point.y);
       }
 
       return point;

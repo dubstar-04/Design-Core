@@ -8,7 +8,6 @@ export class Canvas {
     this.core = core;
     this.matrix = new Matrix();
 
-    // TODO: Move scale factors to settings?
     this.minScaleFactor = 0.05;
     this.maxScaleFactor = 300;
 
@@ -17,7 +16,6 @@ export class Canvas {
 
     this.panDelta = new Point();
     this.lastDelta = new Point();
-    // this.alpha = 1.0;
     this.flipped = false;
 
     // function to call external pain command for the ui
@@ -42,7 +40,7 @@ export class Canvas {
       this.core.canvas.pan();
     }
 
-    this.core.scene.mouseMoved();
+    this.core.scene.inputManager.mouseMoved();
   }
 
   mouseDown(button) {
@@ -56,8 +54,6 @@ export class Canvas {
       case 2: // right button
         break;
     }
-
-    this.core.scene.mouseDown(button);
   };
 
   mouseUp(button) {
@@ -73,7 +69,7 @@ export class Canvas {
         break;
     }
 
-    this.core.scene.mouseUp(button);
+    this.core.scene.inputManager.mouseUp(button);
   };
 
   doubleClick(button) {
@@ -115,7 +111,7 @@ export class Canvas {
   }
 
   zoomExtents() {
-    const extents = this.core.scene.getExtents();
+    const extents = this.core.scene.boundingRect();
     if (extents) {
       // calculate the center of all items
       const selectionCenter = new Point(extents.xmin + ((extents.xmax - extents.xmin) / 2), extents.ymin + ((extents.ymax - extents.ymin) / 2));
@@ -150,14 +146,14 @@ export class Canvas {
   paint(context, width, height) {
     // This paint request is called by an external paint function
     // some ui framework create and destroy the context for every paint
-    // context is not persistent and is not availble outside this function
+    // context is not persistent and is not available outside this function
 
-    // TODO: Should this be set external to the draw function and old called on resize of canvas?
+    // TODO: Should this be set external to the draw function and only called on resize of canvas?
     this.width = width;
     this.height = height;
 
     // TODO: Need to consider how to change the height when resizing the window
-    // maybe something like translate the differnce between the new and old height?
+    // maybe something like translate the difference between the new and old height?
     if (this.flipped === false) {
       this.matrix.translate(0, -this.height);
       this.flipped = true;
@@ -201,15 +197,6 @@ export class Canvas {
     let j = 0;
     let k = 0;
 
-    /*
-    if (this.panning || this.zooming) {
-    //If Pan or Zoom is in progress, only draw a portion of the entities
-    if (numOfEntities > 350) {
-    i = (numOfEntities - 350)
-    }
-    }
-    */
-
     for (i; i < numOfEntities; i++) {
       const layer = this.core.layerManager.getLayerByName(this.core.scene.items[i].layer);
 
@@ -226,14 +213,14 @@ export class Canvas {
       this.core.scene.items[i].draw(context, this.getScale(), this.core, colour);
     }
 
+    const tempItemColour = this.core.settings.helpergeometrycolour.toString();
     for (j; j < this.core.scene.tempItems.length; j++) {
-      const colour = this.core.scene.tempItems[j].colour;
-      this.core.scene.tempItems[j].draw(context, this.getScale(), this.core, colour);
+      this.core.scene.tempItems[j].draw(context, this.getScale(), this.core, tempItemColour);
     }
 
-    for (k; k < this.core.scene.selection.selectedItems.length; k++) {
-      const colour = this.core.scene.selection.selectedItems[k].colour;
-      this.core.scene.selection.selectedItems[k].draw(context, this.getScale(), this.core, colour);
+    const colour = this.core.settings.selecteditemscolour.toString();
+    for (k; k < this.core.scene.selectionManager.selectedItems.length; k++) {
+      this.core.scene.selectionManager.selectedItems[k].draw(context, this.getScale(), this.core, colour);
     }
   }
 
@@ -275,7 +262,6 @@ export class Canvas {
         context.lineWidth = lineWidth / this.getScale();
         context.beginPath();
       } catch { // Cairo
-        // TODO: Move grid linewidth to settings?
         context.setLineWidth(lineWidth / this.getScale());
       }
 
@@ -313,8 +299,6 @@ export class Canvas {
         context.moveTo(xgridmin, i);
         context.lineTo(xgridmax, i);
       }
-
-      // TODO: draw offset value on gridline origin
 
       context.stroke();
     }

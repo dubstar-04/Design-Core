@@ -1,19 +1,19 @@
 export class Utils {
   static degrees2radians(degrees) {
-    return degrees * Math.PI / 180;
+    return Utils.round(degrees * Math.PI / 180);
   };
 
   static radians2degrees(radians) {
-    return radians * 180 / Math.PI;
+    return Utils.round(radians * 180 / Math.PI);
   };
 
-  static distBetweenPoints(firstPointx, firstPointy, secondPointx, secondPointy) {
-    const A = (firstPointx - secondPointx);
-    const B = (firstPointy - secondPointy);
-    const ASQ = Math.pow(A, 2);
-    const BSQ = Math.pow(B, 2);
-    const dist = Math.sqrt(ASQ + BSQ);
-    return dist;
+  /**
+   * Round to 5 decimal places
+   * @param {number} number
+   * @returns rounded number
+   */
+  static round(number) {
+    return Math.round(number * 100000) / 100000;
   }
 
 

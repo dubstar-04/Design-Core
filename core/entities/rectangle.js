@@ -1,8 +1,9 @@
 import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Rectangle extends Entity {
   constructor(data) {
@@ -33,17 +34,28 @@ export class Rectangle extends Entity {
     return command;
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op);
+      this.points.push(pt1);
 
-    prompt[1] = Strings.Input.START;
-    expectedType[1] = ['Point'];
+      const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
+      const pt2 = await core.scene.inputManager.requestInput(op2);
+      this.points.push(pt2);
 
-    prompt[2] = Strings.Input.END;
-    expectedType[2] = ['Point'];
+      core.scene.inputManager.executeCommand(this);
+    } catch (err) {
+      Logging.instance.error(`${this.type} - ${err}`);
+    }
+  }
 
-    return {expectedType: expectedType, prompt: prompt, reset: (num === prompt.length-1), action: num === this.minPoints};
+  preview(core) {
+    if (this.points.length >= 1) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [this.points.at(-1), mousePoint];
+      core.scene.createTempItem(this.type, {points: points});
+    }
   }
 
   draw(ctx, scale, core, colour) {
@@ -202,7 +214,7 @@ export class Rectangle extends Entity {
         closest.x = A.x + ABx * t;
         closest.y = A.y + ABy * t;
 
-        const dist = Utils.distBetweenPoints(P.x, P.y, closest.x, closest.y);
+        const dist = P.distance(closest);
         if (dist < distance) {
           distance = dist;
         }

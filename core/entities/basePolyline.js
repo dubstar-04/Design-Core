@@ -1,8 +1,9 @@
 import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class BasePolyline extends Entity {
   constructor(data) {
@@ -43,17 +44,32 @@ export class BasePolyline extends Entity {
     }
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op);
+      this.points.push(pt1);
 
-    prompt[1] = Strings.Input.START;
-    expectedType[1] = ['Point'];
+      let pt2;
+      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT]);
+      let index;
+      while (true) {
+        pt2 = await core.scene.inputManager.requestInput(op2);
+        this.points.push(pt2);
+        // first creation will get a new index, subsequent will use the index to update the original polyline
+        index = core.scene.inputManager.actionCommand(this, index);
+      }
+    } catch (err) {
+      Logging.instance.error(`${this.type} - ${err}`);
+    }
+  }
 
-    prompt[2] = Strings.Input.POINTORQUIT;
-    expectedType[2] = ['Point', 'Number'];
-
-    return {expectedType: expectedType, prompt: prompt, reset: false, action: num >= this.minPoints};
+  preview(core) {
+    if (this.points.length >= 1) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [...this.points, mousePoint];
+      core.scene.createTempItem(this.type, {points: points});
+    }
   }
 
   draw(ctx, scale, core, colour) {
@@ -137,7 +153,7 @@ export class BasePolyline extends Entity {
       const pnt = P.perpendicular(A, B);
 
       if (pnt !== null) {
-        const pntDist = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y);
+        const pntDist = P.distance(pnt);
 
         if (pntDist < distance) {
           distance = pntDist;

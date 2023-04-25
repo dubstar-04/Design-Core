@@ -1,11 +1,25 @@
 import {Utils} from './utils.js';
+import {SelectionWindow} from './selectionWindow.js';
+
+export class SingleSelection {
+  constructor(index, point) {
+    this.selectedItemIndex = index;
+    this.selectedPoint = point;
+  }
+}
+
+export class SelectionSet {
+  constructor() {
+    this.accepted = false;
+    this.selectionSet = [];
+  }
+}
 
 // TODO: Refactor class.
-export class Selection {
+export class SelectionManager {
   constructor(core) {
     this.core = core;
-    this.selectionSet = []; // store a list of selected items indices
-    this.selectionAccepted = false; // Store a bool so we know when the selectionSet has been accepted
+    this.selectionSet = new SelectionSet(); // store a list of selected items indices
     this.selectedItems = []; // store a copy of selected items
   }
 
@@ -14,9 +28,8 @@ export class Selection {
    */
   reset() {
     this.selectedItems = [];
-    this.selectionSet = [];
+    this.selectionSet = new SelectionSet();
     this.selectionSetChanged();
-    this.selectionAccepted = false;
   }
 
   /**
@@ -25,6 +38,21 @@ export class Selection {
   selectionSetChanged() {
     // signal to the properties manager that the selection set is changed
     this.core.propertyManager.selectionSetChanged();
+  }
+
+  /**
+   * Draw the selection selection window
+   */
+  drawSelectionWindow() {
+    const selectionPoints = [];
+    selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
+    selectionPoints.push(this.core.mouse.pointOnScene());
+
+    const data = {
+      points: selectionPoints,
+    };
+
+    this.core.scene.addToTempItems(new SelectionWindow(data));
   }
 
   /**
@@ -52,7 +80,6 @@ export class Selection {
 
       this.selectionSetChanged();
     }
-
     this.core.canvas.requestPaint();
   }
 
@@ -75,28 +102,32 @@ export class Selection {
 
   /**
    * Select the item closest to the mouse and add it to the selection set
+   * @returns {SingleSelection} - return single selection
    */
-  singleSelect() {
-    const closestItemIndex = this.findClosestItem();
-
+  singleSelect(point) {
+    const closestItemIndex = this.findClosestItem(point);
     if (closestItemIndex !== undefined) {
-      this.addToSelectionSet(closestItemIndex);
-      this.selectionSetChanged();
-    } else {
-      this.reset();
+      // this.addToSelectionSet(closestItemIndex);
+      // this.selectionSetChanged();
+      const selection = new SingleSelection(closestItemIndex, point);
+      return selection;
     }
+
+    this.reset();
+    return new SingleSelection();
   }
 
   /**
-   * Find closest item to mouse press
+   * Find closest item to point
+   * @param  {Point} point
    * @returns {Integer} - return index of closest item or undefined
    */
-  findClosestItem() {
+  findClosestItem(point) {
     let delta = 1.65 / this.core.canvas.getScale(); // find a more suitable starting value
     let closestItemIndex;
 
     for (let i = 0; i < this.core.scene.items.length; i++) {
-      const distance = this.core.scene.items[i].closestPoint(this.core.mouse.pointOnScene())[1]; // ClosestPoint()[1] returns a distance to the closest point
+      const distance = this.core.scene.items[i].closestPoint(point)[1]; // ClosestPoint()[1] returns a distance to the closest point
 
       if (distance < delta) {
         delta = distance;
@@ -124,9 +155,12 @@ export class Selection {
   * @param  {Integer} index
   */
   addToSelectionSet(index) {
+    if (index === undefined) {
+      return;
+    }
     // only store selections once
-    if (this.selectionSet.indexOf(index) === -1) {
-      this.selectionSet.push(index);
+    if (this.selectionSet.selectionSet.indexOf(index) === -1) {
+      this.selectionSet.selectionSet.push(index);
       this.addToSelectedItems(index);
     }
   }
@@ -149,8 +183,8 @@ export class Selection {
   reloadSelectedItems() {
     this.selectedItems = [];
 
-    for (let i = 0; i < this.selectionSet.length; i++) {
-      this.addToSelectedItems(this.selectionSet[i]);
+    for (let i = 0; i < this.selectionSet.selectionSet.length; i++) {
+      this.addToSelectedItems(this.selectionSet.selectionSet[i]);
     }
 
     this.core.canvas.requestPaint();

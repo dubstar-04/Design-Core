@@ -8,6 +8,7 @@ console.log = function(msg) {
 };
 
 test('Logging levelValue', () => {
+  Logging.instance.setLevel('OFF');
   expect(Logging.instance.levelValue).toBe(0);
   Logging.instance.setLevel('ERROR');
   expect(Logging.instance.levelValue).toBe(1);

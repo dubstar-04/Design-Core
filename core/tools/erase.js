@@ -1,10 +1,11 @@
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Erase extends Tool {
   constructor() {
     super();
-    this.minPoints = 0;
   }
 
   static register() {
@@ -12,24 +13,23 @@ export class Erase extends Tool {
     return command;
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
 
-    const selection = `${core.scene.selection.selectionSet.length}  ${Strings.Input.SELECTED}`;
-    const noSelection = Strings.Input.SELECTENTITIES;
+      if (!core.scene.selectionManager.selectionSet.selectionSet.length) {
+        await core.scene.inputManager.requestInput(op);
+      }
 
-    prompt[1] = core.scene.selection.selectionSet.length ? selection : noSelection;
-    expectedType[1] = ['CanvasSelection', 'SelectionAccepted'];
-
-    const accepted = (inputType === 'SelectionAccepted');
-
-    return {expectedType: expectedType, prompt: prompt, reset: accepted, action: accepted};
+      core.scene.inputManager.executeCommand();
+    } catch (error) {
+      Logging.instance.error(`${this.type} - ${err}`);
+    }
   }
 
   action(core) {
     // get a copy of the selection set
-    const selections = core.scene.selection.selectionSet.slice();
+    const selections = core.scene.selectionManager.selectionSet.selectionSet.slice();
     // sort the selection in descending order
     selections.sort((a, b)=>b-a);
 

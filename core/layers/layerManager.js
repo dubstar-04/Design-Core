@@ -43,7 +43,7 @@ export class LayerManager {
 
   addLayer(layer) {
     const newLayer = new Layer(layer);
-    // TODO: investigate why this gets called so many times when loading drawings
+    // This is called multiple times from the check layers function when opening files
     if (!this.layerExists(newLayer)) {
       this.layers.push(newLayer);
       this.core.scene.saveRequired();

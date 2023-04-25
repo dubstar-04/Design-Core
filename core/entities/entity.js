@@ -11,28 +11,18 @@ export class Entity {
       writable: true,
     });
 
-    Object.defineProperty(this, 'showHelperGeometry', {
-      enumerable: false,
-      value: false,
-      writable: true,
-    });
-
     Object.defineProperty(this, 'points', {
       enumerable: false,
       value: [],
       writable: true,
     });
 
-    Object.defineProperty(this, 'minPoints', {
-      enumerable: false,
-      value: 2,
-      writable: true,
-    });
-
+    /*
     Object.defineProperty(this, 'trueColour', {
       enumerable: false,
       writable: true,
     });
+    */
 
     this.lineWidth = 2;
     this.colour = 'BYLAYER';
@@ -73,9 +63,9 @@ export class Entity {
   }
 
   getColour() {
-    if (this.trueColour !== undefined) {
-      return this.trueColour;
-    }
+    // if (this.trueColour !== undefined) {
+    //   return this.trueColour;
+    // }
 
     return this.colour;
   }

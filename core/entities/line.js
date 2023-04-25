@@ -3,6 +3,8 @@ import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Logging} from '../lib/logging.js';
 
 export class Line extends Entity {
   constructor(data) {
@@ -27,17 +29,38 @@ export class Line extends Entity {
     return command;
   }
 
-  processInput(num, input, inputType, core) {
-    const expectedType = [];
-    const prompt = [];
+  async execute(core) {
+    try {
+      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const pt1 = await core.scene.inputManager.requestInput(op);
+      this.points.push(pt1);
 
-    prompt[1] = Strings.Input.START;
-    expectedType[1] = ['Point'];
+      let pt2;
+      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.NUMBER]);
+      while (true) {
+        pt2 = await core.scene.inputManager.requestInput(op2);
+        if (Input.getType(pt2) === Input.Type.POINT) {
+          this.points.push(pt2);
+        } else if (Input.getType(pt2) === Input.Type.NUMBER) {
+          const basePoint = this.points.at(-1);
+          const angle = Utils.degrees2radians(core.mouse.inputAngle());
+          const point = basePoint.project(angle, pt2);
+          this.points.push(point);
+        }
 
-    prompt[2] = Strings.Input.POINTORQUIT;
-    expectedType[2] = ['Point', 'Number'];
+        core.scene.inputManager.actionCommand(this);
+      }
+    } catch (err) {
+      Logging.instance.error(`${this.type} - ${err}`);
+    }
+  }
 
-    return {expectedType: expectedType, prompt: prompt, reset: false, action: num >= this.minPoints};
+  preview(core) {
+    if (this.points.length >= 1) {
+      const mousePoint = core.mouse.pointOnScene();
+      const points = [this.points.at(-1), mousePoint];
+      core.scene.createTempItem(this.type, {points: points});
+    }
   }
 
   draw(ctx, scale, core, colour) {
@@ -269,7 +292,7 @@ export class Line extends Entity {
       return [P, Infinity];
     }
 
-    const distance = Utils.distBetweenPoints(P.x, P.y, pnt.x, pnt.y);
+    const distance = P.distance(pnt);
     return [pnt, distance];
   }
 
