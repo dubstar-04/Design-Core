@@ -52,7 +52,7 @@ export class Arc extends Entity {
       const pt1 = await core.scene.inputManager.requestInput(op1);
       this.points.push(pt1);
 
-      const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT, Input.Type.NUMBER]);
+      const op2 = new PromptOptions(Strings.Input.ANGLE, [Input.Type.POINT, Input.Type.NUMBER]);
       const pt2 = await core.scene.inputManager.requestInput(op2);
 
       if (Input.getType(pt2) === Input.Type.POINT) {
