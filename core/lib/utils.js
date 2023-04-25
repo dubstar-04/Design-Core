@@ -1,8 +1,18 @@
 export class Utils {
+  /**
+   * Convert degrees to radians
+   * @param {number} degrees
+   * @returns angle in radians
+   */
   static degrees2radians(degrees) {
     return Utils.round(degrees * Math.PI / 180);
   };
 
+  /**
+   * Convert radians to degrees
+   * @param {number} radians
+   * @returns angle in degrees
+   */
   static radians2degrees(radians) {
     return Utils.round(radians * 180 / Math.PI);
   };
