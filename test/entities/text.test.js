@@ -7,20 +7,20 @@ test('Test Text.setRotation', () => {
 
   // Zero
   setRotText.setRotation(0);
-  // expect(setRotText.rotation).toBe(0); //returns 360
+  expect(setRotText.rotation).toBe(0);
 
   // Positive
   setRotText.setRotation(22.5);
   expect(setRotText.rotation).toBe(22.5);
 
   setRotText.setRotation(23);
-  // expect(setRotText.rotation).toBe(23); // returns 22.999999999999993
+  expect(setRotText.rotation).toBe(23);
 
   setRotText.setRotation(45);
   expect(setRotText.rotation).toBe(45);
 
   setRotText.setRotation(90);
-  // expect(setRotText.rotation).toBe(90); //returns 89.9999999
+  expect(setRotText.rotation).toBe(90);
 
   setRotText.setRotation(135);
   expect(setRotText.rotation).toBe(135);
@@ -36,18 +36,18 @@ test('Test Text.setRotation', () => {
 
   // Greater than 360
   setRotText.setRotation((360 + 90));
-  // expect(setRotText.rotation).toBe(90); //returns 89.9999999
+  expect(setRotText.rotation).toBe(90);
 
   // Negative
   setRotText.setRotation(-22.5);
-  // expect(setRotText.rotation).toBe(337.5); // Returns 337.49999999999994
+  expect(setRotText.rotation).toBe(337.5);
 
   setRotText.setRotation(-90);
   expect(setRotText.rotation).toBe(270);
 
-  // precision
+  // precision - rounds to closest 5 dp
   setRotText.setRotation(10.123456789);
-  // expect(setRotText.rotation).toBe(10.123456789); // Returns 10.123456789000004
+  expect(setRotText.rotation).toBe(10.12346);
 });
 
 
