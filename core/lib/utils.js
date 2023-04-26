@@ -23,7 +23,7 @@ export class Utils {
    * @returns rounded number
    */
   static round(number) {
-    return Math.round(number * 100000) / 100000;
+    return Number(number.toFixed(5));
   }
 
   /**
