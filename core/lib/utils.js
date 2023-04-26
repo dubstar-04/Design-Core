@@ -1,10 +1,20 @@
 export class Utils {
+  /**
+   * Convert degrees to radians
+   * @param {number} degrees
+   * @returns angle in radians
+   */
   static degrees2radians(degrees) {
-    return Utils.round(degrees * Math.PI / 180);
+    return degrees * Math.PI / 180;
   };
 
+  /**
+   * Convert radians to degrees
+   * @param {number} radians
+   * @returns angle in degrees
+   */
   static radians2degrees(radians) {
-    return Utils.round(radians * 180 / Math.PI);
+    return radians * 180 / Math.PI;
   };
 
   /**
@@ -13,10 +23,15 @@ export class Utils {
    * @returns rounded number
    */
   static round(number) {
-    return Math.round(number * 100000) / 100000;
+    return Number(number.toFixed(5));
   }
 
-
+  /**
+   * Deep clone object
+   * @param {object} core
+   * @param {objec} obj - object to clone
+   * @returns - new cloned object
+   */
   static cloneObject(core, obj) {
     // deep clone obj and all its attributes
     if (obj === null || typeof obj !== 'object') {
@@ -33,7 +48,6 @@ export class Utils {
 
     return clone;
   }
-
 
   /**
    * Returns a levenshtein edit distance to the input strings

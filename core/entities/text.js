@@ -168,7 +168,7 @@ export class Text extends Entity {
   getRotation() {
     if (this.points[1] !== undefined) {
       const angle = Utils.radians2degrees(this.points[0].angle(this.points[1]));
-      return angle;
+      return Utils.round(angle);
     }
 
     return 0;
@@ -331,6 +331,7 @@ export class Text extends Entity {
   }
 
   closestPoint(P) {
+    // TODO: Support rotation
     const rect = this.getBoundingRect();
     const botLeft = new Point(rect.x, rect.y);
     const topRight = new Point(rect.x + rect.width, rect.y + rect.height);
