@@ -168,7 +168,7 @@ export class Text extends Entity {
   getRotation() {
     if (this.points[1] !== undefined) {
       const angle = Utils.radians2degrees(this.points[0].angle(this.points[1]));
-      return angle;
+      return Utils.round(angle);
     }
 
     return 0;
