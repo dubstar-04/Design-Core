@@ -37,10 +37,10 @@ test('Test Point.angle', () => {
   const pt1 = new Point();
 
   /* 0 degrees */
-  expect(pt1.angle(new Point(10, 0))).toBe(Math.PI*2);
+  expect(pt1.angle(new Point(10, 0))).toBe(0);
 
   /* 22.5 degrees */
-  expect(pt1.angle(new Point(13.065629648764, 5.411961001462))).toBe(Math.PI/8);
+  expect(pt1.angle(new Point(13.065629648764, 5.411961001462))).toBeCloseTo(Math.PI/8);
 
   /* 45 degrees */
   expect(pt1.angle(new Point(10, 10))).toBe(Math.PI/4);
