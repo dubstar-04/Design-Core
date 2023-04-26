@@ -36,7 +36,8 @@ export class Point {
    * @param  {Point} that
    */
   angle(that) {
-    return Math.atan2((this.y - that.y), (this.x - that.x)) + Math.PI;
+    const angle = Math.atan2((this.y - that.y), (this.x - that.x)) + Math.PI;
+    return angle % (Math.PI*2);
   }
 
 
