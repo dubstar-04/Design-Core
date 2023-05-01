@@ -5,7 +5,6 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {Utils} from '../lib/utils.js';
 
-
 export class BasePolyline extends Entity {
   constructor(data) {
     super(data);
@@ -198,7 +197,15 @@ export class BasePolyline extends Entity {
     for (let i = 1; i < this.points.length; i++) {
       const A = this.points[i - 1];
       const B = this.points[i];
-      const pnt = P.perpendicular(A, B);
+
+      let pnt;
+      if (A.bulge !== 0) {
+        const C = A.getCentrePoint(B);
+        const direction = A.bulge;
+        pnt = P.closestPointOnArc(A, B, C, direction);
+      } else {
+        pnt = P.closestPointOnLine(A, B);
+      }
 
       if (pnt !== null) {
         const pntDist = P.distance(pnt);
