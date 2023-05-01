@@ -9,6 +9,13 @@ export class BasePolyline extends Entity {
   constructor(data) {
     super(data);
 
+    this.modes = {
+      LINE: 'Line',
+      ARC: 'Arc',
+    };
+
+    this.inputMode = this.modes.LINE;
+
     Object.defineProperty(this, 'flags', {
       enumerable: false,
       value: 0,
