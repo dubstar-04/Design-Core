@@ -1,9 +1,10 @@
-import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
 import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
+import {Utils} from '../lib/utils.js';
+
 
 export class BasePolyline extends Entity {
   constructor(data) {
@@ -58,13 +59,35 @@ export class BasePolyline extends Entity {
       this.points.push(pt1);
 
       let pt2;
-      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT]);
+      let op2;
       let index;
       while (true) {
+        let options;
+        if (this.points.length >= 2) {
+          options = this.inputMode === this.modes.LINE ? [this.modes.ARC] : [this.modes.LINE];
+        }
+
+        op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT], options);
         pt2 = await core.scene.inputManager.requestInput(op2);
-        this.points.push(pt2);
-        // first creation will get a new index, subsequent will use the index to update the original polyline
-        index = core.scene.inputManager.actionCommand(this, index);
+
+        if (Input.getType(pt2) === Input.Type.POINT) {
+          if (this.inputMode === this.modes.ARC) {
+            this.points.at(-1).bulge = this.getBulgeFromSegment(pt2);
+          }
+
+          this.points.push(pt2);
+          // first creation will get a new index, subsequent will use the index to update the original polyline
+          index = core.scene.inputManager.actionCommand(this, index);
+        } else if (Input.getType(pt2) === Input.Type.STRING) {
+          log('polyline input:', pt2);
+          if (pt2 === this.modes.ARC) {
+            log('switch to arc mode');
+            this.inputMode = this.modes.ARC;
+          }
+          if (pt2 === this.modes.LINE) {
+            this.inputMode = this.modes.LINE;
+          }
+        }
       }
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
@@ -72,9 +95,17 @@ export class BasePolyline extends Entity {
   }
 
   preview(core) {
+    const mousePoint = core.mouse.pointOnScene();
+
     if (this.points.length >= 1) {
-      const mousePoint = core.mouse.pointOnScene();
       const points = [...this.points, mousePoint];
+      core.scene.createTempItem(this.type, {points: points});
+    }
+
+    if (this.inputMode === this.modes.ARC) {
+      const arcpoints = Utils.cloneObject(core, this.points);
+      arcpoints.at(-1).bulge = this.getBulgeFromSegment(mousePoint);
+      const points = [...arcpoints, mousePoint];
       core.scene.createTempItem(this.type, {points: points});
     }
   }
@@ -93,7 +124,19 @@ export class BasePolyline extends Entity {
     ctx.moveTo(this.points[0].x, this.points[0].y);
 
     for (let i = 1; i < this.points.length; i++) {
-      ctx.lineTo(this.points[i].x, this.points[i].y);
+      if (this.points[i].bulge === 0) {
+        ctx.lineTo(this.points[i].x, this.points[i].y);
+      } else {
+        const centerPoint = this.points[i].getCentrePoint(this.points[i + 1]);
+        const radius = this.points[i].getRadius(this.points[i + 1]);
+
+        if (this.points[i].bulge > 0) {
+          // TODO: make this work with canvas
+          ctx.arc(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(this.points[i + 1]));
+        } else {
+          ctx.arcNegative(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(this.points[i + 1]));
+        }
+      }
     }
 
     // handle a closed shape
