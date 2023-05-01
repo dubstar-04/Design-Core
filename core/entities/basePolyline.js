@@ -169,4 +169,32 @@ export class BasePolyline extends Entity {
 
     return [xmin, xmax, ymin, ymax];
   }
+
+  /**
+   * Get the bulge value from the prevous segment and the selected point
+   * @param {point} point
+   * @returns polyline bulge value
+   */
+  getBulgeFromSegment(point) {
+    const lastSegBulge = this.points.at(-2).bulge;
+    const lastSegIsArc = lastSegBulge !== 0;
+
+    // get the angle at the end of the previous segment
+    let lastSegAngle;
+    if (lastSegIsArc) {
+      const centerPoint = this.points.at(-2).getCentrePoint(this.points.at(-1));
+      // angle is perpendicular to the center to end point ray, in the direction of the bulge
+      lastSegAngle = centerPoint.angle(this.points.at(-1)) + (Math.PI / 2) * Math.sign(lastSegBulge);
+    } else {
+      // line segement angle is just the angle from point 0 to to point 1
+      lastSegAngle = this.points.at(-2).angle(this.points.at(-1));
+    }
+
+    const mouseAngle = this.points.at(-1).angle(point) % (2 * Math.PI);
+    // get the angle delta between point and the previous segment
+    // ensure that the angle is always less than 2 * Math.PI
+    const angleDelta = ((mouseAngle - lastSegAngle) + 3 * Math.PI) % (2*Math.PI) - Math.PI;
+    const bulge = angleDelta / (Math.PI / 2);
+    return bulge;
+  }
 }
