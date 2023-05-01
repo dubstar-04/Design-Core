@@ -7,6 +7,8 @@ export class Point {
     this.type = this.constructor.name;
     this.x = 0;
     this.y = 0;
+    // bulge value used for defining arcs in polylines
+    // arc is ccw if positive
     this.bulge = 0;
 
     if (x !== undefined) {
