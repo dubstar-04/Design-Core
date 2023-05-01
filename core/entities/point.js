@@ -250,4 +250,53 @@ export class Point {
     const pnt = this.perpendicular(startPoint, endPoint);
     return pnt;
   }
+
+  /**
+   * Find the closest arc on a line between start and end points
+   * @param {Point} startPoint
+   * @param {Point} endPoint
+   * @param {Point} centerPoint
+   * @param {number} direction - CCW if > 0
+   * @returns the closest point on the arc or null
+   */
+  closestPointOnArc(startPoint, endPoint, centerPoint, direction=1) {
+    const length = this.distance(centerPoint);
+    const radius = centerPoint.distance(startPoint);
+
+    const Cx = centerPoint.x + radius * (this.x - centerPoint.x) / length;
+    const Cy = centerPoint.y + radius * (this.y - centerPoint.y) / length;
+    const closest = new Point(Cx, Cy);
+
+    const snapAngle = centerPoint.angle(this);
+    const startAngle = centerPoint.angle(startPoint);
+    const endAngle = centerPoint.angle(endPoint);
+
+    if (direction > 0) {
+      if (startAngle < endAngle) {
+        if (snapAngle >= startAngle && snapAngle <= endAngle) {
+          return closest;
+        }
+      }
+
+      if (startAngle > endAngle) {
+        if (snapAngle >= startAngle || snapAngle <= endAngle) {
+          return closest;
+        }
+      }
+    } else if (direction < 0) {
+      if (startAngle < endAngle) {
+        if (snapAngle <= startAngle || snapAngle >= endAngle) {
+          return closest;
+        }
+      }
+
+      if (startAngle > endAngle) {
+        if (snapAngle <= startAngle && snapAngle >= endAngle) {
+          return closest;
+        }
+      }
+    }
+    // Point not on arc
+    return null;
+  }
 }
