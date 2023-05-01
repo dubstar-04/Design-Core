@@ -103,15 +103,6 @@ export class BasePolyline extends Entity {
     };
   }
 
-  midPoint(x, x1, y, y1) {
-    const midX = (x + x1) / 2;
-    const midY = (y + y1) / 2;
-    const midPoint = new Point(midX, midY);
-
-    return midPoint;
-  }
-
-
   snaps(mousePoint, delta, core) {
     const snaps = [];
 
@@ -124,10 +115,7 @@ export class BasePolyline extends Entity {
 
     if (core.settings.midsnap) {
       for (let i = 1; i < this.points.length; i++) {
-        const start = this.points[i - 1];
-        const end = this.points[i];
-
-        snaps.push(this.midPoint(start.x, end.x, start.y, end.y));
+        snaps.push( this.points[i - 1].midPoint(this.points[i]));
       }
     }
 
