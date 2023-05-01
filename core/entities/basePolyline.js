@@ -165,7 +165,17 @@ export class BasePolyline extends Entity {
 
     if (core.settings.midsnap) {
       for (let i = 1; i < this.points.length; i++) {
-        snaps.push( this.points[i - 1].midPoint(this.points[i]));
+        if (this.points[i-1].bulge === 0) {
+          snaps.push( this.points[i - 1].midPoint(this.points[i]));
+        }
+      }
+    }
+
+    if (core.settings.centresnap) {
+      for (let i = 1; i < this.points.length; i++) {
+        if (this.points[i-1].bulge !== 0) {
+          snaps.push( this.points[i - 1].getCentrePoint(this.points[i]));
+        }
       }
     }
 
