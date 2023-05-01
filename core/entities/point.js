@@ -238,4 +238,16 @@ export class Point {
     if (this.x == that.x && this.y == that.y) return true;
     return false;
   }
+
+
+  /**
+   * Find the closest point on a line between start and end points
+   * @param {*} startPoint
+   * @param {*} endPoint
+   * @returns the closest point on the line or null
+   */
+  closestPointOnLine(startPoint, endPoint) {
+    const pnt = this.perpendicular(startPoint, endPoint);
+    return pnt;
+  }
 }
