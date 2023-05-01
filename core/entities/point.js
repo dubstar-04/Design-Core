@@ -16,6 +16,66 @@ export class Point {
   }
 
   /**
+   * Get the arc angle in radians from the bulge value
+   * @returns arc angle in radians
+   */
+  angleFromBulge() {
+    return Math.atan(this.bulge) * 4;
+  }
+
+  /**
+   * Return the radius of the arc from the next point in the polyline
+   */
+  getRadius(nextPoint) {
+    if (this.bulge == 0) {
+      return 0;
+    }
+
+    const rad = this.distance(nextPoint) * (1 + Math.pow(this.bulge, 2)) / (4 * Math.abs(this.bulge));
+    return rad;
+  }
+
+  /**
+   * Returns apothem; the distance from arc center to cord midpoint
+   * @param {Point} nextPoint
+   * @returns apothem
+   */
+  getApothem(nextPoint) {
+    const apothem = Math.sqrt(Math.pow(this.getRadius(nextPoint), 2) - Math.pow(this.distance(nextPoint) / 2, 2));
+    return apothem;
+  }
+
+  /**
+   * Return the centre point of the arc
+   * @param {Point} nextPoint
+   * @returns Point
+   */
+  getCentrePoint(nextPoint) {
+    const midp = this.midPoint(nextPoint);
+
+    if (this.bulge == 0) {
+      return midp;
+    }
+
+    let a = this.getApothem(nextPoint);
+
+    // check if the center point is inverted. i.e. at 180 it goes inside the arc
+    if (this.angleFromBulge() > Math.PI) {
+      a = -a;
+    }
+
+    const angle = this.angle(nextPoint);
+
+    let centre = midp.project(angle - Math.PI / 2, a);
+
+    if (this.bulge > 0) {
+      centre = midp.project(angle + Math.PI / 2, a);
+    }
+
+    return centre;
+  }
+
+  /**
    * Add this to that
    * @param  {Point} that
    */
