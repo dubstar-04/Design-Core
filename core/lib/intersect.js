@@ -292,8 +292,8 @@ export class Intersection {
    */
   static intersectCircleArc(circle, arc, extend) {
     const c = arc.centre;
-    const sa = arc.startAngle;
-    const ea = arc.endAngle;
+    const sa = arc.centre.angle(arc.startPoint);
+    const ea = arc.centre.angle(arc.endPoint);
 
     const inter1 = this.intersectCircleCircle(circle, arc, extend);
     const result = new Intersection('No Intersection');
@@ -668,10 +668,22 @@ export class Intersection {
       const b1 = polyline.points[i];
       const b2 = polyline.points[(i + 1) % length];
 
-      const line2 = {start: b1, end: b2};
-      const inter = this.intersectLineLine(line2, line, extend);
 
-      result.appendPoints(inter.points);
+      if (b1.bulge === 0) {
+        const line2 = {start: b1, end: b2};
+        const inter = this.intersectLineLine(line2, line, extend);
+        result.appendPoints(inter.points);
+      } else {
+        const arc = {};
+        arc.centre = b1.getCentrePoint(b2);
+        arc.startPoint = b1;
+        arc.endPoint = b2;
+        arc.radius = arc.centre.distance(b1);
+        arc.direction = b1.bulge;
+
+        const interArc = this.intersectArcLine(arc, line, extend);
+        result.appendPoints(interArc.points);
+      }
     }
 
     if (result.points.length > 0) result.status = 'Intersection';
