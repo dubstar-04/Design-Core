@@ -143,9 +143,9 @@ export class Arc extends Entity {
   intersectPoints() {
     return {
       centre: this.points[0],
+      startPoint: this.points[1],
+      endPoint: this.points[2],
       radius: this.radius,
-      startAngle: this.startAngle(),
-      endAngle: this.endAngle(),
       direction: this.direction,
     };
   }
