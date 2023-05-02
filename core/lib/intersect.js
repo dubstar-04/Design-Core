@@ -291,16 +291,12 @@ export class Intersection {
    * @returns
    */
   static intersectCircleArc(circle, arc, extend) {
-    const c = arc.centre;
-    const sa = arc.centre.angle(arc.startPoint);
-    const ea = arc.centre.angle(arc.endPoint);
-
     const inter1 = this.intersectCircleCircle(circle, arc, extend);
     const result = new Intersection('No Intersection');
 
     if (!extend) {
       for (let i = 0; i < inter1.points.length; i++) {
-        if (c.angle(inter1.points[i]) > sa && c.angle(inter1.points[i]) < ea) {
+        if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
           result.points.push(inter1.points[i]);
         }
       }
