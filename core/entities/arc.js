@@ -189,7 +189,7 @@ export class Arc extends Entity {
     return [P, Infinity, false];
   }
 
-  extremes() {
+  boundingBox() {
     const xValues = [];
     const yValues = [];
 

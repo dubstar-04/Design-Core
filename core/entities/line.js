@@ -296,7 +296,7 @@ export class Line extends Entity {
     return [pnt, distance];
   }
 
-  extremes() {
+  boundingBox() {
     const xmin = Math.min(this.points[0].x, this.points[1].x);
     const xmax = Math.max(this.points[0].x, this.points[1].x);
     const ymin = Math.min(this.points[0].y, this.points[1].y);

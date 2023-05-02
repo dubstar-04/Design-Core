@@ -220,7 +220,7 @@ export class BasePolyline extends Entity {
     return [minPnt, distance];
   }
 
-  extremes() {
+  boundingBox() {
     const xValues = [];
     const yValues = [];
 

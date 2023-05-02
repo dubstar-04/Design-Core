@@ -210,14 +210,14 @@ export class Block extends Entity {
     return [minPnt, distance];
   }
 
-  extremes() {
+  boundingBox() {
     let xmin = 0;
     let xmax = 0;
     let ymin = 0;
     let ymax = 0;
 
     for (let idx = 0; idx < this.items.length; idx++) {
-      const itemExtremes = this.items[idx].extremes();
+      const itemExtremes = this.items[idx].boundingBox();
 
       xmin = Math.min(xmin, itemExtremes[0]);
       xmax = Math.max(xmax, itemExtremes[1]);

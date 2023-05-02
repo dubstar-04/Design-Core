@@ -78,7 +78,7 @@ export class Entity {
     }
 
     // determin if this entities is within a the window specified by selectionExtremes
-    const extremePoints = this.extremes();
+    const extremePoints = this.boundingBox();
     if ( extremePoints[0] > selectionExtremes[0] &&
          extremePoints[1] < selectionExtremes[1] &&
          extremePoints[2] > selectionExtremes[2] &&

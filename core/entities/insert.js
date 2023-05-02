@@ -72,7 +72,7 @@ export class Insert {
     return [minPnt, distance];
   }
 
-  extremes() {
+  boundingBox() {
     return [];
   }
 

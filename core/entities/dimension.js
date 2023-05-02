@@ -459,8 +459,8 @@ export class Dimension extends Entity {
     return this.block.closestPoint(P);
   }
 
-  extremes() {
-    return this.block.extremes();
+  boundingBox() {
+    return this.block.boundingBox();
   }
 
   within(selectionExtremes, core) {
