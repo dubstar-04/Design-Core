@@ -262,3 +262,84 @@ test('Test Point.isSame', () => {
   const pt3 = new Point(10, 10);
   expect(pt2.isSame(pt3)).toBe(false);
 });
+
+
+test('Test Point.closestPointOnLine', () => {
+  const lineStart1 = new Point(-10, 0);
+  const lineEnd1 = new Point(10, 0);
+
+  const pt1 = new Point();
+  const perp1 = pt1.closestPointOnLine(lineStart1, lineEnd1);
+  expect(perp1.x).toBe(0);
+  expect(perp1.y).toBe(0);
+
+  const pt2 = new Point(5, 5);
+  const perp2 = pt2.closestPointOnLine(lineStart1, lineEnd1);
+  expect(perp2.x).toBe(5);
+  expect(perp2.y).toBe(0);
+
+  const pt3 = new Point(-5, -5);
+  const perp3 = pt3.closestPointOnLine(lineStart1, lineEnd1);
+  expect(perp3.x).toBe(-5);
+  expect(perp3.y).toBe(0);
+
+  const pt4 = new Point(15, 15);
+  const perp4 = pt4.closestPointOnLine(lineStart1, lineEnd1);
+  expect(perp4).toBe(null);
+});
+
+test('Test Point.closestPointOnArc', () => {
+  const arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
+
+  const pt3 = new Point(5, 5);
+  const closest1 = pt3.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(closest1.x).toBe(10);
+  expect(closest1.y).toBe(10);
+
+  const pt4 = new Point(0, 5);
+  const closest2 = pt4.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(closest2.x).toBe(0);
+  expect(closest2.y).toBeCloseTo(14.14);
+
+  const pt5 = new Point(20, 10);
+  const closest3 = pt5.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(closest3).toBe(null);
+});
+
+
+test('Test Point.isOnArc', () => {
+  const arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
+
+  const pt3 = new Point(5, 5);
+  const onArc1 = pt3.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc1).toBe(true);
+
+  const pt4 = new Point(0, 5);
+  const onArc2 = pt4.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc2).toBe(true);
+
+  const pt5 = new Point(20, 10);
+  const onArc3 = pt5.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc3).toBe(false);
+});
+
+test('Test Point.isOnLine', () => {
+  const lineStart1 = new Point(-10, 0);
+  const lineEnd1 = new Point(10, 0);
+
+  const pt1 = new Point();
+  const isOnLine1 = pt1.isOnLine(lineStart1, lineEnd1);
+  expect(isOnLine1).toBe(true);
+
+  const pt3 = new Point(5, 0);
+  const isOnLine2 = pt3.isOnLine(lineStart1, lineEnd1);
+  expect(isOnLine2).toBe(true);
+
+  const pt4 = new Point(-5, 0);
+  const isOnLine3 = pt4.isOnLine(lineStart1, lineEnd1);
+  expect(isOnLine3).toBe(true);
+
+  const pt5 = new Point(20, 10);
+  const isOnLine4 = pt5.isOnLine(lineStart1, lineEnd1);
+  expect(isOnLine4).toBe(false);
+});
