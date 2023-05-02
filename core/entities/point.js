@@ -267,6 +267,23 @@ export class Point {
     const Cy = centerPoint.y + radius * (this.y - centerPoint.y) / length;
     const closest = new Point(Cx, Cy);
 
+    if (closest.isOnArc(startPoint, endPoint, centerPoint, direction)) {
+      return closest;
+    }
+
+    // Point not on arc
+    return null;
+  }
+
+  /**
+   * Determine is point is on arc segment
+   * @param {Point} startPoint
+   * @param {Point} endPoint
+   * @param {Point} centerPoint
+   * @param {number} direction - CCW if > 0
+   * @returns true or false
+   */
+  isOnArc(startPoint, endPoint, centerPoint, direction=1) {
     const snapAngle = centerPoint.angle(this);
     const startAngle = centerPoint.angle(startPoint);
     const endAngle = centerPoint.angle(endPoint);
@@ -274,29 +291,29 @@ export class Point {
     if (direction > 0) {
       if (startAngle < endAngle) {
         if (snapAngle >= startAngle && snapAngle <= endAngle) {
-          return closest;
+          return true;
         }
       }
 
       if (startAngle > endAngle) {
         if (snapAngle >= startAngle || snapAngle <= endAngle) {
-          return closest;
+          return true;
         }
       }
     } else if (direction < 0) {
       if (startAngle < endAngle) {
         if (snapAngle <= startAngle || snapAngle >= endAngle) {
-          return closest;
+          return true;
         }
       }
 
       if (startAngle > endAngle) {
         if (snapAngle <= startAngle && snapAngle >= endAngle) {
-          return closest;
+          return true;
         }
       }
     }
-    // Point not on arc
-    return null;
+
+    return false;
   }
 }
