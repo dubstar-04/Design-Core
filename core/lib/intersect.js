@@ -209,12 +209,6 @@ export class Intersection {
    * @returns
    */
   static intersectArcRectangle(arc, rectangle, extend) {
-    // TODO: Remove unused variables
-    // const c = arc.centre;
-    // const r = arc.radius;
-    // const sa = arc.e;
-    // const ea = arc.endAngle;
-
     const r1 = rectangle.start;
     const r2 = rectangle.end;
 
@@ -314,7 +308,6 @@ export class Intersection {
    */
   static intersectCircleArc(circle, arc, extend) {
     const c = arc.centre;
-    // const r = arc.radius;
     const sa = arc.startAngle;
     const ea = arc.endAngle;
 
@@ -355,8 +348,6 @@ export class Intersection {
    * @returns
    */
   static intersectCircleRectangle(circle, rectangle, extend) {
-    // var c = circle.centre
-    // var r = circle.radius
     const r1 = rectangle.start;
     const r2 = rectangle.end;
     extend = extend || false;
