@@ -250,7 +250,7 @@ export class InputManager {
    * Handle window selection
    */
   windowSelect() {
-    log('single select');
+    log('window select');
     this.core.scene.selectionManager.windowSelect();
   }
 
