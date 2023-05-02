@@ -178,6 +178,14 @@ test('Test Intersection.intersectArcCircle()', () => {
   expect(result.points[0].x).toBeCloseTo(5.894);
   expect(result.points[0].y).toBeCloseTo(12.853);
 
+  // Clockwise Arc Intersection
+  const cwArc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10), direction: -1};
+  const cwResult = Intersection.intersectArcCircle(cwArc, circle, false);
+  expect(cwResult.status).toBe('Intersection');
+  expect(cwResult.points.length).toBe(1);
+  expect(cwResult.points[0].x).toBeCloseTo(12.853);
+  expect(cwResult.points[0].y).toBeCloseTo(5.894);
+
   // No Intersection
   const arc1 = {centre: new Point(), radius: 14.14, startPoint: new Point(-10, 0), endPoint: new Point(0, -10)};
   const circle1 = {centre: new Point(10, 10), radius: 5};
