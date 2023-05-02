@@ -254,29 +254,13 @@ export class Intersection {
    * @returns
    */
   static intersectArcLine(arc, line, extend) {
-    const c = arc.centre;
-    const sa = arc.startAngle;
-    const ea = arc.endAngle;
-
     const inter1 = this.intersectCircleLine(arc, line, extend);
     const result = new Intersection('No Intersection');
 
     if (!extend) {
       for (let i = 0; i < inter1.points.length; i++) {
-        if (sa < ea) {
-          // Arc scenario 1 - start angle < end angle
-          // if the intersection angle is > start angle AND < end angle the point in on the arc
-          if (c.angle(inter1.points[i]) > sa && c.angle(inter1.points[i]) < ea) {
-            result.appendPoints(inter1.points[i]);
-          }
-        } else if (sa > ea) {
-          // Arc scenario 2 - start angle > end angle
-          // if the intersection angle is > start angle AND < 0 radians OR
-          // the intersection angle is < end angle AND > 0 radians the point in on the arc
-          if (c.angle(inter1.points[i]) >= sa && c.angle(inter1.points[i]) <= (Math.PI * 2) ||
-              c.angle(inter1.points[i]) <= ea && c.angle(inter1.points[i]) >= 0) {
-            result.appendPoints(inter1.points[i]);
-          }
+        if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
+          result.appendPoints(inter1.points[i]);
         }
       }
 
