@@ -239,7 +239,6 @@ export class Point {
     return false;
   }
 
-
   /**
    * Find the closest point on a line between start and end points
    * @param {*} startPoint
@@ -312,6 +311,18 @@ export class Point {
           return true;
         }
       }
+    }
+
+    return false;
+  }
+
+
+  isOnLine(startPoint, endPoint) {
+    const slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
+    const y = slope * this.x + startPoint.y;
+
+    if ((y <= this.y && y >= this.y) && (this.x >= startPoint.x && this.x <= endPoint.x)) {
+      return true;
     }
 
     return false;
