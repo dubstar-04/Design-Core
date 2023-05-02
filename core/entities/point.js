@@ -275,7 +275,7 @@ export class Point {
   }
 
   /**
-   * Determine is point is on arc segment
+   * Determine if point is on arc segment
    * @param {Point} startPoint
    * @param {Point} endPoint
    * @param {Point} centerPoint
@@ -317,6 +317,12 @@ export class Point {
   }
 
 
+  /**
+   * Determine if point is on line segment
+   * @param {Point} startPoint
+   * @param {Point} endPoint
+   * @returns true or false
+   */
   isOnLine(startPoint, endPoint) {
     const slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
     const y = slope * this.x + startPoint.y;
