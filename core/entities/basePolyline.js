@@ -78,9 +78,7 @@ export class BasePolyline extends Entity {
           // first creation will get a new index, subsequent will use the index to update the original polyline
           index = core.scene.inputManager.actionCommand(this, index);
         } else if (Input.getType(pt2) === Input.Type.STRING) {
-          log('polyline input:', pt2);
           if (pt2 === this.modes.ARC) {
-            log('switch to arc mode');
             this.inputMode = this.modes.ARC;
           }
           if (pt2 === this.modes.LINE) {
