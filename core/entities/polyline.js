@@ -17,6 +17,9 @@ export class Polyline extends BasePolyline {
           if (child[0] === 'VERTEX') {
             child.points.forEach((point) => {
               const pt = new Point(point.x, point.y);
+              if (point.hasOwnProperty('bulge')) {
+                pt.bulge = point.bulge;
+              }
               this.points.push(pt);
             });
           }
