@@ -30,6 +30,8 @@ export class Lwpolyline extends BasePolyline {
           '\n', point.y,
           '\n', '30', // Z
           '\n', '0',
+          '\n', '42', // bulge
+          '\n', point.bulge,
       );
     });
 
