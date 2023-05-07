@@ -83,9 +83,9 @@ export class Polyline extends BasePolyline {
           '\n', '20', // Y
           '\n', this.points[i].y,
           '\n', '30', // Z
-          // "\n", "0",
-          // "\n", "0",
           '\n', '0',
+          '\n', '42',
+          '\n', this.points[i].bulge,
       );
     }
 
