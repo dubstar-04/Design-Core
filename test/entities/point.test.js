@@ -424,6 +424,65 @@ test('Test Point.getRadius', () => {
   point.bulge = Math.tan(angle / 4);
   expect(point.getRadius(new Point(50, -50))).toBeCloseTo(50);
 });
+
+test('Test Point.getApothem', () => {
+  // start point: 100,0
+  // center: 100,50
+  // radius: 50
+  const point = new Point(100, 0);
+
+  // bulge: 0
+  expect(point.getApothem(new Point(200, 0))).toBe(0);
+
+  // included angle: 45
+  // end point: 135.3553, 14.6447
+  let angle = Math.PI * 0.25;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.getApothem(new Point(135.3553, 14.6447))).toBeCloseTo(46.19395);
+
+  // included angle: 45
+  // end point: 135.3553, -14.6447
+  angle = -Math.PI * 0.25;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.getApothem(new Point(135.3553, -14.6447))).toBeCloseTo(46.19395);
+
+  // included angle: 90
+  // end point: 150, 50
+  angle = Math.PI * 0.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.getApothem(new Point(150, 50))).toBeCloseTo(35.35534);
+
+  // included angle: 90
+  // end point: 150, -50
+  angle = -Math.PI * 0.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.getApothem(new Point(150, -50))).toBeCloseTo(35.35534);
+
+  // included angle: 180
+  // end point: 100,100
+  angle = Math.PI;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.getApothem(new Point(100, 100))).toBeCloseTo(0);
+
+  // included angle: 180
+  // end point: 100,-100
+  angle = -Math.PI;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.getApothem(new Point(100, -100))).toBeCloseTo(0);
+
+  // included angle: 270
+  // end point: 50, 50
+  angle = Math.PI * 1.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.getApothem(new Point(50, 50))).toBeCloseTo(35.35534);
+
+  // included angle: 270
+  // end point: 50, 50
+  angle = -Math.PI * 1.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.getApothem(new Point(50, -50))).toBeCloseTo(35.35534);
+});
+
 test('Test Point.getCentrePoint', () => {
   // start point: 100,0
   // center: 100,50
