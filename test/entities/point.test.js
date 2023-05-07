@@ -344,6 +344,16 @@ test('Test Point.isOnLine', () => {
   expect(isOnLine4).toBe(false);
 });
 
+test('Test Point.angleFromBulge', () => {
+  const angle = Math.PI;
+  const bulge = Math.tan(angle / 4);
+
+  const point = new Point();
+  point.bulge = bulge;
+
+
+  expect(point.angleFromBulge()).toBe(angle);
+});
 
 test('Test Point.getCentrePoint', () => {
   // start point: 100,0
