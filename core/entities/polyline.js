@@ -55,6 +55,8 @@ export class Polyline extends BasePolyline {
         '\n', this.flags,
         // "\n", "100", //Subclass marker
         // "\n", "AcDb2dPolyline",
+        '\n', '66', // Vertices follow: required for R12, optional for R2000+
+        '\n', '1',
         vertices, // Dont use a new line here as the vertex data will start with a new line.
         '\n', '0',
         '\n', 'SEQEND', // END OF SEQUENCE
