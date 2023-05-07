@@ -240,7 +240,7 @@ export class BasePolyline extends Entity {
   }
 
   /**
-   * Get the bulge value from the prevous segment and the selected point
+   * Get the bulge value from the previous segment and the selected point
    * @param {point} point
    * @returns polyline bulge value
    */
@@ -252,10 +252,10 @@ export class BasePolyline extends Entity {
     let lastSegAngle;
     if (lastSegIsArc) {
       const centerPoint = this.points.at(-2).getCentrePoint(this.points.at(-1));
-      // angle is perpendicular to the center to end point ray, in the direction of the bulge
+      // angle is perpendicular to the center-to-end point ray, in the direction of the bulge
       lastSegAngle = centerPoint.angle(this.points.at(-1)) + (Math.PI / 2) * Math.sign(lastSegBulge);
     } else {
-      // line segement angle is just the angle from point 0 to to point 1
+      // line segment angle is the angle from point 0 to to point 1
       lastSegAngle = this.points.at(-2).angle(this.points.at(-1));
     }
 
