@@ -6,13 +6,13 @@ export class Polyline extends BasePolyline {
     super(data);
 
     if (data) {
+      if (data.children) {
       // remove any points
       // point data comes from the vertices
-      if (data.points) {
-        this.points = [];
-      }
+        if (data.points) {
+          this.points = [];
+        }
 
-      if (data.children) {
         data.children.forEach((child) => {
           if (child[0] === 'VERTEX') {
             child.points.forEach((point) => {
