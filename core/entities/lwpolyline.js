@@ -16,7 +16,7 @@ export class Lwpolyline extends BasePolyline {
   }
 
   static register() {
-    const command = {command: 'Lwpolyline'}; // , shortcut: 'PL', type: 'Entity'};
+    const command = {command: 'Lwpolyline'};
     return command;
   }
 
