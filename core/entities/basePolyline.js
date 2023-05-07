@@ -263,7 +263,9 @@ export class BasePolyline extends Entity {
     // get the angle delta between point and the previous segment
     // ensure that the angle is always less than 2 * Math.PI
     const angleDelta = ((mouseAngle - lastSegAngle) + 3 * Math.PI) % (2*Math.PI) - Math.PI;
-    const bulge = angleDelta / (Math.PI / 2);
+    // angleDelta is 1/2 the included angle
+    // bulge is tan of (included angle * 0.25)
+    const bulge = Math.tan((angleDelta * 2) / 4);
     return bulge;
   }
 }
