@@ -283,8 +283,8 @@ export class Point {
   }
 
   /**
-     * Return the radius of the arc from the next point in the polyline
-     */
+   * Return the radius of the arc from the next point in the polyline
+   */
   getRadius(nextPoint) {
     if (this.bulge == 0) {
       return 0;
@@ -295,20 +295,24 @@ export class Point {
   }
 
   /**
-     * Returns apothem; the distance from arc center to cord midpoint
-     * @param {Point} nextPoint
-     * @returns apothem
-     */
+   * Returns apothem; the distance from arc center to cord midpoint
+   * @param {Point} nextPoint
+   * @returns apothem
+   */
   getApothem(nextPoint) {
+    if (this.bulge == 0) {
+      return 0;
+    }
+
     const apothem = Math.sqrt(Math.pow(this.getRadius(nextPoint), 2) - Math.pow(this.distance(nextPoint) / 2, 2));
     return apothem;
   }
 
   /**
-     * Return the centre point of the arc
-     * @param {Point} nextPoint
-     * @returns Point
-     */
+   * Return the centre point of the arc
+   * @param {Point} nextPoint
+   * @returns Point
+   */
   getCentrePoint(nextPoint) {
     const midp = this.midPoint(nextPoint);
 
