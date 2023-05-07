@@ -29,7 +29,7 @@ export class Polyline extends BasePolyline {
   }
 
   static register() {
-    const command = {command: 'Polyline'};
+    const command = {command: 'Polyline', shortcut: 'PL', type: 'Entity'};
     return command;
   }
 
