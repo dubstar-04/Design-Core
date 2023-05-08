@@ -3,27 +3,27 @@ import {Point} from '../../core/entities/point.js';
 import {Move} from '../../core/tools/move.js';
 
 const core = new Core();
-const scene = core.scene;
 
 test('Test Move.action', () => {
-  const move = new Move();
-
   // Add items to scene
-  scene.addToScene('Line', {points: [new Point(), new Point(0, 10)]});
-  scene.addToScene('Circle', {points: [new Point(), new Point(0, 10)]});
-  scene.addToScene('Polyline', {points: [new Point(), new Point(0, 10)]});
-  scene.addToScene('Arc', {points: [new Point(), new Point(0, 10), new Point(10, 0)]});
-  scene.addToScene('Rectangle', {points: [new Point(), new Point(0, 10)]});
-  scene.addToScene('Text', {points: [new Point(), new Point(0, 10)], height: 10, rotation: 0, string: 'text test'});
+  core.scene.addToScene('Line', {points: [new Point(), new Point(0, 10)]});
+  core.scene.addToScene('Circle', {points: [new Point(), new Point(0, 10)]});
+  core.scene.addToScene('Polyline', {points: [new Point(), new Point(0, 10)]});
+  core.scene.addToScene('Arc', {points: [new Point(), new Point(0, 10), new Point(10, 0)]});
+  core.scene.addToScene('Rectangle', {points: [new Point(), new Point(0, 10)]});
+  core.scene.addToScene('Text', {points: [new Point(), new Point(0, 10)], height: 10, rotation: 0, string: 'text test'});
 
   // Add items to selection set
-  for (let i = 0; i < scene.items.length; i++) {
+  for (let i = 0; i < core.scene.items.length; i++) {
     core.scene.selectionManager.addToSelectionSet(i);
   }
 
   /**
    * move by x = 10 y = 0
    */
+
+  const move = new Move();
+
   // set base point
   move.points.push(new Point());
 
@@ -33,9 +33,9 @@ test('Test Move.action', () => {
   // Perform move
   move.action(core);
 
-  for (let i = 0; i < scene.items.length; i++) {
-    expect(scene.items[i].points[0].x).toBe(10);
-    expect(scene.items[i].points[0].y).toBe(0);
+  for (let i = 0; i < core.scene.items.length; i++) {
+    expect(core.scene.items[i].points[0].x).toBe(10);
+    expect(core.scene.items[i].points[0].y).toBe(0);
   }
 
 
@@ -54,9 +54,9 @@ test('Test Move.action', () => {
   // Perform move
   move.action(core);
 
-  for (let i = 0; i < scene.items.length; i++) {
-    expect(scene.items[i].points[0].x).toBe(10);
-    expect(scene.items[i].points[0].y).toBe(10);
+  for (let i = 0; i < core.scene.items.length; i++) {
+    expect(core.scene.items[i].points[0].x).toBe(10);
+    expect(core.scene.items[i].points[0].y).toBe(10);
   }
 
   /**
@@ -74,8 +74,8 @@ test('Test Move.action', () => {
   // Perform move
   move.action(core);
 
-  for (let i = 0; i < scene.items.length; i++) {
-    expect(scene.items[i].points[0].x).toBe(0);
-    expect(scene.items[i].points[0].y).toBe(0);
+  for (let i = 0; i < core.scene.items.length; i++) {
+    expect(core.scene.items[i].points[0].x).toBe(0);
+    expect(core.scene.items[i].points[0].y).toBe(0);
   }
 });
