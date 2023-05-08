@@ -20,6 +20,9 @@ export class Lwpolyline extends BasePolyline {
     return command;
   }
 
+  // dxf
+  // R12 doesn't support Lwpolyline
+  // output as polyline definition by default from super class
   /*
   dxf() {
     let pointData = '';
