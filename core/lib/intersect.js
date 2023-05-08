@@ -394,7 +394,7 @@ export class Intersection {
         result.appendPoints(inter.points);
       } else {
         const arc = {};
-        arc.centre = b1.getCentrePoint(b2);
+        arc.centre = b1.bulgeCentrePoint(b2);
         arc.startPoint = b1;
         arc.endPoint = b2;
         arc.radius = arc.centre.distance(b1);

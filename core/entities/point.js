@@ -278,14 +278,14 @@ export class Point {
    * Get the arc angle in radians from the bulge value
    * @returns arc angle in radians
    */
-  angleFromBulge() {
+  bulgeAngle() {
     return Math.atan(this.bulge) * 4;
   }
 
   /**
    * Return the radius of the arc from the next point in the polyline
    */
-  getRadius(nextPoint) {
+  bulgeRadius(nextPoint) {
     if (this.bulge == 0) {
       return 0;
     }
@@ -299,12 +299,12 @@ export class Point {
    * @param {Point} nextPoint
    * @returns apothem
    */
-  getApothem(nextPoint) {
+  apothem(nextPoint) {
     if (this.bulge == 0) {
       return 0;
     }
 
-    const apothem = Math.sqrt(Math.pow(this.getRadius(nextPoint), 2) - Math.pow(this.distance(nextPoint) / 2, 2));
+    const apothem = Math.sqrt(Math.pow(this.bulgeRadius(nextPoint), 2) - Math.pow(this.distance(nextPoint) / 2, 2));
     return apothem;
   }
 
@@ -313,17 +313,17 @@ export class Point {
    * @param {Point} nextPoint
    * @returns Point
    */
-  getCentrePoint(nextPoint) {
+  bulgeCentrePoint(nextPoint) {
     const midp = this.midPoint(nextPoint);
 
     if (this.bulge == 0) {
       return midp;
     }
 
-    let a = this.getApothem(nextPoint);
+    let a = this.apothem(nextPoint);
 
     // check if the center point is inverted. i.e. at 180 it goes inside the arc
-    if (Math.abs(this.angleFromBulge()) > Math.PI) {
+    if (Math.abs(this.bulgeAngle()) > Math.PI) {
       a = -a;
     }
 
