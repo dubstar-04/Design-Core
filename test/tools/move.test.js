@@ -1,0 +1,81 @@
+import {Core} from '../../core/core.js';
+import {Point} from '../../core/entities/point.js';
+import {Move} from '../../core/tools/move.js';
+
+const core = new Core();
+const scene = core.scene;
+
+test('Test Trim.action', () => {
+  const move = new Move();
+
+  // Add items to scene
+  scene.addToScene('Line', {points: [new Point(), new Point(0, 10)]});
+  scene.addToScene('Circle', {points: [new Point(), new Point(0, 10)]});
+  scene.addToScene('Polyline', {points: [new Point(), new Point(0, 10)]});
+  scene.addToScene('Arc', {points: [new Point(), new Point(0, 10), new Point(10, 0)]});
+  scene.addToScene('Rectangle', {points: [new Point(), new Point(0, 10)]});
+  scene.addToScene('Text', {points: [new Point(), new Point(0, 10)], height: 10, rotation: 0, string: 'text test'});
+
+  // Select boundry item
+  for (let i = 0; i < scene.items.length; i++) {
+    core.scene.selectionManager.addToSelectionSet(i);
+  }
+
+  /**
+   * move by x = 10 y = 0
+   */
+  // set base point
+  move.points.push(new Point());
+
+  // set destination point
+  move.points.push(new Point(10, 0));
+
+  // Perform move
+  move.action(core);
+
+  for (let i = 0; i < scene.items.length; i++) {
+    expect(scene.items[i].points[0].x).toBe(10);
+    expect(scene.items[i].points[0].y).toBe(0);
+  }
+
+
+  /**
+   * move by x = 0 y = 10
+   */
+  // reset move points
+  move.points = [];
+
+  // set base point
+  move.points.push(new Point());
+
+  // set destination point
+  move.points.push(new Point(0, 10));
+
+  // Perform move
+  move.action(core);
+
+  for (let i = 0; i < scene.items.length; i++) {
+    expect(scene.items[i].points[0].x).toBe(10);
+    expect(scene.items[i].points[0].y).toBe(10);
+  }
+
+  /**
+   * move by x = -10 y = -10
+   */
+  // reset move points
+  move.points = [];
+
+  // set base point
+  move.points.push(new Point());
+
+  // set destination point
+  move.points.push(new Point(-10, -10));
+
+  // Perform move
+  move.action(core);
+
+  for (let i = 0; i < scene.items.length; i++) {
+    expect(scene.items[i].points[0].x).toBe(0);
+    expect(scene.items[i].points[0].y).toBe(0);
+  }
+});
