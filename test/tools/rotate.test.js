@@ -5,8 +5,6 @@ import {Rotate} from '../../core/tools/rotate.js';
 const core = new Core();
 
 test('Test Rotate.action', () => {
-  console.log('selection set:', core.scene.selectionManager.selectionSet);
-
   // Add items to scene
   core.scene.addToScene('Line', {points: [new Point(10, 0), new Point(20, 0)]});
   core.scene.addToScene('Circle', {points: [new Point(10, 0), new Point(20, 0)]});
