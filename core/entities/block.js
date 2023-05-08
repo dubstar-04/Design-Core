@@ -84,6 +84,10 @@ export class Block extends Entity {
         '\n', '0.0',
         '\n', '3', // name again
         '\n', this.name,
+        '\n', '1',
+        '\n', '',
+        '\n', '0',
+        '\n', 'ENDBLK',
     );
     return data;
   }
