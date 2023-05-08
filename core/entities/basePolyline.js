@@ -158,6 +158,67 @@ export class BasePolyline extends Entity {
     ctx.stroke();
   }
 
+  dxf() {
+    const vertices = this.vertices();
+    const dxfitem = '';
+    const data = dxfitem.concat(
+        '0',
+        '\n', 'POLYLINE',
+        // "\n", "5", //HANDLE
+        // "\n", "DA",
+        '\n', '8', // LAYERNAME
+        '\n', this.layer,
+        '\n', '10', // X
+        '\n', '0',
+        '\n', '20', // Y
+        '\n', '0',
+        '\n', '30', // Z
+        '\n', '0',
+        '\n', '39', // Line Width
+        '\n', this.lineWidth,
+        '\n', '70', // Flags
+        '\n', this.flags,
+        // "\n", "100", //Subclass marker
+        // "\n", "AcDb2dPolyline",
+        '\n', '66', // Vertices follow: required for R12, optional for R2000+
+        '\n', '1',
+        vertices, // Dont use a new line here as the vertex data will start with a new line.
+        '\n', '0',
+        '\n', 'SEQEND', // END OF SEQUENCE
+        '\n', '8', // LAYERNAME
+        '\n', this.layer,
+    );
+    return data;
+  }
+
+  vertices() {
+    let verticesData = '';
+    for (let i = 0; i < this.points.length; i++) {
+      verticesData = verticesData.concat(
+          '\n', '0',
+          '\n', 'VERTEX',
+          // "\n", "5", //HANDLE
+          // "\n", "DA",
+          '\n', '8', // LAYERNAME
+          '\n', '0',
+          // "\n", "100",
+          // "\n", "AcDbVertex",
+          // "\n", "100",
+          // "\n", "AcDb2dVertex",
+          '\n', '10', // X
+          '\n', this.points[i].x,
+          '\n', '20', // Y
+          '\n', this.points[i].y,
+          '\n', '30', // Z
+          '\n', '0',
+          '\n', '42',
+          '\n', this.points[i].bulge,
+      );
+    }
+
+    return verticesData;
+  }
+
   intersectPoints() {
     return {
       points: this.points,

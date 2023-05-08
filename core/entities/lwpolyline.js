@@ -20,6 +20,7 @@ export class Lwpolyline extends BasePolyline {
     return command;
   }
 
+  /*
   dxf() {
     let pointData = '';
     this.points.forEach((point) => {
@@ -54,4 +55,5 @@ export class Lwpolyline extends BasePolyline {
     );
     return data;
   }
+  */
 }
