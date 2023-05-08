@@ -5,7 +5,7 @@ import {Move} from '../../core/tools/move.js';
 const core = new Core();
 const scene = core.scene;
 
-test('Test Trim.action', () => {
+test('Test Move.action', () => {
   const move = new Move();
 
   // Add items to scene
@@ -16,7 +16,7 @@ test('Test Trim.action', () => {
   scene.addToScene('Rectangle', {points: [new Point(), new Point(0, 10)]});
   scene.addToScene('Text', {points: [new Point(), new Point(0, 10)], height: 10, rotation: 0, string: 'text test'});
 
-  // Select boundry item
+  // Add items to selection set
   for (let i = 0; i < scene.items.length; i++) {
     core.scene.selectionManager.addToSelectionSet(i);
   }
