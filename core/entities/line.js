@@ -112,7 +112,7 @@ export class Line extends Entity {
 
       for (let i = 0; i < line.points.length; i++) {
         for (let j = 0; j < intersectPnts.length; j++) {
-          if (betweenPoints(core.mouse, [intersectPnts[j], line.points[i]], false)) {
+          if (betweenPoints(core.mouse.pointOnScene(), [intersectPnts[j], line.points[i]], false)) {
             if (Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100 < Math.round(line.points[0].distance(line.points[1]) * 100) / 100) {
               originPoint = i;
               validPoints.push(j);
@@ -180,7 +180,7 @@ export class Line extends Entity {
 
     if (points.length > 1) {
       // is the mouse between two points
-      const pnts = betweenPoints(core.mouse, points, true);
+      const pnts = betweenPoints(core.mouse.pointOnScene(), points, true);
 
       if (typeof pnts !== 'undefined') {
         trimBetween(pnts, this);
@@ -198,7 +198,7 @@ export class Line extends Entity {
 
     // Find which end is closer to the mouse
     // ToDo: Pass the mouse location in rather than needing a ref to core.
-    if (this.points[0].distance(core.mouse) < this.points[1].distance(core.mouse)) {
+    if (this.points[0].distance(core.mouse.pointOnScene()) < this.points[1].distance(core.mouse.pointOnScene())) {
       originPoint = 0;
     } else {
       originPoint = 1;
