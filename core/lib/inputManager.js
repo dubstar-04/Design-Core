@@ -16,10 +16,36 @@ export class PromptOptions {
    */
   respond(input) {
     if (this.types.includes(Input.getType(input))) {
+      // expected type input, pass to active command
       this.resolve(input);
+    } else if (this.parseInputToOption(input) !== undefined) {
+      // input matches command option, pass to active command
+      this.resolve(this.parseInputToOption(input));
     } else {
       throw Error('Invalid response type');
     }
+  }
+
+  /**
+   * Match the input to a command option
+   * @param {any} input
+   * @returns undefined or the matched option
+   */
+  parseInputToOption(input) {
+    if (this.options.length === 0) {
+      return;
+    }
+
+    for (let i = 0; i < this.options.length; i++) {
+      const option = this.options[i];
+      // convert the option to uppercase and substring to the input length for comparison
+      const optionSubstring = option.toUpperCase().substring(0, input.length);
+      if (optionSubstring === input.toUpperCase()) {
+        return option;
+      }
+    }
+
+    return;
   }
 
   /**
@@ -224,7 +250,7 @@ export class InputManager {
    * Handle window selection
    */
   windowSelect() {
-    log('single select');
+    log('window select');
     this.core.scene.selectionManager.windowSelect();
   }
 

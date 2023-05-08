@@ -16,10 +16,14 @@ export class Lwpolyline extends BasePolyline {
   }
 
   static register() {
-    const command = {command: 'Lwpolyline', shortcut: 'PL', type: 'Entity'};
+    const command = {command: 'Lwpolyline'};
     return command;
   }
 
+  // dxf
+  // R12 doesn't support Lwpolyline
+  // output as polyline definition by default from super class
+  /*
   dxf() {
     let pointData = '';
     this.points.forEach((point) => {
@@ -30,6 +34,8 @@ export class Lwpolyline extends BasePolyline {
           '\n', point.y,
           '\n', '30', // Z
           '\n', '0',
+          '\n', '42', // bulge
+          '\n', point.bulge,
       );
     });
 
@@ -52,4 +58,5 @@ export class Lwpolyline extends BasePolyline {
     );
     return data;
   }
+  */
 }

@@ -37,7 +37,7 @@ export class Scene {
     }
 
     for (let i = 0; i < this.items.length; i++) {
-      const extremes = this.items[i].extremes();
+      const extremes = this.items[i].boundingBox();
       xmin = (xmin === undefined) ? extremes[0] : (extremes[0] < xmin) ? extremes[0] : xmin;
       xmax = (xmax === undefined) ? extremes[1] : (extremes[1] > xmax) ? extremes[1] : xmax;
       ymin = (ymin === undefined) ? extremes[2] : (extremes[2] < ymin) ? extremes[2] : ymin;

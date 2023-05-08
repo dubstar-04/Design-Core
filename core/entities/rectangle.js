@@ -224,7 +224,7 @@ export class Rectangle extends Entity {
     return [closest, distance];
   }
 
-  extremes() {
+  boundingBox() {
     const xValues = [];
     const yValues = [];
 

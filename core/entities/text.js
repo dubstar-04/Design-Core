@@ -351,7 +351,7 @@ export class Text extends Entity {
     return [mid, distance];
   }
 
-  extremes() {
+  boundingBox() {
     const rect = this.getBoundingRect();
     const xmin = rect.x;
     const xmax = rect.x + rect.width;

@@ -7,6 +7,8 @@ export class Point {
     this.type = this.constructor.name;
     this.x = 0;
     this.y = 0;
+    // bulge value used for defining arcs in polylines
+    // arc is ccw if positive
     this.bulge = 0;
 
     if (x !== undefined) {
@@ -175,5 +177,161 @@ export class Point {
   isSame(that) {
     if (this.x == that.x && this.y == that.y) return true;
     return false;
+  }
+
+  /**
+   * Find the closest point on a line between start and end points
+   * @param {*} startPoint
+   * @param {*} endPoint
+   * @returns the closest point on the line or null
+   */
+  closestPointOnLine(startPoint, endPoint) {
+    const pnt = this.perpendicular(startPoint, endPoint);
+    return pnt;
+  }
+
+  /**
+   * Find the closest arc on a line between start and end points
+   * @param {Point} startPoint
+   * @param {Point} endPoint
+   * @param {Point} centerPoint
+   * @param {number} direction - CCW if > 0
+   * @returns the closest point on the arc or null
+   */
+  closestPointOnArc(startPoint, endPoint, centerPoint, direction=1) {
+    const length = this.distance(centerPoint);
+    const radius = centerPoint.distance(startPoint);
+
+    const Cx = centerPoint.x + radius * (this.x - centerPoint.x) / length;
+    const Cy = centerPoint.y + radius * (this.y - centerPoint.y) / length;
+    const closest = new Point(Cx, Cy);
+
+    if (closest.isOnArc(startPoint, endPoint, centerPoint, direction)) {
+      return closest;
+    }
+
+    // Point not on arc
+    return null;
+  }
+
+  /**
+   * Determine if point is on arc segment
+   * @param {Point} startPoint
+   * @param {Point} endPoint
+   * @param {Point} centerPoint
+   * @param {number} direction - CCW if > 0
+   * @returns true or false
+   */
+  isOnArc(startPoint, endPoint, centerPoint, direction=1) {
+    const snapAngle = centerPoint.angle(this);
+    const startAngle = centerPoint.angle(startPoint);
+    const endAngle = centerPoint.angle(endPoint);
+
+    if (direction > 0) {
+      if (startAngle < endAngle) {
+        if (snapAngle >= startAngle && snapAngle <= endAngle) {
+          return true;
+        }
+      }
+
+      if (startAngle > endAngle) {
+        if (snapAngle >= startAngle || snapAngle <= endAngle) {
+          return true;
+        }
+      }
+    } else if (direction < 0) {
+      if (startAngle < endAngle) {
+        if (snapAngle <= startAngle || snapAngle >= endAngle) {
+          return true;
+        }
+      }
+
+      if (startAngle > endAngle) {
+        if (snapAngle <= startAngle && snapAngle >= endAngle) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+
+  /**
+   * Determine if point is on line segment
+   * @param {Point} startPoint
+   * @param {Point} endPoint
+   * @returns true or false
+   */
+  isOnLine(startPoint, endPoint) {
+    const slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
+    const y = slope * this.x + startPoint.y;
+
+    if ((y <= this.y && y >= this.y) && (this.x >= startPoint.x && this.x <= endPoint.x)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Get the arc angle in radians from the bulge value
+   * @returns arc angle in radians
+   */
+  bulgeAngle() {
+    return Math.atan(this.bulge) * 4;
+  }
+
+  /**
+   * Return the radius of the arc from the next point in the polyline
+   */
+  bulgeRadius(nextPoint) {
+    if (this.bulge == 0) {
+      return 0;
+    }
+
+    const rad = this.distance(nextPoint) * (1 + Math.pow(this.bulge, 2)) / (4 * Math.abs(this.bulge));
+    return rad;
+  }
+
+  /**
+   * Returns apothem; the distance from arc center to cord midpoint
+   * @param {Point} nextPoint
+   * @returns apothem
+   */
+  apothem(nextPoint) {
+    if (this.bulge == 0) {
+      return 0;
+    }
+
+    const apothem = Math.sqrt(Math.pow(this.bulgeRadius(nextPoint), 2) - Math.pow(this.distance(nextPoint) / 2, 2));
+    return apothem;
+  }
+
+  /**
+   * Return the centre point of the arc
+   * @param {Point} nextPoint
+   * @returns Point
+   */
+  bulgeCentrePoint(nextPoint) {
+    const midp = this.midPoint(nextPoint);
+
+    if (this.bulge == 0) {
+      return midp;
+    }
+
+    let a = this.apothem(nextPoint);
+
+    // check if the center point is inverted. i.e. at 180 it goes inside the arc
+    if (Math.abs(this.bulgeAngle()) > Math.PI) {
+      a = -a;
+    }
+
+    // get the direction from the midpoint to the center point
+    const direction = this.angle(nextPoint) + (Math.PI / 2) * Math.sign(this.bulge);
+    // centre point is the apothem distance from the mid point in the given direction
+    const centre = midp.project(direction, a);
+
+    return centre;
   }
 }

@@ -12,6 +12,14 @@ export class Arc extends Entity {
     super(data);
     this.radius = 1;
 
+    // direction: ccw => 1, cw =< 1
+    Object.defineProperty(this, 'direction', {
+      enumerable: false,
+      value: 1,
+      writable: true,
+    });
+
+
     if (data) {
       if (data.points || data[40]) {
         // DXF Groupcode 40 - Radius
@@ -135,9 +143,10 @@ export class Arc extends Entity {
   intersectPoints() {
     return {
       centre: this.points[0],
+      startPoint: this.points[1],
+      endPoint: this.points[2],
       radius: this.radius,
-      startAngle: this.startAngle(),
-      endAngle: this.endAngle(),
+      direction: this.direction,
     };
   }
 
@@ -173,36 +182,23 @@ export class Arc extends Entity {
   }
 
   closestPoint(P) {
-    // find the closest point on the Arc
-    const length = this.points[0].distance(P);
-    const Cx = this.points[0].x + this.radius * (P.x - this.points[0].x) / length;
-    const Cy = this.points[0].y + this.radius * (P.y - this.points[0].y) / length;
-    const closest = new Point(Cx, Cy);
-    const distance = closest.distance(P);
+    const startPoint = this.points[1];
+    const endPoint = this.points[2];
+    const centerPoint = this.points[0];
+    // TODO: enable defining clockwise arcs
+    const direction = 1;
+    const pnt = P.closestPointOnArc(startPoint, endPoint, centerPoint, direction);
 
-    const snapAngle = this.points[0].angle(P);
-
-    if (this.startAngle() < this.endAngle()) {
-      // Arc scenario 1 - start angle < end angle
-      // if the intersection angle is > start angle AND < end angle the point in on the arc
-      if (snapAngle > this.startAngle() && snapAngle < this.endAngle()) {
-        return [closest, distance, true];
-      }
-    } else if (this.startAngle() > this.endAngle()) {
-      // Arc scenario 2 - start angle > end angle
-      // if the intersection angle is > start angle AND < 0 radians OR
-      // the intersection angle is < end angle AND > 0 radians the point in on the arc
-      if (snapAngle > this.startAngle() && snapAngle <= (Math.PI * 2) ||
-          snapAngle < this.endAngle() && snapAngle > 0) {
-        return [closest, distance, true];
-      }
+    if (pnt !== null) {
+      const distance = P.distance(pnt);
+      return [pnt, distance];
     }
 
     // closest point not on the arc
-    return [closest, Infinity, false];
+    return [P, Infinity, false];
   }
 
-  extremes() {
+  boundingBox() {
     const xValues = [];
     const yValues = [];
 

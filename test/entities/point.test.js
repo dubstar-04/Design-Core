@@ -262,3 +262,350 @@ test('Test Point.isSame', () => {
   const pt3 = new Point(10, 10);
   expect(pt2.isSame(pt3)).toBe(false);
 });
+
+
+test('Test Point.closestPointOnLine', () => {
+  const lineStart1 = new Point(-10, 0);
+  const lineEnd1 = new Point(10, 0);
+
+  const pt1 = new Point();
+  const perp1 = pt1.closestPointOnLine(lineStart1, lineEnd1);
+  expect(perp1.x).toBe(0);
+  expect(perp1.y).toBe(0);
+
+  const pt2 = new Point(5, 5);
+  const perp2 = pt2.closestPointOnLine(lineStart1, lineEnd1);
+  expect(perp2.x).toBe(5);
+  expect(perp2.y).toBe(0);
+
+  const pt3 = new Point(-5, -5);
+  const perp3 = pt3.closestPointOnLine(lineStart1, lineEnd1);
+  expect(perp3.x).toBe(-5);
+  expect(perp3.y).toBe(0);
+
+  const pt4 = new Point(15, 15);
+  const perp4 = pt4.closestPointOnLine(lineStart1, lineEnd1);
+  expect(perp4).toBe(null);
+});
+
+test('Test Point.closestPointOnArc', () => {
+  const arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
+
+  const pt3 = new Point(5, 5);
+  const closest1 = pt3.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(closest1.x).toBe(10);
+  expect(closest1.y).toBe(10);
+
+  const pt4 = new Point(0, 5);
+  const closest2 = pt4.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(closest2.x).toBe(0);
+  expect(closest2.y).toBeCloseTo(14.14);
+
+  const pt5 = new Point(20, 10);
+  const closest3 = pt5.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(closest3).toBe(null);
+});
+
+
+test('Test Point.isOnArc', () => {
+  const arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
+
+  const pt3 = new Point(5, 5);
+  const onArc1 = pt3.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc1).toBe(true);
+
+  const pt4 = new Point(0, 5);
+  const onArc2 = pt4.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc2).toBe(true);
+
+  const pt5 = new Point(20, 10);
+  const onArc3 = pt5.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc3).toBe(false);
+});
+
+test('Test Point.isOnLine', () => {
+  const lineStart1 = new Point(-10, 0);
+  const lineEnd1 = new Point(10, 0);
+
+  const pt1 = new Point();
+  const isOnLine1 = pt1.isOnLine(lineStart1, lineEnd1);
+  expect(isOnLine1).toBe(true);
+
+  const pt3 = new Point(5, 0);
+  const isOnLine2 = pt3.isOnLine(lineStart1, lineEnd1);
+  expect(isOnLine2).toBe(true);
+
+  const pt4 = new Point(-5, 0);
+  const isOnLine3 = pt4.isOnLine(lineStart1, lineEnd1);
+  expect(isOnLine3).toBe(true);
+
+  const pt5 = new Point(20, 10);
+  const isOnLine4 = pt5.isOnLine(lineStart1, lineEnd1);
+  expect(isOnLine4).toBe(false);
+});
+
+test('Test Point.bulgeAngle', () => {
+  const angle = Math.PI;
+  const bulge = Math.tan(angle / 4);
+
+  const point = new Point();
+  point.bulge = bulge;
+
+
+  expect(point.bulgeAngle()).toBe(angle);
+});
+
+test('Test Point.bulgeRadius', () => {
+  // start point: 100,0
+  // center: 100,50
+  // radius: 50
+  const point = new Point(100, 0);
+
+  // bulge: 0
+  expect(point.bulgeRadius(new Point(200, 0))).toBe(0);
+
+  // included angle: 45
+  // end point: 135.3553, 14.6447
+  let angle = Math.PI * 0.25;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(135.3553, 14.6447))).toBeCloseTo(50);
+
+  // included angle: 45
+  // end point: 135.3553, -14.6447
+  angle = -Math.PI * 0.25;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(135.3553, -14.6447))).toBeCloseTo(50);
+
+  // included angle: 90
+  // end point: 150, 50
+  angle = Math.PI * 0.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(150, 50))).toBeCloseTo(50);
+
+  // included angle: 90
+  // end point: 150, -50
+  angle = -Math.PI * 0.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(150, -50))).toBeCloseTo(50);
+
+  // included angle: 135
+  // end point: 135.3553, 85.3553
+  angle = Math.PI * 0.75;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(135.3553, 85.3553))).toBeCloseTo(50);
+
+  // included angle: 135
+  // end point: 135.3553, -85.3553
+  angle = -Math.PI * 0.75;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(135.3553, -85.3553))).toBeCloseTo(50);
+
+  // included angle: 180
+  // end point: 100,100
+  angle = Math.PI;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(100, 100))).toBeCloseTo(50);
+
+  // included angle: 180
+  // end point: 100,-100
+  angle = -Math.PI;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(100, -100))).toBeCloseTo(50);
+
+  // included angle: 270
+  // end point: 50, 50
+  angle = Math.PI * 1.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(50, 50))).toBeCloseTo(50);
+
+  // included angle: 270
+  // end point: 50, 50
+  angle = -Math.PI * 1.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.bulgeRadius(new Point(50, -50))).toBeCloseTo(50);
+});
+
+test('Test Point.apothem', () => {
+  // start point: 100,0
+  // center: 100,50
+  // radius: 50
+  const point = new Point(100, 0);
+
+  // bulge: 0
+  expect(point.apothem(new Point(200, 0))).toBe(0);
+
+  // included angle: 45
+  // end point: 135.3553, 14.6447
+  let angle = Math.PI * 0.25;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.apothem(new Point(135.3553, 14.6447))).toBeCloseTo(46.19395);
+
+  // included angle: 45
+  // end point: 135.3553, -14.6447
+  angle = -Math.PI * 0.25;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.apothem(new Point(135.3553, -14.6447))).toBeCloseTo(46.19395);
+
+  // included angle: 90
+  // end point: 150, 50
+  angle = Math.PI * 0.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.apothem(new Point(150, 50))).toBeCloseTo(35.35534);
+
+  // included angle: 90
+  // end point: 150, -50
+  angle = -Math.PI * 0.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.apothem(new Point(150, -50))).toBeCloseTo(35.35534);
+
+  // included angle: 180
+  // end point: 100,100
+  angle = Math.PI;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.apothem(new Point(100, 100))).toBeCloseTo(0);
+
+  // included angle: 180
+  // end point: 100,-100
+  angle = -Math.PI;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.apothem(new Point(100, -100))).toBeCloseTo(0);
+
+  // included angle: 270
+  // end point: 50, 50
+  angle = Math.PI * 1.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.apothem(new Point(50, 50))).toBeCloseTo(35.35534);
+
+  // included angle: 270
+  // end point: 50, 50
+  angle = -Math.PI * 1.5;
+  point.bulge = Math.tan(angle / 4);
+  expect(point.apothem(new Point(50, -50))).toBeCloseTo(35.35534);
+});
+
+test('Test Point.bulgeCentrePoint', () => {
+  // start point: 100,0
+  // center: 100,50
+  // radius: 50
+  const point = new Point(100, 0);
+
+  // zero delta angle:
+  // bulge: 0
+  const bulge0CenterPt = point.bulgeCentrePoint(new Point(200, 0));
+  expect(bulge0CenterPt.x).toBe(150);
+  expect(bulge0CenterPt.y).toBe(0);
+
+  // included angle: 45
+  // end point: 135.3553, 14.6447
+  let angle = Math.PI * 0.25;
+  point.bulge = Math.tan(angle / 4);
+  const bulge45CenterPt = point.bulgeCentrePoint(new Point(135.3553, 14.6447));
+  expect(bulge45CenterPt.x).toBeCloseTo(100);
+  expect(bulge45CenterPt.y).toBeCloseTo(50);
+
+  // included angle: 45
+  // end point: 135.3553, -14.6447
+  angle = -Math.PI * 0.25;
+  point.bulge = Math.tan(angle / 4);
+  const bulgeNeg45CenterPt = point.bulgeCentrePoint(new Point(135.3553, -14.6447));
+  expect(bulgeNeg45CenterPt.x).toBeCloseTo(100);
+  expect(bulgeNeg45CenterPt.y).toBeCloseTo(-50);
+
+  // included angle: 90
+  // end point: 150, 50
+  angle = Math.PI * 0.5;
+  point.bulge = Math.tan(angle / 4);
+  const bulge90CenterPt = point.bulgeCentrePoint(new Point(150, 50));
+  expect(bulge90CenterPt.x).toBeCloseTo(100);
+  expect(bulge90CenterPt.y).toBeCloseTo(50);
+
+  // included angle: 90
+  // end point: 150, -50
+  angle = -Math.PI * 0.5;
+  point.bulge = Math.tan(angle / 4);
+  const bulgeNeg90CenterPt = point.bulgeCentrePoint(new Point(150, -50));
+  expect(bulgeNeg90CenterPt.x).toBeCloseTo(100);
+  expect(bulgeNeg90CenterPt.y).toBeCloseTo(-50);
+
+  // included angle: 135
+  // end point: 135.3553, 85.3553
+  angle = Math.PI * 0.75;
+  point.bulge = Math.tan(angle / 4);
+  const bulge135CenterPt = point.bulgeCentrePoint(new Point(135.3553, 85.3553));
+  expect(bulge135CenterPt.x).toBeCloseTo(100);
+  expect(bulge135CenterPt.y).toBeCloseTo(50);
+
+  // included angle: 135
+  // end point: 135.3553, -85.3553
+  angle = -Math.PI * 0.75;
+  point.bulge = Math.tan(angle / 4);
+  const bulgeNeg135CenterPt = point.bulgeCentrePoint(new Point(135.3553, -85.3553));
+  expect(bulgeNeg135CenterPt.x).toBeCloseTo(100);
+  expect(bulgeNeg135CenterPt.y).toBeCloseTo(-50);
+
+  // included angle: 180
+  // end point: 100,100
+  angle = Math.PI;
+  point.bulge = Math.tan(angle / 4);
+  const bulge180CenterPt = point.bulgeCentrePoint(new Point(100, 100));
+  expect(bulge180CenterPt.x).toBeCloseTo(100);
+  expect(bulge180CenterPt.y).toBeCloseTo(50);
+
+  // included angle: 180
+  // end point: 100,-100
+  angle = -Math.PI;
+  point.bulge = Math.tan(angle / 4);
+  const bulgeNeg180CenterPt = point.bulgeCentrePoint(new Point(100, -100));
+  expect(bulgeNeg180CenterPt.x).toBeCloseTo(100);
+  expect(bulgeNeg180CenterPt.y).toBeCloseTo(-50);
+
+  // included angle: 225
+  // end point: 64.6447, 85.3553
+  angle = Math.PI * 1.25;
+  point.bulge = Math.tan(angle / 4);
+  const bulge225CenterPt = point.bulgeCentrePoint(new Point(64.6447, 85.3553));
+  expect(bulge225CenterPt.x).toBeCloseTo(100);
+  expect(bulge225CenterPt.y).toBeCloseTo(50);
+
+  // included angle: 225
+  // end point: 64.6447, -85.3553
+  angle = -Math.PI * 1.25;
+  point.bulge = Math.tan(angle / 4);
+  const bulgeNeg225CenterPt = point.bulgeCentrePoint(new Point(64.6447, -85.3553));
+  expect(bulgeNeg225CenterPt.x).toBeCloseTo(100);
+  expect(bulgeNeg225CenterPt.y).toBeCloseTo(-50);
+
+  // included angle: 270
+  // end point: 50, 50
+  angle = Math.PI * 1.5;
+  point.bulge = Math.tan(angle / 4);
+  const bulge270CenterPt = point.bulgeCentrePoint(new Point(50, 50));
+  expect(bulge270CenterPt.x).toBeCloseTo(100);
+  expect(bulge270CenterPt.y).toBeCloseTo(50);
+
+  // included angle: 270
+  // end point: 50, -50
+  angle = -Math.PI * 1.5;
+  point.bulge = Math.tan(angle / 4);
+  const bulgeNeg270CenterPt = point.bulgeCentrePoint(new Point(50, -50));
+  expect(bulgeNeg270CenterPt.x).toBeCloseTo(100);
+  expect(bulgeNeg270CenterPt.y).toBeCloseTo(-50);
+
+  // included angle: 315
+  // end point: 64.6447, 14.6447
+  angle = Math.PI * 1.75;
+  point.bulge = Math.tan(angle / 4);
+  const bulge315CenterPt = point.bulgeCentrePoint(new Point(64.6447, 14.6447));
+  expect(bulge315CenterPt.x).toBeCloseTo(100);
+  expect(bulge315CenterPt.y).toBeCloseTo(50);
+
+  // included angle: 315
+  // end point: 64.6447, 14.6447
+  angle = -Math.PI * 1.75;
+  point.bulge = Math.tan(angle / 4);
+  const bulgeNeg315CenterPt = point.bulgeCentrePoint(new Point(64.6447, -14.6447));
+  expect(bulgeNeg315CenterPt.x).toBeCloseTo(100);
+  expect(bulgeNeg315CenterPt.y).toBeCloseTo(-50);
+});
+
+
