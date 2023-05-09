@@ -77,67 +77,36 @@ export class Rectangle extends Entity {
     ctx.stroke();
   }
 
-  dxf() {
-    // Save the rectangle as a polyline as there is no rectangle DXF code
+  dxf(file) {
+    // TODO: duplicated code - store the rect as a polyline internally
+    file.writeGroupCode('0', 'POLYLINE');
+    // file.writeGroupCode('5', ''); //Handle
+    file.writeGroupCode('8', this.layer); // LAYERNAME
+    file.writeGroupCode('10', '0');
+    file.writeGroupCode('20', '0');
+    file.writeGroupCode('30', '0');
+    file.writeGroupCode('39', this.lineWidth);
     const closed = (this.points[0].x === this.points[this.points.length - 1].x && this.points[0].y === this.points[this.points.length - 1].y);
-    const vertices = this.vertices();
-    const dxfitem = '';
-    const data = dxfitem.concat(
-        '0',
-        '\n', 'POLYLINE',
-        // "\n", "5", //HANDLE
-        // "\n", "DA",
-        '\n', '8', // LAYERNAME
-        '\n', this.layer,
-        '\n', '66',
-        '\n', '1',
-        '\n', '10', // X
-        '\n', '0',
-        '\n', '20', // Y
-        '\n', '0',
-        '\n', '30', // Z
-        '\n', '0',
-        '\n', '39', // Line Width
-        '\n', this.lineWidth,
-        '\n', '70', // Flags
-        '\n', closed ? '1' : '0',
-        // "\n", "100", //Subclass marker
-        // "\n", "AcDb2dPolyline",
-        vertices, // Dont use a new line here as the vertix data will start with a new line.
-        '\n', '0',
-        '\n', 'SEQEND', // END OF SEQUENCE
-        '\n', '8', // LAYERNAME
-        '\n', this.layer,
-    );
-    return data;
+    file.writeGroupCode('70', closed ? '1' : '0');
+    // file.writeGroupCode('100', 'AcDb2dPolyline');
+    file.writeGroupCode('66', '1'); // Vertices follow: required for R12, optional for R2000+
+    this.vertices(file);
+    file.writeGroupCode('0', 'SEQEND');
+    file.writeGroupCode('8', this.layer);
   }
 
-  vertices() {
-    let verticesData = '';
+  vertices(file) {
     for (let i = 0; i < this.points.length; i++) {
-      verticesData = verticesData.concat(
-          '\n', '0',
-          '\n', 'VERTEX',
-          // "\n", "5", //HANDLE
-          // "\n", "DA",
-          '\n', '8', // LAYERNAME
-          '\n', '0',
-          // "\n", "100",
-          // "\n", "AcDbVertex",
-          // "\n", "100",
-          // "\n", "AcDb2dVertex",
-          '\n', '10', // X
-          '\n', this.points[i].x,
-          '\n', '20', // Y
-          '\n', this.points[i].y,
-          '\n', '30', // Z
-          // "\n", "0",
-          // "\n", "0",
-          '\n', '0',
-      );
+      file.writeGroupCode('0', 'VERTEX');
+      // file.writeGroupCode('5', ''); //Handle
+      file.writeGroupCode('8', this.layer);
+      // file.writeGroupCode('100', 'AcDbVertex');
+      // file.writeGroupCode('100', 'AcDb2dVertex');
+      file.writeGroupCode('10', this.points[i].x); // X
+      file.writeGroupCode('20', this.points[i].y); // Y
+      file.writeGroupCode('30', '0.0');
+      file.writeGroupCode('42', this.points[i].bulge);
     }
-
-    return verticesData;
   }
 
   intersectPoints() {
