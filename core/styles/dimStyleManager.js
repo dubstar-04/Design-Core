@@ -135,4 +135,17 @@ export class DimStyleManager {
       this.styles[styleIndex].name = newUniqueName;
     }
   }
+
+  dxf(file) {
+    // Create table data for dimension styles
+    file.writeGroupCode('0', 'TABLE');
+    file.writeGroupCode('2', 'DIMSTYLE');
+    file.writeGroupCode('70', this.styleCount());
+
+    for (let i = 0; i < this.styleCount(); i++) {
+      this.getStyleByIndex(i).dxf(file);
+    }
+
+    file.writeGroupCode('0', 'ENDTAB');
+  }
 }
