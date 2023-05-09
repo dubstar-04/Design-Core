@@ -1,89 +1,46 @@
+import {DXFFile} from './dxfFile.js';
+
 export class DXFWriter {
   constructor() {
-
   }
 
-  write(core) {
-    this.core = core;
-    let data = '';
-    data = data.concat(
-        // Create Header Data
-        '999',
-        '\nDXF created from Design-Core',
-        '\n0',
-        '\nSECTION',
-        '\n2',
-        '\nHEADER',
-        '\n9',
-        '\n$ACADVER',
-        '\n1',
-        '\nAC1009',
-        '\n9',
-        '\n$CLAYER',
-        '\n8',
-        '\n' + this.core.layerManager.getCLayer(),
-        '\n0',
-        '\nENDSEC',
-    );
+  writeTables(core, file) {
+    file.writeGroupCode('0', 'SECTION');
+    file.writeGroupCode('2', 'TABLES');
+
     // Create table data for layers
-    data = data.concat(
-        '\n0',
-        '\nSECTION',
-        '\n2',
-        '\nTABLES',
-        '\n0',
-        '\nTABLE',
-        '\n2',
-        '\nLAYER',
-        '\n70',
-        '\n' + this.core.layerManager.layerCount());
+    file.writeGroupCode('0', 'TABLE');
+    file.writeGroupCode('2', 'LAYER');
+    file.writeGroupCode('70', this.core.layerManager.layerCount());
 
     for (let i = 0; i < this.core.layerManager.layerCount(); i++) {
-      data = data.concat('\n', this.core.layerManager.getLayerByIndex(i).dxf());
+      this.core.layerManager.getLayerByIndex(i).dxf(file);
     }
 
-    data = data.concat(
-        '\n0',
-        '\nENDTAB',
-    );
+    file.writeGroupCode('0', 'ENDTAB');
 
     // Create table data for text styles
-
-    data = data.concat(
-        '\n0',
-        '\nTABLE',
-        '\n2',
-        '\nSTYLE',
-        '\n70',
-        '\n' + this.core.styleManager.styleCount());
+    file.writeGroupCode('0', 'TABLE');
+    file.writeGroupCode('2', 'STYLE');
+    file.writeGroupCode('70', this.core.styleManager.styleCount());
 
     for (let i = 0; i < this.core.styleManager.styleCount(); i++) {
-      data = data.concat('\n', this.core.styleManager.getStyleByIndex(i).dxf());
+      this.core.styleManager.getStyleByIndex(i).dxf(file);
     }
 
-    data = data.concat(
-        '\n0',
-        '\nENDTAB',
-    );
+    file.writeGroupCode('0', 'ENDTAB');
 
     // Create table data for dimension styles
-
-    data = data.concat(
-        '\n0',
-        '\nTABLE',
-        '\n2',
-        '\nDIMSTYLE',
-        '\n70',
-        '\n' + this.core.dimStyleManager.styleCount());
+    file.writeGroupCode('0', 'TABLE');
+    file.writeGroupCode('2', 'DIMSTYLE');
+    file.writeGroupCode('70', this.core.dimStyleManager.styleCount());
 
     for (let i = 0; i < this.core.dimStyleManager.styleCount(); i++) {
-      data = data.concat('\n', this.core.dimStyleManager.getStyleByIndex(i).dxf());
+      this.core.dimStyleManager.getStyleByIndex(i).dxf(file);
     }
 
-    data = data.concat(
-        '\n0',
-        '\nENDTAB',
-    );
+    file.writeGroupCode('0', 'ENDTAB');
+
 
     let width = 0;
     let height = 0;
@@ -91,6 +48,7 @@ export class DXFWriter {
     let viewCenterY = 0;
 
     const extents = this.core.scene.boundingRect();
+
     if (extents) {
       width = extents.xmax - extents.xmin;
       height = extents.ymax - extents.ymin;
@@ -98,129 +56,90 @@ export class DXFWriter {
       viewCenterY = extents.ymin + height / 2;
     }
 
-    data = data.concat(
-        '\n0',
-        '\nTABLE',
-        '\n2', // Table Name
-        '\nVPORT',
-        '\n70', // Number of entries in table
-        '\n1',
-        '\n0',
-        '\nVPORT',
-        '\n2',
-        '\n*ACTIVE',
-        '\n70', // vport flags
-        '\n0',
-        '\n10', // lower left corner x pos
-        '\n0.0',
-        '\n20', // lower left corner y pos
-        '\n0.0',
-        '\n11', // upper right corner x pos
-        '\n1.0',
-        '\n21', // upper right corner y pos
-        '\n1.0',
-        '\n12', // view centre x pos
-        '\n' + viewCenterX,
-        '\n22', // view centre y pos
-        '\n' + viewCenterY,
-        '\n13', // snap base point x
-        '\n0.0',
-        '\n23', // snap base point y
-        '\n0.0',
-        '\n14', // snap spacing x
-        '\n10.0',
-        '\n24', // snap spacing y
-        '\n10.0',
-        '\n15', // grid spacing x
-        '\n10.0',
-        '\n25', // grid spacing y
-        '\n10.0',
-        '\n16', // view direction (x) from target point
-        '\n0.0',
-        '\n26', // view direction (y) from target point
-        '\n0.0',
-        '\n 36', // view direction (z) from target point
-        '\n1.0',
-        '\n 17', // view target point x
-        '\n0.0',
-        '\n 27', // view target point y
-        '\n0.0',
-        '\n 37', // view target point z
-        '\n0.0',
-        '\n40', // VPort Height
-        '\n' + height,
-        '\n41', // Vport height/width ratio
-        '\n' + width / height,
-        '\n42', // Lens Length
-        '\n50.0',
-        '\n 43', // Front Clipping Plane
-        '\n0.0',
-        '\n 44', // Back Clipping Plane
-        '\n0.0',
-        '\n 50', // Snap Rotation Angle
-        '\n0.0',
-        '\n 51', // View Twist Angle
-        '\n0.0',
-        '\n71', // Viewmode (System constiable)
-        '\n0',
-        '\n72', // Cicle sides
-        '\n1000',
-        '\n73', // fast zoom setting
-        '\n1',
-        '\n74', // UCSICON Setting
-        '\n3',
-        '\n75', // snap on/off
-        '\n 0',
-        '\n76', // grid on/off
-        '\n 1',
-        '\n77', // snap style
-        '\n 0',
-        '\n78', // snap isopair
-        '\n0',
-        '\n0',
-        '\nENDTAB',
-        '\n0',
-        '\nENDSEC');
+    file.writeGroupCode('0', 'TABLE');
+    file.writeGroupCode('2', 'VPORT'); // Table Name
+    file.writeGroupCode('70', '1'); // Number of entries in table
+    file.writeGroupCode('0', 'VPORT');
+    file.writeGroupCode('2', '*ACTIVE');
+    file.writeGroupCode('70', '0'); // vport flags
+    file.writeGroupCode('10', '0.0'); // lower left corner x pos
+    file.writeGroupCode('20', '0.0'); // lower left corner y pos
+    file.writeGroupCode('11', '1.0'); // upper right corner x pos
+    file.writeGroupCode('21', '1.0'); // upper right corner y pos
+    file.writeGroupCode('12', viewCenterX); // view centre x pos
+    file.writeGroupCode('22', viewCenterY); // view centre y pos
+    file.writeGroupCode('13', '0.0'); // snap base point x
+    file.writeGroupCode('23', '0.0'); // snap base point y
+    file.writeGroupCode('14', '10.0'); // snap spacing x
+    file.writeGroupCode('24', '10.0'); // snap spacing y
+    file.writeGroupCode('15', '10.0'); // grid spacing x
+    file.writeGroupCode('25', '10.0'); // grid spacing y
+    file.writeGroupCode('16', '0.0'); // view direction (x) from target point
+    file.writeGroupCode('26', '0.0'); // view direction (y) from target point
+    file.writeGroupCode('36', '1.0'); // view direction (z) from target point
+    file.writeGroupCode('17', '0.0'); // view target point x
+    file.writeGroupCode('27', '0.0'); // view target point y
+    file.writeGroupCode('37', '0.0'); // view target point z
+    file.writeGroupCode('40', height); // VPort Height
+    file.writeGroupCode('41', width / height); // Vport height/width ratio
+    file.writeGroupCode('42', '50.0'); // Lens Length
+    file.writeGroupCode('43', '0.0');// Front Clipping Plane
+    file.writeGroupCode('44', '0.0'); // Back Clipping Plane
+    file.writeGroupCode('50', '0.0'); // Snap Rotation Angle
+    file.writeGroupCode('51', '0.0'); // View Twist Angle
+    file.writeGroupCode('71', '0.0'); // Viewmode (System constiable)
+    file.writeGroupCode('72', '1000'); // Circle sides
+    file.writeGroupCode('73', '1'); // fast zoom setting
+    file.writeGroupCode('74', '3');// UCSICON Setting
+    file.writeGroupCode('75', '0'); // snap on/off
+    file.writeGroupCode('76', '1'); // grid on/off
+    file.writeGroupCode('77', '0'); // snap style
+    file.writeGroupCode('78', '0'); // snap isopair
+    file.writeGroupCode('0', 'ENDTAB');
+    file.writeGroupCode('0', 'ENDSEC');
+  }
 
-    data = data.concat(
-        '\n0',
-        '\nSECTION',
-        // Create Block Data
-        '\n2',
-        '\nBLOCKS');
+  writeBlocks(core, file) {
+    file.writeGroupCode('0', 'SECTION');
+    file.writeGroupCode('2', 'BLOCKS');
 
     for (let i = 0; i < this.core.scene.items.length; i++) {
       if (this.core.scene.items[i].type === 'Block') {
-        data = data.concat('\n', this.core.scene.items[i].dxf());
+        this.core.scene.items[i].dxf(file);
       }
     }
 
-    data = data.concat(
-        '\n0',
-        '\nENDSEC',
-    );
+    file.writeGroupCode('0', 'ENDSEC');
+  }
 
-
-    data = data.concat(
-        '\n0',
-        '\nSECTION',
-        // Create Entity Data
-        '\n2',
-        '\nENTITIES');
+  writeEntities(core, file) {
+    file.writeGroupCode('0', 'SECTION');
+    file.writeGroupCode('2', 'ENTITIES');
 
     for (let i = 0; i < this.core.scene.items.length; i++) {
       if (this.core.scene.items[i].type !== 'Block') {
-        data = data.concat('\n', this.core.scene.items[i].dxf());
+        this.core.scene.items[i].dxf(file);
       }
     }
 
-    data = data.concat(
-        // End Entity and Close File
-        '\n0',
-        '\nENDSEC',
-        '\n0',
-        '\nEOF');
+    file.writeGroupCode('0', 'ENDSEC');
+  }
 
-    return data;
+  write(core) {
+    this.core = core;
+
+    const file = new DXFFile();
+    // write start of file
+    file.writeGroupCode('999', 'DXF created from Design-Core');
+
+    this.core.scene.dxf(file);
+    this.writeTables(core, file);
+    this.writeBlocks(core, file);
+    this.writeEntities(core, file);
+
+    // write end of file
+    file.writeGroupCode('0', 'EOF');
+
+    return file.contents;
   }
 }
