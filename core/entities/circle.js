@@ -86,25 +86,14 @@ export class Circle extends Entity {
     ctx.stroke();
   }
 
-  dxf() {
-    const dxfitem = '';
-    const data = dxfitem.concat(
-        '0',
-        '\n', 'CIRCLE',
-        // "\n", "5", //HANDLE
-        // "\n", "DA",
-        '\n', '8', // LAYERNAME
-        '\n', this.layer,
-        '\n', '10', // X
-        '\n', this.points[0].x,
-        '\n', '20', // Y
-        '\n', this.points[0].y,
-        '\n', '30', // Z
-        '\n', '0.0',
-        '\n', '40',
-        '\n', this.radius, // DIAMETER
-    );
-    return data;
+  dxf(file) {
+    file.writeGroupCode('0', 'CIRCLE');
+    // file.writeGroupCode('5', ''); // Handle
+    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('10', this.points[0].x);
+    file.writeGroupCode('20', this.points[0].y);
+    file.writeGroupCode('30', '0.0');
+    file.writeGroupCode('40', this.radius);
   }
 
   trim(points, core) {

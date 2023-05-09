@@ -106,31 +106,16 @@ export class Style {
     return flags;
   }
 
-  dxf() {
-    const dxfitem = '';
-    const data = dxfitem.concat(
-        '0',
-        '\n', 'STYLE',
-        '\n', '2', // Stylename
-        '\n', this.name,
-        '\n', '3', // Font
-        '\n', this.font,
-        '\n', '4', // Big font name 0 is none
-        '\n', '',
-        '\n', '40', // Text Height
-        '\n', this.textHeight,
-        '\n', '41', // Width Factor
-        '\n', this.widthFactor,
-        '\n', '42', // Last Text Height
-        '\n', this.textHeight,
-        '\n', '50', // Linetype
-        '\n', this.obliqueAngle,
-        '\n', '70', // Flags
-        '\n', this.getStandardFlags(),
-        '\n', '71', // Flags
-        '\n', this.getFlags(),
-    );
-
-    return data;
+  dxf(file) {
+    file.writeGroupCode('0', 'STYLE');
+    file.writeGroupCode('2', this.name); // Stylename
+    file.writeGroupCode('3', this.font); // Font
+    file.writeGroupCode('4', ''); // Big font name 0 is none
+    file.writeGroupCode('40', this.textHeight); // Text Height
+    file.writeGroupCode('41', this.widthFactor); // Width Factor
+    file.writeGroupCode('42', this.textHeight); // Last Text Height
+    file.writeGroupCode('50', this.obliqueAngle);
+    file.writeGroupCode('70', this.getStandardFlags()); // Flags
+    file.writeGroupCode('71', this.getFlags()); // Flags
   }
 }

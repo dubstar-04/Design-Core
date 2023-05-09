@@ -396,51 +396,25 @@ export class Dimension extends Entity {
     // ////////////////////////////////////////
   }
 
-  dxf() {
-    const dxfitem = '';
-    const data = dxfitem.concat(
-        '0',
-        '\n', 'DIMENSION',
-        '\n', '8', // LAYERNAME
-        '\n', this.layer,
-        '\n', '2', // BLOCKNAME
-        '\n', this.blockName,
-        '\n', '10', // X - DEFINITION / ARROW POINT
-        '\n', this.points[0].x,
-        '\n', '20', // Y - DEFINITION / ARROW POINT
-        '\n', this.points[0].y,
-        '\n', '30', // Z - DEFINITION / ARROW POINT
-        '\n', '0.0',
-        '\n', '11', // X - TEXT MIDPOINT
-        '\n', this.points[2].x,
-        '\n', '21', // Y - TEXT MIDPOINT
-        '\n', this.points[2].y, // Y
-        '\n', '31', // Z - TEXT MIDPOINT
-        '\n', '0.0',
-        '\n', '70', // DIMENSION TYPE
-        '\n', 0, // this.dimType,
-        // 0 = Rotated, horizontal, or vertical
-        // 1 = Aligned
-        // 2 = Angular
-        // 3 = Diameter
-        // 4 = Radius
-        '\n', '13', // X - START POINT OF FIRST EXTENSION LINE
-        '\n', this.points[0].x,
-        '\n', '23', // Y - START POINT OF FIRST EXTENSION LINE
-        '\n', this.points[0].y, // Y
-        '\n', '33', // Z - START POINT OF FIRST EXTENSION LINE
-        '\n', '0.0',
-        '\n', '14', // X - START POINT OF SECOND EXTENSION LINE
-        '\n', this.points[1].x,
-        '\n', '24', // Y - START POINT OF SECOND EXTENSION LINE
-        '\n', this.points[1].y, // Y
-        '\n', '34', // Z - START POINT OF SECOND EXTENSION LINE
-        '\n', '0.0',
-        '\n', '3', // DIMENSION STYLE
-        '\n', 'STANDARD',
-
-    );
-    return data;
+  dxf(file) {
+    file.writeGroupCode('0', 'DIMENSION');
+    // file.writeGroupCode('5', ''); // Handle
+    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('2', this.blockName);
+    file.writeGroupCode('10', this.points[0].x); // X - DEFINITION / ARROW POINT
+    file.writeGroupCode('20', this.points[0].y); // Y - DEFINITION / ARROW POINT
+    file.writeGroupCode('30', '0.0'); // Z - DEFINITION / ARROW POINT
+    file.writeGroupCode('11', this.points[2].x); // X - TEXT MIDPOINT
+    file.writeGroupCode('21', this.points[2].y); // Y - TEXT MIDPOINT
+    file.writeGroupCode('31', '0.0'); // Z - TEXT MIDPOINT
+    file.writeGroupCode('70', 0); // DIMENSION TYPE
+    file.writeGroupCode('13', this.points[0].x); // X - START POINT OF FIRST EXTENSION LINE
+    file.writeGroupCode('23', this.points[0].y); // Y - START POINT OF FIRST EXTENSION LINE
+    file.writeGroupCode('33', '0.0'); // Z - START POINT OF FIRST EXTENSION LINE
+    file.writeGroupCode('14', this.points[1].x); // X - START POINT OF SECOND EXTENSION LINE
+    file.writeGroupCode('24', this.points[1].y); // Y - START POINT OF SECOND EXTENSION LINE
+    file.writeGroupCode('34', '0.0'); // Z - START POINT OF SECOND EXTENSION LINE
+    file.writeGroupCode('3', 'STANDARD'); // DIMENSION STYLE
   }
 
   snaps(mousePoint, delta, core) {
