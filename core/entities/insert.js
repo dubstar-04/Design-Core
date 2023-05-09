@@ -25,23 +25,14 @@ export class Insert {
     return command;
   }
 
-  dxf() {
-    const dxfitem = '';
-    const data = dxfitem.concat(
-        '0',
-        '\n', 'Insert',
-        '\n', '8',
-        '\n', 0,
-        '\n', '2', // name
-        '\n', this.block,
-        '\n', '10', // X
-        '\n', this.points[0].x,
-        '\n', '20', // Y
-        '\n', this.points[0].y,
-        '\n', '30', // Z
-        '\n', '0.0',
-    );
-    return data;
+  dxf(file) {
+    file.writeGroupCode('0', 'INSERT');
+    // file.writeGroupCode('5', ''); // Handle
+    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('2', this.block);
+    file.writeGroupCode('10', this.points[0].x);
+    file.writeGroupCode('20', this.points[0].y);
+    file.writeGroupCode('30', '0.0');
   }
 
   draw(ctx, scale, core, colour) {
