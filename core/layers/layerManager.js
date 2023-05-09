@@ -166,4 +166,18 @@ export class LayerManager {
       this.layers[layerIndex].name = newUniqueName;
     }
   }
+
+
+  dxf(file) {
+    // Create table data for layers
+    file.writeGroupCode('0', 'TABLE');
+    file.writeGroupCode('2', 'LAYER');
+    file.writeGroupCode('70', this.layerCount());
+
+    for (let i = 0; i < this.layerCount(); i++) {
+      this.getLayerByIndex(i).dxf(file);
+    }
+
+    file.writeGroupCode('0', 'ENDTAB');
+  }
 }
