@@ -117,27 +117,15 @@ export class Arc extends Entity {
     ctx.stroke();
   }
 
-  dxf() {
-    const dxfitem = '';
-    const data = dxfitem.concat(
-        '0',
-        '\n', 'ARC',
-        '\n', '8', // LAYERNAME
-        '\n', this.layer,
-        '\n', '10', // X
-        '\n', this.points[0].x,
-        '\n', '20', // Y
-        '\n', this.points[0].y,
-        '\n', '30', // Z
-        '\n', '0.0',
-        '\n', '40',
-        '\n', this.radius, // Radius
-        '\n', '50', // START ANGLE
-        '\n', Utils.radians2degrees(this.startAngle()), // Radians
-        '\n', '51', // END ANGLE
-        '\n', Utils.radians2degrees(this.endAngle()), // Radians
-    );
-    return data;
+  dxf(file) {
+    file.writeGroupCode('0', 'ARC');
+    file.writeGroupCode('8', this.layer); // LAYERNAME
+    file.writeGroupCode('10', this.points[0].x); // X
+    file.writeGroupCode('20', this.points[0].y); // Y
+    file.writeGroupCode('30', '0.0'); // Z
+    file.writeGroupCode('40', this.radius); // Radius
+    file.writeGroupCode('50', Utils.radians2degrees(this.startAngle())); // Start Angle
+    file.writeGroupCode('51', Utils.radians2degrees(this.endAngle())); // End Angle
   }
 
   intersectPoints() {
