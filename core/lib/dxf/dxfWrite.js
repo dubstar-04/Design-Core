@@ -4,6 +4,11 @@ export class DXFWriter {
   constructor() {
   }
 
+  /**
+   * Write DXF header section
+   * @param {object} core
+   * @param {DXFFile} file
+   */
   writeHeaders(core, file) {
     // write headers
     file.writeGroupCode('0', 'SECTION');
@@ -15,6 +20,11 @@ export class DXFWriter {
     file.writeGroupCode('0', 'ENDSEC');
   }
 
+  /**
+   * Write DXF table section
+   * @param {object} core
+   * @param {DXFFile} file
+   */
   writeTables(core, file) {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'TABLES');
@@ -29,6 +39,11 @@ export class DXFWriter {
     core.scene.dxf(file);
   }
 
+  /**
+   * Write DXF block section
+   * @param {object} core
+   * @param {DXFFile} file
+   */
   writeBlocks(core, file) {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'BLOCKS');
@@ -42,6 +57,11 @@ export class DXFWriter {
     file.writeGroupCode('0', 'ENDSEC');
   }
 
+  /**
+   * Write DXF entities section
+   * @param {object} core
+   * @param {DXFFile} file
+   */
   writeEntities(core, file) {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'ENTITIES');
@@ -55,6 +75,11 @@ export class DXFWriter {
     file.writeGroupCode('0', 'ENDSEC');
   }
 
+  /**
+   * Write DXF file
+   * @param {object} core
+   * @returns dxf formatted string formatted
+   */
   write(core) {
     const file = new DXFFile();
     // write start of file
