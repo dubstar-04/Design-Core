@@ -116,4 +116,14 @@ export class Scene {
     const helper = this.core.commandManager.createNew(type, data);
     this.addToTempItems(helper);
   }
+
+  dxf(file) {
+    file.writeGroupCode('0', 'SECTION');
+    file.writeGroupCode('2', 'HEADER');
+    file.writeGroupCode('9', '$ACADVER');
+    file.writeGroupCode('1', file.version);
+    file.writeGroupCode('9', '$CLAYER');
+    file.writeGroupCode('8', this.core.layerManager.getCLayer());
+    file.writeGroupCode('0', 'ENDSEC');
+  }
 }
