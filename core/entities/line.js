@@ -79,29 +79,16 @@ export class Line extends Entity {
     ctx.stroke();
   }
 
-  dxf() {
-    const dxfitem = '';
-    const data = dxfitem.concat(
-        '0',
-        '\n', 'LINE',
-        // "\n", "5", //HANDLE
-        // "\n", "DA",
-        '\n', '8', // LAYERNAME
-        '\n', this.layer,
-        '\n', '10', // X
-        '\n', this.points[0].x,
-        '\n', '20', // Y
-        '\n', this.points[0].y,
-        '\n', '30', // Z
-        '\n', '0.0',
-        '\n', '11', // X
-        '\n', this.points[1].x,
-        '\n', '21', // Y
-        '\n', this.points[1].y, // Y
-        '\n', '31', // Z
-        '\n', '0.0',
-    );
-    return data;
+  dxf(file) {
+    file.writeGroupCode('0', 'LINE');
+    // file.writeGroupCode('5', ''); //HANDLE
+    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('10', this.points[0].x);
+    file.writeGroupCode('20', this.points[0].y);
+    file.writeGroupCode('30', '0.0');
+    file.writeGroupCode('11', this.points[1].x);
+    file.writeGroupCode('21', this.points[1].y);
+    file.writeGroupCode('31', '0.0');
   }
 
   trim(points, core) {
