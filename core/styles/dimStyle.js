@@ -66,94 +66,48 @@ export class DimStyle {
     return flags;
   }
 
-  dxf() {
-    const dxfitem = '';
-    const data = dxfitem.concat(
-        '0',
-        '\n', 'DIMSTYLE',
-        '\n', '2', // Stylename
-        '\n', this.name,
-        '\n', '70', // Flags
-        '\n', this.getStandardFlags(),
-        '\n', '3', // DIMPOST
-        '\n', this.DIMPOST,
-        '\n', '4', // DIMAPOST
-        '\n', this.DIMAPOST,
-        '\n', '5', // DIMBLK
-        '\n', this.DIMBLK,
-        '\n', '6', // DIMBLK1
-        '\n', this.DIMBLK1,
-        '\n', '7', // DIMBLK2
-        '\n', this.DIMBLK2,
-        '\n', '40', // DIMSCALE
-        '\n', this.DIMSCALE,
-        '\n', '41', // DIMASZ
-        '\n', this.DIMASZ,
-        '\n', '42', // DIMEXO
-        '\n', this.DIMEXO,
-        '\n', '43', // DIMDLI
-        '\n', this.DIMDLI,
-        '\n', '44', // DIMEXE
-        '\n', this.DIMEXE,
-        '\n', '45', // DIMRND
-        '\n', this.DIMRND,
-        '\n', '46', // DIMDLE
-        '\n', this.DIMDLE,
-        '\n', '47', // DIMTP
-        '\n', this.DIMTP,
-        '\n', '48', // DIMTM
-        '\n', this.DIMTM,
-        '\n', '140', // DIMTXT
-        '\n', this.DIMTXT,
-        '\n', '141', // DIMCEN
-        '\n', this.DIMCEN,
-        '\n', '142', // DIMTSZ
-        '\n', this.DIMTSZ,
-        '\n', '143', // DIMALTF
-        '\n', this.DIMALTF,
-        '\n', '144', // DIMLFAC
-        '\n', this.DIMLFAC,
-        '\n', '145', // DIMTVP
-        '\n', this.DIMTVP,
-        '\n', '146', // DIMTFAC
-        '\n', this.DIMTFAC,
-        '\n', '147', // DIMGAP
-        '\n', this.DIMGAP,
-        '\n', '71', // DIMTOL
-        '\n', this.DIMTOL,
-        '\n', '72', // DIMLIM
-        '\n', this.DIMLIM,
-        '\n', '73', // DIMTIH
-        '\n', this.DIMTIH,
-        '\n', '74', // DIMTOH
-        '\n', this.DIMTOH,
-        '\n', '75', // DIMSE1
-        '\n', this.DIMSE1,
-        '\n', '76', // DIMSE2
-        '\n', this.DIMSE2,
-        '\n', '77', // DIMTAD
-        '\n', this.DIMTAD,
-        '\n', '78', // DIMZIN
-        '\n', this.DIMZIN,
-        '\n', '170', // DIMALT
-        '\n', this.DIMALT,
-        '\n', '171', // DIMALTD
-        '\n', this.DIMALTD,
-        '\n', '172', // DIMTOFL
-        '\n', this.DIMTOFL,
-        '\n', '173', // DIMSAH
-        '\n', this.DIMSAH,
-        '\n', '174', // DIMTIX
-        '\n', this.DIMTIX,
-        '\n', '175', // DIMSOXD
-        '\n', this.DIMSOXD,
-        '\n', '176', // DIMCLRD
-        '\n', this.DIMCLRD,
-        '\n', '177', // DIMCLRE
-        '\n', this.DIMCLRE,
-        '\n', '178', // DIMCLRT
-        '\n', this.DIMCLRT,
-    );
-    return data;
+  dxf(file) {
+    file.writeGroupCode('0', 'DIMSTYLE');
+    file.writeGroupCode('2', this.name); // Stylename
+    file.writeGroupCode('70', this.getStandardFlags()); // Flags
+    file.writeGroupCode('3', this.DIMPOST); // DIMPOST
+    file.writeGroupCode('4', this.DIMAPOST); // DIMAPOST
+    file.writeGroupCode('5', this.DIMBLK); // DIMBLK
+    file.writeGroupCode('6', this.DIMBLK1); // DIMBLK1
+    file.writeGroupCode('7', this.DIMBLK2); // DIMBLK2
+    file.writeGroupCode('40', this.DIMSCALE); // DIMSCALE
+    file.writeGroupCode('41', this.DIMASZ); // DIMASZ
+    file.writeGroupCode('42', this.DIMEXO); // DIMEXO
+    file.writeGroupCode('43', this.DIMDLI); // DIMDLI
+    file.writeGroupCode('44', this.DIMEXE); // DIMEXE
+    file.writeGroupCode('45', this.DIMRND); // DIMRND
+    file.writeGroupCode('46', this.DIMDLE); // DIMDLE
+    file.writeGroupCode('47', this.DIMTP); // DIMTP
+    file.writeGroupCode('48', this.DIMTM); // DIMTM
+    file.writeGroupCode('140', this.DIMTXT); // DIMTXT
+    file.writeGroupCode('141', this.DIMCEN); // DIMCEN
+    file.writeGroupCode('142', this.DIMTSZ); // DIMTSZ
+    file.writeGroupCode('143', this.DIMALTF); // DIMALTF
+    file.writeGroupCode('144', this.DIMLFAC); // DIMLFAC
+    file.writeGroupCode('145', this.DIMTVP); // DIMTVP
+    file.writeGroupCode('146', this.DIMTFAC); // DIMTFAC
+    file.writeGroupCode('147', this.DIMGAP); // DIMGAP
+    file.writeGroupCode('71', this.DIMTOL); // DIMTOL
+    file.writeGroupCode('72', this.DIMLIM); // DIMLIM
+    file.writeGroupCode('73', this.DIMTIH); // DIMTIH
+    file.writeGroupCode('74', this.DIMTOH); // DIMTOH
+    file.writeGroupCode('75', this.DIMSE1); // DIMSE1
+    file.writeGroupCode('76', this.DIMSE2); // DIMSE2
+    file.writeGroupCode('77', this.DIMTAD); // DIMTAD
+    file.writeGroupCode('78', this.DIMZIN); // DIMZIN
+    file.writeGroupCode('170', this.DIMALT); // DIMALT
+    file.writeGroupCode('171', this.DIMALTD); // DIMALTD
+    file.writeGroupCode('172', this.DIMTOFL); // DIMTOFL
+    file.writeGroupCode('173', this.DIMSAH); // DIMSAH
+    file.writeGroupCode('174', this.DIMTIX); // DIMTIX
+    file.writeGroupCode('175', this.DIMSOXD); // DIMSOXD
+    file.writeGroupCode('176', this.DIMCLRD); // DIMCLRD
+    file.writeGroupCode('177', this.DIMCLRE); // DIMCLRE
+    file.writeGroupCode('178', this.DIMCLRT); // DIMCLRT
   }
 }
