@@ -281,39 +281,19 @@ export class Text extends Entity {
         */
   }
 
-  dxf() {
-    const dxfitem = '';
-    const data = dxfitem.concat(
-        '0',
-        '\n', 'TEXT',
-        '\n', '8', // LAYERNAME
-        '\n', this.layer,
-        '\n', '10', // X
-        '\n', this.points[0].x,
-        '\n', '20', // Y
-        '\n', this.points[0].y,
-        '\n', '30', // Z
-        '\n', '0.0',
-        // "\n", "11", //X
-        // "\n", this.points[1].x,
-        // "\n", "21", //Y
-        // "\n", this.points[1].y, //Y
-        // "\n", "31", //Z
-        // "\n", "0.0",
-        '\n', '1', // STRING
-        '\n', this.string,
-        '\n', '40', // STRING
-        '\n', this.height,
-        '\n', '50', // ROTATION
-        '\n', this.rotation,
-        // "\n", "7", // TEXT STYLE
-        // "\n", "STANDARD",
-        // "\n", "72", //HORIZONTAL ALIGNMENT
-        // "\n", this.getHorizontalAlignment(),
-        // "\n", "73", //VERTICAL ALIGNMENT
-        // "\n", this.getVerticalAlignment()
-    );
-    return data;
+  dxf(file) {
+    file.writeGroupCode('0', 'TEXT');
+    // file.writeGroupCode('5', ''); // Handle
+    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('10', this.points[0].x);
+    file.writeGroupCode('20', this.points[0].y);
+    file.writeGroupCode('30', '0.0');
+    file.writeGroupCode('1', this.string);
+    file.writeGroupCode('40', this.height);
+    file.writeGroupCode('50', this.rotation);
+    // file.writeGroupCode('7', 'STANDARD'); // TEXT STYLE
+    // file.writeGroupCode('72', this.getHorizontalAlignment()); //HORIZONTAL ALIGNMENT
+    // file.writeGroupCode('73', this.getVerticalAlignment()); //VERTICAL ALIGNMENT
   }
 
   snaps(mousePoint, delta, core) {
