@@ -218,11 +218,8 @@ export class InputManager {
   mouseMoved() {
     this.core.scene.tempItems = [];
 
-    // TODO: Can't select, snap and create an item at the same time
-    // add conditionals or return to reduce the number of paint requests
-
-    if (this.core.mouse.buttonOneDown) {
-      this.core.scene.selectionManager.drawSelectionWindow();
+    if (this.activeCommand !== undefined) {
+      this.activeCommand.preview(this.core);
       this.core.canvas.requestPaint();
     }
 
@@ -231,8 +228,15 @@ export class InputManager {
       this.core.canvas.requestPaint();
     }
 
-    if (this.activeCommand !== undefined) {
-      this.activeCommand.preview(this.core);
+    if (this.core.mouse.buttonOneDown) {
+      if (this.promptOption !== undefined) {
+        // check if the active command requires a selection set
+        if (!this.promptOption.types.includes(Input.Type.SELECTIONSET)) {
+          return;
+        }
+      }
+
+      this.core.scene.selectionManager.drawSelectionWindow();
       this.core.canvas.requestPaint();
     }
   }
@@ -283,8 +287,12 @@ export class InputManager {
         // Clear tempItems - This is here to remove the crossing window
         this.core.scene.tempItems = [];
 
-        // TODO: can't select and window select at the same time
-        // This needs combining with canvas.mouseMove to define selection, snapping and window selection
+        if (this.promptOption !== undefined) {
+          // check if the active command requires a selection set
+          if (!this.promptOption.types.includes(Input.Type.SELECTIONSET)) {
+            return;
+          }
+        }
 
         // check if the mouse position has changed since mousedown
         if (!this.core.mouse.mouseDownCanvasPoint.isSame(this.core.mouse.pointOnCanvas())) {
