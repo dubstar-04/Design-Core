@@ -2,6 +2,7 @@ export class DXFFile {
   constructor() {
     this.contents = '';
     this.version = DXFFile.Version.R12;
+    this.handleCounter = 10;
   }
 
   /**
@@ -20,6 +21,7 @@ export class DXFFile {
    */
   clearFile() {
     this.contents = '';
+    this.handleCounter = 10;
   }
 
   /**
