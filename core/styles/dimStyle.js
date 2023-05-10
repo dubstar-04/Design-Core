@@ -1,3 +1,5 @@
+import {DXFFile} from '../lib/dxf/dxfFile.js';
+
 export class DimStyle {
   constructor(data) {
     // Define Properties
@@ -68,6 +70,9 @@ export class DimStyle {
 
   dxf(file) {
     file.writeGroupCode('0', 'DIMSTYLE');
+    file.writeGroupCode('105', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbDimStyleTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Stylename
     file.writeGroupCode('70', this.getStandardFlags()); // Flags
     file.writeGroupCode('3', this.DIMPOST); // DIMPOST
