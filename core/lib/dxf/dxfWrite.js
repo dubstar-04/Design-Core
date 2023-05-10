@@ -17,6 +17,8 @@ export class DXFWriter {
     file.writeGroupCode('1', file.version);
     file.writeGroupCode('9', '$CLAYER');
     file.writeGroupCode('8', core.layerManager.getCLayer());
+    file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
+    file.writeGroupCode('5', '349', DXFFile.Version.R2000); // TODO: This needs to reflect the actual handle values
     file.writeGroupCode('0', 'ENDSEC');
   }
 
@@ -29,6 +31,52 @@ export class DXFWriter {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'TABLES');
 
+    // LTYPE Table
+    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'LTYPE', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '2', DXFFile.Version.R2000);
+    // By Block
+    file.writeGroupCode('0', 'LTYPE', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbLinetypeTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'ByBlock', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('3', '', DXFFile.Version.R2000);
+    file.writeGroupCode('72', '65', DXFFile.Version.R2000);
+    file.writeGroupCode('73', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('40', '0.0', DXFFile.Version.R2000);
+
+    // By Layer
+    file.writeGroupCode('0', 'LTYPE', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbLinetypeTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'ByLayer', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('3', '', DXFFile.Version.R2000);
+    file.writeGroupCode('72', '65', DXFFile.Version.R2000);
+    file.writeGroupCode('73', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('40', '0.0', DXFFile.Version.R2000);
+
+    // By Layer
+    file.writeGroupCode('0', 'LTYPE', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbLinetypeTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'Continuous', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('3', 'Solid Line', DXFFile.Version.R2000);
+    file.writeGroupCode('72', '65', DXFFile.Version.R2000);
+    file.writeGroupCode('73', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('40', '0.0', DXFFile.Version.R2000);
+
+    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
+
+
     // layer table
     core.layerManager.dxf(file);
     // style table
@@ -37,6 +85,71 @@ export class DXFWriter {
     core.dimStyleManager.dxf(file);
     // vport table
     core.scene.dxf(file);
+
+    // VIEW Table
+    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'VIEW', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
+
+    // UCS TABLE
+    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'UCS', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
+
+    // APPID Table
+    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'APPID', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '9', DXFFile.Version.R2000);
+    file.writeGroupCode('0', 'APPID', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '9', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbRegAppTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'ACAD', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
+
+    // BLOCK_RECORD Table
+    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'BLOCK_RECORD', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '2', DXFFile.Version.R2000);
+
+    // Model Space
+    file.writeGroupCode('0', 'BLOCK_RECORD', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '1', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbBlockTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('2', '*Model_Space', DXFFile.Version.R2000);
+    file.writeGroupCode('340', '22', DXFFile.Version.R2000);
+
+    // Paper Space
+    file.writeGroupCode('0', 'BLOCK_RECORD', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '1', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbBlockTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('2', '*Paper_Space', DXFFile.Version.R2000);
+    file.writeGroupCode('340', '22', DXFFile.Version.R2000);
+
+    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
+
+    // end tables section
+    file.writeGroupCode('0', 'ENDSEC');
   }
 
   /**
@@ -53,6 +166,47 @@ export class DXFWriter {
         core.scene.items[i].dxf(file);
       }
     }
+
+    // Model Space
+    file.writeGroupCode('0', 'BLOCK', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '1', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('8', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
+    file.writeGroupCode('2', '*Model_Space', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '0.0', DXFFile.Version.R2000);
+    file.writeGroupCode('10', '0.0', DXFFile.Version.R2000);
+    file.writeGroupCode('20', '0.0', DXFFile.Version.R2000);
+    file.writeGroupCode('30', '0.0', DXFFile.Version.R2000);
+    file.writeGroupCode('3', '*Model_Space', DXFFile.Version.R2000);
+    file.writeGroupCode('1', '', DXFFile.Version.R2000);
+    file.writeGroupCode('0', 'ENDBLK', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('8', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
+
+    // Model Space
+    file.writeGroupCode('0', 'BLOCK', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '1', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('8', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
+    file.writeGroupCode('2', '*Paper_Space', DXFFile.Version.R2000);
+    file.writeGroupCode('70', '0.0', DXFFile.Version.R2000);
+    file.writeGroupCode('10', '0.0', DXFFile.Version.R2000);
+    file.writeGroupCode('20', '0.0', DXFFile.Version.R2000);
+    file.writeGroupCode('30', '0.0', DXFFile.Version.R2000);
+    file.writeGroupCode('3', '*Paper_Space', DXFFile.Version.R2000);
+    file.writeGroupCode('1', '', DXFFile.Version.R2000);
+    file.writeGroupCode('0', 'ENDBLK', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('8', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
+
 
     file.writeGroupCode('0', 'ENDSEC');
   }
@@ -90,6 +244,23 @@ export class DXFWriter {
     this.writeTables(core, file);
     this.writeBlocks(core, file);
     this.writeEntities(core, file);
+
+    // Dictionary
+    file.writeGroupCode('0', 'SECTION', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'OBJECTS', DXFFile.Version.R2000);
+    file.writeGroupCode('0', 'DICTIONARY', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', '0', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbDictionary', DXFFile.Version.R2000);
+    file.writeGroupCode('281', '1', DXFFile.Version.R2000);
+    file.writeGroupCode('3', 'ACAD_GROUP', DXFFile.Version.R2000);
+    file.writeGroupCode('350', 'D', DXFFile.Version.R2000);
+    file.writeGroupCode('0', 'DICTIONARY', DXFFile.Version.R2000);
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('330', 'C', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbDictionary', DXFFile.Version.R2000);
+    file.writeGroupCode('281', '1', DXFFile.Version.R2000);
+    file.writeGroupCode('0', 'ENDSEC', DXFFile.Version.R2000);
 
     // write end of file
     file.writeGroupCode('0', 'EOF');
