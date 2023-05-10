@@ -25,6 +25,20 @@ export class DXFFile {
   }
 
   /**
+   * Returns the next available handle value
+   * A handle is an arbitrary but unique hex value as string up to 16 hexadecimal digits (8 bytes).
+   * R12 handles are optional.
+   * R13+ handles are mandatory.
+   * The header variable $HANDSEED must be greater than the largest handle value
+   * @returns handle value
+   */
+  nextHandle() {
+    const handle = this.handleCounter.toString(16).toUpperCase();
+    this.handleCounter++;
+    return handle;
+  }
+
+  /**
    * Write the group code and value to file
    * @param {String} groupCode
    * @param {String} groupValue
