@@ -1,4 +1,5 @@
 import {Colours} from '../lib/colours.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
 
 export class Layer {
   constructor(data) {
@@ -117,11 +118,15 @@ export class Layer {
 
   dxf(file) {
     file.writeGroupCode('0', 'LAYER');
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbLayerTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Layername
     file.writeGroupCode('70', this.getFlags()); // Flags
     const colourValue = this.on ? Colours.getACADColour(this.colour) : (0 - Colours.getACADColour(this.colour));
     file.writeGroupCode('62', colourValue); // Colour: Negative if layer is off
     file.writeGroupCode('6', this.lineType);
+    file.writeGroupCode('390', file.nextHandle(), DXFFile.Version.R2000); // plotstylename handle - //TODO: this needs to be linked to the actual plotstyle
     // file.writeGroupCode('290', this.plotting ? 1 : 0); //plotting   |   These items codes don't seem to be
     // file.writeGroupCode('370', 'this.lineWeight '); // lineWeight      |   supported in ACAD.
   }
