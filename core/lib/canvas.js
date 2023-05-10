@@ -54,6 +54,8 @@ export class Canvas {
       case 2: // right button
         break;
     }
+
+    this.core.scene.inputManager.mouseDown(button);
   };
 
   mouseUp(button) {
