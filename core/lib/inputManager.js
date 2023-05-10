@@ -254,6 +254,25 @@ export class InputManager {
     this.core.scene.selectionManager.windowSelect();
   }
 
+
+  /**
+ * Handle mouse down
+ * @param {integer} button
+ */
+  mouseDown(button) {
+    switch (button) {
+      case 0: // left button
+        // TODO: can't select and window select at the same time
+        // This needs combining with canvas.mouseMove to define selection, snapping and window selection
+        this.singleSelect();
+        break;
+      case 1: // middle button
+        break;
+      case 2: // right button
+        break;
+    }
+  };
+
   /**
  * Handle mouse up
  * @param {integer} button
@@ -266,7 +285,6 @@ export class InputManager {
 
         // TODO: can't select and window select at the same time
         // This needs combining with canvas.mouseMove to define selection, snapping and window selection
-        this.singleSelect();
 
         // check if the mouse position has changed since mousedown
         if (!this.core.mouse.mouseDownCanvasPoint.isSame(this.core.mouse.pointOnCanvas())) {
