@@ -7,6 +7,7 @@ import {Line} from './line.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
 
 export class Dimension extends Entity {
   constructor(data) {
@@ -398,7 +399,9 @@ export class Dimension extends Entity {
 
   dxf(file) {
     file.writeGroupCode('0', 'DIMENSION');
-    // file.writeGroupCode('5', ''); // Handle
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbDimension', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('2', this.blockName);
     file.writeGroupCode('10', this.points[0].x); // X - DEFINITION / ARROW POINT
