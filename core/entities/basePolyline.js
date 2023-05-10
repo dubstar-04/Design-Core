@@ -4,6 +4,7 @@ import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {Utils} from '../lib/utils.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
 
 export class BasePolyline extends Entity {
   constructor(data) {
@@ -160,7 +161,9 @@ export class BasePolyline extends Entity {
 
   dxf(file) {
     file.writeGroupCode('0', 'POLYLINE');
-    // file.writeGroupCode('5', ''); //Handle
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbPolyline', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer); // LAYERNAME
     file.writeGroupCode('10', '0');
     file.writeGroupCode('20', '0');
@@ -177,10 +180,10 @@ export class BasePolyline extends Entity {
   vertices(file) {
     for (let i = 0; i < this.points.length; i++) {
       file.writeGroupCode('0', 'VERTEX');
-      // file.writeGroupCode('5', ''); //Handle
+      file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+      file.writeGroupCode('100', 'AcDbVertex', DXFFile.Version.R2000);
+      file.writeGroupCode('100', 'AcDb2dVertex', DXFFile.Version.R2000);
       file.writeGroupCode('8', this.layer);
-      // file.writeGroupCode('100', 'AcDbVertex');
-      // file.writeGroupCode('100', 'AcDb2dVertex');
       file.writeGroupCode('10', this.points[i].x); // X
       file.writeGroupCode('20', this.points[i].y); // Y
       file.writeGroupCode('30', '0.0');
