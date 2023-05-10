@@ -4,6 +4,9 @@ export class DXFFile {
     this.version = DXFFile.Version.R12;
   }
 
+  /**
+   * Static enum of version numbers
+   */
   static Version = {
     R2010: 'AC1024',
     R2007: 'AC1021',
@@ -12,10 +15,20 @@ export class DXFFile {
     R12: 'AC1009',
   };
 
+  /**
+   * Reset the file
+   */
   clearFile() {
     this.contents = '';
   }
 
+  /**
+   * Write the group code and value to file
+   * @param {String} groupCode
+   * @param {String} groupValue
+   * @param {String} version - DXFFile.Version
+   * @returns
+   */
   writeGroupCode(groupCode, groupValue, version=DXFFile.Version.R12) {
     // return if the groupcode is required for a later version
     if (version > this.version) {
@@ -26,6 +39,10 @@ export class DXFFile {
     this.writeLine(groupValue);
   }
 
+  /**
+   * Write a new line to the contents
+   * @param {String} value
+   */
   writeLine(value) {
     this.contents = this.contents.concat(`${value}\n`);
   }
