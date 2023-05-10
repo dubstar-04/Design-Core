@@ -2,6 +2,7 @@ import {SelectionManager} from './selectionManager.js';
 import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 import {InputManager} from './inputManager.js';
+import {DXFFile} from './dxf/dxfFile.js';
 
 export class Scene {
   constructor(core) {
@@ -134,8 +135,13 @@ export class Scene {
 
     file.writeGroupCode('0', 'TABLE');
     file.writeGroupCode('2', 'VPORT'); // Table Name
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
     file.writeGroupCode('70', '1'); // Number of entries in table
     file.writeGroupCode('0', 'VPORT');
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbViewportTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', '*ACTIVE');
     file.writeGroupCode('70', '0'); // vport flags
     file.writeGroupCode('10', '0.0'); // lower left corner x pos
@@ -172,6 +178,5 @@ export class Scene {
     file.writeGroupCode('77', '0'); // snap style
     file.writeGroupCode('78', '0'); // snap isopair
     file.writeGroupCode('0', 'ENDTAB');
-    file.writeGroupCode('0', 'ENDSEC');
   }
 }
