@@ -163,17 +163,18 @@ export class BasePolyline extends Entity {
     file.writeGroupCode('0', 'POLYLINE');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbPolyline', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDb2dPolyline', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer); // LAYERNAME
     file.writeGroupCode('10', '0');
     file.writeGroupCode('20', '0');
     file.writeGroupCode('30', '0');
     file.writeGroupCode('39', this.lineWidth);
     file.writeGroupCode('70', this.flags);
-    // file.writeGroupCode('100', 'AcDb2dPolyline');
     file.writeGroupCode('66', '1'); // Vertices follow: required for R12, optional for R2000+
     this.vertices(file);
     file.writeGroupCode('0', 'SEQEND');
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
   }
 
@@ -181,6 +182,7 @@ export class BasePolyline extends Entity {
     for (let i = 0; i < this.points.length; i++) {
       file.writeGroupCode('0', 'VERTEX');
       file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+      file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
       file.writeGroupCode('100', 'AcDbVertex', DXFFile.Version.R2000);
       file.writeGroupCode('100', 'AcDb2dVertex', DXFFile.Version.R2000);
       file.writeGroupCode('8', this.layer);
