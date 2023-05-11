@@ -122,12 +122,13 @@ export class Arc extends Entity {
     file.writeGroupCode('0', 'ARC');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbArc', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbCircle', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer); // LAYERNAME
     file.writeGroupCode('10', this.points[0].x); // X
     file.writeGroupCode('20', this.points[0].y); // Y
     file.writeGroupCode('30', '0.0'); // Z
     file.writeGroupCode('40', this.radius); // Radius
+    file.writeGroupCode('100', 'AcDbArc', DXFFile.Version.R2000);
     file.writeGroupCode('50', Utils.radians2degrees(this.startAngle())); // Start Angle
     file.writeGroupCode('51', Utils.radians2degrees(this.endAngle())); // End Angle
   }
