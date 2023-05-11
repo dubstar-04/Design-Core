@@ -294,6 +294,7 @@ export class Text extends Entity {
     file.writeGroupCode('1', this.string);
     file.writeGroupCode('40', this.height);
     file.writeGroupCode('50', this.rotation);
+    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     // file.writeGroupCode('7', 'STANDARD'); // TEXT STYLE
     // file.writeGroupCode('72', this.getHorizontalAlignment()); //HORIZONTAL ALIGNMENT
     // file.writeGroupCode('73', this.getVerticalAlignment()); //VERTICAL ALIGNMENT
