@@ -44,9 +44,6 @@ export class DXFWriter {
     file.writeGroupCode('2', 'ByBlock', DXFFile.Version.R2000);
     file.writeGroupCode('70', '0', DXFFile.Version.R2000);
     file.writeGroupCode('3', '', DXFFile.Version.R2000);
-    file.writeGroupCode('72', '65', DXFFile.Version.R2000);
-    file.writeGroupCode('73', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('40', '0.0', DXFFile.Version.R2000);
 
     // By Layer
     file.writeGroupCode('0', 'LTYPE', DXFFile.Version.R2000);
@@ -56,9 +53,6 @@ export class DXFWriter {
     file.writeGroupCode('2', 'ByLayer', DXFFile.Version.R2000);
     file.writeGroupCode('70', '0', DXFFile.Version.R2000);
     file.writeGroupCode('3', '', DXFFile.Version.R2000);
-    file.writeGroupCode('72', '65', DXFFile.Version.R2000);
-    file.writeGroupCode('73', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('40', '0.0', DXFFile.Version.R2000);
 
     // By Layer
     file.writeGroupCode('0', 'LTYPE', DXFFile.Version.R2000);
@@ -68,9 +62,6 @@ export class DXFWriter {
     file.writeGroupCode('2', 'Continuous', DXFFile.Version.R2000);
     file.writeGroupCode('70', '0', DXFFile.Version.R2000);
     file.writeGroupCode('3', 'Solid Line', DXFFile.Version.R2000);
-    file.writeGroupCode('72', '65', DXFFile.Version.R2000);
-    file.writeGroupCode('73', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('40', '0.0', DXFFile.Version.R2000);
 
     file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
 
