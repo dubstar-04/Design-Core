@@ -155,6 +155,9 @@ export class DXFWriter {
       }
     }
 
+
+    // Three empty definitions always appear in the BLOCKS section.
+    // They are titled *Model_Space, *Paper_Space and *Paper_Space0.
     // Model Space
     file.writeGroupCode('0', 'BLOCK', DXFFile.Version.R2000);
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
