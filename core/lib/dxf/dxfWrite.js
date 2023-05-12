@@ -32,6 +32,7 @@ export class DXFWriter {
     file.writeGroupCode('2', 'TABLES');
 
     // LTYPE Table
+    // The LTYPE Table must preceed the LAYER table
     file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
     file.writeGroupCode('2', 'LTYPE', DXFFile.Version.R2000);
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
