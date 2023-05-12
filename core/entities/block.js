@@ -81,6 +81,7 @@ export class Block extends Entity {
     file.writeGroupCode('1', '');
     file.writeGroupCode('0', 'ENDBLK');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
   }
 
