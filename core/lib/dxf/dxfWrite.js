@@ -37,7 +37,6 @@ export class DXFWriter {
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('330', '0', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '2', DXFFile.Version.R2000);
     // By Block
     file.writeGroupCode('0', 'LTYPE', DXFFile.Version.R2000);
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
@@ -92,7 +91,6 @@ export class DXFWriter {
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('330', '0', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
     file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
 
     // UCS TABLE
@@ -101,7 +99,6 @@ export class DXFWriter {
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('330', '0', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
     file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
 
     // APPID Table
@@ -110,7 +107,6 @@ export class DXFWriter {
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('330', '0', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '9', DXFFile.Version.R2000);
     file.writeGroupCode('0', 'APPID', DXFFile.Version.R2000);
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('330', '9', DXFFile.Version.R2000);
@@ -175,7 +171,6 @@ export class DXFWriter {
     file.writeGroupCode('8', '0', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
     file.writeGroupCode('2', '*Model_Space', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '0.0', DXFFile.Version.R2000);
     file.writeGroupCode('10', '0.0', DXFFile.Version.R2000);
     file.writeGroupCode('20', '0.0', DXFFile.Version.R2000);
     file.writeGroupCode('30', '0.0', DXFFile.Version.R2000);
@@ -195,7 +190,6 @@ export class DXFWriter {
     file.writeGroupCode('8', '0', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
     file.writeGroupCode('2', '*Paper_Space', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '0.0', DXFFile.Version.R2000);
     file.writeGroupCode('10', '0.0', DXFFile.Version.R2000);
     file.writeGroupCode('20', '0.0', DXFFile.Version.R2000);
     file.writeGroupCode('30', '0.0', DXFFile.Version.R2000);
