@@ -7,20 +7,36 @@ export class StyleManagerBase {
   }
 
 
+  /**
+   * Get styles
+   * @returns list of styles
+   */
   getStyles() {
     return this.styles;
   }
 
+  /**
+   * Get style count
+   * @returns number of styles
+   */
   styleCount() {
     return this.styles.length;
   }
 
+  /**
+   * Adds a new style to the list of active styles
+   */
   newStyle() {
     this.addStyle({
       'name': this.getUniqueName('NEW_STYLE'),
     });
   }
 
+  /**
+   * Generate a unique name
+   * @param {string} name
+   * @returns unique name
+   */
   getUniqueName(name) {
     let count = 0;
     let styStr = name.replace(/ /g, '_'); // .toUpperCase();
@@ -37,6 +53,10 @@ export class StyleManagerBase {
     return styStr;
   };
 
+  /**
+   * Add a style to the list of styles
+   * @param {style} style
+   */
   addStyle(style) {
     // Call the subclass to create a new typed style object
     const newstyle = this.createStyle(style);
@@ -67,6 +87,11 @@ export class StyleManagerBase {
     }
   }
 
+  /**
+   * Delete a style using the style index
+   * @param {number} styleIndex
+   * @returns undefined
+   */
   deleteStyle(styleIndex) {
     if (this.styles[styleIndex] === undefined) {
       return;
@@ -91,6 +116,9 @@ export class StyleManagerBase {
     this.styles.splice(styleIndex, 1);
   }
 
+  /**
+   * Get the name of the current style
+   */
   getCstyle() {
     return this.currentstyle;
   }
@@ -115,6 +143,9 @@ export class StyleManagerBase {
     return styleExists;
   }
 
+  /**
+   * Ensure that used styles and default styles exist
+   */
   checkStyles() {
     if (!this.styleCount()) {
       this.addStandardStyles();
@@ -155,11 +186,22 @@ export class StyleManagerBase {
     return;
   }
 
+  /**
+   * Get the style from an index
+   * @param {number} styleIndex
+   * @returns
+   */
   getStyleByIndex(styleIndex) {
     return this.styles[styleIndex];
   }
 
 
+  /**
+   * Rename the style at index with newName
+   * @param {number} styleIndex
+   * @param {string} newName
+   * @returns undefined
+   */
   renameStyle(styleIndex, newName) {
     // can't rename the STANDARD style
     if (this.getStyleByIndex(styleIndex).name.toUpperCase() === 'STANDARD') {
