@@ -46,6 +46,27 @@ export class StyleManagerBase {
     }
   }
 
+  /**
+   * Delete all items that use style
+   * @param {string} style
+   */
+  deleteStyleFromScene(style) {
+    const selectionSet = [];
+
+    for (let i = 0; i < this.core.scene.items.length; i++) {
+      if (this.core.scene.items[i].style === style) {
+        selectionSet.push(i);
+      }
+    }
+
+    // sort the selection in descending order
+    selectionSet.sort((a, b)=>b-a);
+
+    for (let j = 0; j < selectionSet.length; j++) {
+      this.core.scene.items.splice((selectionSet[j]), 1);
+    }
+  }
+
   deleteStyle(styleIndex) {
     if (this.styles[styleIndex] === undefined) {
       return;
@@ -64,7 +85,7 @@ export class StyleManagerBase {
     }
 
     // delete all item using the selected style
-    this.core.scene.deleteWithStyle(styleToDelete);
+    this.deleteStyleFromScene(styleToDelete);
 
     // Delete The style
     this.styles.splice(styleIndex, 1);
