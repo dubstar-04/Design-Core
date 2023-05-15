@@ -1,7 +1,6 @@
 
 import {DxfIterator} from '../dxfIterator.js';
 import {Strings} from '../../strings.js';
-import {Logging} from '../../logging.js';
 export class Section {
   constructor() {
 
@@ -30,13 +29,19 @@ export class Section {
       return;
     }
 
+    // get the group value
+    let value = this.getGroupValue(currentPair);
+
     if (object.hasOwnProperty(`${currentPair.code}`)) {
-      // seems to be common to have duplicated properties?
-      Logging.instance.debug(`ERROR: Duplicate property: ${currentPair.code} - line: ${iterator.currentIndex}`);
+      // add multiple group codes to an array
+      if (Array.isArray(object[currentPair.code])) {
+        value = object[currentPair.code].push(value);
+      } else {
+        value = [object[currentPair.code], value];
+      }
     }
 
-    // get the group value
-    const value = this.getGroupValue(currentPair);
+
     // add group value to the object
     object[currentPair.code] = value;
   }
