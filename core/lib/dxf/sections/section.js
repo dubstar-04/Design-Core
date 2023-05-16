@@ -35,7 +35,7 @@ export class Section {
     if (object.hasOwnProperty(`${currentPair.code}`)) {
       // add multiple group codes to an array
       if (Array.isArray(object[currentPair.code])) {
-        value = object[currentPair.code].push(value);
+        value = [...object[currentPair.code], value];
       } else {
         value = [object[currentPair.code], value];
       }
