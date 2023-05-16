@@ -11,6 +11,18 @@ export class DimStyleManager extends StyleManagerBase {
     return new DimStyle(style);
   }
 
+  addStandardStyles() {
+    this.addStyle({
+      'name': 'STANDARD',
+    });
+    /*
+    this.addStyle({
+      'name': 'ANNOTATIVE',
+    });
+    */
+    // this.core.scene.saveRequired();
+  }
+
   dxf(file) {
     // Create table data for dimension styles
     file.writeGroupCode('0', 'TABLE');

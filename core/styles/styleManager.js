@@ -11,6 +11,18 @@ export class StyleManager extends StyleManagerBase {
     return new Style(style);
   }
 
+  addStandardStyles() {
+    this.addStyle({
+      'name': 'STANDARD',
+    });
+    /*
+    this.addStyle({
+      'name': 'ANNOTATIVE',
+    });
+    */
+    // this.core.scene.saveRequired();
+  }
+
   dxf(file) {
     // Create table data for text styles
     file.writeGroupCode('0', 'TABLE');

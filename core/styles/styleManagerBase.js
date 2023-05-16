@@ -159,18 +159,6 @@ export class StyleManagerBase {
     }
   }
 
-  addStandardStyles() {
-    this.addStyle({
-      'name': 'STANDARD',
-    });
-    /*
-    this.addStyle({
-      'name': 'ANNOTATIVE',
-    });
-    */
-    // this.core.scene.saveRequired();
-  }
-
   /**
    * get a style matching stylename
    * @param {string} styleName
