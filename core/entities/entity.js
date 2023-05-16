@@ -26,6 +26,7 @@ export class Entity {
 
     this.lineWidth = 2;
     this.colour = 'BYLAYER';
+    this.lineType = 'BYLAYER';
     this.layer = '0';
 
 
@@ -54,6 +55,11 @@ export class Entity {
         this.trueColour = data.trueColour;
       }
       */
+
+      if (data.lineType || data[6]) {
+        // DXF Groupcode 6 - lineType
+        this.lineType = data.lineType || data[6];
+      }
 
       if (data.layer || data[8]) {
         // DXF Groupcode 8 - layername
