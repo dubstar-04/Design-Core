@@ -118,15 +118,11 @@ export class LayerManager {
   }
 
   addStandardLayers() {
-    this.addLayer({
-      'name': '0',
-      'colour': '#00BFFF',
-    });
-    this.addLayer({
-      'name': 'DEFPOINTS',
-      'plotting': false,
-    });
-    this.core.scene.saveRequired();
+    this.addLayer({'name': '0', 'colour': '#00BFFF'});
+    this.addLayer({'name': 'DEFPOINTS', 'plotting': false});
+    this.addLayer({'name': 'CENTERLINE', 'colour': '#FFFF00', 'lineType': 'CENTER'});
+    this.addLayer({'name': 'HIDDEN', 'colour': '#D6D6D6', 'lineType': 'HIDDEN'});
+    // this.core.scene.saveRequired();
   }
 
   getLayerIndex(layerName) {
