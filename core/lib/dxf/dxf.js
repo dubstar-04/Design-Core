@@ -55,6 +55,12 @@ export class DXF {
           core.layerManager.addLayer(layer);
         });
       }
+
+      if (table[2] === 'LTYPE') {
+        table.children.forEach((ltype) => {
+          core.ltypeManager.addStyle(ltype);
+        });
+      }
     });
   }
 
