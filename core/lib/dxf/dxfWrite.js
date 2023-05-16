@@ -31,42 +31,8 @@ export class DXFWriter {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'TABLES');
 
-    // LTYPE Table
-    // The LTYPE Table must preceed the LAYER table
-    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'LTYPE', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    // By Block
-    file.writeGroupCode('0', 'LTYPE', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbLinetypeTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'ByBlock', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('3', '', DXFFile.Version.R2000);
-
-    // By Layer
-    file.writeGroupCode('0', 'LTYPE', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbLinetypeTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'ByLayer', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('3', '', DXFFile.Version.R2000);
-
-    // By Layer
-    file.writeGroupCode('0', 'LTYPE', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbLinetypeTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'Continuous', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('3', 'Solid Line', DXFFile.Version.R2000);
-
-    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
-
-
+    // type table
+    core.ltypeManager.dxf(file);
     // layer table
     core.layerManager.dxf(file);
     // style table
