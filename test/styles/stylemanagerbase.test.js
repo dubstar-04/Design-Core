@@ -6,6 +6,11 @@ StyleManagerBase.prototype.createStyle = function(style) {
   return {name: style.name};
 };
 
+// mock addStandardStyles method
+StyleManagerBase.prototype.addStandardStyles = function() {
+  this.addStyle({'name': 'TEST'});
+};
+
 const core = new Core();
 const styleManager = new StyleManagerBase(core);
 
