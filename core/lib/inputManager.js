@@ -217,6 +217,7 @@ export class InputManager {
    */
   mouseMoved() {
     this.core.scene.tempItems = [];
+    this.core.scene.auxiliaryItems = [];
 
     // TODO: Can't select, snap and create an item at the same time
     // add conditionals or return to reduce the number of paint requests
@@ -262,7 +263,7 @@ export class InputManager {
     switch (button) {
       case 0: // left button
         // Clear tempItems - This is here to remove the crossing window
-        this.core.scene.tempItems = [];
+        this.core.scene.auxiliaryItems = [];
 
         // TODO: can't select and window select at the same time
         // This needs combining with canvas.mouseMove to define selection, snapping and window selection
