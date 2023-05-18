@@ -12,6 +12,7 @@ export class Scene {
 
     this.items = []; // Main array that stores all the geometry
     this.tempItems = []; // Temporary Array to store items while input is being gathered
+    this.auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
     this.selectionManager = new SelectionManager(core);
     this.inputManager = new InputManager(core);
@@ -22,6 +23,7 @@ export class Scene {
    */
   reset() {
     this.tempItems = [];
+    this.auxiliaryItems = [];
     this.selectionManager.reset();
     this.core.canvas.requestPaint();
   }
@@ -106,6 +108,14 @@ export class Scene {
    */
   addToTempItems(item) {
     this.tempItems.push(item); // Add it to the tempItems Array
+  }
+
+  /**
+   * Add items to the scenes auxiliary items
+   * @param {object} item
+   */
+  addToAuxiliaryItems(item) {
+    this.auxiliaryItems.push(item); // Add it to the auxiliary Array
   }
 
   /**
