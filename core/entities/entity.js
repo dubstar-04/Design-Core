@@ -68,12 +68,20 @@ export class Entity {
     }
   }
 
-  getColour() {
+  getColour(core) {
     // if (this.trueColour !== undefined) {
     //   return this.trueColour;
     // }
 
-    return this.colour;
+    let colour = this.colour;
+
+    if (colour === 'BYLAYER') {
+      const layer = core.layerManager.getLayerByName(this.layer);
+      colour = layer.colour;
+    }
+
+    return colour;
+  }
   }
 
 
