@@ -48,7 +48,7 @@ export class Snapping {
    */
   addSnapPoint(snapPoint, scene) {
     // show the snap point
-    scene.addToTempItems(new SnapPoint(snapPoint));
+    scene.addToAuxiliaryItems(new SnapPoint(snapPoint));
 
     // Move the mouse to the closest snap point so if the mouse if clicked the snap point is used.
     scene.core.mouse.setPosFromScenePoint(snapPoint);
