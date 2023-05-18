@@ -68,6 +68,17 @@ export class DXF {
     const blocks = this.reader.blocks;
 
     blocks.forEach((block) => {
+      if (block.hasOwnProperty('2')) {
+        if (block[2].toUpperCase().includes('MODEL_SPACE')) {
+          // skip model_space blocks
+          return;
+        }
+
+        if (block[2].toUpperCase().includes('PAPER_SPACE')) {
+          // skip paper_space blocks
+          return;
+        }
+      }
       if (block.hasOwnProperty('points')) {
         block.points = this.parsePoints(block.points);
       }
