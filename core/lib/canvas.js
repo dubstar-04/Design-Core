@@ -234,14 +234,18 @@ export class Canvas {
   setContext(item, context) {
     const colour = item.getColour(this.core);
     const lineType = item.getLineType(this.core);
+    const lineWidth = item.lineWidth / this.getScale();
 
     try { // HTML Canvas
       context.strokeStyle = colour;
-      ctx.fillStyle = colour;
+      context.fillStyle = colour;
+      context.lineWidth = lineWidth;
+      context.beginPath();
     } catch { // Cairo
       const rgbColour = Colours.hexToScaledRGB(colour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       context.setDash(lineType.getPattern(this.getScale()), 1);
+      context.setLineWidth(lineWidth);
     }
   }
 
