@@ -8,7 +8,7 @@ class SnapPoint {
     this.snapPoint = snapPoint;
   }
 
-  draw(ctx, scale, core, colour) {
+  draw(ctx, scale, core) {
     const snapColour = core.settings.snapcolour.toString();
     const radius = 4;
 
