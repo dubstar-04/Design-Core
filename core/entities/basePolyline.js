@@ -118,13 +118,6 @@ export class BasePolyline extends Entity {
   }
 
   draw(ctx, scale) {
-    try { // HTML Canvas
-      ctx.lineWidth = this.lineWidth / scale;
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.setLineWidth(this.lineWidth / scale);
-    }
-
     ctx.moveTo(this.points[0].x, this.points[0].y);
 
     for (let i = 1; i < this.points.length; i++) {

@@ -64,13 +64,6 @@ export class Line extends Entity {
   }
 
   draw(ctx, scale) {
-    try { // HTML Canvas
-      ctx.lineWidth = this.lineWidth / scale;
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.setLineWidth(this.lineWidth / scale);
-    }
-
     ctx.moveTo(this.points[0].x, this.points[0].y);
     ctx.lineTo(this.points[1].x, this.points[1].y);
     ctx.stroke();

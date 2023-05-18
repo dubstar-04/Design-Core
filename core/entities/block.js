@@ -105,13 +105,6 @@ export class Block extends Entity {
 
     ctx.save();
 
-    try { // HTML Canvas
-      ctx.lineWidth = this.lineWidth / scale;
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.setLineWidth(this.lineWidth / scale);
-    }
-
     // blocks are associated with an insert point.
     // translate ctx by the insert location
     // this allows the items to be draw without knowing the insert location of the parent block

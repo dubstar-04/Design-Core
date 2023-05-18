@@ -72,13 +72,6 @@ export class Circle extends Entity {
   }
 
   draw(ctx, scale) {
-    try { // HTML Canvas
-      ctx.lineWidth = this.lineWidth / scale;
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.setLineWidth(this.lineWidth / scale);
-    }
-
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, 0, 6.283);
     ctx.stroke();
   }

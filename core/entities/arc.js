@@ -102,15 +102,7 @@ export class Arc extends Entity {
   }
 
   draw(ctx, scale) {
-    try { // HTML Canvas
-      ctx.lineWidth = this.lineWidth / scale;
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.setLineWidth(this.lineWidth / scale);
-    }
-
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, this.startAngle(), this.endAngle());
-
     ctx.stroke();
   }
 
