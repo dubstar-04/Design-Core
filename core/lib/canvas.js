@@ -216,6 +216,11 @@ export class Canvas {
     const tempItemColour = this.core.settings.helpergeometrycolour.toString();
     for (j; j < this.core.scene.tempItems.length; j++) {
       this.core.scene.tempItems[j].draw(context, this.getScale(), this.core, tempItemColour);
+    // Paint the auxiliary scene items
+    // auxiliary items include things like the selection window, snap points etc
+    // these items have their own draw routine
+    for (let l = 0; l < this.core.scene.auxiliaryItems.length; l++) {
+      this.core.scene.auxiliaryItems[l].draw(context, this.getScale(), this.core);
     }
 
     const colour = this.core.settings.selecteditemscolour.toString();
