@@ -333,7 +333,7 @@ export class Dimension extends Entity {
     return entities;
   }
 
-  draw(ctx, scale, core, colour) {
+  draw(ctx, scale) {
     const entities = this.getBlockEntities();
 
     if (entities) {
@@ -345,7 +345,7 @@ export class Dimension extends Entity {
       this.block.addItem(this.text);
     }
 
-    this.block.draw(ctx, scale, core, colour);
+    this.block.draw(ctx, scale);
     /*
     function drawArrowHead(point, angle, height) {
       triangleWidth = height;

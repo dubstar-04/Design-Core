@@ -1,7 +1,6 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
-import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
@@ -227,7 +226,7 @@ export class Text extends Entity {
     return rect;
   }
 
-  draw(ctx, scale, core, colour) {
+  draw(ctx, scale) {
     ctx.save();
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
@@ -249,17 +248,14 @@ export class Text extends Entity {
     }
 
     try { // HTML
-      ctx.fillStyle = colour;
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt ' + core.styleManager.getStyleByName(this.styleName).font.toString();
+      // ctx.font = this.height + 'pt ' + core.styleManager.getStyleByName(this.styleName).font.toString();
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
       this.boundingRect.height = this.height;
     } catch { // Cairo
-      const rgbColour = Colours.hexToScaledRGB(colour);
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       ctx.moveTo(0, 0);
       ctx.setFontSize(this.height);
       ctx.showText(String(this.string));

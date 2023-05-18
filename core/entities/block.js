@@ -1,5 +1,4 @@
 import {Point} from './point.js';
-import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 
@@ -98,7 +97,7 @@ export class Block extends Entity {
     this.points[0] = point;
   }
 
-  draw(ctx, scale, core, colour) {
+  draw(ctx, scale) {
     if (!this.items.length) {
       // nothing to draw
       return;
@@ -107,13 +106,10 @@ export class Block extends Entity {
     ctx.save();
 
     try { // HTML Canvas
-      ctx.strokeStyle = colour;
       ctx.lineWidth = this.lineWidth / scale;
       ctx.beginPath();
     } catch { // Cairo
       ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.hexToScaledRGB(colour);
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
     // blocks are associated with an insert point.
@@ -128,7 +124,7 @@ export class Block extends Entity {
         if (itemColour === 'BYBLOCK') {
           this.items[item].colour = colour;
         }
-        this.items[item].draw(ctx, scale, core, colour);
+        this.items[item].draw(ctx, scale);
         // reset item colour
         this.items[item].colour = itemColour;
       }

@@ -1,5 +1,4 @@
 import {Strings} from '../lib/strings.js';
-import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
@@ -118,15 +117,12 @@ export class BasePolyline extends Entity {
     }
   }
 
-  draw(ctx, scale, core, colour) {
+  draw(ctx, scale) {
     try { // HTML Canvas
-      ctx.strokeStyle = colour;
       ctx.lineWidth = this.lineWidth / scale;
       ctx.beginPath();
     } catch { // Cairo
       ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.hexToScaledRGB(colour);
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
     ctx.moveTo(this.points[0].x, this.points[0].y);

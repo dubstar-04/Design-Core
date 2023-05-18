@@ -1,6 +1,5 @@
 import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
-import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
@@ -72,15 +71,12 @@ export class Circle extends Entity {
     this.points[1] = this.points[0].project(0, rad);
   }
 
-  draw(ctx, scale, core, colour) {
+  draw(ctx, scale) {
     try { // HTML Canvas
-      ctx.strokeStyle = colour;
       ctx.lineWidth = this.lineWidth / scale;
       ctx.beginPath();
     } catch { // Cairo
       ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.hexToScaledRGB(colour);
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, 0, 6.283);
