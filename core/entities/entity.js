@@ -82,6 +82,18 @@ export class Entity {
 
     return colour;
   }
+
+  getLineType(core) {
+    let lineTypeName = this.lineType;
+
+    if (lineTypeName === 'BYLAYER') {
+      const layer = core.layerManager.getLayerByName(this.layer);
+      lineTypeName = layer.lineType;
+    }
+
+    const lineType = core.ltypeManager.getStyleByName(lineTypeName);
+
+    return lineType;
   }
 
 
