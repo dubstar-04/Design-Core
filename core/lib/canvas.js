@@ -172,6 +172,7 @@ export class Canvas {
     const pos = new Point();
     const origin = this.core.mouse.transformToScene(pos);
 
+    // Paint the scene background
     try {// HTML
       // this.clear()
       context.fillStyle = this.core.settings.canvasbackgroundcolour;
@@ -192,40 +193,38 @@ export class Canvas {
 
     this.paintGrid(context, width, height);
 
-    const numOfEntities = this.core.scene.items.length;
-    let i = 0;
-    let j = 0;
-    let k = 0;
-
-    for (i; i < numOfEntities; i++) {
+    // Paint the primary scene items
+    for (let i = 0; i < this.core.scene.items.length; i++) {
       const layer = this.core.layerManager.getLayerByName(this.core.scene.items[i].layer);
 
       if (!layer.isVisible) {
         continue;
       }
 
-      let colour = this.core.scene.items[i].colour;
-
-      if (colour === 'BYLAYER') {
-        colour = layer.colour;
-      }
-
-      this.core.scene.items[i].draw(context, this.getScale(), this.core, colour);
+      this.setContext(this.core.scene.items[i], context);
+      this.core.scene.items[i].draw(context, this.getScale());
     }
 
-    const tempItemColour = this.core.settings.helpergeometrycolour.toString();
-    for (j; j < this.core.scene.tempItems.length; j++) {
-      this.core.scene.tempItems[j].draw(context, this.getScale(), this.core, tempItemColour);
+    // Paint the temporary scene items
+    for (let j = 0; j < this.core.scene.tempItems.length; j++) {
+      this.setContext(this.core.scene.tempItems[j], context);
+      this.core.scene.tempItems[j].draw(context, this.getScale());
+    }
+
+    // Paint the selected scene items
+    for (let k = 0; k < this.core.scene.selectionManager.selectedItems.length; k++) {
+      this.setContext(this.core.scene.selectionManager.selectedItems[k], context);
+      this.core.scene.selectionManager.selectedItems[k].draw(context, this.getScale());
+    }
+
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
     for (let l = 0; l < this.core.scene.auxiliaryItems.length; l++) {
       this.core.scene.auxiliaryItems[l].draw(context, this.getScale(), this.core);
     }
+  }
 
-    const colour = this.core.settings.selecteditemscolour.toString();
-    for (k; k < this.core.scene.selectionManager.selectedItems.length; k++) {
-      this.core.scene.selectionManager.selectedItems[k].draw(context, this.getScale(), this.core, colour);
   /**
    * Set the scene context
    * @param {entity} item
