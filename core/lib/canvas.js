@@ -226,6 +226,23 @@ export class Canvas {
     const colour = this.core.settings.selecteditemscolour.toString();
     for (k; k < this.core.scene.selectionManager.selectedItems.length; k++) {
       this.core.scene.selectionManager.selectedItems[k].draw(context, this.getScale(), this.core, colour);
+  /**
+   * Set the scene context
+   * @param {entity} item
+   * @param {object} context - scene painting context from ui
+   * @param {string} contextColour - colour to overide item colour
+   */
+  setContext(item, context) {
+    const colour = item.getColour(this.core);
+    const lineType = item.getLineType(this.core);
+
+    try { // HTML Canvas
+      context.strokeStyle = colour;
+      ctx.fillStyle = colour;
+    } catch { // Cairo
+      const rgbColour = Colours.hexToScaledRGB(colour);
+      context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+      context.setDash(lineType.getPattern(this.getScale()), 1);
     }
   }
 
