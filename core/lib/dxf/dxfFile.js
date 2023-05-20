@@ -9,6 +9,8 @@ export class DXFFile {
    * Static enum of version numbers
    */
   static Version = {
+    R2018: 'AC1032',
+    R2013: 'AC1027',
     R2010: 'AC1024',
     R2007: 'AC1021',
     R2004: 'AC1018',
