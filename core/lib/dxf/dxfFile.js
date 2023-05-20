@@ -35,9 +35,19 @@ export class DXFFile {
    * @returns handle value
    */
   nextHandle() {
-    const handle = this.handleCounter.toString(16).toUpperCase();
+    const handle = this.formatHandle(this.handleCounter);
     this.handleCounter++;
     return handle;
+  }
+
+  /**
+   * Format a handle value
+   * A handle is an arbitrary but unique hex value as string up to 16 hexadecimal digits (8 bytes).
+   * @param {number} value
+   * @returns handle hex value
+   */
+  formatHandle(value) {
+    return value.toString(16).toUpperCase();
   }
 
   /**
