@@ -6,11 +6,13 @@ export class SelectionWindow {
   constructor(data) {
     this.colour = '#FF0000';
     this.lineWidth = 1;
+    this.dashPattern = [];
 
     if (data) {
       if (data.points) {
         if (data.points[1].y > data.points[0].y) {
           this.colour = '#FF0000';
+          this.dashPattern = [5];
         } else {
           this.colour = '#0000FF';
         }
@@ -48,6 +50,8 @@ export class SelectionWindow {
       this.drawRect(ctx);
       ctx.fillPreserve();
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+      const scaledPattern = this.dashPattern.map((x) => x / scale);
+      ctx.setDash(scaledPattern, 1);
       ctx.stroke();
     }
   }

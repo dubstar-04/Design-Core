@@ -1,9 +1,9 @@
 import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
-import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
 
 export class Circle extends Entity {
   constructor(data) {
@@ -71,24 +71,16 @@ export class Circle extends Entity {
     this.points[1] = this.points[0].project(0, rad);
   }
 
-  draw(ctx, scale, core, colour) {
-    try { // HTML Canvas
-      ctx.strokeStyle = colour;
-      ctx.lineWidth = this.lineWidth / scale;
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.hexToScaledRGB(colour);
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-    }
-
+  draw(ctx, scale) {
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, 0, 6.283);
     ctx.stroke();
   }
 
   dxf(file) {
     file.writeGroupCode('0', 'CIRCLE');
-    // file.writeGroupCode('5', ''); // Handle
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbCircle', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);

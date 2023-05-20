@@ -35,7 +35,7 @@ export class Insert {
     file.writeGroupCode('30', '0.0');
   }
 
-  draw(ctx, scale, core, colour) {
+  draw(ctx, scale) {
     return;
   }
 

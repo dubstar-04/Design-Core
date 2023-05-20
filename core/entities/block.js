@@ -1,6 +1,6 @@
 import {Point} from './point.js';
-import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
 
 export class Block extends Entity {
   constructor(data) {
@@ -67,6 +67,9 @@ export class Block extends Entity {
 
   dxf(file) {
     file.writeGroupCode('0', 'BLOCK');
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('2', this.name);
     file.writeGroupCode('10', this.points[0].x);
@@ -76,6 +79,9 @@ export class Block extends Entity {
     file.writeGroupCode('3', this.name); // Name again
     file.writeGroupCode('1', '');
     file.writeGroupCode('0', 'ENDBLK');
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
   }
 
   clearItems() {
@@ -91,23 +97,13 @@ export class Block extends Entity {
     this.points[0] = point;
   }
 
-  draw(ctx, scale, core, colour) {
+  draw(ctx, scale) {
     if (!this.items.length) {
       // nothing to draw
       return;
     }
 
     ctx.save();
-
-    try { // HTML Canvas
-      ctx.strokeStyle = colour;
-      ctx.lineWidth = this.lineWidth / scale;
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.hexToScaledRGB(colour);
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-    }
 
     // blocks are associated with an insert point.
     // translate ctx by the insert location
@@ -121,7 +117,7 @@ export class Block extends Entity {
         if (itemColour === 'BYBLOCK') {
           this.items[item].colour = colour;
         }
-        this.items[item].draw(ctx, scale, core, colour);
+        this.items[item].draw(ctx, scale);
         // reset item colour
         this.items[item].colour = itemColour;
       }

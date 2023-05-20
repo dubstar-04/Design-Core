@@ -1,9 +1,9 @@
 import {Strings} from '../lib/strings.js';
-import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {Utils} from '../lib/utils.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
 
 export class BasePolyline extends Entity {
   constructor(data) {
@@ -117,32 +117,24 @@ export class BasePolyline extends Entity {
     }
   }
 
-  draw(ctx, scale, core, colour) {
-    try { // HTML Canvas
-      ctx.strokeStyle = colour;
-      ctx.lineWidth = this.lineWidth / scale;
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.hexToScaledRGB(colour);
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-    }
-
+  draw(ctx, scale) {
     ctx.moveTo(this.points[0].x, this.points[0].y);
 
     for (let i = 1; i < this.points.length; i++) {
       if (this.points[i].bulge === 0) {
         ctx.lineTo(this.points[i].x, this.points[i].y);
       } else {
-        const centerPoint = this.points[i].bulgeCentrePoint(this.points[i + 1]);
-        const radius = this.points[i].bulgeRadius(this.points[i + 1]);
+        // define the next point or the first point for closed shapes
+        const nextPoint = this.points[i + 1] || this.points[0];
+        const centerPoint = this.points[i].bulgeCentrePoint(nextPoint);
+        const radius = this.points[i].bulgeRadius(nextPoint);
 
 
         if (this.points[i].bulge > 0) {
           // TODO: make this work with canvas
-          ctx.arc(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(this.points[i + 1]));
+          ctx.arc(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
         } else {
-          ctx.arcNegative(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(this.points[i + 1]));
+          ctx.arcNegative(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
         }
 
         // debug centerpoint
@@ -160,27 +152,31 @@ export class BasePolyline extends Entity {
 
   dxf(file) {
     file.writeGroupCode('0', 'POLYLINE');
-    // file.writeGroupCode('5', ''); //Handle
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDb2dPolyline', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer); // LAYERNAME
     file.writeGroupCode('10', '0');
     file.writeGroupCode('20', '0');
     file.writeGroupCode('30', '0');
     file.writeGroupCode('39', this.lineWidth);
     file.writeGroupCode('70', this.flags);
-    // file.writeGroupCode('100', 'AcDb2dPolyline');
     file.writeGroupCode('66', '1'); // Vertices follow: required for R12, optional for R2000+
     this.vertices(file);
     file.writeGroupCode('0', 'SEQEND');
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
   }
 
   vertices(file) {
     for (let i = 0; i < this.points.length; i++) {
       file.writeGroupCode('0', 'VERTEX');
-      // file.writeGroupCode('5', ''); //Handle
+      file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+      file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+      file.writeGroupCode('100', 'AcDbVertex', DXFFile.Version.R2000);
+      file.writeGroupCode('100', 'AcDb2dVertex', DXFFile.Version.R2000);
       file.writeGroupCode('8', this.layer);
-      // file.writeGroupCode('100', 'AcDbVertex');
-      // file.writeGroupCode('100', 'AcDb2dVertex');
       file.writeGroupCode('10', this.points[i].x); // X
       file.writeGroupCode('20', this.points[i].y); // Y
       file.writeGroupCode('30', '0.0');

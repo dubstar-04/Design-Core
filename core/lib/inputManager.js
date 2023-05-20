@@ -217,6 +217,7 @@ export class InputManager {
    */
   mouseMoved() {
     this.core.scene.tempItems = [];
+    this.core.scene.auxiliaryItems = [];
 
     if (this.activeCommand !== undefined) {
       this.activeCommand.preview(this.core);
@@ -285,7 +286,7 @@ export class InputManager {
     switch (button) {
       case 0: // left button
         // Clear tempItems - This is here to remove the crossing window
-        this.core.scene.tempItems = [];
+        this.core.scene.auxiliaryItems = [];
 
         if (this.promptOption !== undefined) {
           // check if the active command requires a selection set

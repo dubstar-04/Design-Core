@@ -1,3 +1,5 @@
+import {DXFFile} from '../lib/dxf/dxfFile.js';
+
 export class Style {
   constructor(data) {
     // Define Properties
@@ -108,6 +110,9 @@ export class Style {
 
   dxf(file) {
     file.writeGroupCode('0', 'STYLE');
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbTextStyleTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Stylename
     file.writeGroupCode('3', this.font); // Font
     file.writeGroupCode('4', ''); // Big font name 0 is none

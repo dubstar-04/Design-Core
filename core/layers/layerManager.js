@@ -1,6 +1,7 @@
 
 import {Layer} from './layer.js';
 import {Strings} from '../lib/strings.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
 
 export class LayerManager {
   constructor(core) {
@@ -117,15 +118,11 @@ export class LayerManager {
   }
 
   addStandardLayers() {
-    this.addLayer({
-      'name': '0',
-      'colour': '#00BFFF',
-    });
-    this.addLayer({
-      'name': 'DEFPOINTS',
-      'plotting': false,
-    });
-    this.core.scene.saveRequired();
+    this.addLayer({'name': '0', 'colour': '#00BFFF'});
+    this.addLayer({'name': 'DEFPOINTS', 'plotting': false});
+    this.addLayer({'name': 'CENTERLINE', 'colour': '#FFFF00', 'lineType': 'CENTER'});
+    this.addLayer({'name': 'HIDDEN', 'colour': '#D6D6D6', 'lineType': 'HIDDEN'});
+    // this.core.scene.saveRequired();
   }
 
   getLayerIndex(layerName) {
@@ -172,10 +169,14 @@ export class LayerManager {
     // Create table data for layers
     file.writeGroupCode('0', 'TABLE');
     file.writeGroupCode('2', 'LAYER');
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
     file.writeGroupCode('70', this.layerCount());
 
     for (let i = 0; i < this.layerCount(); i++) {
-      this.getLayerByIndex(i).dxf(file);
+      if (this.getLayerByIndex(i).name !== 'DEFPOINTS') {
+        this.getLayerByIndex(i).dxf(file);
+      }
     }
 
     file.writeGroupCode('0', 'ENDTAB');

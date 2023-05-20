@@ -26,6 +26,7 @@ export class Entity {
 
     this.lineWidth = 2;
     this.colour = 'BYLAYER';
+    this.lineType = 'BYLAYER';
     this.layer = '0';
 
 
@@ -55,6 +56,11 @@ export class Entity {
       }
       */
 
+      if (data.lineType || data[6]) {
+        // DXF Groupcode 6 - lineType
+        this.lineType = data.lineType || data[6];
+      }
+
       if (data.layer || data[8]) {
         // DXF Groupcode 8 - layername
         this.layer = data.layer || data[8];
@@ -62,12 +68,32 @@ export class Entity {
     }
   }
 
-  getColour() {
+  getColour(core) {
     // if (this.trueColour !== undefined) {
     //   return this.trueColour;
     // }
 
-    return this.colour;
+    let colour = this.colour;
+
+    if (colour === 'BYLAYER') {
+      const layer = core.layerManager.getLayerByName(this.layer);
+      colour = layer.colour;
+    }
+
+    return colour;
+  }
+
+  getLineType(core) {
+    let lineTypeName = this.lineType;
+
+    if (lineTypeName === 'BYLAYER') {
+      const layer = core.layerManager.getLayerByName(this.layer);
+      lineTypeName = layer.lineType;
+    }
+
+    const lineType = core.ltypeManager.getStyleByName(lineTypeName);
+
+    return lineType;
   }
 
 

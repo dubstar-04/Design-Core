@@ -1,10 +1,10 @@
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
-import {Colours} from '../lib/colours.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
 
 export class Text extends Entity {
   constructor(data) {
@@ -226,7 +226,7 @@ export class Text extends Entity {
     return rect;
   }
 
-  draw(ctx, scale, core, colour) {
+  draw(ctx, scale) {
     ctx.save();
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
@@ -248,17 +248,14 @@ export class Text extends Entity {
     }
 
     try { // HTML
-      ctx.fillStyle = colour;
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt ' + core.styleManager.getStyleByName(this.styleName).font.toString();
+      // ctx.font = this.height + 'pt ' + core.styleManager.getStyleByName(this.styleName).font.toString();
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
       this.boundingRect.height = this.height;
     } catch { // Cairo
-      const rgbColour = Colours.hexToScaledRGB(colour);
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       ctx.moveTo(0, 0);
       ctx.setFontSize(this.height);
       ctx.showText(String(this.string));
@@ -283,7 +280,9 @@ export class Text extends Entity {
 
   dxf(file) {
     file.writeGroupCode('0', 'TEXT');
-    // file.writeGroupCode('5', ''); // Handle
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
@@ -291,6 +290,7 @@ export class Text extends Entity {
     file.writeGroupCode('1', this.string);
     file.writeGroupCode('40', this.height);
     file.writeGroupCode('50', this.rotation);
+    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     // file.writeGroupCode('7', 'STANDARD'); // TEXT STYLE
     // file.writeGroupCode('72', this.getHorizontalAlignment()); //HORIZONTAL ALIGNMENT
     // file.writeGroupCode('73', this.getVerticalAlignment()); //VERTICAL ALIGNMENT

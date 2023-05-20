@@ -6,7 +6,7 @@ const layerManager = core.layerManager;
 
 test('Test LayerManager.getLayers', () => {
   const layers = layerManager.getLayers();
-  expect(layers).toHaveLength(2);
+  expect(layers).toHaveLength(4);
 
   expect(layers[0]).toHaveProperty('name', '0');
   expect(layers[1]).toHaveProperty('name', 'DEFPOINTS');
@@ -14,7 +14,7 @@ test('Test LayerManager.getLayers', () => {
 
 test('Test LayerManager.layerCount', () => {
   const count = layerManager.layerCount();
-  expect(count).toBe(2);
+  expect(count).toBe(4);
 });
 
 test('Test LayerManager.newLayer', () => {
@@ -95,11 +95,11 @@ test('Test LayerManager.checkLayers', () => {
 
   layerManager.checkLayers();
   const layers = layerManager.getLayers();
-  expect(layers).toHaveLength(3);
+  expect(layers).toHaveLength(5);
 
   expect(layers[0]).toHaveProperty('name', '0');
   expect(layers[1]).toHaveProperty('name', 'DEFPOINTS');
-  expect(layers[2]).toHaveProperty('name', newLayerName);
+  expect(layers[4]).toHaveProperty('name', newLayerName);
 });
 
 test('Test LayerManager.addStandardLayers', () => {
@@ -108,7 +108,7 @@ test('Test LayerManager.addStandardLayers', () => {
   layerManager.addStandardLayers();
 
   const layers = layerManager.getLayers();
-  expect(layers).toHaveLength(2);
+  expect(layers).toHaveLength(4);
 
   expect(layers[0]).toHaveProperty('name', '0');
   expect(layers[1]).toHaveProperty('name', 'DEFPOINTS');

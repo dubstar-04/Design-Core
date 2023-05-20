@@ -43,6 +43,16 @@ export class DXF {
         core.layerManager.setCLayer(layerName);
       }
     }
+
+    if (header.hasOwnProperty('$ACADVER')) {
+      const version = header['$ACADVER'];
+      if (version.hasOwnProperty('1')) {
+        const versionNumber = version['1'];
+        // TODO: Check this is a valid and supported version
+        // TODO: save the version number to output the same version
+        console.log('version:', versionNumber);
+      }
+    }
   }
 
 
@@ -55,6 +65,12 @@ export class DXF {
           core.layerManager.addLayer(layer);
         });
       }
+
+      if (table[2] === 'LTYPE') {
+        table.children.forEach((ltype) => {
+          core.ltypeManager.addStyle(ltype);
+        });
+      }
     });
   }
 
@@ -62,6 +78,17 @@ export class DXF {
     const blocks = this.reader.blocks;
 
     blocks.forEach((block) => {
+      if (block.hasOwnProperty('2')) {
+        if (block[2].toUpperCase().includes('MODEL_SPACE')) {
+          // skip model_space blocks
+          return;
+        }
+
+        if (block[2].toUpperCase().includes('PAPER_SPACE')) {
+          // skip paper_space blocks
+          return;
+        }
+      }
       if (block.hasOwnProperty('points')) {
         block.points = this.parsePoints(block.points);
       }

@@ -2,6 +2,7 @@ import {SelectionManager} from './selectionManager.js';
 import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 import {InputManager} from './inputManager.js';
+import {DXFFile} from './dxf/dxfFile.js';
 
 export class Scene {
   constructor(core) {
@@ -11,6 +12,7 @@ export class Scene {
 
     this.items = []; // Main array that stores all the geometry
     this.tempItems = []; // Temporary Array to store items while input is being gathered
+    this.auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
     this.selectionManager = new SelectionManager(core);
     this.inputManager = new InputManager(core);
@@ -21,6 +23,7 @@ export class Scene {
    */
   reset() {
     this.tempItems = [];
+    this.auxiliaryItems = [];
     this.selectionManager.reset();
     this.core.canvas.requestPaint();
   }
@@ -108,6 +111,14 @@ export class Scene {
   }
 
   /**
+   * Add items to the scenes auxiliary items
+   * @param {object} item
+   */
+  addToAuxiliaryItems(item) {
+    this.auxiliaryItems.push(item); // Add it to the auxiliary Array
+  }
+
+  /**
    * Create a new temp item and add to scenes tempItems
    * @param {string} type - entity type
    * @param {object} data - object of entity parameters
@@ -134,8 +145,13 @@ export class Scene {
 
     file.writeGroupCode('0', 'TABLE');
     file.writeGroupCode('2', 'VPORT'); // Table Name
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
     file.writeGroupCode('70', '1'); // Number of entries in table
     file.writeGroupCode('0', 'VPORT');
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbViewportTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', '*ACTIVE');
     file.writeGroupCode('70', '0'); // vport flags
     file.writeGroupCode('10', '0.0'); // lower left corner x pos
@@ -172,6 +188,5 @@ export class Scene {
     file.writeGroupCode('77', '0'); // snap style
     file.writeGroupCode('78', '0'); // snap isopair
     file.writeGroupCode('0', 'ENDTAB');
-    file.writeGroupCode('0', 'ENDSEC');
   }
 }
