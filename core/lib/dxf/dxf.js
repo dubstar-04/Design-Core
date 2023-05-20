@@ -43,6 +43,16 @@ export class DXF {
         core.layerManager.setCLayer(layerName);
       }
     }
+
+    if (header.hasOwnProperty('$ACADVER')) {
+      const version = header['$ACADVER'];
+      if (version.hasOwnProperty('1')) {
+        const versionNumber = version['1'];
+        // TODO: Check this is a valid and supported version
+        // TODO: save the version number to output the same version
+        console.log('version:', versionNumber);
+      }
+    }
   }
 
 
