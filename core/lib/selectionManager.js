@@ -107,8 +107,8 @@ export class SelectionManager {
   singleSelect(point) {
     const closestItemIndex = this.findClosestItem(point);
     if (closestItemIndex !== undefined) {
-      // this.addToSelectionSet(closestItemIndex);
-      // this.selectionSetChanged();
+      this.addToSelectionSet(closestItemIndex);
+      this.selectionSetChanged();
       const selection = new SingleSelection(closestItemIndex, point);
       return selection;
     }
