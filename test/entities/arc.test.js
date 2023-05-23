@@ -49,6 +49,25 @@ test('Test Arc.endAngle', () => {
   arc = new Arc({points: [new Point(100, 100), new Point(170.71, 170.71), new Point(100, 200)]});
   expect(arc.endAngle()).toBeCloseTo(Math.PI / 2);
 });
+
+test('Test Arc.closestPoint', () => {
+  // clockwise 45 degrees 0 - 45
+  const arc = new Arc({points: [new Point(100, 100), new Point(170.71, 170.71), new Point(200, 100)]});
+  // inside
+  const point1 = new Point(128.3525, 169.4344);
+  const closest1 = arc.closestPoint(point1);
+  expect(closest1[0].x).toBeCloseTo(137.8);
+  expect(closest1[0].y).toBeCloseTo(192.578);
+  expect(closest1[1]).toBeCloseTo(25);
+
+  // outside
+  const point2 = new Point(147.2541, 215.7240);
+  const closest2 = arc.closestPoint(point2);
+  expect(closest2[0].x).toBeCloseTo(137.8);
+  expect(closest2[0].y).toBeCloseTo(192.578);
+  expect(closest2[1]).toBeCloseTo(25);
+});
+
 test('Test Arc.boundingBox', () => {
   // clockwise 45 degrees 45 - 0
   let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
