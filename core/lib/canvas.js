@@ -113,16 +113,17 @@ export class Canvas {
   }
 
   zoomExtents() {
-    const extents = this.core.scene.boundingRect();
+    const extents = this.core.scene.boundingBox();
+
     if (extents) {
       // calculate the center of all items
-      const selectionCenter = new Point(extents.xmin + ((extents.xmax - extents.xmin) / 2), extents.ymin + ((extents.ymax - extents.ymin) / 2));
+      const selectionCenter = new Point(extents.xMin + (extents.xLength / 2), extents.yMin + (extents.yLength / 2));
       // get the center of the screen transformed to a scene position
       const screenCenter = new Point(this.width / 2, this.height / 2);
       // calculate the translation delta required to center on screen
       const translateDelta = this.core.mouse.transformToScene(screenCenter).subtract(selectionCenter);
       // calculate the scale required to fill the screen
-      const targetScale = Math.min((this.width / (extents.xmax - extents.xmin)), (this.height / (extents.ymax - extents.ymin)));
+      const targetScale = Math.min((this.width / extents.xLength), (this.height / extents.yLength));
       // calculate the scale delta required to fill 90% of the screen
       const scaleDelta = targetScale / this.getScale() * 0.9;
       // apply scale
