@@ -2,6 +2,15 @@ import {Point} from '../../core/entities/point';
 import {Text} from '../../core/entities/text';
 
 
+test('Test BasePolyline.closestPoint', () => {
+  const text = new Text({points: [new Point(100, 100)]});
+  const point1 = new Point(90, 90);
+  const closest1 = text.closestPoint(point1);
+  expect(closest1[0].x).toBeCloseTo(105);
+  expect(closest1[0].y).toBeCloseTo(105);
+  expect(closest1[1]).toBeCloseTo(21.21);
+});
+
 test('Test Text.setRotation', () => {
   const setRotText = new Text({points: [new Point()]});
 
@@ -85,4 +94,13 @@ test('Test Text.getRotation', () => {
 
   getRotText.points = [new Point(100, 100), new Point(0, 100)];
   expect(getRotText.getRotation()).toBe(180);
+});
+
+
+test('Test Text.boundingBox', () => {
+  const text = new Text({points: [new Point(11, 12)]});
+  expect(text.boundingBox().xMin).toBeCloseTo(11);
+  expect(text.boundingBox().xMax).toBeCloseTo(21);
+  expect(text.boundingBox().yMin).toBeCloseTo(12);
+  expect(text.boundingBox().yMax).toBeCloseTo(22);
 });

@@ -1,6 +1,27 @@
-// import {Point} from '../../entities/point.js';
-// import {Utils} from '../../lib/utils.js';
-// import {Snapping} from '../../lib/snapping.js';
-// import {Scene} from '../../lib/scene';
+import {Line} from '../../core/entities/line';
+import {Point} from '../../core/entities/point';
+import {Scene} from '../../core/lib/scene.js';
 
-test.todo('Test scene');
+const scene = new Scene();
+
+
+test('Test Scene.boundingBox', () => {
+  // empty scene
+  expect(scene.boundingBox()).toBeUndefined();
+
+  const line1 = new Line({points: [new Point(-102, -102), new Point(201, 202)]});
+  // add to scene (bypass scene.addToScene())
+  scene.items.push(line1);
+  expect(scene.boundingBox().xMin).toBeCloseTo(-102);
+  expect(scene.boundingBox().xMax).toBeCloseTo(201);
+  expect(scene.boundingBox().yMin).toBeCloseTo(-102);
+  expect(scene.boundingBox().yMax).toBeCloseTo(202);
+
+  const line2 = new Line({points: [new Point(1001, -2002), new Point(-2001, 2002)]});
+  // add to scene (bypass scene.addToScene())
+  scene.items.push(line2);
+  expect(scene.boundingBox().xMin).toBeCloseTo(-2001);
+  expect(scene.boundingBox().xMax).toBeCloseTo(1001);
+  expect(scene.boundingBox().yMin).toBeCloseTo(-2002);
+  expect(scene.boundingBox().yMax).toBeCloseTo(2002);
+});

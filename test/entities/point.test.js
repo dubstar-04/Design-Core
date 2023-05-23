@@ -303,6 +303,12 @@ test('Test Point.closestPointOnArc', () => {
   const pt5 = new Point(20, 10);
   const closest3 = pt5.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
   expect(closest3).toBe(null);
+
+  // test circle i.e. start and end points are the same
+  const pt6 = new Point(5, 5);
+  const onCircle = pt6.closestPointOnArc(arc.startPoint, arc.startPoint, arc.centre);
+  expect(onCircle.x).toBe(10);
+  expect(onCircle.y).toBe(10);
 });
 
 

@@ -4,6 +4,7 @@ import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {BoundingBox} from '../lib/boundingBox.js';
 
 export class Circle extends Entity {
   constructor(data) {
@@ -12,7 +13,7 @@ export class Circle extends Entity {
     // add radius property with getter and setter
     // needs to be enumberable to appear in the object props
     Object.defineProperty(this, 'radius', {
-      get: this.bulgeRadius,
+      get: this.getRadius,
       set: this.setRadius,
       enumerable: true,
     });
@@ -63,7 +64,7 @@ export class Circle extends Entity {
     }
   }
 
-  bulgeRadius() {
+  getRadius() {
     return this.points[0].distance(this.points[1]);
   }
 
@@ -153,10 +154,7 @@ export class Circle extends Entity {
 
   closestPoint(P) {
     // find the closest point on the circle
-    const length = this.points[0].distance(P);
-    const Cx = this.points[0].x + this.radius * (P.x - this.points[0].x) / length;
-    const Cy = this.points[0].y + this.radius * (P.y - this.points[0].y) / length;
-    const closest = new Point(Cx, Cy);
+    const closest = P.closestPointOnArc(this.points[1], this.points[1], this.points[0]);
     const distance = closest.distance(P);
 
     return [closest, distance];
@@ -168,6 +166,9 @@ export class Circle extends Entity {
     const ymin = this.points[0].y - this.radius;
     const ymax = this.points[0].y + this.radius;
 
-    return [xmin, xmax, ymin, ymax];
+    const topLeft = new Point(xmin, ymax);
+    const bottomRight = new Point(xmax, ymin);
+
+    return new BoundingBox(topLeft, bottomRight);
   }
 }

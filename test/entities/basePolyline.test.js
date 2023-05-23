@@ -1,6 +1,59 @@
 import {BasePolyline} from '../../core/entities/basePolyline';
 import {Point} from '../../core/entities/point';
 
+
+test('Test BasePolyline.closestPoint', () => {
+  const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
+  points[1].bulge = -1;
+  const polyline = new BasePolyline({points: points});
+  // line segment
+  const point1 = new Point(150, 85);
+  const closest1 = polyline.closestPoint(point1);
+  expect(closest1[0].x).toBeCloseTo(150);
+  expect(closest1[0].y).toBeCloseTo(100);
+  expect(closest1[1]).toBeCloseTo(15);
+
+  // arc segment
+  const point2 = new Point(210, 65);
+  const closest2 = polyline.closestPoint(point2);
+  expect(closest2[0].x).toBeCloseTo(217.6777);
+  expect(closest2[0].y).toBeCloseTo(57.3223);
+  expect(closest2[1]).toBeCloseTo(10.857);
+});
+
+test('Test BasePolyline.boundingBox', () => {
+  let polyline = new BasePolyline({points: [new Point(101, 102), new Point(201, 202)]});
+  expect(polyline.boundingBox().xMin).toBeCloseTo(101);
+  expect(polyline.boundingBox().xMax).toBeCloseTo(201);
+  expect(polyline.boundingBox().yMin).toBeCloseTo(102);
+  expect(polyline.boundingBox().yMax).toBeCloseTo(202);
+
+  polyline = new BasePolyline({points: [new Point(101, 102), new Point(-201, 202)]});
+  expect(polyline.boundingBox().xMin).toBeCloseTo(-201);
+  expect(polyline.boundingBox().xMax).toBeCloseTo(101);
+  expect(polyline.boundingBox().yMin).toBeCloseTo(102);
+  expect(polyline.boundingBox().yMax).toBeCloseTo(202);
+
+
+  let points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
+  // set the bulge
+  points[1].bulge = -1;
+  polyline = new BasePolyline({points: points});
+  expect(polyline.boundingBox().xMin).toBeCloseTo(101);
+  expect(polyline.boundingBox().xMax).toBeCloseTo(251);
+  expect(polyline.boundingBox().yMin).toBeCloseTo(0);
+  expect(polyline.boundingBox().yMax).toBeCloseTo(102);
+
+  points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
+  // set the bulge
+  points[1].bulge = -1;
+  polyline = new BasePolyline({points: points});
+  expect(polyline.boundingBox().xMin).toBeCloseTo(101);
+  expect(polyline.boundingBox().xMax).toBeCloseTo(251);
+  expect(polyline.boundingBox().yMin).toBeCloseTo(0);
+  expect(polyline.boundingBox().yMax).toBeCloseTo(102);
+});
+
 test('Test BasePolyline.getBulgeFromSegment', () => {
   // start point: 100,0
   // center: 100,50

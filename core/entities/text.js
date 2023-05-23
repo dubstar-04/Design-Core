@@ -5,6 +5,7 @@ import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {BoundingBox} from '../lib/boundingBox.js';
 
 export class Text extends Entity {
   constructor(data) {
@@ -333,11 +334,16 @@ export class Text extends Entity {
 
   boundingBox() {
     const rect = this.getBoundingRect();
+
     const xmin = rect.x;
     const xmax = rect.x + rect.width;
     const ymin = rect.y;
     const ymax = rect.y + rect.height;
-    return [xmin, xmax, ymin, ymax];
+
+    const topLeft = new Point(xmin, ymax);
+    const bottomRight = new Point(xmax, ymin);
+
+    return new BoundingBox(topLeft, bottomRight);
   }
 
   intersectPoints() {

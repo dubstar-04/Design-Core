@@ -5,6 +5,7 @@ import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {BoundingBox} from '../lib/boundingBox.js';
 
 export class Line extends Entity {
   constructor(data) {
@@ -276,11 +277,6 @@ export class Line extends Entity {
   }
 
   boundingBox() {
-    const xmin = Math.min(this.points[0].x, this.points[1].x);
-    const xmax = Math.max(this.points[0].x, this.points[1].x);
-    const ymin = Math.min(this.points[0].y, this.points[1].y);
-    const ymax = Math.max(this.points[0].y, this.points[1].y);
-
-    return [xmin, xmax, ymin, ymax];
+    return BoundingBox.lineBoundingBox(this.points[0], this.points[1]);
   }
 }

@@ -191,7 +191,7 @@ export class Point {
   }
 
   /**
-   * Find the closest arc on a line between start and end points
+   * Find the closest point on a arc between start and end points
    * @param {Point} startPoint
    * @param {Point} endPoint
    * @param {Point} centerPoint
@@ -205,6 +205,11 @@ export class Point {
     const Cx = centerPoint.x + radius * (this.x - centerPoint.x) / length;
     const Cy = centerPoint.y + radius * (this.y - centerPoint.y) / length;
     const closest = new Point(Cx, Cy);
+
+    // circle
+    if (startPoint.isSame(endPoint)) {
+      return closest;
+    }
 
     if (closest.isOnArc(startPoint, endPoint, centerPoint, direction)) {
       return closest;

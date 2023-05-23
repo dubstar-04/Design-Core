@@ -99,21 +99,22 @@ export class Entity {
 
   within(selectionExtremes, core) {
     const layer = core.layerManager.getLayerByName(this.layer);
+
     if (!layer.isSelectable) {
       return;
     }
 
     // determin if this entities is within a the window specified by selectionExtremes
-    const extremePoints = this.boundingBox();
-    if ( extremePoints[0] > selectionExtremes[0] &&
-         extremePoints[1] < selectionExtremes[1] &&
-         extremePoints[2] > selectionExtremes[2] &&
-         extremePoints[3] < selectionExtremes[3]
+    const boundingBox = this.boundingBox();
+    if ( boundingBox.xMin > selectionExtremes[0] &&
+          boundingBox.xMax < selectionExtremes[1] &&
+          boundingBox.yMin > selectionExtremes[2] &&
+          boundingBox.yMax < selectionExtremes[3]
     ) {
       return true;
-    } else {
-      return false;
     }
+
+    return false;
   }
 
   touched(selectionExtremes, core) {

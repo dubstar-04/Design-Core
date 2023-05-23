@@ -1,3 +1,4 @@
+import {BoundingBox} from '../lib/boundingBox.js';
 
 export class Insert {
   constructor(data) {
@@ -64,7 +65,7 @@ export class Insert {
   }
 
   boundingBox() {
-    return [];
+    return new BoundingBox();
   }
 
   touched(selectionExtremes, core) {

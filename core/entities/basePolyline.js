@@ -4,6 +4,8 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {Utils} from '../lib/utils.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {BoundingBox} from '../lib/boundingBox.js';
+import {Point} from './point.js';
 
 export class BasePolyline extends Entity {
   constructor(data) {
@@ -259,20 +261,29 @@ export class BasePolyline extends Entity {
   }
 
   boundingBox() {
-    const xValues = [];
-    const yValues = [];
+    let xmin; let xmax; let ymin; let ymax;
 
     for (let i = 0; i < this.points.length; i++) {
-      xValues.push(this.points[i].x);
-      yValues.push(this.points[i].y);
+      const nextPoint = this.points[i + 1] || this.points[0];
+
+      let boundingBox = BoundingBox.lineBoundingBox(this.points[i], nextPoint);
+
+      if (this.points[i].bulge !== 0) {
+        const centerPoint = this.points[i].bulgeCentrePoint(nextPoint);
+        boundingBox = BoundingBox.arcBoundingBox(centerPoint, this.points[i], nextPoint, this.points[i].bulge);
+      }
+
+      xmin = Math.min(xmin || Infinity, boundingBox.xMin);
+      xmax = Math.max(xmax || -Infinity, boundingBox.xMax);
+      ymin = Math.min(ymin || Infinity, boundingBox.yMin);
+      ymax = Math.max(ymax || -Infinity, boundingBox.yMax);
     }
 
-    const xmin = Math.min(...xValues);
-    const xmax = Math.max(...xValues);
-    const ymin = Math.min(...yValues);
-    const ymax = Math.max(...yValues);
 
-    return [xmin, xmax, ymin, ymax];
+    const topLeft = new Point(xmin, ymax);
+    const bottomRight = new Point(xmax, ymin);
+
+    return new BoundingBox(topLeft, bottomRight);
   }
 
   /**
