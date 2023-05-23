@@ -39,6 +39,16 @@ test('Test Arc.startAngle', () => {
   arc = new Arc({points: [new Point(100, 100), new Point(170.71, 170.71), new Point(100, 200)]});
   expect(arc.startAngle()).toBeCloseTo(Math.PI / 4);
 });
+
+test('Test Arc.endAngle', () => {
+  // clockwise 45 degrees 0 - 45
+  let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
+  expect(arc.endAngle()).toBe(Math.PI / 4);
+
+  // clockwise 45 degrees 45 - 90
+  arc = new Arc({points: [new Point(100, 100), new Point(170.71, 170.71), new Point(100, 200)]});
+  expect(arc.endAngle()).toBeCloseTo(Math.PI / 2);
+});
 test('Test Arc.boundingBox', () => {
   // clockwise 45 degrees 45 - 0
   let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
