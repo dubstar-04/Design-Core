@@ -11,3 +11,9 @@ test('Test Entity.getColour', () => {
   const entity = new Entity();
   expect(entity.getColour(core)).toBe('#00BFFF');
 });
+
+test('Test Entity.getLineType', () => {
+  const entity = new Entity();
+  expect(entity.getLineType(core).name).toBe('CONTINUOUS');
+});
+
