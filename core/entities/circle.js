@@ -4,6 +4,7 @@ import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {BoundingBox} from '../lib/boundingBox.js';
 
 export class Circle extends Entity {
   constructor(data) {
@@ -168,6 +169,9 @@ export class Circle extends Entity {
     const ymin = this.points[0].y - this.radius;
     const ymax = this.points[0].y + this.radius;
 
-    return [xmin, xmax, ymin, ymax];
+    const topLeft = new Point(xmin, ymax);
+    const bottomRight = new Point(xmax, ymin);
+
+    return new BoundingBox(topLeft, bottomRight);
   }
 }
