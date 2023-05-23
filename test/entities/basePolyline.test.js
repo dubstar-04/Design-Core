@@ -2,6 +2,25 @@ import {BasePolyline} from '../../core/entities/basePolyline';
 import {Point} from '../../core/entities/point';
 
 
+test('Test BasePolyline.closestPoint', () => {
+  const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
+  points[1].bulge = -1;
+  const polyline = new BasePolyline({points: points});
+  // line segment
+  const point1 = new Point(150, 85);
+  const closest1 = polyline.closestPoint(point1);
+  expect(closest1[0].x).toBeCloseTo(150);
+  expect(closest1[0].y).toBeCloseTo(100);
+  expect(closest1[1]).toBeCloseTo(15);
+
+  // arc segment
+  const point2 = new Point(210, 65);
+  const closest2 = polyline.closestPoint(point2);
+  expect(closest2[0].x).toBeCloseTo(217.6777);
+  expect(closest2[0].y).toBeCloseTo(57.3223);
+  expect(closest2[1]).toBeCloseTo(10.857);
+});
+
 test('Test BasePolyline.boundingBox', () => {
   let polyline = new BasePolyline({points: [new Point(101, 102), new Point(201, 202)]});
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
