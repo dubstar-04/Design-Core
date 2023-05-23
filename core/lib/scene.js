@@ -3,6 +3,8 @@ import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 import {InputManager} from './inputManager.js';
 import {DXFFile} from './dxf/dxfFile.js';
+import {BoundingBox} from './boundingBox.js';
+import {Point} from '../entities/point.js';
 
 export class Scene {
   constructor(core) {
@@ -29,10 +31,10 @@ export class Scene {
   }
 
   /**
-   * Get the scene bounding rect
-   * @returns scene bounding rect
+   * Get the scene bounding box
+   * @returns scene bounding box
    */
-  boundingRect() {
+  boundingBox() {
     let xmin; let xmax; let ymin; let ymax;
 
     if (this.items.length === 0) {
@@ -40,11 +42,12 @@ export class Scene {
     }
 
     for (let i = 0; i < this.items.length; i++) {
-      const extremes = this.items[i].boundingBox();
-      xmin = (xmin === undefined) ? extremes[0] : (extremes[0] < xmin) ? extremes[0] : xmin;
-      xmax = (xmax === undefined) ? extremes[1] : (extremes[1] > xmax) ? extremes[1] : xmax;
-      ymin = (ymin === undefined) ? extremes[2] : (extremes[2] < ymin) ? extremes[2] : ymin;
-      ymax = (ymax === undefined) ? extremes[3] : (extremes[3] > ymax) ? extremes[3] : ymax;
+      const itemBoundingBox = this.items[i].boundingBox();
+
+      xmin = Math.min(xmin || Infinity, itemBoundingBox.xMin);
+      xmax = Math.max(xmax || -Infinity, itemBoundingBox.xMax);
+      ymin = Math.min(ymin || Infinity, itemBoundingBox.yMin);
+      ymax = Math.max(ymax || -Infinity, itemBoundingBox.yMax);
     }
 
     // if all values are zero return undefined
@@ -52,12 +55,7 @@ export class Scene {
       return;
     }
 
-    return {
-      xmin: xmin,
-      xmax: xmax,
-      ymin: ymin,
-      ymax: ymax,
-    };
+    return new BoundingBox(new Point(xmin, ymin), new Point(xmax, ymax));
   }
 
   /**
@@ -134,7 +132,7 @@ export class Scene {
     let viewCenterX = 0;
     let viewCenterY = 0;
 
-    const extents = this.boundingRect();
+    const extents = this.boundingBox();
 
     if (extents) {
       width = extents.xmax - extents.xmin;
