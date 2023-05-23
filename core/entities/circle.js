@@ -12,7 +12,7 @@ export class Circle extends Entity {
     // add radius property with getter and setter
     // needs to be enumberable to appear in the object props
     Object.defineProperty(this, 'radius', {
-      get: this.bulgeRadius,
+      get: this.getRadius,
       set: this.setRadius,
       enumerable: true,
     });
@@ -63,7 +63,7 @@ export class Circle extends Entity {
     }
   }
 
-  bulgeRadius() {
+  getRadius() {
     return this.points[0].distance(this.points[1]);
   }
 
