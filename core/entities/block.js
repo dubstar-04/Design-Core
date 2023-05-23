@@ -1,6 +1,7 @@
 import {Point} from './point.js';
 import {Entity} from './entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {BoundingBox} from '../lib/boundingBox.js';
 
 export class Block extends Entity {
   constructor(data) {
@@ -197,21 +198,24 @@ export class Block extends Entity {
   }
 
   boundingBox() {
-    let xmin = 0;
-    let xmax = 0;
-    let ymin = 0;
-    let ymax = 0;
+    let xmin;
+    let xmax;
+    let ymin;
+    let ymax;
 
     for (let idx = 0; idx < this.items.length; idx++) {
-      const itemExtremes = this.items[idx].boundingBox();
+      const itemBoundingBox = this.items[idx].boundingBox();
 
-      xmin = Math.min(xmin, itemExtremes[0]);
-      xmax = Math.max(xmax, itemExtremes[1]);
-      ymin = Math.min(ymin, itemExtremes[2]);
-      ymax = Math.max(ymax, itemExtremes[3]);
+      xmin = Math.min(xmin || Infinity, itemBoundingBox.xMin);
+      xmax = Math.max(xmax || -Infinity, itemBoundingBox.xMax);
+      ymin = Math.min(ymin || Infinity, itemBoundingBox.yMin);
+      ymax = Math.max(ymax || -Infinity, itemBoundingBox.yMax);
     }
 
-    return [xmin, xmax, ymin, ymax];
+    const topLeft = new Point(xmin, ymax);
+    const bottomRight = new Point(xmax, ymin);
+
+    return new BoundingBox(topLeft, bottomRight);
   }
 
   touched(selectionExtremes, core) {
