@@ -206,6 +206,11 @@ export class Point {
     const Cy = centerPoint.y + radius * (this.y - centerPoint.y) / length;
     const closest = new Point(Cx, Cy);
 
+    // circle
+    if (startPoint.isSame(endPoint)) {
+      return closest;
+    }
+
     if (closest.isOnArc(startPoint, endPoint, centerPoint, direction)) {
       return closest;
     }
