@@ -191,7 +191,7 @@ export class Point {
   }
 
   /**
-   * Find the closest arc on a line between start and end points
+   * Find the closest point on a arc between start and end points
    * @param {Point} startPoint
    * @param {Point} endPoint
    * @param {Point} centerPoint
