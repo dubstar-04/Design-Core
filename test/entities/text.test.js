@@ -86,3 +86,12 @@ test('Test Text.getRotation', () => {
   getRotText.points = [new Point(100, 100), new Point(0, 100)];
   expect(getRotText.getRotation()).toBe(180);
 });
+
+
+test('Test Text.boundingBox', () => {
+  const text = new Text({points: [new Point(11, 12)]});
+  expect(text.boundingBox().xMin).toBeCloseTo(11);
+  expect(text.boundingBox().xMax).toBeCloseTo(21);
+  expect(text.boundingBox().yMin).toBeCloseTo(12);
+  expect(text.boundingBox().yMax).toBeCloseTo(22);
+});
