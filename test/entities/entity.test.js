@@ -17,3 +17,11 @@ test('Test Entity.getLineType', () => {
   expect(entity.getLineType(core).name).toBe('CONTINUOUS');
 });
 
+test('Test Entity.Within', () => {
+  const entity = new Line({points: [new Point(100, 100), new Point(200, 200)]});
+  const selectionExtremesFalse = [101, 199, 101, 199];
+  const selectionExtremesTrue = [99, 201, 99, 201];
+
+  expect(entity.within(selectionExtremesFalse, core)).toBe(false);
+  expect(entity.within(selectionExtremesTrue, core)).toBe(true);
+});
