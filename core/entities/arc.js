@@ -5,6 +5,7 @@ import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {BoundingBox} from '../lib/boundingBox.js';
 
 
 export class Arc extends Entity {
@@ -184,23 +185,11 @@ export class Arc extends Entity {
     return [P, Infinity, false];
   }
 
+  /**
+   * Return boundingbox
+   * @returns BoundingBox
+   */
   boundingBox() {
-    const xValues = [];
-    const yValues = [];
-
-    xValues.push(this.radius * Math.cos(this.startAngle()) + this.points[0].x);
-    yValues.push(this.radius * Math.sin(this.startAngle()) + this.points[0].y);
-    xValues.push(this.radius * Math.cos(this.endAngle()) + this.points[0].x);
-    yValues.push(this.radius * Math.sin(this.endAngle()) + this.points[0].y);
-
-    xValues.push((xValues[0] + xValues[1]) / 2);
-    yValues.push((yValues[0] + yValues[1]) / 2);
-
-    const xmin = Math.min(...xValues);
-    const xmax = Math.max(...xValues);
-    const ymin = Math.min(...yValues);
-    const ymax = Math.max(...yValues);
-
-    return [xmin, xmax, ymin, ymax];
+    return BoundingBox.arcBoundingBox(this.points[0], this.points[1], this.points[2], this.direction);
   }
 }
