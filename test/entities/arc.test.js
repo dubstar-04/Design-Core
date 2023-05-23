@@ -1,4 +1,6 @@
 import {Core} from '../../core/core.js';
+import {Arc} from '../../core/entities/arc.js';
+import {Point} from '../../core/entities/point.js';
 
 const core = new Core();
 const commandline = core.commandLine;
@@ -26,6 +28,16 @@ test('Test Arc.execute', () => {
   // commented out because it fails. looks like the commands above run before the execute command because its async
   // need to await enter pressed or similar without affecting user experience
   // expect(core.scene.items.length).toBe(1),
+});
+
+test('Test Arc.startAngle', () => {
+  // clockwise 45 degrees 0 - 45
+  let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
+  expect(arc.startAngle()).toBe(0);
+
+  // clockwise 45 degrees 45 - 90
+  arc = new Arc({points: [new Point(100, 100), new Point(170.71, 170.71), new Point(100, 200)]});
+  expect(arc.startAngle()).toBeCloseTo(Math.PI / 4);
 });
 test('Test Arc.boundingBox', () => {
   // clockwise 45 degrees 45 - 0
