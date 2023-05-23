@@ -154,10 +154,7 @@ export class Circle extends Entity {
 
   closestPoint(P) {
     // find the closest point on the circle
-    const length = this.points[0].distance(P);
-    const Cx = this.points[0].x + this.radius * (P.x - this.points[0].x) / length;
-    const Cy = this.points[0].y + this.radius * (P.y - this.points[0].y) / length;
-    const closest = new Point(Cx, Cy);
+    const closest = P.closestPointOnArc(this.points[1], this.points[1], this.points[0]);
     const distance = closest.distance(P);
 
     return [closest, distance];
