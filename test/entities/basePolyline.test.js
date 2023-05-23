@@ -1,6 +1,40 @@
 import {BasePolyline} from '../../core/entities/basePolyline';
 import {Point} from '../../core/entities/point';
 
+
+test('Test BasePolyline.boundingBox', () => {
+  let polyline = new BasePolyline({points: [new Point(101, 102), new Point(201, 202)]});
+  expect(polyline.boundingBox().xMin).toBeCloseTo(101);
+  expect(polyline.boundingBox().xMax).toBeCloseTo(201);
+  expect(polyline.boundingBox().yMin).toBeCloseTo(102);
+  expect(polyline.boundingBox().yMax).toBeCloseTo(202);
+
+  polyline = new BasePolyline({points: [new Point(101, 102), new Point(-201, 202)]});
+  expect(polyline.boundingBox().xMin).toBeCloseTo(-201);
+  expect(polyline.boundingBox().xMax).toBeCloseTo(101);
+  expect(polyline.boundingBox().yMin).toBeCloseTo(102);
+  expect(polyline.boundingBox().yMax).toBeCloseTo(202);
+
+
+  let points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
+  // set the bulge
+  points[1].bulge = -1;
+  polyline = new BasePolyline({points: points});
+  expect(polyline.boundingBox().xMin).toBeCloseTo(101);
+  expect(polyline.boundingBox().xMax).toBeCloseTo(251);
+  expect(polyline.boundingBox().yMin).toBeCloseTo(0);
+  expect(polyline.boundingBox().yMax).toBeCloseTo(102);
+
+  points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
+  // set the bulge
+  points[1].bulge = -1;
+  polyline = new BasePolyline({points: points});
+  expect(polyline.boundingBox().xMin).toBeCloseTo(101);
+  expect(polyline.boundingBox().xMax).toBeCloseTo(251);
+  expect(polyline.boundingBox().yMin).toBeCloseTo(0);
+  expect(polyline.boundingBox().yMax).toBeCloseTo(102);
+});
+
 test('Test BasePolyline.getBulgeFromSegment', () => {
   // start point: 100,0
   // center: 100,50
