@@ -12,13 +12,12 @@ export class Arc extends Entity {
     super(data);
     this.radius = 1;
 
-    // direction: ccw => 1, cw =< 1
+    // direction: - ccw > 0, cw < 0
     Object.defineProperty(this, 'direction', {
       enumerable: false,
       value: 1,
       writable: true,
     });
-
 
     if (data) {
       if (data.points || data[40]) {
@@ -41,6 +40,12 @@ export class Arc extends Entity {
         // DXF Groupcode 51 - End Angle
         const angle = Utils.degrees2radians(data.endAngle || data[51]);
         this.points[2] = this.points[0].project(angle, this.radius);
+      }
+
+      if (data.hasOwnProperty('direction')) {
+        // No DXF Groupcode - Arc Direction
+        const direction = data.direction;
+        this.direction = direction;
       }
     }
   }
