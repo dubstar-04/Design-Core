@@ -243,6 +243,7 @@ export class Canvas {
       context.strokeStyle = colour;
       context.fillStyle = colour;
       context.lineWidth = lineWidth;
+      context.setLineDash(lineType.getPattern(this.getScale()));
       context.beginPath();
     } catch { // Cairo
       const rgbColour = Colours.hexToScaledRGB(colour);

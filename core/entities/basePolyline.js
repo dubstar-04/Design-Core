@@ -131,12 +131,15 @@ export class BasePolyline extends Entity {
         const centerPoint = this.points[i].bulgeCentrePoint(nextPoint);
         const radius = this.points[i].bulgeRadius(nextPoint);
 
-
         if (this.points[i].bulge > 0) {
           // TODO: make this work with canvas
           ctx.arc(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
         } else {
-          ctx.arcNegative(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
+          try { // HTML
+            ctx.arc(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint), true);
+          } catch { // Cairo
+            ctx.arcNegative(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
+          }
         }
 
         // debug centerpoint
