@@ -32,6 +32,8 @@ export class SelectionWindow {
     const colour = this.colour;
     ctx.fillStyle = colour;
 
+    const scaledPattern = this.dashPattern.map((x) => x / scale);
+
     try { // HTML Canvas
       ctx.strokeStyle = colour;
       ctx.lineWidth = this.lineWidth / scale;
@@ -42,6 +44,7 @@ export class SelectionWindow {
       ctx.fillRect(this.points[0].x, this.points[0].y, width, height);
       ctx.globalAlpha = 1.0;
       this.drawRect(ctx);
+      ctx.setLineDash(scaledPattern);
       ctx.stroke();
     } catch { // Cairo
       ctx.setLineWidth(this.lineWidth / scale);
@@ -50,7 +53,7 @@ export class SelectionWindow {
       this.drawRect(ctx);
       ctx.fillPreserve();
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-      const scaledPattern = this.dashPattern.map((x) => x / scale);
+
       ctx.setDash(scaledPattern, 1);
       ctx.stroke();
     }
