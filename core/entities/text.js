@@ -251,7 +251,7 @@ export class Text extends Entity {
     try { // HTML
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      // ctx.font = this.height + 'pt ' + core.styleManager.getStyleByName(this.styleName).font.toString();
+      ctx.font = this.height + 'pt Arial'; // + core.styleManager.getStyleByName(this.styleName).font.toString();
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
