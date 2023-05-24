@@ -246,7 +246,7 @@ export class InputManager {
    * Handle single selection
    */
   singleSelect() {
-    log('single select');
+    console.log('single select');
     const point = this.core.mouse.pointOnScene();
     this.onLeftClick(point);
   }
@@ -255,7 +255,7 @@ export class InputManager {
    * Handle window selection
    */
   windowSelect() {
-    log('window select');
+    console.log('window select');
     this.core.scene.selectionManager.windowSelect();
   }
 
