@@ -78,10 +78,9 @@ export class LType {
 
     file.writeGroupCode('40', patternLength);
 
-      for (let i = 0; i < this.pattern.length; i++) {
-        file.writeGroupCode('49', this.pattern[i]);
-        file.writeGroupCode('74', '0');
-      }
+    for (let i = 0; i < this.pattern.length; i++) {
+      file.writeGroupCode('49', this.pattern[i]);
+      file.writeGroupCode('74', '0', DXFFile.Version.R2000);
     }
   }
 }
