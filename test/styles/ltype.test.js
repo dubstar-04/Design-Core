@@ -1,10 +1,5 @@
-import {Core} from '../../core/core.js';
 import {DXFFile} from '../../core/lib/dxf/dxfFile.js';
 import {LType} from '../../core/styles/ltype.js';
-import {StyleManagerBase} from '../../core/styles/styleManagerBase.js';
-
-// const core = new Core();
-// const styleManager = new StyleManagerBase(core);
 
 const file = new DXFFile();
 const R12File = new DXFFile('R12');
