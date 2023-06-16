@@ -1,8 +1,60 @@
+import {Logging} from '../logging.js';
+import {Strings} from '../strings.js';
+
 export class DXFFile {
-  constructor() {
+  constructor(version='R2018') {
     this.contents = '';
-    this.version = DXFFile.Version.R12;
+
+    // Validate version
+    if (DXFFile.Version.hasOwnProperty(version) === false) {
+      throw Error('Invalid Version');
+    }
+
+    this.version = DXFFile.Version[version];
     this.handleCounter = 10;
+  }
+
+  /**
+   * Check if a dxf version is valid - 'AC1009' = valid, R12 = not valid
+   * @param {string} version
+   * @returns boolean - true if version is valid
+   */
+  static validDxfVersion(version) {
+    if (Object.values(DXFFile.Version).indexOf(version) === -1) {
+      return false;
+    }
+    return true;
+  }
+
+
+  /**
+   * Check if a dxf key is valid - R12 = valid, 'AC1009' = not valid
+   * @param {string} key
+   * @returns boolean - true if version is valid
+   */
+  static validDxfKey(key) {
+    if (Object.keys(DXFFile.Version).indexOf(key) === -1) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Return the dxf key for the dxf version e.g key = R12 version = 'AC1009
+   * @param {*} dxfVersion
+   * @returns dxf key (R Number) for valid dxf versions
+   */
+  static getVersionKey(dxfVersion) {
+    if (DXFFile.validDxfVersion(dxfVersion)) {
+      const key = Object.keys(DXFFile.Version).find((key) => DXFFile.Version[key] === dxfVersion);
+      if (DXFFile.validDxfKey(key)) {
+        return key;
+      }
+    }
+
+    // dxfVersion is invalid or unsupported
+    Logging.instance.error(` ${Strings.Error.INVALIDDXFFORMAT} - ${dxfVersion}`);
+    throw Error(Strings.Error.INVALIDDXFFORMAT);
   }
 
   /**
