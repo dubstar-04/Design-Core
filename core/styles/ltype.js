@@ -68,14 +68,15 @@ export class LType {
     file.writeGroupCode('72', 65); // Alignment code; value is always 65, the ASCII code for A
     file.writeGroupCode('73', this.pattern.length);
 
-    if (this.pattern.length) {
-      file.writeGroupCode('73', this.pattern.length);
+    let patternLength = 0;
 
-      const patternLength = this.pattern.reduce(
+    if (this.pattern.length) {
+      patternLength = this.pattern.reduce(
           (accumulator, patternValue) => accumulator + Math.abs(patternValue),
       );
+    }
 
-      file.writeGroupCode('40', patternLength);
+    file.writeGroupCode('40', patternLength);
 
       for (let i = 0; i < this.pattern.length; i++) {
         file.writeGroupCode('49', this.pattern[i]);
