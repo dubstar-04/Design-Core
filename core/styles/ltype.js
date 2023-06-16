@@ -66,6 +66,7 @@ export class LType {
     file.writeGroupCode('70', this.flags);
     file.writeGroupCode('3', this.description);
     file.writeGroupCode('72', 65); // Alignment code; value is always 65, the ASCII code for A
+    file.writeGroupCode('73', this.pattern.length);
 
     if (this.pattern.length) {
       file.writeGroupCode('73', this.pattern.length);
