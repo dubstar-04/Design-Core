@@ -18,6 +18,9 @@ export class Scene {
 
     this.selectionManager = new SelectionManager(core);
     this.inputManager = new InputManager(core);
+
+    // store the version of dxf that is currently being used
+    this.dxfVersion = 'R2018';
   }
 
   /**
