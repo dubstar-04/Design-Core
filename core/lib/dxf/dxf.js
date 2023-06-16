@@ -48,9 +48,10 @@ export class DXF {
       const version = header['$ACADVER'];
       if (version.hasOwnProperty('1')) {
         const versionNumber = version['1'];
-        // TODO: Check this is a valid and supported version
-        // TODO: save the version number to output the same version
-        console.log('version:', versionNumber);
+        // pass the version to core
+        const versionKey = DXFFile.getVersionKey(versionNumber);
+        Logging.instance.debug(`Opening DXF Version: ${versionKey}`);
+        core.dxfVersion = versionNumber;
       }
     }
   }
