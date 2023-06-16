@@ -69,8 +69,10 @@ export class Core {
    * Save the current scene to a dxf string
    * @return {string} The dxf file as a string.
    */
-  saveFile() {
-    return FileIO.saveDxf(this);
+  saveFile(version) {
+    return FileIO.saveDxf(this, version);
+  }
+
   /**
    * Return the supported dxf versions
    * @returns array js object containing the version
