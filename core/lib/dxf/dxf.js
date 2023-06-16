@@ -1,5 +1,6 @@
 import {DXFReader} from './dxfRead.js';
 import {DXFWriter} from './dxfWrite.js';
+import {DXFFile} from './dxfFile.js';
 import {Point} from '../../entities/point.js';
 import {Strings} from '../strings.js';
 import {Logging} from '../logging.js';
@@ -15,9 +16,9 @@ export class DXF {
     this.reader.read(data);
   }
 
-  write(core) {
+  write(core, version) {
     const writer = new DXFWriter();
-    const data = writer.write(core);
+    const data = writer.write(core, version);
     return data;
   }
 
