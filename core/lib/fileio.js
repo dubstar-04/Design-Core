@@ -3,9 +3,9 @@ import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 
 export class FileIO {
-  static saveDxf(core) {
+  static saveDxf(core, version) {
     const dxfWriter = new DXF();
-    const data = dxfWriter.write(core);
+    const data = dxfWriter.write(core, version);
     return data;
   }
 
