@@ -135,10 +135,10 @@ export class Scene {
     const extents = this.boundingBox();
 
     if (extents) {
-      width = extents.xmax - extents.xmin;
-      height = extents.ymax - extents.ymin;
-      viewCenterX = extents.xmin + width / 2;
-      viewCenterY = extents.ymin + height / 2;
+      width = extents.xLength;
+      height = extents.yLength;
+      viewCenterX = extents.xMin + width / 2;
+      viewCenterY = extents.yMin + height / 2;
     }
 
     file.writeGroupCode('0', 'TABLE');
