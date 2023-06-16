@@ -179,8 +179,11 @@ export class DXFWriter {
    * @param {object} core
    * @returns dxf formatted string formatted
    */
-  write(core) {
-    const file = new DXFFile();
+  write(core, version) {
+    if (version === undefined) {
+      version = core.dxfVersion;
+    }
+    const file = new DXFFile(version);
     // write start of file
     file.writeGroupCode('999', 'DXF created from Design-Core');
 

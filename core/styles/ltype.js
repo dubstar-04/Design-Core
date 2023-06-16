@@ -65,20 +65,22 @@ export class LType {
     file.writeGroupCode('2', this.name);
     file.writeGroupCode('70', this.flags);
     file.writeGroupCode('3', this.description);
+    file.writeGroupCode('72', 65); // Alignment code; value is always 65, the ASCII code for A
+    file.writeGroupCode('73', this.pattern.length);
+
+    let patternLength = 0;
 
     if (this.pattern.length) {
-      file.writeGroupCode('73', this.pattern.length);
-
-      const patternLength = this.pattern.reduce(
+      patternLength = this.pattern.reduce(
           (accumulator, patternValue) => accumulator + Math.abs(patternValue),
       );
+    }
 
-      file.writeGroupCode('40', patternLength);
+    file.writeGroupCode('40', patternLength);
 
-      for (let i = 0; i < this.pattern.length; i++) {
-        file.writeGroupCode('49', this.pattern[i]);
-        file.writeGroupCode('74', '0');
-      }
+    for (let i = 0; i < this.pattern.length; i++) {
+      file.writeGroupCode('49', this.pattern[i]);
+      file.writeGroupCode('74', '0', DXFFile.Version.R2000);
     }
   }
 }

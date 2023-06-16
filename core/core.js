@@ -11,7 +11,7 @@ import {PropertyManager} from './properties/propertyManager.js';
 
 import {FileIO} from './lib/fileio.js';
 import {Settings} from './lib/settings.js';
-
+import {DXFFile} from './lib/dxf/dxfFile.js';
 
 /** Class representing design core. This is the primary entry point */
 export class Core {
@@ -34,6 +34,31 @@ export class Core {
 
     // function to call external notification command for the ui
     this.externalNotifyCallbackFunction;
+  }
+
+  /**
+   * Get the current dxf version
+   */
+  get dxfVersion() {
+    return this.scene.dxfVersion;
+  }
+
+  /**
+   * Set the current dxf version
+   */
+  set dxfVersion(version) {
+    // version should be the RXXXX format for the dxf version
+
+    // Check if we have the ACXXXX value
+    if (DXFFile.validDxfVersion(version)) {
+      // convert the ACXXXX value to the key RXXXX value
+      version = DXFFile.getVersionKey(version);
+    }
+
+    // Check if we have the RXXXX value
+    if (DXFFile.validDxfKey(version)) {
+      this.scene.dxfVersion = version;
+    }
   }
 
   /**
@@ -69,7 +94,15 @@ export class Core {
    * Save the current scene to a dxf string
    * @return {string} The dxf file as a string.
    */
-  saveFile() {
-    return FileIO.saveDxf(this);
+  saveFile(version) {
+    return FileIO.saveDxf(this, version);
+  }
+
+  /**
+   * Return the supported dxf versions
+   * @returns array js object containing the version
+   */
+  supportedDXFVersions() {
+    return DXFFile.Version;
   }
 }
