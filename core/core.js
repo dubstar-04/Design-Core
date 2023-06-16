@@ -71,5 +71,11 @@ export class Core {
    */
   saveFile() {
     return FileIO.saveDxf(this);
+  /**
+   * Return the supported dxf versions
+   * @returns array js object containing the version
+   */
+  supportedDXFVersions() {
+    return DXFFile.Version;
   }
 }
