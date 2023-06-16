@@ -5,6 +5,7 @@ export class Strings {
     FILEOPEN: 'Error opening file',
     INPUT: 'Incorrect input',
     INVALIDFILE: 'Invalid File',
+    INVALIDDXFFORMAT: 'Invalid DXF Format',
     INVALIDPOINT: 'Invalid Point Data',
     INVALIDGROUPCODE: 'Invalid DXF Groupcode',
     INVALIDNUMBER: 'Invalid Number',
