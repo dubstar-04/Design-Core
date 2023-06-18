@@ -16,6 +16,7 @@ export class Strings {
   // Warning Strings
   static Warning = {
     WARNING: 'Warning',
+    UNSUPPORTEDENTITIES: 'File contains unsupported entities',
   };
 
   // Message Strings
