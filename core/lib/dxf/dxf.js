@@ -149,7 +149,7 @@ export class DXF {
     if (core.commandManager.isCommand(command)) {
       core.scene.addToScene(command, item);
     } else {
-      Logger.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
+      Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
     }
   }
 
