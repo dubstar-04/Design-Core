@@ -9,6 +9,9 @@ export class DXF {
   constructor() {
     this.reader;
     this.writer;
+
+    // flag indicates if dxf contains unsupported elements
+    this.unsupportedElements = false;
   }
 
   read(data) {
@@ -32,6 +35,10 @@ export class DXF {
 
     // load headers last to ensure the elements and layers exist
     this.loadHeader(core);
+
+    if (this.unsupportedElements) {
+      core.notify(Strings.Warning.UNSUPPORTEDENTITIES);
+    }
   }
 
   loadHeader(core) {
@@ -150,6 +157,7 @@ export class DXF {
       core.scene.addToScene(command, item);
     } else {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
+      this.unsupportedElements = true;
     }
   }
 
