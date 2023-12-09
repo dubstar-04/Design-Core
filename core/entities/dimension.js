@@ -123,7 +123,7 @@ export class Dimension extends Entity {
   }
 
   preview(core) {
-    if (this.points.length >= 1) {
+    if (this.points.length == 1) {
       const mousePoint = core.mouse.pointOnScene();
       const points = [this.points.at(0), mousePoint];
       core.scene.createTempItem('Line', {points: points});
