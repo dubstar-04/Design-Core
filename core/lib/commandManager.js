@@ -7,7 +7,7 @@ import {Rectangle} from '../entities/rectangle.js';
 // import {Ellipse} from '../entities/ellipse.js';
 // import {Spline} from '../entities/spline.js';
 import {Text} from '../entities/text.js';
-// import {Dimension} from '../entities/dimension.js';
+import {Dimension} from '../entities/dimension.js';
 import {Block} from '../entities/block.js';
 import {Insert} from '../entities/insert.js';
 
@@ -40,7 +40,7 @@ const classes = {
   // Ellipse,
   // Spline,
   Text,
-  // Dimension,
+  Dimension,
   Block,
   Insert,
   Move,
