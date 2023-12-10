@@ -28,7 +28,7 @@ export class Text extends Entity {
 
     // needs to be non-enumberable as to not appear in the object props
     Object.defineProperty(this, 'boundingRect', {
-      enumerable: false,
+      // enumerable: false,
       value: {width: 10, height: 10},
       writable: true,
     });

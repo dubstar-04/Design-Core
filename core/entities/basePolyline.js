@@ -17,19 +17,19 @@ export class BasePolyline extends Entity {
     };
 
     Object.defineProperty(this, 'modes', {
-      enumerable: false,
+      // enumerable: false,
       value: modes,
       writable: true,
     });
 
     Object.defineProperty(this, 'inputMode', {
-      enumerable: false,
+      // enumerable: false,
       value: this.modes.LINE,
       writable: true,
     });
 
     Object.defineProperty(this, 'flags', {
-      enumerable: false,
+      // enumerable: false,
       value: 0,
       writable: true,
     });

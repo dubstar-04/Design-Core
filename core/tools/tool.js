@@ -1,13 +1,13 @@
 export class Tool {
   constructor() {
     Object.defineProperty(this, 'type', {
-      enumerable: false,
+      // enumerable: false,
       value: this.constructor.name,
       writable: true,
     });
 
     Object.defineProperty(this, 'points', {
-      enumerable: false,
+      // enumerable: false,
       value: [],
       writable: true,
     });

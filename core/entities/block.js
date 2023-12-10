@@ -9,19 +9,19 @@ export class Block extends Entity {
     this.name = '';
 
     Object.defineProperty(this, 'location', {
-      enumerable: false,
+      // enumerable: false,
       value: new Point(),
       writable: true,
     });
 
     Object.defineProperty(this, 'flags', {
-      enumerable: false,
+      // enumerable: false,
       value: 1,
       writable: true,
     });
 
     Object.defineProperty(this, 'items', {
-      enumerable: false,
+      // enumerable: false,
       value: [],
       writable: true,
     });

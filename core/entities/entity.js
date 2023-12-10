@@ -6,20 +6,20 @@ import {Strings} from '../lib/strings.js';
 export class Entity {
   constructor(data) {
     Object.defineProperty(this, 'type', {
-      enumerable: false,
+      // enumerable: false,
       value: this.constructor.name,
       writable: true,
     });
 
     Object.defineProperty(this, 'points', {
-      enumerable: false,
+      // enumerable: false,
       value: [],
       writable: true,
     });
 
     /*
     Object.defineProperty(this, 'trueColour', {
-      enumerable: false,
+      //enumerable: false,
       writable: true,
     });
     */
