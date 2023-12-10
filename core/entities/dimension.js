@@ -173,17 +173,6 @@ export class Dimension extends Entity {
     return type;
   }
 
-  length() {
-    const A = (this.points[0].x - this.points[1].x);
-    const B = (this.points[0].y - this.points[1].y);
-    const ASQ = Math.pow(A, 2);
-    const BSQ = Math.pow(B, 2);
-    const dist = Math.sqrt(ASQ + BSQ);
-
-    return dist;
-  }
-
-
   getExtensionPoints() {
     // return p1 and p2 for the dimension arrows
 
