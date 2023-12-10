@@ -110,7 +110,7 @@ export class Dimension extends Entity {
   }
 
   static register() {
-    const command = {command: 'Dimension'}; // , shortcut: 'DIM', type: 'Entity'};
+    const command = {command: 'Dimension', shortcut: 'DIM', type: 'Entity'};
     return command;
   }
 
