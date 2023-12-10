@@ -88,6 +88,15 @@ export class DXF {
 
     blocks.forEach((block) => {
       if (block.hasOwnProperty('2')) {
+        /*
+        Three empty definitions always appear in the BLOCKS section.
+        They are titled *Model_Space, *Paper_Space and *Paper_Space0.
+        These definitions manifest the representations of model space and paper space as block definitions internally.
+        The internal name of the first paper space layout is *Paper_Space,
+        the second is *Paper_Space0,
+        the third is *Paper_Space1,
+        and so on.
+        */
         if (block[2].toUpperCase().includes('MODEL_SPACE')) {
           // skip model_space blocks
           return;
