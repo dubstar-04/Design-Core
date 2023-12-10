@@ -43,18 +43,19 @@ export class Entity {
         this.colour = data.colour || Colours.getHexColour(data[62]);
       }
 
-      /*
       if (data.trueColour || data[420]) {
-      // DXF Groupcode 420 - true color
-      // A 24-bit color value that should be dealt with in terms of bytes with values
-      // of 0 to 255. The lowest byte is the blue value, the middle byte is the
-      // green value, and the third byte is the red value. The top byte is always
-      // 0. The group code cannot be used by custom entities for their own data
-      // because the group code is reserved for AcDbEntity, class-level color data
-      // and AcDbEntity, class-level transparency data
-        this.trueColour = data.trueColour;
+        // DXF Groupcode 420 - true color
+        // A 24-bit color value that should be dealt with in terms of bytes with values
+        // of 0 to 255. The lowest byte is the blue value, the middle byte is the
+        // green value, and the third byte is the red value. The top byte is always
+        // 0. The group code cannot be used by custom entities for their own data
+        // because the group code is reserved for AcDbEntity, class-level color data
+        // and AcDbEntity, class-level transparency data
+        // this.trueColour = data.trueColour;
+        const err = 'Groupcode 420 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
-      */
+
 
       if (data.lineType || data[6]) {
         // DXF Groupcode 6 - lineType

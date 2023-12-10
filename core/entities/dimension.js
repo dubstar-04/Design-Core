@@ -27,6 +27,8 @@ export class Dimension extends Entity {
         // The string explicitly entered by the user.
         // Optional; default is the measurement. If null or “<>”, the dimension measurement is drawn as the text,
         // if ““ (one blank space), the text is suppressed. Anything else is drawn as the text
+        const err = 'Groupcode 1 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
 
       if (data.blockName || data[2]) {
@@ -43,11 +45,15 @@ export class Dimension extends Entity {
         // DXF Groupcode 41 - Line Spacing Factor
         // Percentage of default (3-on-5) line spacing to be applied.
         // Valid values range from 0.25 to 4.00
+        const err = 'Groupcode 41 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
 
       if (data[42]) {
         // DXF Groupcode 42 - Actual Measurement
         // Read-only
+        const err = 'Groupcode 42 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
 
       if (data[51]) {
@@ -57,6 +63,8 @@ export class Dimension extends Entity {
         // text and lines for horizontal, vertical, and rotated linear dimensions
         // This group value is the negative if the angle between the OCS X axis and the UCS X axis.
         // It is always in the XY plane of the OCS
+        const err = 'Groupcode 51 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
 
       if (data.angle || data[53]) {
@@ -83,12 +91,16 @@ export class Dimension extends Entity {
         // 1 = Top left; 2 = Top center; 3 = Top right
         // 4 = Middle left; 5 = Middle center; 6 = Middle right
         // 7 = Bottom left; 8 = Bottom center; 9 = Bottom right
+        const err = 'Groupcode 71 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
 
       if (data[72]) {
         // DXF Groupcode 72 - Line Spacing
         // 1 (or missing) = At least (taller characters will override)
         // 2 = Exact (taller characters will not override)
+        const err = 'Groupcode 72 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
 
       if (data.leaderLength) {
