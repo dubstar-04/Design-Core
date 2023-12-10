@@ -11,7 +11,7 @@ export class Circle extends Entity {
     super(data);
 
     // add radius property with getter and setter
-    // needs to be enumberable to appear in the object props
+    // needs to be enumerable to appear in the object props
     Object.defineProperty(this, 'radius', {
       get: this.getRadius,
       set: this.setRadius,

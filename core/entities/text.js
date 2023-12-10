@@ -19,14 +19,14 @@ export class Text extends Entity {
     this.styleName = 'STANDARD';
 
     // add rotation property with getter and setter
-    // needs to be enumberable to appear in the object props
+    // needs to be enumerable to appear in the object props
     Object.defineProperty(this, 'rotation', {
       get: this.getRotation,
       set: this.setRotation,
       enumerable: true,
     });
 
-    // needs to be non-enumberable as to not appear in the object props
+    // needs to be non-enumerable as to not appear in the object props
     Object.defineProperty(this, 'boundingRect', {
       // enumerable: false,
       value: {width: 10, height: 10},
