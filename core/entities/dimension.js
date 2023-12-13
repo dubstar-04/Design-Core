@@ -91,6 +91,11 @@ export class Dimension extends Entity {
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
+      if (data[50]) {
+        // DXF Groupcode 50 - Angle of rotated, horizontal, or vertical dimensions
+        this.linearDimAngle = data[50];
+      }
+
       if (data[51]) {
         // DXF Groupcode 51 - Horizontal Direction
         // All dimension types have an optional 51 group code, which indicates the horizontal direction
