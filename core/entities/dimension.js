@@ -71,6 +71,11 @@ export class Dimension extends Entity {
         this.styleName = data.styleName || data[3];
       }
 
+      if (data[40]) {
+        // DXF Groupcode 40 - Leader length for radius and diameter dimensions
+        this.leaderLength = data[40];
+      }
+
       if (data[41]) {
         // DXF Groupcode 41 - Line Spacing Factor
         // Percentage of default (3-on-5) line spacing to be applied.
