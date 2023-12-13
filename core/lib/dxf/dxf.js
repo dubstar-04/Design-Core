@@ -80,6 +80,12 @@ export class DXF {
           core.ltypeManager.addStyle(ltype);
         });
       }
+
+      if (table[2] === 'DIMSTYLE') {
+        table.children.forEach((style) => {
+          core.dimStyleManager.addStyle(style);
+        });
+      }
     });
   }
 
