@@ -1,4 +1,5 @@
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {Logging} from '../lib/logging.js';
 
 export class DimStyle {
   constructor(data) {
