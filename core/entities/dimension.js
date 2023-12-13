@@ -396,9 +396,9 @@ export class Dimension extends Entity {
     this.block.draw(ctx, scale);
   }
 
-    // ////////////////////////////////////////
-    // draw test point for perpendicular
-    /*
+  // ////////////////////////////////////////
+  // draw test point for perpendicular
+  /*
         pnt = this.points[2].perpendicular(this.points[0], this.points[1])
         if (pnt) {
             ctx.moveTo(pnt.x, pnt.y);
