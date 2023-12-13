@@ -256,6 +256,9 @@ export class DimStyle {
         this.DIMCLRT = data[178];
       }
     }
+
+    const err = 'DXF Groupcodes incomplete';
+    Logging.instance.warn(`${this.type} - ${err}`);
   }
 
   getStandardFlags() {
