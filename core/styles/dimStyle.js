@@ -45,6 +45,70 @@ export class DimStyle {
     this.DIMCLRE = '0'; // 177 - Dimension extension line color, range is 0 = BYBLOCK, 256 = BYLAYER
     this.DIMCLRT = '0'; // 178 - Dimension text color, range is 0 = BYBLOCK, 256 = BYLAYER
 
+    // this.DIMADEC // 179 - Number of precision places displayed in angular dimensions
+    // this.DIMUNIT // 270 - (obsolete, now use DIMLUNIT AND DIMFRAC)
+    // this.DIMDEC // 271 - Number of decimal places for the tolerance values of a primary units dimension
+    // this.DIMTDEC // 272 - Number of decimal places to display the tolerance values
+    // this.DIMALTU // 273 - Units format for alternate units of all dimension style family members except angular:
+    // 1 = Scientific; 2 = Decimal; 3 = Engineering;
+    // 4 = Architectural (stacked); 5 = Fractional (stacked);
+    // 6 = Architectural; 7 = Fractional
+    // this.DIMALTTD // 274 - Number of decimal places for tolerance values of an alternate units dimension
+    // this.DIMAUNIT // 275 - Angle format for angular dimensions:
+    // 0 = Decimal degrees; 1 = Degrees/minutes/seconds;
+    // 2 = Gradians; 3 = Radians; 4 = Surveyor’s units
+    // this.DIMFRAC // 276 -
+    // this.DIMLUNIT // 277 - Sets units for all dimension types except Angular:
+    // 1 = Scientific; 2 = Decimal; 3 = Engineering;
+    // 4 = Architectural; 5 = Fractional; 6 = Windows desktop
+    // this.DIMDSEP // 278 - Single-character decimal separator used when creating dimensions whose unit format is decimal
+    // this.DIMTMOVE // 279 - Dimension text movement rules:
+    // 0 = Moves the dimension line with dimension text
+    // 1 = Adds a leader when dimension text is moved
+    // 2 = Allows text to be moved freely without a leader
+    // this.DIMJUST // 280 - Horizontal dimension text position:
+    // 0 = Above dimension line and center-justified between extension lines
+    // 1 = Above dimension line and next to first extension line
+    // 2 = Above dimension line and next to second extension line
+    // 3 = Above and center-justified to first extension line
+    // 4 = Above and center-justified to second extension line
+    // this.DIMSD1 // 281 - Suppression of first extension line:
+    // 0 = Not suppressed; 1 = Suppressed
+    // this.DIMSD2 // 282 - Suppression of second extension line:
+    // 0 = Not suppressed; 1 = Suppressed
+    // this.DIMTOLJ // 283 - Vertical justification for tolerance values:
+    // 0 = Top; 1 = Middle; 2 = Bottom
+    // this.DIMTZIN // 284 - Controls suppression of zeros for tolerance values:
+    // 0 = Suppresses zero feet and precisely zero inches
+    // 1 = Includes zero feet and precisely zero inches
+    // 2 = Includes zero feet and suppresses zero inches
+    // 3 = Includes zero inches and suppresses zero feet
+    // this.DIMALTZ // 285 - Controls suppression of zeros for alternate unit dimension values:
+    // 0 = Suppresses zero feet and precisely zero inches
+    // 1 = Includes zero feet and precisely zero inches
+    // 2 = Includes zero feet and suppresses zero inches
+    // 3 = Includes zero inches and suppresses zero feet
+    // this.DIMALTTZ // 286 - Controls suppression of zeros for alternate tolerance values:
+    // 0 = Suppresses zero feet and precisely zero inches
+    // 1 = Includes zero feet and precisely zero inches
+    // 2 = Includes zero feet and suppresses zero inches
+    // 3 = Includes zero inches and suppresses zero feet
+    // this.DIMFIT // 287 - (obsolete, now use DIMATFIT and DIMTMOVE)
+    // this.DIMUPT // 288 - Cursor functionality for user-positioned text:
+    // 0 = Controls only the dimension line location
+    // 1 = Controls the text position as well as the dimension line location
+    // this.DIMATFIT // 289 - Controls dimension text and arrow placement when space is not sufficient to place both within the extension lines:
+    // 0 = Places both text and arrows outside extension lines
+    // 1 = Moves arrows first, then text
+    // 2 = Moves text first, then arrows
+    // 3 = Moves either text or arrows, whichever fits best AutoCAD adds a leader to moved dimension text when DIMTMOVE is set to 1
+    // this.DIMTXSTY // 340 - (handle of referenced STYLE)
+    // this.DIMLDRBLK // 341 - (handle of referenced BLOCK)
+    // this.DIMBLK // 342 - (handle of referenced BLOCK)
+    // this.DIMBLK1 // 343 - (handle of referenced BLOCK)
+    // this.DIMBLK2 // 344 - (handle of referenced BLOCK)
+    // this.DIMLWD // 371 - (lineweight enum value)
+    // this.DIMLWE // 372 - (lineweight enum value)
 
     if (data) {
       if (data.name || data[2]) {
