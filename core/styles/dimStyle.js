@@ -9,7 +9,7 @@ export class DimStyle {
     this.DIMAPOST = ''; // 4 - Alternate dimensioning suffix
     this.DIMBLK = ''; // 5 - Arrow block name
     this.DIMBLK1 = ''; // 6 - First arrow block name
-    this.DIMBLK2 = ''; // 8 - Second arrow block name
+    this.DIMBLK2 = ''; // 7 - Second arrow block name
     this.DIMSCALE = '1.0'; // 40 - dimension scale
     this.DIMASZ = '0.18'; // 41 - arrow size
     this.DIMEXO = '0.0625'; // 42 - offset from origin
