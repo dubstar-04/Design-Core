@@ -3,7 +3,7 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 export class DimStyle {
   constructor(data) {
     // Define Properties
-    this.type = 'DimStyle';
+    this.type = this.constructor.name;
     this.name = '';
     this.DIMPOST = ''; // 3 - General dimensioning suffix
     this.DIMAPOST = ''; // 4 - Alternate dimensioning suffix
