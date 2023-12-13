@@ -394,29 +394,7 @@ export class Dimension extends Entity {
     }
 
     this.block.draw(ctx, scale);
-    /*
-    function drawArrowHead(point, angle, height) {
-      triangleWidth = height;
-      triangleHeight = height * 1.5;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(point.x, point.y);
-      p1 = new Point(point.x + triangleWidth / 2, point.y + triangleHeight);
-      p2 = new Point(point.x + -triangleWidth / 2, point.y + triangleHeight);
-      angle = angle - Math.PI / 2;
-      p1 = p1.rotate(point, angle);
-      p2 = p2.rotate(point, angle);
-
-      ctx.lineTo(p1.x, p1.y);
-      ctx.lineTo(p2.x, p2.y);
-      ctx.closePath();
-      // ctx.fillStyle = this.colour;
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-    }
-    */
+  }
 
     // ////////////////////////////////////////
     // draw test point for perpendicular
