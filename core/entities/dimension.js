@@ -406,10 +406,10 @@ export class Dimension extends Entity {
             ctx.stroke()
         }
         */
-    // ////////////////////////////////////////
+  // ////////////////////////////////////////
 
-    // Draw Bounding Box to test the getBoundingRect() /
-    /*
+  // Draw Bounding Box to test the getBoundingRect() /
+  /*
         ctx.strokeStyle = colour;
         ctx.lineWidth = 1 / scale;
         ctx.beginPath()
@@ -420,8 +420,8 @@ export class Dimension extends Entity {
         ctx.lineTo(rect.x, rect.y);
         ctx.stroke()
         */
-    // ////////////////////////////////////////
-  }
+  // ////////////////////////////////////////
+
 
   dxf(file) {
     file.writeGroupCode('0', 'DIMENSION');
