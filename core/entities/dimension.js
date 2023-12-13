@@ -12,14 +12,44 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 export class Dimension extends Entity {
   constructor(data) {
     super(data);
-    this.blockName = '';
-    this.block = new Block();
-    this.text = new Text();
-    this.dimType = 0;
-    this.leaderLength = 0; // 40: Leader length for radius and diameter dimensions
-    this.angle = 0; // 50 Angle of rotated, horizontal or vertical linear dimensions
-    this.styleName = 'STANDARD';
 
+    // console.log(data);
+
+    Object.defineProperty(this, 'blockName', {
+      value: '',
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'block', {
+      value: new Block({points: [new Point(), new Point()]}),
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'text', {
+      value: new Text(),
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'dimType', {
+      value: 0,
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'styleName', {
+      value: 'STANDARD',
+      writable: true,
+      enumerable: true,
+    });
+
+    Object.defineProperty(this, 'leaderLength', {
+      value: 0,
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'linearDimAngle', {
+      value: 0,
+      writable: true,
+    });
 
     if (data) {
       if (data[1]) {
