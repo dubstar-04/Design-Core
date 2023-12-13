@@ -47,7 +47,214 @@ export class DimStyle {
 
 
     if (data) {
-      this.name = data.name;
+      if (data.name || data[2]) {
+        // DXF Groupcode 2 - ltype name
+        this.name = data.name || data[2];
+      }
+
+      if (data[3]) {
+        // DXF Groupcode 3 - General dimensioning suffix
+        this.DIMPOST = data[3];
+      }
+
+      if (data[4]) {
+        // DXF Groupcode 4 - Alternate dimensioning suffix
+        this.DIMAPOST = data[4];
+      }
+
+      if (data[5]) {
+        // DXF Groupcode 5 - Arrow block name
+        this.DIMBLK = data[5];
+
+        const err = 'DXF Groupcode 5 - obsolete';
+        Logging.instance.warn(`${this.type} - ${err}`);
+      }
+
+      if (data[6]) {
+        // DXF Groupcode 6 - First arrow block name
+        this.DIMBLK1 = data[6];
+
+        const err = 'DXF Groupcode 6 - obsolete';
+        Logging.instance.warn(`${this.type} - ${err}`);
+      }
+
+      if (data[7]) {
+        // DXF Groupcode 7 - Second arrow block name
+        this.DIMBLK2 = data[7];
+
+        const err = 'DXF Groupcode 7 - obsolete';
+        Logging.instance.warn(`${this.type} - ${err}`);
+      }
+
+      if (data[40]) {
+        // DXF Groupcode 40 - dimension scale
+        this.DIMSCALE = data[40];
+      }
+
+      if (data[41]) {
+        // DXF Groupcode 41 - arrow size
+        this.DIMASZ = data[41];
+      }
+
+      if (data[42]) {
+        // DXF Groupcode 42 - offset from origin
+        this.DIMEXO = data[42];
+      }
+
+      if (data[43]) {
+        // DXF Groupcode 43 - Baseline spacing
+        this.DIMDLI = data[43];
+      }
+
+      if (data[44]) {
+        // DXF Groupcode 44- extend beyond dim lines
+        this.DIMEXE = data[44];
+      }
+
+      if (data[45]) {
+        // DXF Groupcode 45 - Rounding value for dimension distances
+        this.DIMRND = data[45];
+      }
+
+      if (data[45]) {
+        // DXF Groupcode 46 - Dimension line extension
+        this.DIMDLE = data[46];
+      }
+
+      if (data[47]) {
+        // DXF Groupcode 47 - Plus tolerance
+        this.DIMTP = data[47];
+      }
+
+      if (data[48]) {
+        // DXF Groupcode 48 - Minus tolerance
+        this.DIMTM = data[48];
+      }
+
+      if (data[140]) {
+        // DXF Groupcode 140 - Dimensioning text height
+        this.DIMTXT = data[140];
+      }
+
+      if (data[141]) {
+        // DXF Groupcode 141 - centre marks
+        this.DIMCEN = data[141];
+      }
+
+      if (data[142]) {
+        // DXF Groupcode 142 - Dimensioning tick size; 0 = no ticks
+        this.DIMTSZ = data[142];
+      }
+
+      if (data[143]) {
+        // DXF Groupcode 143 - multiplier for alternate units
+        this.DIMALTF = data[143];
+      }
+
+      if (data[144]) {
+        // DXF Groupcode 144 - Measurement scale factor
+        this.DIMLFAC = data[144];
+      }
+
+      if (data[145]) {
+        // DXF Groupcode 145 - Text vertical position
+        this.DIMTVP = data[145];
+      }
+
+      if (data[146]) {
+        // DXF Groupcode 146 - Dimension tolerance display scale factor
+        this.DIMTFAC = data[146];
+      }
+
+      if (data[147]) {
+        // DXF Groupcode 147 - offset from dimline
+        this.DIMGAP = data[147];
+      }
+
+      if (data[71]) {
+        // DXF Groupcode 71 - Dimension tolerances generated if nonzero
+        this.DIMTOL = data[71];
+      }
+
+      if (data[72]) {
+        // DXF Groupcode 72 - Dimension limits generated if nonzero
+        this.DIMLIM = data[72];
+      }
+
+      if (data[73]) {
+        // DXF Groupcode 73 - Text inside horizontal if nonzero
+        this.DIMTIH = data[73];
+      }
+
+      if (data[74]) {
+        // DXF Groupcode 74 - Text outside horizontal if nonzero
+        this.DIMTOH = data[74];
+      }
+
+      if (data[75]) {
+        // DXF Groupcode 75 - First extension line suppressed if nonzero
+        this.DIMSE1 = data[75];
+      }
+
+      if (data[76]) {
+        // DXF Groupcode 76 - Second extension line suppressed if nonzero
+        this.DIMSE2 = data[76];
+      }
+
+      if (data[77]) {
+        // DXF Groupcode 77 -Text above dimension line if nonzero
+        this.DIMTAD = data[77];
+      }
+
+      if (data[78]) {
+        // DXF Groupcode 78 - Zero suppression for “feet & inch” dimensions
+        this.DIMZIN = data[78];
+      }
+
+      if (data[170]) {
+        // DXF Groupcode 170 - Alternate unit dimensioning performed if nonzero
+        this.DIMALT = data[170];
+      }
+
+      if (data[171]) {
+        // DXF Groupcode 171 - Alternate unit decimal places
+        this.DIMALTD = data[171];
+      }
+
+      if (data[172]) {
+        // DXF Groupcode 172 - If text outside extensions, force line extensions between extensions if nonzero
+        this.DIMTOFL = data[172];
+      }
+
+      if (data[173]) {
+        // DXF Groupcode 173 - Use separate arrow blocks if nonzero
+        this.DIMSAH = data[173];
+      }
+
+      if (data[174]) {
+        // DXF Groupcode 174 - Force text inside extensions if nonzero
+        this.DIMTIX = data[174];
+      }
+
+      if (data[175]) {
+        // DXF Groupcode 175 - Suppress outside-extensions dimension lines if nonzero
+        this.DIMSOXD = data[175];
+      }
+
+      if (data[176]) {
+        // DXF Groupcode 176 - Dimension line color, range is 0 = BYBLOCK, 256 = BYLAYER
+        this.DIMCLRD = data[176];
+      }
+
+      if (data[177]) {
+        // DXF Groupcode 177 - Dimension extension line color, range is 0 = BYBLOCK, 256 = BYLAYER
+        this.DIMCLRE = data[177];
+      }
+
+      if (data[178]) {
+        // DXF Groupcode 178 - Dimension text color, range is 0 = BYBLOCK, 256 = BYLAYER
+        this.DIMCLRT = data[178];
+      }
     }
   }
 
