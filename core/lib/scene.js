@@ -104,6 +104,27 @@ export class Scene {
   }
 
   /**
+   * Find items in scene
+   * @param {string} type - entity type
+   * @param {string} prop - object of entity parameters
+   * @param {any} value - value of the property
+   * @returns - index of items
+   */
+  findItem(type, prop, value) {
+    // console.log('findinscene:', type, prop, value);
+
+    const filteredItems = [];
+
+    this.items.forEach((item, index) => {
+      if (item.type.toUpperCase() === type.toUpperCase() && item.hasOwnProperty(prop) && item[prop] === value) {
+        console.log('findInScene - item found:', item.type, index, item.name);
+        filteredItems.push(index);
+      }
+    });
+
+    return filteredItems;
+  }
+  /**
    * Add items to the scenes tempItems
    * @param {object} item
    */
