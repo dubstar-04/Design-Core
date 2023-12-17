@@ -86,6 +86,11 @@ export class Section {
           if (Object.keys(point).length) {
             return point;
           }
+          // add the point sequence value
+          // '10', '11', '12', '13', '14', '15', '16'
+          const sequence = this.parseInt(iterator.currentPair().code);
+          point.sequence = sequence;
+
           const xValue = this.getGroupValue(currentPair);
           point.x = xValue;
           break;

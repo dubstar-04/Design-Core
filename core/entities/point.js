@@ -7,6 +7,11 @@ export class Point {
     this.type = this.constructor.name;
     this.x = 0;
     this.y = 0;
+    // sequence holds a reference to the dxf group code sequence the point represents
+    // 10, 20, 30;
+    // 11, 21, 31;
+    this.sequence;
+
     // bulge value used for defining arcs in polylines
     // arc is ccw if positive
     this.bulge = 0;
