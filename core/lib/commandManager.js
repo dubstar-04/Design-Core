@@ -7,7 +7,10 @@ import {Rectangle} from '../entities/rectangle.js';
 // import {Ellipse} from '../entities/ellipse.js';
 // import {Spline} from '../entities/spline.js';
 import {Text} from '../entities/text.js';
-import {Dimension} from '../entities/dimension.js';
+import {AlignedDimension} from '../entities/alignedDimension.js';
+import {AngularDimension} from '../entities/angularDimension.js';
+import {DiametricDimension} from '../entities/diametricDimension.js';
+// import {BaseDimension} from '../entities/basedimension.js';
 import {Block} from '../entities/block.js';
 import {Insert} from '../entities/insert.js';
 
@@ -40,7 +43,10 @@ const classes = {
   // Ellipse,
   // Spline,
   Text,
-  Dimension,
+  AngularDimension,
+  AlignedDimension,
+  DiametricDimension,
+  // BaseDimension,
   Block,
   Insert,
   Move,
