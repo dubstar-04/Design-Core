@@ -132,7 +132,7 @@ export class Line extends Entity {
           lineWidth: line.lineWidth,
         };
 
-        core.scene.addToScene('Line', data);
+        core.scene.addItem('Line', data);
 
         if (a < b) {
           line.points[1] = pnts[0];

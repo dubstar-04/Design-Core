@@ -112,7 +112,7 @@ export class Circle extends Entity {
         lineWidth: this.lineWidth,
       };
 
-      core.scene.addToScene('Arc', data, core.scene.items.indexOf(this));
+      core.scene.addItem('Arc', data, core.scene.items.indexOf(this));
     }
   }
 
