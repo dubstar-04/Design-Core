@@ -107,6 +107,10 @@ export class Arc extends Entity {
     return this.points[0].angle(this.points[2]);
   }
 
+  getRadius() {
+    return this.radius;
+  }
+
   draw(ctx, scale) {
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, this.startAngle(), this.endAngle());
     ctx.stroke();
