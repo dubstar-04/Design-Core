@@ -75,7 +75,7 @@ export class Scene {
    * @param {number} index - integer of item to replace
    * @returns - index of created item
    */
-  addToScene(type, data, index) {
+  addItem(type, data, index) {
     // TODO: validate data is valid for type
     if (!data) {
       throw Error('Input data missing');

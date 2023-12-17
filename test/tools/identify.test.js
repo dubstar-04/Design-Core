@@ -11,7 +11,7 @@ core.notify = (notification) => {
 
 test('Test distance.action', () => {
   // Add items to scene
-  core.scene.addToScene('Line', {points: [new Point(), new Point(0, 10)]});
+  core.scene.addItem('Line', {points: [new Point(), new Point(0, 10)]});
 
   const identify = new Identify();
 

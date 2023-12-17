@@ -146,7 +146,7 @@ export class DXF {
         });
       }
 
-      this.addToScene(core, block);
+      this.addItem(core, block);
     });
   }
 
@@ -162,14 +162,15 @@ export class DXF {
     });
   }
 
-  addToScene(core, item) {
+
+  addItem(core, item) {
     if (item.hasOwnProperty('0') === false) {
       return;
     }
 
     const command = item[0];
     if (core.commandManager.isCommand(command)) {
-      core.scene.addToScene(command, item);
+      core.scene.addItem(command, item);
     } else {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
       this.unsupportedElements = true;

@@ -91,7 +91,7 @@ test('Test LayerManager.checkLayers', () => {
     layer: newLayerName,
   };
 
-  core.scene.addToScene('Line', data, false);
+  core.scene.addItem('Line', data, false);
 
   layerManager.checkLayers();
   const layers = layerManager.getLayers();

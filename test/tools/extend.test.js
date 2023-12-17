@@ -25,8 +25,8 @@ test('Test Extend.action', () => {
    * Extend end from horizontal line
    */
   // Add items to scene
-  core.scene.addToScene('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addToScene('Line', {points: [lineTwoStart, lineTwoEnd]});
+  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
+  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
   // Select boundary item
   core.scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
@@ -57,8 +57,8 @@ test('Test Extend.action', () => {
   // clear scene items
   core.scene.items = [];
   // Add items to scene
-  core.scene.addToScene('Line', {points: [lineTwoStart, lineTwoEnd]});
-  core.scene.addToScene('Line', {points: [lineThreeStart, lineThreeEnd]});
+  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  core.scene.addItem('Line', {points: [lineThreeStart, lineThreeEnd]});
   // Select boundary item
   core.scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
@@ -88,8 +88,8 @@ test('Test Extend.action', () => {
   // clear scene items
   core.scene.items = [];
   // Add items to scene
-  core.scene.addToScene('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addToScene('Line', {points: [crossingLineStart, crossingLineEnd]});
+  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
+  core.scene.addItem('Line', {points: [crossingLineStart, crossingLineEnd]});
   // Select boundary item
   core.scene.selectionManager.addToSelectionSet(0);
   // select item to Extend

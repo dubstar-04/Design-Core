@@ -366,7 +366,7 @@ export class InputManager {
       // set the items layer to the current layer
       item.layer = this.core.layerManager.getCLayer();
       // return the item index
-      return this.core.scene.addToScene(item.type, item, index);
+      return this.core.scene.addItem(item.type, item, index);
     }
   }
 }
