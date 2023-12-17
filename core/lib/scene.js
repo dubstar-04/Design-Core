@@ -135,6 +135,24 @@ export class Scene {
   }
 
   /**
+   * Remove Item
+   * @param {number} type - items index
+   * @returns - success status
+   */
+  removeItem(index) {
+    // console.log('remove item', index);
+    const count = this.items.length;
+    this.items.splice(index, 1);
+
+    // console.log('before', count, 'after', this.items.length);
+    if (this.items.length < count) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
    * Add items to the scenes tempItems
    * @param {object} item
    */
