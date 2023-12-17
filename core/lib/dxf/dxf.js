@@ -184,6 +184,9 @@ export class DXF {
       if (point.hasOwnProperty('bulge')) {
         pt.bulge = point.bulge;
       }
+      if (point.hasOwnProperty('sequence')) {
+        pt.sequence = point.sequence;
+      }
       points.push(pt);
     });
     return points;
