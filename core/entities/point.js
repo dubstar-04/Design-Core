@@ -145,9 +145,10 @@ export class Point {
   };
 
   /**
-   * Find the closest point to this on the straight line between Pt1 and Pt2
+   * Find the closest point to this on the ray formed by Pt1 and Pt2
    * @param  {Point} Pt1
    * @param  {Point} Pt2
+   * @returns the closest point on the ray
    */
   perpendicular(Pt1, Pt2) {
     const APx = this.x - Pt1.x;
@@ -160,14 +161,17 @@ export class Point {
     const t = ABdotAP / magAB2;
 
     // check if the point is < start or > end
+    /*
     if (t > 0 && t < 1) {
       const x = Pt1.x + ABx * t;
       const y = Pt1.y + ABy * t;
       return new Point(x, y);
     }
+    */
 
-    // no perpendicular point found. return null
-    return null;
+    const x = Pt1.x + ABx * t;
+    const y = Pt1.y + ABy * t;
+    return new Point(x, y);
   }
 
   /**
