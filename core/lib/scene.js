@@ -124,6 +124,16 @@ export class Scene {
 
     return filteredItems;
   }
+
+  /**
+   * Get Item
+   * @param {number} type - items index
+   * @returns - item
+   */
+  getItem(index) {
+    return this.items[index];
+  }
+
   /**
    * Add items to the scenes tempItems
    * @param {object} item
