@@ -191,7 +191,11 @@ export class Point {
    */
   closestPointOnLine(startPoint, endPoint) {
     const pnt = this.perpendicular(startPoint, endPoint);
-    return pnt;
+    if (pnt.isOnLine(startPoint, endPoint)) {
+      return pnt;
+    }
+
+    return null;
   }
 
   /**
