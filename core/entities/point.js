@@ -282,13 +282,10 @@ export class Point {
    * @returns true or false
    */
   isOnLine(startPoint, endPoint) {
-    const slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
-    const y = slope * this.x + startPoint.y;
-
-    if ((y <= this.y && y >= this.y) && (this.x >= startPoint.x && this.x <= endPoint.x)) {
+    // check start -> point + point -> end equals start -> end
+    if (startPoint.distance(this) + this.distance(endPoint) === startPoint.distance(endPoint)) {
       return true;
     }
-
     return false;
   }
 
