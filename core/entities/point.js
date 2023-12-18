@@ -165,15 +165,6 @@ export class Point {
     const ABdotAP = ABx * APx + ABy * APy;
     const t = ABdotAP / magAB2;
 
-    // check if the point is < start or > end
-    /*
-    if (t > 0 && t < 1) {
-      const x = Pt1.x + ABx * t;
-      const y = Pt1.y + ABy * t;
-      return new Point(x, y);
-    }
-    */
-
     const x = Pt1.x + ABx * t;
     const y = Pt1.y + ABy * t;
     return new Point(x, y);
