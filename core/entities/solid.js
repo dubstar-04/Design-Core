@@ -51,4 +51,8 @@ export class Solid extends Entity {
   closestPoint(P) {
     return [P, Infinity];
   }
+
+  boundingBox() {
+    return BoundingBox.fromPoints(this.points);
+  }
 }
