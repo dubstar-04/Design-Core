@@ -17,20 +17,20 @@ import {DXFFile} from './lib/dxf/dxfFile.js';
 export class Core {
   /** Create a core object */
   constructor() {
-    this.scene = new Scene(this);
-    this.commandManager = new CommandManager(this);
-    this.canvas = new Canvas(this);
+    this.scene = new Scene();
+    this.commandManager = new CommandManager();
+    this.canvas = new Canvas();
 
-    this.mouse = new Mouse(this);
-    this.commandLine = new CommandLine(this);
+    this.mouse = new Mouse();
+    this.commandLine = new CommandLine();
 
-    this.layerManager = new LayerManager(this);
-    this.ltypeManager = new LTypeManager(this);
-    this.styleManager = new StyleManager(this);
-    this.dimStyleManager = new DimStyleManager(this);
-    this.propertyManager = new PropertyManager(this);
+    this.layerManager = new LayerManager();
+    this.ltypeManager = new LTypeManager();
+    this.styleManager = new StyleManager();
+    this.dimStyleManager = new DimStyleManager();
+    this.propertyManager = new PropertyManager();
 
-    this.settings = new Settings(this);
+    this.settings = new Settings();
 
     // function to call external notification command for the ui
     this.externalNotifyCallbackFunction;
