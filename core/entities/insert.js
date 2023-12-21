@@ -1,6 +1,8 @@
 import {Entity} from './entity.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
+import {Core} from '../core.js';
+
 export class Insert extends Entity {
   constructor(data) {
     super(data);
@@ -86,12 +88,12 @@ export class Insert extends Entity {
     return;
   }
 
-  snaps(mousePoint, delta, core) {
+  snaps(mousePoint, delta) {
     snaps = [];
     return snaps;
   }
 
-  within(selectionExtremes, core) {
+  within(selectionExtremes) {
     // insert cannot be selected
     return false;
   }
@@ -114,7 +116,7 @@ export class Insert extends Entity {
     return new BoundingBox();
   }
 
-  touched(selectionExtremes, core) {
+  touched(selectionExtremes) {
     // insert cannot be selected
     return false;
   }

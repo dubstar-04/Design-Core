@@ -5,6 +5,8 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {Polyline} from './polyline.js';
 
+import {Core} from '../core.js';
+
 export class Rectangle extends Entity {
   constructor(data) {
     super(data);
@@ -17,30 +19,30 @@ export class Rectangle extends Entity {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op);
+      const pt1 = await Core.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
       const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
-      const pt2 = await core.scene.inputManager.requestInput(op2);
+      const pt2 = await Core.Scene.inputManager.requestInput(op2);
       this.points.push(pt2);
 
       const points = this.rectPoints(this.points[0], this.points[1]);
       const polyline = new Polyline({points: points});
 
-      core.scene.inputManager.executeCommand(polyline);
+      Core.Scene.inputManager.executeCommand(polyline);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  preview(core) {
+  preview() {
     if (this.points.length >= 1) {
-      const mousePoint = core.mouse.pointOnScene();
+      const mousePoint = Core.Mouse.pointOnScene();
       const points = this.rectPoints(this.points.at(-1), mousePoint);
-      core.scene.createTempItem('Polyline', {points: points});
+      Core.Scene.createTempItem('Polyline', {points: points});
     }
   }
 

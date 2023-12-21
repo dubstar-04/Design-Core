@@ -12,7 +12,7 @@ StyleManagerBase.prototype.addStandardStyles = function() {
 };
 
 const core = new Core();
-const styleManager = new StyleManagerBase(core);
+const styleManager = new StyleManagerBase();
 
 
 test('Test StyleManagerBase.getStyles', () => {

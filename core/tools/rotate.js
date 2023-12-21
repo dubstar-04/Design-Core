@@ -15,24 +15,24 @@ export class Rotate extends Tool {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
 
-      if (!core.scene.selectionManager.selectionSet.selectionSet.length) {
-        await core.scene.inputManager.requestInput(op);
+      if (!Core.Scene.selectionManager.selectionSet.selectionSet.length) {
+        await Core.Scene.inputManager.requestInput(op);
       }
 
       const op2 = new PromptOptions(Strings.Input.BASEPOINT, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op2);
+      const pt1 = await Core.Scene.inputManager.requestInput(op2);
       this.points.push(pt1);
 
       const op3 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt2 = await core.scene.inputManager.requestInput(op3);
+      const pt2 = await Core.Scene.inputManager.requestInput(op3);
       this.points.push(pt2);
 
       const op4 = new PromptOptions(Strings.Input.ROTATION, [Input.Type.POINT, Input.Type.NUMBER]);
-      const pt3 = await core.scene.inputManager.requestInput(op4);
+      const pt3 = await Core.Scene.inputManager.requestInput(op4);
       if (Input.getType(pt3) === Input.Type.POINT) {
         this.points.push(pt3);
       } else if (Input.getType(pt3) === Input.Type.NUMBER) {
@@ -44,20 +44,20 @@ export class Rotate extends Tool {
       }
 
 
-      core.scene.inputManager.executeCommand();
+      Core.Scene.inputManager.executeCommand();
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  preview(core) {
-    const mousePoint = core.mouse.pointOnScene();
+  preview() {
+    const mousePoint = Core.Mouse.pointOnScene();
 
     if (this.points.length >= 1) {
       // Draw a line
       const points = [this.points.at(0), mousePoint];
 
-      core.scene.createTempItem('Line', {points: points});
+      Core.Scene.createTempItem('Line', {points: points});
     }
 
     if (this.points.length >= 2) {
@@ -72,20 +72,20 @@ export class Rotate extends Tool {
 
       const theta = ang2 - ang1;
 
-      for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        for (let j = 0; j < core.scene.selectionManager.selectedItems[i].points.length; j++) {
-          const x = this.points[0].x + (core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.cos(theta) - (core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.sin(theta);
-          const y = this.points[0].y + (core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.sin(theta) + (core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.cos(theta);
+      for (let i = 0; i < Core.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        for (let j = 0; j < Core.Scene.selectionManager.selectedItems[i].points.length; j++) {
+          const x = this.points[0].x + (Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.cos(theta) - (Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.sin(theta);
+          const y = this.points[0].y + (Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.sin(theta) + (Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.cos(theta);
 
-          core.scene.selectionManager.selectedItems[i].points[j].x = x;
-          core.scene.selectionManager.selectedItems[i].points[j].y = y;
+          Core.Scene.selectionManager.selectedItems[i].points[j].x = x;
+          Core.Scene.selectionManager.selectedItems[i].points[j].y = y;
         }
       }
     }
   };
 
 
-  action(core) {
+  action() {
     const A = this.points[0].x - this.points[1].x;
     const O = this.points[0].y - this.points[1].y;
 
@@ -97,13 +97,13 @@ export class Rotate extends Tool {
 
     const theta = ang2 - ang1;
 
-    for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      for (let j = 0; j < core.scene.selectionManager.selectedItems[i].points.length; j++) {
-        const x = this.points[0].x + (core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.cos(theta) - (core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.sin(theta);
-        const y = this.points[0].y + (core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.sin(theta) + (core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.cos(theta);
+    for (let i = 0; i < Core.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      for (let j = 0; j < Core.Scene.selectionManager.selectedItems[i].points.length; j++) {
+        const x = this.points[0].x + (Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.cos(theta) - (Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.sin(theta);
+        const y = this.points[0].y + (Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.sin(theta) + (Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.cos(theta);
 
-        core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x = x;
-        core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y = y;
+        Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x = x;
+        Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y = y;
       }
     }
   };

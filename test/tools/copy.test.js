@@ -6,16 +6,16 @@ const core = new Core();
 
 test('Test Copy.action', () => {
   // Add items to scene
-  core.scene.addItem('Line', {points: [new Point(), new Point(0, 10)]});
-  core.scene.addItem('Circle', {points: [new Point(), new Point(0, 10)]});
-  core.scene.addItem('Polyline', {points: [new Point(), new Point(0, 10)]});
-  core.scene.addItem('Arc', {points: [new Point(), new Point(0, 10), new Point(10, 0)]});
-  core.scene.addItem('Rectangle', {points: [new Point(), new Point(0, 10)]});
-  core.scene.addItem('Text', {points: [new Point(), new Point(0, 10)], height: 10, rotation: 0, string: 'text test'});
+  Core.Scene.addItem('Line', {points: [new Point(), new Point(0, 10)]});
+  Core.Scene.addItem('Circle', {points: [new Point(), new Point(0, 10)]});
+  Core.Scene.addItem('Polyline', {points: [new Point(), new Point(0, 10)]});
+  Core.Scene.addItem('Arc', {points: [new Point(), new Point(0, 10), new Point(10, 0)]});
+  Core.Scene.addItem('Rectangle', {points: [new Point(), new Point(0, 10)]});
+  Core.Scene.addItem('Text', {points: [new Point(), new Point(0, 10)], height: 10, rotation: 0, string: 'text test'});
 
   // Add items to selection set
-  for (let i = 0; i < core.scene.items.length; i++) {
-    core.scene.selectionManager.addToSelectionSet(i);
+  for (let i = 0; i < Core.Scene.items.length; i++) {
+    Core.Scene.selectionManager.addToSelectionSet(i);
   }
 
   /**
@@ -31,12 +31,12 @@ test('Test Copy.action', () => {
   copy.points.push(new Point(10, 0));
 
   // Perform Copy
-  copy.action(core);
+  copy.action();
 
-  expect(core.scene.items.length).toBe(12);
+  expect(Core.Scene.items.length).toBe(12);
 
-  for (let i = 6; i < core.scene.items.length; i++) {
-    expect(core.scene.items[i].points[0].x).toBe(10);
-    expect(core.scene.items[i].points[0].y).toBe(0);
+  for (let i = 6; i < Core.Scene.items.length; i++) {
+    expect(Core.Scene.items[i].points[0].x).toBe(10);
+    expect(Core.Scene.items[i].points[0].y).toBe(0);
   }
 });

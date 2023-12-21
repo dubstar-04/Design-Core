@@ -3,6 +3,8 @@ import {Intersection} from '../lib/intersect.js';
 import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
 
+import {Core} from '../core.js';
+
 export class Entity {
   constructor(data) {
     Object.defineProperty(this, 'type', {
@@ -69,7 +71,7 @@ export class Entity {
     }
   }
 
-  getColour(core) {
+  getColour() {
     // if (this.trueColour !== undefined) {
     //   return this.trueColour;
     // }
@@ -77,29 +79,29 @@ export class Entity {
     let colour = this.colour;
 
     if (colour === 'BYLAYER') {
-      const layer = core.layerManager.getLayerByName(this.layer);
+      const layer = Core.LayerManager.getLayerByName(this.layer);
       colour = layer.colour;
     }
 
     return colour;
   }
 
-  getLineType(core) {
+  getLineType() {
     let lineTypeName = this.lineType;
 
     if (lineTypeName === 'BYLAYER') {
-      const layer = core.layerManager.getLayerByName(this.layer);
+      const layer = Core.LayerManager.getLayerByName(this.layer);
       lineTypeName = layer.lineType;
     }
 
-    const lineType = core.ltypeManager.getStyleByName(lineTypeName);
+    const lineType = Core.LTypeManager.getStyleByName(lineTypeName);
 
     return lineType;
   }
 
 
-  within(selectionExtremes, core) {
-    const layer = core.layerManager.getLayerByName(this.layer);
+  within(selectionExtremes) {
+    const layer = Core.LayerManager.getLayerByName(this.layer);
 
     if (!layer.isSelectable) {
       return;
@@ -118,8 +120,8 @@ export class Entity {
     return false;
   }
 
-  touched(selectionExtremes, core) {
-    const layer = core.layerManager.getLayerByName(this.layer);
+  touched(selectionExtremes) {
+    const layer = Core.LayerManager.getLayerByName(this.layer);
 
     if (!layer.isSelectable) {
       return;
@@ -137,7 +139,7 @@ export class Entity {
 
     if (Intersection.hasOwnProperty(intersectFunction) === false) {
       const msg = `${Strings.Error.INVALIDINTERSECTTYPE}: ${this.type}`;
-      core.notify(msg);
+      Core.instance.notify(msg);
       throw Error(msg);
     }
 
@@ -150,11 +152,11 @@ export class Entity {
     return false;
   }
 
-  extend(points, core) {
+  extend(points) {
     // extend function to be overidden by implementation
   }
 
-  trim(points, core) {
+  trim(points) {
     // trim function to be overidden by implementation
   }
 }

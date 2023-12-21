@@ -15,27 +15,27 @@ export class Trim extends Tool {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.BOUNDARY, [Input.Type.SELECTIONSET]);
 
-      if (!core.scene.selectionManager.selectionSet.selectionSet.length) {
-        await core.scene.inputManager.requestInput(op);
+      if (!Core.Scene.selectionManager.selectionSet.selectionSet.length) {
+        await Core.Scene.inputManager.requestInput(op);
       }
 
       const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       while (true) {
-        const selection = await core.scene.inputManager.requestInput(op2);
+        const selection = await Core.Scene.inputManager.requestInput(op2);
         this.selectedIndex = selection.selectedItemIndex;
-        core.scene.inputManager.actionCommand();
+        Core.Scene.inputManager.actionCommand();
       }
     } catch (error) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  action(core) {
-    // const item = core.scene.selectionManager.findClosestItem(core.mouse.pointOnScene());
+  action() {
+    // const item = Core.Scene.selectionManager.findClosestItem(Core.Mouse.pointOnScene());
 
     const item = this.selectedIndex;
 
@@ -43,10 +43,10 @@ export class Trim extends Tool {
       const intersectPoints = [];
       let TrimItem;
 
-      for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        if (core.scene.selectionManager.selectionSet.selectionSet[i] !== item) {
-          const boundaryItem = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]];
-          TrimItem = core.scene.items[item];
+      for (let i = 0; i < Core.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        if (Core.Scene.selectionManager.selectionSet.selectionSet[i] !== item) {
+          const boundaryItem = Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]];
+          TrimItem = Core.Scene.items[item];
 
           const functionName = 'intersect' + boundaryItem.type + TrimItem.type;
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), TrimItem.intersectPoints());
@@ -60,7 +60,7 @@ export class Trim extends Tool {
       }
 
       if (intersectPoints) {
-        TrimItem.trim(intersectPoints, core);
+        TrimItem.trim(intersectPoints);
       }
 
       this.selectedIndex = undefined;

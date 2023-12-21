@@ -236,8 +236,8 @@ export class Canvas {
    * @param {string} contextColour - colour to overide item colour
    */
   setContext(item, context) {
-    const colour = item.getColour(Core.instance);
-    const lineType = item.getLineType(Core.instance);
+    const colour = item.getColour();
+    const lineType = item.getLineType();
     const lineWidth = item.lineWidth / this.getScale();
 
     try { // HTML Canvas

@@ -3,6 +3,8 @@ import {Entity} from './entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
+import {Core} from '../core.js';
+
 export class Block extends Entity {
   constructor(data) {
     super(data);
@@ -139,7 +141,7 @@ export class Block extends Entity {
         */
   }
 
-  snaps(mousePoint, delta, core) {
+  snaps(mousePoint, delta) {
     let snaps = [];
 
     if (!this.items.length) {
@@ -151,7 +153,7 @@ export class Block extends Entity {
 
     for (let item = 0; item < this.items.length; item++) {
       // collect the child item snaps
-      const itemSnaps = this.items[item].snaps(mousePoint, delta, core);
+      const itemSnaps = this.items[item].snaps(mousePoint, delta);
 
       for (let snap = 0; snap < itemSnaps.length; snap++) {
         // offset the item snap point by the block insert location
@@ -218,13 +220,13 @@ export class Block extends Entity {
     return new BoundingBox(topLeft, bottomRight);
   }
 
-  touched(selectionExtremes, core) {
+  touched(selectionExtremes) {
     if (!this.items.length) {
       // nothing to draw
       return false;
     }
 
-    const layer = core.layerManager.getLayerByName(this.layer);
+    const layer = Core.LayerManager.getLayerByName(this.layer);
 
     if (!layer.isSelectable) {
       return;
@@ -239,7 +241,7 @@ export class Block extends Entity {
     ];
 
     for (let idx = 0; idx < this.items.length; idx++) {
-      const touched = this.items[idx].touched(adjustedSelectionExtremes, core);
+      const touched = this.items[idx].touched(adjustedSelectionExtremes);
       if (touched) {
         return true;
       }

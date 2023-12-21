@@ -6,23 +6,23 @@ const core = new Core();
 
 test('Test Erase.action', () => {
   // Add items to scene
-  core.scene.addItem('Line', {points: [new Point(10, 0), new Point(20, 0)]});
-  core.scene.addItem('Circle', {points: [new Point(10, 0), new Point(20, 0)]});
-  core.scene.addItem('Polyline', {points: [new Point(10, 0), new Point(20, 0)]});
-  core.scene.addItem('Arc', {points: [new Point(10, 0), new Point(10, 10), new Point(0, 10)]});
-  core.scene.addItem('Rectangle', {points: [new Point(10, 0), new Point(0, 10)]});
-  core.scene.addItem('Text', {points: [new Point(10, 0), new Point(0, 10)], height: 10, rotation: 0, string: 'text test'});
+  Core.Scene.addItem('Line', {points: [new Point(10, 0), new Point(20, 0)]});
+  Core.Scene.addItem('Circle', {points: [new Point(10, 0), new Point(20, 0)]});
+  Core.Scene.addItem('Polyline', {points: [new Point(10, 0), new Point(20, 0)]});
+  Core.Scene.addItem('Arc', {points: [new Point(10, 0), new Point(10, 10), new Point(0, 10)]});
+  Core.Scene.addItem('Rectangle', {points: [new Point(10, 0), new Point(0, 10)]});
+  Core.Scene.addItem('Text', {points: [new Point(10, 0), new Point(0, 10)], height: 10, rotation: 0, string: 'text test'});
 
   // Add items to selection set
-  for (let i = 0; i < core.scene.items.length; i++) {
-    core.scene.selectionManager.addToSelectionSet(i);
+  for (let i = 0; i < Core.Scene.items.length; i++) {
+    Core.Scene.selectionManager.addToSelectionSet(i);
   }
 
-  expect(core.scene.items.length).toBe(6);
+  expect(Core.Scene.items.length).toBe(6);
 
   // Perform Erase
   const erase = new Erase();
-  erase.action(core);
+  erase.action();
 
-  expect(core.scene.items.length).toBe(0);
+  expect(Core.Scene.items.length).toBe(0);
 });

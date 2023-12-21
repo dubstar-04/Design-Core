@@ -66,13 +66,13 @@ export class SelectionManager {
     // Loop through all the entities and see if it should be selected
       for (let i = 0; i < Core.Scene.items.length; i++) {
       // check if the item is within the selection rect
-        if (Core.Scene.items[i].within(selectionRect, Core.instance)) {
+        if (Core.Scene.items[i].within(selectionRect)) {
           this.addToSelectionSet(i);
         }
 
         if (crossingSelect) {
         // check if the item is touched / crossed by the selection rect
-          if (Core.Scene.items[i].touched(selectionRect, Core.instance)) {
+          if (Core.Scene.items[i].touched(selectionRect)) {
             this.addToSelectionSet(i);
           }
         }
@@ -170,7 +170,7 @@ export class SelectionManager {
    * @param  {Integer} index
    */
   addToSelectedItems(index) {
-    const copyofitem = Utils.cloneObject(Core.instance, Core.Scene.items[index]);
+    const copyofitem = Utils.cloneObject(Core.Scene.items[index]);
     copyofitem.colour = Core.instance.settings.selecteditemscolour.toString();
     copyofitem.lineWidth = copyofitem.lineWidth * 2;
     this.selectedItems.push(copyofitem);

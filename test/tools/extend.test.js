@@ -25,28 +25,28 @@ test('Test Extend.action', () => {
    * Extend end from horizontal line
    */
   // Add items to scene
-  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  Core.Scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
+  Core.Scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
+  Core.Scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
   extend.selectedIndex = 1;
   // set mouse location - required for Extend
-  core.mouse.setPosFromScenePoint(new Point(40, 50));
+  Core.Mouse.setPosFromScenePoint(new Point(40, 50));
   // Perform Extend
-  extend.action(core);
+  extend.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(Core.Scene.items[0].points[0].x).toBe(lineOneStart.x);
+  expect(Core.Scene.items[0].points[0].y).toBe(lineOneStart.y);
+  expect(Core.Scene.items[0].points[1].x).toBe(lineOneEnd.x);
+  expect(Core.Scene.items[0].points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(100);
-  expect(core.scene.items[1].points[1].y).toBe(lineTwoEnd.y);
+  expect(Core.Scene.items[1].points[0].x).toBe(lineTwoStart.x);
+  expect(Core.Scene.items[1].points[0].y).toBe(lineTwoStart.y);
+  expect(Core.Scene.items[1].points[1].x).toBe(100);
+  expect(Core.Scene.items[1].points[1].y).toBe(lineTwoEnd.y);
 
   /**
    * Extend test two
@@ -55,30 +55,30 @@ test('Test Extend.action', () => {
    */
 
   // clear scene items
-  core.scene.items = [];
+  Core.Scene.items = [];
   // Add items to scene
-  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
-  core.scene.addItem('Line', {points: [lineThreeStart, lineThreeEnd]});
+  Core.Scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  Core.Scene.addItem('Line', {points: [lineThreeStart, lineThreeEnd]});
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
+  Core.Scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
   extend.selectedIndex = 1;
   // set mouse location - required for Extend
-  core.mouse.setPosFromScenePoint(new Point(0, 20));
+  Core.Mouse.setPosFromScenePoint(new Point(0, 20));
   // Perform Extend
-  extend.action(core);
+  extend.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineTwoEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineTwoEnd.y);
+  expect(Core.Scene.items[0].points[0].x).toBe(lineTwoStart.x);
+  expect(Core.Scene.items[0].points[0].y).toBe(lineTwoStart.y);
+  expect(Core.Scene.items[0].points[1].x).toBe(lineTwoEnd.x);
+  expect(Core.Scene.items[0].points[1].y).toBe(lineTwoEnd.y);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(lineThreeStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(lineThreeStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(lineThreeEnd.x);
-  expect(core.scene.items[1].points[1].y).toBe(50);
+  expect(Core.Scene.items[1].points[0].x).toBe(lineThreeStart.x);
+  expect(Core.Scene.items[1].points[0].y).toBe(lineThreeStart.y);
+  expect(Core.Scene.items[1].points[1].x).toBe(lineThreeEnd.x);
+  expect(Core.Scene.items[1].points[1].y).toBe(50);
 
   /**
    * Extend test three
@@ -86,28 +86,28 @@ test('Test Extend.action', () => {
    * trim end from crossing line
    */
   // clear scene items
-  core.scene.items = [];
+  Core.Scene.items = [];
   // Add items to scene
-  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addItem('Line', {points: [crossingLineStart, crossingLineEnd]});
+  Core.Scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
+  Core.Scene.addItem('Line', {points: [crossingLineStart, crossingLineEnd]});
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
+  Core.Scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
   extend.selectedIndex = 1;
   // set mouse location - required for Extend
-  core.mouse.setPosFromScenePoint(new Point(35, 35));
+  Core.Mouse.setPosFromScenePoint(new Point(35, 35));
   // Perform Extend
-  extend.action(core);
+  extend.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(Core.Scene.items[0].points[0].x).toBe(lineOneStart.x);
+  expect(Core.Scene.items[0].points[0].y).toBe(lineOneStart.y);
+  expect(Core.Scene.items[0].points[1].x).toBe(lineOneEnd.x);
+  expect(Core.Scene.items[0].points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(crossingLineStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(crossingLineStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(100);
-  expect(core.scene.items[1].points[1].y).toBe(100);
+  expect(Core.Scene.items[1].points[0].x).toBe(crossingLineStart.x);
+  expect(Core.Scene.items[1].points[0].y).toBe(crossingLineStart.y);
+  expect(Core.Scene.items[1].points[1].x).toBe(100);
+  expect(Core.Scene.items[1].points[1].y).toBe(100);
 });

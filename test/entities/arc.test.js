@@ -3,7 +3,7 @@ import {Arc} from '../../core/entities/arc.js';
 import {Point} from '../../core/entities/point.js';
 
 const core = new Core();
-const commandline = core.commandLine;
+const commandline = Core.CommandLine;
 
 test('Test Arc.execute', () => {
   // Create arc - point, point, angle
@@ -27,7 +27,7 @@ test('Test Arc.execute', () => {
   // TODO: work out how to test user input for commands
   // commented out because it fails. looks like the commands above run before the execute command because its async
   // need to await enter pressed or similar without affecting user experience
-  // expect(core.scene.items.length).toBe(1),
+  // expect(Core.Scene.items.length).toBe(1),
 });
 
 test('Test Arc.startAngle', () => {

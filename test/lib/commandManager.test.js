@@ -4,7 +4,7 @@ import {CommandManager} from '../../core/lib/commandManager.js';
 import {Point} from '../../core/entities/point.js';
 
 const core = new Core();
-const commandManager = new CommandManager(core);
+const commandManager = new CommandManager();
 
 test('Test CommandManager.createNew', () => {
   const startPoint = new Point();

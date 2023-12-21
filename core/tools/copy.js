@@ -14,70 +14,70 @@ export class Copy extends Tool {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
 
-      if (!core.scene.selectionManager.selectionSet.selectionSet.length) {
-        await core.scene.inputManager.requestInput(op);
+      if (!Core.Scene.selectionManager.selectionSet.selectionSet.length) {
+        await Core.Scene.inputManager.requestInput(op);
       }
 
       const op2 = new PromptOptions(Strings.Input.BASEPOINT, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op2);
+      const pt1 = await Core.Scene.inputManager.requestInput(op2);
       this.points.push(pt1);
 
       const op3 = new PromptOptions(Strings.Input.DESTINATION, [Input.Type.POINT, Input.Type.NUMBER]);
-      const pt2 = await core.scene.inputManager.requestInput(op3);
+      const pt2 = await Core.Scene.inputManager.requestInput(op3);
 
       if (Input.getType(pt2) === Input.Type.POINT) {
         this.points.push(pt2);
       } else if (Input.getType(pt2) === Input.Type.NUMBER) {
         const basePoint = this.points.at(-1);
-        const angle = Utils.degrees2radians(core.mouse.inputAngle());
+        const angle = Utils.degrees2radians(Core.Mouse.inputAngle());
         const point = basePoint.project(angle, pt2);
         this.points.push(point);
       }
 
-      core.scene.inputManager.executeCommand();
+      Core.Scene.inputManager.executeCommand();
     } catch (error) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  preview(core) {
+  preview() {
     if (this.points.length >= 1) {
-      const mousePoint = core.mouse.pointOnScene();
+      const mousePoint = Core.Mouse.pointOnScene();
 
       // Draw a line
       const points = [this.points.at(-1), mousePoint];
 
-      core.scene.createTempItem('Line', {points: points});
+      Core.Scene.createTempItem('Line', {points: points});
 
       const xDelta = mousePoint.x - this.points[0].x;
       const yDelta = mousePoint.y - this.points[0].y;
 
-      for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        for (let j = 0; j < core.scene.selectionManager.selectedItems[i].points.length; j++) {
-          core.scene.selectionManager.selectedItems[i].points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
-          core.scene.selectionManager.selectedItems[i].points[j].y = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
+      for (let i = 0; i < Core.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        for (let j = 0; j < Core.Scene.selectionManager.selectedItems[i].points.length; j++) {
+          Core.Scene.selectionManager.selectedItems[i].points[j].x = Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
+          Core.Scene.selectionManager.selectedItems[i].points[j].y = Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
         }
       }
     }
   }
 
-  action(core) {
+  action() {
     const xDelta = this.points[1].x - this.points[0].x;
     const yDelta = this.points[1].y - this.points[0].y;
 
-    for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      const copyofitem = Utils.cloneObject(core, core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]]);
+    for (let i = 0; i < Core.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      const copyofitem = Utils.cloneObject( Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]]);
 
       for (let j = 0; j < copyofitem.points.length; j++) {
-        copyofitem.points[j].x = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
-        copyofitem.points[j].y = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
+        copyofitem.points[j].x = Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
+        copyofitem.points[j].y = Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
       }
 
-      core.scene.items.push(copyofitem);
+      Core.Scene.items.push(copyofitem);
     }
   };
 }

@@ -2,7 +2,7 @@ import {Core} from '../../core/core.js';
 import {Point} from '../../core/entities/point.js';
 
 const core = new Core();
-const layerManager = core.layerManager;
+const layerManager = Core.LayerManager;
 
 test('Test LayerManager.getLayers', () => {
   const layers = layerManager.getLayers();
@@ -91,7 +91,7 @@ test('Test LayerManager.checkLayers', () => {
     layer: newLayerName,
   };
 
-  core.scene.addItem('Line', data, false);
+  Core.Scene.addItem('Line', data, false);
 
   layerManager.checkLayers();
   const layers = layerManager.getLayers();

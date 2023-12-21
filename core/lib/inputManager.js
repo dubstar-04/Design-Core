@@ -170,7 +170,7 @@ export class InputManager {
       this.promptOption.respond(input);
     } else if (Core.CommandManager.isCommand(input) || Core.CommandManager.isShortcut(input)) {
       this.initialiseItem(Core.CommandManager.getCommand(input));
-      this.activeCommand.execute(Core.instance);
+      this.activeCommand.execute();
     }
   }
 
@@ -187,7 +187,7 @@ export class InputManager {
       }
     } else {
       this.initialiseItem(Core.CommandLine.lastCommand[0]);
-      this.activeCommand.execute(Core.instance);
+      this.activeCommand.execute();
     }
   }
 
@@ -220,7 +220,7 @@ export class InputManager {
     Core.Scene.auxiliaryItems = [];
 
     if (this.activeCommand !== undefined) {
-      this.activeCommand.preview(Core.instance);
+      this.activeCommand.preview();
       Core.Canvas.requestPaint();
     }
 
@@ -246,7 +246,7 @@ export class InputManager {
    * Handle single selection
    */
   singleSelect() {
-    console.log('single select');
+    // console.log('single select');
     const point = Core.Mouse.pointOnScene();
     this.onLeftClick(point);
   }
@@ -255,7 +255,7 @@ export class InputManager {
    * Handle window selection
    */
   windowSelect() {
-    console.log('window select');
+    // console.log('window select');
     Core.Scene.selectionManager.windowSelect();
   }
 
@@ -361,7 +361,7 @@ export class InputManager {
    */
   actionCommand(item, index = undefined) {
     if (this.activeCommand instanceof Tool) {
-      this.activeCommand.action(Core.instance);
+      this.activeCommand.action();
     } else {
       // set the items layer to the current layer
       item.layer = Core.LayerManager.getCLayer();

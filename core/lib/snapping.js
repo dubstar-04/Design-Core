@@ -72,7 +72,7 @@ export class Snapping {
         continue;
       }
 
-      const itemSnaps = scene.items[i].snaps(Core.Mouse.pointOnScene(), delta, Core.instance); // get an array of snap point from the item
+      const itemSnaps = scene.items[i].snaps(Core.Mouse.pointOnScene(), delta); // get an array of snap point from the item
       if (itemSnaps) {
         for (let j = 0; j < itemSnaps.length; j++) {
           const length = itemSnaps[j].distance(Core.Mouse.pointOnScene());

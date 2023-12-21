@@ -13,11 +13,11 @@ export class Tool {
     });
   }
 
-  action(core) {
+  action() {
     // action function to be overidden by implementation
   };
 
-  preview(core) {
+  preview() {
     // preview function to be overidden by implementation
   };
 }

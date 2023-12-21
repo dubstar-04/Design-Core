@@ -7,6 +7,8 @@ import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
+import {Core} from '../core.js';
+
 export class Text extends Entity {
   constructor(data) {
     super(data);
@@ -103,45 +105,45 @@ export class Text extends Entity {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op);
+      const pt1 = await Core.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
       const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
-      const height = await core.scene.inputManager.requestInput(op2);
+      const height = await Core.Scene.inputManager.requestInput(op2);
       this.height = height;
 
       const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
-      const rotation = await core.scene.inputManager.requestInput(op3);
+      const rotation = await Core.Scene.inputManager.requestInput(op3);
       this.setRotation(rotation);
 
       const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
-      const string = await core.scene.inputManager.requestInput(op4);
+      const string = await Core.Scene.inputManager.requestInput(op4);
       this.string = String(string);
 
-      core.scene.inputManager.executeCommand(this);
+      Core.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  preview(core) {
+  preview() {
     if (this.points.length >= 1) {
-      if (core.scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
+      if (Core.Scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
         const data = {
           points: this.points,
           height: this.height,
           rotation: this.rotation,
-          string: core.commandLine.command,
+          string: Core.CommandLine.command,
         };
 
-        core.scene.createTempItem(this.type, data);
+        Core.Scene.createTempItem(this.type, data);
       } else {
-        const mousePoint = core.mouse.pointOnScene();
+        const mousePoint = Core.Mouse.pointOnScene();
         const points = [this.points.at(-1), mousePoint];
-        core.scene.createTempItem('Line', {points: points});
+        Core.Scene.createTempItem('Line', {points: points});
       }
     }
   }
@@ -251,7 +253,7 @@ export class Text extends Entity {
     try { // HTML
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt Arial'; // + core.styleManager.getStyleByName(this.styleName).font.toString();
+      ctx.font = this.height + 'pt Arial'; // + Core.StyleManager.getStyleByName(this.styleName).font.toString();
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
@@ -297,7 +299,7 @@ export class Text extends Entity {
     // file.writeGroupCode('73', this.getVerticalAlignment()); //VERTICAL ALIGNMENT
   }
 
-  snaps(mousePoint, delta, core) {
+  snaps(mousePoint, delta) {
     const rect = this.getBoundingRect();
 
     const botLeft = new Point(rect.x, rect.y);

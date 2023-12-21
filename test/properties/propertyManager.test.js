@@ -13,25 +13,25 @@ const data = {
   colour: '#FFFFFF',
 };
 
-core.scene.addItem('Line', data);
-core.scene.addItem('Circle', data);
-core.scene.addItem('Text', data);
+Core.Scene.addItem('Line', data);
+Core.Scene.addItem('Circle', data);
+Core.Scene.addItem('Text', data);
 // Add Arc with a different Colour
-core.scene.addItem('Arc', {points: [point1, point2], colour: '#000000'});
+Core.Scene.addItem('Arc', {points: [point1, point2], colour: '#000000'});
 
 test('Test propertyManager.getItemTypes', () => {
   // Add an item to the selectionSet
-  core.scene.selectionManager.selectionSet.selectionSet.push(0);
+  Core.Scene.selectionManager.selectionSet.selectionSet.push(0);
   let types = propertiesManager.getItemTypes();
   expect(types.length).toBe(1);
 
   // Add the same item to the selectionSet - shouldn't change the count
-  core.scene.selectionManager.selectionSet.selectionSet.push(0);
+  Core.Scene.selectionManager.selectionSet.selectionSet.push(0);
   types = propertiesManager.getItemTypes();
   expect(types.length).toBe(1);
 
   // Add a new item to the selectionSet - result should include 'All'
-  core.scene.selectionManager.selectionSet.selectionSet.push(1);
+  Core.Scene.selectionManager.selectionSet.selectionSet.push(1);
   types = propertiesManager.getItemTypes();
   expect(types.length).toBe(3);
   expect(types[0]).toBe('All');
@@ -39,44 +39,44 @@ test('Test propertyManager.getItemTypes', () => {
 
 test('Test propertyManager.setItemProperties', () => {
   // clear the selection set
-  core.scene.reset();
+  Core.Scene.reset();
   // add the text entity
-  core.scene.selectionManager.selectionSet.selectionSet.push(2);
+  Core.Scene.selectionManager.selectionSet.selectionSet.push(2);
   // set the string attribute of the text entity
   const string = 'test text';
   propertiesManager.setItemProperties('string', string);
 
-  let text = core.scene.items[2];
+  let text = Core.Scene.items[2];
   expect(text.type).toBe('Text');
   expect(text.string).toBe(string);
 
   // try and set a non-existent property
   propertiesManager.setItemProperties('faux-prop', string);
-  text = core.scene.items[2];
+  text = Core.Scene.items[2];
   expect(text['faux-prop']).toBeUndefined();
 
   // clear the selection set
-  core.scene.reset();
+  Core.Scene.reset();
   // Select the circle element
-  core.scene.selectionManager.selectionSet.selectionSet.push(1);
+  Core.Scene.selectionManager.selectionSet.selectionSet.push(1);
   // get the current radius
-  const radius = core.scene.items[1].radius;
+  const radius = Core.Scene.items[1].radius;
   // try and set an incorrect value
   propertiesManager.setItemProperties('radius', string);
-  const circle = core.scene.items[1];
+  const circle = Core.Scene.items[1];
   expect(circle.radius).toBe(radius);
 });
 
 test('Test propertyManager.getItemProperties', () => {
   // clear the selection set
-  core.scene.reset();
+  Core.Scene.reset();
 
   // get props with nothing selected - should be undefined
   let properties = propertiesManager.getItemProperties();
   expect(properties).toBeUndefined();
 
   // Add the line entity to the selectionSet
-  core.scene.selectionManager.selectionSet.selectionSet.push(0);
+  Core.Scene.selectionManager.selectionSet.selectionSet.push(0);
   properties = propertiesManager.getItemProperties('Line');
   expect(properties.length).toBeGreaterThan(0);
 
@@ -91,14 +91,14 @@ test('Test propertyManager.getItemProperties', () => {
 
 test('Test propertyManager.getItemPropertyValue', () => {
   // clear the selection set
-  core.scene.reset();
+  Core.Scene.reset();
 
   // get props with nothing selected - should be undefined
   let propertyValues = propertiesManager.getItemPropertyValue();
   expect(propertyValues).toBeUndefined();
 
   // Add the line entity to the selectionSet
-  core.scene.selectionManager.selectionSet.selectionSet.push(0);
+  Core.Scene.selectionManager.selectionSet.selectionSet.push(0);
   // get the line colour
   propertyValues = propertiesManager.getItemPropertyValue('Line', 'colour');
   expect(propertyValues.length).toBeGreaterThan(0);
@@ -109,7 +109,7 @@ test('Test propertyManager.getItemPropertyValue', () => {
   expect(propertyValues).toBeUndefined();
 
   // get props for all selected types - index 0 and 3 colour should be Varies
-  core.scene.selectionManager.selectionSet.selectionSet.push(3);
+  Core.Scene.selectionManager.selectionSet.selectionSet.push(3);
   propertyValues = propertiesManager.getItemPropertyValue('All', 'colour');
   expect(propertyValues).toBe('Varies');
 });

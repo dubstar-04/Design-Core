@@ -13,28 +13,28 @@ export class Distance extends Tool {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op);
+      const pt1 = await Core.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
       const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
-      const pt2 = await core.scene.inputManager.requestInput(op2);
+      const pt2 = await Core.Scene.inputManager.requestInput(op2);
       this.points.push(pt2);
 
 
-      core.scene.inputManager.executeCommand();
+      Core.Scene.inputManager.executeCommand();
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  preview(core) {
+  preview() {
     // TODO: Draw a preview of the measurement
   }
 
-  action(core) {
+  action() {
     const length = this.points[0].distance(this.points[1]).toFixed(1);
     const x = (this.points[1].x - this.points[0].x).toFixed(1);
     const y = (this.points[1].y - this.points[0].y).toFixed(1);

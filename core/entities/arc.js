@@ -7,6 +7,8 @@ import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
+import {Core} from '../core.js';
+
 
 export class Arc extends Entity {
   constructor(data) {
@@ -56,18 +58,18 @@ export class Arc extends Entity {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.CENTER, [Input.Type.POINT]);
-      const pt = await core.scene.inputManager.requestInput(op);
+      const pt = await Core.Scene.inputManager.requestInput(op);
       this.points.push(pt);
 
       const op1 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op1);
+      const pt1 = await Core.Scene.inputManager.requestInput(op1);
       this.points.push(pt1);
 
       const op2 = new PromptOptions(Strings.Input.ANGLE, [Input.Type.POINT, Input.Type.NUMBER]);
-      const pt2 = await core.scene.inputManager.requestInput(op2);
+      const pt2 = await Core.Scene.inputManager.requestInput(op2);
 
       if (Input.getType(pt2) === Input.Type.POINT) {
         this.points.push(pt2);
@@ -79,23 +81,23 @@ export class Arc extends Entity {
         this.points.push(point);
       }
 
-      core.scene.inputManager.executeCommand(this);
+      Core.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  preview(core) {
+  preview() {
     if (this.points.length >= 1) {
-      const mousePoint = core.mouse.pointOnScene();
+      const mousePoint = Core.Mouse.pointOnScene();
       const points = [this.points.at(0), mousePoint];
-      core.scene.createTempItem('Line', {points: points});
+      Core.Scene.createTempItem('Line', {points: points});
     }
 
     if (this.points.length >= 2) {
-      const mousePoint = core.mouse.pointOnScene();
+      const mousePoint = Core.Mouse.pointOnScene();
       const points = [...this.points, mousePoint];
-      core.scene.createTempItem(this.type, {points: points});
+      Core.Scene.createTempItem(this.type, {points: points});
     }
   }
 
@@ -141,10 +143,10 @@ export class Arc extends Entity {
     };
   }
 
-  snaps(mousePoint, delta, core) {
+  snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (core.settings.endsnap) {
+    if (Core.Settings.endsnap) {
       // Speed this up by generating the proper start and end points when the arc is initialised
       const startPoint = new Point(this.points[0].x + (this.radius * Math.cos(this.startAngle())),
           this.points[0].y + (this.radius * Math.sin(this.startAngle())));
@@ -154,12 +156,12 @@ export class Arc extends Entity {
       snaps.push(startPoint, endPoint);
     }
 
-    if (core.settings.centresnap) {
+    if (Core.Settings.centresnap) {
       const centre = this.points[0];
       snaps.push(centre);
     }
 
-    if (core.settings.nearestsnap) {
+    if (Core.Settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint);
 
       // Crude way to snap to the closest point or a node
