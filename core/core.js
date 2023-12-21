@@ -97,7 +97,7 @@ export class Core {
    * Get the LineTypeManager
    */
   static get LTypeManager() {
-    return this.instance.lTypeManager;
+    return this.instance.ltypeManager;
   }
 
   /**
