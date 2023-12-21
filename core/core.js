@@ -190,7 +190,7 @@ export class Core {
    * @param  {string} file
    */
   openFile(file) {
-    FileIO.openFile(this, file);
+    FileIO.openFile(file);
   }
 
 
@@ -199,7 +199,7 @@ export class Core {
    * @return {string} The dxf file as a string.
    */
   saveFile(version) {
-    return FileIO.saveDxf(this, version);
+    return FileIO.saveDxf(version);
   }
 
   /**
