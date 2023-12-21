@@ -3,8 +3,8 @@ import {StyleManagerBase} from './styleManagerBase.js';
 import {LType} from './ltype.js';
 
 export class LTypeManager extends StyleManagerBase {
-  constructor(core) {
-    super(core);
+  constructor() {
+    super();
   }
 
   createStyle(style) {
@@ -20,7 +20,7 @@ export class LTypeManager extends StyleManagerBase {
     this.addStyle({'name': 'HIDDEN', 'pattern': [6.35, -3.175], 'description': 'Hidden __ __ __ __ __ __ __ __ __ __ __ __ __ _'});
     this.addStyle({'name': 'ByLayer'});
     this.addStyle({'name': 'ByBlock'});
-    // this.core.scene.saveRequired();
+    // Core.Scene.saveRequired();
   }
 
   dxf(file) {

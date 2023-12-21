@@ -3,11 +3,12 @@ import {Layer} from './layer.js';
 import {Strings} from '../lib/strings.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 
+import {Core} from '../core.js';
+
 export class LayerManager {
-  constructor(core) {
+  constructor() {
     this.layers = [];
     this.currentLayer = '0';
-    this.core = core;
 
     this.addStandardLayers();
   }
@@ -47,7 +48,7 @@ export class LayerManager {
     // This is called multiple times from the check layers function when opening files
     if (!this.layerExists(newLayer)) {
       this.layers.push(newLayer);
-      this.core.scene.saveRequired();
+      // Core.Scene.saveRequired();
     }
   }
 
@@ -62,27 +63,27 @@ export class LayerManager {
 
     if (layerToDelete.toUpperCase() === 'DEFPOINTS') {
       // DEFPOINTS layer cannot be deleted
-      this.core.notify(Strings.Message.DEFPOINTSDELETE);
+      Core.instance.notify(Strings.Message.DEFPOINTSDELETE);
       return;
     }
 
     if (layerToDelete === this.currentLayer) {
       // cLayer cannot be deleted
-      this.core.notify(Strings.Message.CLAYERDELETE);
+      Core.instance.notify(Strings.Message.CLAYERDELETE);
       return;
     }
 
     const selectionSet = [];
 
-    for (let i = 0; i < this.core.scene.items.length; i++) {
-      if (this.core.scene.items[i].layer === layerToDelete) {
+    for (let i = 0; i < Core.Scene.items.length; i++) {
+      if (Core.Scene.items[i].layer === layerToDelete) {
         selectionSet.push(i);
       }
     }
 
     selectionSet.sort();
     for (let j = 0; j < selectionSet.length; j++) {
-      this.core.scene.items.splice((selectionSet[j] - j), 1);
+      Core.Scene.items.splice((selectionSet[j] - j), 1);
     }
 
     // Delete The Layer
@@ -109,8 +110,8 @@ export class LayerManager {
       this.addStandardLayers();
     }
 
-    for (let i = 0; i < this.core.scene.items.length; i++) {
-      const layer = (this.core.scene.items[i].layer);
+    for (let i = 0; i < Core.Scene.items.length; i++) {
+      const layer = (Core.Scene.items[i].layer);
       this.addLayer({
         'name': layer,
       });
@@ -122,7 +123,7 @@ export class LayerManager {
     this.addLayer({'name': 'DEFPOINTS', 'plotting': false});
     this.addLayer({'name': 'CENTERLINE', 'colour': '#FFFF00', 'lineType': 'CENTER'});
     this.addLayer({'name': 'HIDDEN', 'colour': '#D6D6D6', 'lineType': 'HIDDEN'});
-    // this.core.scene.saveRequired();
+    // Core.Scene.saveRequired();
   }
 
   getLayerIndex(layerName) {

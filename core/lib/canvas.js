@@ -2,10 +2,11 @@ import {Matrix} from './matrix.js';
 import {Colours} from './colours.js';
 import {Point} from '../entities/point.js';
 
+import {Core} from '../core.js';
+
 export class Canvas {
-  constructor(core) {
+  constructor() {
     this.cvs = null;
-    this.core = core;
     this.matrix = new Matrix();
 
     this.minScaleFactor = 0.05;
@@ -36,11 +37,11 @@ export class Canvas {
   }
 
   mouseMoved() {
-    if (this.core.mouse.buttonTwoDown) {
-      this.core.canvas.pan();
+    if (Core.Mouse.buttonTwoDown) {
+      this.pan();
     }
 
-    this.core.scene.inputManager.mouseMoved();
+    Core.Scene.inputManager.mouseMoved();
   }
 
   mouseDown(button) {
@@ -55,7 +56,7 @@ export class Canvas {
         break;
     }
 
-    this.core.scene.inputManager.mouseDown(button);
+    Core.Scene.inputManager.mouseDown(button);
   };
 
   mouseUp(button) {
@@ -71,7 +72,7 @@ export class Canvas {
         break;
     }
 
-    this.core.scene.inputManager.mouseUp(button);
+    Core.Scene.inputManager.mouseUp(button);
   };
 
   doubleClick(button) {
@@ -88,7 +89,7 @@ export class Canvas {
 
   pan() {
     // pandelta: mouse drag distance in scene scale
-    this.panDelta = this.core.mouse.pointOnScene().subtract(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
+    this.panDelta = Core.Mouse.pointOnScene().subtract(Core.Mouse.transformToScene(Core.Mouse.mouseDownCanvasPoint));
     // delta difference between last delta calculation and current mouse position
     const delta = this.panDelta.subtract(this.lastDelta);
     // set the last delta value
@@ -106,14 +107,14 @@ export class Canvas {
   };
 
   zoom(scale) {
-    const zoomPoint = this.core.mouse.pointOnScene();
+    const zoomPoint = Core.Mouse.pointOnScene();
     this.matrix.scale(scale, scale);
     this.matrix.translate((zoomPoint.x / scale) - zoomPoint.x, (zoomPoint.y / scale) - zoomPoint.y);
     this.requestPaint();
   }
 
   zoomExtents() {
-    const extents = this.core.scene.boundingBox();
+    const extents = Core.Scene.boundingBox();
 
     if (extents) {
       // calculate the center of all items
@@ -121,7 +122,7 @@ export class Canvas {
       // get the center of the screen transformed to a scene position
       const screenCenter = new Point(this.width / 2, this.height / 2);
       // calculate the translation delta required to center on screen
-      const translateDelta = this.core.mouse.transformToScene(screenCenter).subtract(selectionCenter);
+      const translateDelta = Core.Mouse.transformToScene(screenCenter).subtract(selectionCenter);
       // calculate the scale required to fill the screen
       const targetScale = Math.min((this.width / extents.xLength), (this.height / extents.yLength));
       // calculate the scale delta required to fill 90% of the screen
@@ -173,19 +174,19 @@ export class Canvas {
     }
 
     const pos = new Point();
-    const origin = this.core.mouse.transformToScene(pos);
+    const origin = Core.Mouse.transformToScene(pos);
 
     // Paint the scene background
     try {// HTML
       // this.clear()
-      context.fillStyle = this.core.settings.canvasbackgroundcolour;
+      context.fillStyle = Core.Settings.canvasbackgroundcolour;
       context.fillRect(origin.x, origin.y, width / this.getScale(), height / this.getScale());
       // context.globalAlpha = this.cvs.alpha
     } catch { // Cairo
-      const rgbColour = Colours.hexToScaledRGB(this.core.settings.canvasbackgroundcolour);
+      const rgbColour = Colours.hexToScaledRGB(Core.Settings.canvasbackgroundcolour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       const scaled = new Point(width, height);
-      const sc = this.core.mouse.transformToScene(scaled);
+      const sc = Core.Mouse.transformToScene(scaled);
       context.moveTo(origin.x, origin.y);
       context.lineTo(origin.x, sc.y);
       context.lineTo(sc.x, sc.y);
@@ -197,34 +198,34 @@ export class Canvas {
     this.paintGrid(context, width, height);
 
     // Paint the primary scene items
-    for (let i = 0; i < this.core.scene.items.length; i++) {
-      const layer = this.core.layerManager.getLayerByName(this.core.scene.items[i].layer);
+    for (let i = 0; i < Core.Scene.items.length; i++) {
+      const layer = Core.LayerManager.getLayerByName(Core.Scene.items[i].layer);
 
       if (!layer.isVisible) {
         continue;
       }
 
-      this.setContext(this.core.scene.items[i], context);
-      this.core.scene.items[i].draw(context, this.getScale());
+      this.setContext(Core.Scene.items[i], context);
+      Core.Scene.items[i].draw(context, this.getScale());
     }
 
     // Paint the temporary scene items
-    for (let j = 0; j < this.core.scene.tempItems.length; j++) {
-      this.setContext(this.core.scene.tempItems[j], context);
-      this.core.scene.tempItems[j].draw(context, this.getScale());
+    for (let j = 0; j < Core.Scene.tempItems.length; j++) {
+      this.setContext(Core.Scene.tempItems[j], context);
+      Core.Scene.tempItems[j].draw(context, this.getScale());
     }
 
     // Paint the selected scene items
-    for (let k = 0; k < this.core.scene.selectionManager.selectedItems.length; k++) {
-      this.setContext(this.core.scene.selectionManager.selectedItems[k], context);
-      this.core.scene.selectionManager.selectedItems[k].draw(context, this.getScale());
+    for (let k = 0; k < Core.Scene.selectionManager.selectedItems.length; k++) {
+      this.setContext(Core.Scene.selectionManager.selectedItems[k], context);
+      Core.Scene.selectionManager.selectedItems[k].draw(context, this.getScale());
     }
 
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
-    for (let l = 0; l < this.core.scene.auxiliaryItems.length; l++) {
-      this.core.scene.auxiliaryItems[l].draw(context, this.getScale(), this.core);
+    for (let l = 0; l < Core.Scene.auxiliaryItems.length; l++) {
+      Core.Scene.auxiliaryItems[l].draw(context, this.getScale());
     }
   }
 
@@ -235,8 +236,8 @@ export class Canvas {
    * @param {string} contextColour - colour to overide item colour
    */
   setContext(item, context) {
-    const colour = item.getColour(this.core);
-    const lineType = item.getLineType(this.core);
+    const colour = item.getColour(Core.instance);
+    const lineType = item.getLineType(Core.instance);
     const lineWidth = item.lineWidth / this.getScale();
 
     try { // HTML Canvas
@@ -258,12 +259,12 @@ export class Canvas {
     let lineWidth = 0.75;
 
     try { // HTML Canvas
-      context.strokeStyle = this.core.settings.gridcolour;
+      context.strokeStyle = Core.Settings.gridcolour;
       context.lineWidth = lineWidth / this.getScale();
       context.beginPath();
     } catch { // Cairo
       context.setLineWidth(lineWidth / this.getScale());
-      const rgbColour = Colours.hexToScaledRGB(this.core.settings.gridcolour);
+      const rgbColour = Colours.hexToScaledRGB(Core.Settings.gridcolour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
@@ -283,7 +284,7 @@ export class Canvas {
     context.lineTo(0, ygridmin);
     context.stroke();
 
-    if (this.core.settings['drawgrid']) {
+    if (Core.Settings['drawgrid']) {
       // set a feint linewidth for the grid
       lineWidth = lineWidth * 0.25;
 

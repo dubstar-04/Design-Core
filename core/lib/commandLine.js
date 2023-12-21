@@ -1,16 +1,16 @@
 import {Point} from '../entities/point.js';
 import {Input} from './inputManager.js';
 
+import {Core} from '../core.js';
+
 export class CommandLine {
   /**
    * Commandline Constructor
-   * @param {object} core - Design Core Object
    */
-  constructor(core) {
+  constructor() {
     this.cmdLine = ''; // display string
     this.prompt = 'Command:';
     this.command = '';
-    this.core = core;
     this.lastCommand = []; // Store the last command
     this.lastCommandPosition = -1; // Store the current position on the command history
     this.updateCallbackFunction; // set to external callback function
@@ -76,11 +76,11 @@ export class CommandLine {
       this.updateCallbackFunction(this.cmdLine);
     }
 
-    if (this.core.scene.inputManager.activeCommand !== undefined) {
+    if (Core.Scene.inputManager.activeCommand !== undefined) {
       // TODO: This should call a common function that is currently called mouseMove in the scene class
-      this.core.scene.tempItems = [];
-      this.core.scene.inputManager.activeCommand.preview(this.core);
-      this.core.canvas.requestPaint();
+      Core.Scene.tempItems = [];
+      Core.Scene.inputManager.activeCommand.preview(Core.instance);
+      Core.Canvas.requestPaint();
     }
   }
 
@@ -99,7 +99,7 @@ export class CommandLine {
         this.enterPressed();
         break;
       case 'Escape':
-        this.core.scene.inputManager.onEscapePressed();
+        Core.Scene.inputManager.onEscapePressed();
         break;
       case 'Space': // space
         this.spacePressed();
@@ -162,15 +162,15 @@ export class CommandLine {
    * Handles presses of the delete key
    */
   deletePressed() {
-    this.core.scene.inputManager.onCommand('Erase');
+    Core.Scene.inputManager.onCommand('Erase');
   }
 
   /**
    * Handles presses of the space key
    */
   spacePressed() {
-    const activeCommand = this.core.scene.inputManager.activeCommand;
-    const promptOption = this.core.scene.inputManager.promptOption;
+    const activeCommand = Core.Scene.inputManager.activeCommand;
+    const promptOption = Core.Scene.inputManager.promptOption;
 
     if (activeCommand && promptOption.types.includes(Input.Type.STRING)) {
       this.command = this.command + ' ';
@@ -198,9 +198,9 @@ export class CommandLine {
     if (this.cmdLine.length > this.prompt.length) {
       // get the inputprompt and remove the prompt text
       const inputCommand = this.cmdLine.slice(this.prompt.length);
-      this.core.scene.inputManager.onCommand(this.parseInput(inputCommand));
+      Core.Scene.inputManager.onCommand(this.parseInput(inputCommand));
     } else {
-      this.core.scene.inputManager.onEnterPressed();
+      Core.Scene.inputManager.onEnterPressed();
     }
   }
 
@@ -227,7 +227,7 @@ export class CommandLine {
       point.x = parseFloat(xyData[0]);
       point.y = parseFloat(xyData[1]);
 
-      const activeCommand = this.core.scene.inputManager.activeCommand;
+      const activeCommand = Core.Scene.inputManager.activeCommand;
 
       if (isRelative && activeCommand !== undefined && activeCommand.points.length) {
         point.x = parseFloat(activeCommand.points.at(-1).x + point.x);

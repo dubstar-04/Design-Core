@@ -7,9 +7,11 @@ import {Rectangle} from '../entities/rectangle.js';
 // import {Ellipse} from '../entities/ellipse.js';
 // import {Spline} from '../entities/spline.js';
 import {Text} from '../entities/text.js';
+import {Dimension} from '../entities/dimension.js';
 import {AlignedDimension} from '../entities/alignedDimension.js';
 import {AngularDimension} from '../entities/angularDimension.js';
 import {DiametricDimension} from '../entities/diametricDimension.js';
+import {RadialDimension} from '../entities/radialDimension.js';
 // import {BaseDimension} from '../entities/basedimension.js';
 import {Block} from '../entities/block.js';
 import {Insert} from '../entities/insert.js';
@@ -33,6 +35,8 @@ import {Utils} from './utils.js';
 import {Strings} from './strings.js';
 import {Logging} from './logging.js';
 
+import {Core} from '../core.js';
+
 const classes = {
   Line,
   Polyline,
@@ -43,9 +47,11 @@ const classes = {
   // Ellipse,
   // Spline,
   Text,
+  Dimension,
   AngularDimension,
   AlignedDimension,
   DiametricDimension,
+  RadialDimension,
   // BaseDimension,
   Block,
   Insert,
@@ -64,10 +70,9 @@ export class CommandManager {
   /**
    * CommandManager constructor
    */
-  constructor(core) {
+  constructor() {
     // store a list of the available commands
     this.commands = [];
-    this.core = core;
 
     for (const index in classes) {
       if (typeof classes[index].register === 'function') {
@@ -133,7 +138,7 @@ export class CommandManager {
     // get a fuzzy match and notify
     const command = this.getFuzzyMatch(input);
     const shortcut = this.getShortcut(command);
-    this.core.notify(`${Strings.Message.RECOMMEND} ${command} (${shortcut})`);
+    Core.instance.notify(`${Strings.Message.RECOMMEND} ${command} (${shortcut})`);
     return false;
   }
 

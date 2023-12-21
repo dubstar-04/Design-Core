@@ -1,5 +1,6 @@
 import {Tool} from '../tools/tool.js';
 import {Snapping} from './snapping.js';
+import {Core} from '../core.js';
 
 export class PromptOptions {
   constructor(promptMessage = 'error', types = [], options = []) {
@@ -108,8 +109,7 @@ export class Input {
 }
 
 export class InputManager {
-  constructor(core) {
-    this.core = core;
+  constructor() {
     this.activeCommand = undefined;
 
     this.selection = undefined;
@@ -123,11 +123,11 @@ export class InputManager {
    */
   reset() {
     this.snapping.active = false;
-    this.core.commandLine.resetPrompt();
+    Core.CommandLine.resetPrompt();
     this.activeCommand = undefined;
     // this.promptOption.reject('reject');
     this.promptOption = undefined;
-    this.core.scene.reset();
+    Core.Scene.reset();
   }
 
   /**
@@ -168,9 +168,9 @@ export class InputManager {
   onCommand(input) {
     if (this.activeCommand !== undefined) {
       this.promptOption.respond(input);
-    } else if (this.core.commandManager.isCommand(input) || this.core.commandManager.isShortcut(input)) {
-      this.initialiseItem(this.core.commandManager.getCommand(input));
-      this.activeCommand.execute(this.core);
+    } else if (Core.CommandManager.isCommand(input) || Core.CommandManager.isShortcut(input)) {
+      this.initialiseItem(Core.CommandManager.getCommand(input));
+      this.activeCommand.execute(Core.instance);
     }
   }
 
@@ -179,15 +179,15 @@ export class InputManager {
    */
   onEnterPressed() {
     if (this.activeCommand !== undefined) {
-      if (this.promptOption.types.includes(Input.Type.SELECTIONSET) && this.core.scene.selectionManager.selectionSet.accepted !== true) {
-        this.core.scene.selectionManager.selectionSet.accepted = true;
-        this.promptOption.respond(this.core.scene.selectionManager.selectionSet);
+      if (this.promptOption.types.includes(Input.Type.SELECTIONSET) && Core.Scene.selectionManager.selectionSet.accepted !== true) {
+        Core.Scene.selectionManager.selectionSet.accepted = true;
+        this.promptOption.respond(Core.Scene.selectionManager.selectionSet);
       } else {
         this.reset();
       }
     } else {
-      this.initialiseItem(this.core.commandLine.lastCommand[0]);
-      this.activeCommand.execute(this.core);
+      this.initialiseItem(Core.CommandLine.lastCommand[0]);
+      this.activeCommand.execute(Core.instance);
     }
   }
 
@@ -207,7 +207,7 @@ export class InputManager {
       this.snapping.active = false;
       this.promptOption.respond(point);
     } else {
-      const selection = this.core.scene.selectionManager.singleSelect(this.core.mouse.pointOnScene());
+      const selection = Core.Scene.selectionManager.singleSelect(Core.Mouse.pointOnScene());
       this.onSelection(selection);
     }
   }
@@ -216,20 +216,20 @@ export class InputManager {
    * Handle mouse position changes
    */
   mouseMoved() {
-    this.core.scene.tempItems = [];
-    this.core.scene.auxiliaryItems = [];
+    Core.Scene.tempItems = [];
+    Core.Scene.auxiliaryItems = [];
 
     if (this.activeCommand !== undefined) {
-      this.activeCommand.preview(this.core);
-      this.core.canvas.requestPaint();
+      this.activeCommand.preview(Core.instance);
+      Core.Canvas.requestPaint();
     }
 
     if (this.snapping.active) {
-      this.snapping.snap(this.core.scene);
-      this.core.canvas.requestPaint();
+      this.snapping.snap(Core.Scene);
+      Core.Canvas.requestPaint();
     }
 
-    if (this.core.mouse.buttonOneDown) {
+    if (Core.Mouse.buttonOneDown) {
       if (this.promptOption !== undefined) {
         // check if the active command requires a selection set
         if (!this.promptOption.types.includes(Input.Type.SELECTIONSET)) {
@@ -237,8 +237,8 @@ export class InputManager {
         }
       }
 
-      this.core.scene.selectionManager.drawSelectionWindow();
-      this.core.canvas.requestPaint();
+      Core.Scene.selectionManager.drawSelectionWindow();
+      Core.Canvas.requestPaint();
     }
   }
 
@@ -247,7 +247,7 @@ export class InputManager {
    */
   singleSelect() {
     console.log('single select');
-    const point = this.core.mouse.pointOnScene();
+    const point = Core.Mouse.pointOnScene();
     this.onLeftClick(point);
   }
 
@@ -256,7 +256,7 @@ export class InputManager {
    */
   windowSelect() {
     console.log('window select');
-    this.core.scene.selectionManager.windowSelect();
+    Core.Scene.selectionManager.windowSelect();
   }
 
 
@@ -286,7 +286,7 @@ export class InputManager {
     switch (button) {
       case 0: // left button
         // Clear tempItems - This is here to remove the crossing window
-        this.core.scene.auxiliaryItems = [];
+        Core.Scene.auxiliaryItems = [];
 
         if (this.promptOption !== undefined) {
           // check if the active command requires a selection set
@@ -296,7 +296,7 @@ export class InputManager {
         }
 
         // check if the mouse position has changed since mousedown
-        if (!this.core.mouse.mouseDownCanvasPoint.isSame(this.core.mouse.pointOnCanvas())) {
+        if (!Core.Mouse.mouseDownCanvasPoint.isSame(Core.Mouse.pointOnCanvas())) {
           this.windowSelect();
         }
 
@@ -318,7 +318,7 @@ export class InputManager {
       this.promptOption.respond(selection);
     } else {
       if (Input.getType(selection) === Input.Type.SINGLESELECTION) {
-        this.core.scene.selectionManager.addToSelectionSet(selection.selectedItemIndex);
+        Core.Scene.selectionManager.addToSelectionSet(selection.selectedItemIndex);
       }
 
       // update selection set
@@ -330,9 +330,9 @@ export class InputManager {
  * @param {string} command
  */
   initialiseItem(command) {
-    this.core.scene.saveRequired();
-    this.core.commandLine.addToCommandHistory(command);
-    this.activeCommand = this.core.commandManager.createNew(command);
+    Core.Scene.saveRequired();
+    Core.CommandLine.addToCommandHistory(command);
+    this.activeCommand = Core.CommandManager.createNew(command);
   };
 
   /**
@@ -341,7 +341,7 @@ export class InputManager {
    */
   setPrompt(prompt) {
     // TODO: single line method required?
-    this.core.commandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
+    Core.CommandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
   }
 
   /**
@@ -361,12 +361,12 @@ export class InputManager {
    */
   actionCommand(item, index = undefined) {
     if (this.activeCommand instanceof Tool) {
-      this.activeCommand.action(this.core);
+      this.activeCommand.action(Core.instance);
     } else {
       // set the items layer to the current layer
-      item.layer = this.core.layerManager.getCLayer();
+      item.layer = Core.LayerManager.getCLayer();
       // return the item index
-      return this.core.scene.addItem(item.type, item, index);
+      return Core.Scene.addItem(item.type, item, index);
     }
   }
 }

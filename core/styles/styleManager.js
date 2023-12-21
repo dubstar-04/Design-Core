@@ -3,8 +3,8 @@ import {StyleManagerBase} from './styleManagerBase.js';
 import {Style} from './style.js';
 
 export class StyleManager extends StyleManagerBase {
-  constructor(core) {
-    super(core);
+  constructor() {
+    super();
   }
 
   createStyle(style) {
@@ -20,7 +20,7 @@ export class StyleManager extends StyleManagerBase {
       'name': 'ANNOTATIVE',
     });
     */
-    // this.core.scene.saveRequired();
+    // Core.scene.saveRequired();
   }
 
   dxf(file) {

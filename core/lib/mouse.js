@@ -1,18 +1,17 @@
 import {Point} from '../entities/point.js';
 import {Utils} from './utils.js';
+import {Core} from '../core.js';
 
 export class Mouse {
   /**
    * Mouse Constructor
-   * @param {object} core
    */
-  constructor(core) {
+  constructor() {
     this.x = 0;
     this.y = 0;
     this.buttonOneDown = false;
     this.buttonTwoDown = false;
     this.buttonThreeDown = false;
-    this.core = core;
     this.mouseDownCanvasPoint = new Point();
     this.lastClick = 0; // Timer for double click
     this.lastButton = 0; // last button for double click check
@@ -68,7 +67,7 @@ export class Mouse {
    * @returns
    */
   transformToScene(point) {
-    const scenePoint = this.core.canvas.matrix.invert().transformPoint(point.x, 0 - point.y + this.core.canvas.height);
+    const scenePoint = Core.Canvas.matrix.invert().transformPoint(point.x, 0 - point.y + Core.Canvas.height);
     return scenePoint;
   }
 
@@ -78,8 +77,8 @@ export class Mouse {
    * @returns
    */
   transformToCanvas(point) {
-    const canvasPoint = this.core.canvas.matrix.transformPoint(point.x, point.y);
-    canvasPoint.y = 0 - canvasPoint.y + this.core.canvas.height;
+    const canvasPoint = Core.Canvas.matrix.transformPoint(point.x, point.y);
+    canvasPoint.y = 0 - canvasPoint.y + Core.Canvas.height;
     return canvasPoint;
   }
 
@@ -120,23 +119,23 @@ export class Mouse {
     this.x = x;
     // canvas are typically origin top left. CAD is typically origin bottom left.
     // move the origin down to the bottom and invert the y position
-    this.y = -y + this.core.canvas.height;
+    this.y = -y + Core.Canvas.height;
 
-    if (this.core.settings.polar) {
+    if (Core.Settings.polar) {
       // if polar is enabled - get the closest points
-      const polarSnap = this.core.scene.inputManager.snapping.polarSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
+      const polarSnap = Core.Scene.inputManager.snapping.polarSnap(this.transformToScene(this.mouseDownCanvasPoint));
       if (polarSnap) {
         this.setPosFromScenePoint(polarSnap);
       }
-    } else if (this.core.settings.ortho) {
+    } else if (Core.Settings.ortho) {
       // if ortho is enabled - get the nearest ortho point
-      const orthoSnap = this.snapping.orthoSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
+      const orthoSnap = this.snapping.orthoSnap(this.transformToScene(this.mouseDownCanvasPoint));
       if (orthoSnap) {
         this.setPosFromScenePoint(orthoSnap);
       }
     }
 
-    this.core.canvas.mouseMoved();
+    Core.Canvas.mouseMoved();
   }
 
   /**
@@ -159,7 +158,7 @@ export class Mouse {
     }
 
     if (this.isDoubleClick(button) === false) {
-      this.core.canvas.mouseDown(button);
+      Core.Canvas.mouseDown(button);
     }
   }
 
@@ -202,7 +201,7 @@ export class Mouse {
         break;
     }
 
-    this.core.canvas.mouseUp(button);
+    Core.Canvas.mouseUp(button);
   }
 
   /**
@@ -210,7 +209,7 @@ export class Mouse {
    * @param {number} button - 0 = left, 1 = wheel, 2 = right;
    */
   doubleClick(button) {
-    this.core.canvas.doubleClick(button);
+    Core.Canvas.doubleClick(button);
   }
 
   /**
@@ -218,7 +217,7 @@ export class Mouse {
    * @param {number} delta - +/- 1 for zoom in / out
    */
   wheel(delta) {
-    this.core.canvas.wheel(delta);
+    Core.Canvas.wheel(delta);
   }
 
   /**

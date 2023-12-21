@@ -3,8 +3,8 @@ import {DimStyle} from './dimStyle.js';
 import {StyleManagerBase} from './styleManagerBase.js';
 
 export class DimStyleManager extends StyleManagerBase {
-  constructor(core) {
-    super(core);
+  constructor() {
+    super();
   }
 
   createStyle(style) {
@@ -20,7 +20,7 @@ export class DimStyleManager extends StyleManagerBase {
       'name': 'ANNOTATIVE',
     });
     */
-    // this.core.scene.saveRequired();
+    // Core.scene.saveRequired();
   }
 
   dxf(file) {

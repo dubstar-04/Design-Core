@@ -1,4 +1,5 @@
 import {DXFFile} from './dxfFile.js';
+import {Core} from '../../core.js';
 
 export class DXFWriter {
   constructor() {
@@ -6,41 +7,39 @@ export class DXFWriter {
 
   /**
    * Write DXF header section
-   * @param {object} core
    * @param {DXFFile} file
    */
-  writeHeaders(core, file) {
+  writeHeaders(file) {
     // write headers
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'HEADER');
     file.writeGroupCode('9', '$ACADVER');
     file.writeGroupCode('1', file.version);
     file.writeGroupCode('9', '$CLAYER');
-    file.writeGroupCode('8', core.layerManager.getCLayer());
+    file.writeGroupCode('8', Core.LayerManager.getCLayer());
     file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.formatHandle(core.scene.items.length + 200), DXFFile.Version.R2000); // TODO: This needs to reflect the actual handle values
+    file.writeGroupCode('5', file.formatHandle(Core.Scene.items.length + 200), DXFFile.Version.R2000); // TODO: This needs to reflect the actual handle values
     file.writeGroupCode('0', 'ENDSEC');
   }
 
   /**
    * Write DXF table section
-   * @param {object} core
    * @param {DXFFile} file
    */
-  writeTables(core, file) {
+  writeTables(file) {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'TABLES');
 
     // type table
-    core.ltypeManager.dxf(file);
+    Core.LTypeManager.dxf(file);
     // layer table
-    core.layerManager.dxf(file);
+    Core.LayerManager.dxf(file);
     // style table
-    core.styleManager.dxf(file);
+    Core.StyleManager.dxf(file);
     // dimstyle table
-    core.dimStyleManager.dxf(file);
+    Core.DimStyleManager.dxf(file);
     // vport table
-    core.scene.dxf(file);
+    Core.Scene.dxf(file);
 
     // VIEW Table
     file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
@@ -100,16 +99,15 @@ export class DXFWriter {
 
   /**
    * Write DXF block section
-   * @param {object} core
    * @param {DXFFile} file
    */
-  writeBlocks(core, file) {
+  writeBlocks(file) {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'BLOCKS');
 
-    for (let i = 0; i < core.scene.items.length; i++) {
-      if (core.scene.items[i].type === 'Block') {
-        core.scene.items[i].dxf(file);
+    for (let i = 0; i < Core.Scene.items.length; i++) {
+      if (Core.Scene.items[i].type === 'Block') {
+        Core.Scene.items[i].dxf(file);
       }
     }
 
@@ -158,16 +156,15 @@ export class DXFWriter {
 
   /**
    * Write DXF entities section
-   * @param {object} core
    * @param {DXFFile} file
    */
-  writeEntities(core, file) {
+  writeEntities(file) {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'ENTITIES');
 
-    for (let i = 0; i < core.scene.items.length; i++) {
-      if (core.scene.items[i].type !== 'Block') {
-        core.scene.items[i].dxf(file);
+    for (let i = 0; i < Core.Scene.items.length; i++) {
+      if (Core.Scene.items[i].type !== 'Block') {
+        Core.Scene.items[i].dxf(file);
       }
     }
 
@@ -176,22 +173,21 @@ export class DXFWriter {
 
   /**
    * Write DXF file
-   * @param {object} core
    * @returns dxf formatted string formatted
    */
-  write(core, version) {
+  write(version) {
     if (version === undefined) {
-      version = core.dxfVersion;
+      version = Core.instance.dxfVersion;
     }
     const file = new DXFFile(version);
     // write start of file
     file.writeGroupCode('999', 'DXF created from Design-Core');
 
     // write sections
-    this.writeHeaders(core, file);
-    this.writeTables(core, file);
-    this.writeBlocks(core, file);
-    this.writeEntities(core, file);
+    this.writeHeaders(file);
+    this.writeTables(file);
+    this.writeBlocks(file);
+    this.writeEntities(file);
 
     // Dictionary
     file.writeGroupCode('0', 'SECTION', DXFFile.Version.R2000);

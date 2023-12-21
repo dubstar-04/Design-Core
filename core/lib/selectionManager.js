@@ -1,5 +1,6 @@
 import {Utils} from './utils.js';
 import {SelectionWindow} from './selectionWindow.js';
+import {Core} from '../core.js';
 
 export class SingleSelection {
   constructor(index, point) {
@@ -17,8 +18,7 @@ export class SelectionSet {
 
 // TODO: Refactor class.
 export class SelectionManager {
-  constructor(core) {
-    this.core = core;
+  constructor() {
     this.selectionSet = new SelectionSet(); // store a list of selected items indices
     this.selectedItems = []; // store a copy of selected items
   }
@@ -37,7 +37,7 @@ export class SelectionManager {
    */
   selectionSetChanged() {
     // signal to the properties manager that the selection set is changed
-    this.core.propertyManager.selectionSetChanged();
+    Core.instance.propertyManager.selectionSetChanged();
   }
 
   /**
@@ -45,14 +45,14 @@ export class SelectionManager {
    */
   drawSelectionWindow() {
     const selectionPoints = [];
-    selectionPoints.push(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint));
-    selectionPoints.push(this.core.mouse.pointOnScene());
+    selectionPoints.push(Core.Mouse.transformToScene(Core.Mouse.mouseDownCanvasPoint));
+    selectionPoints.push(Core.Mouse.pointOnScene());
 
     const data = {
       points: selectionPoints,
     };
 
-    this.core.scene.addToAuxiliaryItems(new SelectionWindow(data));
+    Core.Scene.addToAuxiliaryItems(new SelectionWindow(data));
   }
 
   /**
@@ -60,19 +60,19 @@ export class SelectionManager {
    */
   windowSelect() {
     const selectionRect = this.getSelectionRect();
-    const crossingSelect = this.core.mouse.pointOnScene().y > this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y;
+    const crossingSelect = Core.Mouse.pointOnScene().y > Core.Mouse.transformToScene(Core.Mouse.mouseDownCanvasPoint).y;
 
     if (selectionRect !== undefined) {
     // Loop through all the entities and see if it should be selected
-      for (let i = 0; i < this.core.scene.items.length; i++) {
+      for (let i = 0; i < Core.Scene.items.length; i++) {
       // check if the item is within the selection rect
-        if (this.core.scene.items[i].within(selectionRect, this.core)) {
+        if (Core.Scene.items[i].within(selectionRect, Core.instance)) {
           this.addToSelectionSet(i);
         }
 
         if (crossingSelect) {
         // check if the item is touched / crossed by the selection rect
-          if (this.core.scene.items[i].touched(selectionRect, this.core)) {
+          if (Core.Scene.items[i].touched(selectionRect, Core.instance)) {
             this.addToSelectionSet(i);
           }
         }
@@ -80,7 +80,7 @@ export class SelectionManager {
 
       this.selectionSetChanged();
     }
-    this.core.canvas.requestPaint();
+    Core.instance.canvas.requestPaint();
   }
 
   /**
@@ -89,10 +89,10 @@ export class SelectionManager {
    */
   getSelectionRect() {
     // TODO: It would be nice if this returned an object {xmin: xmin, ymin:ymin ...}
-    const xmin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-    const xmax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).x, this.core.mouse.pointOnScene().x);
-    const ymin = Math.min(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
-    const ymax = Math.max(this.core.mouse.transformToScene(this.core.mouse.mouseDownCanvasPoint).y, this.core.mouse.pointOnScene().y);
+    const xmin = Math.min(Core.Mouse.transformToScene(Core.Mouse.mouseDownCanvasPoint).x, Core.Mouse.pointOnScene().x);
+    const xmax = Math.max(Core.Mouse.transformToScene(Core.Mouse.mouseDownCanvasPoint).x, Core.Mouse.pointOnScene().x);
+    const ymin = Math.min(Core.Mouse.transformToScene(Core.Mouse.mouseDownCanvasPoint).y, Core.Mouse.pointOnScene().y);
+    const ymax = Math.max(Core.Mouse.transformToScene(Core.Mouse.mouseDownCanvasPoint).y, Core.Mouse.pointOnScene().y);
 
     const selectionRect = [xmin, xmax, ymin, ymax];
 
@@ -123,11 +123,11 @@ export class SelectionManager {
    * @returns {Integer} - return index of closest item or undefined
    */
   findClosestItem(point) {
-    let delta = 1.65 / this.core.canvas.getScale(); // find a more suitable starting value
+    let delta = 1.65 / Core.instance.canvas.getScale(); // find a more suitable starting value
     let closestItemIndex;
 
-    for (let i = 0; i < this.core.scene.items.length; i++) {
-      const distance = this.core.scene.items[i].closestPoint(point)[1]; // ClosestPoint()[1] returns a distance to the closest point
+    for (let i = 0; i < Core.Scene.items.length; i++) {
+      const distance = Core.Scene.items[i].closestPoint(point)[1]; // ClosestPoint()[1] returns a distance to the closest point
 
       if (distance < delta) {
         delta = distance;
@@ -170,8 +170,8 @@ export class SelectionManager {
    * @param  {Integer} index
    */
   addToSelectedItems(index) {
-    const copyofitem = Utils.cloneObject(this.core, this.core.scene.items[index]);
-    copyofitem.colour = this.core.settings.selecteditemscolour.toString();
+    const copyofitem = Utils.cloneObject(Core.instance, Core.Scene.items[index]);
+    copyofitem.colour = Core.instance.settings.selecteditemscolour.toString();
     copyofitem.lineWidth = copyofitem.lineWidth * 2;
     this.selectedItems.push(copyofitem);
   }
@@ -187,6 +187,6 @@ export class SelectionManager {
       this.addToSelectedItems(this.selectionSet.selectionSet[i]);
     }
 
-    this.core.canvas.requestPaint();
+    Core.instance.canvas.requestPaint();
   }
 }

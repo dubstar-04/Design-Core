@@ -28,11 +28,10 @@ export class Utils {
 
   /**
    * Deep clone object
-   * @param {object} core
    * @param {objec} obj - object to clone
    * @returns - new cloned object
    */
-  static cloneObject(core, obj) {
+  static cloneObject(obj) {
     // deep clone obj and all its attributes
     if (obj === null || typeof obj !== 'object') {
       return obj;
@@ -43,7 +42,7 @@ export class Utils {
 
     for (const key of Reflect.ownKeys(obj)) {
       const value = obj[key];
-      clone[key] = value instanceof Object && typeof value !== 'function' ? this.cloneObject(core, value) : value;
+      clone[key] = value instanceof Object && typeof value !== 'function' ? this.cloneObject(value) : value;
     }
 
     return clone;

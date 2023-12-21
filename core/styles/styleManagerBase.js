@@ -1,8 +1,9 @@
+import {Core} from '../core.js';
+
 export class StyleManagerBase {
-  constructor(core) {
+  constructor() {
     this.styles = [];
     this.currentstyle = 'STANDARD';
-    this.core = core;
     this.addStandardStyles();
   }
 
@@ -62,7 +63,7 @@ export class StyleManagerBase {
     const newstyle = this.createStyle(style);
     if (!this.styleExists(newstyle.name)) {
       this.styles.push(newstyle);
-      // this.core.scene.saveRequired();
+      // Core.Scene.saveRequired();
     }
   }
 
@@ -73,8 +74,8 @@ export class StyleManagerBase {
   deleteStyleFromScene(style) {
     const selectionSet = [];
 
-    for (let i = 0; i < this.core.scene.items.length; i++) {
-      if (this.core.scene.items[i].style === style) {
+    for (let i = 0; i < Core.Scene.items.length; i++) {
+      if (Core.Scene.items[i].style === style) {
         selectionSet.push(i);
       }
     }
@@ -83,7 +84,7 @@ export class StyleManagerBase {
     selectionSet.sort((a, b)=>b-a);
 
     for (let j = 0; j < selectionSet.length; j++) {
-      this.core.scene.items.splice((selectionSet[j]), 1);
+      Core.Scene.items.splice((selectionSet[j]), 1);
     }
   }
 
@@ -151,7 +152,7 @@ export class StyleManagerBase {
       this.addStandardStyles();
     }
 
-    for (let i = 0; i < this.core.scene.items.length; i++) {
+    for (let i = 0; i < Core.Scene.items.length; i++) {
       const style = (items[i].style);
       this.addstyle({
         'name': style,
