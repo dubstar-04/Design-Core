@@ -1,4 +1,5 @@
 import {Point} from '../entities/point.js';
+import {Logging} from './logging.js';
 
 export class BoundingBox {
   constructor(firstCorner = new Point(), secondCorner = new Point()) {
@@ -46,6 +47,22 @@ export class BoundingBox {
    */
   get yLength() {
     return this.yMax - this.yMin;
+  }
+
+  /**
+   * Return the bounding box for points
+   * @param {Array} points
+   */
+  static fromPoints(points) {
+    if (!points.length) {
+      throw Error('BoundingBox from points - point array empty');
+    }
+    const xMin = points.reduce((min, p) => p.x < min ? p.x : min, points[0].x);
+    const xMax = points.reduce((max, p) => p.x > max ? p.x : max, points[0].x);
+    const yMin = points.reduce((min, p) => p.y < min ? p.y : min, points[0].y);
+    const yMax = points.reduce((max, p) => p.y > max ? p.y : max, points[0].y);
+
+    return new BoundingBox(new Point(xMin, yMin), new Point(xMax, yMax));
   }
 
   /**
