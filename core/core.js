@@ -128,6 +128,18 @@ export class Core {
     return this.instance.settings;
   }
 
+  /** End of Static Accessors **/
+
+
+  /**
+   * Activate the current context
+   * Required to set the _instance to the current context
+   * The instance is accessed via static methods
+   */
+  activate() {
+    // TODO: is there a better way to track the context / instance
+    Core._instance = this;
+  }
   /**
    * Get the current dxf version
    */
