@@ -112,13 +112,10 @@ export class Scene {
    * @returns - index of items
    */
   findItem(type, prop, value) {
-    // console.log('findinscene:', type, prop, value);
-
     const filteredItems = [];
 
     this.items.forEach((item, index) => {
       if (item.type.toUpperCase() === type.toUpperCase() && item.hasOwnProperty(prop) && item[prop] === value) {
-        console.log('findInScene - item found:', item.type, index, item.name);
         filteredItems.push(index);
       }
     });
@@ -141,11 +138,9 @@ export class Scene {
    * @returns - success status
    */
   removeItem(index) {
-    // console.log('remove item', index);
     const count = this.items.length;
     this.items.splice(index, 1);
 
-    // console.log('before', count, 'after', this.items.length);
     if (this.items.length < count) {
       return true;
     }
