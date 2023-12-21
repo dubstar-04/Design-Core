@@ -34,6 +34,98 @@ export class Core {
 
     // function to call external notification command for the ui
     this.externalNotifyCallbackFunction;
+
+    // create a static reference to the instantiated core object
+    Core._instance = this;
+  }
+
+  /** Static Accessors **/
+  /**
+   * Get the current core instance
+   */
+  static get instance() {
+    if (!this._instance) {
+      throw Error('Core not instantiated');
+    }
+
+    return this._instance;
+  }
+
+  /**
+   * Get the Scene
+   */
+  static get Scene() {
+    return this.instance.scene;
+  }
+
+  /**
+   * Get the CommandManager
+   */
+  static get CommandManager() {
+    return this.instance.commandManager;
+  }
+
+  /**
+   * Get the Canvas
+   */
+  static get Canvas() {
+    return this.instance.canvas;
+  }
+
+  /**
+   * Get the Mouse
+   */
+  static get Mouse() {
+    return this.instance.mouse;
+  }
+
+  /**
+   * Get the CommandLine
+   */
+  static get CommandLine() {
+    return this.instance.commandLine;
+  }
+
+  /**
+   * Get the LayerManager
+   */
+  static get LayerManager() {
+    return this.instance.layerManager;
+  }
+
+  /**
+   * Get the LineTypeManager
+   */
+  static get LTypeManager() {
+    return this.instance.lTypeManager;
+  }
+
+  /**
+   * Get the StyleManager
+   */
+  static get StyleManager() {
+    return this.instance.styleManager;
+  }
+
+  /**
+   * Get the DimStyleManager
+   */
+  static get DimStyleManager() {
+    return this.instance.dimStyleManager;
+  }
+
+  /**
+   * Get the property manager
+   */
+  static get PropertyManager() {
+    return this.instance.propertyManager;
+  }
+
+  /**
+   * Get the property manager
+   */
+  static get Settings() {
+    return this.instance.settings;
   }
 
   /**
