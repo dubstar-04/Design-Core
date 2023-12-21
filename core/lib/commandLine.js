@@ -79,7 +79,7 @@ export class CommandLine {
     if (Core.Scene.inputManager.activeCommand !== undefined) {
       // TODO: This should call a common function that is currently called mouseMove in the scene class
       Core.Scene.tempItems = [];
-      Core.Scene.inputManager.activeCommand.preview(Core.instance);
+      Core.Scene.inputManager.activeCommand.preview();
       Core.Canvas.requestPaint();
     }
   }
