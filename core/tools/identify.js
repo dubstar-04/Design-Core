@@ -3,6 +3,8 @@ import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
+import {Core} from '../core.js';
+
 export class Identify extends Tool {
   constructor() {
     super();
@@ -29,6 +31,6 @@ export class Identify extends Tool {
     const x = this.points.at(-1).x.toFixed(1);
     const y = this.points.at(-1).y.toFixed(1);
     const id = (`X:${x} Y:${y}`);
-    core.notify(id);
+    Core.instance.notify(id);
   }
 }

@@ -3,6 +3,8 @@ import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
+import {Core} from '../core.js';
+
 export class Distance extends Tool {
   constructor() {
     super();
@@ -23,7 +25,6 @@ export class Distance extends Tool {
       const pt2 = await Core.Scene.inputManager.requestInput(op2);
       this.points.push(pt2);
 
-
       Core.Scene.inputManager.executeCommand();
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
@@ -39,6 +40,6 @@ export class Distance extends Tool {
     const x = (this.points[1].x - this.points[0].x).toFixed(1);
     const y = (this.points[1].y - this.points[0].y).toFixed(1);
     const di = (`${Strings.Strings.LENGTH}: ${length} &#916;X: ${x} &#916;Y: ${y}`);
-    core.notify(di);
+    Core.instance.notify(di);
   }
 }
