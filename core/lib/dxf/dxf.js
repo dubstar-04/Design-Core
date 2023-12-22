@@ -131,9 +131,9 @@ export class DXF {
 
           const command = child[0];
           // check if the child is a valid entity
-          if (Core.CommandManagerisCommand(command)) {
+          if (Core.CommandManager.isCommand(command)) {
             // create an instance of the child entity
-            const item = Core.CommandManagercreateNew(command, child);
+            const item = Core.CommandManager.createNew(command, child);
 
             if (block.hasOwnProperty('items') === false) {
               block.items = [];
