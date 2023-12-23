@@ -5,11 +5,11 @@ import {Solid} from './solid.js';
 import {Entity} from './entity.js';
 import {Logging} from '../lib/logging.js';
 
+import {Core} from '../core.js';
+
 export class BaseDimension extends Entity {
   constructor(data) {
     super(data);
-
-    // console.log(data);
 
     Object.defineProperty(this, 'blockName', {
       value: '',
@@ -61,7 +61,6 @@ export class BaseDimension extends Entity {
       if (data.block) {
         // Reference to block that contains the entities that make up this dimension
         this.block = data.block;
-        console.log('block paired with dimension');
       }*/
 
       if (data.blockName || data[2]) {
@@ -204,7 +203,9 @@ export class BaseDimension extends Entity {
   }
 
   draw(ctx, scale) {
-    const entities = this.buildDimension();
+    const style = Core.DimStyleManager.getStyleByName(this.styleName);
+
+    const entities = this.buildDimension(style);
 
     if (entities) {
       this.block.clearItems();
@@ -246,7 +247,7 @@ export class BaseDimension extends Entity {
   // ////////////////////////////////////////
 
 
-  snaps(mousePoint, delta, core) {
+  snaps(mousePoint, delta) {
     const snaps = [];
     return snaps;
   }
@@ -259,15 +260,15 @@ export class BaseDimension extends Entity {
     return this.block.boundingBox();
   }
 
-  within(selectionExtremes, core) {
-    return this.block.within(selectionExtremes, core);
+  within(selectionExtremes) {
+    return this.block.within(selectionExtremes);
   }
 
   intersectPoints() {
     return this.block.intersectPoints();
   }
 
-  touched(selectionExtremes, core) {
-    return this.block.touched(selectionExtremes, core);
+  touched(selectionExtremes) {
+    return this.block.touched(selectionExtremes);
   }
 }
