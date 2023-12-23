@@ -196,26 +196,38 @@ export class DimStyle {
 
       if (data[147]) {
         // DXF Groupcode 147 - offset from dimline
+        // The value of DIMGAP is also used as the minimum length of each segment of the dimension line.
+        // To locate the components of a linear dimension within the extension lines, enough space must be available for both arrowheads (2 x DIMASZ),
+        // both dimension line segments (2 x DIMGAP), a gap on either side of the dimension text (another 2 x DIMGAP), and the length of the dimension text,
+        // which depends on its size and number of decimal places displayed
         this.DIMGAP = data[147];
       }
 
       if (data[71]) {
         // DXF Groupcode 71 - Dimension tolerances generated if nonzero
+        // Setting DIMTOL to on (1) turns DIMLIM off (0)
         this.DIMTOL = data[71];
       }
 
       if (data[72]) {
         // DXF Groupcode 72 - Dimension limits generated if nonzero
+        // 0 = Dimension limits are not generated as default text
+        // 1 = Dimension limits are generated as default text
+        // Setting DIMLIM to on (1) turns DIMTOL off (0)
         this.DIMLIM = data[72];
       }
 
       if (data[73]) {
         // DXF Groupcode 73 - Text inside horizontal if nonzero
+        // 0 = Aligns text with the dimension line
+        // 1 = Draws text horizontally
         this.DIMTIH = data[73];
       }
 
       if (data[74]) {
         // DXF Groupcode 74 - Text outside horizontal if nonzero
+        // 0 = Aligns text with the dimension line
+        // 1 = Draws text horizontally
         this.DIMTOH = data[74];
       }
 
@@ -231,6 +243,12 @@ export class DimStyle {
 
       if (data[77]) {
         // DXF Groupcode 77 -Text above dimension line if nonzero
+        // 0 = Centers the dimension text between the extension lines.
+        // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1). The distance from the dimension line to the baseline of the lowest line of text is the current DIMGAP value.
+        // 2 = Places the dimension text on the side of the dimension line farthest away from the defining points.
+        // 3 = Places the dimension text to conform to Japanese Industrial Standards (JIS).
+        // 4 = Places the dimension text below the dimension line.
+
         this.DIMTAD = data[77];
       }
 
@@ -496,7 +514,7 @@ export class DimStyle {
     // 4 = Vertical Text
     // 16 = Style is from an xref
     // 32 = Xref is resolved (If set with 16)
-    // 64 = Required for
+    // 64 = Required internally by AutoCAD, can be ignored
 
     let flags = 0;
 
