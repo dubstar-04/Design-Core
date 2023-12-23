@@ -471,6 +471,25 @@ export class DimStyle {
     Logging.instance.warn(`${this.type} - ${err}`);
   }
 
+  /**
+   * Get valueName property value from dimstyle
+   * @param {string} valueName
+   * @returns value or undefined
+   */
+  getValue(valueName) {
+    if (this.hasOwnProperty(valueName)) {
+      return this[valueName];
+    }
+
+    const err = `Getting Value - ${valueName}`;
+    Logging.instance.warn(`${this.type} - ${err}`);
+    return;
+  }
+
+  /**
+   * Get standard flags for the dimstyle
+   * @returns
+   */
   getStandardFlags() {
     // Standard flags (bit-coded values):
     // 1 = This entry describes as shape
