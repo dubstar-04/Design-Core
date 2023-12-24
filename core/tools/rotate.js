@@ -4,6 +4,8 @@ import {Utils} from '../lib/utils.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
+import {Core} from '../core.js';
+
 
 export class Rotate extends Tool {
   constructor() {

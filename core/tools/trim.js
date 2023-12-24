@@ -4,6 +4,8 @@ import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
+import {Core} from '../core.js';
+
 export class Trim extends Tool {
   constructor() {
     super();
