@@ -221,12 +221,10 @@ export class InputManager {
 
     if (this.activeCommand !== undefined) {
       this.activeCommand.preview();
-      Core.Canvas.requestPaint();
     }
 
     if (this.snapping.active) {
       this.snapping.snap();
-      Core.Canvas.requestPaint();
     }
 
     if (Core.Mouse.buttonOneDown) {
@@ -238,8 +236,9 @@ export class InputManager {
       }
 
       Core.Scene.selectionManager.drawSelectionWindow();
-      Core.Canvas.requestPaint();
     }
+
+    Core.Canvas.requestPaint();
   }
 
   /**
