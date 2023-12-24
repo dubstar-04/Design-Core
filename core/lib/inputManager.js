@@ -225,7 +225,7 @@ export class InputManager {
     }
 
     if (this.snapping.active) {
-      this.snapping.snap(Core.Scene);
+      this.snapping.snap();
       Core.Canvas.requestPaint();
     }
 

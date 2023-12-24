@@ -36,10 +36,10 @@ export class Snapping {
    * Get snap point and draw to the scene
    * @param {scene} scene object //TODO: passing scene is hacky. Find a cleaner way
    */
-  snap(scene) {
-    const snapPoint = this.getSnapPoint(scene);
+  snap() {
+    const snapPoint = this.getSnapPoint();
     if (snapPoint) {
-      this.addSnapPoint(snapPoint, scene);
+      this.addSnapPoint(snapPoint);
     }
   }
 
@@ -48,9 +48,9 @@ export class Snapping {
    * @param {Point} snapPoint
    * @param {scene} scene
    */
-  addSnapPoint(snapPoint, scene) {
+  addSnapPoint(snapPoint) {
     // show the snap point
-    scene.addToAuxiliaryItems(new SnapPoint(snapPoint));
+    Core.Scene.addToAuxiliaryItems(new SnapPoint(snapPoint));
 
     // Move the mouse to the closest snap point so if the mouse if clicked the snap point is used.
     Core.Mouse.setPosFromScenePoint(snapPoint);
@@ -61,18 +61,18 @@ export class Snapping {
    * @param {scene} scene
    * @returns Point or undefined
    */
-  getSnapPoint(scene) {
+  getSnapPoint() {
     let snapPoint;
     let delta = 25 / Core.Canvas.getScale(); // find a more suitable starting value
 
-    for (let i = 0; i < scene.items.length; i++) {
-      const layer = Core.LayerManager.getLayerByName(scene.items[i].layer);
+    for (let i = 0; i < Core.Scene.items.length; i++) {
+      const layer = Core.LayerManager.getLayerByName(Core.Scene.items[i].layer);
 
       if (!layer.isVisible) {
         continue;
       }
 
-      const itemSnaps = scene.items[i].snaps(Core.Mouse.pointOnScene(), delta); // get an array of snap point from the item
+      const itemSnaps = Core.Scene.items[i].snaps(Core.Mouse.pointOnScene(), delta); // get an array of snap point from the item
       if (itemSnaps) {
         for (let j = 0; j < itemSnaps.length; j++) {
           const length = itemSnaps[j].distance(Core.Mouse.pointOnScene());
