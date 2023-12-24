@@ -1,5 +1,7 @@
 import {Tool} from '../tools/tool.js';
 import {Snapping} from './snapping.js';
+import {Utils} from './utils.js';
+
 import {Core} from '../core.js';
 
 export class PromptOptions {
@@ -227,6 +229,7 @@ export class InputManager {
       this.snapping.snap();
     }
 
+    // selection window active
     if (Core.Mouse.buttonOneDown) {
       if (this.promptOption !== undefined) {
         // check if the active command requires a selection set
@@ -236,6 +239,17 @@ export class InputManager {
       }
 
       Core.Scene.selectionManager.drawSelectionWindow();
+    }
+
+    // Determine if the mouse is over a scene item
+    if (this.activeCommand === undefined || this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
+      const index = Core.Scene.selectionManager.findClosestItem(Core.Mouse.pointOnScene());
+      if (index !== undefined) {
+        const copyofitem = Utils.cloneObject(Core.Scene.items[index]);
+        // copyofitem.colour = Core.instance.settings.selecteditemscolour.toString();
+        copyofitem.lineWidth = copyofitem.lineWidth * 2;
+        Core.Scene.addToTempItems(copyofitem);
+      }
     }
 
     Core.Canvas.requestPaint();
