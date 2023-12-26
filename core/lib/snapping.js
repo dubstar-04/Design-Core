@@ -34,7 +34,6 @@ export class Snapping {
 
   /**
    * Get snap point and draw to the scene
-   * @param {scene} scene object //TODO: passing scene is hacky. Find a cleaner way
    */
   snap() {
     const snapPoint = this.getSnapPoint();
@@ -46,7 +45,6 @@ export class Snapping {
   /**
    * Draw the snap point
    * @param {Point} snapPoint
-   * @param {scene} scene
    */
   addSnapPoint(snapPoint) {
     // show the snap point
@@ -58,7 +56,6 @@ export class Snapping {
 
   /**
    * Get the closest snap point
-   * @param {scene} scene
    * @returns Point or undefined
    */
   getSnapPoint() {
