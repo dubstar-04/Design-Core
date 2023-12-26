@@ -34,12 +34,18 @@ export class Snapping {
 
   /**
    * Get snap point and draw to the scene
+   * @returns Point or undefined
    */
   snap() {
-    const snapPoint = this.getSnapPoint();
-    if (snapPoint) {
-      this.addSnapPoint(snapPoint);
+    if (this.active) {
+      const snapPoint = this.getSnapPoint();
+      if (snapPoint) {
+        this.addSnapPoint(snapPoint);
+        return snapPoint;
+      }
     }
+
+    return;
   }
 
   /**
