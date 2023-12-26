@@ -205,12 +205,29 @@ export class InputManager {
    * @param {Point} point
    */
   onLeftClick(point) {
-    if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {
-      this.snapping.active = false;
-      this.promptOption.respond(point);
-    } else {
+    // left clicks are used for selection of entities and points
+    // Selection of entities can only occur if there is no active snap available
+    // Selection of entities can only occur if the mouse is over an entity
+    // Final selection is a non-snapped point on the scene
+
+    // Selection Priority:
+    // Point snapping
+    // Entity Selection
+    // Point of scene
+
+    // TODO: snap and index is already performed during mouse moves
+    const snap = this.snapping.snap();
+    const index = Core.Scene.selectionManager.findClosestItem(Core.Mouse.pointOnScene());
+
+    // Select entity only mouse is close to an entity and no snap point is available
+    // Do allow selection when there is no command active
+    // Don't allow selection of there is an active command that does't require a selection i.e. prompt option includes SINGLESELECTION
+    if (index !== undefined && !snap && (this.activeCommand === undefined || this.promptOption !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION)|| this.promptOption.types.includes(Input.Type.SELECTIONSET)))) {
       const selection = Core.Scene.selectionManager.singleSelect(Core.Mouse.pointOnScene());
       this.onSelection(selection);
+    } else if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {
+      this.snapping.active = false;
+      this.promptOption.respond(point);
     }
   }
 
@@ -225,10 +242,6 @@ export class InputManager {
       this.activeCommand.preview();
     }
 
-    if (this.snapping.active) {
-      this.snapping.snap();
-    }
-
     // selection window active
     if (Core.Mouse.buttonOneDown) {
       if (this.promptOption !== undefined) {
@@ -241,14 +254,22 @@ export class InputManager {
       Core.Scene.selectionManager.drawSelectionWindow();
     }
 
-    // Determine if the mouse is over a scene item
-    if (this.activeCommand === undefined || this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
-      const index = Core.Scene.selectionManager.findClosestItem(Core.Mouse.pointOnScene());
-      if (index !== undefined) {
-        const copyofitem = Utils.cloneObject(Core.Scene.items[index]);
-        // copyofitem.colour = Core.instance.settings.selecteditemscolour.toString();
-        copyofitem.lineWidth = copyofitem.lineWidth * 2;
-        Core.Scene.addToTempItems(copyofitem);
+    // store the snapped point
+    let snapped;
+    if (this.snapping.active) {
+      snapped = this.snapping.snap();
+    }
+
+    // Determine if the mouse is over a scene item only if no snap point is available
+    if (snapped === undefined) {
+      if (this.activeCommand === undefined || this.activeCommand !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION) || this.promptOption.types.includes(Input.Type.SELECTIONSET))) {
+        const index = Core.Scene.selectionManager.findClosestItem(Core.Mouse.pointOnScene());
+        if (index !== undefined) {
+          const copyofitem = Utils.cloneObject(Core.Scene.items[index]);
+          // copyofitem.colour = Core.instance.settings.selecteditemscolour.toString();
+          copyofitem.lineWidth = copyofitem.lineWidth * 2;
+          Core.Scene.addToTempItems(copyofitem);
+        }
       }
     }
 
