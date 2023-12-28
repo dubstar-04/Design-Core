@@ -12,6 +12,7 @@ import {PropertyManager} from './properties/propertyManager.js';
 import {FileIO} from './lib/fileio.js';
 import {Settings} from './lib/settings.js';
 import {DXFFile} from './lib/dxf/dxfFile.js';
+import {Logging} from './lib/logging.js';
 
 /** Class representing design core. This is the primary entry point */
 export class Core {
@@ -181,6 +182,7 @@ export class Core {
   notify(message) {
     if (this.externalNotifyCallbackFunction) {
       this.externalNotifyCallbackFunction(message);
+      Logging.instance.debug(message);
     }
   }
 
