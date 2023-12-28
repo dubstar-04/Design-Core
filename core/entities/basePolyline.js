@@ -76,11 +76,13 @@ export class BasePolyline extends Entity {
       let index;
       while (true) {
         let options;
+        let prompt = Strings.Input.NEXTPOINT;
         if (this.points.length >= 2) {
           options = this.inputMode === this.modes.LINE ? [this.modes.ARC] : [this.modes.LINE];
+          prompt = `${Strings.Input.NEXTPOINT} or ${Strings.Input.OPTION}`;
         }
 
-        op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT], options);
+        op2 = new PromptOptions(prompt, [Input.Type.POINT], options);
         pt2 = await Core.Scene.inputManager.requestInput(op2);
 
         if (Input.getType(pt2) === Input.Type.POINT) {
@@ -92,6 +94,7 @@ export class BasePolyline extends Entity {
           // first creation will get a new index, subsequent will use the index to update the original polyline
           index = Core.Scene.inputManager.actionCommand(this, index);
         } else if (Input.getType(pt2) === Input.Type.STRING) {
+          // options are converted to input in the prompt options class
           if (pt2 === this.modes.ARC) {
             this.inputMode = this.modes.ARC;
           }
