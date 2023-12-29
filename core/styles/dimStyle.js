@@ -45,7 +45,7 @@ export class DimStyle {
     this.DIMCLRD = 0; // 176 - Dimension line color, range is 0 = BYBLOCK, 256 = BYLAYER
     this.DIMCLRE = 0; // 177 - Dimension extension line color, range is 0 = BYBLOCK, 256 = BYLAYER
     this.DIMCLRT = 0; // 178 - Dimension text color, range is 0 = BYBLOCK, 256 = BYLAYER
-    this.DIMADEC = 0; // 179 - Number of precision places displayed in angular dimensions
+    this.DIMADEC = 0; // 179 - Number of precision places displayed in angular dimensions - Stored as dictionary
     this.DIMUNIT= 2; // 270 - (obsolete, now use DIMLUNIT AND DIMFRAC)
     this.DIMDEC = 2; // 271 - Number of decimal places for the tolerance values of a primary units dimension
     this.DIMTDEC = 2; // 272 - Number of decimal places to display the tolerance values
@@ -54,7 +54,7 @@ export class DimStyle {
     this.DIMAUNIT = 0; // 275 - Angle format for angular dimensions
     this.DIMFRAC = 0; // 276 - Fraction format when DIMLUNIT is set to 4 (Architectural) or 5 (Fractional).
     this.DIMLUNIT = 2; // 277 - Sets units for all dimension types except Angular
-    this.DIMDSEP = ','; // 278 - Single-character decimal separator used when creating dimensions whose unit format is decimal
+    this.DIMDSEP = ','; // 278 - Single-character decimal separator used when creating dimensions whose unit format is decimal - Stored as dictionary
     this.DIMTMOVE = 0; // 279 - Dimension text movement rules
     this.DIMJUST = 0; // 280 - Horizontal dimension text position
     this.DIMSD1 = 0; // 281 - Suppression of first extension line
@@ -359,6 +359,9 @@ export class DimStyle {
 
       if (data[278]) {
         // DXF Groupcode 278 - Single-character decimal separator used when creating dimensions whose unit format is decimal
+        // Period - ?
+        // Comma - 44
+        // Space - 32
         this.DIMDSEP = data[278];
       }
 
@@ -580,7 +583,7 @@ export class DimStyle {
     file.writeGroupCode('275', this.DIMAUNIT);
     file.writeGroupCode('276', this.DIMFRAC);
     file.writeGroupCode('277', this.DIMLUNIT);
-    file.writeGroupCode('278', this.DIMDSEP);
+    // file.writeGroupCode('278', this.DIMDSEP); - AutoCAD uses a numberical description
     file.writeGroupCode('279', this.DIMTMOVE);
     file.writeGroupCode('280', this.DIMJUST);
     file.writeGroupCode('281', this.DIMSD1);
