@@ -12,20 +12,20 @@ export class DimStyle {
     this.DIMBLK1 = ''; // 6 - First arrow block name
     this.DIMBLK2 = ''; // 7 - Second arrow block name
     this.DIMSCALE = 1.0; // 40 - dimension scale
-    this.DIMASZ = 0.18; // 41 - arrow size
-    this.DIMEXO = 0.0625; // 42 - offset from origin
-    this.DIMDLI = 0.38; // 43 - Baseline spacing
-    this.DIMEXE = 0.18; // 44- extend beyond dim lines
+    this.DIMASZ = 2.5; // 41 - arrow size
+    this.DIMEXO = 0.625; // 42 - offset from origin
+    this.DIMDLI = 3.75; // 43 - Baseline spacing
+    this.DIMEXE = 1.25; // 44- extend beyond dim lines
     this.DIMRND = 0.0; // 45 - Rounding value for dimension distances
     this.DIMDLE = 0.0; // 46 - Dimension line extension
     this.DIMTP = 0.0; // 47 - Plus tolerance
     this.DIMTM = 0.0; // 48 - Minus tolerance
     this.DIMTXT = 2.5; // 140 - Dimensioning text height
-    this.DIMCEN = 0.09; // 141 - centre marks
+    this.DIMCEN = 2.5; // 141 - centre marks
     this.DIMTSZ = 0.0; // 142 - Dimensioning tick size; 0 = no ticks
-    this.DIMALTF = 25.39; // 143 - multiplier for alternate units
+    this.DIMALTF = 0.0394; // 143 - multiplier for alternate units
     this.DIMLFAC = 1.0; // 144 - Measurement scale factor
-    this.DIMTVP = 0.0; // 145 - Text vertical position
+    this.DIMTVP = 0.0; // 145 - Text vertical position, The DIMTVP value is used when DIMTAD is off.
     this.DIMTFAC = 1.0; // 146 - Dimension tolerance display scale factor
     this.DIMGAP = 0.6250; // 147 - offset from dimline
     this.DIMTOL = 0; // 71 - Dimension tolerances generated if nonzero
