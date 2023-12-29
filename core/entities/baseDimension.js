@@ -163,6 +163,9 @@ export class BaseDimension extends Entity {
     return type;
   }
 
+  getPointBySequence(sequenceNumber) {
+    const point = this.points.find((point) => point.sequence === sequenceNumber);
+    return point;
   }
 
   getArrowHead(point, angle, height) {
