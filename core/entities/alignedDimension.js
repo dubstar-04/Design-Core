@@ -33,9 +33,9 @@ export class AlignedDimension extends BaseDimension {
       this.points.push(pt14);
 
       const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
-      const pt10 = await Core.Scene.inputManager.requestInput(op2);
-      pt10.sequence = 10;
-      this.points.push(pt10);
+      const pt11 = await Core.Scene.inputManager.requestInput(op2);
+      pt11.sequence = 11;
+      this.points.push(pt11);
 
       Core.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -46,17 +46,31 @@ export class AlignedDimension extends BaseDimension {
   preview() {
     if (this.points.length == 1) {
       const mousePoint = Core.Mouse.pointOnScene();
-      mousePoint.sequence = 14;
       const points = [this.points.at(0), mousePoint];
       Core.Scene.createTempItem('Line', {points: points});
     }
 
     if (this.points.length > 1) {
       const mousePoint = Core.Mouse.pointOnScene();
-      mousePoint.sequence = 10;
+      mousePoint.sequence = 11;
       const points = [...this.points, mousePoint];
       Core.Scene.createTempItem(this.type, {points: points});
     }
+  }
+
+  static getPointsFromSelection(items) {
+    const points = [];
+    const item = items[0];
+
+    const pt13 = item.points[0];
+    pt13.sequence = 13;
+    points.push(pt13);
+
+    const pt14 = item.points[1];
+    pt14.sequence = 14;
+    points.push(pt14);
+
+    return points;
   }
 
   buildDimension(style) {
@@ -235,31 +249,31 @@ export class AlignedDimension extends BaseDimension {
   }
 
   dxf(file) {
-    const Pt13 = this.getPointBySequence(13);
-    const Pt14 = this.getPointBySequence(14);
     const Pt10 = this.getPointBySequence(10);
     const Pt11 = this.text.points[0];
+    const Pt13 = this.getPointBySequence(13);
+    const Pt14 = this.getPointBySequence(14);
 
     file.writeGroupCode('0', 'DIMENSION');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimension', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
-    // file.writeGroupCode('2', this.blockName);
-    file.writeGroupCode('10', Pt10.x); // X - DEFINITION / ARROW POINT
-    file.writeGroupCode('20', Pt10.y); // Y - DEFINITION / ARROW POINT
-    file.writeGroupCode('30', '0.0'); // Z - DEFINITION / ARROW POINT
-    file.writeGroupCode('11', Pt11.x); // X - TEXT MIDPOINT
-    file.writeGroupCode('21', Pt11.y); // Y - TEXT MIDPOINT
-    file.writeGroupCode('31', '0.0'); // Z - TEXT MIDPOINT
+    // file.writeGroupCode('2', this.blockName);  // Block not required
+    file.writeGroupCode('10', Pt10.x); // X - definition / arrow point
+    file.writeGroupCode('20', Pt10.y); // Y
+    file.writeGroupCode('30', '0.0'); // Z
+    file.writeGroupCode('11', Pt11.x); // X - text midpoint
+    file.writeGroupCode('21', Pt11.y); // Y
+    file.writeGroupCode('31', '0.0'); // Z
     file.writeGroupCode('70', 1); // DIMENSION TYPE 0 = rotated, 1 = aligned
     file.writeGroupCode('3', 'STANDARD'); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbAlignedDimension', DXFFile.Version.R2000);
-    file.writeGroupCode('13', Pt13.x); // X - START POINT OF FIRST EXTENSION LINE
-    file.writeGroupCode('23', Pt13.y); // Y - START POINT OF FIRST EXTENSION LINE
-    file.writeGroupCode('33', '0.0'); // Z - START POINT OF FIRST EXTENSION LINE
-    file.writeGroupCode('14', Pt14.x); // X - START POINT OF SECOND EXTENSION LINE
-    file.writeGroupCode('24', Pt14.y); // Y - START POINT OF SECOND EXTENSION LINE
-    file.writeGroupCode('34', '0.0'); // Z - START POINT OF SECOND EXTENSION LINE
+    file.writeGroupCode('13', Pt13.x); // X - start point of first extension line
+    file.writeGroupCode('23', Pt13.y); // Y
+    file.writeGroupCode('33', '0.0'); // Z
+    file.writeGroupCode('14', Pt14.x); // X - start point of second extension line
+    file.writeGroupCode('24', Pt14.y); // Y
+    file.writeGroupCode('34', '0.0'); // Z
   }
 }
