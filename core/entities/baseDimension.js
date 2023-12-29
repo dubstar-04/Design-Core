@@ -163,27 +163,7 @@ export class BaseDimension extends Entity {
     return type;
   }
 
-  /*
-  getBoundingRect() {
-    extPnts = this.getExtensionPoints();
-
-    if (!extPnts) {
-      return null;
-    }
-
-    const xmin = Math.min(this.points[0].x, this.points[1].x, extPnts.startPoint.x, extPnts.endPoint.x);
-    const xmax = Math.max(this.points[0].x, this.points[1].x, extPnts.startPoint.x, extPnts.endPoint.x);
-    const ymin = Math.min(this.points[0].y, this.points[1].y, extPnts.startPoint.y, extPnts.endPoint.y);
-    const ymax = Math.max(this.points[0].y, this.points[1].y, extPnts.startPoint.y, extPnts.endPoint.y);
-
-    width = xmax - xmin;
-    height = ymax - ymin;
-
-    const rect = {width: width, height: height, x: xmin, y: ymin};
-
-    return rect;
   }
-  */
 
   getArrowHead(point, angle, height) {
     const triangleWidth = height;
@@ -219,33 +199,6 @@ export class BaseDimension extends Entity {
 
     this.block.draw(ctx, scale);
   }
-
-  // ////////////////////////////////////////
-  // draw test point for perpendicular
-  /*
-        pnt = this.points[2].perpendicular(this.points[0], this.points[1])
-        if (pnt) {
-            ctx.moveTo(pnt.x, pnt.y);
-            ctx.arc(pnt.x, pnt.y, 5 / scale, radians2degrees(0), radians2degrees(360), false);
-            ctx.stroke()
-        }
-        */
-  // ////////////////////////////////////////
-
-  // Draw Bounding Box to test the getBoundingRect() /
-  /*
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = 1 / scale;
-        ctx.beginPath()
-        ctx.moveTo(rect.x, rect.y);
-        ctx.lineTo(rect.x + rect.width, rect.y);
-        ctx.lineTo(rect.x + rect.width, rect.y + rect.height);
-        ctx.lineTo(rect.x, rect.y + rect.height);
-        ctx.lineTo(rect.x, rect.y);
-        ctx.stroke()
-        */
-  // ////////////////////////////////////////
-
 
   snaps(mousePoint, delta) {
     const snaps = [];
