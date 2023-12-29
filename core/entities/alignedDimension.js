@@ -60,9 +60,9 @@ export class AlignedDimension extends BaseDimension {
   }
 
   buildDimension(style) {
-    const Pt1 = this.points.find((point) => point.sequence === 13);
-    const Pt2 = this.points.find((point) => point.sequence === 14);
-    const Pt3 = this.points.find((point) => point.sequence === 10);
+    const Pt1 = this.getPointBySequence(13);
+    const Pt2 = this.getPointBySequence(14);
+    const Pt3 = this.getPointBySequence(11);
 
     let dimension = 0;
     const entities = [];
@@ -235,9 +235,9 @@ export class AlignedDimension extends BaseDimension {
   }
 
   dxf(file) {
-    const Pt13 = this.points.find((point) => point.sequence === 13);
-    const Pt14 = this.points.find((point) => point.sequence === 14);
-    const Pt10 = this.points.find((point) => point.sequence === 10);
+    const Pt13 = this.getPointBySequence(13);
+    const Pt14 = this.getPointBySequence(14);
+    const Pt10 = this.getPointBySequence(10);
     const Pt11 = this.text.points[0];
 
     file.writeGroupCode('0', 'DIMENSION');
