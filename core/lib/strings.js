@@ -35,6 +35,12 @@ export class Strings {
     VARIES: 'Varies',
   };
 
+  // Unicode Symbols
+  static Symbol = {
+    DIAMETER: '\u2300',
+    DEGREE: '\u00B0',
+  };
+
   // Input Strings
   static Input = {
     BASEPOINT: 'Specify base point',
