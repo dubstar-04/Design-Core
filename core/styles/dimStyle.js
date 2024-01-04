@@ -74,6 +74,27 @@ export class DimStyle {
     this.DIMLWD = -2; // 371 - (lineweight enum value)
     this.DIMLWE = -2; // 372 - (lineweight enum value)
 
+    /*
+    The following properties are not implemented
+    DIMALTRND - R2000
+    DIMANNO - R2008
+    DIMARCSYM - R2007
+    DIMASSOC - 2002
+    DIMASO - OBSOLETE
+    DIMAZIN - R2000
+    DIMCONSTRAINTICON - R2010
+    DIMFXL - R2007
+    DIMFXLON - R2007
+    DIMJOGANG - R2007
+    DIMLTEX1 - R2007
+    DIMLTEX2 - R2007
+    DIMLTYPE - R2007
+    DIMSHO - OBSOLETE
+    DIMTFILL - R2007
+    DIMTFILLCLR - R2007
+    DIMTXTDIRECTION - R2010
+    */
+
     if (data) {
       if (data.name || data[2]) {
         // DXF Groupcode 2 - ltype name
@@ -116,6 +137,19 @@ export class DimStyle {
 
       if (data[40]) {
         // DXF Groupcode 40 - dimension scale
+        /*
+          Sets the overall scale factor applied to dimensioning variables that specify sizes, distances, or offsets.
+          Also affects the leader objects with the LEADER command.
+          Use MLEADERSCALE to scale multileader objects created with the MLEADER command.
+          0.0 = A reasonable default value is computed based on the scaling between the current model space viewport and paper space.
+          If you are in paper space or model space and not using the paper space feature, the scale factor is 1.0.
+          >0 = A scale factor is computed that leads text sizes, arrowhead sizes, and other scaled distances to plot at their face values.
+
+          DIMSCALE does not affect measured lengths, coordinates, or angles.
+          Use DIMSCALE to control the overall scale of dimensions.
+          However, if the current dimension style is annotative, DIMSCALE is automatically set to zero and the dimension scale is controlled by the CANNOSCALE system variable.
+          DIMSCALE cannot be set to a non-zero value when using annotative dimensions.
+        */
         this.DIMSCALE = data[40];
       }
 
@@ -254,6 +288,17 @@ export class DimStyle {
 
       if (data[78]) {
         // DXF Groupcode 78 - Zero suppression for “feet & inch” dimensions
+        /*
+        Values 0-3 affect feet-and-inch dimensions only:
+
+        0 = Suppresses zero feet and precisely zero inches
+        1 = Includes zero feet and precisely zero inches
+        2 = Includes zero feet and suppresses zero inches
+        3 = Includes zero inches and suppresses zero feet
+        4 = Suppresses leading zeros in decimal dimensions (for example, 0.5000 becomes .5000)
+        8 = Suppresses trailing zeros in decimal dimensions (for example, 12.5000 becomes 12.5)
+        12 = Suppresses both leading and trailing zeros (for example, 0.5000 becomes .5)
+        */
         this.DIMZIN = data[78];
       }
 
@@ -274,16 +319,34 @@ export class DimStyle {
 
       if (data[173]) {
         // DXF Groupcode 173 - Use separate arrow blocks if nonzero
+        /*
+        Off = Use arrowhead blocks set by DIMBLK
+        On = Use arrowhead blocks set by DIMBLK1 and DIMBLK2
+        */
         this.DIMSAH = data[173];
       }
 
       if (data[174]) {
         // DXF Groupcode 174 - Force text inside extensions if nonzero
+        /*
+        Off = Varies with the type of dimension.
+        For linear and angular dimensions, text is placed inside the extension lines if there is sufficient room.
+        For radius and diameter dimensions that don’t fit inside the circle or arc, DIMTIX has no effect and always forces the text outside the circle or arc.
+
+        On = Draws dimension text between the extension lines even if it would ordinarily be placed outside those lines
+        */
         this.DIMTIX = data[174];
       }
 
       if (data[175]) {
         // DXF Groupcode 175 - Suppress outside-extensions dimension lines if nonzero
+        /*
+        If not enough space is available inside the extension lines and DIMTIX is on, setting DIMSOXD to On suppresses the arrowheads.
+        If DIMTIX is off, DIMSOXD has no effect
+
+        Off = Arrowheads are not suppressed
+        On = Arrowheads are suppressed
+        */
         this.DIMSOXD = data[175];
       }
 
@@ -322,6 +385,7 @@ export class DimStyle {
 
       if (data[272]) {
         // DXF Groupcode 272 - Number of decimal places to display the tolerance values
+        // This system variable has no effect unless DIMTOL is set to On. The default for DIMTOL is Off
         this.DIMTDEC = data[272];
       }
 
@@ -464,6 +528,28 @@ export class DimStyle {
 
       if (data[342]) {
         // DXF Groupcode 342 - (handle of referenced BLOCK)
+        /*
+        “” = closed filled
+        “_DOT” = dot
+        “_DOTSMALL” = dot small
+        “_DOTBLANK”= dot blank
+        “_ORIGIN” = origin indicator
+        “_ORIGIN2” = origin indicator 2
+        “_OPEN” = open
+        “_OPEN90” = right angle
+        “_OPEN30” = open 30
+        “_CLOSED” = closed
+        “_SMALL” = dot small blank
+        “_NONE” = none
+        “_OBLIQUE” = oblique
+        “_BOXFILLED” = box filled
+        “_BOXBLANK” = box
+        “_CLOSEDBLANK” = closed blank
+        “_DATUMFILLED” = datum triangle filled
+        “_DATUMBLANK” = datum triangle
+        “_INTEGRAL” = integral
+        “_ARCHTICK” = architectural tick
+        */
         this.DIMBLK = data[342];
       }
 
@@ -479,11 +565,21 @@ export class DimStyle {
 
       if (data[371]) {
         // DXF Groupcode 371 - (lineweight enum value)
+        /*
+        -3 Default (the LWDEFAULT value)
+        -2 BYBLOCK
+        -1 BYLAYER
+        */
         this.DIMLWD = data[371];
       }
 
       if (data[372]) {
         // DXF Groupcode 372 - (lineweight enum value)
+        /*
+        -3 Default (the LWDEFAULT value)
+        -2 BYBLOCK
+        -1 BYLAYER
+        */
         this.DIMLWE = data[372];
       }
     }
@@ -574,33 +670,33 @@ export class DimStyle {
     file.writeGroupCode('176', this.DIMCLRD);
     file.writeGroupCode('177', this.DIMCLRE);
     file.writeGroupCode('178', this.DIMCLRT);
-    file.writeGroupCode('179', this.DIMADEC);
+    file.writeGroupCode('179', this.DIMADEC, DXFFile.Version.R14);
     // file.writeGroupCode('270', this.DIMUNIT); // obsolete, now use DIMLUNIT AND DIMFRAC
     file.writeGroupCode('271', this.DIMDEC);
-    file.writeGroupCode('272', this.DIMTDEC);
-    file.writeGroupCode('273', this.DIMALTU);
-    file.writeGroupCode('274', this.DIMALTTD);
-    file.writeGroupCode('275', this.DIMAUNIT);
-    file.writeGroupCode('276', this.DIMFRAC);
-    file.writeGroupCode('277', this.DIMLUNIT);
-    // file.writeGroupCode('278', this.DIMDSEP); - AutoCAD uses a numberical description
-    file.writeGroupCode('279', this.DIMTMOVE);
-    file.writeGroupCode('280', this.DIMJUST);
-    file.writeGroupCode('283', this.DIMTOLJ);
-    file.writeGroupCode('284', this.DIMTZIN);
-    file.writeGroupCode('285', this.DIMALTZ);
-    file.writeGroupCode('286', this.DIMALTTZ);
+    file.writeGroupCode('272', this.DIMTDEC, DXFFile.Version.R13);
+    file.writeGroupCode('273', this.DIMALTU, DXFFile.Version.R13);
+    file.writeGroupCode('274', this.DIMALTTD, DXFFile.Version.R13);
+    file.writeGroupCode('275', this.DIMAUNIT, DXFFile.Version.R13);
+    file.writeGroupCode('276', this.DIMFRAC, DXFFile.Version.R2000);
+    file.writeGroupCode('277', this.DIMLUNIT, DXFFile.Version.R2000);
+    // file.writeGroupCode('278', this.DIMDSEP, DXFFile.Version.R14)); - TODO: AutoCAD uses a numberical description
+    file.writeGroupCode('279', this.DIMTMOVE, DXFFile.Version.R2000);
+    file.writeGroupCode('280', this.DIMJUST, DXFFile.Version.R13);
     file.writeGroupCode('281', this.DIMSD1 ? 1 : 0, DXFFile.Version.R13); // convert bool to int
     file.writeGroupCode('282', this.DIMSD2 ? 1 : 0, DXFFile.Version.R13); // convert bool to int
+    file.writeGroupCode('283', this.DIMTOLJ, DXFFile.Version.R13);
+    file.writeGroupCode('284', this.DIMTZIN, DXFFile.Version.R13);
+    file.writeGroupCode('285', this.DIMALTZ, DXFFile.Version.R13);
+    file.writeGroupCode('286', this.DIMALTTZ, DXFFile.Version.R13);
     file.writeGroupCode('287', this.DIMFIT);
-    file.writeGroupCode('288', this.DIMUPT);
-    file.writeGroupCode('289', this.DIMATFIT);
-    file.writeGroupCode('340', this.DIMTXSTY);
-    file.writeGroupCode('341', this.DIMLDRBLK);
+    file.writeGroupCode('288', this.DIMUPT, DXFFile.Version.R13);
+    file.writeGroupCode('289', this.DIMATFIT, DXFFile.Version.R2000);
+    file.writeGroupCode('340', this.DIMTXSTY, DXFFile.Version.R13);
+    file.writeGroupCode('341', this.DIMLDRBLK, DXFFile.Version.R2000);
     file.writeGroupCode('342', this.DIMBLK);
     file.writeGroupCode('343', this.DIMBLK1);
     file.writeGroupCode('344', this.DIMBLK2);
-    file.writeGroupCode('371', this.DIMLWD);
-    file.writeGroupCode('372', this.DIMLWE);
+    file.writeGroupCode('371', this.DIMLWD, DXFFile.Version.R2000);
+    file.writeGroupCode('372', this.DIMLWE, DXFFile.Version.R2000);
   }
 }
