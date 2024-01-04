@@ -3,7 +3,7 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 export class Style {
   constructor(data) {
     // Define Properties
-    this.type = 'Style';
+    this.type = this.constructor.name;
     this.name = '';
     this.font = 'Arial'; // TODO: how to set the font to one thats available. See style.js also.
     this.textHeight = 2.5;
