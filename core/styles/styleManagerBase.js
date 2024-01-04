@@ -172,7 +172,11 @@ export class StyleManagerBase {
       }
     }
 
-    return;
+    const msg = 'Invalid Style Name';
+    const err = (`${this.type} - ${msg}`);
+    throw Error(err);
+
+    // return;
   }
 
   /**
