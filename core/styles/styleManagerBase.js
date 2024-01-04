@@ -202,6 +202,11 @@ export class StyleManagerBase {
       return;
     }
 
+    // make sure it is a new new name
+    if (this.getStyleByIndex(styleIndex).name.toUpperCase() === newName.toUpperCase()) {
+      return;
+    }
+
     const newUniqueName = this.getUniqueName(newName);
 
     // if the style to change is the current style, update the currentstyle property
