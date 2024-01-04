@@ -32,8 +32,8 @@ export class DimStyle {
     this.DIMLIM = 0; // 72 - Dimension limits generated if nonzero
     this.DIMTIH = 0; // 73 - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
     this.DIMTOH = 0; // 74 - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
-    this.DIMSE1 = 0; // 75 - First extension line suppressed if nonzero
-    this.DIMSE2 = 0; // 76 - Second extension line suppressed if nonzero
+    this.DIMSE1 = false; // 75 - First extension line suppressed if nonzero
+    this.DIMSE2 = false; // 76 - Second extension line suppressed if nonzero
     this.DIMTAD = 0; // 77 -Text above dimension line if nonzero
     this.DIMZIN = 0; // 78 - Zero suppression for “feet & inch” dimensions
     this.DIMALT = 0; // 170 - Alternate unit dimensioning performed if nonzero
@@ -57,8 +57,8 @@ export class DimStyle {
     this.DIMDSEP = ','; // 278 - Single-character decimal separator used when creating dimensions whose unit format is decimal - Stored as dictionary
     this.DIMTMOVE = 0; // 279 - Dimension text movement rules
     this.DIMJUST = 0; // 280 - Horizontal dimension text position
-    this.DIMSD1 = 0; // 281 - Suppression of first extension line
-    this.DIMSD2 = 0; // 282 - Suppression of second extension line
+    this.DIMSD1 = false; // 281 - Suppression of first extension line
+    this.DIMSD2 = false; // 282 - Suppression of second extension line
     this.DIMTOLJ = 0; // 283 - Vertical justification for tolerance values
     this.DIMTZIN = 8; // 284 - Controls suppression of zeros for tolerance values
     this.DIMALTZ = 0; // 285 - Controls suppression of zeros for alternate unit dimension values
@@ -233,12 +233,12 @@ export class DimStyle {
 
       if (data[75]) {
         // DXF Groupcode 75 - First extension line suppressed if nonzero
-        this.DIMSE1 = data[75];
+        this.DIMSE1 = Boolean(data[75]);
       }
 
       if (data[76]) {
         // DXF Groupcode 76 - Second extension line suppressed if nonzero
-        this.DIMSE2 = data[76];
+        this.DIMSE2 = Boolean(data[76]);
       }
 
       if (data[77]) {
@@ -386,13 +386,13 @@ export class DimStyle {
       if (data[281]) {
         // DXF Groupcode 281 - Suppression of first extension line:
         // 0 = Not suppressed; 1 = Suppressed
-        this.DIMSD1 = data[281];
+        this.DIMSD1 = Boolean(data[281]);
       }
 
       if (data[282]) {
         // DXF Groupcode 282 - Suppression of second extension line:
         // 0 = Not suppressed; 1 = Suppressed
-        this.DIMSD2 = data[282];
+        this.DIMSD2 = Boolean(data[282]);
       }
 
       if (data[283]) {
@@ -561,8 +561,8 @@ export class DimStyle {
     file.writeGroupCode('72', this.DIMLIM);
     file.writeGroupCode('73', this.DIMTIH);
     file.writeGroupCode('74', this.DIMTOH);
-    file.writeGroupCode('75', this.DIMSE1);
-    file.writeGroupCode('76', this.DIMSE2);
+    file.writeGroupCode('75', this.DIMSE1 ? 1 : 0); // convert bool to int
+    file.writeGroupCode('76', this.DIMSE2 ? 1 : 0); // convert bool to int
     file.writeGroupCode('77', this.DIMTAD);
     file.writeGroupCode('78', this.DIMZIN);
     file.writeGroupCode('170', this.DIMALT);
@@ -586,12 +586,12 @@ export class DimStyle {
     // file.writeGroupCode('278', this.DIMDSEP); - AutoCAD uses a numberical description
     file.writeGroupCode('279', this.DIMTMOVE);
     file.writeGroupCode('280', this.DIMJUST);
-    file.writeGroupCode('281', this.DIMSD1);
-    file.writeGroupCode('282', this.DIMSD2);
     file.writeGroupCode('283', this.DIMTOLJ);
     file.writeGroupCode('284', this.DIMTZIN);
     file.writeGroupCode('285', this.DIMALTZ);
     file.writeGroupCode('286', this.DIMALTTZ);
+    file.writeGroupCode('281', this.DIMSD1 ? 1 : 0, DXFFile.Version.R13); // convert bool to int
+    file.writeGroupCode('282', this.DIMSD2 ? 1 : 0, DXFFile.Version.R13); // convert bool to int
     file.writeGroupCode('287', this.DIMFIT);
     file.writeGroupCode('288', this.DIMUPT);
     file.writeGroupCode('289', this.DIMATFIT);
