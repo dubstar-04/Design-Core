@@ -214,7 +214,7 @@ export class StyleManagerBase {
       this.setCstyle(newUniqueName);
     }
 
-    // TODO: update all items using the stle
+    // TODO: update all items using the style
     this.styles[styleIndex].name = newUniqueName;
   }
 
