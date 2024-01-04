@@ -125,7 +125,7 @@ export class Text extends Entity {
       const currentStyle = Core.StyleManager.getCstyle();
       this.styleName = currentStyle;
 
-      // get height from style
+      // get properties from style
       const style = Core.StyleManager.getStyleByName(this.styleName);
       if (style.textHeight) {
         this.height = style.textHeight;
@@ -136,6 +136,8 @@ export class Text extends Entity {
       const height = await Core.Scene.inputManager.requestInput(op2);
       this.height = height;
       */
+      this.backwards = style.backwards;
+      this.upsideDown = style.upsideDown;
 
       const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
       const rotation = await Core.Scene.inputManager.requestInput(op3);
