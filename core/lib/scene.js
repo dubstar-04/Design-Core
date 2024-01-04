@@ -179,6 +179,7 @@ export class Scene {
     let height = 0;
     let viewCenterX = 0;
     let viewCenterY = 0;
+    let ratio = 0;
 
     const extents = this.boundingBox();
 
@@ -187,6 +188,7 @@ export class Scene {
       height = extents.yLength;
       viewCenterX = extents.xMin + width / 2;
       viewCenterY = extents.yMin + height / 2;
+      ratio = width / height;
     }
 
     file.writeGroupCode('0', 'TABLE');
@@ -219,7 +221,7 @@ export class Scene {
     file.writeGroupCode('27', '0.0'); // view target point y
     file.writeGroupCode('37', '0.0'); // view target point z
     file.writeGroupCode('40', height); // VPort Height
-    file.writeGroupCode('41', width / height); // Vport height/width ratio
+    file.writeGroupCode('41', ratio); // Vport height/width ratio
     file.writeGroupCode('42', '50.0'); // Lens Length
     file.writeGroupCode('43', '0.0');// Front Clipping Plane
     file.writeGroupCode('44', '0.0'); // Back Clipping Plane
