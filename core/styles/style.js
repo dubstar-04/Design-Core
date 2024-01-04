@@ -10,7 +10,7 @@ export class Style {
     this.widthFactor = 1;
     this.obliqueAngle = 0;
     this.backwards = false;
-    this.upsideDown = false;
+    this.upsidedown = false;
     this.vertical = false;
 
 
@@ -62,10 +62,10 @@ export class Style {
             this.backwards = true;
             break;
           case 4:
-            this.upsideDown = true;
+            this.upsidedown = true;
             break;
           case 6:
-            this.upsideDown = true;
+            this.upsidedown = true;
             this.backwards = true;
             break;
         }
@@ -84,7 +84,7 @@ export class Style {
     if (this.backwards) {
       flags += 2;
     }
-    if (this.upsideDown) {
+    if (this.upsidedown) {
       flags += 4;
     }
 
