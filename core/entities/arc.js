@@ -17,7 +17,6 @@ export class Arc extends Entity {
 
     // direction: - ccw > 0, cw < 0
     Object.defineProperty(this, 'direction', {
-      // enumerable: false,
       value: 1,
       writable: true,
     });

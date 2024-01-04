@@ -8,13 +8,11 @@ import {Core} from '../core.js';
 export class Entity {
   constructor(data) {
     Object.defineProperty(this, 'type', {
-      // enumerable: false,
       value: this.constructor.name,
       writable: true,
     });
 
     Object.defineProperty(this, 'points', {
-      // enumerable: false,
       value: [],
       writable: true,
     });
