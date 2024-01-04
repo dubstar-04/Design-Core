@@ -265,11 +265,7 @@ export class Line extends Entity {
   }
 
   closestPoint(P) {
-    // find the closest point on the straight line
-    const A = new Point(this.points[0].x, this.points[0].y);
-    const B = new Point(this.points[1].x, this.points[1].y);
-
-    const pnt = P.perpendicular(A, B);
+    const pnt = P.closestPointOnLine(this.points[0], this.points[1]);
     if (pnt === null) {
       return [P, Infinity];
     }
