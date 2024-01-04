@@ -110,10 +110,10 @@ export class Style {
   set backwards(bool) {
     if (bool) {
       // Add flag
-      this.standardFlags = (this.flags | 2);
+      this.flags = (this.flags | 2);
     } else {
       // remove flag
-      this.standardFlags = (this.flags ^ (this.flags & 2));
+      this.flags = (this.flags ^ (this.flags & 2));
     }
   }
 
