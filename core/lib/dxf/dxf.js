@@ -82,6 +82,12 @@ export class DXF {
         });
       }
 
+      if (table[2] === 'STYLE') {
+        table.children.forEach((style) => {
+          Core.StyleManager.addStyle(style);
+        });
+      }
+
       if (table[2] === 'DIMSTYLE') {
         table.children.forEach((style) => {
           Core.DimStyleManager.addStyle(style);
