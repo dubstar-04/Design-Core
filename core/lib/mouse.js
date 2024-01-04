@@ -129,7 +129,7 @@ export class Mouse {
       }
     } else if (Core.Settings.ortho) {
       // if ortho is enabled - get the nearest ortho point
-      const orthoSnap = this.snapping.orthoSnap(this.transformToScene(this.mouseDownCanvasPoint));
+      const orthoSnap = Core.Scene.inputManager.snapping.orthoSnap(this.transformToScene(this.mouseDownCanvasPoint));
       if (orthoSnap) {
         this.setPosFromScenePoint(orthoSnap);
       }
