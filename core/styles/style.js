@@ -9,103 +9,111 @@ export class Style {
     this.textHeight = 2.5;
     this.widthFactor = 1;
     this.obliqueAngle = 0;
-    this.backwards = false;
-    this.upsidedown = false;
-    this.vertical = false;
-
+    this.lastTextHeight = this.textHeight;
+    this.flags = 0;
+    this.standardFlags = 0;
 
     if (data) {
-      this.name = data.name;
-
-      if (data.font) {
-        this.font = data.font;
+      if (data.name || data[2]) {
+        // DXF Groupcode 2 - ltype name
+        this.name = data.name || data[2];
       }
 
-      if (data.bigFont) {
-        this.bigFont = data.bigFont;
+      if (data.font || data[3]) {
+        // DXF Groupcode 3 - style font
+        this.font = data.font || data[3];
       }
 
-      if (data.textHeight) {
-        this.textHeight = data.textHeight;
+      if (data.bigFont || data[4]) {
+        // DXF Groupcode 4 - big font
+        this.bigFont = data.bigFont || data[4];
       }
 
-      if (data.lastTextHeight) {
-        this.lastTextHeight = data.lastTextHeight;
+      if (data.textHeight || data[40]) {
+        // DXF Groupcode 40 - Text height
+        this.textHeight = data.textHeight || data[40];
       }
 
-      if (data.obliqueAngle) {
-        this.obliqueAngle = data.obliqueAngle;
+      if (data.widthFactor || data[41]) {
+        // DXF Groupcode 41 - width factor
+        this.widthFactor = data.widthFactor || data[41];
       }
 
-      if (data.standardFlags) {
-        this.standardFlags = data.standardFlags;
+      if (data.lastTextHeight || data[42]) {
+        // DXF Groupcode 42 - Last text height
+        this.lastTextHeight = data.lastTextHeight || data[42];
       }
 
-      if (data.widthFactor) {
-        this.widthFactor = data.widthFactor;
+      if (data.obliqueAngle || data[50]) {
+        // DXF Groupcode 50 - test height
+        this.obliqueAngle = data.obliqueAngle || data[50];
       }
 
-      if (data.standardFlags) {
-        switch (data.standardFlags) {
-          case 4:
-            this.vertical = true;
-            break;
-        }
+      if (data.standardFlags || data[70]) {
+        // DXF Groupcode 70 - standard flags
+        /*
+        1 = If set, this entry describes a shape
+        4 = Vertical text
+        16 = If set, table entry is externally dependent on an xref
+        32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved
+        64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
+        (This flag is for the benefit of AutoCAD commands. It can be ignored.
+        */
+        this.standardFlags = data.standardFlags || data[70];
       }
 
-      if (data.flags) {
-        switch (data.flags) {
-          // DXF Data
-          // 2 = Text is backward (mirrored in X).
-          // 4 = Text is upside down (mirrored in Y).
-          case 2:
-            this.backwards = true;
-            break;
-          case 4:
-            this.upsidedown = true;
-            break;
-          case 6:
-            this.upsidedown = true;
-            this.backwards = true;
-            break;
-        }
+      if (data.flags || data[71]) {
+        // DXF Groupcode 71 - flags (bit-coded values):
+        // 2 = Text is backward (mirrored in X).
+        // 4 = Text is upside down (mirrored in Y).
+        this.flags = data.flags || data[71];
       }
     }
   }
 
-  getFlags() {
-    // Standard flags (bit-coded values):
-    // 2 = Text is backward (mirrored in x).
-    // 4 = Text is upside down (mirrored in y).
-    // 4 = Text is backward and upside down
-
-    let flags = 0;
-
-    if (this.backwards) {
-      flags += 2;
-    }
-    if (this.upsidedown) {
-      flags += 4;
-    }
-
-    return flags;
+  get vertical() {
+    // Vertical value is bitmasked in standardflags as value 4
+    return Boolean(this.standardFlags & 4);
   }
 
-  getStandardFlags() {
-    // Standard flags (bit-coded values):
-    // 1 = This entry describes as shape
-    // 4 = Vertical Text
-    // 16 = Style is from an xref
-    // 32 = Xref is resolved (If set with 16)
-    // 64 = Required for
-
-    let flags = 0;
-
-    if (this.vertical) {
-      flags += 4;
+  set vertical(bool) {
+    if (bool) {
+      // Add vertical flag
+      this.standardFlags = (this.standardFlags | 4);
+    } else {
+      // remove vertical flag
+      this.standardFlags = (this.standardFlags ^ (this.standardFlags & 4));
     }
+  }
 
-    return flags;
+  get backwards() {
+    // Upside down value is bitmasked in flags as value 2
+    return Boolean(this.flags & 2);
+  }
+
+  set backwards(bool) {
+    if (bool) {
+      // Add flag
+      this.standardFlags = (this.flags | 2);
+    } else {
+      // remove flag
+      this.standardFlags = (this.flags ^ (this.flags & 2));
+    }
+  }
+
+  get upsideDown() {
+    // Upside down value is bitmasked in flags as value 4
+    return Boolean(this.flags & 4);
+  }
+
+  set upsideDown(bool) {
+    if (bool) {
+      // Add flag
+      this.flags = (this.flags | 4);
+    } else {
+      // remove flag
+      this.flags = (this.flags ^ (this.flags & 4));
+    }
   }
 
   dxf(file) {
@@ -115,12 +123,12 @@ export class Style {
     file.writeGroupCode('100', 'AcDbTextStyleTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Stylename
     file.writeGroupCode('3', this.font); // Font
-    file.writeGroupCode('4', ''); // Big font name 0 is none
+    file.writeGroupCode('4', ''); // Big font name blank is none
     file.writeGroupCode('40', this.textHeight); // Text Height
     file.writeGroupCode('41', this.widthFactor); // Width Factor
     file.writeGroupCode('42', this.textHeight); // Last Text Height
     file.writeGroupCode('50', this.obliqueAngle);
-    file.writeGroupCode('70', this.getStandardFlags()); // Flags
-    file.writeGroupCode('71', this.getFlags()); // Flags
+    file.writeGroupCode('70', this.standardFlags); // Standard Flags
+    file.writeGroupCode('71', this.flags); // Flags
   }
 }
