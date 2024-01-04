@@ -131,13 +131,15 @@ export class Text extends Entity {
         this.height = style.textHeight;
       }
 
-      /*
-      const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
-      const height = await Core.Scene.inputManager.requestInput(op2);
-      this.height = height;
-      */
       this.backwards = style.backwards;
       this.upsideDown = style.upsideDown;
+
+      // Get the font size when standard style is used
+      if (this.styleName.toUpperCase() === 'STANDARD') {
+        const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
+        const height = await Core.Scene.inputManager.requestInput(op2);
+        this.height = height;
+      }
 
       const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
       const rotation = await Core.Scene.inputManager.requestInput(op3);
