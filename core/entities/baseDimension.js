@@ -168,12 +168,9 @@ export class BaseDimension extends Entity {
     return point;
   }
 
-  getArrowHead(point, angle, height) {
-    const triangleWidth = height;
-    const triangleHeight = height * 1.5;
-
-    let p1 = new Point(point.x + triangleWidth / 2, point.y + triangleHeight);
-    let p2 = new Point(point.x + -triangleWidth / 2, point.y + triangleHeight);
+  getArrowHead(point, angle, size) {
+    let p1 = new Point(point.x + size/4, point.y + size);
+    let p2 = new Point(point.x - size/4, point.y + size);
     const ang = angle - Math.PI / 2;
     p1 = p1.rotate(point, ang);
     p2 = p2.rotate(point, ang);
