@@ -71,11 +71,19 @@ export class Style {
     }
   }
 
+  /**
+   * Get the vertical value
+   * @returns {bool}
+   */
   get vertical() {
     // Vertical value is bitmasked in standardflags as value 4
     return Boolean(this.standardFlags & 4);
   }
 
+  /**
+   * Set the vertical value
+   * @param {boolean} bool
+   */
   set vertical(bool) {
     if (bool) {
       // Add vertical flag
@@ -86,11 +94,19 @@ export class Style {
     }
   }
 
+  /**
+   * Get the backwards value
+   * @returns {bool}
+   */
   get backwards() {
     // Upside down value is bitmasked in flags as value 2
     return Boolean(this.flags & 2);
   }
 
+  /**
+   * set the backwards value
+   * @param {boolean} bool
+   */
   set backwards(bool) {
     if (bool) {
       // Add flag
@@ -101,11 +117,19 @@ export class Style {
     }
   }
 
+  /**
+   * Get the upside down value
+   * @returns {bool}
+   */
   get upsideDown() {
     // Upside down value is bitmasked in flags as value 4
     return Boolean(this.flags & 4);
   }
 
+  /**
+   * Set the upside down value
+   * @param {boolean} bool
+   */
   set upsideDown(bool) {
     if (bool) {
       // Add flag
