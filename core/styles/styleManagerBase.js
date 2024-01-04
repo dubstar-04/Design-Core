@@ -217,4 +217,31 @@ export class StyleManagerBase {
     // TODO: update all items using the stle
     this.styles[styleIndex].name = newUniqueName;
   }
+
+  /**
+   * Update the style property with value
+   * @param {number} styleIndex
+   * @param {string} property
+   * @param {any} value
+   */
+  updateStyle(styleIndex, property, value) {
+    // check of the index exists
+    if (this.styles[styleIndex] === undefined) {
+      const msg = 'Invalid Style Index';
+      const err = (`${this.type} - ${msg}`);
+      throw Error(err);
+    }
+
+    if (this.styles[styleIndex][property] === undefined) {
+      const msg = 'Invalid Style Property';
+      const err = (`${this.type} - ${msg}`);
+      throw Error(err);
+    }
+
+    if (property.toUpperCase() === 'NAME') {
+      this.renameStyle(styleIndex, value);
+    } else {
+      this.styles[styleIndex][property] = value;
+    }
+  }
 }
