@@ -16,8 +16,6 @@ export class Text extends Entity {
     this.height = 2.5;
     this.horizontalAlignment = 0;
     this.verticalAlignment = 0;
-    this.backwards = false;
-    this.upsideDown = false;
     this.styleName = 'STANDARD';
 
     // add rotation property with getter and setter
@@ -33,6 +31,30 @@ export class Text extends Entity {
       // enumerable: false,
       value: {width: 10, height: 10},
       writable: true,
+    });
+
+    // needs to be non-enumerable as to not appear in the object props
+    Object.defineProperty(this, 'flags', {
+      // enumerable: false,
+      value: 0,
+      writable: true,
+    });
+
+    // add backwards property with getter and setter
+    // needs to be enumerable to appear in the object props
+    Object.defineProperty(this, 'backwards', {
+      get: this.getBackwards,
+      set: this.setBackwards,
+      enumerable: true,
+    });
+
+
+    // add upsidedown property with getter and setter
+    // needs to be enumerable to appear in the object props
+    Object.defineProperty(this, 'upsideDown', {
+      get: this.getUpsideDown,
+      set: this.setUpsideDown,
+      enumerable: true,
     });
 
     if (data) {
@@ -80,22 +102,10 @@ export class Text extends Entity {
       }
 
       if (data.flags || data[71]) {
-        // DXF Groupcode 71 - Text Flags
+        // DXF Groupcode 71 - flags (bit-coded values):
         // 2 = Text is backward (mirrored in X).
         // 4 = Text is upside down (mirrored in Y).
-        const flags = data.flags || data[71];
-        switch (flags) {
-          case 2:
-            this.backwards = true;
-            break;
-          case 4:
-            this.upsideDown = true;
-            break;
-          case 6:
-            this.upsideDown = true;
-            this.backwards = true;
-            break;
-        }
+        this.flags = data.flags || data[71];
       }
     }
   }
@@ -111,9 +121,21 @@ export class Text extends Entity {
       const pt1 = await Core.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
+      // set the text style to the current style
+      const currentStyle = Core.StyleManager.getCstyle();
+      this.styleName = currentStyle;
+
+      // get height from style
+      const style = Core.StyleManager.getStyleByName(this.styleName);
+      if (style.textHeight) {
+        this.height = style.textHeight;
+      }
+
+      /*
       const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
       const height = await Core.Scene.inputManager.requestInput(op2);
       this.height = height;
+      */
 
       const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
       const rotation = await Core.Scene.inputManager.requestInput(op3);
@@ -177,6 +199,56 @@ export class Text extends Entity {
     return 0;
   }
 
+  /**
+   * Get the backwards value
+   * @returns {boolean} true if the text is flipped horizontally
+   */
+  getBackwards() {
+    // Backwards value is bitmasked in flags as value 2
+    return Boolean(this.flags & 2);
+  }
+
+  /**
+   * Set the backwards value
+   * @param {boolean} bool
+   */
+  setBackwards(bool) {
+    if (bool) {
+      // Add flag
+      this.flags = (this.flags | 2);
+    } else {
+      // remove flag
+      this.flags = (this.flags ^ (this.flags & 2));
+    }
+  }
+
+  /**
+   * Get the upside down value
+   * @returns {boolean} true if the text is flipped vertically
+   */
+  getUpsideDown() {
+    // Upside down value is bitmasked in flags as value 4
+    return Boolean(this.flags & 4);
+  }
+
+  /**
+   * Set the upside down value
+   * @param {boolean} bool
+   */
+  setUpsideDown(bool) {
+    if (bool) {
+      // Add flag
+      this.flags = (this.flags | 4);
+    } else {
+      // remove flag
+      this.flags = (this.flags ^ (this.flags & 4));
+    }
+  }
+
+  /**
+   * Get a string describing the horizontal text alignment
+   * @returns {string}
+   */
   getHorizontalAlignment() {
     /* DXF Data
         0 = Left; 1= Center; 2 = Right
@@ -203,6 +275,10 @@ export class Text extends Entity {
     }
   }
 
+  /**
+   * Get a string describing the vertical text alignment
+   * @returns {string}
+   */
   getVerticalAlignment() {
     /* DXF Data
         Vertical text justification type (optional, default = 0): integer codes (not bit- coded):
@@ -234,6 +310,9 @@ export class Text extends Entity {
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
 
+    const style = Core.StyleManager.getStyleByName(this.styleName);
+    // style.textHeight
+
     if (this.upsideDown) {
       ctx.scale(1, -1);
     }
@@ -261,6 +340,7 @@ export class Text extends Entity {
     } catch { // Cairo
       ctx.moveTo(0, 0);
       ctx.setFontSize(this.height);
+      // ctx.select_font_face('HelveticaNeueLT Std Lt', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
       ctx.showText(String(this.string));
       this.boundingRect = ctx.textExtents(String(this.string));
     }
@@ -285,18 +365,19 @@ export class Text extends Entity {
     file.writeGroupCode('0', 'TEXT');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
-    file.writeGroupCode('1', this.string);
     file.writeGroupCode('40', this.height);
+    file.writeGroupCode('1', this.string);
     file.writeGroupCode('50', this.rotation);
-    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     // file.writeGroupCode('7', 'STANDARD'); // TEXT STYLE
-    // file.writeGroupCode('72', this.getHorizontalAlignment()); //HORIZONTAL ALIGNMENT
-    // file.writeGroupCode('73', this.getVerticalAlignment()); //VERTICAL ALIGNMENT
+    file.writeGroupCode('71', this.flags); // Text generation flags
+    file.writeGroupCode('72', this.horizontalAlignment); // Horizontal alignment
+    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
+    file.writeGroupCode('73', this.verticalAlignment); // Vertical alignment
   }
 
   snaps(mousePoint, delta) {
