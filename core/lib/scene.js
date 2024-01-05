@@ -6,18 +6,19 @@ import {DXFFile} from './dxf/dxfFile.js';
 import {BoundingBox} from './boundingBox.js';
 import {Point} from '../entities/point.js';
 
+import {DesignCore} from '../designCore.js';
+
 export class Scene {
-  constructor(core) {
+  constructor() {
     // initialise the scene variables
-    this.core = core;
     this.saved = false;
 
     this.items = []; // Main array that stores all the geometry
     this.tempItems = []; // Temporary Array to store items while input is being gathered
     this.auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
-    this.selectionManager = new SelectionManager(core);
-    this.inputManager = new InputManager(core);
+    this.selectionManager = new SelectionManager();
+    this.inputManager = new InputManager();
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
@@ -30,7 +31,7 @@ export class Scene {
     this.tempItems = [];
     this.auxiliaryItems = [];
     this.selectionManager.reset();
-    this.core.canvas.requestPaint();
+    DesignCore.Canvas.requestPaint();
   }
 
   /**
@@ -75,20 +76,20 @@ export class Scene {
    * @param {number} index - integer of item to replace
    * @returns - index of created item
    */
-  addToScene(type, data, index) {
+  addItem(type, data, index) {
     // TODO: validate data is valid for type
     if (!data) {
       throw Error('Input data missing');
     }
 
     // check type is a valid command
-    if (!this.core.commandManager.isCommand(type)) {
+    if (!DesignCore.CommandManager.isCommand(type)) {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
       this.reset();
       return;
     }
     // Create a new item, send it the points array
-    const item = this.core.commandManager.createNew(type, data);
+    const item = DesignCore.CommandManager.createNew(type, data);
 
     if (typeof index === 'undefined') {
       // add to end of array
@@ -101,6 +102,50 @@ export class Scene {
 
     // return the index of the added item
     return index;
+  }
+
+  /**
+   * Find items in scene
+   * @param {string} type - entity type
+   * @param {string} prop - object of entity parameters
+   * @param {any} value - value of the property
+   * @returns - index of items
+   */
+  findItem(type, prop, value) {
+    const filteredItems = [];
+
+    this.items.forEach((item, index) => {
+      if (item.type.toUpperCase() === type.toUpperCase() && item.hasOwnProperty(prop) && item[prop] === value) {
+        filteredItems.push(index);
+      }
+    });
+
+    return filteredItems;
+  }
+
+  /**
+   * Get Item
+   * @param {number} type - items index
+   * @returns - item
+   */
+  getItem(index) {
+    return this.items[index];
+  }
+
+  /**
+   * Remove Item
+   * @param {number} type - items index
+   * @returns - success status
+   */
+  removeItem(index) {
+    const count = this.items.length;
+    this.items.splice(index, 1);
+
+    if (this.items.length < count) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -125,7 +170,7 @@ export class Scene {
    * @param {object} data - object of entity parameters
    */
   createTempItem(type, data) {
-    const helper = this.core.commandManager.createNew(type, data);
+    const helper = DesignCore.CommandManager.createNew(type, data);
     this.addToTempItems(helper);
   }
 
@@ -134,6 +179,7 @@ export class Scene {
     let height = 0;
     let viewCenterX = 0;
     let viewCenterY = 0;
+    let ratio = 0;
 
     const extents = this.boundingBox();
 
@@ -142,6 +188,7 @@ export class Scene {
       height = extents.yLength;
       viewCenterX = extents.xMin + width / 2;
       viewCenterY = extents.yMin + height / 2;
+      ratio = width / height;
     }
 
     file.writeGroupCode('0', 'TABLE');
@@ -174,7 +221,7 @@ export class Scene {
     file.writeGroupCode('27', '0.0'); // view target point y
     file.writeGroupCode('37', '0.0'); // view target point z
     file.writeGroupCode('40', height); // VPort Height
-    file.writeGroupCode('41', width / height); // Vport height/width ratio
+    file.writeGroupCode('41', ratio); // Vport height/width ratio
     file.writeGroupCode('42', '50.0'); // Lens Length
     file.writeGroupCode('43', '0.0');// Front Clipping Plane
     file.writeGroupCode('44', '0.0'); // Back Clipping Plane

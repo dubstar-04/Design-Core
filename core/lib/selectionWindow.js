@@ -28,7 +28,7 @@ export class SelectionWindow {
   }
 
 
-  draw(ctx, scale, core) {
+  draw(ctx, scale) {
     const colour = this.colour;
     ctx.fillStyle = colour;
 

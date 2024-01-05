@@ -1,22 +1,68 @@
+import {Entity} from './entity.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
-export class Insert {
+export class Insert extends Entity {
   constructor(data) {
-    this.block = '';
+    super(data);
+
+    // add block property
+    Object.defineProperty(this, 'block', {
+      value: '',
+      writable: true,
+    });
 
     if (data) {
-      this.block = data.block;
-
-      if (data.points) {
-        this.points = data.points;
+      if (data.block || data[2]) {
+        // DXF Groupcode 2 - Block name
+        this.block = data.block || data[2];
       }
 
-      if (data.colour) {
-        this.colour = data.colour;
+      if (data[41]) {
+        // DXF Groupcode 41 - X Scale Factor (optional, default = 1)
+        const err = 'Groupcode 41 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data.layer) {
-        this.layer = data.layer;
+      if (data[42]) {
+        // DXF Groupcode 42 - Y Scale Factor (optional, default = 1)
+        const err = 'Groupcode 42 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
+      }
+
+      if (data[43]) {
+        // DXF Groupcode 43 - Z Scale Factor (optional, default = 1)
+        const err = 'Groupcode 43 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
+      }
+
+      if (data[44]) {
+        // DXF Groupcode 44 - Column Spacing (optional, default = 0)
+        const err = 'Groupcode 44 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
+      }
+
+      if (data[45]) {
+        // DXF Groupcode 45 - Row Spacing (optional, default = 0)
+        const err = 'Groupcode 45 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
+      }
+
+      if (data[50]) {
+        // DXF Groupcode 50 - Rotation Angle (optional, default = 0)
+        const err = 'Groupcode 50 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
+      }
+
+      if (data[70]) {
+        // DXF Groupcode 70 - Column Count (optional, default = 1)
+        const err = 'Groupcode 70 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
+      }
+
+      if (data[71]) {
+        // DXF Groupcode 71 - Row Count(optional, default = 1)
+        const err = 'Groupcode 71 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
     }
   }
@@ -40,12 +86,12 @@ export class Insert {
     return;
   }
 
-  snaps(mousePoint, delta, core) {
+  snaps(mousePoint, delta) {
     snaps = [];
     return snaps;
   }
 
-  within(selectionExtremes, core) {
+  within(selectionExtremes) {
     // insert cannot be selected
     return false;
   }
@@ -68,7 +114,7 @@ export class Insert {
     return new BoundingBox();
   }
 
-  touched(selectionExtremes, core) {
+  touched(selectionExtremes) {
     // insert cannot be selected
     return false;
   }

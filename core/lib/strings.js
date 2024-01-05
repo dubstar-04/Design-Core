@@ -35,6 +35,12 @@ export class Strings {
     VARIES: 'Varies',
   };
 
+  // Unicode Symbols
+  static Symbol = {
+    DIAMETER: '\u2300',
+    DEGREE: '\u00B0',
+  };
+
   // Input Strings
   static Input = {
     BASEPOINT: 'Specify base point',
@@ -43,11 +49,13 @@ export class Strings {
     START: 'Specify start point',
     END: 'Specify end point',
     POINT: 'Specify a point',
+    DIMENSION: 'Specify dimension location',
     NEXTPOINT: 'Specify next point',
     RADIUS: 'Specify radius',
     POSITION: 'Specify position',
     HEIGHT: 'Specify height',
     STRING: 'Specify text',
+    OPTION: 'Specify option',
     ANGLE: 'Specify angle',
     ROTATION: 'Specify rotation angle',
     DESTINATION: 'Specify destination',

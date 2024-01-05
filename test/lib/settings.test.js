@@ -1,7 +1,7 @@
-import {Settings} from '../../core/lib/settings';
+import {Core} from '../../core/core/core.js';
 
-const settings = new Settings();
-
+const core = new Core();
+const settings = core.settings;
 
 test('Test Settings.setSetting', () => {
   expect(settings.endsnap).toBe(true);

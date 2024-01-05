@@ -3,23 +3,23 @@ import {Intersection} from '../lib/intersect.js';
 import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
 
+import {DesignCore} from '../designCore.js';
+
 export class Entity {
   constructor(data) {
     Object.defineProperty(this, 'type', {
-      enumerable: false,
       value: this.constructor.name,
       writable: true,
     });
 
     Object.defineProperty(this, 'points', {
-      enumerable: false,
       value: [],
       writable: true,
     });
 
     /*
     Object.defineProperty(this, 'trueColour', {
-      enumerable: false,
+      //enumerable: false,
       writable: true,
     });
     */
@@ -43,18 +43,19 @@ export class Entity {
         this.colour = data.colour || Colours.getHexColour(data[62]);
       }
 
-      /*
       if (data.trueColour || data[420]) {
-      // DXF Groupcode 420 - true color
-      // A 24-bit color value that should be dealt with in terms of bytes with values
-      // of 0 to 255. The lowest byte is the blue value, the middle byte is the
-      // green value, and the third byte is the red value. The top byte is always
-      // 0. The group code cannot be used by custom entities for their own data
-      // because the group code is reserved for AcDbEntity, class-level color data
-      // and AcDbEntity, class-level transparency data
-        this.trueColour = data.trueColour;
+        // DXF Groupcode 420 - true color
+        // A 24-bit color value that should be dealt with in terms of bytes with values
+        // of 0 to 255. The lowest byte is the blue value, the middle byte is the
+        // green value, and the third byte is the red value. The top byte is always
+        // 0. The group code cannot be used by custom entities for their own data
+        // because the group code is reserved for AcDbEntity, class-level color data
+        // and AcDbEntity, class-level transparency data
+        // this.trueColour = data.trueColour;
+        const err = 'Groupcode 420 not implemented';
+        Logging.instance.warn(`${this.type} - ${err}`);
       }
-      */
+
 
       if (data.lineType || data[6]) {
         // DXF Groupcode 6 - lineType
@@ -68,7 +69,7 @@ export class Entity {
     }
   }
 
-  getColour(core) {
+  getColour() {
     // if (this.trueColour !== undefined) {
     //   return this.trueColour;
     // }
@@ -76,29 +77,29 @@ export class Entity {
     let colour = this.colour;
 
     if (colour === 'BYLAYER') {
-      const layer = core.layerManager.getLayerByName(this.layer);
+      const layer = DesignCore.LayerManager.getLayerByName(this.layer);
       colour = layer.colour;
     }
 
     return colour;
   }
 
-  getLineType(core) {
+  getLineType() {
     let lineTypeName = this.lineType;
 
     if (lineTypeName === 'BYLAYER') {
-      const layer = core.layerManager.getLayerByName(this.layer);
+      const layer = DesignCore.LayerManager.getLayerByName(this.layer);
       lineTypeName = layer.lineType;
     }
 
-    const lineType = core.ltypeManager.getStyleByName(lineTypeName);
+    const lineType = DesignCore.LTypeManager.getStyleByName(lineTypeName);
 
     return lineType;
   }
 
 
-  within(selectionExtremes, core) {
-    const layer = core.layerManager.getLayerByName(this.layer);
+  within(selectionExtremes) {
+    const layer = DesignCore.LayerManager.getLayerByName(this.layer);
 
     if (!layer.isSelectable) {
       return;
@@ -117,8 +118,8 @@ export class Entity {
     return false;
   }
 
-  touched(selectionExtremes, core) {
-    const layer = core.layerManager.getLayerByName(this.layer);
+  touched(selectionExtremes) {
+    const layer = DesignCore.LayerManager.getLayerByName(this.layer);
 
     if (!layer.isSelectable) {
       return;
@@ -136,7 +137,7 @@ export class Entity {
 
     if (Intersection.hasOwnProperty(intersectFunction) === false) {
       const msg = `${Strings.Error.INVALIDINTERSECTTYPE}: ${this.type}`;
-      core.notify(msg);
+      DesignCore.Core.notify(msg);
       throw Error(msg);
     }
 
@@ -149,11 +150,11 @@ export class Entity {
     return false;
   }
 
-  extend(points, core) {
+  extend(points) {
     // extend function to be overidden by implementation
   }
 
-  trim(points, core) {
+  trim(points) {
     // trim function to be overidden by implementation
   }
 }

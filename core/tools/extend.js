@@ -4,6 +4,8 @@ import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
+import {DesignCore} from '../designCore.js';
+
 export class Extend extends Tool {
   constructor() {
     super();
@@ -15,27 +17,27 @@ export class Extend extends Tool {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.BOUNDARY, [Input.Type.SELECTIONSET]);
 
-      if (!core.scene.selectionManager.selectionSet.selectionSet.length) {
-        await core.scene.inputManager.requestInput(op);
+      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+        await DesignCore.Scene.inputManager.requestInput(op);
       }
 
       const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       while (true) {
-        const selection = await core.scene.inputManager.requestInput(op2);
+        const selection = await DesignCore.Scene.inputManager.requestInput(op2);
         this.selectedIndex = selection.selectedItemIndex;
-        core.scene.inputManager.actionCommand();
+        DesignCore.Scene.inputManager.actionCommand();
       }
     } catch (error) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  action(core) {
-    // const item = core.scene.selectionManager.findClosestItem(core.mouse.pointOnScene());
+  action() {
+    // const item = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
 
     const item = this.selectedIndex;
 
@@ -43,10 +45,10 @@ export class Extend extends Tool {
       const intersectPoints = [];
       let extendItem;
 
-      for (let i = 0; i < core.scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        if (core.scene.selectionManager.selectionSet.selectionSet[i] !== item) {
-          const boundaryItem = core.scene.items[core.scene.selectionManager.selectionSet.selectionSet[i]];
-          extendItem = core.scene.items[item];
+      for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        if (DesignCore.Scene.selectionManager.selectionSet.selectionSet[i] !== item) {
+          const boundaryItem = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]];
+          extendItem = DesignCore.Scene.items[item];
 
           const functionName = 'intersect' + boundaryItem.type + extendItem.type;
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), extendItem.intersectPoints(), true);
@@ -60,7 +62,7 @@ export class Extend extends Tool {
       }
 
       if (intersectPoints) {
-        extendItem.extend(intersectPoints, core);
+        extendItem.extend(intersectPoints);
       }
 
       this.selectedIndex = undefined;

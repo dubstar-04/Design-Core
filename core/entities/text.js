@@ -7,6 +7,8 @@ import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
+import {DesignCore} from '../designCore.js';
+
 export class Text extends Entity {
   constructor(data) {
     super(data);
@@ -14,23 +16,43 @@ export class Text extends Entity {
     this.height = 2.5;
     this.horizontalAlignment = 0;
     this.verticalAlignment = 0;
-    this.backwards = false;
-    this.upsideDown = false;
     this.styleName = 'STANDARD';
 
     // add rotation property with getter and setter
-    // needs to be enumberable to appear in the object props
+    // needs to be enumerable to appear in the object props
     Object.defineProperty(this, 'rotation', {
       get: this.getRotation,
       set: this.setRotation,
       enumerable: true,
     });
 
-    // needs to be non-enumberable as to not appear in the object props
+    // needs to be non-enumerable as to not appear in the object props
     Object.defineProperty(this, 'boundingRect', {
-      enumerable: false,
       value: {width: 10, height: 10},
       writable: true,
+    });
+
+    // needs to be non-enumerable as to not appear in the object props
+    Object.defineProperty(this, 'flags', {
+      value: 0,
+      writable: true,
+    });
+
+    // add backwards property with getter and setter
+    // needs to be enumerable to appear in the object props
+    Object.defineProperty(this, 'backwards', {
+      get: this.getBackwards,
+      set: this.setBackwards,
+      enumerable: true,
+    });
+
+
+    // add upsidedown property with getter and setter
+    // needs to be enumerable to appear in the object props
+    Object.defineProperty(this, 'upsideDown', {
+      get: this.getUpsideDown,
+      set: this.setUpsideDown,
+      enumerable: true,
     });
 
     if (data) {
@@ -78,22 +100,10 @@ export class Text extends Entity {
       }
 
       if (data.flags || data[71]) {
-        // DXF Groupcode 71 - Text Flags
+        // DXF Groupcode 71 - flags (bit-coded values):
         // 2 = Text is backward (mirrored in X).
         // 4 = Text is upside down (mirrored in Y).
-        const flags = data.flags || data[71];
-        switch (flags) {
-          case 2:
-            this.backwards = true;
-            break;
-          case 4:
-            this.upsideDown = true;
-            break;
-          case 6:
-            this.upsideDown = true;
-            this.backwards = true;
-            break;
-        }
+        this.flags = data.flags || data[71];
       }
     }
   }
@@ -103,45 +113,61 @@ export class Text extends Entity {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op);
+      const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
-      const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
-      const height = await core.scene.inputManager.requestInput(op2);
-      this.height = height;
+      // set the text style to the current style
+      const currentStyle = DesignCore.StyleManager.getCstyle();
+      this.styleName = currentStyle;
+
+      // get properties from style
+      const style = DesignCore.StyleManager.getStyleByName(this.styleName);
+      if (style.textHeight) {
+        this.height = style.textHeight;
+      }
+
+      this.backwards = style.backwards;
+      this.upsideDown = style.upsideDown;
+
+      // Get the font size when standard style is used
+      if (this.styleName.toUpperCase() === 'STANDARD') {
+        const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
+        const height = await DesignCore.Scene.inputManager.requestInput(op2);
+        this.height = height;
+      }
 
       const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
-      const rotation = await core.scene.inputManager.requestInput(op3);
+      const rotation = await DesignCore.Scene.inputManager.requestInput(op3);
       this.setRotation(rotation);
 
       const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
-      const string = await core.scene.inputManager.requestInput(op4);
+      const string = await DesignCore.Scene.inputManager.requestInput(op4);
       this.string = String(string);
 
-      core.scene.inputManager.executeCommand(this);
+      DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  preview(core) {
+  preview() {
     if (this.points.length >= 1) {
-      if (core.scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
+      if (DesignCore.Scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
         const data = {
           points: this.points,
           height: this.height,
           rotation: this.rotation,
-          string: core.commandLine.command,
+          string: DesignCore.CommandLine.command,
         };
 
-        core.scene.createTempItem(this.type, data);
+        DesignCore.Scene.createTempItem(this.type, data);
       } else {
-        const mousePoint = core.mouse.pointOnScene();
+        const mousePoint = DesignCore.Mouse.pointOnScene();
         const points = [this.points.at(-1), mousePoint];
-        core.scene.createTempItem('Line', {points: points});
+        DesignCore.Scene.createTempItem('Line', {points: points});
       }
     }
   }
@@ -175,6 +201,56 @@ export class Text extends Entity {
     return 0;
   }
 
+  /**
+   * Get the backwards value
+   * @returns {boolean} true if the text is flipped horizontally
+   */
+  getBackwards() {
+    // Backwards value is bitmasked in flags as value 2
+    return Boolean(this.flags & 2);
+  }
+
+  /**
+   * Set the backwards value
+   * @param {boolean} bool
+   */
+  setBackwards(bool) {
+    if (bool) {
+      // Add flag
+      this.flags = (this.flags | 2);
+    } else {
+      // remove flag
+      this.flags = (this.flags ^ (this.flags & 2));
+    }
+  }
+
+  /**
+   * Get the upside down value
+   * @returns {boolean} true if the text is flipped vertically
+   */
+  getUpsideDown() {
+    // Upside down value is bitmasked in flags as value 4
+    return Boolean(this.flags & 4);
+  }
+
+  /**
+   * Set the upside down value
+   * @param {boolean} bool
+   */
+  setUpsideDown(bool) {
+    if (bool) {
+      // Add flag
+      this.flags = (this.flags | 4);
+    } else {
+      // remove flag
+      this.flags = (this.flags ^ (this.flags & 4));
+    }
+  }
+
+  /**
+   * Get a string describing the horizontal text alignment
+   * @returns {string}
+   */
   getHorizontalAlignment() {
     /* DXF Data
         0 = Left; 1= Center; 2 = Right
@@ -201,6 +277,10 @@ export class Text extends Entity {
     }
   }
 
+  /**
+   * Get a string describing the vertical text alignment
+   * @returns {string}
+   */
   getVerticalAlignment() {
     /* DXF Data
         Vertical text justification type (optional, default = 0): integer codes (not bit- coded):
@@ -232,6 +312,9 @@ export class Text extends Entity {
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
 
+    const style = DesignCore.StyleManager.getStyleByName(this.styleName);
+    // style.textHeight
+
     if (this.upsideDown) {
       ctx.scale(1, -1);
     }
@@ -251,16 +334,50 @@ export class Text extends Entity {
     try { // HTML
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt Arial'; // + core.styleManager.getStyleByName(this.styleName).font.toString();
+      ctx.font = this.height + 'pt Arial'; // +DesignCore.StyleManager.getStyleByName(this.styleName).font.toString();
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
       this.boundingRect.height = this.height;
     } catch { // Cairo
-      ctx.moveTo(0, 0);
       ctx.setFontSize(this.height);
-      ctx.showText(String(this.string));
+      ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
       this.boundingRect = ctx.textExtents(String(this.string));
+
+      // console.log(this.boundingRect);
+
+      let x = 0;
+      let y = 0;
+      switch (this.horizontalAlignment) {
+        case 0: // 0 = Left;
+          x = -this.boundingRect.xBearing;
+          break;
+        case 1: // 1= Center;
+          x = -this.boundingRect.xBearing-this.boundingRect.width / 2;
+          break;
+        case 2: // 2 = Right
+          x = -this.boundingRect.xBearing-this.boundingRect.width;
+          break;
+      }
+
+      switch (this.verticalAlignment) {
+        case 0: // 0 = Baseline;
+          y = 0;
+          break;
+        case 1: // 1 = Bottom;
+          y = -this.boundingRect.yBearing - this.boundingRect.height;
+          break;
+        case 2: // 2 = Middle
+          y = -this.boundingRect.yBearing - this.boundingRect.height / 2;
+          break;
+        case 3: // 3 = Top
+          y = -this.boundingRect.yBearing;
+          break;
+      }
+
+
+      ctx.moveTo(x, y);
+      ctx.showText(String(this.string));
     }
     ctx.stroke();
     ctx.restore();
@@ -283,21 +400,22 @@ export class Text extends Entity {
     file.writeGroupCode('0', 'TEXT');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
-    file.writeGroupCode('1', this.string);
     file.writeGroupCode('40', this.height);
+    file.writeGroupCode('1', this.string);
     file.writeGroupCode('50', this.rotation);
-    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     // file.writeGroupCode('7', 'STANDARD'); // TEXT STYLE
-    // file.writeGroupCode('72', this.getHorizontalAlignment()); //HORIZONTAL ALIGNMENT
-    // file.writeGroupCode('73', this.getVerticalAlignment()); //VERTICAL ALIGNMENT
+    file.writeGroupCode('71', this.flags); // Text generation flags
+    file.writeGroupCode('72', this.horizontalAlignment); // Horizontal alignment
+    file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
+    file.writeGroupCode('73', this.verticalAlignment); // Vertical alignment
   }
 
-  snaps(mousePoint, delta, core) {
+  snaps(mousePoint, delta) {
     const rect = this.getBoundingRect();
 
     const botLeft = new Point(rect.x, rect.y);

@@ -2,21 +2,23 @@ import {DXF} from './dxf/dxf.js';
 import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 
+import {DesignCore} from '../designCore.js';
+
 export class FileIO {
-  static saveDxf(core, version) {
+  static saveDxf(version) {
     const dxfWriter = new DXF();
-    const data = dxfWriter.write(core, version);
+    const data = dxfWriter.write(version);
     return data;
   }
 
-  static openFile(core, data) {
+  static openFile(data) {
     const dxf = new DXF();
     try {
-      dxf.loadDxf(core, data);
-      core.canvas.requestPaint();
-      core.notify(Strings.Message.FILEOPEN);
+      dxf.loadDxf(data);
+      DesignCore.Canvas.requestPaint();
+      DesignCore.Core.notify(Strings.Message.FILEOPEN);
     } catch (error) {
-      core.notify(error.toString());
+      DesignCore.Core.notify(error.toString());
       Logging.instance.debug(error.stack);
     }
   }

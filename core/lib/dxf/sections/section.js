@@ -10,7 +10,7 @@ export class Section {
     const currentPair = iterator.currentPair();
 
     // parse point values
-    if (['10', '11', '12', '13'].includes(currentPair.code)) {
+    if (['10', '11', '12', '13', '14', '15', '16'].includes(currentPair.code)) {
       const point = this.parsePoint(iterator);
 
       iterator.prevPair();
@@ -75,25 +75,30 @@ export class Section {
     const point = {};
 
     // first group code must be an x value for a point
-    if (['10', '11', '12', '13'].includes(iterator.currentPair().code) === false) {
+    if (['10', '11', '12', '13', '14', '15', '16'].includes(iterator.currentPair().code) === false) {
       iterator.dxfError(Strings.Error.INVALIDPOINT);
     }
 
     while (true) {
       const currentPair = iterator.currentPair();
       switch (true) {
-        case (['10', '11', '12', '13'].includes(currentPair.code)):
+        case (['10', '11', '12', '13', '14', '15', '16'].includes(currentPair.code)):
           if (Object.keys(point).length) {
             return point;
           }
+          // add the point sequence value
+          // '10', '11', '12', '13', '14', '15', '16'
+          const sequence = this.parseInt(iterator.currentPair().code);
+          point.sequence = sequence;
+
           const xValue = this.getGroupValue(currentPair);
           point.x = xValue;
           break;
-        case (['20', '21', '22', '23'].includes(currentPair.code)):
+        case (['20', '21', '22', '23', '24', '25', '26'].includes(currentPair.code)):
           const yValue = this.getGroupValue(currentPair);
           point.y = yValue;
           break;
-        case (['30', '31', '32', '33'].includes(currentPair.code)):
+        case (['30', '31', '32', '33', '34', '35', '36'].includes(currentPair.code)):
           const zValue = this.getGroupValue(currentPair);
           point.z = zValue;
           break;

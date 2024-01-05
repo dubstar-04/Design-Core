@@ -3,6 +3,8 @@ import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
+import {DesignCore} from '../designCore.js';
+
 export class Identify extends Tool {
   constructor() {
     super();
@@ -13,22 +15,22 @@ export class Identify extends Tool {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op);
+      const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
-      core.scene.inputManager.executeCommand();
+      DesignCore.Scene.inputManager.executeCommand();
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  action(core) {
+  action() {
     const x = this.points.at(-1).x.toFixed(1);
     const y = this.points.at(-1).y.toFixed(1);
     const id = (`X:${x} Y:${y}`);
-    core.notify(id);
+    DesignCore.Core.notify(id);
   }
 }

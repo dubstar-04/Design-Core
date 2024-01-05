@@ -5,6 +5,8 @@ import {Point} from '../../entities/point.js';
 import {Strings} from '../strings.js';
 import {Logging} from '../logging.js';
 
+import {DesignCore} from '../../designCore.js';
+
 export class DXF {
   constructor() {
     this.reader;
@@ -19,36 +21,36 @@ export class DXF {
     this.reader.read(data);
   }
 
-  write(core, version) {
+  write(version) {
     const writer = new DXFWriter();
-    const data = writer.write(core, version);
+    const data = writer.write(version);
     return data;
   }
 
-  loadDxf(core, data) {
+  loadDxf(data) {
     Logging.instance.debug('Loading File');
     this.read(data);
 
-    this.loadTables(core);
-    this.loadBlocks(core);
-    this.loadEntities(core);
+    this.loadTables();
+    this.loadBlocks();
+    this.loadEntities();
 
     // load headers last to ensure the elements and layers exist
-    this.loadHeader(core);
+    this.loadHeader();
 
     if (this.unsupportedElements) {
-      core.notify(Strings.Warning.UNSUPPORTEDENTITIES);
+      DesignCore.Core.notify(Strings.Warning.UNSUPPORTEDENTITIES);
     }
   }
 
-  loadHeader(core) {
+  loadHeader() {
     const header = this.reader.header;
 
     if (header.hasOwnProperty('$CLAYER')) {
       const clayer = header['$CLAYER'];
       if (clayer.hasOwnProperty('8')) {
         const layerName = clayer['8'];
-        core.layerManager.setCLayer(layerName);
+        DesignCore.LayerManager.setCLayer(layerName);
       }
     }
 
@@ -59,35 +61,56 @@ export class DXF {
         // pass the version to core
         const versionKey = DXFFile.getVersionKey(versionNumber);
         Logging.instance.debug(`Opening DXF Version: ${versionKey}`);
-        core.dxfVersion = versionNumber;
+        DesignCore.Core.dxfVersion = versionNumber;
       }
     }
   }
 
 
-  loadTables(core) {
+  loadTables() {
     const tables = this.reader.tables;
 
     tables.forEach((table) => {
       if (table[2] === 'LAYER') {
         table.children.forEach((layer) => {
-          core.layerManager.addLayer(layer);
+          DesignCore.LayerManager.addLayer(layer);
         });
       }
 
       if (table[2] === 'LTYPE') {
         table.children.forEach((ltype) => {
-          core.ltypeManager.addStyle(ltype);
+          DesignCore.LTypeManager.addStyle(ltype);
+        });
+      }
+
+      if (table[2] === 'STYLE') {
+        table.children.forEach((style) => {
+          DesignCore.StyleManager.addStyle(style);
+        });
+      }
+
+      if (table[2] === 'DIMSTYLE') {
+        table.children.forEach((style) => {
+          DesignCore.DimStyleManager.addStyle(style);
         });
       }
     });
   }
 
-  loadBlocks(core) {
+  loadBlocks() {
     const blocks = this.reader.blocks;
 
     blocks.forEach((block) => {
       if (block.hasOwnProperty('2')) {
+        /*
+        Three empty definitions always appear in the BLOCKS section.
+        They are titled *Model_Space, *Paper_Space and *Paper_Space0.
+        These definitions manifest the representations of model space and paper space as block definitions internally.
+        The internal name of the first paper space layout is *Paper_Space,
+        the second is *Paper_Space0,
+        the third is *Paper_Space1,
+        and so on.
+        */
         if (block[2].toUpperCase().includes('MODEL_SPACE')) {
           // skip model_space blocks
           return;
@@ -115,9 +138,9 @@ export class DXF {
 
           const command = child[0];
           // check if the child is a valid entity
-          if (core.commandManager.isCommand(command)) {
+          if (DesignCore.CommandManager.isCommand(command)) {
             // create an instance of the child entity
-            const item = core.commandManager.createNew(command, child);
+            const item = DesignCore.CommandManager.createNew(command, child);
 
             if (block.hasOwnProperty('items') === false) {
               block.items = [];
@@ -131,11 +154,11 @@ export class DXF {
         });
       }
 
-      this.addToScene(core, block);
+      this.addItem(block);
     });
   }
 
-  loadEntities(core) {
+  loadEntities() {
     const entities = this.reader.entities;
 
     entities.forEach((entity) => {
@@ -143,18 +166,19 @@ export class DXF {
         entity.points = this.parsePoints(entity.points);
       }
 
-      this.addToScene(core, entity);
+      this.addItem(entity);
     });
   }
 
-  addToScene(core, item) {
+
+  addItem(item) {
     if (item.hasOwnProperty('0') === false) {
       return;
     }
 
     const command = item[0];
-    if (core.commandManager.isCommand(command)) {
-      core.scene.addToScene(command, item);
+    if (DesignCore.CommandManager.isCommand(command)) {
+      DesignCore.Scene.addItem(command, item);
     } else {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
       this.unsupportedElements = true;
@@ -167,6 +191,9 @@ export class DXF {
       const pt = new Point(point.x, point.y);
       if (point.hasOwnProperty('bulge')) {
         pt.bulge = point.bulge;
+      }
+      if (point.hasOwnProperty('sequence')) {
+        pt.sequence = point.sequence;
       }
       points.push(pt);
     });

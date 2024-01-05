@@ -1,9 +1,10 @@
+import {DesignCore} from '../designCore.js';
+
 export class Settings {
   /**
    * Settings Constructor
    */
-  constructor(core) {
-    this.core = core;
+  constructor() {
     this.canvasbackgroundcolour = '#1e1e1e'; // "#000000";
     this.selecteditemscolour = '#00FF00';
     this.snapcolour = '#FF0000';
@@ -34,8 +35,9 @@ export class Settings {
   setSetting(setting, value) {
     // TODO: Check setting is valid
     this[setting] = value;
-    if (this.core) {
-      this.core.canvas.requestPaint();
+
+    if (DesignCore.instance) {
+      DesignCore.Canvas.requestPaint();
     }
   }
 

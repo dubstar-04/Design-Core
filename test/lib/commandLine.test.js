@@ -1,9 +1,9 @@
-import {Core} from '../../core/core.js';
+import {Core} from '../../core/core/core.js';
 import {Input, PromptOptions} from '../../core/lib/inputManager.js';
 import {Strings} from '../../core/lib/strings.js';
 
 const core = new Core();
-const commandline = core.commandLine; // new CommandLine(core);
+const commandline = core.commandLine; // new CommandLine();
 
 test('Test Commandline.resetPrompt', () => {
   commandline.handleKeys('L');

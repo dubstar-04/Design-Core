@@ -40,7 +40,7 @@ export class DXFFile {
   }
 
   /**
-   * Return the dxf key for the dxf version e.g key = R12 version = 'AC1009
+   * Return the dxf key for the dxf version e.g key = R12 version = 'AC1009'
    * @param {*} dxfVersion
    * @returns dxf key (R Number) for valid dxf versions
    */
@@ -67,6 +67,8 @@ export class DXFFile {
     R2007: 'AC1021',
     R2004: 'AC1018',
     R2000: 'AC1015',
+    R14: 'AC1014',
+    R13: 'AC1012',
     R12: 'AC1009',
   };
 

@@ -7,6 +7,8 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 import {Point} from './point.js';
 
+import {DesignCore} from '../designCore.js';
+
 export class BasePolyline extends Entity {
   constructor(data) {
     super(data);
@@ -17,19 +19,16 @@ export class BasePolyline extends Entity {
     };
 
     Object.defineProperty(this, 'modes', {
-      enumerable: false,
       value: modes,
       writable: true,
     });
 
     Object.defineProperty(this, 'inputMode', {
-      enumerable: false,
       value: this.modes.LINE,
       writable: true,
     });
 
     Object.defineProperty(this, 'flags', {
-      enumerable: false,
       value: 0,
       writable: true,
     });
@@ -63,10 +62,10 @@ export class BasePolyline extends Entity {
     }
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op);
+      const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
       let pt2;
@@ -74,12 +73,14 @@ export class BasePolyline extends Entity {
       let index;
       while (true) {
         let options;
+        let prompt = Strings.Input.NEXTPOINT;
         if (this.points.length >= 2) {
           options = this.inputMode === this.modes.LINE ? [this.modes.ARC] : [this.modes.LINE];
+          prompt = `${Strings.Input.NEXTPOINT} or ${Strings.Input.OPTION}`;
         }
 
-        op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT], options);
-        pt2 = await core.scene.inputManager.requestInput(op2);
+        op2 = new PromptOptions(prompt, [Input.Type.POINT], options);
+        pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
 
         if (Input.getType(pt2) === Input.Type.POINT) {
           if (this.inputMode === this.modes.ARC) {
@@ -88,8 +89,9 @@ export class BasePolyline extends Entity {
 
           this.points.push(pt2);
           // first creation will get a new index, subsequent will use the index to update the original polyline
-          index = core.scene.inputManager.actionCommand(this, index);
+          index = DesignCore.Scene.inputManager.actionCommand(this, index);
         } else if (Input.getType(pt2) === Input.Type.STRING) {
+          // options are converted to input in the prompt options class
           if (pt2 === this.modes.ARC) {
             this.inputMode = this.modes.ARC;
           }
@@ -103,19 +105,19 @@ export class BasePolyline extends Entity {
     }
   }
 
-  preview(core) {
-    const mousePoint = core.mouse.pointOnScene();
+  preview() {
+    const mousePoint = DesignCore.Mouse.pointOnScene();
 
     if (this.points.length >= 1) {
       const points = [...this.points, mousePoint];
-      core.scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, {points: points});
     }
 
     if (this.inputMode === this.modes.ARC) {
-      const arcpoints = Utils.cloneObject(core, this.points);
+      const arcpoints = Utils.cloneObject( this.points);
       arcpoints.at(-1).bulge = this.getBulgeFromSegment(mousePoint);
       const points = [...arcpoints, mousePoint];
-      core.scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, {points: points});
     }
   }
 
@@ -195,17 +197,17 @@ export class BasePolyline extends Entity {
     };
   }
 
-  snaps(mousePoint, delta, core) {
+  snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (core.settings.endsnap) {
+    if (DesignCore.Settings.endsnap) {
       // End points for each segment
       for (let i = 0; i < this.points.length; i++) {
         snaps.push(this.points[i]);
       }
     }
 
-    if (core.settings.midsnap) {
+    if (DesignCore.Settings.midsnap) {
       for (let i = 1; i < this.points.length; i++) {
         if (this.points[i-1].bulge === 0) {
           snaps.push( this.points[i - 1].midPoint(this.points[i]));
@@ -213,7 +215,7 @@ export class BasePolyline extends Entity {
       }
     }
 
-    if (core.settings.centresnap) {
+    if (DesignCore.Settings.centresnap) {
       for (let i = 1; i < this.points.length; i++) {
         if (this.points[i-1].bulge !== 0) {
           snaps.push( this.points[i - 1].bulgeCentrePoint(this.points[i]));
@@ -221,7 +223,7 @@ export class BasePolyline extends Entity {
       }
     }
 
-    if (core.settings.nearestsnap) {
+    if (DesignCore.Settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint);
 
       // Crude way to snap to the closest point or a node

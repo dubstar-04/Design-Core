@@ -1,4 +1,5 @@
-import {Core} from '../../core/core.js';
+import {Core} from '../../core/core/core.js';
+import {DesignCore} from '../../core/designCore.js';
 import {Point} from '../../core/entities/point.js';
 import {Distance} from '../../core/tools/distance.js';
 
@@ -11,7 +12,7 @@ core.notify = (notification) => {
 
 test('Test distance.action', () => {
   // Add items to scene
-  core.scene.addToScene('Line', {points: [new Point(), new Point(0, 10)]});
+  DesignCore.Scene.addItem('Line', {points: [new Point(), new Point(0, 10)]});
 
   const distance = new Distance();
 
@@ -22,7 +23,7 @@ test('Test distance.action', () => {
   distance.points.push(new Point(0, 10));
 
   // Perform distance
-  distance.action(core);
+  distance.action();
 
   expect(output).not.toBeUndefined();
   expect(output).toBe('Length: 10.0 &#916;X: 0.0 &#916;Y: 10.0');

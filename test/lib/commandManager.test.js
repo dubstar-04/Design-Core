@@ -1,10 +1,9 @@
 
-import {Core} from '../../core/core.js';
-import {CommandManager} from '../../core/lib/commandManager.js';
+import {Core} from '../../core/core/core.js';
 import {Point} from '../../core/entities/point.js';
 
 const core = new Core();
-const commandManager = new CommandManager(core);
+const commandManager = core.commandManager;
 
 test('Test CommandManager.createNew', () => {
   const startPoint = new Point();

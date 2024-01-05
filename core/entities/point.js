@@ -7,6 +7,11 @@ export class Point {
     this.type = this.constructor.name;
     this.x = 0;
     this.y = 0;
+    // sequence holds a reference to the dxf group code sequence the point represents
+    // 10, 20, 30;
+    // 11, 21, 31;
+    this.sequence;
+
     // bulge value used for defining arcs in polylines
     // arc is ccw if positive
     this.bulge = 0;
@@ -145,9 +150,10 @@ export class Point {
   };
 
   /**
-   * Find the closest point to this on the straight line between Pt1 and Pt2
+   * Find the closest point to this on the ray formed by Pt1 and Pt2
    * @param  {Point} Pt1
    * @param  {Point} Pt2
+   * @returns the closest point on the ray
    */
   perpendicular(Pt1, Pt2) {
     const APx = this.x - Pt1.x;
@@ -159,15 +165,9 @@ export class Point {
     const ABdotAP = ABx * APx + ABy * APy;
     const t = ABdotAP / magAB2;
 
-    // check if the point is < start or > end
-    if (t > 0 && t < 1) {
-      const x = Pt1.x + ABx * t;
-      const y = Pt1.y + ABy * t;
-      return new Point(x, y);
-    }
-
-    // no perpendicular point found. return null
-    return null;
+    const x = Pt1.x + ABx * t;
+    const y = Pt1.y + ABy * t;
+    return new Point(x, y);
   }
 
   /**
@@ -187,7 +187,11 @@ export class Point {
    */
   closestPointOnLine(startPoint, endPoint) {
     const pnt = this.perpendicular(startPoint, endPoint);
-    return pnt;
+    if (pnt.isOnLine(startPoint, endPoint)) {
+      return pnt;
+    }
+
+    return null;
   }
 
   /**
@@ -269,13 +273,10 @@ export class Point {
    * @returns true or false
    */
   isOnLine(startPoint, endPoint) {
-    const slope = (endPoint.y - startPoint.y) / (endPoint.x - startPoint.x);
-    const y = slope * this.x + startPoint.y;
-
-    if ((y <= this.y && y >= this.y) && (this.x >= startPoint.x && this.x <= endPoint.x)) {
+    // check start -> point + point -> end equals start -> end
+    if (startPoint.distance(this) + this.distance(endPoint) === startPoint.distance(endPoint)) {
       return true;
     }
-
     return false;
   }
 

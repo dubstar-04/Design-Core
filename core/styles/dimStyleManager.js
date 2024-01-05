@@ -3,8 +3,8 @@ import {DimStyle} from './dimStyle.js';
 import {StyleManagerBase} from './styleManagerBase.js';
 
 export class DimStyleManager extends StyleManagerBase {
-  constructor(core) {
-    super(core);
+  constructor() {
+    super();
   }
 
   createStyle(style) {
@@ -14,13 +14,16 @@ export class DimStyleManager extends StyleManagerBase {
   addStandardStyles() {
     this.addStyle({
       'name': 'STANDARD',
+      // DIMCLRD - 176 - Dimension line color
+      // DIMCLRE - 177 - Dimension extension line color
+      // DIMCLRT -  178 - Dimension text color
     });
-    /*
+
     this.addStyle({
       'name': 'ANNOTATIVE',
     });
-    */
-    // this.core.scene.saveRequired();
+
+    // DesignCore.scene.saveRequired();
   }
 
   dxf(file) {

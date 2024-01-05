@@ -7,6 +7,8 @@ import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
+import {DesignCore} from '../designCore.js';
+
 export class Line extends Entity {
   constructor(data) {
     super(data);
@@ -30,37 +32,37 @@ export class Line extends Entity {
     return command;
   }
 
-  async execute(core) {
+  async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await core.scene.inputManager.requestInput(op);
+      const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
       let pt2;
       const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.NUMBER]);
       while (true) {
-        pt2 = await core.scene.inputManager.requestInput(op2);
+        pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
         if (Input.getType(pt2) === Input.Type.POINT) {
           this.points.push(pt2);
         } else if (Input.getType(pt2) === Input.Type.NUMBER) {
           const basePoint = this.points.at(-1);
-          const angle = Utils.degrees2radians(core.mouse.inputAngle());
+          const angle = Utils.degrees2radians(DesignCore.Mouse.inputAngle());
           const point = basePoint.project(angle, pt2);
           this.points.push(point);
         }
 
-        core.scene.inputManager.actionCommand(this);
+        DesignCore.Scene.inputManager.actionCommand(this);
       }
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
-  preview(core) {
+  preview() {
     if (this.points.length >= 1) {
-      const mousePoint = core.mouse.pointOnScene();
+      const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(-1), mousePoint];
-      core.scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, {points: points});
     }
   }
 
@@ -84,7 +86,7 @@ export class Line extends Entity {
     file.writeGroupCode('31', '0.0');
   }
 
-  trim(points, core) {
+  trim(points) {
     function trimOneEnd(intersectPnts, line) {
       let originPoint;
       let destinationPoint;
@@ -92,7 +94,7 @@ export class Line extends Entity {
 
       for (let i = 0; i < line.points.length; i++) {
         for (let j = 0; j < intersectPnts.length; j++) {
-          if (betweenPoints(core.mouse.pointOnScene(), [intersectPnts[j], line.points[i]], false)) {
+          if (betweenPoints(DesignCore.Mouse.pointOnScene(), [intersectPnts[j], line.points[i]], false)) {
             if (Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100 < Math.round(line.points[0].distance(line.points[1]) * 100) / 100) {
               originPoint = i;
               validPoints.push(j);
@@ -132,7 +134,7 @@ export class Line extends Entity {
           lineWidth: line.lineWidth,
         };
 
-        core.scene.addToScene('Line', data);
+        DesignCore.Scene.addItem('Line', data);
 
         if (a < b) {
           line.points[1] = pnts[0];
@@ -160,7 +162,7 @@ export class Line extends Entity {
 
     if (points.length > 1) {
       // is the mouse between two points
-      const pnts = betweenPoints(core.mouse.pointOnScene(), points, true);
+      const pnts = betweenPoints(DesignCore.Mouse.pointOnScene(), points, true);
 
       if (typeof pnts !== 'undefined') {
         trimBetween(pnts, this);
@@ -172,13 +174,13 @@ export class Line extends Entity {
     }
   }
 
-  extend(points, core) {
+  extend(points) {
     let originPoint;
     let destinationPoint;
 
     // Find which end is closer to the mouse
     // ToDo: Pass the mouse location in rather than needing a ref to core.
-    if (this.points[0].distance(core.mouse.pointOnScene()) < this.points[1].distance(core.mouse.pointOnScene())) {
+    if (this.points[0].distance(DesignCore.Mouse.pointOnScene()) < this.points[1].distance(DesignCore.Mouse.pointOnScene())) {
       originPoint = 0;
     } else {
       originPoint = 1;
@@ -237,20 +239,20 @@ export class Line extends Entity {
     return midPoint;
   }
 
-  snaps(mousePoint, delta, core) {
+  snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (core.settings.endsnap) {
+    if (DesignCore.Settings.endsnap) {
       const start = new Point(this.points[0].x, this.points[0].y);
       const end = new Point(this.points[1].x, this.points[1].y);
       snaps.push(start, end);
     }
 
-    if (core.settings.midsnap) {
+    if (DesignCore.Settings.midsnap) {
       snaps.push(this.midPoint());
     }
 
-    if (core.settings.nearestsnap) {
+    if (DesignCore.Settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint, start, end);
 
       // Crude way to snap to the closest point or a node
@@ -263,11 +265,7 @@ export class Line extends Entity {
   }
 
   closestPoint(P) {
-    // find the closest point on the straight line
-    const A = new Point(this.points[0].x, this.points[0].y);
-    const B = new Point(this.points[1].x, this.points[1].y);
-
-    const pnt = P.perpendicular(A, B);
+    const pnt = P.closestPointOnLine(this.points[0], this.points[1]);
     if (pnt === null) {
       return [P, Infinity];
     }

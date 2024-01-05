@@ -122,3 +122,12 @@ test('Test BoundingBox.arcBoundingBox', () => {
   expect(arcBB.yMin).toBe(0);
   expect(arcBB.yMax).toBe(200);
 });
+
+test('Test BoundingBox.fromPoints', () => {
+  // clockwise 270 degrees: 0 - 270
+  const bbFromPoints = BoundingBox.fromPoints([new Point(100, 100), new Point(200, 100), new Point(100, -100)]);
+  expect(bbFromPoints.xMin).toBeCloseTo(100);
+  expect(bbFromPoints.xMax).toBeCloseTo(200);
+  expect(bbFromPoints.yMin).toBeCloseTo(-100);
+  expect(bbFromPoints.yMax).toBeCloseTo(100);
+});

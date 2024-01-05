@@ -1,8 +1,9 @@
+import {DesignCore} from '../designCore.js';
+
 export class StyleManagerBase {
-  constructor(core) {
+  constructor() {
     this.styles = [];
     this.currentstyle = 'STANDARD';
-    this.core = core;
     this.addStandardStyles();
   }
 
@@ -62,7 +63,7 @@ export class StyleManagerBase {
     const newstyle = this.createStyle(style);
     if (!this.styleExists(newstyle.name)) {
       this.styles.push(newstyle);
-      // this.core.scene.saveRequired();
+      // DesignCore.Scene.saveRequired();
     }
   }
 
@@ -73,8 +74,8 @@ export class StyleManagerBase {
   deleteStyleFromScene(style) {
     const selectionSet = [];
 
-    for (let i = 0; i < this.core.scene.items.length; i++) {
-      if (this.core.scene.items[i].style === style) {
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      if (DesignCore.Scene.items[i].style === style) {
         selectionSet.push(i);
       }
     }
@@ -83,7 +84,7 @@ export class StyleManagerBase {
     selectionSet.sort((a, b)=>b-a);
 
     for (let j = 0; j < selectionSet.length; j++) {
-      this.core.scene.items.splice((selectionSet[j]), 1);
+      DesignCore.Scene.items.splice((selectionSet[j]), 1);
     }
   }
 
@@ -151,7 +152,7 @@ export class StyleManagerBase {
       this.addStandardStyles();
     }
 
-    for (let i = 0; i < this.core.scene.items.length; i++) {
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
       const style = (items[i].style);
       this.addstyle({
         'name': style,
@@ -171,7 +172,11 @@ export class StyleManagerBase {
       }
     }
 
-    return;
+    const msg = 'Invalid Style Name';
+    const err = (`${this.type} - ${msg}`);
+    throw Error(err);
+
+    // return;
   }
 
   /**
@@ -201,14 +206,47 @@ export class StyleManagerBase {
       return;
     }
 
-    const newUniqueName = this.getUniqueName(newName);
-
-    // if the style to change is the current style, update the currentstyle property
-    if (this.getStyleByIndex(styleIndex).name === this.currentstyle) {
-      this.setCstyle(newUniqueName);
+    // make sure it is a new new name
+    if (this.getStyleByIndex(styleIndex).name.toUpperCase() === newName.toUpperCase()) {
+      return;
     }
 
-    // TODO: update all items using the stle
+    const newUniqueName = this.getUniqueName(newName);
+
+    // TODO: update all items using the style
+    const currentStyleName = this.styles[styleIndex].name;
     this.styles[styleIndex].name = newUniqueName;
+
+    // if the style to change is the current style, update the currentstyle property
+    if (currentStyleName === this.currentstyle) {
+      this.setCstyle(newUniqueName);
+    }
+  }
+
+  /**
+   * Update the style property with value
+   * @param {number} styleIndex
+   * @param {string} property
+   * @param {any} value
+   */
+  updateStyle(styleIndex, property, value) {
+    // check of the index exists
+    if (this.styles[styleIndex] === undefined) {
+      const msg = 'Invalid Style Index';
+      const err = (`${this.type} - ${msg}`);
+      throw Error(err);
+    }
+
+    if (this.styles[styleIndex][property] === undefined) {
+      const msg = 'Invalid Style Property';
+      const err = (`${this.type} - ${msg}`);
+      throw Error(err);
+    }
+
+    if (property.toUpperCase() === 'NAME') {
+      this.renameStyle(styleIndex, value);
+    } else {
+      this.styles[styleIndex][property] = value;
+    }
   }
 }

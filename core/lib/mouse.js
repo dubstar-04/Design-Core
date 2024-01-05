@@ -1,18 +1,18 @@
 import {Point} from '../entities/point.js';
 import {Utils} from './utils.js';
+import {DesignCore} from '../designCore.js';
 
 export class Mouse {
   /**
    * Mouse Constructor
-   * @param {object} core
    */
-  constructor(core) {
+  constructor() {
     this.x = 0;
     this.y = 0;
     this.buttonOneDown = false;
     this.buttonTwoDown = false;
     this.buttonThreeDown = false;
-    this.core = core;
+    this.buttonOneDownScenePoint = new Point(); // store the location of the last scene click
     this.mouseDownCanvasPoint = new Point();
     this.lastClick = 0; // Timer for double click
     this.lastButton = 0; // last button for double click check
@@ -68,7 +68,7 @@ export class Mouse {
    * @returns
    */
   transformToScene(point) {
-    const scenePoint = this.core.canvas.matrix.invert().transformPoint(point.x, 0 - point.y + this.core.canvas.height);
+    const scenePoint = DesignCore.Canvas.matrix.invert().transformPoint(point.x, 0 - point.y +DesignCore.Canvas.height);
     return scenePoint;
   }
 
@@ -78,8 +78,8 @@ export class Mouse {
    * @returns
    */
   transformToCanvas(point) {
-    const canvasPoint = this.core.canvas.matrix.transformPoint(point.x, point.y);
-    canvasPoint.y = 0 - canvasPoint.y + this.core.canvas.height;
+    const canvasPoint = DesignCore.Canvas.matrix.transformPoint(point.x, point.y);
+    canvasPoint.y = 0 - canvasPoint.y +DesignCore.Canvas.height;
     return canvasPoint;
   }
 
@@ -120,23 +120,23 @@ export class Mouse {
     this.x = x;
     // canvas are typically origin top left. CAD is typically origin bottom left.
     // move the origin down to the bottom and invert the y position
-    this.y = -y + this.core.canvas.height;
+    this.y = -y + DesignCore.Canvas.height;
 
-    if (this.core.settings.polar) {
+    if (DesignCore.Settings.polar) {
       // if polar is enabled - get the closest points
-      const polarSnap = this.core.scene.inputManager.snapping.polarSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
+      const polarSnap = DesignCore.Scene.inputManager.snapping.polarSnap(this.buttonOneDownScenePoint);
       if (polarSnap) {
         this.setPosFromScenePoint(polarSnap);
       }
-    } else if (this.core.settings.ortho) {
+    } else if (DesignCore.Settings.ortho) {
       // if ortho is enabled - get the nearest ortho point
-      const orthoSnap = this.snapping.orthoSnap(this.transformToScene(this.mouseDownCanvasPoint), this.core);
+      const orthoSnap = DesignCore.Scene.inputManager.snapping.orthoSnap(this.buttonOneDownScenePoint);
       if (orthoSnap) {
         this.setPosFromScenePoint(orthoSnap);
       }
     }
 
-    this.core.canvas.mouseMoved();
+    DesignCore.Canvas.mouseMoved();
   }
 
   /**
@@ -149,6 +149,7 @@ export class Mouse {
     switch (button) {
       case 0:
         this.buttonOneDown = true;
+        this.buttonOneDownScenePoint = this.pointOnScene();
         break;
       case 1:
         this.buttonTwoDown = true;
@@ -159,7 +160,7 @@ export class Mouse {
     }
 
     if (this.isDoubleClick(button) === false) {
-      this.core.canvas.mouseDown(button);
+      DesignCore.Canvas.mouseDown(button);
     }
   }
 
@@ -202,7 +203,7 @@ export class Mouse {
         break;
     }
 
-    this.core.canvas.mouseUp(button);
+    DesignCore.Canvas.mouseUp(button);
   }
 
   /**
@@ -210,7 +211,7 @@ export class Mouse {
    * @param {number} button - 0 = left, 1 = wheel, 2 = right;
    */
   doubleClick(button) {
-    this.core.canvas.doubleClick(button);
+    DesignCore.Canvas.doubleClick(button);
   }
 
   /**
@@ -218,7 +219,7 @@ export class Mouse {
    * @param {number} delta - +/- 1 for zoom in / out
    */
   wheel(delta) {
-    this.core.canvas.wheel(delta);
+    DesignCore.Canvas.wheel(delta);
   }
 
   /**
