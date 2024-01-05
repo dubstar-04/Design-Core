@@ -66,7 +66,7 @@ export class Snapping {
    */
   getSnapPoint() {
     let snapPoint;
-    let delta = 25 /DesignCore.Canvas.getScale(); // find a more suitable starting value
+    let delta = 25 / DesignCore.Canvas.getScale(); // find a more suitable starting value
 
     for (let i = 0; i <DesignCore.Scene.items.length; i++) {
       const layer = DesignCore.LayerManager.getLayerByName(DesignCore.Scene.items[i].layer);
@@ -105,7 +105,7 @@ export class Snapping {
     // get the angle to the mouse position
     const mouseAngle = previousPoint.angle(DesignCore.Mouse.pointOnScene());
     // get the closest polar angle
-    const closestPolarAngle = DesignCore.Settings.polarangle * Math.round(Utils.radians2degrees(mouseAngle) /DesignCore.Settings.polarangle);
+    const closestPolarAngle = DesignCore.Settings.polarangle * Math.round(Utils.radians2degrees(mouseAngle) / DesignCore.Settings.polarangle);
     // get the angle to the closest polar angle from the mouse position
     const diff = Utils.radians2degrees(mouseAngle) - closestPolarAngle;
 
