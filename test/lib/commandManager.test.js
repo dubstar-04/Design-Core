@@ -1,5 +1,5 @@
 
-import {Core} from '../../core/core.js';
+import {Core} from '../../core/core/core.js';
 import {CommandManager} from '../../core/lib/commandManager.js';
 import {Point} from '../../core/entities/point.js';
 
