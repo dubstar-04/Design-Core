@@ -214,10 +214,11 @@ export class StyleManagerBase {
     const newUniqueName = this.getUniqueName(newName);
 
     // TODO: update all items using the style
+    const currentStyleName = this.styles[styleIndex].name;
     this.styles[styleIndex].name = newUniqueName;
 
     // if the style to change is the current style, update the currentstyle property
-    if (this.getStyleByIndex(styleIndex).name === this.currentstyle) {
+    if (currentStyleName === this.currentstyle) {
       this.setCstyle(newUniqueName);
     }
   }

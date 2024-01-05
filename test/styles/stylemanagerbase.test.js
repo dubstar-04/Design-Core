@@ -169,4 +169,36 @@ test('Test StyleManagerBase.renameStyle', () => {
   // try and rename to current name - no change
   styleManager.renameStyle(0, 'styleOneRenamed');
   expect(styleManager.getStyleByIndex(0).name).toBe('styleOneRenamed');
+
+  // try and rename current style
+  styleManager.setCstyle('styleTwo');
+  styleManager.renameStyle(1, 'styleTwoRenamed');
+  expect(styleManager.getStyleByIndex(1).name).toBe('styleTwoRenamed');
+  expect(styleManager.getCstyle()).toBe('styleTwoRenamed');
+});
+
+
+test('Test StyleManagerBase.updateStyle', () => {
+  // add some style to the styles array property
+  styleManager.styles = [{name: 'styleOne', textHeight: 2}, {name: 'styleTwo', textHeight: 3}];
+
+  // update non-existent style index
+  expect(() => {
+    styleManager.updateStyle(10, 'Non-Existent-property', 'value');
+  }).toThrow();
+
+
+  // update non-existent style property
+  expect(() => {
+    styleManager.updateStyle(1, 'Non-Existent-property', 'value');
+  }).toThrow();
+
+  // update style name
+  styleManager.updateStyle(0, 'name', 'styleOneRenamed');
+  expect(styleManager.getStyleByIndex(0).name).toBe('styleOneRenamed');
+
+
+  // update style text height
+  styleManager.updateStyle(0, 'textHeight', 20);
+  expect(styleManager.getStyleByIndex(0).textHeight).toBe(20);
 });
