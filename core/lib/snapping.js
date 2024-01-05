@@ -3,7 +3,7 @@ import {Point} from '../entities/point.js';
 import {Colours} from './colours.js';
 import {Utils} from './utils.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 class SnapPoint {
   constructor(snapPoint) {
@@ -11,7 +11,7 @@ class SnapPoint {
   }
 
   draw(ctx, scale) {
-    const snapColour = Core.Settings.snapcolour.toString();
+    const snapColour = DesignCore.Settings.snapcolour.toString();
     const radius = 4;
 
     try { // HTML Canvas
@@ -54,10 +54,10 @@ export class Snapping {
    */
   addSnapPoint(snapPoint) {
     // show the snap point
-    Core.Scene.addToAuxiliaryItems(new SnapPoint(snapPoint));
+    DesignCore.Scene.addToAuxiliaryItems(new SnapPoint(snapPoint));
 
     // Move the mouse to the closest snap point so if the mouse if clicked the snap point is used.
-    Core.Mouse.setPosFromScenePoint(snapPoint);
+    DesignCore.Mouse.setPosFromScenePoint(snapPoint);
   }
 
   /**
@@ -66,19 +66,19 @@ export class Snapping {
    */
   getSnapPoint() {
     let snapPoint;
-    let delta = 25 / Core.Canvas.getScale(); // find a more suitable starting value
+    let delta = 25 /DesignCore.Canvas.getScale(); // find a more suitable starting value
 
-    for (let i = 0; i < Core.Scene.items.length; i++) {
-      const layer = Core.LayerManager.getLayerByName(Core.Scene.items[i].layer);
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      const layer = DesignCore.LayerManager.getLayerByName(DesignCore.Scene.items[i].layer);
 
       if (!layer.isVisible) {
         continue;
       }
 
-      const itemSnaps = Core.Scene.items[i].snaps(Core.Mouse.pointOnScene(), delta); // get an array of snap point from the item
+      const itemSnaps = DesignCore.Scene.items[i].snaps(DesignCore.Mouse.pointOnScene(), delta); // get an array of snap point from the item
       if (itemSnaps) {
         for (let j = 0; j < itemSnaps.length; j++) {
-          const length = itemSnaps[j].distance(Core.Mouse.pointOnScene());
+          const length = itemSnaps[j].distance(DesignCore.Mouse.pointOnScene());
           if (length < delta) {
             delta = length;
             snapPoint = itemSnaps[j];
@@ -99,15 +99,15 @@ export class Snapping {
     let snapPoint;
     const angleTolerance = 4;
     // get the angle to the mouse position
-    const mouseAngle = previousPoint.angle(Core.Mouse.pointOnScene());
+    const mouseAngle = previousPoint.angle(DesignCore.Mouse.pointOnScene());
     // get the closest polar angle
-    const closestPolarAngle = Core.Settings.polarangle * Math.round(Utils.radians2degrees(mouseAngle) / Core.Settings.polarangle);
+    const closestPolarAngle = DesignCore.Settings.polarangle * Math.round(Utils.radians2degrees(mouseAngle) /DesignCore.Settings.polarangle);
     // get the angle to the closest polar angle from the mouse position
     const diff = Utils.radians2degrees(mouseAngle) - closestPolarAngle;
 
     // check if the angle between the mouseAngle and the closestPolarAngle is within tolerance
     if (Math.abs(diff) < angleTolerance) {
-      snapPoint = Core.Mouse.pointOnScene().rotate(previousPoint, Utils.degrees2radians(-diff));
+      snapPoint = DesignCore.Mouse.pointOnScene().rotate(previousPoint, Utils.degrees2radians(-diff));
       return snapPoint;
     }
     return snapPoint;
@@ -120,13 +120,13 @@ export class Snapping {
    */
   orthoSnap(previousPoint) {
     let snapPoint;
-    const x = Core.Mouse.pointOnScene().x - previousPoint.x;
-    const y = Core.Mouse.pointOnScene().y - previousPoint.y;
+    const x = DesignCore.Mouse.pointOnScene().x - previousPoint.x;
+    const y = DesignCore.Mouse.pointOnScene().y - previousPoint.y;
 
     if (Math.abs(x) > Math.abs(y)) {
-      snapPoint = new Point(Core.Mouse.pointOnScene().x, previousPoint.y);
+      snapPoint = new Point(DesignCore.Mouse.pointOnScene().x, previousPoint.y);
     } else {
-      snapPoint = new Point(previousPoint.x, Core.Mouse.pointOnScene().y);
+      snapPoint = new Point(previousPoint.x, DesignCore.Mouse.pointOnScene().y);
     }
     return snapPoint;
   }

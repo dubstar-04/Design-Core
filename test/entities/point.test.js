@@ -248,7 +248,8 @@ test('Test Point.perpendicular', () => {
 
   const pt4 = new Point(15, 15);
   const perp4 = pt4.perpendicular(lineStart1, lineEnd1);
-  expect(perp4).toBe(null);
+  expect(perp4.x).toBe(15);
+  expect(perp4.y).toBe(0);
 });
 
 

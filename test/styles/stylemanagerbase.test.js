@@ -1,5 +1,7 @@
-import {Core} from '../../core/core.js';
+import {Core} from '../../core/core/core.js';
 import {StyleManagerBase} from '../../core/styles/styleManagerBase';
+
+const core = new Core();
 
 // mock createStyle method
 StyleManagerBase.prototype.createStyle = function(style) {
@@ -11,7 +13,7 @@ StyleManagerBase.prototype.addStandardStyles = function() {
   this.addStyle({'name': 'TEST'});
 };
 
-const core = new Core();
+// const core = new Core();
 const styleManager = new StyleManagerBase();
 
 
@@ -91,7 +93,10 @@ test('Test StyleManagerBase.setCstyle', () => {
   styleManager.setCstyle('styleOne');
   expect(styleManager.getCstyle()).toBe('styleOne');
 
-  styleManager.setCstyle('Non-Existent');
+  expect(() => {
+    styleManager.setCstyle('Non-Existent');
+  }).toThrow();
+  // styleManager.setCstyle('Non-Existent');
   expect(styleManager.getCstyle()).toBe('styleOne');
 });
 
@@ -133,7 +138,10 @@ test('Test StyleManagerBase.getStyleByName', () => {
   styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
 
   expect(styleManager.getStyleByName('styleOne').name).toBe('styleOne');
-  expect(styleManager.getStyleByName('Non-Existent')).toBeUndefined();
+  expect(() => {
+    styleManager.getStyleByName('Non-Existent');
+  }).toThrow();
+  // expect(styleManager.getStyleByName('Non-Existent')).toBeUndefined();
 });
 
 test('Test StyleManagerBase.getStyleByIndex', () => {
@@ -159,7 +167,7 @@ test('Test StyleManagerBase.renameStyle', () => {
   styleManager.renameStyle(0, 'styleOneRenamed');
   expect(styleManager.getStyleByIndex(0).name).toBe('styleOneRenamed');
 
-  // try and rename to existing name
+  // try and rename to current name - no change
   styleManager.renameStyle(0, 'styleOneRenamed');
-  expect(styleManager.getStyleByIndex(0).name).toBe('styleOneRenamed_1');
+  expect(styleManager.getStyleByIndex(0).name).toBe('styleOneRenamed');
 });

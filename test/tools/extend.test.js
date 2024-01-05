@@ -1,4 +1,5 @@
-import {Core} from '../../core/core.js';
+import {Core} from '../../core/core/core.js';
+import {DesignCore} from '../../core/designCore.js';
 import {Point} from '../../core/entities/point.js';
 import {Extend} from '../../core/tools/extend.js';
 
@@ -25,28 +26,28 @@ test('Test Extend.action', () => {
    * Extend end from horizontal line
    */
   // Add items to scene
-  Core.Scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  Core.Scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  DesignCore.Scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
+  DesignCore.Scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
   // Select boundary item
-  Core.Scene.selectionManager.addToSelectionSet(0);
+  DesignCore.Scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
   extend.selectedIndex = 1;
   // set mouse location - required for Extend
-  Core.Mouse.setPosFromScenePoint(new Point(40, 50));
+  DesignCore.Mouse.setPosFromScenePoint(new Point(40, 50));
   // Perform Extend
   extend.action();
 
   // line one
-  expect(Core.Scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(Core.Scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(Core.Scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(Core.Scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(DesignCore.Scene.items[0].points[0].x).toBe(lineOneStart.x);
+  expect(DesignCore.Scene.items[0].points[0].y).toBe(lineOneStart.y);
+  expect(DesignCore.Scene.items[0].points[1].x).toBe(lineOneEnd.x);
+  expect(DesignCore.Scene.items[0].points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(Core.Scene.items[1].points[0].x).toBe(lineTwoStart.x);
-  expect(Core.Scene.items[1].points[0].y).toBe(lineTwoStart.y);
-  expect(Core.Scene.items[1].points[1].x).toBe(100);
-  expect(Core.Scene.items[1].points[1].y).toBe(lineTwoEnd.y);
+  expect(DesignCore.Scene.items[1].points[0].x).toBe(lineTwoStart.x);
+  expect(DesignCore.Scene.items[1].points[0].y).toBe(lineTwoStart.y);
+  expect(DesignCore.Scene.items[1].points[1].x).toBe(100);
+  expect(DesignCore.Scene.items[1].points[1].y).toBe(lineTwoEnd.y);
 
   /**
    * Extend test two
@@ -55,30 +56,30 @@ test('Test Extend.action', () => {
    */
 
   // clear scene items
-  Core.Scene.items = [];
+  DesignCore.Scene.items = [];
   // Add items to scene
-  Core.Scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
-  Core.Scene.addItem('Line', {points: [lineThreeStart, lineThreeEnd]});
+  DesignCore.Scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  DesignCore.Scene.addItem('Line', {points: [lineThreeStart, lineThreeEnd]});
   // Select boundary item
-  Core.Scene.selectionManager.addToSelectionSet(0);
+  DesignCore.Scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
   extend.selectedIndex = 1;
   // set mouse location - required for Extend
-  Core.Mouse.setPosFromScenePoint(new Point(0, 20));
+  DesignCore.Mouse.setPosFromScenePoint(new Point(0, 20));
   // Perform Extend
   extend.action();
 
   // line one
-  expect(Core.Scene.items[0].points[0].x).toBe(lineTwoStart.x);
-  expect(Core.Scene.items[0].points[0].y).toBe(lineTwoStart.y);
-  expect(Core.Scene.items[0].points[1].x).toBe(lineTwoEnd.x);
-  expect(Core.Scene.items[0].points[1].y).toBe(lineTwoEnd.y);
+  expect(DesignCore.Scene.items[0].points[0].x).toBe(lineTwoStart.x);
+  expect(DesignCore.Scene.items[0].points[0].y).toBe(lineTwoStart.y);
+  expect(DesignCore.Scene.items[0].points[1].x).toBe(lineTwoEnd.x);
+  expect(DesignCore.Scene.items[0].points[1].y).toBe(lineTwoEnd.y);
 
   // line two
-  expect(Core.Scene.items[1].points[0].x).toBe(lineThreeStart.x);
-  expect(Core.Scene.items[1].points[0].y).toBe(lineThreeStart.y);
-  expect(Core.Scene.items[1].points[1].x).toBe(lineThreeEnd.x);
-  expect(Core.Scene.items[1].points[1].y).toBe(50);
+  expect(DesignCore.Scene.items[1].points[0].x).toBe(lineThreeStart.x);
+  expect(DesignCore.Scene.items[1].points[0].y).toBe(lineThreeStart.y);
+  expect(DesignCore.Scene.items[1].points[1].x).toBe(lineThreeEnd.x);
+  expect(DesignCore.Scene.items[1].points[1].y).toBe(50);
 
   /**
    * Extend test three
@@ -86,28 +87,28 @@ test('Test Extend.action', () => {
    * trim end from crossing line
    */
   // clear scene items
-  Core.Scene.items = [];
+  DesignCore.Scene.items = [];
   // Add items to scene
-  Core.Scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  Core.Scene.addItem('Line', {points: [crossingLineStart, crossingLineEnd]});
+  DesignCore.Scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
+  DesignCore.Scene.addItem('Line', {points: [crossingLineStart, crossingLineEnd]});
   // Select boundary item
-  Core.Scene.selectionManager.addToSelectionSet(0);
+  DesignCore.Scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
   extend.selectedIndex = 1;
   // set mouse location - required for Extend
-  Core.Mouse.setPosFromScenePoint(new Point(35, 35));
+  DesignCore.Mouse.setPosFromScenePoint(new Point(35, 35));
   // Perform Extend
   extend.action();
 
   // line one
-  expect(Core.Scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(Core.Scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(Core.Scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(Core.Scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(DesignCore.Scene.items[0].points[0].x).toBe(lineOneStart.x);
+  expect(DesignCore.Scene.items[0].points[0].y).toBe(lineOneStart.y);
+  expect(DesignCore.Scene.items[0].points[1].x).toBe(lineOneEnd.x);
+  expect(DesignCore.Scene.items[0].points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(Core.Scene.items[1].points[0].x).toBe(crossingLineStart.x);
-  expect(Core.Scene.items[1].points[0].y).toBe(crossingLineStart.y);
-  expect(Core.Scene.items[1].points[1].x).toBe(100);
-  expect(Core.Scene.items[1].points[1].y).toBe(100);
+  expect(DesignCore.Scene.items[1].points[0].x).toBe(crossingLineStart.x);
+  expect(DesignCore.Scene.items[1].points[0].y).toBe(crossingLineStart.y);
+  expect(DesignCore.Scene.items[1].points[1].x).toBe(100);
+  expect(DesignCore.Scene.items[1].points[1].y).toBe(100);
 });

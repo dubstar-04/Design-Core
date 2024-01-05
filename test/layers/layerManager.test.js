@@ -1,8 +1,9 @@
-import {Core} from '../../core/core.js';
+import {Core} from '../../core/core/core.js';
+import {DesignCore} from '../../core/designCore.js';
 import {Point} from '../../core/entities/point.js';
 
 const core = new Core();
-const layerManager = Core.LayerManager;
+const layerManager = DesignCore.LayerManager;
 
 test('Test LayerManager.getLayers', () => {
   const layers = layerManager.getLayers();
@@ -91,7 +92,7 @@ test('Test LayerManager.checkLayers', () => {
     layer: newLayerName,
   };
 
-  Core.Scene.addItem('Line', data, false);
+  DesignCore.Scene.addItem('Line', data, false);
 
   layerManager.checkLayers();
   const layers = layerManager.getLayers();
