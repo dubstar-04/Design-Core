@@ -27,7 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Dependency Check
+    - name: Circular Dependency Check
       run: npx madge --circular --extensions js .
 
     - run: npm ci
