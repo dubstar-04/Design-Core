@@ -170,7 +170,7 @@ export class InputManager {
   onCommand(input) {
     if (this.activeCommand !== undefined) {
       this.promptOption.respond(input);
-    } else if (DesignCore.CommandManager.isCommand(input) ||DesignCore.CommandManager.isShortcut(input)) {
+    } else if (DesignCore.CommandManager.isCommand(input) || DesignCore.CommandManager.isShortcut(input)) {
       this.initialiseItem(DesignCore.CommandManager.getCommand(input));
       this.activeCommand.execute();
     }
@@ -181,7 +181,7 @@ export class InputManager {
    */
   onEnterPressed() {
     if (this.activeCommand !== undefined) {
-      if (this.promptOption.types.includes(Input.Type.SELECTIONSET) &&DesignCore.Scene.selectionManager.selectionSet.accepted !== true) {
+      if (this.promptOption.types.includes(Input.Type.SELECTIONSET) && DesignCore.Scene.selectionManager.selectionSet.accepted !== true) {
         DesignCore.Scene.selectionManager.selectionSet.accepted = true;
         this.promptOption.respond(DesignCore.Scene.selectionManager.selectionSet);
       } else {
