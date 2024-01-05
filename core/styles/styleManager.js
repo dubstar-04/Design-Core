@@ -15,12 +15,12 @@ export class StyleManager extends StyleManagerBase {
     this.addStyle({
       'name': 'STANDARD',
     });
-    /*
+
     this.addStyle({
       'name': 'ANNOTATIVE',
     });
-    */
-    // Core.scene.saveRequired();
+
+    // DesignCore.scene.saveRequired();
   }
 
   dxf(file) {

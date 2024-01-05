@@ -1,4 +1,4 @@
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class StyleManagerBase {
   constructor() {
@@ -63,7 +63,7 @@ export class StyleManagerBase {
     const newstyle = this.createStyle(style);
     if (!this.styleExists(newstyle.name)) {
       this.styles.push(newstyle);
-      // Core.Scene.saveRequired();
+      // DesignCore.Scene.saveRequired();
     }
   }
 
@@ -74,8 +74,8 @@ export class StyleManagerBase {
   deleteStyleFromScene(style) {
     const selectionSet = [];
 
-    for (let i = 0; i < Core.Scene.items.length; i++) {
-      if (Core.Scene.items[i].style === style) {
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      if (DesignCore.Scene.items[i].style === style) {
         selectionSet.push(i);
       }
     }
@@ -84,7 +84,7 @@ export class StyleManagerBase {
     selectionSet.sort((a, b)=>b-a);
 
     for (let j = 0; j < selectionSet.length; j++) {
-      Core.Scene.items.splice((selectionSet[j]), 1);
+      DesignCore.Scene.items.splice((selectionSet[j]), 1);
     }
   }
 
@@ -152,7 +152,7 @@ export class StyleManagerBase {
       this.addStandardStyles();
     }
 
-    for (let i = 0; i < Core.Scene.items.length; i++) {
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
       const style = (items[i].style);
       this.addstyle({
         'name': style,
@@ -213,13 +213,13 @@ export class StyleManagerBase {
 
     const newUniqueName = this.getUniqueName(newName);
 
+    // TODO: update all items using the style
+    this.styles[styleIndex].name = newUniqueName;
+
     // if the style to change is the current style, update the currentstyle property
     if (this.getStyleByIndex(styleIndex).name === this.currentstyle) {
       this.setCstyle(newUniqueName);
     }
-
-    // TODO: update all items using the style
-    this.styles[styleIndex].name = newUniqueName;
   }
 
   /**

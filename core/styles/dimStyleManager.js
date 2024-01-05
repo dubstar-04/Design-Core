@@ -14,13 +14,16 @@ export class DimStyleManager extends StyleManagerBase {
   addStandardStyles() {
     this.addStyle({
       'name': 'STANDARD',
+      // DIMCLRD - 176 - Dimension line color
+      // DIMCLRE - 177 - Dimension extension line color
+      // DIMCLRT -  178 - Dimension text color
     });
-    /*
+
     this.addStyle({
       'name': 'ANNOTATIVE',
     });
-    */
-    // Core.scene.saveRequired();
+
+    // DesignCore.scene.saveRequired();
   }
 
   dxf(file) {

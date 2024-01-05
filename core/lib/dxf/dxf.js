@@ -4,7 +4,8 @@ import {DXFFile} from './dxfFile.js';
 import {Point} from '../../entities/point.js';
 import {Strings} from '../strings.js';
 import {Logging} from '../logging.js';
-import {Core} from '../../core.js';
+
+import {DesignCore} from '../../designCore.js';
 
 export class DXF {
   constructor() {
@@ -38,7 +39,7 @@ export class DXF {
     this.loadHeader();
 
     if (this.unsupportedElements) {
-      Core.instance.notify(Strings.Warning.UNSUPPORTEDENTITIES);
+      DesignCore.Core.notify(Strings.Warning.UNSUPPORTEDENTITIES);
     }
   }
 
@@ -49,7 +50,7 @@ export class DXF {
       const clayer = header['$CLAYER'];
       if (clayer.hasOwnProperty('8')) {
         const layerName = clayer['8'];
-        Core.LayerManager.setCLayer(layerName);
+        DesignCore.LayerManager.setCLayer(layerName);
       }
     }
 
@@ -60,7 +61,7 @@ export class DXF {
         // pass the version to core
         const versionKey = DXFFile.getVersionKey(versionNumber);
         Logging.instance.debug(`Opening DXF Version: ${versionKey}`);
-        Core.instance.dxfVersion = versionNumber;
+        DesignCore.Core.dxfVersion = versionNumber;
       }
     }
   }
@@ -72,25 +73,25 @@ export class DXF {
     tables.forEach((table) => {
       if (table[2] === 'LAYER') {
         table.children.forEach((layer) => {
-          Core.LayerManager.addLayer(layer);
+          DesignCore.LayerManager.addLayer(layer);
         });
       }
 
       if (table[2] === 'LTYPE') {
         table.children.forEach((ltype) => {
-          Core.LTypeManager.addStyle(ltype);
+          DesignCore.LTypeManager.addStyle(ltype);
         });
       }
 
       if (table[2] === 'STYLE') {
         table.children.forEach((style) => {
-          Core.StyleManager.addStyle(style);
+          DesignCore.StyleManager.addStyle(style);
         });
       }
 
       if (table[2] === 'DIMSTYLE') {
         table.children.forEach((style) => {
-          Core.DimStyleManager.addStyle(style);
+          DesignCore.DimStyleManager.addStyle(style);
         });
       }
     });
@@ -137,9 +138,9 @@ export class DXF {
 
           const command = child[0];
           // check if the child is a valid entity
-          if (Core.CommandManager.isCommand(command)) {
+          if (DesignCore.CommandManager.isCommand(command)) {
             // create an instance of the child entity
-            const item = Core.CommandManager.createNew(command, child);
+            const item = DesignCore.CommandManager.createNew(command, child);
 
             if (block.hasOwnProperty('items') === false) {
               block.items = [];
@@ -176,8 +177,8 @@ export class DXF {
     }
 
     const command = item[0];
-    if (Core.CommandManager.isCommand(command)) {
-      Core.Scene.addItem(command, item);
+    if (DesignCore.CommandManager.isCommand(command)) {
+      DesignCore.Scene.addItem(command, item);
     } else {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
       this.unsupportedElements = true;

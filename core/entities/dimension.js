@@ -14,7 +14,7 @@ import {Strings} from '../lib/strings.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 import {SingleSelection} from '../lib/selectionManager.js';
 
 export class Dimension extends BaseDimension {
@@ -41,11 +41,11 @@ export class Dimension extends BaseDimension {
         const item = new this.dimensionMap[dimType](data);
 
         // find the block linked to this dimension
-        const linkedBlockIndex = Core.Scene.findItem('BLOCK', 'name', data[2]);
+        const linkedBlockIndex = DesignCore.Scene.findItem('BLOCK', 'name', data[2]);
 
         if (linkedBlockIndex.length) {
         // remove the block from the scene, dimensions manage their block internally
-          const removed = Core.Scene.removeItem(linkedBlockIndex[0]);
+          const removed = DesignCore.Scene.removeItem(linkedBlockIndex[0]);
         }
 
         return item;
@@ -68,7 +68,7 @@ export class Dimension extends BaseDimension {
 
       while (!inputValid) {
         const options = new PromptOptions(`${Strings.Input.START} or ${Strings.Input.SELECT}`, [Input.Type.POINT, Input.Type.SINGLESELECTION]);
-        const input1 = await Core.Scene.inputManager.requestInput(options);
+        const input1 = await DesignCore.Scene.inputManager.requestInput(options);
 
         if (input1 instanceof Point) {
           inputValid = true;
@@ -80,13 +80,13 @@ export class Dimension extends BaseDimension {
 
           // select a second point to define the dimension
           const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
-          const pt14 = await Core.Scene.inputManager.requestInput(op1);
+          const pt14 = await DesignCore.Scene.inputManager.requestInput(op1);
           pt14.sequence = 14;
           this.points.push(pt14);
         }
 
         if (input1 instanceof SingleSelection) {
-          const selectedItem = Core.Scene.getItem(input1.selectedItemIndex);
+          const selectedItem = DesignCore.Scene.getItem(input1.selectedItemIndex);
 
           // check the selected entity is supported
           if ([Line, Circle, Arc].some((entity) => selectedItem instanceof entity)) {
@@ -107,8 +107,8 @@ export class Dimension extends BaseDimension {
             }
           } else {
             const msg = `${this.type} - Unsupported Type: ${selectedItem.type}`;
-            Core.instance.notify(msg);
-            Core.Scene.selectionManager.reset();
+            DesignCore.Core.notify(msg);
+            DesignCore.Scene.selectionManager.reset();
           }
         }
       }
@@ -130,7 +130,7 @@ export class Dimension extends BaseDimension {
           op2 = new PromptOptions(`${Strings.Input.DIMENSION} or ${Strings.Input.OPTION}`, [Input.Type.POINT], options);
         }
 
-        const input2 = await Core.Scene.inputManager.requestInput(op2);
+        const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
 
         if (Input.getType(input2) === Input.Type.POINT) {
           const pt11 = input2;
@@ -157,20 +157,20 @@ export class Dimension extends BaseDimension {
         }
 
         if (Input.getType(input2) === Input.Type.SINGLESELECTION) {
-          const selectedItem2 = Core.Scene.getItem(input2.selectedItemIndex);
+          const selectedItem2 = DesignCore.Scene.getItem(input2.selectedItemIndex);
           if ([Line].some((entity) => selectedItem2 instanceof entity)) {
             this.selectedItems.push(selectedItem2);
             // Two lines selected - switch to angular dimension
             this.dimType = 2;
           } else {
             const msg = `${this.type} - Unsupported Type: ${selectedItem2.type}`;
-            Core.instance.notify(msg);
-            Core.Scene.selectionManager.reset();
+            DesignCore.Core.notify(msg);
+            DesignCore.Scene.selectionManager.reset();
           }
         }
       }
 
-      Core.Scene.inputManager.executeCommand(this);
+      DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
@@ -185,18 +185,18 @@ export class Dimension extends BaseDimension {
     if (this.selectedItems.length) {
       const itemPoints = dimensionType.getPointsFromSelection(this.selectedItems);
 
-      const mousePoint = Core.Mouse.pointOnScene();
+      const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
 
       const points = [...itemPoints, mousePoint];
-      Core.Scene.createTempItem(dimensionTypeString, {points: points});
+      DesignCore.Scene.createTempItem(dimensionTypeString, {points: points});
     }
 
     if (this.points.length > 1) {
-      const mousePoint = Core.Mouse.pointOnScene();
+      const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
       const points = [...this.points, mousePoint];
-      Core.Scene.createTempItem(dimensionTypeString, {points: points});
+      DesignCore.Scene.createTempItem(dimensionTypeString, {points: points});
     }
   }
 }

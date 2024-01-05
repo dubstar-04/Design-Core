@@ -7,7 +7,7 @@ import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class Text extends Entity {
   constructor(data) {
@@ -116,15 +116,15 @@ export class Text extends Entity {
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await Core.Scene.inputManager.requestInput(op);
+      const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
       // set the text style to the current style
-      const currentStyle = Core.StyleManager.getCstyle();
+      const currentStyle = DesignCore.StyleManager.getCstyle();
       this.styleName = currentStyle;
 
       // get properties from style
-      const style = Core.StyleManager.getStyleByName(this.styleName);
+      const style = DesignCore.StyleManager.getStyleByName(this.styleName);
       if (style.textHeight) {
         this.height = style.textHeight;
       }
@@ -135,19 +135,19 @@ export class Text extends Entity {
       // Get the font size when standard style is used
       if (this.styleName.toUpperCase() === 'STANDARD') {
         const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
-        const height = await Core.Scene.inputManager.requestInput(op2);
+        const height = await DesignCore.Scene.inputManager.requestInput(op2);
         this.height = height;
       }
 
       const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
-      const rotation = await Core.Scene.inputManager.requestInput(op3);
+      const rotation = await DesignCore.Scene.inputManager.requestInput(op3);
       this.setRotation(rotation);
 
       const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
-      const string = await Core.Scene.inputManager.requestInput(op4);
+      const string = await DesignCore.Scene.inputManager.requestInput(op4);
       this.string = String(string);
 
-      Core.Scene.inputManager.executeCommand(this);
+      DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
@@ -155,19 +155,19 @@ export class Text extends Entity {
 
   preview() {
     if (this.points.length >= 1) {
-      if (Core.Scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
+      if (DesignCore.Scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
         const data = {
           points: this.points,
           height: this.height,
           rotation: this.rotation,
-          string: Core.CommandLine.command,
+          string: DesignCore.CommandLine.command,
         };
 
-        Core.Scene.createTempItem(this.type, data);
+        DesignCore.Scene.createTempItem(this.type, data);
       } else {
-        const mousePoint = Core.Mouse.pointOnScene();
+        const mousePoint = DesignCore.Mouse.pointOnScene();
         const points = [this.points.at(-1), mousePoint];
-        Core.Scene.createTempItem('Line', {points: points});
+        DesignCore.Scene.createTempItem('Line', {points: points});
       }
     }
   }
@@ -312,7 +312,7 @@ export class Text extends Entity {
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
 
-    const style = Core.StyleManager.getStyleByName(this.styleName);
+    const style = DesignCore.StyleManager.getStyleByName(this.styleName);
     // style.textHeight
 
     if (this.upsideDown) {
@@ -334,17 +334,50 @@ export class Text extends Entity {
     try { // HTML
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt Arial'; // + Core.StyleManager.getStyleByName(this.styleName).font.toString();
+      ctx.font = this.height + 'pt Arial'; // +DesignCore.StyleManager.getStyleByName(this.styleName).font.toString();
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
       this.boundingRect.height = this.height;
     } catch { // Cairo
-      ctx.moveTo(0, 0);
       ctx.setFontSize(this.height);
-      // ctx.select_font_face('HelveticaNeueLT Std Lt', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
-      ctx.showText(String(this.string));
+      ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
       this.boundingRect = ctx.textExtents(String(this.string));
+
+      // console.log(this.boundingRect);
+
+      let x = 0;
+      let y = 0;
+      switch (this.horizontalAlignment) {
+        case 0: // 0 = Left;
+          x = -this.boundingRect.xBearing;
+          break;
+        case 1: // 1= Center;
+          x = -this.boundingRect.xBearing-this.boundingRect.width / 2;
+          break;
+        case 2: // 2 = Right
+          x = -this.boundingRect.xBearing-this.boundingRect.width;
+          break;
+      }
+
+      switch (this.verticalAlignment) {
+        case 0: // 0 = Baseline;
+          y = 0;
+          break;
+        case 1: // 1 = Bottom;
+          y = -this.boundingRect.yBearing - this.boundingRect.height;
+          break;
+        case 2: // 2 = Middle
+          y = -this.boundingRect.yBearing - this.boundingRect.height / 2;
+          break;
+        case 3: // 3 = Top
+          y = -this.boundingRect.yBearing;
+          break;
+      }
+
+
+      ctx.moveTo(x, y);
+      ctx.showText(String(this.string));
     }
     ctx.stroke();
     ctx.restore();

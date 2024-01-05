@@ -3,7 +3,7 @@ import {Intersection} from '../lib/intersect.js';
 import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class Entity {
   constructor(data) {
@@ -77,7 +77,7 @@ export class Entity {
     let colour = this.colour;
 
     if (colour === 'BYLAYER') {
-      const layer = Core.LayerManager.getLayerByName(this.layer);
+      const layer = DesignCore.LayerManager.getLayerByName(this.layer);
       colour = layer.colour;
     }
 
@@ -88,18 +88,18 @@ export class Entity {
     let lineTypeName = this.lineType;
 
     if (lineTypeName === 'BYLAYER') {
-      const layer = Core.LayerManager.getLayerByName(this.layer);
+      const layer = DesignCore.LayerManager.getLayerByName(this.layer);
       lineTypeName = layer.lineType;
     }
 
-    const lineType = Core.LTypeManager.getStyleByName(lineTypeName);
+    const lineType = DesignCore.LTypeManager.getStyleByName(lineTypeName);
 
     return lineType;
   }
 
 
   within(selectionExtremes) {
-    const layer = Core.LayerManager.getLayerByName(this.layer);
+    const layer = DesignCore.LayerManager.getLayerByName(this.layer);
 
     if (!layer.isSelectable) {
       return;
@@ -119,7 +119,7 @@ export class Entity {
   }
 
   touched(selectionExtremes) {
-    const layer = Core.LayerManager.getLayerByName(this.layer);
+    const layer = DesignCore.LayerManager.getLayerByName(this.layer);
 
     if (!layer.isSelectable) {
       return;
@@ -137,7 +137,7 @@ export class Entity {
 
     if (Intersection.hasOwnProperty(intersectFunction) === false) {
       const msg = `${Strings.Error.INVALIDINTERSECTTYPE}: ${this.type}`;
-      Core.instance.notify(msg);
+      DesignCore.Core.notify(msg);
       throw Error(msg);
     }
 

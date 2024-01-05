@@ -7,7 +7,7 @@ import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BaseDimension} from './baseDimension.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class DiametricDimension extends BaseDimension {
   constructor(data) {
@@ -23,38 +23,38 @@ export class DiametricDimension extends BaseDimension {
     try {
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
 
-      if (!Core.Scene.selectionManager.selectionSet.selectionSet.length) {
-        const selection = await Core.Scene.inputManager.requestInput(op);
+      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+        const selection = await DesignCore.Scene.inputManager.requestInput(op);
       }
 
       const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
-      const pt1 = await Core.Scene.inputManager.requestInput(op1);
+      const pt1 = await DesignCore.Scene.inputManager.requestInput(op1);
       pt1.sequence = 11;
       this.points.push(pt1);
       const selectionPoints = DiametricDimension.getPointsFromSelection();
       this.points.push(...selectionPoints);
 
-      Core.Scene.inputManager.executeCommand(this);
+      DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
 
   preview() {
-    if (Core.Scene.selectionManager.selectionSet.selectionSet.length) {
-      const mousePoint = Core.Mouse.pointOnScene();
+    if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+      const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
 
       const selectionPoints = DiametricDimension.getPointsFromSelection();
       const points = [...selectionPoints, mousePoint];
-      Core.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, {points: points});
     }
   }
 
   static getPointsFromSelection(items) {
     const item = items[0];
     const center = item.points[0];
-    const mousePoint = Core.Mouse.pointOnScene();
+    const mousePoint = DesignCore.Mouse.pointOnScene();
 
     const angle = center.angle(mousePoint);
     const radPoint = center.project(angle, item.getRadius());

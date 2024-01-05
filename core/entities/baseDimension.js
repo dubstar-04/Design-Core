@@ -5,7 +5,7 @@ import {Solid} from './solid.js';
 import {Entity} from './entity.js';
 import {Logging} from '../lib/logging.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class BaseDimension extends Entity {
   constructor(data) {
@@ -183,7 +183,7 @@ export class BaseDimension extends Entity {
   }
 
   draw(ctx, scale) {
-    const style = Core.DimStyleManager.getStyleByName(this.styleName);
+    const style = DesignCore.DimStyleManager.getStyleByName(this.styleName);
 
     const entities = this.buildDimension(style);
 

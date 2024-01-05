@@ -4,7 +4,7 @@ import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class Trim extends Tool {
   constructor() {
@@ -21,15 +21,15 @@ export class Trim extends Tool {
     try {
       const op = new PromptOptions(Strings.Input.BOUNDARY, [Input.Type.SELECTIONSET]);
 
-      if (!Core.Scene.selectionManager.selectionSet.selectionSet.length) {
-        await Core.Scene.inputManager.requestInput(op);
+      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+        await DesignCore.Scene.inputManager.requestInput(op);
       }
 
       const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       while (true) {
-        const selection = await Core.Scene.inputManager.requestInput(op2);
+        const selection = await DesignCore.Scene.inputManager.requestInput(op2);
         this.selectedIndex = selection.selectedItemIndex;
-        Core.Scene.inputManager.actionCommand();
+        DesignCore.Scene.inputManager.actionCommand();
       }
     } catch (error) {
       Logging.instance.error(`${this.type} - ${err}`);
@@ -37,7 +37,7 @@ export class Trim extends Tool {
   }
 
   action() {
-    // const item = Core.Scene.selectionManager.findClosestItem(Core.Mouse.pointOnScene());
+    // const item = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
 
     const item = this.selectedIndex;
 
@@ -45,10 +45,10 @@ export class Trim extends Tool {
       const intersectPoints = [];
       let TrimItem;
 
-      for (let i = 0; i < Core.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        if (Core.Scene.selectionManager.selectionSet.selectionSet[i] !== item) {
-          const boundaryItem = Core.Scene.items[Core.Scene.selectionManager.selectionSet.selectionSet[i]];
-          TrimItem = Core.Scene.items[item];
+      for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        if (DesignCore.Scene.selectionManager.selectionSet.selectionSet[i] !== item) {
+          const boundaryItem = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]];
+          TrimItem = DesignCore.Scene.items[item];
 
           const functionName = 'intersect' + boundaryItem.type + TrimItem.type;
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), TrimItem.intersectPoints());

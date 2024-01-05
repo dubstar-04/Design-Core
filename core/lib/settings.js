@@ -1,4 +1,4 @@
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class Settings {
   /**
@@ -36,8 +36,8 @@ export class Settings {
     // TODO: Check setting is valid
     this[setting] = value;
 
-    if (Core.instance) {
-      Core.Canvas.requestPaint();
+    if (DesignCore.instance) {
+      DesignCore.Canvas.requestPaint();
     }
   }
 

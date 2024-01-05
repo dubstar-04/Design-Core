@@ -3,7 +3,7 @@ import {Tool} from './tool.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class Identify extends Tool {
   constructor() {
@@ -18,10 +18,10 @@ export class Identify extends Tool {
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);
-      const pt1 = await Core.Scene.inputManager.requestInput(op);
+      const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
-      Core.Scene.inputManager.executeCommand();
+      DesignCore.Scene.inputManager.executeCommand();
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
@@ -31,6 +31,6 @@ export class Identify extends Tool {
     const x = this.points.at(-1).x.toFixed(1);
     const y = this.points.at(-1).y.toFixed(1);
     const id = (`X:${x} Y:${y}`);
-    Core.instance.notify(id);
+    DesignCore.Core.notify(id);
   }
 }

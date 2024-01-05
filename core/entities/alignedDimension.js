@@ -8,7 +8,7 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BaseDimension} from './baseDimension.js';
 import {Point} from './point.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class AlignedDimension extends BaseDimension {
   constructor(data) {
@@ -23,21 +23,21 @@ export class AlignedDimension extends BaseDimension {
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt13 = await Core.Scene.inputManager.requestInput(op);
+      const pt13 = await DesignCore.Scene.inputManager.requestInput(op);
       pt13.sequence = 13;
       this.points.push(pt13);
 
       const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
-      const pt14 = await Core.Scene.inputManager.requestInput(op1);
+      const pt14 = await DesignCore.Scene.inputManager.requestInput(op1);
       pt14.sequence = 14;
       this.points.push(pt14);
 
       const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
-      const pt11 = await Core.Scene.inputManager.requestInput(op2);
+      const pt11 = await DesignCore.Scene.inputManager.requestInput(op2);
       pt11.sequence = 11;
       this.points.push(pt11);
 
-      Core.Scene.inputManager.executeCommand(this);
+      DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
@@ -45,16 +45,16 @@ export class AlignedDimension extends BaseDimension {
 
   preview() {
     if (this.points.length == 1) {
-      const mousePoint = Core.Mouse.pointOnScene();
+      const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(0), mousePoint];
-      Core.Scene.createTempItem('Line', {points: points});
+      DesignCore.Scene.createTempItem('Line', {points: points});
     }
 
     if (this.points.length > 1) {
-      const mousePoint = Core.Mouse.pointOnScene();
+      const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
       const points = [...this.points, mousePoint];
-      Core.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, {points: points});
     }
   }
 

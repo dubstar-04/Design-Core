@@ -1,7 +1,7 @@
 import {Logging} from '../lib/logging.js';
 import {BasePolyline} from './basePolyline.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class Lwpolyline extends BasePolyline {
   constructor(data) {

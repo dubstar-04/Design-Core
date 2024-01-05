@@ -9,7 +9,7 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BaseDimension} from './baseDimension.js';
 import {Intersection} from '../lib/intersect.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class AngularDimension extends BaseDimension {
   constructor(data) {
@@ -25,10 +25,10 @@ export class AngularDimension extends BaseDimension {
     try {
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
 
-      if (!Core.Scene.selectionManager.selectionSet.selectionSet.length) {
-        const selection = await Core.Scene.inputManager.requestInput(op);
+      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+        const selection = await DesignCore.Scene.inputManager.requestInput(op);
 
-        const line1 = Core.Scene.getItem(selection.selectedItemIndex);
+        const line1 = DesignCore.Scene.getItem(selection.selectedItemIndex);
 
         const pt15 = line1.points[0];
         pt15.sequence = 15;
@@ -38,16 +38,16 @@ export class AngularDimension extends BaseDimension {
         pt10.sequence = 10;
         this.points.push(pt10);
 
-        Core.Scene.selectionManager.reset();
+        DesignCore.Scene.selectionManager.reset();
       }
 
       const op1 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
 
 
-      if (!Core.Scene.selectionManager.selectionSet.selectionSet.length) {
-        const selection2 = await Core.Scene.inputManager.requestInput(op1);
+      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+        const selection2 = await DesignCore.Scene.inputManager.requestInput(op1);
 
-        const line2 = Core.Scene.getItem(selection.selectedItemIndex);
+        const line2 = DesignCore.Scene.getItem(selection.selectedItemIndex);
 
         const pt13 = line2.points[0];
         pt13.sequence = 13;
@@ -57,11 +57,11 @@ export class AngularDimension extends BaseDimension {
         pt14.sequence = 14;
         this.points.push(pt14);
 
-        Core.Scene.selectionManager.reset();
+        DesignCore.Scene.selectionManager.reset();
       }
 
       const op2 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt11 = await Core.Scene.inputManager.requestInput(op2);
+      const pt11 = await DesignCore.Scene.inputManager.requestInput(op2);
       pt11.sequence = 11;
       this.points.push(pt11);
 
@@ -72,7 +72,7 @@ export class AngularDimension extends BaseDimension {
       pt16.sequence = 16;
       this.points.push(pt16);
 
-      Core.Scene.inputManager.executeCommand(this);
+      DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
@@ -80,7 +80,7 @@ export class AngularDimension extends BaseDimension {
 
   preview() {
     if (this.points.length >= 4) {
-      const mousePoint = Core.Mouse.pointOnScene();
+      const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
 
       const pt15 = this.getPointBySequence(15);
@@ -90,7 +90,7 @@ export class AngularDimension extends BaseDimension {
       pt16.sequence = 16;
 
       const points = [...this.points, mousePoint, pt16];
-      Core.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, {points: points});
     }
   }
 

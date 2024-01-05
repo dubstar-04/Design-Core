@@ -2,7 +2,7 @@ import {DXF} from './dxf/dxf.js';
 import {Logging} from './logging.js';
 import {Strings} from './strings.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class FileIO {
   static saveDxf(version) {
@@ -15,10 +15,10 @@ export class FileIO {
     const dxf = new DXF();
     try {
       dxf.loadDxf(data);
-      Core.Canvas.requestPaint();
-      Core.instance.notify(Strings.Message.FILEOPEN);
+      DesignCore.Canvas.requestPaint();
+      DesignCore.Core.notify(Strings.Message.FILEOPEN);
     } catch (error) {
-      Core.instance.notify(error.toString());
+      DesignCore.Core.notify(error.toString());
       Logging.instance.debug(error.stack);
     }
   }

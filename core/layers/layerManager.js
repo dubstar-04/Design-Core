@@ -3,7 +3,7 @@ import {Layer} from './layer.js';
 import {Strings} from '../lib/strings.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class LayerManager {
   constructor() {
@@ -48,7 +48,7 @@ export class LayerManager {
     // This is called multiple times from the check layers function when opening files
     if (!this.layerExists(newLayer)) {
       this.layers.push(newLayer);
-      // Core.Scene.saveRequired();
+      // DesignCore.Scene.saveRequired();
     }
   }
 
@@ -63,27 +63,27 @@ export class LayerManager {
 
     if (layerToDelete.toUpperCase() === 'DEFPOINTS') {
       // DEFPOINTS layer cannot be deleted
-      Core.instance.notify(Strings.Message.DEFPOINTSDELETE);
+      DesignCore.Core.notify(Strings.Message.DEFPOINTSDELETE);
       return;
     }
 
     if (layerToDelete === this.currentLayer) {
       // cLayer cannot be deleted
-      Core.instance.notify(Strings.Message.CLAYERDELETE);
+      DesignCore.Core.notify(Strings.Message.CLAYERDELETE);
       return;
     }
 
     const selectionSet = [];
 
-    for (let i = 0; i < Core.Scene.items.length; i++) {
-      if (Core.Scene.items[i].layer === layerToDelete) {
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      if (DesignCore.Scene.items[i].layer === layerToDelete) {
         selectionSet.push(i);
       }
     }
 
     selectionSet.sort();
     for (let j = 0; j < selectionSet.length; j++) {
-      Core.Scene.items.splice((selectionSet[j] - j), 1);
+      DesignCore.Scene.items.splice((selectionSet[j] - j), 1);
     }
 
     // Delete The Layer
@@ -110,8 +110,8 @@ export class LayerManager {
       this.addStandardLayers();
     }
 
-    for (let i = 0; i < Core.Scene.items.length; i++) {
-      const layer = (Core.Scene.items[i].layer);
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      const layer = (DesignCore.Scene.items[i].layer);
       this.addLayer({
         'name': layer,
       });
@@ -123,7 +123,7 @@ export class LayerManager {
     this.addLayer({'name': 'DEFPOINTS', 'plotting': false});
     this.addLayer({'name': 'CENTERLINE', 'colour': '#FFFF00', 'lineType': 'CENTER'});
     this.addLayer({'name': 'HIDDEN', 'colour': '#D6D6D6', 'lineType': 'HIDDEN'});
-    // Core.Scene.saveRequired();
+    // DesignCore.Scene.saveRequired();
   }
 
   getLayerIndex(layerName) {

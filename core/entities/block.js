@@ -3,7 +3,7 @@ import {Entity} from './entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class Block extends Entity {
   constructor(data) {
@@ -223,7 +223,7 @@ export class Block extends Entity {
       return false;
     }
 
-    const layer = Core.LayerManager.getLayerByName(this.layer);
+    const layer = DesignCore.LayerManager.getLayerByName(this.layer);
 
     if (!layer.isSelectable) {
       return;

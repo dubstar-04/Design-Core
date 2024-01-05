@@ -20,7 +20,7 @@ export class LTypeManager extends StyleManagerBase {
     this.addStyle({'name': 'HIDDEN', 'pattern': [6.35, -3.175], 'description': 'Hidden __ __ __ __ __ __ __ __ __ __ __ __ __ _'});
     this.addStyle({'name': 'ByLayer'});
     this.addStyle({'name': 'ByBlock'});
-    // Core.Scene.saveRequired();
+    // DesignCore.Scene.saveRequired();
   }
 
   dxf(file) {

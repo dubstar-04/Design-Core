@@ -6,7 +6,7 @@ import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class Circle extends Entity {
   constructor(data) {
@@ -40,11 +40,11 @@ export class Circle extends Entity {
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await Core.Scene.inputManager.requestInput(op);
+      const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
       this.points.push(pt1);
 
       const op2 = new PromptOptions(Strings.Input.RADIUS, [Input.Type.POINT, Input.Type.NUMBER]);
-      const pt2 = await Core.Scene.inputManager.requestInput(op2);
+      const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
       if (Input.getType(pt2) === Input.Type.POINT) {
         this.points.push(pt2);
       }
@@ -52,7 +52,7 @@ export class Circle extends Entity {
       if (Input.getType(pt2) === Input.Type.NUMBER) {
         this.setRadius(pt2);
       }
-      Core.Scene.inputManager.executeCommand(this);
+      DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
@@ -60,9 +60,9 @@ export class Circle extends Entity {
 
   preview() {
     if (this.points.length >= 1) {
-      const mousePoint = Core.Mouse.pointOnScene();
+      const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(-1), mousePoint];
-      Core.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, {points: points});
     }
   }
 
@@ -94,7 +94,7 @@ export class Circle extends Entity {
   trim(points) {
     if (points.length > 1) {
       const start = points[0];
-      const cen = Core.Mouse.pointOnScene();
+      const cen = DesignCore.Mouse.pointOnScene();
       const end = points[1];
 
       const arcPoints = [this.points[0]];
@@ -114,7 +114,7 @@ export class Circle extends Entity {
         lineWidth: this.lineWidth,
       };
 
-      Core.Scene.addItem('Arc', data, Core.Scene.items.indexOf(this));
+      DesignCore.Scene.addItem('Arc', data, DesignCore.Scene.items.indexOf(this));
     }
   }
 
@@ -128,12 +128,12 @@ export class Circle extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (Core.Settings.centresnap) {
+    if (DesignCore.Settings.centresnap) {
       const centre = new Point(this.points[0].x, this.points[0].y);
       snaps.push(centre);
     }
 
-    if (Core.Settings.quadrantsnap) {
+    if (DesignCore.Settings.quadrantsnap) {
       const angle0 = new Point(this.points[0].x + this.radius, this.points[0].y);
       const angle90 = new Point(this.points[0].x, this.points[0].y + this.radius);
       const angle180 = new Point(this.points[0].x - this.radius, this.points[0].y);
@@ -142,7 +142,7 @@ export class Circle extends Entity {
       snaps.push(angle0, angle90, angle180, angle270);
     }
 
-    if (Core.Settings.nearestsnap) {
+    if (DesignCore.Settings.nearestsnap) {
       const closest = this.closestPoint(mousePoint);
 
       // Crude way to snap to the closest point or a node

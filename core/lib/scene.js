@@ -6,7 +6,7 @@ import {DXFFile} from './dxf/dxfFile.js';
 import {BoundingBox} from './boundingBox.js';
 import {Point} from '../entities/point.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class Scene {
   constructor() {
@@ -31,7 +31,7 @@ export class Scene {
     this.tempItems = [];
     this.auxiliaryItems = [];
     this.selectionManager.reset();
-    Core.Canvas.requestPaint();
+    DesignCore.Canvas.requestPaint();
   }
 
   /**
@@ -83,13 +83,13 @@ export class Scene {
     }
 
     // check type is a valid command
-    if (!Core.CommandManager.isCommand(type)) {
+    if (!DesignCore.CommandManager.isCommand(type)) {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
       this.reset();
       return;
     }
     // Create a new item, send it the points array
-    const item = Core.CommandManager.createNew(type, data);
+    const item = DesignCore.CommandManager.createNew(type, data);
 
     if (typeof index === 'undefined') {
       // add to end of array
@@ -170,7 +170,7 @@ export class Scene {
    * @param {object} data - object of entity parameters
    */
   createTempItem(type, data) {
-    const helper = Core.CommandManager.createNew(type, data);
+    const helper = DesignCore.CommandManager.createNew(type, data);
     this.addToTempItems(helper);
   }
 

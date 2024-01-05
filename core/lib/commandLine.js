@@ -1,7 +1,7 @@
 import {Point} from '../entities/point.js';
 import {Input} from './inputManager.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 export class CommandLine {
   /**
@@ -76,11 +76,11 @@ export class CommandLine {
       this.updateCallbackFunction(this.cmdLine);
     }
 
-    if (Core.Scene.inputManager.activeCommand !== undefined) {
+    if (DesignCore.Scene.inputManager.activeCommand !== undefined) {
       // TODO: This should call a common function that is currently called mouseMove in the scene class
-      Core.Scene.tempItems = [];
-      Core.Scene.inputManager.activeCommand.preview();
-      Core.Canvas.requestPaint();
+      DesignCore.Scene.tempItems = [];
+      DesignCore.Scene.inputManager.activeCommand.preview();
+      DesignCore.Canvas.requestPaint();
     }
   }
 
@@ -99,7 +99,7 @@ export class CommandLine {
         this.enterPressed();
         break;
       case 'Escape':
-        Core.Scene.inputManager.onEscapePressed();
+        DesignCore.Scene.inputManager.onEscapePressed();
         break;
       case 'Space': // space
         this.spacePressed();
@@ -162,15 +162,15 @@ export class CommandLine {
    * Handles presses of the delete key
    */
   deletePressed() {
-    Core.Scene.inputManager.onCommand('Erase');
+    DesignCore.Scene.inputManager.onCommand('Erase');
   }
 
   /**
    * Handles presses of the space key
    */
   spacePressed() {
-    const activeCommand = Core.Scene.inputManager.activeCommand;
-    const promptOption = Core.Scene.inputManager.promptOption;
+    const activeCommand = DesignCore.Scene.inputManager.activeCommand;
+    const promptOption = DesignCore.Scene.inputManager.promptOption;
 
     if (activeCommand && promptOption.types.includes(Input.Type.STRING)) {
       this.command = this.command + ' ';
@@ -198,9 +198,9 @@ export class CommandLine {
     if (this.cmdLine.length > this.prompt.length) {
       // get the inputprompt and remove the prompt text
       const inputCommand = this.cmdLine.slice(this.prompt.length);
-      Core.Scene.inputManager.onCommand(this.parseInput(inputCommand));
+      DesignCore.Scene.inputManager.onCommand(this.parseInput(inputCommand));
     } else {
-      Core.Scene.inputManager.onEnterPressed();
+      DesignCore.Scene.inputManager.onEnterPressed();
     }
   }
 
@@ -227,7 +227,7 @@ export class CommandLine {
       point.x = parseFloat(xyData[0]);
       point.y = parseFloat(xyData[1]);
 
-      const activeCommand = Core.Scene.inputManager.activeCommand;
+      const activeCommand = DesignCore.Scene.inputManager.activeCommand;
 
       if (isRelative && activeCommand !== undefined && activeCommand.points.length) {
         point.x = parseFloat(activeCommand.points.at(-1).x + point.x);

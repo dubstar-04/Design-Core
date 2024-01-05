@@ -35,7 +35,7 @@ import {Utils} from './utils.js';
 import {Strings} from './strings.js';
 import {Logging} from './logging.js';
 
-import {Core} from '../core.js';
+import {DesignCore} from '../designCore.js';
 
 const classes = {
   Line,
@@ -138,7 +138,7 @@ export class CommandManager {
     // get a fuzzy match and notify
     const command = this.getFuzzyMatch(input);
     const shortcut = this.getShortcut(command);
-    Core.instance.notify(`${Strings.Message.RECOMMEND} ${command} (${shortcut})`);
+    DesignCore.Core.notify(`${Strings.Message.RECOMMEND} ${command} (${shortcut})`);
     return false;
   }
 
