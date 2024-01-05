@@ -96,6 +96,10 @@ export class Snapping {
    * @returns Point or undefined
    */
   polarSnap(previousPoint) {
+    if (!this.active) {
+      return;
+    }
+
     let snapPoint;
     const angleTolerance = 4;
     // get the angle to the mouse position
@@ -119,6 +123,10 @@ export class Snapping {
    * @returns Point or undefined
    */
   orthoSnap(previousPoint) {
+    if (!this.active) {
+      return;
+    }
+
     let snapPoint;
     const x = DesignCore.Mouse.pointOnScene().x - previousPoint.x;
     const y = DesignCore.Mouse.pointOnScene().y - previousPoint.y;
