@@ -33,5 +33,8 @@ jobs:
     - name: Run ESLint
       run: npx eslint . --ext .js
 
+    - name: Dependency Check
+      run: npx madge --circular --extensions js .
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
