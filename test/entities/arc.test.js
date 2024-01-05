@@ -1,10 +1,9 @@
 import {Core} from '../../core/core/core.js';
-import {DesignCore} from '../../core/designCore.js';
 import {Arc} from '../../core/entities/arc.js';
 import {Point} from '../../core/entities/point.js';
 
 const core = new Core();
-const commandline = DesignCore.CommandLine;
+const commandline = core.commandLine;
 
 test('Test Arc.execute', () => {
   // Create arc - point, point, angle

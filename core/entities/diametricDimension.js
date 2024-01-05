@@ -24,7 +24,8 @@ export class DiametricDimension extends BaseDimension {
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
 
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-        const selection = await DesignCore.Scene.inputManager.requestInput(op);
+        // const selection =
+        await DesignCore.Scene.inputManager.requestInput(op);
       }
 
       const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);

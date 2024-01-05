@@ -1,5 +1,4 @@
 import {BaseDimension} from './baseDimension.js';
-import {BasePolyline} from './basePolyline.js';
 import {AlignedDimension} from './alignedDimension.js';
 import {DiametricDimension} from './diametricDimension.js';
 import {AngularDimension} from './angularDimension.js';
@@ -45,7 +44,8 @@ export class Dimension extends BaseDimension {
 
         if (linkedBlockIndex.length) {
         // remove the block from the scene, dimensions manage their block internally
-          const removed = DesignCore.Scene.removeItem(linkedBlockIndex[0]);
+          // const removed =
+          DesignCore.Scene.removeItem(linkedBlockIndex[0]);
         }
 
         return item;

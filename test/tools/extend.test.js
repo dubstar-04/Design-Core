@@ -1,5 +1,4 @@
 import {Core} from '../../core/core/core.js';
-import {DesignCore} from '../../core/designCore.js';
 import {Point} from '../../core/entities/point.js';
 import {Extend} from '../../core/tools/extend.js';
 
@@ -26,28 +25,28 @@ test('Test Extend.action', () => {
    * Extend end from horizontal line
    */
   // Add items to scene
-  DesignCore.Scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  DesignCore.Scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
+  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
   // Select boundary item
-  DesignCore.Scene.selectionManager.addToSelectionSet(0);
+  core.scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
   extend.selectedIndex = 1;
   // set mouse location - required for Extend
-  DesignCore.Mouse.setPosFromScenePoint(new Point(40, 50));
+  core.mouse.setPosFromScenePoint(new Point(40, 50));
   // Perform Extend
   extend.action();
 
   // line one
-  expect(DesignCore.Scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(DesignCore.Scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(DesignCore.Scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(DesignCore.Scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(DesignCore.Scene.items[1].points[0].x).toBe(lineTwoStart.x);
-  expect(DesignCore.Scene.items[1].points[0].y).toBe(lineTwoStart.y);
-  expect(DesignCore.Scene.items[1].points[1].x).toBe(100);
-  expect(DesignCore.Scene.items[1].points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.items[1].points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.items[1].points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.items[1].points[1].x).toBe(100);
+  expect(core.scene.items[1].points[1].y).toBe(lineTwoEnd.y);
 
   /**
    * Extend test two
@@ -56,30 +55,30 @@ test('Test Extend.action', () => {
    */
 
   // clear scene items
-  DesignCore.Scene.items = [];
+  core.scene.items = [];
   // Add items to scene
-  DesignCore.Scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
-  DesignCore.Scene.addItem('Line', {points: [lineThreeStart, lineThreeEnd]});
+  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  core.scene.addItem('Line', {points: [lineThreeStart, lineThreeEnd]});
   // Select boundary item
-  DesignCore.Scene.selectionManager.addToSelectionSet(0);
+  core.scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
   extend.selectedIndex = 1;
   // set mouse location - required for Extend
-  DesignCore.Mouse.setPosFromScenePoint(new Point(0, 20));
+  core.mouse.setPosFromScenePoint(new Point(0, 20));
   // Perform Extend
   extend.action();
 
   // line one
-  expect(DesignCore.Scene.items[0].points[0].x).toBe(lineTwoStart.x);
-  expect(DesignCore.Scene.items[0].points[0].y).toBe(lineTwoStart.y);
-  expect(DesignCore.Scene.items[0].points[1].x).toBe(lineTwoEnd.x);
-  expect(DesignCore.Scene.items[0].points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.items[0].points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.items[0].points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.items[0].points[1].x).toBe(lineTwoEnd.x);
+  expect(core.scene.items[0].points[1].y).toBe(lineTwoEnd.y);
 
   // line two
-  expect(DesignCore.Scene.items[1].points[0].x).toBe(lineThreeStart.x);
-  expect(DesignCore.Scene.items[1].points[0].y).toBe(lineThreeStart.y);
-  expect(DesignCore.Scene.items[1].points[1].x).toBe(lineThreeEnd.x);
-  expect(DesignCore.Scene.items[1].points[1].y).toBe(50);
+  expect(core.scene.items[1].points[0].x).toBe(lineThreeStart.x);
+  expect(core.scene.items[1].points[0].y).toBe(lineThreeStart.y);
+  expect(core.scene.items[1].points[1].x).toBe(lineThreeEnd.x);
+  expect(core.scene.items[1].points[1].y).toBe(50);
 
   /**
    * Extend test three
@@ -87,28 +86,28 @@ test('Test Extend.action', () => {
    * trim end from crossing line
    */
   // clear scene items
-  DesignCore.Scene.items = [];
+  core.scene.items = [];
   // Add items to scene
-  DesignCore.Scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  DesignCore.Scene.addItem('Line', {points: [crossingLineStart, crossingLineEnd]});
+  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
+  core.scene.addItem('Line', {points: [crossingLineStart, crossingLineEnd]});
   // Select boundary item
-  DesignCore.Scene.selectionManager.addToSelectionSet(0);
+  core.scene.selectionManager.addToSelectionSet(0);
   // select item to Extend
   extend.selectedIndex = 1;
   // set mouse location - required for Extend
-  DesignCore.Mouse.setPosFromScenePoint(new Point(35, 35));
+  core.mouse.setPosFromScenePoint(new Point(35, 35));
   // Perform Extend
   extend.action();
 
   // line one
-  expect(DesignCore.Scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(DesignCore.Scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(DesignCore.Scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(DesignCore.Scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(DesignCore.Scene.items[1].points[0].x).toBe(crossingLineStart.x);
-  expect(DesignCore.Scene.items[1].points[0].y).toBe(crossingLineStart.y);
-  expect(DesignCore.Scene.items[1].points[1].x).toBe(100);
-  expect(DesignCore.Scene.items[1].points[1].y).toBe(100);
+  expect(core.scene.items[1].points[0].x).toBe(crossingLineStart.x);
+  expect(core.scene.items[1].points[0].y).toBe(crossingLineStart.y);
+  expect(core.scene.items[1].points[1].x).toBe(100);
+  expect(core.scene.items[1].points[1].y).toBe(100);
 });

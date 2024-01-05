@@ -1,8 +1,6 @@
 import {Entity} from './entity.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
-import {DesignCore} from '../designCore.js';
-
 export class Insert extends Entity {
   constructor(data) {
     super(data);

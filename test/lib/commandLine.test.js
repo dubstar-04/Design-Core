@@ -1,10 +1,9 @@
 import {Core} from '../../core/core/core.js';
-import {DesignCore} from '../../core/designCore.js';
 import {Input, PromptOptions} from '../../core/lib/inputManager.js';
 import {Strings} from '../../core/lib/strings.js';
 
 const core = new Core();
-const commandline = DesignCore.CommandLine; // new CommandLine();
+const commandline = core.commandLine; // new CommandLine();
 
 test('Test Commandline.resetPrompt', () => {
   commandline.handleKeys('L');
@@ -55,7 +54,7 @@ test('Test CommandLine.handleKeys', () => {
 });
 
 test('Test CommandLine.spacePressed', () => {
-  const inputManager = DesignCore.Scene.inputManager;
+  const inputManager = core.scene.inputManager;
   const promptOption = new PromptOptions(Strings.Input.START, [Input.Type.STRING]);
 
   inputManager.reset();
@@ -140,8 +139,8 @@ test('Test CommandLine.parseInput', () => {
   expect(relPoint1.x).toBe(101);
   expect(relPoint1.y).toBe(102);
 
-  DesignCore.Scene.inputManager.initialiseItem('Line');
-  DesignCore.Scene.inputManager.activeCommand.points.push(relPoint1);
+  core.scene.inputManager.initialiseItem('Line');
+  core.scene.inputManager.activeCommand.points.push(relPoint1);
   const relPoint2 = commandline.parseInput('@101,102');
   expect(relPoint2.constructor.name).toBe('Point');
   expect(relPoint2.x).toBe(202);

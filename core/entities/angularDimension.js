@@ -47,7 +47,7 @@ export class AngularDimension extends BaseDimension {
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
         const selection2 = await DesignCore.Scene.inputManager.requestInput(op1);
 
-        const line2 = DesignCore.Scene.getItem(selection.selectedItemIndex);
+        const line2 = DesignCore.Scene.getItem(selection2.selectedItemIndex);
 
         const pt13 = line2.points[0];
         pt13.sequence = 13;

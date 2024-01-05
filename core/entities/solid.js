@@ -1,8 +1,4 @@
-import {Point} from './point.js';
-import {Strings} from '../lib/strings.js';
 import {Entity} from './entity.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 

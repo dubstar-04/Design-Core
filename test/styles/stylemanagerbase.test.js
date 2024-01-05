@@ -1,7 +1,6 @@
 import {Core} from '../../core/core/core.js';
 import {StyleManagerBase} from '../../core/styles/styleManagerBase';
 
-const core = new Core();
 
 // mock createStyle method
 StyleManagerBase.prototype.createStyle = function(style) {
@@ -13,9 +12,9 @@ StyleManagerBase.prototype.addStandardStyles = function() {
   this.addStyle({'name': 'TEST'});
 };
 
-// const core = new Core();
+// initialise core
+new Core();
 const styleManager = new StyleManagerBase();
-
 
 test('Test StyleManagerBase.getStyles', () => {
   // add some style to the styles array property
