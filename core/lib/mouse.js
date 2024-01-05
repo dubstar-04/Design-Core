@@ -12,6 +12,7 @@ export class Mouse {
     this.buttonOneDown = false;
     this.buttonTwoDown = false;
     this.buttonThreeDown = false;
+    this.buttonOneDownScenePoint = new Point(); // store the location of the last scene click
     this.mouseDownCanvasPoint = new Point();
     this.lastClick = 0; // Timer for double click
     this.lastButton = 0; // last button for double click check
@@ -119,17 +120,17 @@ export class Mouse {
     this.x = x;
     // canvas are typically origin top left. CAD is typically origin bottom left.
     // move the origin down to the bottom and invert the y position
-    this.y = -y +DesignCore.Canvas.height;
+    this.y = -y + DesignCore.Canvas.height;
 
     if (DesignCore.Settings.polar) {
       // if polar is enabled - get the closest points
-      const polarSnap = DesignCore.Scene.inputManager.snapping.polarSnap(this.transformToScene(this.mouseDownCanvasPoint));
+      const polarSnap = DesignCore.Scene.inputManager.snapping.polarSnap(this.buttonOneDownScenePoint);
       if (polarSnap) {
         this.setPosFromScenePoint(polarSnap);
       }
     } else if (DesignCore.Settings.ortho) {
       // if ortho is enabled - get the nearest ortho point
-      const orthoSnap = DesignCore.Scene.inputManager.snapping.orthoSnap(this.transformToScene(this.mouseDownCanvasPoint));
+      const orthoSnap = DesignCore.Scene.inputManager.snapping.orthoSnap(this.buttonOneDownScenePoint);
       if (orthoSnap) {
         this.setPosFromScenePoint(orthoSnap);
       }
@@ -148,6 +149,7 @@ export class Mouse {
     switch (button) {
       case 0:
         this.buttonOneDown = true;
+        this.buttonOneDownScenePoint = this.pointOnScene();
         break;
       case 1:
         this.buttonTwoDown = true;
