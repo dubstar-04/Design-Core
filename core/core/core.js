@@ -1,18 +1,20 @@
-import {Scene} from './lib/scene.js';
-import {CommandManager} from './lib/commandManager.js';
-import {Mouse} from './lib/mouse.js';
-import {Canvas} from './lib/canvas.js';
-import {CommandLine} from './lib/commandLine.js';
-import {LayerManager} from './layers/layerManager.js';
-import {LTypeManager} from './styles/ltypeManager.js';
-import {StyleManager} from './styles/styleManager.js';
-import {DimStyleManager} from './styles/dimStyleManager.js';
-import {PropertyManager} from './properties/propertyManager.js';
+import {Scene} from '../lib/scene.js';
+import {CommandManager} from '../lib/commandManager.js';
+import {Mouse} from '../lib/mouse.js';
+import {Canvas} from '../lib/canvas.js';
+import {CommandLine} from '../lib/commandLine.js';
+import {LayerManager} from '../layers/layerManager.js';
+import {LTypeManager} from '../styles/ltypeManager.js';
+import {StyleManager} from '../styles/styleManager.js';
+import {DimStyleManager} from '../styles/dimStyleManager.js';
+import {PropertyManager} from '../properties/propertyManager.js';
 
-import {FileIO} from './lib/fileio.js';
-import {Settings} from './lib/settings.js';
-import {DXFFile} from './lib/dxf/dxfFile.js';
-import {Logging} from './lib/logging.js';
+import {FileIO} from '../lib/fileio.js';
+import {Settings} from '../lib/settings.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {Logging} from '../lib/logging.js';
+
+import {DesignCore} from '../designCore.js';
 
 /** Class representing design core. This is the primary entry point */
 export class Core {
@@ -37,100 +39,12 @@ export class Core {
     this.externalNotifyCallbackFunction;
 
     // create a static reference to the instantiated core object
-    Core._instance = this;
+    // DesignCore._instance = this;
+    // Design.Core = this;
+
+    // return Design;
+    this.activate();
   }
-
-  /** Static Accessors **/
-  /**
-   * Get the current core instance
-   */
-  static get instance() {
-    if (!this._instance) {
-      throw Error('Core not instantiated');
-    }
-
-    return this._instance;
-  }
-
-  /**
-   * Get the Scene
-   */
-  static get Scene() {
-    return this.instance.scene;
-  }
-
-  /**
-   * Get the CommandManager
-   */
-  static get CommandManager() {
-    return this.instance.commandManager;
-  }
-
-  /**
-   * Get the Canvas
-   */
-  static get Canvas() {
-    return this.instance.canvas;
-  }
-
-  /**
-   * Get the Mouse
-   */
-  static get Mouse() {
-    return this.instance.mouse;
-  }
-
-  /**
-   * Get the CommandLine
-   */
-  static get CommandLine() {
-    return this.instance.commandLine;
-  }
-
-  /**
-   * Get the LayerManager
-   */
-  static get LayerManager() {
-    return this.instance.layerManager;
-  }
-
-  /**
-   * Get the LineTypeManager
-   */
-  static get LTypeManager() {
-    return this.instance.ltypeManager;
-  }
-
-  /**
-   * Get the StyleManager
-   */
-  static get StyleManager() {
-    return this.instance.styleManager;
-  }
-
-  /**
-   * Get the DimStyleManager
-   */
-  static get DimStyleManager() {
-    return this.instance.dimStyleManager;
-  }
-
-  /**
-   * Get the property manager
-   */
-  static get PropertyManager() {
-    return this.instance.propertyManager;
-  }
-
-  /**
-   * Get the property manager
-   */
-  static get Settings() {
-    return this.instance.settings;
-  }
-
-  /** End of Static Accessors **/
-
 
   /**
    * Activate the current context
@@ -139,7 +53,7 @@ export class Core {
    */
   activate() {
     // TODO: is there a better way to track the context / instance
-    Core._instance = this;
+    DesignCore.Core = this;
   }
   /**
    * Get the current dxf version
