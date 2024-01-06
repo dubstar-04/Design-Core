@@ -246,6 +246,9 @@ export class StyleManagerBase {
     const currentStyleName = this.styles[styleIndex].name;
     this.styles[styleIndex].name = newUniqueName;
 
+    // update all scene items with the new style value
+    this.updateSceneStyle(currentStyleName, newUniqueName);
+
     // if the style to change is the current style, update the currentstyle property
     if (currentStyleName === this.currentstyle) {
       this.setCstyle(newUniqueName);
