@@ -163,9 +163,9 @@ export class StyleManagerBase {
       this.addStandardStyles();
     }
 
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
-      const style = (items[i].style);
-      this.addstyle({
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
+      const style = (DesignCore.Scene.getItem(i)[this.styleProperty]);
+      this.addStyle({
         'name': style,
       });
     }
