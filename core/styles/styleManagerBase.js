@@ -168,6 +168,13 @@ export class StyleManagerBase {
   }
 
   /**
+   * Clear all existing styles
+   */
+  clearStyles() {
+    this.styles = [];
+  }
+
+  /**
    * get a style matching stylename
    * @param {string} styleName
    * @returns style object
