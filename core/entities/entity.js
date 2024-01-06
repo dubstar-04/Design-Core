@@ -77,7 +77,7 @@ export class Entity {
     let colour = this.colour;
 
     if (colour === 'BYLAYER') {
-      const layer = DesignCore.LayerManager.getLayerByName(this.layer);
+      const layer = DesignCore.LayerManager.getStyleByName(this.layer);
       colour = layer.colour;
     }
 
@@ -88,7 +88,7 @@ export class Entity {
     let lineTypeName = this.lineType;
 
     if (lineTypeName === 'BYLAYER') {
-      const layer = DesignCore.LayerManager.getLayerByName(this.layer);
+      const layer = DesignCore.LayerManager.getStyleByName(this.layer);
       lineTypeName = layer.lineType;
     }
 
@@ -99,7 +99,7 @@ export class Entity {
 
 
   within(selectionExtremes) {
-    const layer = DesignCore.LayerManager.getLayerByName(this.layer);
+    const layer = DesignCore.LayerManager.getStyleByName(this.layer);
 
     if (!layer.isSelectable) {
       return;
@@ -119,7 +119,7 @@ export class Entity {
   }
 
   touched(selectionExtremes) {
-    const layer = DesignCore.LayerManager.getLayerByName(this.layer);
+    const layer = DesignCore.LayerManager.getStyleByName(this.layer);
 
     if (!layer.isSelectable) {
       return;

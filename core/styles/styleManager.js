@@ -5,6 +5,9 @@ import {Style} from './style.js';
 export class StyleManager extends StyleManagerBase {
   constructor() {
     super();
+
+    this.indelibleStyles.push('STANDARD');
+    this.styleProperty = 'style';
   }
 
   createStyle(style) {

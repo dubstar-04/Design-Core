@@ -5,6 +5,9 @@ import {LType} from './ltype.js';
 export class LTypeManager extends StyleManagerBase {
   constructor() {
     super();
+
+    this.indelibleStyles.push('CONTINUOUS', 'ByLayer', 'ByBlock');
+    this.styleProperty = 'linetype';
   }
 
   createStyle(style) {

@@ -3,7 +3,7 @@ import {CommandManager} from '../lib/commandManager.js';
 import {Mouse} from '../lib/mouse.js';
 import {Canvas} from '../lib/canvas.js';
 import {CommandLine} from '../lib/commandLine.js';
-import {LayerManager} from '../layers/layerManager.js';
+import {LayerManager} from '../styles/layerManager.js';
 import {LTypeManager} from '../styles/ltypeManager.js';
 import {StyleManager} from '../styles/styleManager.js';
 import {DimStyleManager} from '../styles/dimStyleManager.js';

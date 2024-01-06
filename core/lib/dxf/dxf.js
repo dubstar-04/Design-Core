@@ -50,7 +50,7 @@ export class DXF {
       const clayer = header['$CLAYER'];
       if (clayer.hasOwnProperty('8')) {
         const layerName = clayer['8'];
-        DesignCore.LayerManager.setCLayer(layerName);
+        DesignCore.LayerManager.setCstyle(layerName);
       }
     }
 
@@ -73,25 +73,25 @@ export class DXF {
     tables.forEach((table) => {
       if (table[2] === 'LAYER') {
         table.children.forEach((layer) => {
-          DesignCore.LayerManager.addLayer(layer);
+          DesignCore.LayerManager.addStyle(layer, true);
         });
       }
 
       if (table[2] === 'LTYPE') {
         table.children.forEach((ltype) => {
-          DesignCore.LTypeManager.addStyle(ltype);
+          DesignCore.LTypeManager.addStyle(ltype, true);
         });
       }
 
       if (table[2] === 'STYLE') {
         table.children.forEach((style) => {
-          DesignCore.StyleManager.addStyle(style);
+          DesignCore.StyleManager.addStyle(style, true);
         });
       }
 
       if (table[2] === 'DIMSTYLE') {
         table.children.forEach((style) => {
-          DesignCore.DimStyleManager.addStyle(style);
+          DesignCore.DimStyleManager.addStyle(style, true);
         });
       }
     });

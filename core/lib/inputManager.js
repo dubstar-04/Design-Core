@@ -401,7 +401,7 @@ export class InputManager {
       this.activeCommand.action();
     } else {
       // set the items layer to the current layer
-      item.layer = DesignCore.LayerManager.getCLayer();
+      item.layer = DesignCore.LayerManager.getCstyle();
       // return the item index
       return DesignCore.Scene.addItem(item.type, item, index);
     }

@@ -223,7 +223,7 @@ export class Block extends Entity {
       return false;
     }
 
-    const layer = DesignCore.LayerManager.getLayerByName(this.layer);
+    const layer = DesignCore.LayerManager.getStyleByName(this.layer);
 
     if (!layer.isSelectable) {
       return;
