@@ -59,33 +59,19 @@ export class StyleManagerBase {
    * @param {style} style
    */
   addStyle(style) {
+  addStyle(style, overwrite=false) {
     // Call the subclass to create a new typed style object
-    const newstyle = this.createStyle(style);
-    if (!this.styleExists(newstyle.name)) {
-      this.styles.push(newstyle);
-      // DesignCore.Scene.saveRequired();
+    const newStyle = this.createStyle(style);
+    const newStyleName = newStyle.name;
+    if (!this.styleExists(newStyleName)) {
+      this.styles.push(newStyle);
+    } else if (overwrite) {
+      // Overwrite The style existing style
+      // This is used when loading files;
+      // Standard styles already exist but should be overwritten by the incoming style
+      this.styles.splice(this.getStyleIndex(newStyleName), 1, newStyle);
     }
-  }
-
-  /**
-   * Delete all items that use style
-   * @param {string} style
-   */
-  deleteStyleFromScene(style) {
-    const selectionSet = [];
-
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
-      if (DesignCore.Scene.items[i].style === style) {
-        selectionSet.push(i);
-      }
-    }
-
-    // sort the selection in descending order
-    selectionSet.sort((a, b)=>b-a);
-
-    for (let j = 0; j < selectionSet.length; j++) {
-      DesignCore.Scene.items.splice((selectionSet[j]), 1);
-    }
+    // DesignCore.Scene.saveRequired();
   }
 
   /**
