@@ -89,8 +89,9 @@ export class StyleManagerBase {
 
     const styleToDelete = this.getStyleByIndex(styleIndex).name;
 
-    // Can't delete STANDARD style
-    if (styleToDelete.toUpperCase() === 'STANDARD') {
+    // Can't delete indelible styles (Standard Text Style, Layer 0)
+    if (this.indelibleStyles.some((style) => style.toUpperCase() === styleToDelete.toUpperCase())) {
+      DesignCore.Core.notify(`${styleToDelete} ${Strings.Message.CANNOTBEDELETED}`);
       return;
     }
 
@@ -223,8 +224,10 @@ export class StyleManagerBase {
    * @returns undefined
    */
   renameStyle(styleIndex, newName) {
-    // can't rename the STANDARD style
-    if (this.getStyleByIndex(styleIndex).name.toUpperCase() === 'STANDARD') {
+    const styleToRename = this.getStyleByIndex(styleIndex).name;
+
+    // make sure it is a new name
+    if (styleToRename.toUpperCase() === newName.toUpperCase()) {
       return;
     }
 
