@@ -96,6 +96,7 @@ export class StyleManagerBase {
 
     // Can't delete current style
     if (styleToDelete.toUpperCase() === this.currentstyle.toUpperCase()) {
+      DesignCore.Core.notify(Strings.Message.CSTYLEDELETE);
       return;
     }
 
