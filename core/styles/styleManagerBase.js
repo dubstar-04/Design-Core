@@ -3,9 +3,9 @@ import {DesignCore} from '../designCore.js';
 export class StyleManagerBase {
   constructor() {
     this.styles = [];
-    this.currentstyle = 'STANDARD';
     this.addStandardStyles();
-  }
+    // set the current style to the first available style
+    this.currentstyle = this.styles[0].name;
 
     // list of mandatory styles or layers that cannot be deleted
     this.indelibleStyles = [];
