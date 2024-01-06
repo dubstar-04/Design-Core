@@ -253,6 +253,19 @@ export class StyleManagerBase {
   }
 
   /**
+   * Update all items that use style
+   * @param {string} oldStyleName
+   * @param {string} newStyleName
+   */
+  updateSceneStyle(oldStyleName, newStyleName) {
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      if (DesignCore.Scene.items[i][this.styleProperty] === oldStyleName) {
+        DesignCore.Scene.items[i][this.styleProperty] = newStyleName;
+      }
+    }
+  }
+
+  /**
    * Update the style property with value
    * @param {number} styleIndex
    * @param {string} property
