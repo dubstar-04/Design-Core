@@ -224,13 +224,15 @@ export class StyleManagerBase {
       return;
     }
 
-    // can't rename styles to STANDARD
-    if (newName.toUpperCase() === 'STANDARD') {
+    // Can't rename indelible styles (Standard Text Style, Layer 0)
+    if (this.indelibleStyles.some((style) => style.toUpperCase() === styleToRename.toUpperCase())) {
+      DesignCore.Core.notify(`${styleToRename} ${Strings.Message.CANNOTBERENAMED}`);
       return;
     }
 
-    // make sure it is a new new name
-    if (this.getStyleByIndex(styleIndex).name.toUpperCase() === newName.toUpperCase()) {
+    // Can't rename indelible styles (Standard Text Style, Layer 0)
+    if (this.indelibleStyles.some((style) => style.toUpperCase() === newName.toUpperCase())) {
+      DesignCore.Core.notify(`${newName} ${Strings.Message.CANNOTBERENAMED}`);
       return;
     }
 
