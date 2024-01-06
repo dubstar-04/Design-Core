@@ -104,6 +104,27 @@ export class StyleManagerBase {
   }
 
   /**
+   * Delete all items that use style
+   * @param {string} style
+   */
+  deleteStyleFromScene(style) {
+    const selectionSet = [];
+
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      if (DesignCore.Scene.items[i][this.styleProperty] === style) {
+        selectionSet.push(i);
+      }
+    }
+
+    // sort the selection in descending order
+    selectionSet.sort((a, b)=>b-a);
+
+    for (let j = 0; j < selectionSet.length; j++) {
+      DesignCore.Scene.items.splice((selectionSet[j]), 1);
+    }
+  }
+
+  /**
    * Get the name of the current style
    */
   getCstyle() {
