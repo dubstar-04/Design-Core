@@ -196,7 +196,7 @@ export class StyleManagerBase {
     }
 
     const msg = 'Invalid Style Name';
-    const err = (`${this.type} - ${msg}`);
+    const err = (`${this.constructor.name} - ${msg}: ${styleName}`);
     throw Error(err);
 
     // return;
