@@ -1,4 +1,5 @@
 import {DesignCore} from '../designCore.js';
+import {Strings} from '../lib/strings.js';
 
 export class StyleManagerBase {
   constructor() {
