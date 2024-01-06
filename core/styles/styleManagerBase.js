@@ -61,7 +61,6 @@ export class StyleManagerBase {
    * Add a style to the list of styles
    * @param {style} style
    */
-  addStyle(style) {
   addStyle(style, overwrite=false) {
     // Call the subclass to create a new typed style object
     const newStyle = this.createStyle(style);
