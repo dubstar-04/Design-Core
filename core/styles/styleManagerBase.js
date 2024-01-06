@@ -175,6 +175,15 @@ export class StyleManagerBase {
   }
 
   /**
+   * Find the index of styleName
+   * @param {string} styleName
+   * @returns index of the style or -1 if style doesn't exist
+   */
+  getStyleIndex(styleName) {
+    return this.styles.findIndex((style) => style.name.toUpperCase() === styleName.toUpperCase());
+  }
+
+  /**
    * get a style matching stylename
    * @param {string} styleName
    * @returns style object
