@@ -7,6 +7,9 @@ export class StyleManagerBase {
     this.addStandardStyles();
   }
 
+    // list of mandatory styles or layers that cannot be deleted
+    this.indelibleStyles = [];
+  }
 
   /**
    * Get styles
