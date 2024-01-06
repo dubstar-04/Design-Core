@@ -190,7 +190,7 @@ export class StyleManagerBase {
    */
   getStyleByName(styleName) {
     for (let i = 0; i < this.styleCount(); i++) {
-      if (this.styles[i].name === styleName) {
+      if (this.styles[i].name.toUpperCase() === styleName.toUpperCase()) {
         return this.styles[i];
       }
     }
