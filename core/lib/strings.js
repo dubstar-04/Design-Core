@@ -24,8 +24,9 @@ export class Strings {
     UNKNOWNCOMMAND: 'Unknown command',
     RECOMMEND: 'Did you mean',
     FILEOPEN: 'File opened',
-    CLAYERDELETE: 'Currently selected layer cannot be deleted',
-    DEFPOINTSDELETE: 'Defpoints layer cannot be deleted',
+    CSTYLEDELETE: 'Currently selected style cannot be deleted',
+    CANNOTBEDELETED: 'cannot be deleted',
+    CANNOTBERENAMED: 'cannot be renamed',
   };
 
   // Strings

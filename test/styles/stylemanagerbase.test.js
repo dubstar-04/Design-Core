@@ -65,24 +65,38 @@ test('Test StyleManagerBase.addStyle', () => {
   // Try and add existing style
   styleManager.addStyle({name: 'styleOne'});
   expect(styleManager.styleCount()).toBe(2);
+
+  // OverWrite existing style
+  styleManager.addStyle({name: 'styleone'}, true);
+  expect(styleManager.styleCount()).toBe(2);
+  expect(styleManager.styles[0].name).toBe('styleone');
 });
 
 test('Test StyleManagerBase.deleteStyle', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}], {name: 'Standard'};
+  styleManager.indelibleStyles = ['Standard'];
 
   // Delete style
   styleManager.deleteStyle(1);
   expect(styleManager.styleCount(1)).toBe(1);
 
   // Try and delete an non-existant index
-  styleManager.deleteStyle(1);
+  styleManager.deleteStyle(10);
+  expect(styleManager.styleCount()).toBe(1);
+
+
+  // Check style name
+  const styleIndex = styleManager.getStyleIndex('Standard');
+
+  // Try and delete an indelible styles
+  styleManager.deleteStyle(styleIndex);
   expect(styleManager.styleCount()).toBe(1);
 });
 
 
 test('Test StyleManagerBase.getCstyle', () => {
-  expect(styleManager.getCstyle()).toBe('STANDARD');
+  expect(styleManager.getCstyle()).toBe('TEST');
 });
 
 test('Test StyleManagerBase.setCstyle', () => {
@@ -154,6 +168,7 @@ test('Test StyleManagerBase.getStyleByIndex', () => {
 test('Test StyleManagerBase.renameStyle', () => {
   // add some style to the styles array property
   styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.indelibleStyles = ['Standard'];
 
   // check index name
   expect(styleManager.getStyleByIndex(0).name).toBe('styleOne');

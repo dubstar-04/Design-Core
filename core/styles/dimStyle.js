@@ -5,6 +5,7 @@ export class DimStyle {
   constructor(data) {
     // Define Properties
     this.type = this.constructor.name;
+    this.standardFlags = 0;
     this.name = '';
     this.DIMPOST = ''; // 3 - General dimensioning suffix
     this.DIMAPOST = ''; // 4 - Alternate dimensioning suffix
@@ -235,6 +236,19 @@ export class DimStyle {
         // both dimension line segments (2 x DIMGAP), a gap on either side of the dimension text (another 2 x DIMGAP), and the length of the dimension text,
         // which depends on its size and number of decimal places displayed
         this.DIMGAP = data[147];
+      }
+
+      if (data.standardFlags || data[70]) {
+        // DXF Groupcode 70 - standard flags
+        /*
+        1 = If set, this entry describes a shape
+        4 = Vertical text
+        16 = If set, table entry is externally dependent on an xref
+        32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved
+        64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
+        (This flag is for the benefit of AutoCAD commands. It can be ignored.
+        */
+        this.standardFlags = data.standardFlags || data[70];
       }
 
       if (data[71]) {
@@ -604,25 +618,28 @@ export class DimStyle {
   }
 
   /**
-   * Get standard flags for the dimstyle
-   * @returns
+   * Get the vertical value
+   * @returns {bool}
    */
-  getStandardFlags() {
-    // Standard flags (bit-coded values):
-    // 1 = This entry describes as shape
-    // 4 = Vertical Text
-    // 16 = Style is from an xref
-    // 32 = Xref is resolved (If set with 16)
-    // 64 = Required internally by AutoCAD, can be ignored
-
-    let flags = 0;
-
-    if (this.vertical) {
-      flags += 4;
-    }
-
-    return flags;
+  get vertical() {
+    // Vertical value is bitmasked in standardflags as value 4
+    return Boolean(this.standardFlags & 4);
   }
+
+  /**
+   * Set the vertical value
+   * @param {boolean} bool
+   */
+  set vertical(bool) {
+    if (bool) {
+      // Add vertical flag
+      this.standardFlags = (this.standardFlags | 4);
+    } else {
+      // remove vertical flag
+      this.standardFlags = (this.standardFlags ^ (this.standardFlags & 4));
+    }
+  }
+
 
   dxf(file) {
     file.writeGroupCode('0', 'DIMSTYLE');
@@ -630,7 +647,7 @@ export class DimStyle {
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimStyleTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Stylename
-    file.writeGroupCode('70', this.getStandardFlags());
+    file.writeGroupCode('70', this.standardFlags);
     file.writeGroupCode('3', this.DIMPOST);
     file.writeGroupCode('4', this.DIMAPOST);
     file.writeGroupCode('5', this.DIMBLK);

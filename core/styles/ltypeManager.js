@@ -5,6 +5,9 @@ import {LType} from './ltype.js';
 export class LTypeManager extends StyleManagerBase {
   constructor() {
     super();
+
+    this.indelibleStyles.push('CONTINUOUS', 'ByLayer', 'ByBlock');
+    this.styleProperty = 'linetype';
   }
 
   createStyle(style) {
@@ -13,14 +16,19 @@ export class LTypeManager extends StyleManagerBase {
 
   addStandardStyles() {
     this.addStyle({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
-    this.addStyle({'name': 'CENTER', 'pattern': [31.75, -6.35, 6.35, -6.35], 'description': 'Center ____ _ ____ _ ____ _ ____ _ ____ _ ____'});
-    this.addStyle({'name': 'DASHDOT', 'pattern': [12.7, -6.345, 0, -6.345], 'description': 'Dash dot __ . __ . __ . __ . __ . __ . __ . __'});
-    this.addStyle({'name': 'DOT', 'pattern': [0, -6.35], 'description': 'Dot . . . . . . . . . . . . . . . . . . . . . .'});
-    this.addStyle({'name': 'DASHED', 'pattern': [12.7, -6.35], 'description': 'Dashed __ __ __ __ __ __ __ __ __ __ __ __ __ _'});
-    this.addStyle({'name': 'HIDDEN', 'pattern': [6.35, -3.175], 'description': 'Hidden __ __ __ __ __ __ __ __ __ __ __ __ __ _'});
-    this.addStyle({'name': 'ByLayer'});
-    this.addStyle({'name': 'ByBlock'});
-    // DesignCore.Scene.saveRequired();
+    // this.addStyle({'name': 'ByLayer'});
+    // this.addStyle({'name': 'ByBlock'});
+  }
+
+  getOptionalStyles() {
+    const styles = [];
+    styles.push({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
+    styles.push({'name': 'CENTER', 'pattern': [31.75, -6.35, 6.35, -6.35], 'description': 'Center ____ _ ____ _ ____ _ ____ _ ____ _ ____'});
+    styles.push({'name': 'DASHDOT', 'pattern': [12.7, -6.345, 0, -6.345], 'description': 'Dash dot __ . __ . __ . __ . __ . __ . __ . __'});
+    styles.push({'name': 'DOT', 'pattern': [0, -6.35], 'description': 'Dot . . . . . . . . . . . . . . . . . . . . . .'});
+    styles.push({'name': 'DASHED', 'pattern': [12.7, -6.35], 'description': 'Dashed __ __ __ __ __ __ __ __ __ __ __ __ __ _'});
+    styles.push({'name': 'HIDDEN', 'pattern': [6.35, -3.175], 'description': 'Hidden __ __ __ __ __ __ __ __ __ __ __ __ __ _'});
+    return styles;
   }
 
   dxf(file) {

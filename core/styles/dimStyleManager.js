@@ -5,6 +5,9 @@ import {StyleManagerBase} from './styleManagerBase.js';
 export class DimStyleManager extends StyleManagerBase {
   constructor() {
     super();
+
+    this.indelibleStyles.push('STANDARD');
+    this.styleProperty = 'styleName';
   }
 
   createStyle(style) {

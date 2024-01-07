@@ -1,12 +1,16 @@
 import {DesignCore} from '../designCore.js';
+import {Strings} from '../lib/strings.js';
 
 export class StyleManagerBase {
   constructor() {
     this.styles = [];
-    this.currentstyle = 'STANDARD';
     this.addStandardStyles();
-  }
+    // set the current style to the first available style
+    this.currentstyle = this.styles[0].name;
 
+    // list of mandatory styles or layers that cannot be deleted
+    this.indelibleStyles = [];
+  }
 
   /**
    * Get styles
@@ -58,34 +62,19 @@ export class StyleManagerBase {
    * Add a style to the list of styles
    * @param {style} style
    */
-  addStyle(style) {
+  addStyle(style, overwrite=false) {
     // Call the subclass to create a new typed style object
-    const newstyle = this.createStyle(style);
-    if (!this.styleExists(newstyle.name)) {
-      this.styles.push(newstyle);
-      // DesignCore.Scene.saveRequired();
+    const newStyle = this.createStyle(style);
+    const newStyleName = newStyle.name;
+    if (!this.styleExists(newStyleName)) {
+      this.styles.push(newStyle);
+    } else if (overwrite) {
+      // Overwrite The style existing style
+      // This is used when loading files;
+      // Standard styles already exist but should be overwritten by the incoming style
+      this.styles.splice(this.getStyleIndex(newStyleName), 1, newStyle);
     }
-  }
-
-  /**
-   * Delete all items that use style
-   * @param {string} style
-   */
-  deleteStyleFromScene(style) {
-    const selectionSet = [];
-
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
-      if (DesignCore.Scene.items[i].style === style) {
-        selectionSet.push(i);
-      }
-    }
-
-    // sort the selection in descending order
-    selectionSet.sort((a, b)=>b-a);
-
-    for (let j = 0; j < selectionSet.length; j++) {
-      DesignCore.Scene.items.splice((selectionSet[j]), 1);
-    }
+    // DesignCore.Scene.saveRequired();
   }
 
   /**
@@ -100,13 +89,15 @@ export class StyleManagerBase {
 
     const styleToDelete = this.getStyleByIndex(styleIndex).name;
 
-    // Can't delete STANDARD style
-    if (styleToDelete.toUpperCase() === 'STANDARD') {
+    // Can't delete indelible styles (Standard Text Style, Layer 0)
+    if (this.indelibleStyles.some((style) => style.toUpperCase() === styleToDelete.toUpperCase())) {
+      DesignCore.Core.notify(`${styleToDelete} ${Strings.Message.CANNOTBEDELETED}`);
       return;
     }
 
     // Can't delete current style
     if (styleToDelete.toUpperCase() === this.currentstyle.toUpperCase()) {
+      DesignCore.Core.notify(Strings.Message.CSTYLEDELETE);
       return;
     }
 
@@ -115,6 +106,27 @@ export class StyleManagerBase {
 
     // Delete The style
     this.styles.splice(styleIndex, 1);
+  }
+
+  /**
+   * Delete all items that use style
+   * @param {string} style
+   */
+  deleteStyleFromScene(style) {
+    const selectionSet = [];
+
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      if (DesignCore.Scene.items[i][this.styleProperty] === style) {
+        selectionSet.push(i);
+      }
+    }
+
+    // sort the selection in descending order
+    selectionSet.sort((a, b)=>b-a);
+
+    for (let j = 0; j < selectionSet.length; j++) {
+      DesignCore.Scene.items.splice((selectionSet[j]), 1);
+    }
   }
 
   /**
@@ -152,12 +164,28 @@ export class StyleManagerBase {
       this.addStandardStyles();
     }
 
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
-      const style = (items[i].style);
-      this.addstyle({
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
+      const style = (DesignCore.Scene.getItem(i)[this.styleProperty]);
+      this.addStyle({
         'name': style,
       });
     }
+  }
+
+  /**
+   * Clear all existing styles
+   */
+  clearStyles() {
+    this.styles = [];
+  }
+
+  /**
+   * Find the index of styleName
+   * @param {string} styleName
+   * @returns index of the style or -1 if style doesn't exist
+   */
+  getStyleIndex(styleName) {
+    return this.styles.findIndex((style) => style.name.toUpperCase() === styleName.toUpperCase());
   }
 
   /**
@@ -167,13 +195,13 @@ export class StyleManagerBase {
    */
   getStyleByName(styleName) {
     for (let i = 0; i < this.styleCount(); i++) {
-      if (this.styles[i].name === styleName) {
+      if (this.styles[i].name.toUpperCase() === styleName.toUpperCase()) {
         return this.styles[i];
       }
     }
 
     const msg = 'Invalid Style Name';
-    const err = (`${this.type} - ${msg}`);
+    const err = (`${this.constructor.name} - ${msg}: ${styleName}`);
     throw Error(err);
 
     // return;
@@ -196,30 +224,49 @@ export class StyleManagerBase {
    * @returns undefined
    */
   renameStyle(styleIndex, newName) {
-    // can't rename the STANDARD style
-    if (this.getStyleByIndex(styleIndex).name.toUpperCase() === 'STANDARD') {
+    const styleToRename = this.getStyleByIndex(styleIndex).name;
+
+    // make sure it is a new name
+    if (styleToRename.toUpperCase() === newName.toUpperCase()) {
       return;
     }
 
-    // can't rename styles to STANDARD
-    if (newName.toUpperCase() === 'STANDARD') {
+    // Can't rename indelible styles (Standard Text Style, Layer 0)
+    if (this.indelibleStyles.some((style) => style.toUpperCase() === styleToRename.toUpperCase())) {
+      DesignCore.Core.notify(`${styleToRename} ${Strings.Message.CANNOTBERENAMED}`);
       return;
     }
 
-    // make sure it is a new new name
-    if (this.getStyleByIndex(styleIndex).name.toUpperCase() === newName.toUpperCase()) {
+    // Can't rename indelible styles (Standard Text Style, Layer 0)
+    if (this.indelibleStyles.some((style) => style.toUpperCase() === newName.toUpperCase())) {
+      DesignCore.Core.notify(`${newName} ${Strings.Message.CANNOTBERENAMED}`);
       return;
     }
 
     const newUniqueName = this.getUniqueName(newName);
 
-    // TODO: update all items using the style
     const currentStyleName = this.styles[styleIndex].name;
     this.styles[styleIndex].name = newUniqueName;
+
+    // update all scene items with the new style value
+    this.updateSceneStyle(currentStyleName, newUniqueName);
 
     // if the style to change is the current style, update the currentstyle property
     if (currentStyleName === this.currentstyle) {
       this.setCstyle(newUniqueName);
+    }
+  }
+
+  /**
+   * Update all items that use style
+   * @param {string} oldStyleName
+   * @param {string} newStyleName
+   */
+  updateSceneStyle(oldStyleName, newStyleName) {
+    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      if (DesignCore.Scene.items[i][this.styleProperty] === oldStyleName) {
+        DesignCore.Scene.items[i][this.styleProperty] = newStyleName;
+      }
     }
   }
 
