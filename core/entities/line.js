@@ -253,7 +253,7 @@ export class Line extends Entity {
     }
 
     if (DesignCore.Settings.nearestsnap) {
-      const closest = this.closestPoint(mousePoint, start, end);
+      const closest = this.closestPoint(mousePoint);
 
       // Crude way to snap to the closest point or a node
       if (closest[1] < delta / 10) {
