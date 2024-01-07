@@ -6,7 +6,7 @@ const layerManager = core.layerManager;
 
 test('Test LayerManager.getStyles', () => {
   const layers = layerManager.getStyles();
-  expect(layers).toHaveLength(4);
+  expect(layers).toHaveLength(2);
 
   expect(layers[0]).toHaveProperty('name', '0');
   expect(layers[1]).toHaveProperty('name', 'DEFPOINTS');
@@ -14,7 +14,7 @@ test('Test LayerManager.getStyles', () => {
 
 test('Test LayerManager.styleCount', () => {
   const count = layerManager.styleCount();
-  expect(count).toBe(4);
+  expect(count).toBe(2);
 });
 
 test('Test LayerManager.newStyle', () => {
@@ -95,11 +95,11 @@ test('Test LayerManager.checkStyles', () => {
 
   layerManager.checkStyles();
   const layers = layerManager.getStyles();
-  expect(layers).toHaveLength(5);
+  expect(layers).toHaveLength(3);
 
   expect(layers[0]).toHaveProperty('name', '0');
   expect(layers[1]).toHaveProperty('name', 'DEFPOINTS');
-  expect(layers[4]).toHaveProperty('name', newStyleName);
+  expect(layers[2]).toHaveProperty('name', newStyleName);
 });
 
 test('Test LayerManager.addStandardStyles', () => {
@@ -108,7 +108,7 @@ test('Test LayerManager.addStandardStyles', () => {
   layerManager.addStandardStyles();
 
   const layers = layerManager.getStyles();
-  expect(layers).toHaveLength(4);
+  expect(layers).toHaveLength(2);
 
   expect(layers[0]).toHaveProperty('name', '0');
   expect(layers[1]).toHaveProperty('name', 'DEFPOINTS');
