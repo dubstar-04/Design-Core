@@ -74,14 +74,23 @@ test('Test StyleManagerBase.addStyle', () => {
 
 test('Test StyleManagerBase.deleteStyle', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}], {name: 'Standard'};
+  styleManager.indelibleStyles = ['Standard'];
 
   // Delete style
   styleManager.deleteStyle(1);
   expect(styleManager.styleCount(1)).toBe(1);
 
   // Try and delete an non-existant index
-  styleManager.deleteStyle(1);
+  styleManager.deleteStyle(10);
+  expect(styleManager.styleCount()).toBe(1);
+
+
+  // Check style name
+  const styleIndex = styleManager.getStyleIndex('Standard');
+
+  // Try and delete an indelible styles
+  styleManager.deleteStyle(styleIndex);
   expect(styleManager.styleCount()).toBe(1);
 });
 
@@ -159,13 +168,14 @@ test('Test StyleManagerBase.getStyleByIndex', () => {
 test('Test StyleManagerBase.renameStyle', () => {
   // add some style to the styles array property
   styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.indelibleStyles = ['Standard'];
 
   // check index name
   expect(styleManager.getStyleByIndex(0).name).toBe('styleOne');
 
   // try and rename to STANDARD
-  // styleManager.renameStyle(0, 'STANDARD');
-  // expect(styleManager.getStyleByIndex(0).name).toBe('styleOne');
+  styleManager.renameStyle(0, 'STANDARD');
+  expect(styleManager.getStyleByIndex(0).name).toBe('styleOne');
 
   // valid rename
   styleManager.renameStyle(0, 'styleOneRenamed');
