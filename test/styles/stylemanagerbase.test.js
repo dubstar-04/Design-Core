@@ -65,6 +65,11 @@ test('Test StyleManagerBase.addStyle', () => {
   // Try and add existing style
   styleManager.addStyle({name: 'styleOne'});
   expect(styleManager.styleCount()).toBe(2);
+
+  // OverWrite existing style
+  styleManager.addStyle({name: 'styleone'}, true);
+  expect(styleManager.styleCount()).toBe(2);
+  expect(styleManager.styles[0].name).toBe('styleone');
 });
 
 test('Test StyleManagerBase.deleteStyle', () => {
