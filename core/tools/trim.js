@@ -37,8 +37,6 @@ export class Trim extends Tool {
   }
 
   action() {
-    // const item = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
-
     const item = this.selectedIndex;
 
     if (item !== undefined) {
@@ -65,6 +63,8 @@ export class Trim extends Tool {
         TrimItem.trim(intersectPoints);
       }
 
+      // remove item from selection set and reset the selectedIndex
+      DesignCore.Scene.selectionManager.removeFromSelectionSet(this.selectedIndex);
       this.selectedIndex = undefined;
     }
   }

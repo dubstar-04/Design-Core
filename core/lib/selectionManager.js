@@ -150,9 +150,9 @@ export class SelectionManager {
   * @param  {Integer} index - index of the item in scene.items
   */
   removeFromSelectionSet(index) {
-    const itemIndex = this.selectionSet.indexOf(index);
+    const itemIndex = this.selectionSet.selectionSet.indexOf(index);
     if (itemIndex !== -1) {
-      this.selectionSet.splice(itemIndex, 1);
+      this.selectionSet.selectionSet.splice(itemIndex, 1);
       this.selectedItems.splice(itemIndex, 1);
     }
   }
