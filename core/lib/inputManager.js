@@ -188,8 +188,12 @@ export class InputManager {
         this.reset();
       }
     } else {
-      this.initialiseItem(DesignCore.CommandLine.lastCommand[0]);
-      this.activeCommand.execute();
+      const lastCommand = DesignCore.CommandLine.lastCommand[0];
+      // if there was a previous command - repeat it...
+      if (lastCommand) {
+        this.initialiseItem(lastCommand);
+        this.activeCommand.execute();
+      }
     }
   }
 
