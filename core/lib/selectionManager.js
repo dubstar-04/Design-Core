@@ -127,6 +127,13 @@ export class SelectionManager {
     let closestItemIndex;
 
     for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+      // check the items layer is selectable - i.e. on, thawed, etc...
+      const layer = DesignCore.LayerManager.getStyleByName(DesignCore.Scene.items[i].layer);
+
+      if (!layer.isSelectable) {
+        continue;
+      }
+
       const distance = DesignCore.Scene.items[i].closestPoint(point)[1]; // ClosestPoint()[1] returns a distance to the closest point
 
       if (distance < delta) {
