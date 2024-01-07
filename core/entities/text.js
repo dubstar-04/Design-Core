@@ -18,6 +18,17 @@ export class Text extends Entity {
     this.verticalAlignment = 0;
     this.styleName = 'STANDARD';
 
+
+    // hide inherited propertys
+    // needs to be enumerable=false to not appear in the object props
+    Object.defineProperty(this, 'lineType', {
+      enumerable: false,
+    });
+
+    Object.defineProperty(this, 'lineWidth', {
+      enumerable: false,
+    });
+
     // add rotation property with getter and setter
     // needs to be enumerable to appear in the object props
     Object.defineProperty(this, 'rotation', {
