@@ -1,5 +1,6 @@
 {
-  "name": "Design-Core",
+  "name": "@design-core/core",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
@@ -12,5 +13,28 @@
     "eslint-plugin-n": "^15.3.0",
     "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.2.2"
-  }
+  },
+  "description": "2D CAD Library",
+  "exports": {
+    ".": "./core/core/core.js",
+    "./designCore.js": "./core/designCore.js"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dubstar-04/Design-Core.git"
+  },
+  "keywords": [
+    "CAD"
+  ],
+  "author": "Daniel Wood",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/dubstar-04/Design-Core/issues"
+  },
+  "homepage": "https://github.com/dubstar-04/Design-Core#readme"
 }

@@ -140,7 +140,7 @@ export class Dimension extends BaseDimension {
           // if selected items are available, get the points from the selected items
           // dimensions can be created from point selection only, therefore selected items may not be available
           if (this.selectedItems.length) {
-            const dimensionType = this.dimensionMap[this.dimType];
+            const dimensionType = this.dimensionMap[this.dimType]; // TODO: use this.dimensionMap.name?
             this.points.push(...dimensionType.getPointsFromSelection(this.selectedItems));
           }
         }
