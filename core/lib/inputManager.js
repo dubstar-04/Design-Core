@@ -21,11 +21,10 @@ export class PromptOptions {
    */
   respond(input) {
     if (this.types.includes(Input.getType(input))) {
-      if (Input.getType(input) === Input.Type.NUMBER) {
+      if (Input.getType(input) === Input.Type.DYNAMIC) {
         // NUMBER input received
-        // If the prompt allows for POINT and NUMBER input
-        // convert NUMBER to a POINT
-        if (this.types.includes(Input.Type.POINT)) {
+        // If the prompt allows for DYNAMIC input - convert NUMBER to a POINT
+        if (!isNaN(input)) {
           const basePoint = DesignCore.Scene.inputManager.inputPoint;
           const angle = DesignCore.Scene.inputManager.inputPoint.angle(DesignCore.Mouse.pointOnScene());
           const point = basePoint.project(angle, input);
@@ -114,6 +113,7 @@ export class Input {
     SINGLESELECTION: 'SingleSelection',
     NUMBER: 'Number',
     STRING: 'String',
+    DYNAMIC: 'Dynamic', // convert numerical input to point data
   };
 
   /**
@@ -124,6 +124,14 @@ export class Input {
   static getType(value) {
     if (value === undefined) {
       throw Error('Input.Type: Undefined input type');
+    }
+
+    const po = DesignCore.Scene.inputManager.promptOption;
+    if (po.types.includes(Input.Type.DYNAMIC)) {
+      // if dynamic input is accepted and value is a number
+      if (!isNaN(value)) {
+        return Input.Type.DYNAMIC;
+      }
     }
 
     return value.constructor.name;
