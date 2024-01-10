@@ -81,13 +81,13 @@ export class Mouse {
 
     if (DesignCore.Settings.polar) {
       // if polar is enabled - get the closest points
-      const polarSnap = DesignCore.Scene.inputManager.snapping.polarSnap(this.buttonOneDownScenePoint);
+      const polarSnap = DesignCore.Scene.inputManager.snapping.polarSnap(DesignCore.Scene.inputManager.inputPoint);
       if (polarSnap) {
         this.setPosFromScenePoint(polarSnap);
       }
     } else if (DesignCore.Settings.ortho) {
       // if ortho is enabled - get the nearest ortho point
-      const orthoSnap = DesignCore.Scene.inputManager.snapping.orthoSnap(this.buttonOneDownScenePoint);
+      const orthoSnap = DesignCore.Scene.inputManager.snapping.orthoSnap(DesignCore.Scene.inputManager.inputPoint);
       if (orthoSnap) {
         this.setPosFromScenePoint(orthoSnap);
       }
