@@ -117,6 +117,10 @@ export class InputManager {
     this.selection = undefined;
     this.promptOption = undefined;
 
+    // save the last point input
+    // this is needed for snapping, polar, ortho etc.
+    this.inputPoint = new Point();
+
     this.snapping = new Snapping();
   }
 
