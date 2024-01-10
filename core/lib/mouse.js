@@ -19,34 +19,6 @@ export class Mouse {
   }
 
   /**
-   * Calculates the angle between the last mouse point and current position
-   * @returns
-   */
-  inputAngle() {
-    const previousPoint = this.transformToScene(this.mouseDownCanvasPoint);
-    if (previousPoint) {
-      const angle = Utils.radians2degrees(previousPoint.angle(this.pointOnScene()));
-      return angle;
-    }
-
-    return undefined;
-  }
-
-  /**
-   * Calculates the distance between the last mouse point and current position
-   * @returns
-   */
-  inputLength() {
-    if (this.mouseDownCanvasPoint) {
-      const lastScenePoint = this.transformToScene(this.mouseDownCanvasPoint);
-      const len = lastScenePoint.distance(this.pointOnScene());
-      return len;
-    }
-
-    return undefined;
-  }
-
-  /**
    * Returns the point on the design canvas
    * @returns
    */
@@ -90,21 +62,6 @@ export class Mouse {
    */
   positionString() {
     // return a string showing the position of the mouse on the canvas
-
-    const str = 'X: ' + this.pointOnScene().x.toFixed(1) + ' Y: ' + this.pointOnScene().y.toFixed(1);
-
-    /*
-    // add the length to a previous when available
-      if (this.inputLength()) {
-        str = str + ', Len: ' + Math.round(this.inputLength());
-      }
-
-      // add the angle from the previous point when available
-      if (this.inputAngle()) {
-        str = str + ', Ang: ' + Math.round(this.inputAngle());
-      }
-      */
-
     const str = `X: ${this.pointOnScene().x.toFixed(1)} Y: ${this.pointOnScene().y.toFixed(1)}`;
     return str;
   }
