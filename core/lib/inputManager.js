@@ -1,6 +1,7 @@
 import {Tool} from '../tools/tool.js';
 import {Snapping} from './snapping.js';
 import {Utils} from './utils.js';
+import {Strings} from './strings.js';
 
 import {DesignCore} from '../designCore.js';
 import {Point} from '../entities/point.js';
@@ -43,7 +44,8 @@ export class PromptOptions {
       // input matches command option, pass to active command
       this.resolve(this.parseInputToOption(input));
     } else {
-      throw Error('Invalid response type');
+      // Invalid input receieved. notify the user.
+      DesignCore.Core.notify(`${Strings.Error.INPUT}: ${this.promptMessage}`);
     }
   }
 
