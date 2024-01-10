@@ -3,6 +3,7 @@ import {Snapping} from './snapping.js';
 import {Utils} from './utils.js';
 
 import {DesignCore} from '../designCore.js';
+import {Point} from '../entities/point.js';
 
 export class PromptOptions {
   constructor(promptMessage = 'error', types = [], options = []) {
@@ -19,6 +20,23 @@ export class PromptOptions {
    */
   respond(input) {
     if (this.types.includes(Input.getType(input))) {
+      if (Input.getType(input) === Input.Type.NUMBER) {
+        // NUMBER input received
+        // If the prompt allows for POINT and NUMBER input
+        // convert NUMBER to a POINT
+        if (this.types.includes(Input.Type.POINT)) {
+          const basePoint = DesignCore.Scene.inputManager.inputPoint;
+          const angle = DesignCore.Scene.inputManager.inputPoint.angle(DesignCore.Mouse.pointOnScene());
+          const point = basePoint.project(angle, input);
+          input = point;
+        }
+      }
+
+      // Update the last input point on inputManager
+      if (Input.getType(input) === Input.Type.POINT) {
+        DesignCore.Scene.inputManager.inputPoint = input;
+      }
+
       // expected type input, pass to active command
       this.resolve(input);
     } else if (this.parseInputToOption(input) !== undefined) {
