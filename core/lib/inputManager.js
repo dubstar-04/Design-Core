@@ -292,8 +292,9 @@ export class InputManager {
    */
   singleSelect() {
     // console.log('single select');
-    const point = DesignCore.Mouse.pointOnScene();
-    this.onLeftClick(point);
+    // const point = DesignCore.Mouse.pointOnScene();
+    this.inputPoint = DesignCore.Mouse.pointOnScene();
+    this.onLeftClick(this.inputPoint);
   }
 
   /**
