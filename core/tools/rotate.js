@@ -10,6 +10,7 @@ import {DesignCore} from '../designCore.js';
 export class Rotate extends Tool {
   constructor() {
     super();
+    this.baseAngle = 0;
   }
 
   static register() {
@@ -26,25 +27,32 @@ export class Rotate extends Tool {
       }
 
       const op2 = new PromptOptions(Strings.Input.BASEPOINT, [Input.Type.POINT]);
-      const pt1 = await DesignCore.Scene.inputManager.requestInput(op2);
-      this.points.push(pt1);
+      const input1 = await DesignCore.Scene.inputManager.requestInput(op2);
+      this.points.push(input1);
 
-      const op3 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt2 = await DesignCore.Scene.inputManager.requestInput(op3);
-      this.points.push(pt2);
+      while (this.points.length < 2) {
+        const op3 = new PromptOptions(Strings.Input.ROTATION, [Input.Type.POINT, Input.Type.NUMBER], ['Reference']);
+        const input2 = await DesignCore.Scene.inputManager.requestInput(op3);
 
-      const op4 = new PromptOptions(Strings.Input.ROTATION, [Input.Type.POINT, Input.Type.NUMBER]);
-      const pt3 = await DesignCore.Scene.inputManager.requestInput(op4);
-      if (Input.getType(pt3) === Input.Type.POINT) {
-        this.points.push(pt3);
-      } else if (Input.getType(pt3) === Input.Type.NUMBER) {
-        const basePoint = this.points.at(0);
-        const startPoint = this.points.at(1);
-        const angle = Utils.degrees2radians(pt3);
-        const point = startPoint.rotate(basePoint, angle);
-        this.points.push(point);
+        if (Input.getType(input2) === Input.Type.STRING) {
+        // set the base angle to null to prevent the preview
+          this.baseAngle = null;
+          const op4 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+          const refBase = await DesignCore.Scene.inputManager.requestInput(op4);
+
+          const op5 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
+          const refEnd = await DesignCore.Scene.inputManager.requestInput(op5);
+          // set the base angle to the reference
+          this.baseAngle = refBase.angle(refEnd);
+        } else if (Input.getType(input2) === Input.Type.NUMBER) {
+          const basePoint = this.points.at(0);
+          const angle = Utils.degrees2radians(input2);
+          const point = basePoint.project(angle, 100);
+          this.points.push(point);
+        } else if (Input.getType(input2) === Input.Type.POINT) {
+          this.points.push(input2);
+        }
       }
-
 
       DesignCore.Scene.inputManager.executeCommand();
     } catch (err) {
@@ -55,24 +63,16 @@ export class Rotate extends Tool {
   preview() {
     const mousePoint = DesignCore.Mouse.pointOnScene();
 
-    if (this.points.length >= 1) {
+    if (this.points.length >= 1 && this.baseAngle !== null) {
       // Draw a line
       const points = [this.points.at(0), mousePoint];
 
       DesignCore.Scene.createTempItem('Line', {points: points});
     }
 
-    if (this.points.length >= 2) {
-      const A = this.points[0].x - this.points[1].x;
-      const O = this.points[0].y - this.points[1].y;
-
-      const A1 = this.points[0].x - mousePoint.x;
-      const O1 = this.points[0].y - mousePoint.y;
-
-      const ang1 = Math.atan2(O, A);
-      const ang2 = Math.atan2(O1, A1);
-
-      const theta = ang2 - ang1;
+    if (this.points.length >= 1 ) {
+      const ang = this.points[0].angle(mousePoint);
+      const theta = this.baseAngle === null ? 0 : ang - this.baseAngle;
 
       for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         for (let j = 0; j <DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
@@ -88,16 +88,8 @@ export class Rotate extends Tool {
 
 
   action() {
-    const A = this.points[0].x - this.points[1].x;
-    const O = this.points[0].y - this.points[1].y;
-
-    const A1 = this.points[0].x - this.points[2].x;
-    const O1 = this.points[0].y - this.points[2].y;
-
-    const ang1 = Math.atan2(O, A);
-    const ang2 = Math.atan2(O1, A1);
-
-    const theta = ang2 - ang1;
+    const ang = this.points[0].angle(this.points[1]);
+    const theta = ang - this.baseAngle;
 
     for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       for (let j = 0; j <DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
