@@ -73,13 +73,11 @@ export class BasePolyline extends Entity {
       let index;
       while (true) {
         let options;
-        let prompt = Strings.Input.NEXTPOINT;
         if (this.points.length >= 2) {
           options = this.inputMode === this.modes.LINE ? [this.modes.ARC] : [this.modes.LINE];
-          prompt = `${Strings.Input.NEXTPOINT} or ${Strings.Input.OPTION}`;
         }
 
-        op2 = new PromptOptions(prompt, [Input.Type.POINT, Input.Type.DYNAMIC], options);
+        op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC], options);
         pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
 
         if (Input.getType(pt2) === Input.Type.POINT) {
