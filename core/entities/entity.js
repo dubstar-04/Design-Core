@@ -2,6 +2,7 @@ import {Colours} from '../lib/colours.js';
 import {Intersection} from '../lib/intersect.js';
 import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
+import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
