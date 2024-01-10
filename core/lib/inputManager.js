@@ -85,7 +85,8 @@ export class PromptOptions {
     let msg = `${this.promptMessage}`;
     if (this.options.length) {
       // Add \u0332 after the first letter of each option to include underscore
-      msg = `${this.promptMessage} [${this.options}]`;
+      const optionsWithShortcut = this.options.map((option) => this.getOptionWithShortcut(option));
+      msg = `${this.promptMessage} ${Strings.Strings.OR} [${optionsWithShortcut}]`;
     }
     return msg;
   }
