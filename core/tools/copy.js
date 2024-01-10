@@ -28,17 +28,9 @@ export class Copy extends Tool {
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op2);
       this.points.push(pt1);
 
-      const op3 = new PromptOptions(Strings.Input.DESTINATION, [Input.Type.POINT, Input.Type.NUMBER]);
+      const op3 = new PromptOptions(Strings.Input.DESTINATION, [Input.Type.POINT, Input.Type.DYNAMIC]);
       const pt2 = await DesignCore.Scene.inputManager.requestInput(op3);
-
-      if (Input.getType(pt2) === Input.Type.POINT) {
-        this.points.push(pt2);
-      } else if (Input.getType(pt2) === Input.Type.NUMBER) {
-        const basePoint = this.points.at(-1);
-        const angle = Utils.degrees2radians(DesignCore.Mouse.inputAngle());
-        const point = basePoint.project(angle, pt2);
-        this.points.push(point);
-      }
+      this.points.push(pt2);
 
       DesignCore.Scene.inputManager.executeCommand();
     } catch (error) {

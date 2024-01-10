@@ -38,7 +38,7 @@ export class Line extends Entity {
       this.points.push(pt1);
 
       let pt2;
-      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.NUMBER]);
+      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC]);
       while (true) {
         pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
         this.points.push(pt2);
