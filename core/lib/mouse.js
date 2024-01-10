@@ -105,6 +105,7 @@ export class Mouse {
       }
       */
 
+    const str = `X: ${this.pointOnScene().x.toFixed(1)} Y: ${this.pointOnScene().y.toFixed(1)}`;
     return str;
   }
 
