@@ -1,5 +1,4 @@
 import {Point} from '../entities/point.js';
-import {Utils} from './utils.js';
 import {DesignCore} from '../designCore.js';
 
 export class Mouse {
