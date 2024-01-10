@@ -27,9 +27,6 @@ test('Test Rotate.action', () => {
   // set base point
   rotate.points.push(new Point());
 
-  // set rotation reference point
-  rotate.points.push(new Point(10, 0));
-
   // set rotation destination point
   rotate.points.push(new Point(0, 10));
 
@@ -51,11 +48,8 @@ test('Test Rotate.action', () => {
   // set base point
   rotate.points.push(new Point());
 
-  // set rotation reference point
-  rotate.points.push(new Point(0, 10));
-
   // set rotation destination point
-  rotate.points.push(new Point(10, 0));
+  rotate.points.push(new Point(0, -10));
 
   // Perform rotate
   rotate.action();
