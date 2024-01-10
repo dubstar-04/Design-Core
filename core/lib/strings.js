@@ -34,6 +34,8 @@ export class Strings {
     LENGTH: 'Length',
     LINE: 'Line',
     VARIES: 'Varies',
+    AND: 'and',
+    OR: 'or',
   };
 
   // Unicode Symbols
