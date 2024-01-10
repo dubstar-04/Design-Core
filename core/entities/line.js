@@ -42,15 +42,7 @@ export class Line extends Entity {
       const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.NUMBER]);
       while (true) {
         pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
-        if (Input.getType(pt2) === Input.Type.POINT) {
-          this.points.push(pt2);
-        } else if (Input.getType(pt2) === Input.Type.NUMBER) {
-          const basePoint = this.points.at(-1);
-          const angle = Utils.degrees2radians(DesignCore.Mouse.inputAngle());
-          const point = basePoint.project(angle, pt2);
-          this.points.push(point);
-        }
-
+        this.points.push(pt2);
         DesignCore.Scene.inputManager.actionCommand(this);
       }
     } catch (err) {
