@@ -128,7 +128,7 @@ export class Input {
     }
 
     const po = DesignCore.Scene.inputManager.promptOption;
-    if (po.types.includes(Input.Type.DYNAMIC)) {
+    if (po && po.types.includes(Input.Type.DYNAMIC)) {
       // if dynamic input is accepted and value is a number
       if (!isNaN(value)) {
         return Input.Type.DYNAMIC;
