@@ -1,5 +1,4 @@
 import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
 import {Strings} from '../lib/strings.js';
 import {Entity} from './entity.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
@@ -39,18 +38,10 @@ export class Line extends Entity {
       this.points.push(pt1);
 
       let pt2;
-      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.NUMBER]);
+      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC]);
       while (true) {
         pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
-        if (Input.getType(pt2) === Input.Type.POINT) {
-          this.points.push(pt2);
-        } else if (Input.getType(pt2) === Input.Type.NUMBER) {
-          const basePoint = this.points.at(-1);
-          const angle = Utils.degrees2radians(DesignCore.Mouse.inputAngle());
-          const point = basePoint.project(angle, pt2);
-          this.points.push(point);
-        }
-
+        this.points.push(pt2);
         DesignCore.Scene.inputManager.actionCommand(this);
       }
     } catch (err) {

@@ -3,7 +3,7 @@ export class Strings {
   static Error = {
     ERROR: 'Error',
     FILEOPEN: 'Error opening file',
-    INPUT: 'Incorrect input',
+    INPUT: 'Invalid input',
     INVALIDFILE: 'Invalid File',
     INVALIDDXFFORMAT: 'Invalid DXF Format',
     INVALIDPOINT: 'Invalid Point Data',

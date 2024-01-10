@@ -1,5 +1,4 @@
 import {Point} from '../entities/point.js';
-import {Utils} from './utils.js';
 import {DesignCore} from '../designCore.js';
 
 export class Mouse {
@@ -12,38 +11,9 @@ export class Mouse {
     this.buttonOneDown = false;
     this.buttonTwoDown = false;
     this.buttonThreeDown = false;
-    this.buttonOneDownScenePoint = new Point(); // store the location of the last scene click
     this.mouseDownCanvasPoint = new Point();
     this.lastClick = 0; // Timer for double click
     this.lastButton = 0; // last button for double click check
-  }
-
-  /**
-   * Calculates the angle between the last mouse point and current position
-   * @returns
-   */
-  inputAngle() {
-    const previousPoint = this.transformToScene(this.mouseDownCanvasPoint);
-    if (previousPoint) {
-      const angle = Utils.radians2degrees(previousPoint.angle(this.pointOnScene()));
-      return angle;
-    }
-
-    return undefined;
-  }
-
-  /**
-   * Calculates the distance between the last mouse point and current position
-   * @returns
-   */
-  inputLength() {
-    if (this.mouseDownCanvasPoint) {
-      const lastScenePoint = this.transformToScene(this.mouseDownCanvasPoint);
-      const len = lastScenePoint.distance(this.pointOnScene());
-      return len;
-    }
-
-    return undefined;
   }
 
   /**
@@ -90,21 +60,7 @@ export class Mouse {
    */
   positionString() {
     // return a string showing the position of the mouse on the canvas
-
-    const str = 'X: ' + this.pointOnScene().x.toFixed(1) + ' Y: ' + this.pointOnScene().y.toFixed(1);
-
-    /*
-    // add the length to a previous when available
-      if (this.inputLength()) {
-        str = str + ', Len: ' + Math.round(this.inputLength());
-      }
-
-      // add the angle from the previous point when available
-      if (this.inputAngle()) {
-        str = str + ', Ang: ' + Math.round(this.inputAngle());
-      }
-      */
-
+    const str = `X: ${this.pointOnScene().x.toFixed(1)} Y: ${this.pointOnScene().y.toFixed(1)}`;
     return str;
   }
 
@@ -124,13 +80,13 @@ export class Mouse {
 
     if (DesignCore.Settings.polar) {
       // if polar is enabled - get the closest points
-      const polarSnap = DesignCore.Scene.inputManager.snapping.polarSnap(this.buttonOneDownScenePoint);
+      const polarSnap = DesignCore.Scene.inputManager.snapping.polarSnap(DesignCore.Scene.inputManager.inputPoint);
       if (polarSnap) {
         this.setPosFromScenePoint(polarSnap);
       }
     } else if (DesignCore.Settings.ortho) {
       // if ortho is enabled - get the nearest ortho point
-      const orthoSnap = DesignCore.Scene.inputManager.snapping.orthoSnap(this.buttonOneDownScenePoint);
+      const orthoSnap = DesignCore.Scene.inputManager.snapping.orthoSnap(DesignCore.Scene.inputManager.inputPoint);
       if (orthoSnap) {
         this.setPosFromScenePoint(orthoSnap);
       }
@@ -149,7 +105,6 @@ export class Mouse {
     switch (button) {
       case 0:
         this.buttonOneDown = true;
-        this.buttonOneDownScenePoint = this.pointOnScene();
         break;
       case 1:
         this.buttonTwoDown = true;
@@ -165,7 +120,7 @@ export class Mouse {
   }
 
   /**
-   * Timer function for recognising double clicks
+   * Timer function for recognizing double clicks
    * @param {*} button  - 0 = left, 1 = wheel, 2 = right;
    * @returns
    */

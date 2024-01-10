@@ -1,8 +1,10 @@
 import {Tool} from '../tools/tool.js';
 import {Snapping} from './snapping.js';
 import {Utils} from './utils.js';
+import {Strings} from './strings.js';
 
 import {DesignCore} from '../designCore.js';
+import {Point} from '../entities/point.js';
 
 export class PromptOptions {
   constructor(promptMessage = 'error', types = [], options = []) {
@@ -19,13 +21,30 @@ export class PromptOptions {
    */
   respond(input) {
     if (this.types.includes(Input.getType(input))) {
+      if (Input.getType(input) === Input.Type.DYNAMIC) {
+        // NUMBER input received
+        // If the prompt allows for DYNAMIC input - convert NUMBER to a POINT
+        if (!isNaN(input)) {
+          const basePoint = DesignCore.Scene.inputManager.inputPoint;
+          const angle = DesignCore.Scene.inputManager.inputPoint.angle(DesignCore.Mouse.pointOnScene());
+          const point = basePoint.project(angle, input);
+          input = point;
+        }
+      }
+
+      // Update the last input point on inputManager
+      if (Input.getType(input) === Input.Type.POINT) {
+        DesignCore.Scene.inputManager.inputPoint = input;
+      }
+
       // expected type input, pass to active command
       this.resolve(input);
     } else if (this.parseInputToOption(input) !== undefined) {
       // input matches command option, pass to active command
       this.resolve(this.parseInputToOption(input));
     } else {
-      throw Error('Invalid response type');
+      // Invalid input receieved. notify the user.
+      DesignCore.Core.notify(`${Strings.Error.INPUT}: ${this.promptMessage}`);
     }
   }
 
@@ -94,6 +113,7 @@ export class Input {
     SINGLESELECTION: 'SingleSelection',
     NUMBER: 'Number',
     STRING: 'String',
+    DYNAMIC: 'Dynamic', // convert numerical input to point data
   };
 
   /**
@@ -106,6 +126,14 @@ export class Input {
       throw Error('Input.Type: Undefined input type');
     }
 
+    const po = DesignCore.Scene.inputManager.promptOption;
+    if (po.types.includes(Input.Type.DYNAMIC)) {
+      // if dynamic input is accepted and value is a number
+      if (!isNaN(value)) {
+        return Input.Type.DYNAMIC;
+      }
+    }
+
     return value.constructor.name;
   }
 }
@@ -116,6 +144,10 @@ export class InputManager {
 
     this.selection = undefined;
     this.promptOption = undefined;
+
+    // save the last point input
+    // this is needed for snapping, polar, ortho etc.
+    this.inputPoint = new Point();
 
     this.snapping = new Snapping();
   }
@@ -288,8 +320,9 @@ export class InputManager {
    */
   singleSelect() {
     // console.log('single select');
-    const point = DesignCore.Mouse.pointOnScene();
-    this.onLeftClick(point);
+    // const point = DesignCore.Mouse.pointOnScene();
+    this.inputPoint = DesignCore.Mouse.pointOnScene();
+    this.onLeftClick(this.inputPoint);
   }
 
   /**
