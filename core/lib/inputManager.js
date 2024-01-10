@@ -91,6 +91,16 @@ export class PromptOptions {
   }
 
   /**
+   * Underline the shortcut key for the prompt option
+   * @param {string} option
+   * @returns - option with shortcut underlined
+   */
+  getOptionWithShortcut(option) {
+    const optionWithShortcut = `${option.substring(0, 1)}\u0332${option.substring(1, option.length)}`;
+    return optionWithShortcut;
+  }
+
+  /**
    * Set the resolve callback
    * @param {any} resolve - callback function
    */
