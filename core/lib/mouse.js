@@ -12,7 +12,6 @@ export class Mouse {
     this.buttonOneDown = false;
     this.buttonTwoDown = false;
     this.buttonThreeDown = false;
-    this.buttonOneDownScenePoint = new Point(); // store the location of the last scene click
     this.mouseDownCanvasPoint = new Point();
     this.lastClick = 0; // Timer for double click
     this.lastButton = 0; // last button for double click check
@@ -107,7 +106,6 @@ export class Mouse {
     switch (button) {
       case 0:
         this.buttonOneDown = true;
-        this.buttonOneDownScenePoint = this.pointOnScene();
         break;
       case 1:
         this.buttonTwoDown = true;
