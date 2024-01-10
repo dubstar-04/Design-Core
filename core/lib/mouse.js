@@ -165,7 +165,7 @@ export class Mouse {
   }
 
   /**
-   * Timer function for recognising double clicks
+   * Timer function for recognizing double clicks
    * @param {*} button  - 0 = left, 1 = wheel, 2 = right;
    * @returns
    */
