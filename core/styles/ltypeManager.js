@@ -16,8 +16,8 @@ export class LTypeManager extends StyleManagerBase {
 
   addStandardStyles() {
     this.addStyle({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
-    // this.addStyle({'name': 'ByLayer'});
-    // this.addStyle({'name': 'ByBlock'});
+    this.addStyle({'name': 'ByLayer'});
+    this.addStyle({'name': 'ByBlock'});
   }
 
   getOptionalStyles() {
