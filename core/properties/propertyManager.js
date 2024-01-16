@@ -20,7 +20,7 @@ export class PropertyManager {
   }
 
   setItemProperties(property, newPropertyValue) {
-    for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       // check if the item has the selected property
       if (!DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].hasOwnProperty(property)) {
         continue;
