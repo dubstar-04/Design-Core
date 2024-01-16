@@ -1,4 +1,5 @@
 import {Colours} from '../lib/colours.js';
+import {Colour} from '../lib/colour.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 
 export class Layer {
@@ -9,7 +10,8 @@ export class Layer {
     this.frozen = false;
     this.on = true;
     this.locked = false;
-    this.colour = '#FFFFFF';
+    this.colour = new Colour(); // Colours.aciToRGB(7); // RGB Colour
+    // this.trueColour; // undefined - only used when non-aci colours are set
     this.lineType = 'CONTINUOUS';
     this.lineWeight = 'DEFAULT';
     this.plotting = true;
@@ -20,7 +22,6 @@ export class Layer {
         // DXF Groupcode 2 - Layer Name
         this.name = data.name || data[2];
       }
-
 
       if (data.flags || data[70]) {
       // DXF Groupcode 70 - Layer Flags
@@ -55,11 +56,19 @@ export class Layer {
       }
 
       if (data.colour || data[62]) {
-        // DXF Groupcode 62 - Color Number
-        // (present if not BYLAYER); zero indicates the BYBLOCK
-        // (floating) color; 256 indicates BYLAYER; a negative value indicates that
-        // the layer is turned off (optional)
-        this.colour = data.colour || Colours.getHexColour(data[62]);
+        // DXF Groupcode 62 - Color Number(present if not BYLAYER)(optional);
+        // zero indicates the BYBLOCK
+        // 256 indicates BYLAYER;
+        // A negative value indicates that the layer is turned off
+
+        let aci;
+        if (data.colour && data.colour.hasOwnProperty('aci')) {
+          // get the aci number from the colour
+          aci = data.colour.aci;
+        }
+        if (aci || data[62]) {
+          this.colour.setColourFromACI(aci|| data[62]);
+        }
       }
 
       if (data.lineType || data[6]) {
@@ -76,6 +85,20 @@ export class Layer {
         // DXF Groupcode 290 - Plotting flag
         // If set to 0, do not plot this layer
         this.plotting = data.plotting || data[290];
+      }
+
+      if (data.trueColour || data[420]) {
+        // DXF Groupcode 420 - true color
+        // A 24-bit color value that should be dealt with in terms of bytes with values
+        // of 0 to 255. The lowest byte is the blue value, the middle byte is the
+        // green value, and the third byte is the red value. The top byte is always
+        // 0. The group code cannot be used by custom entities for their own data
+        // because the group code is reserved for AcDbEntity, class-level color data
+        // and AcDbEntity, class-level transparency data
+        const trueColour = Colours.trueColourToRGB(Math.abs(data.trueColour || data[420]));
+        if (trueColour) {
+          this.colour.setColour(trueColour);
+        }
       }
     }
   }
@@ -94,6 +117,18 @@ export class Layer {
     }
 
     return false;
+  }
+
+  getColour() {
+    return this.colour.getColour();
+  }
+
+  /**
+   * Set the layer colour
+   * @param {object} colour - rgb colour
+   */
+  setColour(colour) {
+    this.colour.setColour(colour);
   }
 
   getFlags() {
@@ -123,8 +158,11 @@ export class Layer {
     file.writeGroupCode('100', 'AcDbLayerTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Layername
     file.writeGroupCode('70', this.getFlags()); // Flags
-    const colourValue = this.on ? Colours.getACADColour(this.colour) : (0 - Colours.getACADColour(this.colour));
+    const colourValue = this.on ? this.colour.aci: (0 - this.colour.aci);
     file.writeGroupCode('62', colourValue); // Colour: Negative if layer is off
+    if (this.colour.isTrueColour) {
+      file.writeGroupCode('420', Colours.rgbToTrueColour(this.getColour()));
+    }
     file.writeGroupCode('6', this.lineType);
     file.writeGroupCode('390', file.nextHandle(), DXFFile.Version.R2000); // plotstylename handle - //TODO: this needs to be linked to the actual plotstyle
     // file.writeGroupCode('290', this.plotting ? 1 : 0); //plotting   |   These items codes don't seem to be
