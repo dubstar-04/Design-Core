@@ -103,8 +103,6 @@ export class Block extends Entity {
       return;
     }
 
-    ctx.save();
-
     // blocks are associated with an insert point.
     // translate ctx by the insert location
     // this allows the items to be draw without knowing the insert location of the parent block
@@ -122,8 +120,6 @@ export class Block extends Entity {
         this.items[item].colour = itemColour;
       }
     }
-
-    ctx.restore();
 
     /*
         //////////////////////////////////////////
