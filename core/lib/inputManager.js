@@ -311,7 +311,7 @@ export class InputManager {
         const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
         if (index !== undefined) {
           const copyofitem = Utils.cloneObject(DesignCore.Scene.items[index]);
-          // copyofitem.colour = DesignCore.Core.settings.selecteditemscolour.toString();
+          // copyofitem.colour = DesignCore.Core.settings.selecteditemscolour;
           copyofitem.lineWidth = copyofitem.lineWidth * 2;
           DesignCore.Scene.addToTempItems(copyofitem);
           selecting = true;
