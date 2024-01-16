@@ -19,7 +19,7 @@ export class Text extends Entity {
     this.styleName = 'STANDARD';
 
 
-    // hide inherited propertys
+    // hide inherited properties
     // needs to be enumerable=false to not appear in the object props
     Object.defineProperty(this, 'lineType', {
       enumerable: false,
