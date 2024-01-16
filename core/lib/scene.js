@@ -170,6 +170,7 @@ export class Scene {
    * @param {object} data - object of entity parameters
    */
   createTempItem(type, data) {
+    data.layer = DesignCore.LayerManager.getCstyle();
     const helper = DesignCore.CommandManager.createNew(type, data);
     this.addToTempItems(helper);
   }
