@@ -38,6 +38,12 @@ export class Strings {
     OR: 'or',
   };
 
+  // colours
+  static Colour = {
+    BYLAYER: 'ByLayer',
+    BYBLOCK: 'ByBlock',
+  };
+
   // Unicode Symbols
   static Symbol = {
     DIAMETER: '\u2300',
