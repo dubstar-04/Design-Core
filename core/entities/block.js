@@ -110,14 +110,7 @@ export class Block extends Entity {
 
     for (let item = 0; item < this.items.length; item++) {
       if (typeof this.items[item].draw == 'function') {
-        // handle item colour
-        const itemColour = this.items[item].colour;
-        if (itemColour === 'BYBLOCK') {
-          this.items[item].colour = colour;
-        }
         this.items[item].draw(ctx, scale);
-        // reset item colour
-        this.items[item].colour = itemColour;
       }
     }
 
