@@ -183,7 +183,7 @@ export class Canvas {
       context.fillRect(origin.x, origin.y, width / this.getScale(), height / this.getScale());
       // context.globalAlpha = this.cvs.alpha
     } catch { // Cairo
-      const rgbColour = Colours.hexToScaledRGB(DesignCore.Settings.canvasbackgroundcolour);
+      const rgbColour = Colours.rgbToScaledRGB(DesignCore.Settings.canvasbackgroundcolour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       const scaled = new Point(width, height);
       const sc = DesignCore.Mouse.transformToScene(scaled);
@@ -241,13 +241,13 @@ export class Canvas {
     const lineWidth = item.lineWidth / this.getScale();
 
     try { // HTML Canvas
-      context.strokeStyle = colour;
-      context.fillStyle = colour;
+      context.strokeStyle = Colours.rgbToString(colour);
+      context.fillStyle = Colours.rgbToString(colour);
       context.lineWidth = lineWidth;
       context.setLineDash(lineType.getPattern(this.getScale()));
       context.beginPath();
     } catch { // Cairo
-      const rgbColour = Colours.hexToScaledRGB(colour);
+      const rgbColour = Colours.rgbToScaledRGB(colour); // Colours.hexToScaledRGB(colour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       context.setDash(lineType.getPattern(this.getScale()), 1);
       context.setLineWidth(lineWidth);
@@ -264,7 +264,7 @@ export class Canvas {
       context.beginPath();
     } catch { // Cairo
       context.setLineWidth(lineWidth / this.getScale());
-      const rgbColour = Colours.hexToScaledRGB(DesignCore.Settings.gridcolour);
+      const rgbColour = Colours.rgbToScaledRGB(DesignCore.Settings.gridcolour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 

@@ -11,14 +11,14 @@ class SnapPoint {
   }
 
   draw(ctx, scale) {
-    const snapColour = DesignCore.Settings.snapcolour.toString();
+    const snapColour = DesignCore.Settings.snapcolour;
     const radius = 4;
 
     try { // HTML Canvas
       ctx.strokeStyle = snapColour;
       ctx.beginPath();
     } catch { // Cairo
-      const rgbColour = Colours.hexToScaledRGB(snapColour);
+      const rgbColour = Colours.rgbToScaledRGB(snapColour);
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
 
