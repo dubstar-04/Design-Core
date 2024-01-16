@@ -1,69 +1,95 @@
-export class Colours {
-  /**
-   * Convert an AutoCAD colour index (ACI) to a hex colour
-   * @param  {Number} acadColour
-   */
-  static getHexColour(acadColour) {
-    return this.conversion_table[acadColour];
-  };
 
-  /**
-   * Convert a hex colour to an AutoCAD colour index (ACI)
-   * @param  {String} hexColour
-   */
-  static getACADColour(hexColour) {
-    for (const acadColour in this.conversion_table) {
-      if (this.conversion_table[acadColour] === hexColour) {
-        return acadColour;
+import {Logging} from './logging.js';
+
+/**
+ * Colours is a static class to support colour managements
+ * All colours are stored as RGB {r:, g:, b:} objects
+ * When importing dxf colour are converted to RGB
+ * ACI (AutoCAD colour index) from groupcode 62
+ * True Colour from groupcode 420
+ *
+ */
+export class Colours {
+/**
+ * Check rgb is a valid rgb object
+ * @param {object} rgb
+ * @returns bool - true if the object is an rgb colour, otherwise false.
+ */
+  static isRGB(rgb) {
+    if (rgb) {
+      if (rgb.hasOwnProperty('r') && rgb.r >= 0 && rgb.r <= 255) {
+        if (rgb.hasOwnProperty('g')&& rgb.g >= 0 && rgb.g <= 255) {
+          if (rgb.hasOwnProperty('b')&& rgb.b >= 0 && rgb.b <= 255) {
+            return true;
+          }
+        }
       }
     }
+
+    Logging.instance.error('Invalid RGB value');
+    return false;
+  }
+
+  /**
+   * Convert an AutoCAD colour index (ACI) to a rgb colour
+   * @param  {Number} aci
+   */
+  static aciToRGB(aci) {
+    if ((typeof aci === 'number' || aci instanceof Number)) {
+      if (aci >= 0 && aci <= 256) {
+        return this.rgb_conversion_table[aci];
+      }
+    }
+
+    Logging.instance.warn('Invalid ACI value');
+    return;
   };
 
   /**
-   * Get hex component from r, g or b value
-   * @param  {Number} c
+   * Convert a rgb colour to an AutoCAD colour index (ACI)
+   * @param {object} rgb
+   * @returns
    */
-  static componentToHex(c) {
-    const hex = Math.abs(c).toString(16);
-    return hex.length == 1 ? '0' + hex : hex;
-  }
-
-  /**
-   * Get hex colour from RGB
-   * @param  {Number} r - red value
-   * @param  {Number} g - green value
-   * @param  {Number} b - blue value
-   */
-  static rgbToHex(r, g, b) {
-    return '#' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
-  }
-
-  /**
-   *  Get RGB colour components from hex colour
-   * @param  {String} hexColour
-   */
-  static hexToRGB(hexColour) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexColour);
-
-    if (result) {
-      return {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      };
+  static rgbToACI(rgb) {
+    if (!this.isRGB(rgb)) {
+      // not an rgb colour
+      return;
+    }
+    for (const aci in this.rgb_conversion_table) {
+      if (this.rgb_conversion_table[aci].r === rgb.r) {
+        if (this.rgb_conversion_table[aci].g === rgb.g) {
+          if (this.rgb_conversion_table[aci].b === rgb.b) {
+            // return matching aci
+            return Number(aci);
+          }
+        }
+      }
     }
 
-    return null;
+    // no aci match
+    return;
   }
 
   /**
-   *  Get RGB colour components scaled 0 - 1 from hex colour
-   * @param  {String} hexColour
+   * Convert rgb colour to formatted string
+   * @param {object} rgb
+   * @returns
    */
-  static hexToScaledRGB(hexColour) {
-    const rgb = this.hexToRGB(hexColour);
+  static rgbToString(rgb) {
+    if (this.isRGB(rgb)) {
+      return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    }
 
-    if (rgb) {
+    return;
+  }
+
+  /**
+   * Get RGB colour components scaled 0 - 1 from rgb colour
+   * @param  {object} object with r, g, and b values
+   * @return - scaled rgb object or undefined
+   */
+  static rgbToScaledRGB(rgb) {
+    if (this.isRGB(rgb)) {
       return {
         r: rgb.r / 255,
         g: rgb.g / 255,
@@ -71,267 +97,305 @@ export class Colours {
       };
     }
 
-    return null;
+    return;
   }
 
-  static conversion_table = {
-    // Map the 256 AutoCAD colours to the equivalent hex colour
-    0: 'BYBLOCK',
-    1: '#FF0000',
-    2: '#FFFF00',
-    3: '#00FF00',
-    4: '#00FFFF',
-    5: '#0000FF',
-    6: '#FF00FF',
-    7: '#FFFFFF',
-    8: '#808080',
-    9: '#C0C0C0',
-    10: '#FF0000',
-    11: '#FF7F7F',
-    12: '#CC0000',
-    13: '#CC6666',
-    14: '#990000',
-    15: '#994C4C',
-    16: '#7F0000',
-    17: '#7F3F3F',
-    18: '#4C0000',
-    19: '#4C2626',
-    20: '#FF3F00',
-    21: '#FF9F7F',
-    22: '#CC3300',
-    23: '#CC7F66',
-    24: '#992600',
-    25: '#995F4C',
-    26: '#7F1F00',
-    27: '#7F4F3F',
-    28: '#4C1300',
-    29: '#4C2F26',
-    30: '#FF7F00',
-    31: '#FFBF7F',
-    32: '#CC6600',
-    33: '#CC9966',
-    34: '#994C00',
-    35: '#99724C',
-    36: '#7F3F00',
-    37: '#7F5F3F',
-    38: '#4C2600',
-    39: '#4C3926',
-    40: '#FFBF00',
-    41: '#FFDF7F',
-    42: '#CC9900',
-    43: '#CCB266',
-    44: '#997200',
-    45: '#99854C',
-    46: '#7F5F00',
-    47: '#7F6F3F',
-    48: '#4C3900',
-    49: '#4C4226',
-    50: '#FFFF00',
-    51: '#FFFF7F',
-    52: '#CCCC00',
-    53: '#CCCC66',
-    54: '#999900',
-    55: '#99994C',
-    56: '#7F7F00',
-    57: '#7F7F3F',
-    58: '#4C4C00',
-    59: '#4C4C26',
-    60: '#BFFF00',
-    61: '#DFFF7F',
-    62: '#99CC00',
-    63: '#B2CC66',
-    64: '#729900',
-    65: '#85994C',
-    66: '#5F7F00',
-    67: '#6F7F3F',
-    68: '#394C00',
-    69: '#424C26',
-    70: '#7FFF00',
-    71: '#BFFF7F',
-    72: '#66CC00',
-    73: '#99CC66',
-    74: '#4C9900',
-    75: '#72994C',
-    76: '#3F7F00',
-    77: '#5F7F3F',
-    78: '#264C00',
-    79: '#394C26',
-    80: '#3FFF00',
-    81: '#9FFF7F',
-    82: '#33CC00',
-    83: '#7FCC66',
-    84: '#269900',
-    85: '#5F994C',
-    86: '#1F7F00',
-    87: '#4F7F3F',
-    88: '#134C00',
-    89: '#2F4C26',
-    90: '#00FF00',
-    91: '#7FFF7F',
-    92: '#00CC00',
-    93: '#66CC66',
-    94: '#009900',
-    95: '#4C994C',
-    96: '#007F00',
-    97: '#3F7F3F',
-    98: '#004C00',
-    99: '#264C26',
-    100: '#00FF3F',
-    101: '#7FFF9F',
-    102: '#00CC33',
-    103: '#66CC7F',
-    104: '#009926',
-    105: '#4C995F',
-    106: '#007F1F',
-    107: '#3F7F4F',
-    108: '#004C13',
-    109: '#264C2F',
-    110: '#00FF7F',
-    111: '#7FFFBF',
-    112: '#00CC66',
-    113: '#66CC99',
-    114: '#00994C',
-    115: '#4C9972',
-    116: '#007F3F',
-    117: '#3F7F5F',
-    118: '#004C26',
-    119: '#264C39',
-    120: '#00FFBF',
-    121: '#7FFFDF',
-    122: '#00CC99',
-    123: '#66CCB2',
-    124: '#009972',
-    125: '#4C9985',
-    126: '#007F5F',
-    127: '#3F7F6F',
-    128: '#004C39',
-    129: '#264C42',
-    130: '#00FFFF',
-    131: '#7FFFFF',
-    132: '#00CCCC',
-    133: '#66CCCC',
-    134: '#009999',
-    135: '#4C9999',
-    136: '#007F7F',
-    137: '#3F7F7F',
-    138: '#004C4C',
-    139: '#264C4C',
-    140: '#00BFFF',
-    141: '#7FDFFF',
-    142: '#0099CC',
-    143: '#66B2CC',
-    144: '#007299',
-    145: '#4C8599',
-    146: '#005F7F',
-    147: '#3F6F7F',
-    148: '#00394C',
-    149: '#26424C',
-    150: '#007FFF',
-    151: '#7FBFFF',
-    152: '#0066CC',
-    153: '#6699CC',
-    154: '#004C99',
-    155: '#4C7299',
-    156: '#003F7F',
-    157: '#3F5F7F',
-    158: '#00264C',
-    159: '#26394C',
-    160: '#003FFF',
-    161: '#7F9FFF',
-    162: '#0033CC',
-    163: '#667FCC',
-    164: '#002699',
-    165: '#4C5F99',
-    166: '#001F7F',
-    167: '#3F4F7F',
-    168: '#00134C',
-    169: '#262F4C',
-    170: '#0000FF',
-    171: '#7F7FFF',
-    172: '#0000CC',
-    173: '#6666CC',
-    174: '#000099',
-    175: '#4C4C99',
-    176: '#00007F',
-    177: '#3F3F7F',
-    178: '#00004C',
-    179: '#26264C',
-    180: '#3F00FF',
-    181: '#9F7FFF',
-    182: '#3300CC',
-    183: '#7F66CC',
-    184: '#260099',
-    185: '#5F4C99',
-    186: '#1F007F',
-    187: '#4F3F7F',
-    188: '#13004C',
-    189: '#2F264C',
-    190: '#7F00FF',
-    191: '#BF7FFF',
-    192: '#6600CC',
-    193: '#9966CC',
-    194: '#4C0099',
-    195: '#724C99',
-    196: '#3F007F',
-    197: '#5F3F7F',
-    198: '#26004C',
-    199: '#39264C',
-    200: '#BF00FF',
-    201: '#DF7FFF',
-    202: '#9900CC',
-    203: '#B266CC',
-    204: '#720099',
-    205: '#854C99',
-    206: '#5F007F',
-    207: '#6F3F7F',
-    208: '#39004C',
-    209: '#42264C',
-    210: '#FF00FF',
-    211: '#FF7FFF',
-    212: '#CC00CC',
-    213: '#CC66CC',
-    214: '#990099',
-    215: '#994C99',
-    216: '#7F007F',
-    217: '#7F3F7F',
-    218: '#4C004C',
-    219: '#4C264C',
-    220: '#FF00BF',
-    221: '#FF7FDF',
-    222: '#CC0099',
-    223: '#CC66B2',
-    224: '#990072',
-    225: '#994C85',
-    226: '#7F005F',
-    227: '#7F3F6F',
-    228: '#4C0039',
-    229: '#4C2642',
-    230: '#FF007F',
-    231: '#FF7FBF',
-    232: '#CC0066',
-    233: '#CC6699',
-    234: '#99004C',
-    235: '#994C72',
-    236: '#7F003F',
-    237: '#7F3F5F',
-    238: '#4C0026',
-    239: '#4C2639',
-    240: '#FF003F',
-    241: '#FF7F9F',
-    242: '#CC0033',
-    243: '#CC667F',
-    244: '#990026',
-    245: '#994C5F',
-    246: '#7F001F',
-    247: '#7F3F4F',
-    248: '#4C0013',
-    249: '#4C262F',
-    250: '#333333',
-    251: '#5B5B5B',
-    252: '#848484',
-    253: '#ADADAD',
-    254: '#D6D6D6',
-    255: '#FFFFFF',
-    256: 'BYLAYER', // '#000000'
+  /**
+   *  Get RGB colour components from true colour
+   * @param  {String} trueColour
+   * A 32-bit integer representing a 24-bit color value.
+   * The high-order byte (8 bits) is 0, the low-order byte an unsigned char holding the Blue value (0-255),
+   * then the Green value, and the next-to-high order byte is the Red Value.
+   * Converting this integer value to hexadecimal yields the following bit mask: 0x00RRGGBB.
+   * For example:
+   * true color with Red==200, Green==100 and Blue==50 is 0x00C86432, and in DXF, in decimal, 13132850
+   */
+  static trueColourToRGB(trueColour) {
+    if (trueColour) {
+      return {
+        r: (trueColour & 0xff0000) >> 16,
+        g: (trueColour & 0x00ff00) >> 8,
+        b: (trueColour & 0x0000ff),
+      };
+    }
+    return;
+  }
+
+  /**
+   * Get the trueColour value for rgb colour
+   * @param {object} rgb
+   * @returns integer representing the rgb value as a trueColor
+   */
+  static rgbToTrueColour(rgb) {
+    if (this.isRGB(rgb)) {
+      const trueColour = ((rgb.r<<16)|((rgb.g<<8)|(rgb.b)));
+      return trueColour;
+    }
+
+    return;
+  }
+
+  /**
+   * Map the 256 AutoCAD colours to the equivalent rgb colour
+   */
+  static rgb_conversion_table = {
+
+    0: {r: 0, g: 0, b: 0}, // ByBlock
+    1: {r: 255, g: 0, b: 0},
+    2: {r: 255, g: 255, b: 0},
+    3: {r: 0, g: 255, b: 0},
+    4: {r: 0, g: 255, b: 255},
+    5: {r: 0, g: 0, b: 255},
+    6: {r: 255, g: 0, b: 255},
+    7: {r: 255, g: 255, b: 255}, // changes colour based on background colour
+    8: {r: 128, g: 128, b: 128},
+    9: {r: 192, g: 192, b: 129},
+    10: {r: 255, g: 0, b: 0},
+    11: {r: 255, g: 127, b: 127},
+    12: {r: 204, g: 0, b: 0},
+    13: {r: 204, g: 102, b: 102},
+    14: {r: 138, g: 0, b: 0},
+    15: {r: 138, g: 76, b: 76},
+    16: {r: 127, g: 0, b: 0},
+    17: {r: 127, g: 63, b: 63},
+    18: {r: 76, g: 0, b: 0},
+    19: {r: 76, g: 38, b: 38},
+    20: {r: 255, g: 63, b: 0},
+    21: {r: 255, g: 159, b: 127},
+    22: {r: 204, g: 51, b: 0},
+    23: {r: 204, g: 127, b: 102},
+    24: {r: 153, g: 38, b: 0},
+    25: {r: 153, g: 95, b: 76},
+    26: {r: 127, g: 31, b: 0},
+    27: {r: 127, g: 79, b: 63},
+    28: {r: 76, g: 19, b: 0},
+    29: {r: 76, g: 47, b: 38},
+    30: {r: 255, g: 127, b: 0},
+    31: {r: 255, g: 191, b: 127},
+    32: {r: 204, g: 94, b: 0},
+    33: {r: 204, g: 157, b: 102},
+    34: {r: 153, g: 76, b: 0},
+    35: {r: 153, g: 114, b: 76},
+    36: {r: 127, g: 63, b: 0},
+    37: {r: 127, g: 95, b: 63},
+    38: {r: 76, g: 38, b: 0},
+    39: {r: 76, g: 57, b: 38},
+    40: {r: 255, g: 191, b: 0},
+    41: {r: 255, g: 223, b: 127},
+    42: {r: 204, g: 127, b: 0},
+    43: {r: 204, g: 173, b: 102},
+    44: {r: 153, g: 114, b: 0},
+    45: {r: 153, g: 133, b: 76},
+    46: {r: 127, g: 95, b: 0},
+    47: {r: 127, g: 111, b: 63},
+    48: {r: 76, g: 57, b: 0},
+    49: {r: 76, g: 66, b: 38},
+    50: {r: 255, g: 255, b: 0},
+    51: {r: 255, g: 255, b: 127},
+    52: {r: 204, g: 204, b: 0},
+    38: {r: 204, g: 204, b: 102},
+    54: {r: 153, g: 153, b: 0},
+    55: {r: 153, g: 153, b: 76},
+    56: {r: 127, g: 127, b: 0},
+    57: {r: 127, g: 127, b: 63},
+    58: {r: 76, g: 76, b: 0},
+    59: {r: 76, g: 76, b: 38},
+    60: {r: 191, g: 255, b: 0},
+    61: {r: 223, g: 255, b: 127},
+    62: {r: 127, g: 204, b: 0},
+    63: {r: 173, g: 204, b: 102},
+    64: {r: 114, g: 153, b: 0},
+    65: {r: 133, g: 153, b: 76},
+    66: {r: 95, g: 127, b: 0},
+    67: {r: 111, g: 127, b: 63},
+    68: {r: 57, g: 76, b: 0},
+    69: {r: 66, g: 76, b: 38},
+    70: {r: 127, g: 255, b: 0},
+    71: {r: 191, g: 255, b: 127},
+    72: {r: 94, g: 204, b: 0},
+    73: {r: 157, g: 204, b: 102},
+    74: {r: 76, g: 153, b: 0},
+    75: {r: 114, g: 153, b: 76},
+    76: {r: 63, g: 127, b: 0},
+    77: {r: 95, g: 127, b: 63},
+    78: {r: 38, g: 76, b: 0},
+    79: {r: 57, g: 76, b: 38},
+    80: {r: 63, g: 255, b: 0},
+    81: {r: 159, g: 255, b: 127},
+    82: {r: 51, g: 204, b: 0},
+    83: {r: 127, g: 204, b: 102},
+    84: {r: 38, g: 153, b: 0},
+    85: {r: 95, g: 153, b: 76},
+    86: {r: 31, g: 127, b: 0},
+    87: {r: 79, g: 127, b: 63},
+    88: {r: 19, g: 76, b: 0},
+    89: {r: 47, g: 76, b: 38},
+    90: {r: 0, g: 255, b: 0},
+    91: {r: 127, g: 255, b: 127},
+    92: {r: 0, g: 204, b: 0},
+    93: {r: 102, g: 204, b: 102},
+    94: {r: 0, g: 153, b: 0},
+    95: {r: 76, g: 153, b: 76},
+    96: {r: 0, g: 127, b: 0},
+    97: {r: 63, g: 127, b: 63},
+    98: {r: 0, g: 76, b: 0},
+    99: {r: 38, g: 76, b: 38},
+    100: {r: 0, g: 255, b: 63},
+    101: {r: 127, g: 255, b: 159},
+    102: {r: 0, g: 204, b: 51},
+    103: {r: 102, g: 204, b: 127},
+    104: {r: 0, g: 153, b: 38},
+    105: {r: 76, g: 153, b: 95},
+    106: {r: 0, g: 127, b: 31},
+    107: {r: 63, g: 127, b: 79},
+    108: {r: 0, g: 76, b: 19},
+    109: {r: 38, g: 76, b: 47},
+    110: {r: 0, g: 255, b: 127},
+    111: {r: 127, g: 255, b: 191},
+    112: {r: 0, g: 204, b: 94},
+    113: {r: 102, g: 204, b: 157},
+    114: {r: 0, g: 153, b: 76},
+    115: {r: 76, g: 153, b: 114},
+    116: {r: 0, g: 127, b: 63},
+    117: {r: 63, g: 127, b: 95},
+    118: {r: 0, g: 76, b: 38},
+    119: {r: 38, g: 76, b: 57},
+    120: {r: 0, g: 255, b: 191},
+    121: {r: 127, g: 255, b: 223},
+    122: {r: 0, g: 204, b: 127},
+    123: {r: 102, g: 204, b: 173},
+    124: {r: 0, g: 153, b: 114},
+    125: {r: 76, g: 153, b: 133},
+    126: {r: 0, g: 127, b: 95},
+    127: {r: 63, g: 127, b: 111},
+    128: {r: 0, g: 76, b: 57},
+    129: {r: 38, g: 76, b: 66},
+    130: {r: 0, g: 255, b: 255},
+    131: {r: 127, g: 255, b: 255},
+    132: {r: 0, g: 204, b: 204},
+    133: {r: 102, g: 204, b: 204},
+    134: {r: 0, g: 153, b: 153},
+    135: {r: 76, g: 153, b: 153},
+    136: {r: 0, g: 127, b: 127},
+    137: {r: 63, g: 127, b: 127},
+    138: {r: 0, g: 76, b: 76},
+    139: {r: 38, g: 76, b: 76},
+    140: {r: 0, g: 191, b: 255},
+    141: {r: 127, g: 223, b: 255},
+    142: {r: 0, g: 127, b: 204},
+    143: {r: 102, g: 173, b: 204},
+    144: {r: 0, g: 114, b: 153},
+    145: {r: 76, g: 133, b: 153},
+    146: {r: 0, g: 95, b: 127},
+    147: {r: 63, g: 111, b: 127},
+    148: {r: 0, g: 57, b: 76},
+    149: {r: 38, g: 66, b: 76},
+    150: {r: 0, g: 127, b: 255},
+    151: {r: 127, g: 191, b: 255},
+    152: {r: 0, g: 94, b: 204},
+    138: {r: 102, g: 157, b: 204},
+    154: {r: 0, g: 76, b: 153},
+    155: {r: 76, g: 114, b: 153},
+    156: {r: 0, g: 63, b: 127},
+    157: {r: 63, g: 76, b: 127},
+    158: {r: 0, g: 38, b: 76},
+    159: {r: 38, g: 57, b: 76},
+    160: {r: 0, g: 63, b: 255},
+    161: {r: 127, g: 159, b: 255},
+    162: {r: 0, g: 51, b: 204},
+    163: {r: 102, g: 127, b: 204},
+    164: {r: 0, g: 38, b: 153},
+    165: {r: 76, g: 95, b: 153},
+    166: {r: 0, g: 31, b: 127},
+    167: {r: 63, g: 79, b: 127},
+    168: {r: 0, g: 19, b: 76},
+    169: {r: 38, g: 47, b: 76},
+    170: {r: 0, g: 0, b: 255},
+    171: {r: 127, g: 127, b: 255},
+    172: {r: 0, g: 0, b: 204},
+    173: {r: 102, g: 102, b: 204},
+    174: {r: 0, g: 0, b: 153},
+    175: {r: 76, g: 76, b: 153},
+    176: {r: 0, g: 0, b: 127},
+    177: {r: 63, g: 63, b: 127},
+    178: {r: 0, g: 0, b: 76},
+    179: {r: 38, g: 38, b: 76},
+    180: {r: 63, g: 0, b: 255},
+    181: {r: 159, g: 127, b: 255},
+    182: {r: 51, g: 0, b: 204},
+    183: {r: 127, g: 102, b: 204},
+    184: {r: 38, g: 0, b: 153},
+    185: {r: 95, g: 76, b: 153},
+    186: {r: 31, g: 0, b: 127},
+    187: {r: 95, g: 63, b: 127},
+    188: {r: 19, g: 0, b: 76},
+    204: {r: 59, g: 38, b: 76},
+    190: {r: 127, g: 0, b: 255},
+    191: {r: 191, g: 127, b: 255},
+    192: {r: 94, g: 0, b: 204},
+    193: {r: 157, g: 102, b: 204},
+    194: {r: 76, g: 0, b: 153},
+    195: {r: 114, g: 76, b: 153},
+    196: {r: 63, g: 0, b: 127},
+    197: {r: 95, g: 63, b: 127},
+    198: {r: 38, g: 0, b: 76},
+    199: {r: 57, g: 38, b: 76},
+    200: {r: 191, g: 0, b: 255},
+    201: {r: 223, g: 127, b: 255},
+    202: {r: 127, g: 0, b: 204},
+    203: {r: 173, g: 102, b: 204},
+    204: {r: 114, g: 0, b: 153},
+    204: {r: 118, g: 86, b: 153},
+    206: {r: 95, g: 0, b: 127},
+    207: {r: 111, g: 63, b: 127},
+    208: {r: 57, g: 0, b: 76},
+    209: {r: 66, g: 38, b: 76},
+    210: {r: 255, g: 0, b: 255},
+    211: {r: 255, g: 127, b: 255},
+    212: {r: 204, g: 0, b: 204},
+    213: {r: 204, g: 102, b: 204},
+    214: {r: 153, g: 0, b: 153},
+    215: {r: 153, g: 76, b: 153},
+    216: {r: 127, g: 0, b: 127},
+    217: {r: 127, g: 63, b: 127},
+    218: {r: 76, g: 0, b: 76},
+    219: {r: 76, g: 38, b: 76},
+    220: {r: 255, g: 0, b: 191},
+    221: {r: 255, g: 127, b: 223},
+    222: {r: 204, g: 0, b: 127},
+    223: {r: 204, g: 102, b: 173},
+    224: {r: 153, g: 0, b: 114},
+    225: {r: 153, g: 76, b: 133},
+    226: {r: 127, g: 0, b: 95},
+    227: {r: 127, g: 63, b: 111},
+    228: {r: 76, g: 0, b: 57},
+    229: {r: 76, g: 38, b: 66},
+    230: {r: 255, g: 0, b: 127},
+    231: {r: 255, g: 127, b: 191},
+    232: {r: 204, g: 0, b: 94},
+    233: {r: 204, g: 102, b: 157},
+    234: {r: 153, g: 0, b: 76},
+    235: {r: 153, g: 76, b: 114},
+    236: {r: 127, g: 0, b: 63},
+    237: {r: 127, g: 63, b: 95},
+    238: {r: 76, g: 0, b: 38},
+    239: {r: 76, g: 38, b: 57},
+    240: {r: 255, g: 0, b: 63},
+    241: {r: 255, g: 127, b: 159},
+    242: {r: 204, g: 0, b: 51},
+    243: {r: 204, g: 102, b: 127},
+    244: {r: 153, g: 0, b: 38},
+    245: {r: 153, g: 76, b: 95},
+    246: {r: 127, g: 0, b: 31},
+    247: {r: 127, g: 63, b: 79},
+    248: {r: 76, g: 0, b: 19},
+    249: {r: 76, g: 38, b: 47},
+    250: {r: 51, g: 51, b: 51},
+    251: {r: 91, g: 91, b: 91},
+    252: {r: 132, g: 132, b: 132},
+    253: {r: 173, g: 173, b: 173},
+    254: {r: 214, g: 214, b: 214},
+    255: {r: 255, g: 255, b: 255},
+    256: {r: 255, g: 255, b: 255}, // ByLayer
   };
 }
