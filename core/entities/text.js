@@ -319,7 +319,6 @@ export class Text extends Entity {
   }
 
   draw(ctx, scale) {
-    ctx.save();
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
 
@@ -391,7 +390,6 @@ export class Text extends Entity {
       ctx.showText(String(this.string));
     }
     ctx.stroke();
-    ctx.restore();
 
     // Draw Bounding Box to test the getBoundingRect()
     /*
