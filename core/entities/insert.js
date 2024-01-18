@@ -87,7 +87,7 @@ export class Insert extends Entity {
   }
 
   snaps(mousePoint, delta) {
-    snaps = [];
+    const snaps = [];
     return snaps;
   }
 
