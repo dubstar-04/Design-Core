@@ -319,6 +319,7 @@ export class Text extends Entity {
   }
 
   draw(ctx, scale) {
+    ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
 
@@ -390,6 +391,7 @@ export class Text extends Entity {
       ctx.showText(String(this.string));
     }
     ctx.stroke();
+    ctx.restore(); // restore context before scale and translate
 
     // Draw Bounding Box to test the getBoundingRect()
     /*
