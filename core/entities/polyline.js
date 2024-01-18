@@ -6,10 +6,10 @@ export class Polyline extends BasePolyline {
     super(data);
 
     if (data) {
-      if (data.children) {
+      if (data.hasOwnProperty('children')) {
       // remove any points
       // point data comes from the vertices
-        if (data.points) {
+        if (data.hasOwnProperty('points')) {
           this.points = [];
         }
 

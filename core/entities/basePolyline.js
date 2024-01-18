@@ -34,19 +34,19 @@ export class BasePolyline extends Entity {
     });
 
     if (data) {
-      if (data[40]) {
+      if (data.hasOwnProperty('40')) {
         // DXF Groupcode 40 - Start Width
       }
 
-      if (data[41]) {
+      if (data.hasOwnProperty('41')) {
         // DXF Groupcode 41 - End Width
       }
 
-      if (data[43]) {
+      if (data.hasOwnProperty('43')) {
         // DXF Groupcode 43 - Constant Width
       }
 
-      if (data.flags || data[70]) {
+      if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
         // DXF Groupcode 70 - Polyline flag (bit-coded; default = 0):
         // 1 = This is a closed polyline (or a polygon mesh closed in the M direction)
         // 2 = Curve-fit vertices have been added

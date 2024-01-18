@@ -18,12 +18,12 @@ export class Layer {
 
 
     if (data) {
-      if (data.name || data[2]) {
+      if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - Layer Name
         this.name = data.name || data[2];
       }
 
-      if (data.flags || data[70]) {
+      if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
       // DXF Groupcode 70 - Layer Flags
       // Standard flags (bit-coded values):
       // 1 = Layer is frozen; otherwise layer is thawed
@@ -55,7 +55,7 @@ export class Layer {
         }
       }
 
-      if (data.colour || data[62]) {
+      if (data.hasOwnProperty('colour') || data.hasOwnProperty('62')) {
         // DXF Groupcode 62 - Color Number(present if not BYLAYER)(optional);
         // zero indicates the BYBLOCK
         // 256 indicates BYLAYER;
@@ -71,23 +71,23 @@ export class Layer {
         }
       }
 
-      if (data.lineType || data[6]) {
+      if (data.hasOwnProperty('lineType') || data.hasOwnProperty('6')) {
         // DXF Groupcode 6 - Linetype Name
         this.lineType = data.lineType || data[6];
       }
 
-      if (data.lineWeight || data[370]) {
+      if (data.hasOwnProperty('lineWeight') || data.hasOwnProperty('370')) {
         // DXF Groupcode 370 - Linetype Weight
         this.lineWeight = data.lineWeight || data[370];
       }
 
-      if (data.plotting || data[290]) {
+      if (data.hasOwnProperty('plotting') || data.hasOwnProperty('290')) {
         // DXF Groupcode 290 - Plotting flag
         // If set to 0, do not plot this layer
         this.plotting = data.plotting || data[290];
       }
 
-      if (data.trueColour || data[420]) {
+      if (data.hasOwnProperty('trueColour') || data.hasOwnProperty('420')) {
         // DXF Groupcode 420 - true color
         // A 24-bit color value that should be dealt with in terms of bytes with values
         // of 0 to 255. The lowest byte is the blue value, the middle byte is the

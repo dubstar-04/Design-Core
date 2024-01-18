@@ -12,54 +12,54 @@ export class Insert extends Entity {
     });
 
     if (data) {
-      if (data.block || data[2]) {
+      if (data.hasOwnProperty('block') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - Block name
         this.block = data.block || data[2];
       }
 
-      if (data[41]) {
+      if (data.hasOwnProperty('41')) {
         // DXF Groupcode 41 - X Scale Factor (optional, default = 1)
         const err = 'Groupcode 41 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[42]) {
+      if (data.hasOwnProperty('42')) {
         // DXF Groupcode 42 - Y Scale Factor (optional, default = 1)
         const err = 'Groupcode 42 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[43]) {
+      if (data.hasOwnProperty('43')) {
         // DXF Groupcode 43 - Z Scale Factor (optional, default = 1)
         const err = 'Groupcode 43 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[44]) {
+      if (data.hasOwnProperty('44')) {
         // DXF Groupcode 44 - Column Spacing (optional, default = 0)
         const err = 'Groupcode 44 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[45]) {
+      if (data.hasOwnProperty('45')) {
         // DXF Groupcode 45 - Row Spacing (optional, default = 0)
         const err = 'Groupcode 45 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[50]) {
+      if (data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Rotation Angle (optional, default = 0)
         const err = 'Groupcode 50 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[70]) {
+      if (data.hasOwnProperty('70')) {
         // DXF Groupcode 70 - Column Count (optional, default = 1)
         const err = 'Groupcode 70 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[71]) {
+      if (data.hasOwnProperty('71')) {
         // DXF Groupcode 71 - Row Count(optional, default = 1)
         const err = 'Groupcode 71 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);

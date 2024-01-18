@@ -62,12 +62,12 @@ export class Entity {
       }
 
 
-      if (data.lineType || data[6]) {
+      if (data.hasOwnProperty('lineType') || data.hasOwnProperty('6')) {
         // DXF Groupcode 6 - lineType
         this.lineType = data.lineType || data[6];
       }
 
-      if (data.layer || data[8]) {
+      if (data.hasOwnProperty('layer') || data.hasOwnProperty('8')) {
         // DXF Groupcode 8 - layername
         this.layer = data.layer || data[8];
       }

@@ -24,7 +24,7 @@ export class Circle extends Entity {
     // this.setRadius(1);
 
     if (data) {
-      if (data.radius || data[40]) {
+      if (data.hasOwnProperty('radius') || data.hasOwnProperty('40')) {
         // DXF Groupcode 40 - Radius
         const radius = data.radius || data[40];
         this.setRadius(radius);

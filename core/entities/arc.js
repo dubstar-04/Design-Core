@@ -22,7 +22,7 @@ export class Arc extends Entity {
     });
 
     if (data) {
-      if (data.points || data[40]) {
+      if (data.hasOwnProperty('points') || data.hasOwnProperty('40')) {
         // DXF Groupcode 40 - Radius
         // get the radius from the points or the incoming dxf groupcode
         const radius = this.points[1] ? this.points[0].distance(this.points[1]) : data[40];
@@ -32,13 +32,13 @@ export class Arc extends Entity {
         }
       }
 
-      if (data.hasOwnProperty('startAngle') || data[50]) {
+      if (data.hasOwnProperty('startAngle') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Start Angle
         const angle = Utils.degrees2radians(data.startAngle || data[50]);
         this.points[1] = this.points[0].project(angle, this.radius);
       }
 
-      if (data.hasOwnProperty('endAngle') || data[51]) {
+      if (data.hasOwnProperty('endAngle') || data.hasOwnProperty('51')) {
         // DXF Groupcode 51 - End Angle
         const angle = Utils.degrees2radians(data.endAngle || data[51]);
         this.points[2] = this.points[0].project(angle, this.radius);

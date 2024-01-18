@@ -10,7 +10,7 @@ export class SelectionWindow {
     this.dashPattern = [];
 
     if (data) {
-      if (data.points) {
+      if (data.hasOwnProperty('points')) {
         if (data.points[1].y > data.points[0].y) {
           this.colour = DesignCore.Settings.selectionWindow;
           this.dashPattern = [5];
