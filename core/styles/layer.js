@@ -176,8 +176,9 @@ export class Layer {
       file.writeGroupCode('420', Colours.rgbToTrueColour(this.colour));
     }
     file.writeGroupCode('6', this.lineType);
+    file.writeGroupCode('290', this.plotting ? 1 : 0); // plotting - required to be 0 for defpoints
     file.writeGroupCode('390', file.nextHandle(), DXFFile.Version.R2000); // plotstylename handle - //TODO: this needs to be linked to the actual plotstyle
-    // file.writeGroupCode('290', this.plotting ? 1 : 0); //plotting   |   These items codes don't seem to be
-    // file.writeGroupCode('370', 'this.lineWeight '); // lineWeight      |   supported in ACAD.
+
+    // file.writeGroupCode('370', 'this.lineWeight '); // lineWeight      |  These items codes don't seem to be supported in ACAD.
   }
 }
