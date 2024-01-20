@@ -117,7 +117,7 @@ export class Block extends Entity {
     /*
         //////////////////////////////////////////
         // draw test point for location
-        ctx.strokeStyle = colour;
+        ctx.strokeStyle = Colours.rgbToString(colour);
         ctx.lineWidth = 1 / scale;
         ctx.beginPath()
         ctx.moveTo(this.points[0].x, this.points[0].y);

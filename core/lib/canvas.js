@@ -258,7 +258,7 @@ export class Canvas {
     let lineWidth = 0.75;
 
     try { // HTML Canvas
-      context.strokeStyle = DesignCore.Settings.gridcolour;
+      context.strokeStyle = Colours.rgbToString(DesignCore.Settings.gridcolour);
       context.lineWidth = lineWidth / this.getScale();
       context.beginPath();
     } catch { // Cairo

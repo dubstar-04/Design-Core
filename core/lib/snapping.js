@@ -15,7 +15,7 @@ class SnapPoint {
     const radius = 4;
 
     try { // HTML Canvas
-      ctx.strokeStyle = snapColour;
+      ctx.fillStyle = Colours.rgbToString(snapColour);
       ctx.beginPath();
     } catch { // Cairo
       const rgbColour = Colours.rgbToScaledRGB(snapColour);
