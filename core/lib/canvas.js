@@ -233,7 +233,6 @@ export class Canvas {
    * Set the scene context
    * @param {entity} item
    * @param {object} context - scene painting context from ui
-   * @param {string} contextColour - colour to overide item colour
    */
   setContext(item, context) {
     const colour = item.getColour();
@@ -247,7 +246,7 @@ export class Canvas {
       context.setLineDash(lineType.getPattern(this.getScale()));
       context.beginPath();
     } catch { // Cairo
-      const rgbColour = Colours.rgbToScaledRGB(colour); // Colours.hexToScaledRGB(colour);
+      const rgbColour = Colours.rgbToScaledRGB(colour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       context.setDash(lineType.getPattern(this.getScale()), 1);
       context.setLineWidth(lineWidth);
