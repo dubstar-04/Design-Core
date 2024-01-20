@@ -6,7 +6,7 @@ export class Lwpolyline extends BasePolyline {
     super(data);
 
     if (data) {
-      if (data[90]) {
+      if (data.hasOwnProperty('90')) {
         // DXF Groupcode 90 - Number of vertices
         if (this.points.length !== data[90]) {
           Logging.instance.error(`LWPOLYLINE Vertices Count`);

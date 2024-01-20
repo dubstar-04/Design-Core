@@ -178,7 +178,7 @@ export class SelectionManager {
    */
   addToSelectedItems(index) {
     const copyofitem = Utils.cloneObject(DesignCore.Scene.items[index]);
-    copyofitem.colour = DesignCore.Core.settings.selecteditemscolour.toString();
+    copyofitem.colour = DesignCore.Core.settings.selecteditemscolour;
     copyofitem.lineWidth = copyofitem.lineWidth * 2;
     this.selectedItems.push(copyofitem);
   }

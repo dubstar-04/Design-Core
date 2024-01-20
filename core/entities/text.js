@@ -19,7 +19,7 @@ export class Text extends Entity {
     this.styleName = 'STANDARD';
 
 
-    // hide inherited propertys
+    // hide inherited properties
     // needs to be enumerable=false to not appear in the object props
     Object.defineProperty(this, 'lineType', {
       enumerable: false,
@@ -67,23 +67,27 @@ export class Text extends Entity {
     });
 
     if (data) {
-      if (data.string || data[1]) {
+      if (data.hasOwnProperty('string') || data.hasOwnProperty('1')) {
         // DXF Groupcode 1 - Default Value
         // The string of the text entity
-        this.string = String(data.string || data[1]);
+
+        const string = (data.string || data[1]);
+        if (string !== undefined) {
+          this.string = String(string);
+        }
       }
 
-      if (data.styleName || data[7]) {
+      if (data.hasOwnProperty('styleName') || data.hasOwnProperty('7')) {
         // DXF Groupcode 7 - Text Style Name
         this.styleName = data.styleName || data[7];
       }
 
-      if (data.height || data[40]) {
+      if (data.hasOwnProperty('height') || data.hasOwnProperty('40')) {
         // DXF Groupcode 40 - Text Height
         this.height = data.height || data[40];
       }
 
-      if (data.rotation || data[50]) {
+      if (data.hasOwnProperty('rotation') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Text Rotation, angle in degrees
         // if we get rotation data store this as a point[1] at an angle from point[0]
         // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
@@ -95,7 +99,7 @@ export class Text extends Entity {
         this.points[1] = data.points[0].add(new Point(this.height, 0));
       }
 
-      if (data.horizontalAlignment || data[72]) {
+      if (data.hasOwnProperty('horizontalAlignment') || data.hasOwnProperty('72')) {
         // DXF Groupcode 72 - Horizontal Alignment
         // 0 = Left; 1= Center; 2 = Right
         // 3 = Aligned (if vertical alignment = 0)
@@ -104,13 +108,13 @@ export class Text extends Entity {
         this.horizontalAlignment = data.horizontalAlignment || data[72];
       }
 
-      if (data.verticalAlignment || data[73]) {
+      if (data.hasOwnProperty('verticalAlignment') || data.hasOwnProperty('73')) {
         // DXF Groupcode 73 - Vertical Alignment
         // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
         this.verticalAlignment = data.verticalAlignment || data[73];
       }
 
-      if (data.flags || data[71]) {
+      if (data.hasOwnProperty('flags') || data.hasOwnProperty('71')) {
         // DXF Groupcode 71 - flags (bit-coded values):
         // 2 = Text is backward (mirrored in X).
         // 4 = Text is upside down (mirrored in Y).
@@ -319,7 +323,7 @@ export class Text extends Entity {
   }
 
   draw(ctx, scale) {
-    ctx.save();
+    ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
 
@@ -355,8 +359,6 @@ export class Text extends Entity {
       ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
       this.boundingRect = ctx.textExtents(String(this.string));
 
-      // console.log(this.boundingRect);
-
       let x = 0;
       let y = 0;
       switch (this.horizontalAlignment) {
@@ -391,7 +393,7 @@ export class Text extends Entity {
       ctx.showText(String(this.string));
     }
     ctx.stroke();
-    ctx.restore();
+    ctx.restore(); // restore context before scale and translate
 
     // Draw Bounding Box to test the getBoundingRect()
     /*

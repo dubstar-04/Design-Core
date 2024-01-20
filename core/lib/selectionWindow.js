@@ -1,20 +1,21 @@
+import {DesignCore} from '../designCore.js';
 import {Point} from '../entities/point.js';
 import {Colours} from './colours.js';
 
 
 export class SelectionWindow {
   constructor(data) {
-    this.colour = '#FF0000';
+    this.colour = DesignCore.Settings.selectionWindow;
     this.lineWidth = 1;
     this.dashPattern = [];
 
     if (data) {
-      if (data.points) {
+      if (data.hasOwnProperty('points')) {
         if (data.points[1].y > data.points[0].y) {
-          this.colour = '#FF0000';
+          this.colour = DesignCore.Settings.selectionWindow;
           this.dashPattern = [5];
         } else {
-          this.colour = '#0000FF';
+          this.colour = DesignCore.Settings.crossingWindow;
         }
 
         this.points = [];
@@ -48,7 +49,7 @@ export class SelectionWindow {
       ctx.stroke();
     } catch { // Cairo
       ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.hexToScaledRGB(colour);
+      const rgbColour = Colours.rgbToScaledRGB(colour);
       ctx.setSourceRGBA(rgbColour.r, rgbColour.g, rgbColour.b, 0.2);
       this.drawRect(ctx);
       ctx.fillPreserve();

@@ -20,7 +20,7 @@ export class PropertyManager {
   }
 
   setItemProperties(property, newPropertyValue) {
-    for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       // check if the item has the selected property
       if (!DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].hasOwnProperty(property)) {
         continue;
@@ -100,7 +100,7 @@ export class PropertyManager {
     // Loop through the items and get a list the property values
     const propertiesValueList = [];
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
-      for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         if (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].type === itemType || itemType === 'All') {
           const prop = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]][property];
           propertiesValueList.push(prop);
@@ -108,7 +108,8 @@ export class PropertyManager {
       }
     }
 
-    if (propertiesValueList.every(function(prop) {
+    // Check if every item in the selection set has the same value for the property
+    if (propertiesValueList.every((prop) => {
       return prop === propertiesValueList[0];
     })) {
       return propertiesValueList[0];

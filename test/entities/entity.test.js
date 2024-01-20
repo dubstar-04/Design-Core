@@ -8,9 +8,9 @@ import {Point} from '../../core/entities/point.js';
 // initialise core
 new Core();
 
-test('Test Entity.getColour', () => {
+test('Test Entity.colour', () => {
   const entity = new Entity();
-  expect(entity.getColour()).toBe('#00BFFF');
+  expect(entity.colour).toEqual({'r': 1, 'g': 1, 'b': 1});
 });
 
 test('Test Entity.getLineType', () => {

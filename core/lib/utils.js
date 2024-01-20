@@ -33,6 +33,7 @@ export class Utils {
    */
   static cloneObject(obj) {
     // deep clone obj and all its attributes
+
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }

@@ -12,7 +12,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.3.0",
     "eslint-plugin-promise": "^6.1.1",
-    "jest": "^29.2.2"
+    "jest": "^29.7.0"
   },
   "description": "2D CAD Library",
   "exports": {
@@ -21,8 +21,6 @@
   },
   "directories": {
     "test": "test"
-  },
-  "dependencies": {
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,9 @@
 import {Colours} from '../lib/colours.js';
+import {EntityColour} from '../lib/colour.js';
 import {Intersection} from '../lib/intersect.js';
 import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
+
 
 import {DesignCore} from '../designCore.js';
 
@@ -17,33 +19,41 @@ export class Entity {
       writable: true,
     });
 
-    /*
-    Object.defineProperty(this, 'trueColour', {
-      //enumerable: false,
+    Object.defineProperty(this, 'colour', {
+      get: this.getColour,
+      set: this.setColour,
+    });
+
+    Object.defineProperty(this, 'entityColour', {
+      value: new EntityColour(),
       writable: true,
     });
-    */
 
     this.lineWidth = 2;
-    this.colour = 'BYLAYER';
     this.lineType = 'BYLAYER';
     this.layer = '0';
 
 
     if (data) {
-      if (data.points) {
+      if (data.hasOwnProperty('points')) {
         this.points = data.points;
       }
 
-      if (data.colour || data[62]) {
-        // DXF Groupcode 62 - Color Number
-        // (present if not BYLAYER); zero indicates the BYBLOCK
-        // (floating) color; 256 indicates BYLAYER; a negative value indicates that
-        // the layer is turned off (optional)
-        this.colour = data.colour || Colours.getHexColour(data[62]);
+      if (data.hasOwnProperty('colour') || data.hasOwnProperty('62')) {
+        // DXF Groupcode 62 - Color Number (present if not BYLAYER)(optional);
+        // zero indicates BYBLOCK
+        // 256 indicates BYLAYER;
+        // a negative value indicates that the layer is turned off
+        if (data.colour) {
+          if (Colours.isRGB(data.colour)) {
+            this.colour = data.colour;
+          }
+        } else if (data.hasOwnProperty('62')) {
+          this.entityColour.setColourFromACI(Math.abs(data[62]));
+        }
       }
 
-      if (data.trueColour || data[420]) {
+      if (data.hasOwnProperty('trueColour') || data.hasOwnProperty('420')) {
         // DXF Groupcode 420 - true color
         // A 24-bit color value that should be dealt with in terms of bytes with values
         // of 0 to 255. The lowest byte is the blue value, the middle byte is the
@@ -51,37 +61,56 @@ export class Entity {
         // 0. The group code cannot be used by custom entities for their own data
         // because the group code is reserved for AcDbEntity, class-level color data
         // and AcDbEntity, class-level transparency data
-        // this.trueColour = data.trueColour;
-        const err = 'Groupcode 420 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
+
+        const trueColour = Colours.trueColourToRGB(data.trueColour || data[420]);
+        if (trueColour) {
+          this.colour = trueColour;
+        }
       }
 
 
-      if (data.lineType || data[6]) {
+      if (data.hasOwnProperty('lineType') || data.hasOwnProperty('6')) {
         // DXF Groupcode 6 - lineType
         this.lineType = data.lineType || data[6];
       }
 
-      if (data.layer || data[8]) {
+      if (data.hasOwnProperty('layer') || data.hasOwnProperty('8')) {
         // DXF Groupcode 8 - layername
         this.layer = data.layer || data[8];
       }
     }
   }
 
+
+  /**
+   * get rgb colour
+   * @returns rgb colour object
+   */
   getColour() {
-    // if (this.trueColour !== undefined) {
-    //   return this.trueColour;
-    // }
+    return this.entityColour.getColour(); ;
+  }
 
-    let colour = this.colour;
+  /**
+   * get rgb colour to draw
+   * @returns rgb colour object
+   */
+  getDrawColour() {
+    let rgb = this.getColour();
 
-    if (colour === 'BYLAYER') {
+    if (this.entityColour.byLayer) {
       const layer = DesignCore.LayerManager.getStyleByName(this.layer);
-      colour = layer.colour;
+      rgb = layer.colour;
     }
 
-    return colour;
+    return rgb;
+  }
+
+  /**
+   * Set the entity colour
+   * @param {object} rgb
+   */
+  setColour(rgb) {
+    this.entityColour.setColour(rgb);
   }
 
   getLineType() {

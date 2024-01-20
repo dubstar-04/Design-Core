@@ -13,7 +13,7 @@ export class Line extends Entity {
     super(data);
 
     if (data) {
-      if (data.points) {
+      if (data.hasOwnProperty('points')) {
         // clear points
         this.points = [];
 

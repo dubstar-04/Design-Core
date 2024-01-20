@@ -48,7 +48,7 @@ export class BaseDimension extends Entity {
     });
 
     if (data) {
-      if (data[1]) {
+      if (data.hasOwnProperty('1')) {
         // DXF Groupcode 1 - Dimension text
         // The string explicitly entered by the user.
         // Optional; default is the measurement. If null or “<>”, the dimension measurement is drawn as the text,
@@ -58,27 +58,27 @@ export class BaseDimension extends Entity {
       }
 
       /*
-      if (data.block) {
+      if (data.hasOwnProperty('block')) {
         // Reference to block that contains the entities that make up this dimension
         this.block = data.block;
       }*/
 
-      if (data.blockName || data[2]) {
+      if (data.hasOwnProperty('blockName') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - Blockname
         this.blockName = data.blockName || data[2];
       }
 
-      if (data.styleName || data[3]) {
+      if (data.hasOwnProperty('styleName') || data.hasOwnProperty('3')) {
         // DXF Groupcode 3 - Dimension Style Name
         this.styleName = data.styleName || data[3];
       }
 
-      if (data[40]) {
+      if (data.hasOwnProperty('40')) {
         // DXF Groupcode 40 - Leader length for radius and diameter dimensions
         this.leaderLength = data[40];
       }
 
-      if (data[41]) {
+      if (data.hasOwnProperty('41')) {
         // DXF Groupcode 41 - Line Spacing Factor
         // Percentage of default (3-on-5) line spacing to be applied.
         // Valid values range from 0.25 to 4.00
@@ -86,19 +86,19 @@ export class BaseDimension extends Entity {
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[42]) {
+      if (data.hasOwnProperty('42')) {
         // DXF Groupcode 42 - Actual Measurement
         // Read-only
         const err = 'Groupcode 42 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[50]) {
+      if (data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Angle of rotated, horizontal, or vertical dimensions
         this.linearDimAngle = data[50];
       }
 
-      if (data[51]) {
+      if (data.hasOwnProperty('51')) {
         // DXF Groupcode 51 - Horizontal Direction
         // All dimension types have an optional 51 group code, which indicates the horizontal direction
         // for the dimension entity. The dimension entity determines the orientation of dimension
@@ -109,13 +109,13 @@ export class BaseDimension extends Entity {
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data.angle || data[53]) {
+      if (data.hasOwnProperty('angle') || data.hasOwnProperty('53')) {
         // DXF Groupcode 53 - Rotation
         // rotation angle of the dimension text away from its default orientation
         this.angle = data.angle || data[53];
       }
 
-      if (data.dimType || data[70]) {
+      if (data.hasOwnProperty('dimType') || data.hasOwnProperty('70')) {
         // DXF Groupcode 70 - Dimension Type
         // Values 0-6 are integer values that represent the dimension type. Values 32, 64, and 128
         // are bit values, which are added to the integer values
@@ -135,7 +135,7 @@ export class BaseDimension extends Entity {
         this.dimType = data.dimType || data[70];
       }
 
-      if (data[71]) {
+      if (data.hasOwnProperty('71')) {
         // DXF Groupcode 71 - Attachment Point
         // 1 = Top left; 2 = Top center; 3 = Top right
         // 4 = Middle left; 5 = Middle center; 6 = Middle right
@@ -144,7 +144,7 @@ export class BaseDimension extends Entity {
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data[72]) {
+      if (data.hasOwnProperty('72')) {
         // DXF Groupcode 72 - Line Spacing
         // 1 (or missing) = At least (taller characters will override)
         // 2 = Exact (taller characters will not override)

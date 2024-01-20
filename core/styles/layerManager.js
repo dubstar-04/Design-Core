@@ -2,6 +2,7 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Layer} from './layer.js';
 import {StyleManagerBase} from './styleManagerBase.js';
 
+
 export class LayerManager extends StyleManagerBase {
   constructor() {
     super();
@@ -15,10 +16,8 @@ export class LayerManager extends StyleManagerBase {
   }
 
   addStandardStyles() {
-    this.addStyle({'name': '0', 'colour': '#00BFFF'});
+    this.addStyle({'name': '0'});
     this.addStyle({'name': 'DEFPOINTS', 'plotting': false});
-    // this.addStyle({'name': 'CENTERLINE', 'colour': '#FFFF00', 'lineType': 'CENTER'});
-    // this.addStyle({'name': 'HIDDEN', 'colour': '#D6D6D6', 'lineType': 'HIDDEN'});
   }
 
   dxf(file) {
