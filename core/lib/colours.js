@@ -147,7 +147,7 @@ export class Colours {
     4: {r: 0, g: 255, b: 255},
     5: {r: 0, g: 0, b: 255},
     6: {r: 255, g: 0, b: 255},
-    7: {r: 255, g: 255, b: 255}, // changes colour based on background colour
+    7: {r: 254, g: 254, b: 254}, // changes colour based on background colour (use {254, 254, 254} to be unique)
     8: {r: 128, g: 128, b: 128},
     9: {r: 192, g: 192, b: 129},
     10: {r: 255, g: 0, b: 0},
@@ -396,6 +396,6 @@ export class Colours {
     253: {r: 173, g: 173, b: 173},
     254: {r: 214, g: 214, b: 214},
     255: {r: 255, g: 255, b: 255},
-    256: {r: 255, g: 255, b: 255}, // ByLayer
+    256: {r: 1, g: 1, b: 1}, // ByLayer (Adjusted to {1, 1, 1} to be unique)
   };
 }
