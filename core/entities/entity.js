@@ -19,8 +19,17 @@ export class Entity {
       writable: true,
     });
 
+    Object.defineProperty(this, 'colour', {
+      get: this.getColour,
+      set: this.setColour,
+    });
+
+    Object.defineProperty(this, 'entityColour', {
+      value: new EntityColour(),
+      writable: true,
+    });
+
     this.lineWidth = 2;
-    this.colour = new EntityColour();
     this.lineType = 'BYLAYER';
     this.layer = '0';
 
@@ -35,14 +44,12 @@ export class Entity {
         // zero indicates BYBLOCK
         // 256 indicates BYLAYER;
         // a negative value indicates that the layer is turned off
-        let aci;
-        if (data.colour && data.colour.hasOwnProperty('aci')) {
-          // get the aci number from the colour
-          aci = data.colour.aci;
-        }
-
-        if (aci !== undefined || data.hasOwnProperty('62')) {
-          this.colour.setColourFromACI(aci || data[62]);
+        if (data.colour) {
+          if (Colours.isRGB(data.colour)) {
+            this.colour = data.colour;
+          }
+        } else if (data.hasOwnProperty('62')) {
+          this.entityColour.setColourFromACI(math.abs(data[62]));
         }
       }
 
@@ -57,7 +64,7 @@ export class Entity {
 
         const trueColour = Colours.trueColourToRGB(data.trueColour || data[420]);
         if (trueColour) {
-          this.colour.setColour(trueColour);
+          this.colour = trueColour;
         }
       }
 
@@ -74,12 +81,25 @@ export class Entity {
     }
   }
 
-  getColour() {
-    let rgb = this.colour.getColour();
 
-    if (this.colour.byLayer) {
+  /**
+   * get rgb colour
+   * @returns rgb colour object
+   */
+  getColour() {
+    return this.entityColour.getColour(); ;
+  }
+
+  /**
+   * get rgb colour to draw
+   * @returns rgb colour object
+   */
+  getDrawColour() {
+    let rgb = this.getColour();
+
+    if (this.entityColour.byLayer) {
       const layer = DesignCore.LayerManager.getStyleByName(this.layer);
-      rgb = layer.getColour();
+      rgb = layer.colour;
     }
 
     return rgb;
@@ -90,7 +110,7 @@ export class Entity {
    * @param {object} rgb
    */
   setColour(rgb) {
-    this.colour.setColour(rgb);
+    this.entityColour.setColour(rgb);
   }
 
   getLineType() {
