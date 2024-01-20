@@ -108,7 +108,8 @@ export class PropertyManager {
       }
     }
 
-    if (propertiesValueList.every(function(prop) {
+    // Check if every item in the selection set has the same value for the property
+    if (propertiesValueList.every((prop) => {
       return prop === propertiesValueList[0];
     })) {
       return propertiesValueList[0];
