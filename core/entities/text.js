@@ -397,7 +397,7 @@ export class Text extends Entity {
 
     // Draw Bounding Box to test the getBoundingRect()
     /*
-        ctx.strokeStyle = colour;
+        ctx.strokeStyle = Colours.rgbToString(colour);
         ctx.lineWidth = 1 / scale;
         ctx.beginPath()
         ctx.moveTo(rect.x, rect.y);

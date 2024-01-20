@@ -36,7 +36,8 @@ export class SelectionWindow {
     const scaledPattern = this.dashPattern.map((x) => x / scale);
 
     try { // HTML Canvas
-      ctx.strokeStyle = colour;
+      ctx.strokeStyle = Colours.rgbToString(colour);
+      ctx.fillStyle = Colours.rgbToString(colour);
       ctx.lineWidth = this.lineWidth / scale;
       ctx.beginPath();
       ctx.globalAlpha = 0.2;
