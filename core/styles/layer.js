@@ -75,7 +75,7 @@ export class Layer {
             this.colour = data.colour;
           }
         } else if (data.hasOwnProperty('62')) {
-          this.layerColour.setColourFromACI(math.abs(data[62]));
+          this.layerColour.setColourFromACI(Math.abs(data[62]));
         }
       }
 

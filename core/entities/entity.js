@@ -49,7 +49,7 @@ export class Entity {
             this.colour = data.colour;
           }
         } else if (data.hasOwnProperty('62')) {
-          this.entityColour.setColourFromACI(math.abs(data[62]));
+          this.entityColour.setColourFromACI(Math.abs(data[62]));
         }
       }
 
