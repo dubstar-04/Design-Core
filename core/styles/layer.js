@@ -170,9 +170,9 @@ export class Layer {
     file.writeGroupCode('100', 'AcDbLayerTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Layername
     file.writeGroupCode('70', this.getFlags()); // Flags
-    const colourValue = this.on ? this.colour.aci: (0 - this.colour.aci);
+    const colourValue = this.on ? this.layerColour.aci: (0 - this.layerColour.aci);
     file.writeGroupCode('62', colourValue); // Colour: Negative if layer is off
-    if (this.colour.isTrueColour) {
+    if (this.layerColour.isTrueColour) {
       file.writeGroupCode('420', Colours.rgbToTrueColour(this.colour));
     }
     file.writeGroupCode('6', this.lineType);
