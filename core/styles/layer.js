@@ -10,11 +10,20 @@ export class Layer {
     this.frozen = false;
     this.on = true;
     this.locked = false;
-    this.colour = new Colour(); // Colours.aciToRGB(7); // RGB Colour
     // this.trueColour; // undefined - only used when non-aci colours are set
     this.lineType = 'CONTINUOUS';
     this.lineWeight = 'DEFAULT';
     this.plotting = true;
+
+    Object.defineProperty(this, 'colour', {
+      get: this.getColour,
+      set: this.setColour,
+    });
+
+    Object.defineProperty(this, 'layerColour', {
+      value: new Colour(),
+      writable: true,
+    });
 
 
     if (data) {
@@ -61,13 +70,12 @@ export class Layer {
         // 256 indicates BYLAYER;
         // A negative value indicates that the layer is turned off
 
-        let aci;
-        if (data.colour && data.colour.hasOwnProperty('aci')) {
-          // get the aci number from the colour
-          aci = data.colour.aci;
-        }
-        if (aci || data[62]) {
-          this.colour.setColourFromACI(aci|| data[62]);
+        if (data.colour) {
+          if (Colours.isRGB(data.colour)) {
+            this.colour = data.colour;
+          }
+        } else if (data.hasOwnProperty('62')) {
+          this.layerColour.setColourFromACI(math.abs(data[62]));
         }
       }
 
@@ -97,7 +105,7 @@ export class Layer {
         // and AcDbEntity, class-level transparency data
         const trueColour = Colours.trueColourToRGB(Math.abs(data.trueColour || data[420]));
         if (trueColour) {
-          this.colour.setColour(trueColour);
+          this.colour = trueColour;
         }
       }
     }
@@ -119,8 +127,12 @@ export class Layer {
     return false;
   }
 
+  /**
+   * Get the layer colour
+   * @returns rgb colour
+   */
   getColour() {
-    return this.colour.getColour();
+    return this.layerColour.getColour();
   }
 
   /**
@@ -128,7 +140,7 @@ export class Layer {
    * @param {object} colour - rgb colour
    */
   setColour(colour) {
-    this.colour.setColour(colour);
+    this.layerColour.setColour(colour);
   }
 
   getFlags() {
@@ -161,7 +173,7 @@ export class Layer {
     const colourValue = this.on ? this.colour.aci: (0 - this.colour.aci);
     file.writeGroupCode('62', colourValue); // Colour: Negative if layer is off
     if (this.colour.isTrueColour) {
-      file.writeGroupCode('420', Colours.rgbToTrueColour(this.getColour()));
+      file.writeGroupCode('420', Colours.rgbToTrueColour(this.colour));
     }
     file.writeGroupCode('6', this.lineType);
     file.writeGroupCode('390', file.nextHandle(), DXFFile.Version.R2000); // plotstylename handle - //TODO: this needs to be linked to the actual plotstyle
