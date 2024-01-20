@@ -100,7 +100,7 @@ export class PropertyManager {
     // Loop through the items and get a list the property values
     const propertiesValueList = [];
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
-      for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         if (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].type === itemType || itemType === 'All') {
           const prop = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]][property];
           propertiesValueList.push(prop);
