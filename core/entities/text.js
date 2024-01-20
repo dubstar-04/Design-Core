@@ -359,8 +359,6 @@ export class Text extends Entity {
       ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
       this.boundingRect = ctx.textExtents(String(this.string));
 
-      // console.log(this.boundingRect);
-
       let x = 0;
       let y = 0;
       switch (this.horizontalAlignment) {

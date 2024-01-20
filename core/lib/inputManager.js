@@ -331,8 +331,6 @@ export class InputManager {
    * Handle single selection
    */
   singleSelect() {
-    // console.log('single select');
-    // const point = DesignCore.Mouse.pointOnScene();
     this.inputPoint = DesignCore.Mouse.pointOnScene();
     this.onLeftClick(this.inputPoint);
   }
@@ -341,7 +339,6 @@ export class InputManager {
    * Handle window selection
    */
   windowSelect() {
-    // console.log('window select');
     DesignCore.Scene.selectionManager.windowSelect();
   }
 
