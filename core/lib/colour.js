@@ -29,11 +29,17 @@ export class Colour {
       if (aci !== undefined) {
         this.aci = aci;
       } else {
+        // fall back to aci 7 when non aci colours are selected
+        // e.g. when using truecolour
         this.aci = 7;
       }
     }
   }
 
+  /**
+   * Set rgb colour based on autocad colour index
+   * @param {number} aci
+   */
   setColourFromACI(aci) {
     const rgb = Colours.aciToRGB(Math.abs(aci));
     if (rgb) {
