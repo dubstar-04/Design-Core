@@ -235,7 +235,7 @@ export class Canvas {
    * @param {object} context - scene painting context from ui
    */
   setContext(item, context) {
-    const colour = item.getColour();
+    const colour = item.getDrawColour();
     const lineType = item.getLineType();
     const lineWidth = item.lineWidth / this.getScale();
 
