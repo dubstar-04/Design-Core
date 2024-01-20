@@ -16,7 +16,7 @@ test('Test Colours.aciToRGB', () => {
 
 test('Test Colours.rgbToACI', () => {
   expect(Colours.rgbToACI({r: 0, g: 0, b: 0})).toEqual(0);
-  expect(Colours.rgbToACI({r: 255, g: 255, b: 255})).toEqual(7);
+  expect(Colours.rgbToACI({r: 254, g: 254, b: 254})).toEqual(7);
 });
 
 test('Test Colours.rgbToString', () => {

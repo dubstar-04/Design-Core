@@ -11,14 +11,14 @@ const point2 = new Point(0, 100);
 
 const data = {
   points: [point1, point2],
-  colour: '#FFFFFF',
+  colour: {r: 100, g: 100, b: 100},
 };
 
 DesignCore.Scene.addItem('Line', data);
 DesignCore.Scene.addItem('Circle', data);
 DesignCore.Scene.addItem('Text', data);
 // Add Arc with a different Colour
-DesignCore.Scene.addItem('Arc', {points: [point1, point2], colour: '#000000'});
+DesignCore.Scene.addItem('Arc', {points: [point1, point2], colour: {r: 130, g: 130, b: 130}});
 
 test('Test propertyManager.getItemTypes', () => {
   // Add an item to the selectionSet
@@ -102,8 +102,7 @@ test('Test propertyManager.getItemPropertyValue', () => {
   DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(0);
   // get the line colour
   propertyValues = propertiesManager.getItemPropertyValue('Line', 'colour');
-  expect(propertyValues.length).toBeGreaterThan(0);
-  expect(propertyValues).toBe(data.colour);
+  expect(propertyValues).toEqual(data.colour);
 
   // get circle props with a line selected - should be undefined
   propertyValues = propertiesManager.getItemPropertyValue('Circle', 'colour');

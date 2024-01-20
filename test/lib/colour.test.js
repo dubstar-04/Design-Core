@@ -4,7 +4,7 @@ import {Colour, EntityColour} from '../../core/lib/colour.js';
 test('Test Colour', () => {
   const colour = new Colour();
   expect(colour.aci).toEqual(7);
-  expect(colour.rgb).toEqual({'b': 255, 'g': 255, 'r': 255});
+  expect(colour.rgb).toEqual({'b': 254, 'g': 254, 'r': 254});
 
   const colour4 = new Colour(4);
   expect(colour4.aci).toEqual(4);
@@ -22,7 +22,7 @@ test('Test Colour.isTrueColour', () => {
 
 test('Test Colour.getColour', () => {
   const colour = new Colour();
-  expect(colour.getColour()).toEqual({'b': 255, 'g': 255, 'r': 255});
+  expect(colour.getColour()).toEqual({'b': 254, 'g': 254, 'r': 254});
 });
 
 
@@ -48,7 +48,7 @@ test('Test Colour.setColour', () => {
 test('Test Colour.setColourFromACI', () => {
   const colour = new Colour();
   colour.setColourFromACI(7);
-  expect(colour.rgb).toEqual({'r': 255, 'g': 255, 'b': 255});
+  expect(colour.rgb).toEqual({'r': 254, 'g': 254, 'b': 254});
   expect(colour.aci).toEqual(7);
 
   colour.setColourFromACI(50);
