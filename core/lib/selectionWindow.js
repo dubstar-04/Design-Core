@@ -37,6 +37,7 @@ export class SelectionWindow {
 
     try { // HTML Canvas
       ctx.strokeStyle = Colours.rgbToString(colour);
+      ctx.fillStyle = Colours.rgbToString(colour);
       ctx.lineWidth = this.lineWidth / scale;
       ctx.beginPath();
       ctx.globalAlpha = 0.2;
