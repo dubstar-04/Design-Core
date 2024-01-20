@@ -16,7 +16,7 @@ export class LayerManager extends StyleManagerBase {
   }
 
   addStandardStyles() {
-    this.addStyle({'name': '0', 'colour': new Colour(4)});
+    this.addStyle({'name': '0'});
     this.addStyle({'name': 'DEFPOINTS', 'plotting': false});
   }
 
