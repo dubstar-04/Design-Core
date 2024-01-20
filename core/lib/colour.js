@@ -41,7 +41,8 @@ export class Colour {
    * @param {number} aci
    */
   setColourFromACI(aci) {
-    const rgb = Colours.aciToRGB(Math.abs(aci));
+    // try and get the rgb from the aci
+    const rgb = Colours.aciToRGB(aci);
     if (rgb) {
       this.aci = aci;
       this.rgb = rgb;
