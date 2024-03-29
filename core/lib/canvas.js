@@ -208,6 +208,7 @@ export class Canvas {
 
     // Paint the primary scene items
     this.paintState = this.paintStates.ENTITIES;
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
       const layer = DesignCore.LayerManager.getStyleByName(DesignCore.Scene.items[i].layer);
 
       if (!layer.isVisible) {
@@ -247,11 +248,28 @@ export class Canvas {
    * Set the scene context
    * @param {entity} item
    * @param {object} context - scene painting context from ui
+   * @param {object} block - insert element for the current block, required for colour ByBlock
    */
-  setContext(item, context) {
-    const colour = item.getDrawColour();
+  setContext(item, context, block = undefined) {
+    let colour = item.getDrawColour();
     const lineType = item.getLineType();
-    const lineWidth = item.lineWidth / this.getScale();
+    let lineWidth = item.lineWidth / this.getScale();
+
+    if (this.paintState === this.paintStates.SELECTED) {
+      // Set Context for selected items
+      colour = DesignCore.Core.settings.selecteditemscolour;
+      lineWidth = (item.lineWidth * 2) / this.getScale();
+    } else if (this.paintState === this.paintStates.TEMPORARY) {
+      // Set context for temp items
+      lineWidth = (item.lineWidth * 2) / this.getScale();
+    }
+
+    if (block && this.paintState != this.paintStates.SELECTED) {
+      // set colour for items with colour byblock
+      if (item.entityColour.aci === 0) {
+        colour = block.getDrawColour();
+      }
+    }
 
     try { // HTML Canvas
       context.strokeStyle = Colours.rgbToString(colour);
