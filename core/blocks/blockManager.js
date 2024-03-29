@@ -26,7 +26,7 @@ export class BlockManager {
    * @param {block} blockData
    */
   newBlock(blockData) {
-    // Create a new item, send it the points array
+    // Create a new item, send it the entity data
     const block = DesignCore.CommandManager.createNew('Block', blockData);
     this.blocks.push(block);
     return block;
@@ -44,6 +44,15 @@ export class BlockManager {
 
     // Delete The block
     this.blocks.splice(blockIndex, 1);
+  }
+
+  /**
+   * Find the index of blockName
+   * @param {string} blockName
+   * @returns index of the block or -1 if block doesn't exist
+   */
+  getBlockIndex(blockName) {
+    return this.blocks.findIndex((block) => block.name.toUpperCase() === blockName.toUpperCase());
   }
 
 
