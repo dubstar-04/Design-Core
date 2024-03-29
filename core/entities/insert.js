@@ -1,5 +1,7 @@
 import {Entity} from './entity.js';
-import {BoundingBox} from '../lib/boundingBox.js';
+import {Block} from '../blocks/block.js';
+
+import {DesignCore} from '../designCore.js';
 
 export class Insert extends Entity {
   constructor(data) {
@@ -7,14 +9,17 @@ export class Insert extends Entity {
 
     // add block property
     Object.defineProperty(this, 'block', {
-      value: '',
+      value: new Block(),
       writable: true,
     });
 
     if (data) {
-      if (data.hasOwnProperty('block') || data.hasOwnProperty('2')) {
+      if (data.hasOwnProperty('blockName') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - Block name
-        this.block = data.block || data[2];
+
+        const blockName = data.blockName || data[2];
+        const block = DesignCore.Scene.blockManager.getBlockByName(blockName);
+        this.block = block;
       }
 
       if (data.hasOwnProperty('41')) {
@@ -72,28 +77,48 @@ export class Insert extends Entity {
     return command;
   }
 
+  async execute() {
+    DesignCore.Core.notify(`${this.type} - Not Implemented`);
+    DesignCore.Scene.inputManager.reset();
+  }
+
+  preview() {
+    // not implemented
+  }
+
   dxf(file) {
     file.writeGroupCode('0', 'INSERT');
     // file.writeGroupCode('5', ''); // Handle
     file.writeGroupCode('8', this.layer);
-    file.writeGroupCode('2', this.block);
+    file.writeGroupCode('2', this.block.name);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
   }
 
   draw(ctx, scale) {
-    return;
+    // blocks are associated with an insert point.
+    // translate ctx by the insert location
+    // this allows the block items to be draw without knowing the insert location
+
+    ctx.save();
+    ctx.translate(this.points[0].x, this.points[0].y);
+    // pass *this* to the block to allow colour ByBlock
+    this.block.draw(ctx, scale, this);
+    ctx.restore();
   }
 
   snaps(mousePoint, delta) {
-    const snaps = [];
+    const snaps = this.block.snaps(mousePoint, delta);
     return snaps;
   }
 
   within(selectionExtremes) {
-    // insert cannot be selected
-    return false;
+    // adjust selectionExtremes by the insert position
+    const [xmin, xmax, ymin, ymax] = selectionExtremes;
+    const pt = this.points[0];
+    const sE = [xmin - pt.x, xmax - pt.x, ymin - pt.y, ymax - pt.y];
+    return this.block.within(sE);
   }
 
   intersectPoints() {
@@ -104,18 +129,25 @@ export class Insert extends Entity {
   }
 
   closestPoint(P) {
-    const distance = P.distance(this.points[0]);
-    const minPnt = this.points[0];
+    let distance = P.distance(this.points[0]);
+    let minPnt = this.points[0];
+
+    // adjust P by the insert position
+    P = P.subtract(this.points[0]);
+    [minPnt, distance] = this.block.closestPoint(P);
 
     return [minPnt, distance];
   }
 
   boundingBox() {
-    return new BoundingBox();
+    return this.block.boundingBox();
   }
 
   touched(selectionExtremes) {
-    // insert cannot be selected
-    return false;
+    // adjust selectionExtremes by the insert position
+    const [xmin, xmax, ymin, ymax] = selectionExtremes;
+    const pt = this.points[0];
+    const sE = [xmin - pt.x, xmax - pt.x, ymin - pt.y, ymax - pt.y];
+    return this.block.touched(sE);
   }
 }
