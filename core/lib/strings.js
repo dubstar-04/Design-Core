@@ -64,6 +64,7 @@ export class Strings {
     POSITION: 'Specify position',
     HEIGHT: 'Specify height',
     STRING: 'Specify text',
+    NAME: 'Specify name',
     OPTION: 'Specify option',
     ANGLE: 'Specify angle',
     ROTATION: 'Specify rotation angle',
