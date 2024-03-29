@@ -129,14 +129,11 @@ export class Insert extends Entity {
   }
 
   closestPoint(P) {
-    let distance = P.distance(this.points[0]);
-    let minPnt = this.points[0];
+    // get the closest point from the blocks entities
 
     // adjust P by the insert position
     P = P.subtract(this.points[0]);
-    [minPnt, distance] = this.block.closestPoint(P);
-
-    return [minPnt, distance];
+    return this.block.closestPoint(P); // [minPnt, distance];
   }
 
   boundingBox() {
