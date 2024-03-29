@@ -285,7 +285,7 @@ test('Test Point.closestPointOnLine', () => {
 
   const pt4 = new Point(15, 15);
   const perp4 = pt4.closestPointOnLine(lineStart1, lineEnd1);
-  expect(perp4).toBe(null);
+  expect(perp4).toBe(lineEnd1);
 });
 
 test('Test Point.closestPointOnArc', () => {
