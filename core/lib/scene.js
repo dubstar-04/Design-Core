@@ -7,6 +7,7 @@ import {BoundingBox} from './boundingBox.js';
 import {Point} from '../entities/point.js';
 
 import {DesignCore} from '../designCore.js';
+import {BlockManager} from '../blocks/blockManager.js';
 
 export class Scene {
   constructor() {
@@ -19,6 +20,7 @@ export class Scene {
 
     this.selectionManager = new SelectionManager();
     this.inputManager = new InputManager();
+    this.blockManager = new BlockManager();
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
