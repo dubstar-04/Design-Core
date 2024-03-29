@@ -183,7 +183,7 @@ export class Point {
    * Find the closest point on a line between start and end points
    * @param {*} startPoint
    * @param {*} endPoint
-   * @returns the closest point on the line or null
+   * @returns the closest point on the line
    */
   closestPointOnLine(startPoint, endPoint) {
     const pnt = this.perpendicular(startPoint, endPoint);
@@ -191,7 +191,13 @@ export class Point {
       return pnt;
     }
 
-    return null;
+    // point is not perpendicular to the line
+    // closest point must be at the start or end
+    if (this.distance(startPoint) < this.distance(endPoint)) {
+      return startPoint;
+    } else {
+      return endPoint;
+    }
   }
 
   /**
