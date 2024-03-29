@@ -2,6 +2,17 @@ import {Insert} from '../../core/entities/insert.js';
 import {Point} from '../../core/entities/point.js';
 import {Line} from '../../core/entities/line.js';
 
+// mock file for dxf test
+class File {
+  constructor() {
+    this.contents = '';
+  }
+
+  writeGroupCode(groupCode, groupValue) {
+    this.contents = this.contents.concat(`${groupCode}\n${groupValue}\n`);
+  }
+}
+
 const insert = new Insert({points: [new Point()]});
 const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
 insert.block.addItem(line);
@@ -29,4 +40,27 @@ test('Test Insert.boundingBox', () => {
   expect(insert.boundingBox().xMax).toBeCloseTo(2001);
   expect(insert.boundingBox().yMin).toBeCloseTo(102);
   expect(insert.boundingBox().yMax).toBeCloseTo(2002);
+});
+
+test('Test Insert.dxf', () => {
+  const file = new File();
+  insert.dxf(file);
+  // console.log(file.contents);
+
+
+  const dxfString = `0
+INSERT
+8
+0
+2
+
+10
+0
+20
+0
+30
+0.0
+`;
+
+  expect(file.contents).toEqual(dxfString);
 });
