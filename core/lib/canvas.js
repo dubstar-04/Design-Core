@@ -19,6 +19,15 @@ export class Canvas {
     this.lastDelta = new Point();
     this.flipped = false;
 
+    this.paintState;
+
+    this.paintStates = {
+      ENTITIES: 'ENTITIES',
+      TEMPORARY: 'TEMPORARY',
+      SELECTED: 'SELECTED',
+      AUXILLARY: 'AUXILLARY',
+    };
+
     // function to call external pain command for the ui
     this.externalPaintCallbackFunction;
   }
@@ -198,7 +207,7 @@ export class Canvas {
     this.paintGrid(context, width, height);
 
     // Paint the primary scene items
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+    this.paintState = this.paintStates.ENTITIES;
       const layer = DesignCore.LayerManager.getStyleByName(DesignCore.Scene.items[i].layer);
 
       if (!layer.isVisible) {
@@ -210,13 +219,15 @@ export class Canvas {
     }
 
     // Paint the temporary scene items
-    for (let j = 0; j <DesignCore.Scene.tempItems.length; j++) {
+    this.paintState = this.paintStates.TEMPORARY;
+    for (let j = 0; j < DesignCore.Scene.tempItems.length; j++) {
       this.setContext(DesignCore.Scene.tempItems[j], context);
       DesignCore.Scene.tempItems[j].draw(context, this.getScale());
     }
 
     // Paint the selected scene items
-    for (let k = 0; k <DesignCore.Scene.selectionManager.selectedItems.length; k++) {
+    this.paintState = this.paintStates.SELECTED;
+    for (let k = 0; k < DesignCore.Scene.selectionManager.selectedItems.length; k++) {
       this.setContext(DesignCore.Scene.selectionManager.selectedItems[k], context);
       DesignCore.Scene.selectionManager.selectedItems[k].draw(context, this.getScale());
     }
@@ -224,9 +235,12 @@ export class Canvas {
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
-    for (let l = 0; l <DesignCore.Scene.auxiliaryItems.length; l++) {
+    this.paintState = this.paintStates.AUXILLARY;
+    for (let l = 0; l < DesignCore.Scene.auxiliaryItems.length; l++) {
       DesignCore.Scene.auxiliaryItems[l].draw(context, this.getScale());
     }
+
+    this.paintState = undefined;
   }
 
   /**
