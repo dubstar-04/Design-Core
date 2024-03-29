@@ -1,0 +1,66 @@
+import {DesignCore} from '../designCore.js';
+
+export class BlockManager {
+  constructor() {
+    this.blocks = [];
+  }
+
+  /**
+   * Get blocks
+   * @returns list of blocks
+   */
+  getBlocks() {
+    return this.blocks;
+  }
+
+  /**
+   * Get block count
+   * @returns number of blocks
+   */
+  blockCount() {
+    return this.blocks.length;
+  }
+
+  /**
+   * Create new block
+   * @param {block} blockData
+   */
+  newBlock(blockData) {
+    // Create a new item, send it the points array
+    const block = DesignCore.CommandManager.createNew('Block', blockData);
+    this.blocks.push(block);
+    return block;
+  }
+
+  /**
+   * Delete a block using the block index
+   * @param {number} blockIndex
+   * @returns undefined
+   */
+  deleteBlock(blockIndex) {
+    if (this.blocks[blockIndex] === undefined) {
+      return;
+    }
+
+    // Delete The block
+    this.blocks.splice(blockIndex, 1);
+  }
+
+
+  /**
+   * get a block matching blockname
+   * @param {string} blockName
+   * @returns block object
+   */
+  getBlockByName(blockName) {
+    for (let i = 0; i < this.blockCount(); i++) {
+      if (this.blocks[i].name.toUpperCase() === blockName.toUpperCase()) {
+        return this.blocks[i];
+      }
+    }
+
+    const msg = 'Invalid Block Name';
+    const err = (`${this.constructor.name} - ${msg}: ${blockName}`);
+    throw Error(err);
+  }
+}
