@@ -1,4 +1,4 @@
-import {Block} from '../../core/entities/block.js';
+import {Block} from '../../core/blocks/block.js';
 import {Line} from '../../core/entities/line.js';
 import {Point} from '../../core/entities/point.js';
 
