@@ -109,7 +109,16 @@ export class Insert extends Entity {
   }
 
   snaps(mousePoint, delta) {
-    const snaps = this.block.snaps(mousePoint, delta);
+    const snaps = [];
+    const blockSnaps = this.block.snaps(mousePoint, delta);
+
+    for (let snap = 0; snap < blockSnaps.length; snap++) {
+      // offset the item snap point by the block insert location
+      let snapPoint = blockSnaps[snap];
+      snapPoint = snapPoint.add(this.points[0]);
+      snaps.push(snapPoint);
+    }
+
     return snaps;
   }
 

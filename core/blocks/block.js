@@ -186,25 +186,17 @@ export class Block extends Entity {
   }
 
   snaps(mousePoint, delta) {
-    let snaps = [];
+    const snaps = [];
 
     if (!this.items.length) {
       // nothing to draw
       return snaps;
     }
 
-    snaps = [this.points[0]];
-
     for (let item = 0; item < this.items.length; item++) {
       // collect the child item snaps
       const itemSnaps = this.items[item].snaps(mousePoint, delta);
-
-      for (let snap = 0; snap < itemSnaps.length; snap++) {
-        // offset the item snap point by the block insert location
-        let snapPoint = itemSnaps[snap];
-        snapPoint = snapPoint.add(this.points[0]);
-        snaps.push(snapPoint);
-      }
+      snaps.push(...itemSnaps);
     }
 
     return snaps;
