@@ -265,16 +265,8 @@ export class Block extends Entity {
       return;
     }
 
-    // Offset selectionExtremes by the block insert position
-    const adjustedSelectionExtremes = [
-      selectionExtremes[0] - this.points[0].x,
-      selectionExtremes[1] - this.points[0].x,
-      selectionExtremes[2] - this.points[0].y,
-      selectionExtremes[3] - this.points[0].y,
-    ];
-
     for (let idx = 0; idx < this.items.length; idx++) {
-      const touched = this.items[idx].touched(adjustedSelectionExtremes);
+      const touched = this.items[idx].touched(selectionExtremes);
       if (touched) {
         return true;
       }
