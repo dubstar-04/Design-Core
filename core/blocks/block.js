@@ -218,12 +218,9 @@ export class Block extends Entity {
       return [minPnt, distance];
     }
 
-    // adjust the selection point to offset by the block insert position
-    // const adjustedPoint = P.subtract(this.points[0]);
-
     for (let idx = 0; idx < this.items.length; idx++) {
       const itemClosestPoint = this.items[idx].closestPoint(P);
-      const itemPnt = itemClosestPoint[0]; // .add(this.points[0]); // adjust by the block insert position
+      const itemPnt = itemClosestPoint[0];
       const itemDist = itemClosestPoint[1];
 
       if (itemDist < distance) {
