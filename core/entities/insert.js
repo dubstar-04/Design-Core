@@ -1,5 +1,6 @@
 import {Entity} from './entity.js';
 import {Block} from '../blocks/block.js';
+import {BoundingBox} from '../lib/boundingBox.js';
 
 import {DesignCore} from '../designCore.js';
 
@@ -139,14 +140,16 @@ export class Insert extends Entity {
 
   closestPoint(P) {
     // get the closest point from the blocks entities
-
     // adjust P by the insert position
     P = P.subtract(this.points[0]);
     return this.block.closestPoint(P); // [minPnt, distance];
   }
 
   boundingBox() {
-    return this.block.boundingBox();
+    const blockBB = this.block.boundingBox();
+    const topLeft = blockBB.pt1.add(this.points[0]);
+    const bottomRight = blockBB.pt2.add(this.points[0]);
+    return new BoundingBox(topLeft, bottomRight);
   }
 
   touched(selectionExtremes) {
