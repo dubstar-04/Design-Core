@@ -101,3 +101,14 @@ test('Test EntityColour.setColour', () => {
   expect(colour.byLayer).toEqual(false);
   expect(colour.byBlock).toEqual(true);
 });
+
+
+test('Colour Conversion Test', () => {
+  const colour = new EntityColour();
+
+  // Check the returned ACI is the same as the set ACI
+  for (let i=0; i<255; i++) {
+    colour.setColourFromACI(i);
+    expect(colour.aci).toEqual(i);
+  }
+});
