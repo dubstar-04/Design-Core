@@ -60,7 +60,6 @@ export class EntityColour extends Colour {
   constructor(aci=256) {
     super(aci);
     // default to aci 256 - ByLayer
-    this.aci = aci;
   }
 
   get byLayer() {
