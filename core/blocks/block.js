@@ -128,15 +128,20 @@ export class Block extends Entity {
     file.writeGroupCode('0', 'BLOCK');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name);
+    file.writeGroupCode('70', this.flags);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', 0.0);
-    file.writeGroupCode('70', this.flags);
     file.writeGroupCode('3', this.name); // Name again
     file.writeGroupCode('1', '');
+
+    for (let i = 0; i <this.items.length; i++) {
+      this.items[i].dxf(file);
+    }
+
     file.writeGroupCode('0', 'ENDBLK');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
