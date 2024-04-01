@@ -20,9 +20,6 @@ insert.block.addItem(line);
 test('Test Insert.closestPoint', () => {
   const point = new Point(100, 100);
   const closest = insert.closestPoint(point);
-
-  console.log('closest', closest);
-
   expect(closest[0].x).toBeCloseTo(101);
   expect(closest[0].y).toBeCloseTo(102);
 });
@@ -46,7 +43,6 @@ test('Test Insert.dxf', () => {
   const file = new File();
   insert.dxf(file);
   // console.log(file.contents);
-
 
   const dxfString = `0
 INSERT
