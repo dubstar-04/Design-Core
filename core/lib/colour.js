@@ -12,7 +12,7 @@ export class Colour {
 
   get isTrueColour() {
     const aci = Colours.rgbToACI(this.rgb);
-    if (aci) {
+    if (aci != undefined) {
       return false;
     }
     return true;
