@@ -51,3 +51,16 @@ test('Test Colours.rgbToTrueColour', () => {
   expect(Colours.rgbToTrueColour({r: 200, g: 100, b: 50})).toBe(13132850);
   expect(Colours.rgbToTrueColour()).toBeUndefined();
 });
+
+test('Test Colour Sequence', () => {
+  // loop through all colour values and check the ACI numbers
+  // ensure the numbers are sequential
+  let index = 0;
+
+  for (const key in Colours.rgb_conversion_table) {
+    if (!isNaN(key)) {
+      expect(parseInt(key)).toBe(index);
+      index++;
+    }
+  }
+});
