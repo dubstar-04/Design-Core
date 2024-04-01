@@ -29,7 +29,6 @@ test('Test blockManager.newblock', () => {
 });
 
 test('Test blockManager.deleteblock', () => {
-  console.log('blocks', blockManager.blocks);
   const count = blockManager.blockCount();
 
   // get block index
