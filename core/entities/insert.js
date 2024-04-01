@@ -1,4 +1,5 @@
 import {Entity} from './entity.js';
+import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Block} from '../blocks/block.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
@@ -89,8 +90,11 @@ export class Insert extends Entity {
 
   dxf(file) {
     file.writeGroupCode('0', 'INSERT');
-    // file.writeGroupCode('5', ''); // Handle
+    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
+    this.writeDxfColour(file);
+    file.writeGroupCode('100', 'AcDbBlockReference', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.block.name);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
