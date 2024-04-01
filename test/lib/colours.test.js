@@ -64,3 +64,11 @@ test('Test Colour Sequence', () => {
     }
   }
 });
+
+test('Colours Conversion Test', () => {
+  // Check the returned ACI is the same as the set ACI
+  for (let i=0; i<255; i++) {
+    const rgb = Colours.aciToRGB(i);
+    expect(Colours.rgbToACI(rgb)).toEqual(i);
+  }
+});
