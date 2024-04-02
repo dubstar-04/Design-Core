@@ -2,6 +2,8 @@ import {Entity} from './entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Block} from '../blocks/block.js';
 import {BoundingBox} from '../lib/boundingBox.js';
+import {Point} from './point.js';
+import {Utils} from '../lib/utils.js';
 
 import {DesignCore} from '../designCore.js';
 
@@ -13,6 +15,14 @@ export class Insert extends Entity {
     Object.defineProperty(this, 'block', {
       value: new Block(),
       writable: true,
+    });
+
+    // add rotation property with getter and setter
+    // needs to be enumerable to appear in the object props
+    Object.defineProperty(this, 'rotation', {
+      get: this.getRotation,
+      set: this.setRotation,
+      enumerable: true,
     });
 
     if (data) {
@@ -54,10 +64,16 @@ export class Insert extends Entity {
         Logging.instance.warn(`${this.type} - ${err}`);
       }
 
-      if (data.hasOwnProperty('50')) {
-        // DXF Groupcode 50 - Rotation Angle (optional, default = 0)
-        const err = 'Groupcode 50 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
+      if (data.hasOwnProperty('rotation') || data.hasOwnProperty('50')) {
+        // DXF Groupcode 50 - Text Rotation, angle in degrees
+        // if we get rotation data store this as a point[1] at an angle from point[0]
+        // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
+
+        const rotation = data.rotation || data[50];
+        this.setRotation(rotation);
+      } else {
+        // create points[1] used to determine the text rotation
+        this.points[1] = data.points[0].add(new Point(10, 0));
       }
 
       if (data.hasOwnProperty('70')) {
@@ -99,6 +115,9 @@ export class Insert extends Entity {
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
+    if (this.rotation) {
+      file.writeGroupCode('50', this.rotation);
+    }
   }
 
   draw(ctx, scale) {
@@ -108,9 +127,40 @@ export class Insert extends Entity {
 
     ctx.save();
     ctx.translate(this.points[0].x, this.points[0].y);
+    const rotation = Utils.degrees2radians(this.rotation);
+    ctx.rotate(rotation);
     // pass *this* to the block to allow colour ByBlock
     this.block.draw(ctx, scale, this);
     ctx.restore();
+  }
+
+  /**
+   * Set the insert rotation
+   * @param {number} angle - degrees
+   */
+  setRotation(angle) {
+    // This overwrites the rotation rather than add to it.
+
+    if (angle === undefined) {
+      return;
+    }
+
+    if (angle !== 0) {
+      this.points[1] = this.points[0].project(Utils.degrees2radians(angle), 10);
+    }
+  }
+
+  /**
+     * Get the insert rotation
+     * @return {number} angle - degrees
+     */
+  getRotation() {
+    if (this.points[1] !== undefined) {
+      const angle = Utils.radians2degrees(this.points[0].angle(this.points[1]));
+      return Utils.round(angle);
+    }
+
+    return 0;
   }
 
   snaps(mousePoint, delta) {
