@@ -75,21 +75,17 @@ export class DXFWriter {
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
     file.writeGroupCode('70', '2', DXFFile.Version.R2000);
 
-    // Model Space
-    file.writeGroupCode('0', 'BLOCK_RECORD', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('2', '*Model_Space', DXFFile.Version.R2000);
-    file.writeGroupCode('340', '22', DXFFile.Version.R2000);
-
-    // Paper Space
-    file.writeGroupCode('0', 'BLOCK_RECORD', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('2', '*Paper_Space', DXFFile.Version.R2000);
-    file.writeGroupCode('340', '22', DXFFile.Version.R2000);
+    for (let i = 0; i < DesignCore.Scene.blockManager.blocks.length; i++) {
+      file.writeGroupCode('0', 'BLOCK_RECORD', DXFFile.Version.R2000);
+      file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+      file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
+      file.writeGroupCode('100', 'AcDbBlockTableRecord', DXFFile.Version.R2000);
+      file.writeGroupCode('2', DesignCore.Scene.blockManager.blocks[i].name, DXFFile.Version.R2000);
+      file.writeGroupCode('340', '0', DXFFile.Version.R2000);
+      // file.writeGroupCode('70', '4', DXFFile.Version.R2000); // Insertion Units
+      // file.writeGroupCode('280', '0', DXFFile.Version.R2000); // Explodeability
+      // file.writeGroupCode('281', '0', DXFFile.Version.R2000); // Scaleability
+    }
 
     file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
 
@@ -105,51 +101,9 @@ export class DXFWriter {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'BLOCKS');
 
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
-      if (DesignCore.Scene.items[i].type === 'Block') {
-        DesignCore.Scene.items[i].dxf(file);
-      }
+    for (let i = 0; i < DesignCore.Scene.blockManager.blocks.length; i++) {
+      DesignCore.Scene.blockManager.blocks[i].dxf(file);
     }
-
-
-    // Three empty definitions always appear in the BLOCKS section.
-    // They are titled *Model_Space, *Paper_Space and *Paper_Space0.
-    // Model Space
-    file.writeGroupCode('0', 'BLOCK', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
-    file.writeGroupCode('2', '*Model_Space', DXFFile.Version.R2000);
-    file.writeGroupCode('10', '0.0', DXFFile.Version.R2000);
-    file.writeGroupCode('20', '0.0', DXFFile.Version.R2000);
-    file.writeGroupCode('30', '0.0', DXFFile.Version.R2000);
-    file.writeGroupCode('3', '*Model_Space', DXFFile.Version.R2000);
-    file.writeGroupCode('1', '', DXFFile.Version.R2000);
-    file.writeGroupCode('0', 'ENDBLK', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
-
-    // Model Space
-    file.writeGroupCode('0', 'BLOCK', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
-    file.writeGroupCode('2', '*Paper_Space', DXFFile.Version.R2000);
-    file.writeGroupCode('10', '0.0', DXFFile.Version.R2000);
-    file.writeGroupCode('20', '0.0', DXFFile.Version.R2000);
-    file.writeGroupCode('30', '0.0', DXFFile.Version.R2000);
-    file.writeGroupCode('3', '*Paper_Space', DXFFile.Version.R2000);
-    file.writeGroupCode('1', '', DXFFile.Version.R2000);
-    file.writeGroupCode('0', 'ENDBLK', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
-
 
     file.writeGroupCode('0', 'ENDSEC');
   }
@@ -163,9 +117,7 @@ export class DXFWriter {
     file.writeGroupCode('2', 'ENTITIES');
 
     for (let i = 0; i <DesignCore.Scene.items.length; i++) {
-      if (DesignCore.Scene.items[i].type !== 'Block') {
-        DesignCore.Scene.items[i].dxf(file);
-      }
+      DesignCore.Scene.items[i].dxf(file);
     }
 
     file.writeGroupCode('0', 'ENDSEC');
