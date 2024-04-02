@@ -1,8 +1,12 @@
 import {DesignCore} from '../designCore.js';
+import {Block} from './block.js';
 
 export class BlockManager {
   constructor() {
     this.blocks = [];
+
+    // populate the default blocks
+    this.addDefaultBlocks();
   }
 
   /**
