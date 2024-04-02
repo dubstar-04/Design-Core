@@ -710,9 +710,9 @@ export class DimStyle {
     file.writeGroupCode('289', this.DIMATFIT, DXFFile.Version.R2000);
     file.writeGroupCode('340', this.DIMTXSTY, DXFFile.Version.R13);
     file.writeGroupCode('341', this.DIMLDRBLK, DXFFile.Version.R2000);
-    file.writeGroupCode('342', this.DIMBLK);
-    file.writeGroupCode('343', this.DIMBLK1);
-    file.writeGroupCode('344', this.DIMBLK2);
+    // file.writeGroupCode('342', this.DIMBLK);
+    // file.writeGroupCode('343', this.DIMBLK1);
+    // file.writeGroupCode('344', this.DIMBLK2);
     file.writeGroupCode('371', this.DIMLWD, DXFFile.Version.R2000);
     file.writeGroupCode('372', this.DIMLWE, DXFFile.Version.R2000);
   }
