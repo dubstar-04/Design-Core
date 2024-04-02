@@ -53,8 +53,6 @@ export class Scene {
     for (let i = 0; i < this.items.length; i++) {
       const itemBoundingBox = this.items[i].boundingBox();
 
-      console.log('scene bounding box:', i, itemBoundingBox);
-
       xmin = Math.min(xmin, itemBoundingBox.xMin);
       xmax = Math.max(xmax, itemBoundingBox.xMax);
       ymin = Math.min(ymin, itemBoundingBox.yMin);
