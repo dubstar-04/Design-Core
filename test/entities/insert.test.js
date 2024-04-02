@@ -8,6 +8,10 @@ class File {
     this.contents = '';
   }
 
+  nextHandle() {
+    return 1;
+  }
+
   writeGroupCode(groupCode, groupValue) {
     this.contents = this.contents.concat(`${groupCode}\n${groupValue}\n`);
   }
@@ -46,8 +50,14 @@ test('Test Insert.dxf', () => {
 
   const dxfString = `0
 INSERT
+5
+1
+100
+AcDbEntity
 8
 0
+100
+AcDbBlockReference
 2
 
 10
