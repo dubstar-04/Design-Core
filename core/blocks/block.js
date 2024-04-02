@@ -11,6 +11,7 @@ export class Block extends Entity {
   constructor(data) {
     super(data);
     this.name = '';
+    this.points = [new Point()];
 
     Object.defineProperty(this, 'flags', {
       value: 0,
@@ -118,11 +119,6 @@ export class Block extends Entity {
   }
 
   preview() {}
-
-  setStandardFlags() {
-    // Set standard flags (bit-coded values)
-    this.flags = 1;
-  }
 
   dxf(file) {
     file.writeGroupCode('0', 'BLOCK');
