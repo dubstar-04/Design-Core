@@ -152,11 +152,6 @@ export class Block extends Entity {
     this.items.push(item);
   }
 
-  addInsert(data) {
-    const point = new Point(data.points[0].x, data.points[0].y);
-    this.points[0] = point;
-  }
-
   draw(ctx, scale, insert = undefined) {
     if (!this.items.length) {
       // nothing to draw
