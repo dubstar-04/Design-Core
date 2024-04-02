@@ -25,10 +25,18 @@ export class BlockManager {
    * Create new block
    * @param {block} blockData
    */
-  newBlock(blockData) {
+  newBlock(blockData, overwrite=false) {
     // Create a new item, send it the entity data
     const block = DesignCore.CommandManager.createNew('Block', blockData);
-    this.blocks.push(block);
+    if (!this.blockExists(block.name)) {
+      this.blocks.push(block);
+    } else if (overwrite) {
+      // Overwrite existing block
+      // This is used when loading files;
+      // Blocks *Model_Space, *Paper_Space and *Paper_Space0 already exist but should be overwritten by the incoming blocks
+      this.blocks.splice(this.getBlockIndex(block.name), 1, block);
+    }
+
     return block;
   }
 
