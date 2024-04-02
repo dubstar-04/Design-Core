@@ -33,6 +33,14 @@ export class BlockManager {
   }
 
   /**
+   * Add standard blocks
+   */
+  addDefaultBlocks() {
+    this.blocks.push(new Block({'name': '*Model_Space'}));
+    this.blocks.push(new Block({'name': '*Paper_Space'}));
+  }
+
+  /**
    * Delete a block using the block index
    * @param {number} blockIndex
    * @returns undefined
