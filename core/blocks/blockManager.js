@@ -55,6 +55,15 @@ export class BlockManager {
     return this.blocks.findIndex((block) => block.name.toUpperCase() === blockName.toUpperCase());
   }
 
+  /**
+   * Check if a block exists
+   * @param {string} blockName
+   * @returns true or false
+   */
+  blockExists(blockName) {
+    const blockExists = this.blocks.some((el) => el.name.toUpperCase() === blockName.toUpperCase());
+    return blockExists;
+  }
 
   /**
    * get a block matching blockname
