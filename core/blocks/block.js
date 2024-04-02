@@ -13,7 +13,7 @@ export class Block extends Entity {
     this.name = '';
 
     Object.defineProperty(this, 'flags', {
-      value: 1,
+      value: 0,
       writable: true,
     });
 
