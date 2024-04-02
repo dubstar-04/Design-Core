@@ -264,7 +264,10 @@ export class BasePolyline extends Entity {
   }
 
   boundingBox() {
-    let xmin; let xmax; let ymin; let ymax;
+    let xmin = Infinity;
+    let xmax = -Infinity;
+    let ymin = Infinity;
+    let ymax = -Infinity;
 
     for (let i = 0; i < this.points.length; i++) {
       const nextPoint = this.points[i + 1] || this.points[0];
@@ -276,10 +279,10 @@ export class BasePolyline extends Entity {
         boundingBox = BoundingBox.arcBoundingBox(centerPoint, this.points[i], nextPoint, this.points[i].bulge);
       }
 
-      xmin = Math.min(xmin || Infinity, boundingBox.xMin);
-      xmax = Math.max(xmax || -Infinity, boundingBox.xMax);
-      ymin = Math.min(ymin || Infinity, boundingBox.yMin);
-      ymax = Math.max(ymax || -Infinity, boundingBox.yMax);
+      xmin = Math.min(xmin, boundingBox.xMin);
+      xmax = Math.max(xmax, boundingBox.xMax);
+      ymin = Math.min(ymin, boundingBox.yMin);
+      ymax = Math.max(ymax, boundingBox.yMax);
     }
 
 

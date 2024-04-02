@@ -41,7 +41,10 @@ export class Scene {
    * @returns scene bounding box
    */
   boundingBox() {
-    let xmin; let xmax; let ymin; let ymax;
+    let xmin = Infinity;
+    let xmax = -Infinity;
+    let ymin = Infinity;
+    let ymax = -Infinity;
 
     if (this.items.length === 0) {
       return;
@@ -50,10 +53,12 @@ export class Scene {
     for (let i = 0; i < this.items.length; i++) {
       const itemBoundingBox = this.items[i].boundingBox();
 
-      xmin = Math.min(xmin || Infinity, itemBoundingBox.xMin);
-      xmax = Math.max(xmax || -Infinity, itemBoundingBox.xMax);
-      ymin = Math.min(ymin || Infinity, itemBoundingBox.yMin);
-      ymax = Math.max(ymax || -Infinity, itemBoundingBox.yMax);
+      console.log('scene bounding box:', i, itemBoundingBox);
+
+      xmin = Math.min(xmin, itemBoundingBox.xMin);
+      xmax = Math.max(xmax, itemBoundingBox.xMax);
+      ymin = Math.min(ymin, itemBoundingBox.yMin);
+      ymax = Math.max(ymax, itemBoundingBox.yMax);
     }
 
     // if all values are zero return undefined

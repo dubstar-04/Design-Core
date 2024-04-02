@@ -234,18 +234,18 @@ export class Block extends Entity {
   }
 
   boundingBox() {
-    let xmin;
-    let xmax;
-    let ymin;
-    let ymax;
+    let xmin = Infinity;
+    let xmax = -Infinity;
+    let ymin = Infinity;
+    let ymax = -Infinity;
 
     for (let idx = 0; idx < this.items.length; idx++) {
       const itemBoundingBox = this.items[idx].boundingBox();
 
-      xmin = Math.min(xmin || Infinity, itemBoundingBox.xMin);
-      xmax = Math.max(xmax || -Infinity, itemBoundingBox.xMax);
-      ymin = Math.min(ymin || Infinity, itemBoundingBox.yMin);
-      ymax = Math.max(ymax || -Infinity, itemBoundingBox.yMax);
+      xmin = Math.min(xmin, itemBoundingBox.xMin);
+      xmax = Math.max(xmax, itemBoundingBox.xMax);
+      ymin = Math.min(ymin, itemBoundingBox.yMin);
+      ymax = Math.max(ymax, itemBoundingBox.yMax);
     }
 
     const topLeft = new Point(xmin, ymax);
