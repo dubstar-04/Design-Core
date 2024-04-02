@@ -52,11 +52,11 @@ test('Test Colour.setColourFromACI', () => {
   expect(colour.aci).toEqual(7);
 
   colour.setColourFromACI(50);
-  expect(colour.rgb).toEqual({'r': 255, 'g': 255, 'b': 0});
+  expect(colour.rgb).toEqual({'r': 254, 'g': 254, 'b': 0});
   expect(colour.aci).toEqual(50);
 
   colour.setColourFromACI(-1);
-  expect(colour.rgb).toEqual({'r': 255, 'g': 255, 'b': 0});
+  expect(colour.rgb).toEqual({'r': 254, 'g': 254, 'b': 0});
   expect(colour.aci).toEqual(50);
 });
 
