@@ -39,8 +39,8 @@ export class Solid extends Entity {
     file.writeGroupCode('32', '0.0');
 
     // If only three points are use to define the SOLID then the fourth points is the same as the third.
-    file.writeGroupCode('13', this.points[3].x || this.points[2].x);
-    file.writeGroupCode('23', this.points[3].y || this.points[2].x);
+    file.writeGroupCode('13', this.points.length > 3 ? this.points[3].x : this.points[2].x);
+    file.writeGroupCode('23', this.points.length > 3 ? this.points[3].y : this.points[2].x);
     file.writeGroupCode('33', '0.0');
   }
 
