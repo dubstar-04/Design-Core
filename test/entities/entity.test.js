@@ -26,3 +26,12 @@ test('Test Entity.Within', () => {
   expect(entity.within(selectionExtremesFalse)).toBe(false);
   expect(entity.within(selectionExtremesTrue)).toBe(true);
 });
+
+test('Test Entity.touched', () => {
+  const entity = new Line({points: [new Point(100, 100), new Point(200, 200)]});
+  const selectionExtremesTrue = [101, 199, 101, 199];
+  const selectionExtremesFalse = [99, 201, 99, 201];
+
+  expect(entity.touched(selectionExtremesFalse)).toBe(false);
+  expect(entity.touched(selectionExtremesTrue)).toBe(true);
+});
