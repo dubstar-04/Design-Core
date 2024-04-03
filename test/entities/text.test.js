@@ -1,8 +1,9 @@
 import {Point} from '../../core/entities/point';
 import {Text} from '../../core/entities/text';
 
+import {File} from '../test-helpers/test-helpers.js';
 
-test('Test BasePolyline.closestPoint', () => {
+test('Test Text.closestPoint', () => {
   const text = new Text({points: [new Point(100, 100)]});
   const point1 = new Point(90, 90);
   const closest1 = text.closestPoint(point1);
@@ -103,4 +104,45 @@ test('Test Text.boundingBox', () => {
   expect(text.boundingBox().xMax).toBeCloseTo(21);
   expect(text.boundingBox().yMin).toBeCloseTo(12);
   expect(text.boundingBox().yMax).toBeCloseTo(22);
+});
+
+test('Test Text.dxf', () => {
+  const text = new Text({points: [new Point(100, 200)]});
+  const file = new File();
+  text.dxf(file);
+  // console.log(file.contents);
+
+  const dxfString = `0
+TEXT
+5
+1
+100
+AcDbEntity
+8
+0
+100
+AcDbText
+10
+100
+20
+200
+30
+0.0
+40
+2.5
+1
+
+50
+0
+71
+0
+72
+0
+100
+AcDbText
+73
+0
+`;
+
+  expect(file.contents).toEqual(dxfString);
 });
