@@ -27,6 +27,7 @@ export class Strings {
     CSTYLEDELETE: 'Currently selected style cannot be deleted',
     CANNOTBEDELETED: 'cannot be deleted',
     CANNOTBERENAMED: 'cannot be renamed',
+    CANNOTBEACTIONED: 'cannot be actioned',
   };
 
   // Strings
@@ -36,6 +37,7 @@ export class Strings {
     VARIES: 'Varies',
     AND: 'and',
     OR: 'or',
+    ITEMS: 'item(s)',
   };
 
   // colours
@@ -64,6 +66,7 @@ export class Strings {
     POSITION: 'Specify position',
     HEIGHT: 'Specify height',
     STRING: 'Specify text',
+    NAME: 'Specify name',
     OPTION: 'Specify option',
     ANGLE: 'Specify angle',
     ROTATION: 'Specify rotation angle',

@@ -126,6 +126,15 @@ export class Entity {
     return lineType;
   }
 
+  writeDxfColour(file) {
+    if (this.entityColour.aci != 256) {
+      file.writeGroupCode('62', this.entityColour.aci);
+    }
+    if (this.entityColour.isTrueColour) {
+      file.writeGroupCode('420', Colours.rgbToTrueColour(this.colour));
+    }
+  }
+
 
   within(selectionExtremes) {
     const layer = DesignCore.LayerManager.getStyleByName(this.layer);

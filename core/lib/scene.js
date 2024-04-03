@@ -7,6 +7,7 @@ import {BoundingBox} from './boundingBox.js';
 import {Point} from '../entities/point.js';
 
 import {DesignCore} from '../designCore.js';
+import {BlockManager} from '../blocks/blockManager.js';
 
 export class Scene {
   constructor() {
@@ -19,6 +20,7 @@ export class Scene {
 
     this.selectionManager = new SelectionManager();
     this.inputManager = new InputManager();
+    this.blockManager = new BlockManager();
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
@@ -39,7 +41,10 @@ export class Scene {
    * @returns scene bounding box
    */
   boundingBox() {
-    let xmin; let xmax; let ymin; let ymax;
+    let xmin = Infinity;
+    let xmax = -Infinity;
+    let ymin = Infinity;
+    let ymax = -Infinity;
 
     if (this.items.length === 0) {
       return;
@@ -48,10 +53,10 @@ export class Scene {
     for (let i = 0; i < this.items.length; i++) {
       const itemBoundingBox = this.items[i].boundingBox();
 
-      xmin = Math.min(xmin || Infinity, itemBoundingBox.xMin);
-      xmax = Math.max(xmax || -Infinity, itemBoundingBox.xMax);
-      ymin = Math.min(ymin || Infinity, itemBoundingBox.yMin);
-      ymax = Math.max(ymax || -Infinity, itemBoundingBox.yMax);
+      xmin = Math.min(xmin, itemBoundingBox.xMin);
+      xmax = Math.max(xmax, itemBoundingBox.xMax);
+      ymin = Math.min(ymin, itemBoundingBox.yMin);
+      ymax = Math.max(ymax, itemBoundingBox.yMax);
     }
 
     // if all values are zero return undefined

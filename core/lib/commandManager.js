@@ -13,23 +13,20 @@ import {Text} from '../entities/text.js';
 // import {DiametricDimension} from '../entities/diametricDimension.js';
 // import {RadialDimension} from '../entities/radialDimension.js';
 // import {BaseDimension} from '../entities/basedimension.js';
-import {Block} from '../entities/block.js';
+import {Block} from '../blocks/block.js';
 import {Insert} from '../entities/insert.js';
 
 // import { Point } from "../entities/point.js"
 
 import {Move} from '../tools/move.js';
 import {Copy} from '../tools/copy.js';
-
 import {Rotate} from '../tools/rotate.js';
 import {Erase} from '../tools/erase.js';
-
+import {Explode} from '../tools/explode.js';
 import {Distance} from '../tools/distance.js';
 import {Identify} from '../tools/identify.js';
-
 import {Extend} from '../tools/extend.js';
 import {Trim} from '../tools/trim.js';
-
 
 import {Utils} from './utils.js';
 import {Strings} from './strings.js';
@@ -58,6 +55,7 @@ const classes = {
   Copy,
   Rotate,
   Erase,
+  Explode,
   Distance,
   Identify,
   Extend,

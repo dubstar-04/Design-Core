@@ -12,7 +12,7 @@ export class Colour {
 
   get isTrueColour() {
     const aci = Colours.rgbToACI(this.rgb);
-    if (aci) {
+    if (aci != undefined) {
       return false;
     }
     return true;
@@ -60,7 +60,6 @@ export class EntityColour extends Colour {
   constructor(aci=256) {
     super(aci);
     // default to aci 256 - ByLayer
-    this.aci = aci;
   }
 
   get byLayer() {

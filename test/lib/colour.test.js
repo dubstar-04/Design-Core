@@ -52,11 +52,11 @@ test('Test Colour.setColourFromACI', () => {
   expect(colour.aci).toEqual(7);
 
   colour.setColourFromACI(50);
-  expect(colour.rgb).toEqual({'r': 255, 'g': 255, 'b': 0});
+  expect(colour.rgb).toEqual({'r': 254, 'g': 254, 'b': 0});
   expect(colour.aci).toEqual(50);
 
   colour.setColourFromACI(-1);
-  expect(colour.rgb).toEqual({'r': 255, 'g': 255, 'b': 0});
+  expect(colour.rgb).toEqual({'r': 254, 'g': 254, 'b': 0});
   expect(colour.aci).toEqual(50);
 });
 
@@ -100,4 +100,15 @@ test('Test EntityColour.setColour', () => {
   expect(colour.aci).toEqual(0);
   expect(colour.byLayer).toEqual(false);
   expect(colour.byBlock).toEqual(true);
+});
+
+
+test('Colour Conversion Test', () => {
+  const colour = new EntityColour();
+
+  // Check the returned ACI is the same as the set ACI
+  for (let i=0; i<255; i++) {
+    colour.setColourFromACI(i);
+    expect(colour.aci).toEqual(i);
+  }
 });

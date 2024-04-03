@@ -1,11 +1,16 @@
 import {Core} from '../../core/core/core.js';
 import {Arc} from '../../core/entities/arc.js';
 import {Point} from '../../core/entities/point.js';
+import {DesignCore} from '../../core/designCore.js';
+
+import {File} from '../test-helpers/test-helpers.js';
 
 const core = new Core();
 const commandline = core.commandLine;
 
-test('Test Arc.execute', () => {
+test('Test Arc.execute', async () => {
+  expect(DesignCore.Scene.items.length).toBe(0);
+
   // Create arc - point, point, angle
   commandline.handleKeys('A');
   commandline.enterPressed();
@@ -27,7 +32,7 @@ test('Test Arc.execute', () => {
   // TODO: work out how to test user input for commands
   // commented out because it fails. looks like the commands above run before the execute command because its async
   // need to await enter pressed or similar without affecting user experience
-  // expect(DesignCore.Scene.items.length).toBe(1),
+  // expect(DesignCore.Scene.items.length).toBe(1);
 });
 
 test('Test Arc.startAngle', () => {
@@ -82,4 +87,39 @@ test('Test Arc.boundingBox', () => {
   expect(arc.boundingBox().xMax).toBeCloseTo(200);
   expect(arc.boundingBox().yMin).toBeCloseTo(0);
   expect(arc.boundingBox().yMax).toBeCloseTo(200);
+});
+
+test('Test Arc.dxf', () => {
+  const arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
+  const file = new File();
+  arc.dxf(file);
+  // console.log(file.contents);
+
+  const dxfString = `0
+ARC
+5
+1
+100
+AcDbEntity
+100
+AcDbCircle
+8
+0
+10
+100
+20
+100
+30
+0.0
+40
+100
+100
+AcDbArc
+50
+0
+51
+45
+`;
+
+  expect(file.contents).toEqual(dxfString);
 });

@@ -1,7 +1,9 @@
-import {Point} from './point.js';
-import {Entity} from './entity.js';
+import {Point} from '../entities/point.js';
+import {Entity} from '../entities/entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
+import {Strings} from '../lib/strings.js';
+import {Input, PromptOptions} from '../lib/inputManager.js';
 
 import {DesignCore} from '../designCore.js';
 
@@ -9,14 +11,10 @@ export class Block extends Entity {
   constructor(data) {
     super(data);
     this.name = '';
-
-    Object.defineProperty(this, 'location', {
-      value: new Point(),
-      writable: true,
-    });
+    this.points = [new Point()];
 
     Object.defineProperty(this, 'flags', {
-      value: 1,
+      value: 0,
       writable: true,
     });
 
@@ -29,10 +27,6 @@ export class Block extends Entity {
       if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - Block Name
         this.name = data.name || data[2];
-      }
-
-      if (data.hasOwnProperty('points')) {
-        this.location = data.points[0];
       }
 
       if (data.hasOwnProperty('items')) {
@@ -56,28 +50,94 @@ export class Block extends Entity {
   }
 
   static register() {
-    const command = {command: 'Block'};
+    const command = {command: 'Block', shortcut: 'B'};
     return command;
   }
 
-  setStandardFlags() {
-    // Set standard flags (bit-coded values)
-    this.flags = 1;
+  async execute() {
+    try {
+      // set a name
+      const name = `Block-${DesignCore.Scene.blockManager.blockCount()}`;
+      const nameOp = new PromptOptions(`${Strings.Input.NAME} <${name}>`, [
+        Input.Type.STRING,
+      ]);
+      const selectedName =
+        await DesignCore.Scene.inputManager.requestInput(nameOp);
+
+      // get the insertion point
+      const op2 = new PromptOptions(Strings.Input.BASEPOINT, [
+        Input.Type.POINT,
+      ]);
+      const insertPoint = await DesignCore.Scene.inputManager.requestInput(op2);
+
+      // get the block entities
+      const op = new PromptOptions(Strings.Input.SELECTIONSET, [
+        Input.Type.SELECTIONSET,
+      ]);
+
+      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+        await DesignCore.Scene.inputManager.requestInput(op);
+      }
+
+      // create block
+      const block = DesignCore.Scene.blockManager.newBlock({
+        name: selectedName,
+      });
+
+      // get a copy of the selection set
+      const selections =
+        DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice();
+      // sort the selection in descending order
+      selections.sort((a, b) => b - a);
+
+      // move selected items from scene to block
+      selections.forEach((index) => {
+        const item = DesignCore.Scene.items.splice(index, 1)[0];
+        // adjust the items points to reflect the insert point
+        if (item.hasOwnProperty('points')) {
+          item.points.forEach((point) => {
+            const np = point.subtract(insertPoint);
+            point.x = np.x;
+            point.y = np.y;
+          });
+        }
+        block.items.push(item);
+      });
+
+      // define insert data
+      const insertData = {
+        type: 'Insert',
+        points: [new Point(insertPoint.x, insertPoint.y)],
+        blockName: selectedName,
+      };
+
+      // create the insert
+      DesignCore.Scene.inputManager.executeCommand(insertData);
+    } catch (err) {
+      Logging.instance.error(`${this.type} - ${err}`);
+    }
   }
+
+  preview() {}
 
   dxf(file) {
     file.writeGroupCode('0', 'BLOCK');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name);
+    file.writeGroupCode('70', this.flags);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', 0.0);
-    file.writeGroupCode('70', this.flags);
     file.writeGroupCode('3', this.name); // Name again
     file.writeGroupCode('1', '');
+
+    for (let i = 0; i <this.items.length; i++) {
+      this.items[i].dxf(file);
+    }
+
     file.writeGroupCode('0', 'ENDBLK');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
@@ -92,27 +152,21 @@ export class Block extends Entity {
     this.items.push(item);
   }
 
-  addInsert(data) {
-    const point = new Point(data.points[0].x, data.points[0].y);
-    this.points[0] = point;
-  }
-
-  draw(ctx, scale) {
+  draw(ctx, scale, insert = undefined) {
     if (!this.items.length) {
       // nothing to draw
       return;
     }
 
-    // blocks are associated with an insert point.
-    // translate ctx by the insert location
-    // this allows the items to be draw without knowing the insert location of the parent block
-    ctx.translate(this.points[0].x, this.points[0].y);
+    this.items.forEach((item) => {
+      ctx.save();
+      // Use the current item and block insert to set the context
+      // insert required for colour ByBlock
+      DesignCore.Canvas.setContext(item, ctx, insert);
 
-    for (let item = 0; item < this.items.length; item++) {
-      if (typeof this.items[item].draw == 'function') {
-        this.items[item].draw(ctx, scale);
-      }
-    }
+      item.draw(ctx, scale);
+      ctx.restore();
+    });
 
     /*
         //////////////////////////////////////////
@@ -128,35 +182,20 @@ export class Block extends Entity {
   }
 
   snaps(mousePoint, delta) {
-    let snaps = [];
+    const snaps = [];
 
     if (!this.items.length) {
       // nothing to draw
       return snaps;
     }
 
-    snaps = [this.points[0]];
-
     for (let item = 0; item < this.items.length; item++) {
       // collect the child item snaps
       const itemSnaps = this.items[item].snaps(mousePoint, delta);
-
-      for (let snap = 0; snap < itemSnaps.length; snap++) {
-        // offset the item snap point by the block insert location
-        let snapPoint = itemSnaps[snap];
-        snapPoint = snapPoint.add(this.points[0]);
-        snaps.push(snapPoint);
-      }
+      snaps.push(...itemSnaps);
     }
 
     return snaps;
-  }
-
-  intersectPoints() {
-    return {
-      start: this.points[0],
-      end: this.points[0],
-    };
   }
 
   closestPoint(P) {
@@ -168,12 +207,9 @@ export class Block extends Entity {
       return [minPnt, distance];
     }
 
-    // adjust the selection point to offset by the block insert position
-    const adjustedPoint = P.subtract(this.points[0]);
-
     for (let idx = 0; idx < this.items.length; idx++) {
-      const itemClosestPoint = this.items[idx].closestPoint(adjustedPoint);
-      const itemPnt = itemClosestPoint[0].add(this.points[0]); // adjust by the block insert position
+      const itemClosestPoint = this.items[idx].closestPoint(P);
+      const itemPnt = itemClosestPoint[0];
       const itemDist = itemClosestPoint[1];
 
       if (itemDist < distance) {
@@ -186,18 +222,18 @@ export class Block extends Entity {
   }
 
   boundingBox() {
-    let xmin;
-    let xmax;
-    let ymin;
-    let ymax;
+    let xmin = Infinity;
+    let xmax = -Infinity;
+    let ymin = Infinity;
+    let ymax = -Infinity;
 
     for (let idx = 0; idx < this.items.length; idx++) {
       const itemBoundingBox = this.items[idx].boundingBox();
 
-      xmin = Math.min(xmin || Infinity, itemBoundingBox.xMin);
-      xmax = Math.max(xmax || -Infinity, itemBoundingBox.xMax);
-      ymin = Math.min(ymin || Infinity, itemBoundingBox.yMin);
-      ymax = Math.max(ymax || -Infinity, itemBoundingBox.yMax);
+      xmin = Math.min(xmin, itemBoundingBox.xMin);
+      xmax = Math.max(xmax, itemBoundingBox.xMax);
+      ymin = Math.min(ymin, itemBoundingBox.yMin);
+      ymax = Math.max(ymax, itemBoundingBox.yMax);
     }
 
     const topLeft = new Point(xmin, ymax);
@@ -207,30 +243,13 @@ export class Block extends Entity {
   }
 
   touched(selectionExtremes) {
-    if (!this.items.length) {
-      // nothing to draw
-      return false;
-    }
-
-    const layer = DesignCore.LayerManager.getStyleByName(this.layer);
-
-    if (!layer.isSelectable) {
-      return;
-    }
-
-    // Offset selectionExtremes by the block insert position
-    const adjustedSelectionExtremes = [
-      selectionExtremes[0] - this.points[0].x,
-      selectionExtremes[1] - this.points[0].x,
-      selectionExtremes[2] - this.points[0].y,
-      selectionExtremes[3] - this.points[0].y,
-    ];
-
     for (let idx = 0; idx < this.items.length; idx++) {
-      const touched = this.items[idx].touched(adjustedSelectionExtremes);
+      const touched = this.items[idx].touched(selectionExtremes);
       if (touched) {
         return true;
       }
     }
+
+    return false;
   }
 }
