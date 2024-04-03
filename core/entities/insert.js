@@ -207,6 +207,12 @@ export class Insert extends Entity {
   }
 
   touched(selectionExtremes) {
+    const layer = DesignCore.LayerManager.getStyleByName(this.layer);
+
+    if (!layer.isSelectable) {
+      return;
+    }
+
     // adjust selectionExtremes by the insert position
     const [xmin, xmax, ymin, ymax] = selectionExtremes;
     const pt = this.points[0];
