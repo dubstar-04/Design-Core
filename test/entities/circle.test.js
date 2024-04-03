@@ -1,6 +1,7 @@
 import {Circle} from '../../core/entities/circle.js';
 import {Point} from '../../core/entities/point.js';
 
+import {File} from '../test-helpers/test-helpers.js';
 
 test('Test Circle.getRadius', () => {
   const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
@@ -46,4 +47,33 @@ test('Test Circle.boundingBox', () => {
   expect(circle.boundingBox().xMax).toBeCloseTo(100);
   expect(circle.boundingBox().yMin).toBeCloseTo(-100);
   expect(circle.boundingBox().yMax).toBeCloseTo(100);
+});
+
+test('Test Circle.dxf', () => {
+  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const file = new File();
+  circle.dxf(file);
+  // console.log(file.contents);
+
+  const dxfString = `0
+CIRCLE
+5
+1
+100
+AcDbEntity
+100
+AcDbCircle
+8
+0
+10
+100
+20
+100
+30
+0.0
+40
+100
+`;
+
+  expect(file.contents).toEqual(dxfString);
 });
