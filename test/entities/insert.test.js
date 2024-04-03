@@ -1,19 +1,43 @@
+import {Core} from '../../core/core/core.js';
 import {Insert} from '../../core/entities/insert.js';
 import {Point} from '../../core/entities/point.js';
 import {Line} from '../../core/entities/line.js';
 
 import {File} from '../test-helpers/test-helpers.js';
 
+// initialise core
+new Core();
+
 
 const insert = new Insert({points: [new Point()]});
 const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
 insert.block.addItem(line);
+
+const rotatedInsert = new Insert({points: [new Point()], rotation: 45});
+rotatedInsert.block.addItem(line);
+
+test('Test Insert.snaps', () => {
+  const point = new Point(100, 100);
+  const snaps = insert.snaps(point, 1);
+  expect(snaps[0].x).toBeCloseTo(101);
+  expect(snaps[0].y).toBeCloseTo(102);
+
+  // Test snaps for a rotated block
+  const rotatedSnaps= rotatedInsert.snaps(point);
+  expect(rotatedSnaps[0].x).toBeCloseTo(-0.7071);
+  expect(rotatedSnaps[0].y).toBeCloseTo(143.5426);
+});
 
 test('Test Insert.closestPoint', () => {
   const point = new Point(100, 100);
   const closest = insert.closestPoint(point);
   expect(closest[0].x).toBeCloseTo(101);
   expect(closest[0].y).toBeCloseTo(102);
+
+  // Test closest for a rotated block
+  const rotatedClosest = rotatedInsert.closestPoint(point);
+  expect(rotatedClosest[0].x).toBeCloseTo(101);
+  expect(rotatedClosest[0].y).toBeCloseTo(102);
 });
 
 test('Test Insert.boundingBox', () => {
