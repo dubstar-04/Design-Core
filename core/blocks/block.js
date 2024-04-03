@@ -250,22 +250,13 @@ export class Block extends Entity {
   }
 
   touched(selectionExtremes) {
-    if (!this.items.length) {
-      // nothing to draw
-      return false;
-    }
-
-    const layer = DesignCore.LayerManager.getStyleByName(this.layer);
-
-    if (!layer.isSelectable) {
-      return;
-    }
-
     for (let idx = 0; idx < this.items.length; idx++) {
       const touched = this.items[idx].touched(selectionExtremes);
       if (touched) {
         return true;
       }
     }
+
+    return false;
   }
 }
