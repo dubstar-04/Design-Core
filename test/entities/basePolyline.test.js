@@ -1,6 +1,7 @@
 import {BasePolyline} from '../../core/entities/basePolyline';
 import {Point} from '../../core/entities/point';
 
+import {File} from '../test-helpers/test-helpers.js';
 
 test('Test BasePolyline.closestPoint', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
@@ -176,4 +177,107 @@ test('Test BasePolyline.getBulgeFromSegment', () => {
   angle = -Math.PI * 1.75;
   bulge = Math.tan(angle / 4);
   expect(polyline.getBulgeFromSegment(new Point(64.6447, -14.6447))).toBeCloseTo(bulge);
+});
+
+test('Test Text.dxf', () => {
+  const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
+  points[1].bulge = -1;
+  const polyline = new BasePolyline({points: points});
+  const file = new File();
+  polyline.dxf(file);
+  // console.log(file.contents);
+
+  const dxfString = `0
+POLYLINE
+5
+1
+100
+AcDbEntity
+100
+AcDb2dPolyline
+8
+0
+10
+0
+20
+0
+30
+0
+39
+2
+70
+0
+66
+1
+0
+VERTEX
+5
+1
+100
+AcDbEntity
+100
+AcDbVertex
+100
+AcDb2dVertex
+8
+0
+10
+100
+20
+100
+30
+0.0
+42
+0
+0
+VERTEX
+5
+1
+100
+AcDbEntity
+100
+AcDbVertex
+100
+AcDb2dVertex
+8
+0
+10
+200
+20
+100
+30
+0.0
+42
+-1
+0
+VERTEX
+5
+1
+100
+AcDbEntity
+100
+AcDbVertex
+100
+AcDb2dVertex
+8
+0
+10
+200
+20
+50
+30
+0.0
+42
+0
+0
+SEQEND
+5
+1
+100
+AcDbEntity
+8
+0
+`;
+
+  expect(file.contents).toEqual(dxfString);
 });
