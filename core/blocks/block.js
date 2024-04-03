@@ -198,13 +198,6 @@ export class Block extends Entity {
     return snaps;
   }
 
-  intersectPoints() {
-    return {
-      start: this.points[0],
-      end: this.points[0],
-    };
-  }
-
   closestPoint(P) {
     let distance = Infinity;
     let minPnt = P;
