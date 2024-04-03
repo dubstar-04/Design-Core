@@ -168,10 +168,12 @@ export class Insert extends Entity {
     const blockSnaps = this.block.snaps(mousePoint, delta);
 
     for (let snap = 0; snap < blockSnaps.length; snap++) {
+      const snapPoint = blockSnaps[snap];
       // offset the item snap point by the block insert location
-      let snapPoint = blockSnaps[snap];
-      snapPoint = snapPoint.add(this.points[0]);
-      snaps.push(snapPoint);
+      const rotatedPoint = snapPoint.add(this.points[0]);
+      // rotate the snap point to match the item positions
+      const adjustedPoint = rotatedPoint.rotate(this.points[0], Utils.degrees2radians(this.rotation));
+      snaps.push(adjustedPoint);
     }
 
     return snaps;
@@ -194,9 +196,11 @@ export class Insert extends Entity {
 
   closestPoint(P) {
     // get the closest point from the blocks entities
+    // rotate P to match the block rotation
+    const rotatedPoint = P.rotate(this.points[0], Utils.degrees2radians(-this.rotation));
     // adjust P by the insert position
-    P = P.subtract(this.points[0]);
-    return this.block.closestPoint(P);
+    const adjustedPoint = rotatedPoint.subtract(this.points[0]);
+    return this.block.closestPoint(adjustedPoint);
   }
 
   boundingBox() {
