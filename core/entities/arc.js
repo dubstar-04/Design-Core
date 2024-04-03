@@ -147,10 +147,14 @@ export class Arc extends Entity {
 
     if (DesignCore.Settings.endsnap) {
       // Speed this up by generating the proper start and end points when the arc is initialised
-      const startPoint = new Point(this.points[0].x + (this.radius * Math.cos(this.startAngle())),
-          this.points[0].y + (this.radius * Math.sin(this.startAngle())));
-      const endPoint = new Point(this.points[0].x + (this.radius * Math.cos(this.endAngle())),
-          this.points[0].y + (this.radius * Math.sin(this.endAngle())));
+      const startPoint = new Point(
+          this.points[0].x + (this.radius * Math.cos(this.startAngle())),
+          this.points[0].y + (this.radius * Math.sin(this.startAngle())),
+      );
+      const endPoint = new Point(
+          this.points[0].x + (this.radius * Math.cos(this.endAngle())),
+          this.points[0].y + (this.radius * Math.sin(this.endAngle())),
+      );
 
       snaps.push(startPoint, endPoint);
     }
