@@ -2,20 +2,8 @@ import {Insert} from '../../core/entities/insert.js';
 import {Point} from '../../core/entities/point.js';
 import {Line} from '../../core/entities/line.js';
 
-// mock file for dxf test
-class File {
-  constructor() {
-    this.contents = '';
-  }
+import {File} from '../test-helpers/test-helpers.js';
 
-  nextHandle() {
-    return 1;
-  }
-
-  writeGroupCode(groupCode, groupValue) {
-    this.contents = this.contents.concat(`${groupCode}\n${groupValue}\n`);
-  }
-}
 
 const insert = new Insert({points: [new Point()]});
 const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
