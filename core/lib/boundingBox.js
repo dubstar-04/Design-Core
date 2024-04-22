@@ -49,6 +49,13 @@ export class BoundingBox {
   }
 
   /**
+   * return bounding box center point
+   */
+  get centerPoint() {
+    return new Point(this.xMin + this.xLength / 2, this.yMin + this.yLength / 2);
+  }
+
+  /**
    * Return the bounding box for points
    * @param {Array} points
    */

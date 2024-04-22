@@ -15,6 +15,7 @@ import {Text} from '../entities/text.js';
 // import {BaseDimension} from '../entities/basedimension.js';
 import {Block} from '../blocks/block.js';
 import {Insert} from '../entities/insert.js';
+import {Hatch} from '../entities/hatch.js';
 
 // import { Point } from "../entities/point.js"
 
@@ -51,6 +52,7 @@ const classes = {
   // RadialDimension,
   Block,
   Insert,
+  Hatch,
   Move,
   Copy,
   Rotate,
