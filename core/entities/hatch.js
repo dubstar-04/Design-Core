@@ -153,12 +153,9 @@ export class Hatch extends Entity {
         ctx.translate(centerPoint.x + originX, centerPoint.y + originY);
         // rotate the context
         ctx.rotate(rotation);
-        // determin in the current iteration is odd or even
-        const oddEven = Math.abs(i) % 2;
         // apply the deltaX offset for odd iterations
-        const dashOffset = deltaX * oddEven;
         // define offsets for the current iteration
-        const xOffset = (dashLength * xIncrement) + dashOffset;
+        const xOffset = deltaX * Math.abs(i) + dashLength * xIncrement;
         const yOffset = deltaY * i;
 
         ctx.moveTo(-xOffset, yOffset);
