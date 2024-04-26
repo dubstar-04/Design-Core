@@ -3,8 +3,16 @@ export class Patterns {
     return Patterns.hatch_patterns[name.toUpperCase()];
   }
 
-  static hatch_patterns = {
+  /**
+   * Check if the pattern exists
+   * @param {string} name
+   * @returns bool
+   */
+  static patternExists(name) {
+    return Object.hasOwn(Patterns.hatch_patterns, name);
+  }
 
+  static hatch_patterns = {
     'ANGLE': {description: 'Angle steel', pattern:
 `0, 0, 0, 0, 6.985, 5.08, -1.905 
 90, 0, 0, 0, 6.985, 5.08, -1.905`},
