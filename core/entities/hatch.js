@@ -14,8 +14,6 @@ import {Patterns} from '../lib/patterns.js';
 import {DesignCore} from '../designCore.js';
 import {Intersection} from '../lib/intersect.js';
 
-// import Cairo from 'cairo';
-
 export class Hatch extends Entity {
   constructor(data) {
     super(data);
@@ -139,7 +137,6 @@ export class Hatch extends Entity {
         dashLength = dashPattern.reduce((accumulator, currentValue) => accumulator + currentValue);
       }
 
-      // ctx.setLineCap(Cairo.LineCap.SQUARE);
       ctx.setDash(dashPattern, 0);
       ctx.setLineWidth(1/scale);
 
