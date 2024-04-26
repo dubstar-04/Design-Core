@@ -85,8 +85,15 @@ export class Hatch extends Entity {
         }
       }
     }
-    ctx.clip();
-    this.createPattern(ctx, scale);
+
+    if (Patterns.patternExists(this.patternName)) {
+      ctx.clip();
+      this.createPattern(ctx, scale);
+    } else {
+      ctx.fill();
+    }
+
+
     ctx.restore();
   }
 
@@ -94,30 +101,25 @@ export class Hatch extends Entity {
     ctx.save();
     const boundingBox = this.boundingBox();
 
-    // console.log(this.patternName);
     const patternString = Patterns.getPattern(this.patternName);
 
-    if (patternString === undefined) {
-      console.log(`########## ${this.patternName} Hatch pattern not found ##########`);
-      ctx.fill();
-      ctx.restore();
-      return;
-    }
-
-    const lines = patternString.pattern.split('\n');
-
-    lines.forEach((line)=>{
+    // split the pattern into seperate lines
+    const patternLines = patternString.pattern.split('\n');
+    // process each pattern line
+    patternLines.forEach((line)=>{
       const patternArray = line.split(',');
 
       if (!patternArray.length) {
         return;
       }
 
-      const lineDash = patternArray.splice(5);
-      const dashPattern = lineDash.map((x) => (Math.abs(x) + 0.00001));
-
-      ctx.setDash(dashPattern, 0);
-      ctx.setLineWidth(1/scale);
+      // Each pattern line is considered to be the first member of a line family,
+      // Patterns are created by applying the delta offsets in both directions to generate an infinite family of parallel lines.
+      // originX and originY values are the offsets of the line from the origin and are applied without rotation
+      // The delta-x value indicates the displacement between members of the family in the direction of the line. It is used only for dashed lines.
+      // The delta-y value indicates the spacing between members of the family; that is, it is measured perpendicular to the lines.
+      // A line is considered to be of infinite length.
+      // A dash pattern is superimposed on the line.
 
       const angle = parseFloat(patternArray[0]);
       const originX = parseFloat(patternArray[1]);
@@ -125,31 +127,45 @@ export class Hatch extends Entity {
       const deltaX = parseFloat(patternArray[3]);
       const deltaY = parseFloat(patternArray[4]);
 
-      // Each pattern line is considered to be the first member of a line family, created by applying the delta offsets in both directions to generate
-      // an infinite family of parallel lines.
-      // The delta-x value indicates the displacement between members of the family in the direction of the line. It is used only for dashed lines.
-      // The delta-y value indicates the spacing between members of the family; that is, it is measured perpendicular to the lines.
-      // A line is considered to be of infinite length. A dash pattern is superimposed on the line.
+      // get dash pattern from the end of the array
+      const lineDash = patternArray.splice(5);
+      const dashPattern = lineDash.map((x) => Math.abs(x) + 0.001);
+
+      // define dashlength - i.e. the length of each dash summed
+      // where there is no dash defined use half the boundingbox xlength
+      let dashLength = boundingBox.xLength / 2;
+      if (lineDash.length) {
+        // sum the length of all the dashes
+        dashLength = dashPattern.reduce((accumulator, currentValue) => accumulator + currentValue);
+      }
+
+      // ctx.setLineCap(Cairo.LineCap.SQUARE);
+      ctx.setDash(dashPattern, 0);
+      ctx.setLineWidth(1/scale);
 
       const rotation = Utils.degrees2radians(angle);
       const centerPoint = boundingBox.centerPoint;
-      const steps = Math.ceil((boundingBox.yLength * 2) / deltaY);
 
-      const origin = new Point(originX, originY);
-      const adjustedOrigin = origin.rotate(new Point(), -rotation);
+      const xIncrement = Math.ceil((boundingBox.xLength) / dashLength);
+      const yIncrement = Math.ceil((boundingBox.yLength / 1.75) / deltaY);
 
-      for (let i = -steps; i < steps; i++) {
+      for (let i = -yIncrement; i < yIncrement; i++) {
         ctx.save();
-        ctx.translate(centerPoint.x - boundingBox.xLength, centerPoint.y - boundingBox.yLength);
+        // translate to the center of the shape
+        // apply the origin offsets without rotation
+        ctx.translate(centerPoint.x + originX, centerPoint.y + originY);
+        // rotate the context
         ctx.rotate(rotation);
-
+        // determin in the current iteration is odd or even
         const oddEven = Math.abs(i) % 2;
+        // apply the deltaX offset for odd iterations
         const dashOffset = deltaX * oddEven;
+        // define offsets for the current iteration
+        const xOffset = (dashLength * xIncrement) + dashOffset;
+        const yOffset = deltaY * i;
 
-        const deltaYInc = deltaY * i;
-
-        ctx.moveTo(adjustedOrigin.x + dashOffset, adjustedOrigin.y + deltaYInc);
-        ctx.lineTo(adjustedOrigin.x + boundingBox.xLength * 4, adjustedOrigin.y + deltaYInc);
+        ctx.moveTo(-xOffset, yOffset);
+        ctx.lineTo(xOffset, yOffset);
 
         ctx.stroke();
         ctx.restore();
