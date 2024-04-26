@@ -8,61 +8,71 @@ export class Patterns {
     //    SOLID: {description: 'Solid fill', pattern: `
     // 0,0,0,0,0
     // `},
-    ANGLE: {description: 'Angle steel', pattern:
+    'ANGLE': {description: 'Angle steel', pattern:
 `0, 0, 0, 0, 6.985, 5.08, -1.905 
 90, 0, 0, 0, 6.985, 5.08, -1.905`},
-    ANSI31: {description: 'ANSI Iron, Brick, Stone masonry', pattern:
+
+    'ANSI31': {description: 'ANSI Iron, Brick, Stone masonry', pattern:
 `45, 0, 0, 0, 3.175`},
-    ANSI32: {description: 'ANSI Steel', pattern:
+
+    'ANSI32': {description: 'ANSI Steel', pattern:
 `45, 0, 0, 0, 9.525
 45, 4.49013, 0, 0, 9.525`},
-    ANSI33: {description: 'ANSI Bronze, Brass, Copper', pattern:
+
+    'ANSI33': {description: 'ANSI Bronze, Brass, Copper', pattern:
 `45, 0, 0, 0, 6.35
 45, 4.49013, 0, 0, 6.35, 3.175, -1.5875`},
-    ANSI34: {description: 'ANSI Plastic, Rubber', pattern:
+    'ANSI34': {description: 'ANSI Plastic, Rubber', pattern:
 `45, 0, 0, 0, 19.05
 45, 4.49013, 0, 0, 19.05
 45, 8.98026, 0, 0, 19.05
 45, 13.4704, 0, 0, 19.05`},
 
+    'ANSI35': {description: 'ANSI Fire brick, Refractory material', pattern:
+`45, 0, 0, 0, 6.35
+45, 4.49013, 0, 0, 6.35, 7.9375, -1.5875, 0, -1.5875`},
 
-    /*
-*ANSI35,ANSI Fire brick, Refractory material
-45, 0, 0, 0, 6.35
-45, 4.49013, 0, 0, 6.35, 7.9375, -1.5875, 0, -1.5875
-*ANSI36,ANSI Marble, Slate, Glass
-45, 0, 0, 5.55625, 3.175, 7.9375, -1.5875, 0, -1.5875
-*ANSI37,ANSI Lead, Zinc, Magnesium, Sound/Heat/Elec Insulation
-45, 0, 0, 0, 3.175
-135, 0, 0, 0, 3.175
-*ANSI38,ANSI Aluminum
-45, 0, 0, 0, 3.175
-135, 0, 0, 6.35, 3.175, 7.9375, -4.7625
-*AR-B816, 8x16 block elevation stretcher bond
-0, 0, 0, 0, 203.2
-90, 0, 0, 203.2, 203.2, 203.2, -203.2
-*AR-B816C, 8x16 block elevation stretcher bond with mortar joints
-0, 0, 0, 203.2, 203.2, 396.875, -9.525
+    'ANSI36': {description: 'ANSI Marble, Slate, Glass', pattern:
+`45, 0, 0, 5.55625, 3.175, 7.9375, -1.5875, 0, -1.5875`},
+
+    'ANSI37': {description: 'ANSI Lead, Zinc, Magnesium, Sound/Heat/Elec Insulation', pattern:
+`45, 0, 0, 0, 3.175
+135, 0, 0, 0, 3.175`},
+
+    'ANSI38': {description: 'ANSI Aluminum', pattern:
+`45, 0, 0, 0, 3.175
+135, 0, 0, 6.35, 3.175, 7.9375, -4.7625`},
+
+    'AR-B816': {description: '8x16 block elevation stretcher bond', pattern:
+`0, 0, 0, 0, 203.2
+90, 0, 0, 203.2, 203.2, 203.2, -203.2`},
+
+    'AR-B816C': {description: '8x16 block elevation stretcher bond with mortar joints', pattern:
+`0, 0, 0, 203.2, 203.2, 396.875, -9.525
 0, -203.2, 9.525, 203.2, 203.2, 396.875, -9.525
 90, 0, 0, 203.2, 203.2, -212.725, 193.675
-90, -9.525, 0, 203.2, 203.2, -212.725, 193.675
-*AR-B88, 8x8 block elevation stretcher bond
-0, 0, 0, 0, 203.2
-90, 0, 0, 203.2, 101.6, 203.2, -203.2
-*AR-BRELM, standard brick elevation english bond with mortar joints
-0, 0, 0, 0, 135.484, 193.675, -9.525
+90, -9.525, 0, 203.2, 203.2, -212.725, 193.675`},
+
+    'AR-B88': {description: '8x8 block elevation stretcher bond', pattern:
+`0, 0, 0, 0, 203.2
+90, 0, 0, 203.2, 101.6, 203.2, -203.2`},
+
+    'AR-BRELM': {description: 'standard brick elevation english bond with mortar joints', pattern:
+`0, 0, 0, 0, 135.484, 193.675, -9.525
 0, 0, 57.15, 0, 135.484, 193.675, -9.525
 0, 50.8, 67.7418, 0, 135.484, 92.075, -9.525
 0, 50.8, 124.892, 0, 135.484, 92.075, -9.525
 90, 0, 0, 0, 203.2, 57.15, -78.334
 90, -9.525, 0, 0, 203.2, 57.15, -78.334
 90, 50.8, 67.7418, 0, 101.6, 57.15, -78.334
-90, 41.275, 67.7418, 0, 101.6, 57.15, -78.334
-*AR-BRSTD, standard brick elevation stretcher bond
-0, 0, 0, 0, 67.7418
-90, 0, 0, 67.7418, 101.6, 67.7418, -67.7418
-*AR-CONC, random dot and stone pattern
-50, 0, 0, 104.896, -149.807, 19.05, -209.55
+90, 41.275, 67.7418, 0, 101.6, 57.15, -78.334`},
+
+    'AR-BRSTD': {description: 'standard brick elevation stretcher bond', pattern:
+`0, 0, 0, 0, 67.7418
+90, 0, 0, 67.7418, 101.6, 67.7418, -67.7418`},
+
+    'AR-CONC': {description: 'random dot and stone pattern', pattern:
+`50, 0, 0, 104.896, -149.807, 19.05, -209.55
 355, 0, 0, -51.76101082,187.25814969, 15.24, -167.64058417
 100.4514447,15.182007,-1.3282535,145.5569059,-176.270089,16.1900088,-178.0902446
 46.1842, 0, 50.8, 157.343, -224.71, 28.575, -314.325
@@ -74,12 +84,14 @@ export class Patterns {
 37.5, 0, 0, 53.9242, 65.2018, 0,        -165.608, 0, -170.18, 0, -168.275
 7.5, 0, 0, 79.3242, 90.6018, 0, -97.028, 0, -161.798, 0, -64.135
 -32.5, -56.642, 0, 117.434, 68.0212, 0, -63.5, 0, -198.12, 0, -262.89
--42.5, -82.042, 0, 92.0344, 118.821, 0, -82.55, 0, -131.572, 0, -186.69
-*AR-HBONE, standard brick herringbone pattern @ 45 degrees
-45, 0, 0, 101.6, 101.6, 304.8, -101.6
-135, 71.842, 71.842, 101.6, -101.6, 304.8, -101.6
-*AR-PARQ1, 2x12 parquet flooring: pattern of 12x12
-90, 0, 0, 304.8, 304.8, 304.8, -304.8
+-42.5, -82.042, 0, 92.0344, 118.821, 0, -82.55, 0, -131.572, 0, -186.69`},
+
+    'AR-HBONE': {description: 'standard brick herringbone pattern @ 45 degrees', pattern:
+`45, 0, 0, 101.6, 101.6, 304.8, -101.6
+135, 71.842, 71.842, 101.6, -101.6, 304.8, -101.6`},
+
+    'AR-PARQ1': {description: '2x12 parquet flooring: pattern of 12x12', pattern:
+`90, 0, 0, 304.8, 304.8, 304.8, -304.8
 90, 50.8, 0, 304.8, 304.8, 304.8, -304.8
 90, 101.6, 0, 304.8, 304.8, 304.8, -304.8
 90, 152.4, 0, 304.8, 304.8, 304.8, -304.8
@@ -92,13 +104,15 @@ export class Patterns {
 0, 0, 457.2, 304.8, -304.8, 304.8, -304.8
 0, 0, 508, 304.8, -304.8, 304.8, -304.8
 0, 0, 558.8, 304.8, -304.8, 304.8, -304.8
-0, 0, 609.6, 304.8, -304.8, 304.8, -304.8
-*AR-RROOF, roof shingle texture
-0, 0, 0, 55.88, 25.4, 381, -50.8, 127, -25.4
+0, 0, 609.6, 304.8, -304.8, 304.8, -304.8`},
+
+    'AR-RROOF': {description: 'roof shingle texture', pattern:
+`0, 0, 0, 55.88, 25.4, 381, -50.8, 127, -25.4
 0, 33.782, 12.7, -25.4, 33.782, 76.2, -8.382, 152.4, -19.05
-0, 12.7, 21.59, 132.08, 17.018, 203.2, -35.56, 101.6, -25.4
-*AR-RSHKE, roof wood shake texture
-0, 0, 0, 647.7, 304.8, 152.4,   -127, 177.8, -76.2, 228.6, -101.6
+0, 12.7, 21.59, 132.08, 17.018, 203.2, -35.56, 101.6, -25.4`},
+
+    'AR-RSHKE': {description: 'roof wood shake texture', pattern:
+`0, 0, 0, 647.7, 304.8, 152.4,   -127, 177.8, -76.2, 228.6, -101.6
 0, 152.4, 12.7, 647.7, 304.8, 127, -482.6, 101.6, -152.4
 0, 457.2, -19.05, 647.7, 304.8, 76.2, -787.4
 90, 0, 0, 304.8, 215.9, 292.1, -927.1
@@ -106,71 +120,80 @@ export class Patterns {
 90, 279.4, 0, 304.8, 215.9, 266.7, -952.5
 90, 457.2, -19.05, 304.8, 215.9, 292.1, -927.1
 90, 533.4, -19.05, 304.8, 215.9, 292.1, -927.1
-90, 762, 0, 304.8, 215.9, 279.4, -939.8
-*AR-SAND, random dot pattern
-37.5, 0, 0, 28.5242, 39.8018, 0,        -38.608, 0, -43.18, 0, -41.275
+90, 762, 0, 304.8, 215.9, 279.4, -939.8`},
+
+    'AR-SAND': {description: 'random dot pattern', pattern:
+`37.5, 0, 0, 28.5242, 39.8018, 0, -38.608, 0, -43.18, 0, -41.275
 7.5, 0, 0, 53.9242, 65.2018, 0, -20.828, 0, -34.798, 0, -13.335
 -32.5, -31.242, 0, 66.6344, 42.6212, 0, -12.7, 0, -45.72, 0, -59.69
--42.5, -31.242, 0, 41.2344, 68.0212, 0, -6.35, 0, -29.972, 0, -34.29
-*BOX,Box steel
-90, 0, 0, 0, 25.4
+-42.5, -31.242, 0, 41.2344, 68.0212, 0, -6.35, 0, -29.972, 0, -34.29`},
+
+    'BOX': {description: 'Box steel', pattern:
+`90, 0, 0, 0, 25.4
 90, 6.35, 0, 0, 25.4
 0, 0, 0, 0, 25.4, -6.35, 6.35
 0, 0, 6.35, 0, 25.4, -6.35, 6.35
 0, 0, 12.7, 0, 25.4, 6.35, -6.35
 0, 0, 19.05, 0, 25.4, 6.35, -6.35
 90, 12.7, 0, 0, 25.4, 6.35, -6.35
-90, 19.05, 0, 0, 25.4, 6.35, -6.35
-*BRASS,Brass material
-0, 0, 0, 0, 6.35
-0, 0, 3.175, 0, 6.35, 3.175, -1.5875
-*BRICK,Brick or masonry-type surface
-0, 0, 0, 0, 6.35
+90, 19.05, 0, 0, 25.4, 6.35, -6.35`},
+
+    'BRASS': {description: 'Brass material', pattern:
+`0, 0, 0, 0, 6.35
+0, 0, 3.175, 0, 6.35, 3.175, -1.5875`},
+
+    'BRICK': {description: 'Brick or masonry-type surface', pattern:
+`0, 0, 0, 0, 6.35
 90, 0, 0, 0, 12.7, 6.35, -6.35
-90, 6.35, 0, 0, 12.7, -6.35, 6.35
-*BRSTONE,Brick and stone
-0, 0, 0, 0, 8.382
+90, 6.35, 0, 0, 12.7, -6.35, 6.35`},
+
+    'BRSTONE': {description: 'Brick and stone', pattern:
+`0, 0, 0, 0, 8.382
 90, 22.86, 0, 8.382, 12.7, 8.382, -8.382
 90, 20.32, 0, 8.382, 12.7, 8.382, -8.382
 0, 22.86, 1.397, 12.7, 8.382, -22.86, 2.54
 0, 22.86, 2.794, 12.7, 8.382, -22.86, 2.54
 0, 22.86, 4.191, 12.7, 8.382, -22.86, 2.54
 0, 22.86, 5.588, 12.7, 8.382, -22.86, 2.54
-0, 22.86, 6.985, 12.7, 8.382, -22.86, 2.54
-*CLAY,Clay material
-0, 0, 0, 0, 4.7625
+0, 22.86, 6.985, 12.7, 8.382, -22.86, 2.54`},
+
+    'CLAY': {description: 'Clay material', pattern:
+`0, 0, 0, 0, 4.7625
 0, 0, 0.79375, 0, 4.7625
 0, 0, 1.5875, 0, 4.7625
-0, 0, 3.175, 0, 4.7625, 4.7625, -3.175
-*CORK,Cork material
-0, 0, 0, 0, 3.175
+0, 0, 3.175, 0, 4.7625, 4.7625, -3.175`},
+
+    'CORK': {description: 'Cork material', pattern:
+`0, 0, 0, 0, 3.175
 135, 1.5875, -1.5875, 0, 8.98026, 4.49013, -4.49013
 135, 2.38125, -1.5875, 0, 8.98026, 4.49013, -4.49013
-135, 3.175, -1.5875, 0, 8.98026, 4.49013, -4.49013
-*/
+135, 3.175, -1.5875, 0, 8.98026, 4.49013, -4.49013`},
 
-    CROSS: {description: 'A series of crosses', pattern:
+    'CROSS': {description: 'A series of crosses', pattern:
 `0, 0, 0, 6.35, 6.35, 3.175, -9.525
 90, 1.5875, -1.5875, 6.35, 6.35, 3.175, -9.525`},
 
 
-    /*
-*DASH,Dashed lines
-0, 0, 0, 3.175, 3.175, 3.175, -3.175
-*DOLMIT,Geological rock layering
-0, 0, 0, 0, 6.35
-45, 0, 0, 0, 17.9605,8.98025612106915355989072339,-17.9605122421383071197814467
-*DOTS,A series of dots
-0, 0, 0, 0.79375, 1.5875, 0, -1.5875
-*EARTH,Earth or ground (subterranean)
-0, 0, 0, 6.35, 6.35, 6.35, -6.35
+    'DASH': {description: 'Dashed lines', pattern:
+`0, 0, 0, 3.175, 3.175, 3.175, -3.175`},
+
+    'DOLMIT': {description: 'Geological rock layering', pattern:
+`0, 0, 0, 0, 6.35
+45, 0, 0, 0, 17.9605,8.98025612106915355989072339,-17.9605122421383071197814467`},
+
+    'DOTS': {description: 'A series of dots', pattern:
+`0, 0, 0, 0.79375, 1.5875, 0, -1.5875`},
+
+    'EARTH': {description: 'Earth or ground (subterranean)', pattern:
+`0, 0, 0, 6.35, 6.35, 6.35, -6.35
 0, 0, 2.38125, 6.35, 6.35, 6.35, -6.35
 0, 0, 4.7625, 6.35, 6.35, 6.35, -6.35
 90, 0.79375, 5.55625, 6.35, 6.35, 6.35, -6.35
 90, 3.175, 5.55625, 6.35, 6.35, 6.35, -6.35
-90, 5.55625, 5.55625, 6.35, 6.35, 6.35, -6.35
-*ESCHER,Escher pattern
-60, 0, 0, -15.24, 26.3964542936, 27.94, -2.54
+90, 5.55625, 5.55625, 6.35, 6.35, 6.35, -6.35`},
+
+    'ESCHER': {description: 'Escher pattern', pattern:
+`60, 0, 0, -15.24, 26.3964542936, 27.94, -2.54
 180, 0, 0, -15.24, 26.3964542936, 27.94, -2.54
 300, 0, 0, 15.24, 26.3964542936, 27.94, -2.54
 60, 2.54, 0, -15.24, 26.3964542936, 5.08, -25.4
@@ -190,33 +213,40 @@ export class Patterns {
 120, 1.27, 6.5991135734, 15.24, 26.3964542936, 17.78, -12.7
 120, -6.35, 2.199704516, 15.24, 26.3964542936, 17.78, -12.7
 240, -6.35, -2.199704516, 15.24, 26.3964542936, 17.78, -12.7
-240, 1.27, -6.5991135734, 15.24, 26.3964542936, 17.78, -12.7
-*FLEX,Flexible material
-0, 0, 0, 0, 6.35, 6.35, -6.35
-45,6.35,0,4.490128053,4.490128053,1.5875,-5.8052561314,1.5875,-8.9802561314
-*GOST_GLASS,glass material
-45, 0, 0, 6, -6, 5, -7
+240, 1.27, -6.5991135734, 15.24, 26.3964542936, 17.78, -12.7`},
+
+    'FLEX': {description: 'Flexible material', pattern:
+`0, 0, 0, 0, 6.35, 6.35, -6.35
+45,6.35,0,4.490128053,4.490128053,1.5875,-5.8052561314,1.5875,-8.9802561314`},
+
+    'GOST_GLASS': {description: 'glass material', pattern:
+`45, 0, 0, 6, -6, 5, -7
 45, 2.121320, 0, 6, -6, 2, -10
-45, 0, 2.121320, 6, -6, 2, -10
-*GOST_WOOD,wood material
-90, 0, 0, 0, -6, 10, -2
+45, 0, 2.121320, 6, -6, 2, -10`},
+
+    'GOST_WOOD': {description: 'wood material', pattern:
+`90, 0, 0, 0, -6, 10, -2
 90, 2, -2, 0, -6, 6, -1.5, 3, -1.5
-90, 4, -5, 0, -6, 10, -2
-*GOST_GROUND,ground
-45, 0, 0, 10, -10, 20
+90, 4, -5, 0, -6, 10, -2`},
+
+    'GOST_GROUND': {description: 'ground', pattern:
+`45, 0, 0, 10, -10, 20
 45, 3, 0, 10, -10, 20
-45, 6, 0, 10, -10, 20
-*GRASS,Grass area
-90, 0, 0, 17.96051224, 17.96051224, 4.7625, -31.15852448
+45, 6, 0, 10, -10, 20`},
+
+    'GRASS': {description: 'Grass area', pattern:
+`90, 0, 0, 17.96051224, 17.96051224, 4.7625, -31.15852448
 45, 0, 0, 0, 25.4, 4.7625, -20.6375
-135, 0, 0, 0, 25.4, 4.7625, -20.6375
-*GRATE,Grated area
-0, 0, 0, 0, 0.79375
-90, 0, 0, 0, 3.175
-*GRAVEL,Gravel pattern
-228.0127875,18.288,25.4,305.85067529778,1.88796713245,3.4172144,-338.30483639565
-184.969741,16.002,22.86,-305.8545235377,1.10019612724,5.8640472,-580.54048893524
-132.5104471,10.16,22.352,-377.59492241548,1.56030959675,4.1348152,-409.347227941
+135, 0, 0, 0, 25.4, 4.7625, -20.6375`},
+
+    'GRATE': {description: 'Grated area', pattern:
+`0, 0, 0, 0, 0.79375
+90, 0, 0, 0, 3.175`},
+
+    'GRAVEL': {description: 'Gravel pattern', pattern:
+`228.0127875, 18.288, 25.4, 305.85067529778, 1.88796713245,3.4172144,-338.30483639565
+184.969741, 16.002, 22.86, -305.8545235377, 1.10019612724, 5.8640472, -580.54048893524
+132.5104471, 10.16,22.352, -377.59492241548, 1.56030959675, 4.1348152, -409.347227941
 267.273689,.254,16.002,-508.63316875916,1.20815479432,5.3400452,-528.66437425738
 292.83365418,0.0,10.668,-330.19770134945,1.23208097566,5.236337,-518.39807745344
 357.273689,2.032,5.842,-508.63316875916,1.20815479432,5.3400452,-528.66437425738
@@ -254,166 +284,195 @@ export class Patterns {
 325.3048465,21.844,11.43,310.04235091354,-1.6064370526,4.0160956,-397.5931672414
 254.0546041,25.146,9.144,104.6687497289,3.48895832444,3.6982908,-181.21650038772
 207.64597536,24.13,5.588,545.36007557253,1.07143433066,6.021451,-596.12464422938
-175.42607874,18.796,2.794,331.1739336186,1.01276432357,6.3702946,-630.6584645624
-*HEX,Hexagons
-0, 0, 0, 0, 5.4992613154, 3.175, -6.35
+175.42607874,18.796,2.794,331.1739336186,1.01276432357,6.3702946,-630.6584645624`},
+
+    'HEX': {description: 'Hexagons', pattern:
+`0, 0, 0, 0, 5.4992613154, 3.175, -6.35
 120, 0, 0, 0, 5.4992613154, 3.175, -6.35
-60, 3.175, 0, 0, 5.4992613154, 3.175, -6.35
-*/
+60, 3.175, 0, 0, 5.4992613154, 3.175, -6.35`},
 
-
-    HONEY: {description: 'Honeycomb pattern', pattern:
+    'HONEY': {description: 'Honeycomb pattern', pattern:
 `0, 0, 0, 4.7625, 2.749630645, 3.175, -6.35
 120, 0, 0, 4.7625, 2.749630645, 3.175, -6.35
-60, 0, 0, 4.7625, 2.749630645, -6.35, 3.175`},
+60, 3.175, 0, 4.7625, 2.749630645, 3.175, -6.35`},
+
+    'HOUND': {description: 'Houndstooth check', pattern:
+`0, 0, 0, 6.35, 1.5875, 25.4, -12.7
+90, 0, 0, -6.35, 1.5875, 25.4, -12.7`},
+
+    'INSUL': {description: 'Insulation material', pattern:
+`0, 0, 0, 0, 9.525
+0, 0, 3.175, 0, 9.525, 3.175, -3.175
+0, 0, 6.35, 0, 9.525, 3.175, -3.175`},
 
     /*
-*HOUND,Houndstooth check
-0, 0, 0, 6.35, 1.5875, 25.4, -12.7
-90, 0, 0, -6.35, 1.5875, 25.4, -12.7
-*INSUL,Insulation material
-0, 0, 0, 0, 9.525
-0, 0, 3.175, 0, 9.525, 3.175, -3.175
-0, 0, 6.35, 0, 9.525, 3.175, -3.175
-;;
-;;  Hatch Pattern Definition related to ISO/DIS 12011 line types
-;;
-;;  (Width * 5 = Distance between lines)
-;;
-;;  The size of the line segments related to the ISO/DIS 12011 linetypes
-;;  define the following hatch pattern.
-;;  The pen width of 1 mm is the base of the definition. To use them with
-;;  the other ISO/DIS 12011 predefined pen widths, the line has to be scaled
-;;  with the appropriate value (e.g. pen width 0,5 mm -> ltscale 0.5).
-;;
-*ACAD_ISO02W100, dashed line
-0, 0,0, 0,5, 12,-3
-*ACAD_ISO03W100, dashed space line
-0, 0,0, 0,5, 12,-18
-*ACAD_ISO04W100, long dashed dotted line
-0, 0,0, 0,5, 24,-3,.5,-3
-*ACAD_ISO05W100, long dashed double dotted line
-0, 0,0, 0,5, 24,-3,.5,-3,.5,-3
-*ACAD_ISO06W100, long dashed triplicate dotted line
-0, 0,0, 0,5, 24,-3,.5,-3,.5,-6.5
-0, 0,0, 0,5, -34,.5,-3
-*ACAD_ISO07W100, dotted line
-0, 0,0, 0,5, .5,-3
-*ACAD_ISO08W100, long dashed short dashed line
-0, 0,0, 0,5, 24,-3,6,-3
-*ACAD_ISO09W100, long dashed double-short-dashed line
-0, 0,0, 0,5, 24,-3,6,-3,6,-3
-*ACAD_ISO10W100, dashed dotted line
-0, 0,0, 0,5, 12,-3,.5,-3
-*ACAD_ISO11W100, double-dashed dotted line
-0, 0,0, 0,5, 12,-3,12,-3,.5,-3
-*ACAD_ISO12W100, dashed double-dotted line
-0, 0,0, 0,5, 12,-3,.5,-3,.5,-3
-*ACAD_ISO13W100, double-dashed double-dotted line
-0, 0,0, 0,5, 12,-3,12,-3,.5,-6.5
-0, 0,0, 0,5, -33.5,.5,-3
-*ACAD_ISO14W100, dashed triplicate-dotted line
-0, 0,0, 0,5, 12,-3,.5,-3,.5,-6.5
-0, 0,0, 0,5, -22,.5,-3
-*ACAD_ISO15W100, double-dashed triplicate-dotted line
-0, 0,0, 0,5, 12,-3,12,-3,.5,-10
-0, 0,0, 0,5, -33.5,.5,-3,.5,-3
-;;
-;; end of ACAD_ISO hatch pattern definition
-;;
-;;  Hatch Pattern Definition related to JIS A 0150
-;;
-*JIS_LC_20, LC JIS A 0150(@20)
-45,0,0,0,20
-45,.4,0,0,20
-*JIS_LC_20A, LC JIS A 0150(@20Се)
-45,0,0,0,20
-45,1,0,0,20
-*JIS_LC_8, LC JIS A 0150(@8)
-45,0,0,0,7.8
-45,.4,0,0,7.8
-*JIS_LC_8A, LC JIS A 0150(@8Се)
-45,0,0,0,7.8
-45,1,0,0,7.8
-*JIS_RC_10, RC JIS A 0150(@10)
-45,0,0,0,10
-45,.725,0,0,10
-45,1.45,0,0,10
-*JIS_RC_15, RC JIS A 0150(@15)
-45,0,0,0,15
-45,.725,0,0,15
-45,1.45,0,0,15
-*JIS_RC_18, RC JIS A 0150(@18)
-45,0,0,0,18
-45,1,0,0,18
-45,2,0,0,18
-*JIS_RC_30, RC JIS A 0150(@30)
-45,0,0,0,30
-45,1,0,0,30
-45,2,0,0,30
-*JIS_STN_1E, STONE JIS A 0150(@1)
-45, 0, 0, 0, 1
-45, .705, 0, 0,1, 1, -.5
-*JIS_STN_2.5, STONE JIS A 0150(@2.5)
-45, 0, 0, 0, 2.5
-45, 1.765, 0, 0,2.5, 1.2, -.5
-*JIS_WOOD, WOOD JIS A 0150
-45,0,0,0,.70710678
-;;
-*LINE,Parallel horizontal lines
-0, 0, 0, 0, 3.175
-*MUDST,Mud and sand
-0, 0, 0, 12.7, 6.35, 6.35,      -6.35, 0, -6.35, 0, -6.35
-*NET,Horizontal / vertical grid
-0, 0, 0, 0, 3.175
-90, 0, 0, 0, 3.175
-*NET3,Network pattern 0-60-120
-0, 0, 0, 0, 3.175
-60, 0, 0, 0, 3.175
-120, 0, 0, 0, 3.175
-*PLAST,Plastic material
-0, 0, 0, 0, 6.35
-0, 0, 0.79375, 0, 6.35
-0, 0, 1.5875, 0, 6.35
-*PLASTI,Plastic material
-0, 0, 0, 0, 6.35
-0, 0, 0.79375, 0, 6.35
-0, 0, 1.5875, 0, 6.35
-0, 0, 3.96875, 0, 6.35
-*SACNCR,Concrete
-45, 0, 0, 0, 2.38125
-45, 1.6838, 0, 0, 2.38125, 0, -2.38125
-*SQUARE,Small aligned squares
-0, 0, 0, 0, 3.175, 3.175, -3.175
-90, 0, 0, 0, 3.175, 3.175, -3.175
+  Hatch Pattern Definition related to ISO/DIS 12011 line types
+
+  (Width * 5 = Distance between lines)
+
+  The size of the line segments related to the ISO/DIS 12011 linetypes
+  define the following hatch pattern.
+  The pen width of 1 mm is the base of the definition. To use them with
+  the other ISO/DIS 12011 predefined pen widths, the line has to be scaled
+  with the appropriate value (e.g. pen width 0,5 mm -> ltscale 0.5).
 */
 
-    STARS: {description: 'Star of David', pattern:
+    'ACAD_ISO02W100': {description: 'dashed line', pattern:
+`0, 0,0, 0,5, 12,-3`},
+
+    'ACAD_ISO03W100': {description: 'dashed space line', pattern:
+`0, 0,0, 0,5, 12,-18`},
+
+    'ACAD_ISO04W100': {description: 'long dashed dotted line', pattern:
+`0, 0,0, 0,5, 24,-3,.5,-3`},
+
+    'ACAD_ISO05W100': {description: 'long dashed double dotted line', pattern:
+`0, 0,0, 0,5, 24,-3,.5,-3,.5,-3`},
+
+    'ACAD_ISO06W100': {description: 'long dashed triplicate dotted line', pattern:
+`0, 0,0, 0,5, 24,-3,.5,-3,.5,-6.5
+0, 0,0, 0,5, -34,.5,-3`},
+
+    'ACAD_ISO07W100': {description: 'dotted line', pattern:
+`0, 0,0, 0,5, .5,-3`},
+
+    'ACAD_ISO08W100': {description: 'long dashed short dashed line', pattern:
+`0, 0,0, 0,5, 24,-3,6,-3`},
+
+    'ACAD_ISO09W100': {description: 'long dashed double-short-dashed line', pattern:
+`0, 0,0, 0,5, 24,-3,6,-3,6,-3`},
+
+    'ACAD_ISO10W100': {description: 'dashed dotted line', pattern:
+`0, 0,0, 0,5, 12,-3,.5,-3`},
+
+    'ACAD_ISO11W100': {description: 'double-dashed dotted line', pattern:
+`0, 0,0, 0,5, 12,-3,12,-3,.5,-3`},
+
+    'ACAD_ISO12W100': {description: 'dashed double-dotted line', pattern:
+`0, 0,0, 0,5, 12,-3,.5,-3,.5,-3`},
+
+    'ACAD_ISO13W100': {description: 'double-dashed double-dotted line', pattern:
+`0, 0,0, 0,5, 12,-3,12,-3,.5,-6.5
+0, 0,0, 0,5, -33.5,.5,-3`},
+
+    'ACAD_ISO14W100': {description: 'dashed triplicate-dotted line', pattern:
+`0, 0,0, 0,5, 12,-3,.5,-3,.5,-6.5
+0, 0,0, 0,5, -22,.5,-3`},
+
+    'ACAD_ISO15W100': {description: 'double-dashed triplicate-dotted line', pattern:
+`0, 0,0, 0,5, 12,-3,12,-3,.5,-10
+0, 0,0, 0,5, -33.5,.5,-3,.5,-3`},
+
+    'JIS_LC_20': {description: 'LC JIS A 0150(@20)', pattern:
+`45,0,0,0,20
+45,.4,0,0,20`},
+
+    'JIS_LC_20A': {description: 'LC JIS A 0150(@20Се)', pattern:
+`45,0,0,0,20
+45,1,0,0,20`},
+
+    'JIS_LC_8': {description: 'LC JIS A 0150(@8)', pattern:
+`45,0,0,0,7.8
+45,.4,0,0,7.8`},
+
+    'JIS_LC_8A': {description: 'LC JIS A 0150(@8Се)', pattern:
+`45,0,0,0,7.8
+45,1,0,0,7.8`},
+
+    'JIS_RC_10': {description: 'RC JIS A 0150(@10)', pattern:
+`45,0,0,0,10
+45,.725,0,0,10
+45,1.45,0,0,10`},
+
+    'JIS_RC_15': {description: 'RC JIS A 0150(@15)', pattern:
+`45,0,0,0,15
+45,.725,0,0,15
+45,1.45,0,0,15`},
+
+    'JIS_RC_18': {description: 'RC JIS A 0150(@18)', pattern:
+`45,0,0,0,18
+45,1,0,0,18
+45,2,0,0,18`},
+
+    'JIS_RC_30': {description: 'RC JIS A 0150(@30)', pattern:
+`45,0,0,0,30
+45,1,0,0,30
+45,2,0,0,30`},
+
+    'JIS_STN_1E': {description: 'STONE JIS A 0150(@1)', pattern:
+`45, 0, 0, 0, 1
+45, .705, 0, 0,1, 1, -.5`},
+
+    'JIS_STN_2.5': {description: 'STONE JIS A 0150(@2.5)', pattern:
+`45, 0, 0, 0, 2.5
+45, 1.765, 0, 0,2.5, 1.2, -.5`},
+
+    'JIS_WOOD': {description: 'WOOD JIS A 0150', pattern:
+`45,0,0,0,.70710678`},
+
+    'LINE': {description: 'Parallel horizontal lines', pattern:
+`0, 0, 0, 0, 3.175`},
+
+    'MUDST': {description: 'Mud and sand', pattern:
+`0, 0, 0, 12.7, 6.35, 6.35,-6.35, 0, -6.35, 0, -6.35`},
+
+    'NET': {description: 'Horizontal / vertical grid', pattern:
+`0, 0, 0, 0, 3.175
+90, 0, 0, 0, 3.175`},
+
+    'NET3': {description: 'Network pattern 0-60-120', pattern:
+`0, 0, 0, 0, 3.175
+60, 0, 0, 0, 3.175
+120, 0, 0, 0, 3.175`},
+
+    'PLAST': {description: 'Plastic material', pattern:
+`0, 0, 0, 0, 6.35
+0, 0, 0.79375, 0, 6.35
+0, 0, 1.5875, 0, 6.35`},
+
+    'PLASTI': {description: 'Plastic material', pattern:
+`0, 0, 0, 0, 6.35
+0, 0, 0.79375, 0, 6.35
+0, 0, 1.5875, 0, 6.35
+0, 0, 3.96875, 0, 6.35`},
+
+    'SACNCR': {description: 'Concrete', pattern:
+`45, 0, 0, 0, 2.38125
+45, 1.6838, 0, 0, 2.38125, 0, -2.38125`},
+
+    'SQUARE': {description: 'Small aligned squares', pattern:
+`0, 0, 0, 0, 3.175, 3.175, -3.175
+90, 0, 0, 0, 3.175, 3.175, -3.175`},
+
+    'STARS': {description: 'Star of David', pattern:
 `0, 0, 0, 0, 5.4992613154, 3.175, -3.175
 60, 0, 0, 0, 5.4992613154, 3.175, -3.175
 120, 1.5875, 2.7496306704, 0, 5.4992613154, 3.175, -3.175`},
 
-    /*
-*STEEL,Steel material
-45, 0, 0, 0, 3.175
-45, 0, 1.5875, 0, 3.175
-*SWAMP,Swampy area
-0, 0, 0, 12.7, 21.9970452362, 3.175, -22.225
+    'STEEL': {description: 'Steel material', pattern:
+`45, 0, 0, 0, 3.175
+45, 0, 1.5875, 0, 3.175`},
+
+    'SWAMP': {description: 'Swampy area', pattern:
+`0, 0, 0, 12.7, 21.9970452362, 3.175, -22.225
 90, 1.5875, 0, 21.9970452362, 12.7, 1.5875, -42.4065904724
 90, 1.984375, 0, 21.9970452362, 12.7, 1.27, -42.7240904724
 90, 1.190625, 0, 21.9970452362, 12.7, 1.27, -42.7240904724
 60, 2.38125, 0, 12.7, 21.9970452362, 1.016, -24.384
-120, 0.79375, 0, 12.7, 21.9970452362, 1.016, -24.384
-*TRANS,Heat transfer material
-0, 0, 0, 0, 6.35
-0, 0, 3.175, 0, 6.35, 3.175, -3.175
-*TRIANG,Equilateral triangles
-60, 0, 0, 4.7625, 8.2488919604, 4.7625, -4.7625
+120, 0.79375, 0, 12.7, 21.9970452362, 1.016, -24.384`},
+
+    'TRANS': {description: 'Heat transfer material', pattern:
+`0, 0, 0, 0, 6.35
+0, 0, 3.175, 0, 6.35, 3.175, -3.175`},
+
+    'TRIANG': {description: 'Equilateral triangles', pattern:
+`60, 0, 0, 4.7625, 8.2488919604, 4.7625, -4.7625
 120, 0, 0, 4.7625, 8.2488919604, 4.7625, -4.7625
-0, -2.38125, 4.1244459802, 4.7625, 8.2488919604, 4.7625, -4.7625
-*ZIGZAG,Staircase effect
-0, 0, 0, 3.175, 3.175, 3.175, -3.175
-90, 3.175, 0, 3.175, 3.175, 3.175, -3.175
-*/
+0, -2.38125, 4.1244459802, 4.7625, 8.2488919604, 4.7625, -4.7625`},
+
+    'ZIGZAG': {description: 'Staircase effect', pattern:
+`0, 0, 0, 3.175, 3.175, 3.175, -3.175
+90, 3.175, 0, 3.175, 3.175, 3.175, -3.175`},
+
   };
 }
