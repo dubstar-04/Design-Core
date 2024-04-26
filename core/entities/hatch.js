@@ -146,8 +146,8 @@ export class Hatch extends Entity {
       const rotation = Utils.degrees2radians(angle);
       const centerPoint = boundingBox.centerPoint;
 
-      const xIncrement = Math.ceil((boundingBox.xLength) / dashLength);
-      const yIncrement = Math.ceil((boundingBox.yLength / 1.75) / deltaY);
+      const xIncrement = Math.abs(Math.ceil((boundingBox.xLength) / dashLength));
+      const yIncrement = Math.abs(Math.ceil((boundingBox.yLength / 1.75) / deltaY));
 
       for (let i = -yIncrement; i < yIncrement; i++) {
         ctx.save();
