@@ -1,4 +1,9 @@
 export class Patterns {
+  /**
+     * Get Pattern
+     * @param {string} name
+     * @returns pattern string for the pattern name
+     */
   static getPattern(name) {
     return Patterns.hatch_patterns[name.toUpperCase()];
   }
