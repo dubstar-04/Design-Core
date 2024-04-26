@@ -308,7 +308,7 @@ export class Patterns {
 
     'HOUND': {description: 'Houndstooth check', pattern:
 `0, 0, 0, 6.35, 1.5875, 25.4, -12.7
-90, 0, 0, -6.35, 1.5875, 25.4, -12.7`},
+90, 0, 0, 6.35, 1.5875, 25.4, -12.7`},
 
     'INSUL': {description: 'Insulation material', pattern:
 `0, 0, 0, 0, 9.525
