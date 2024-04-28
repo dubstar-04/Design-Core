@@ -9,7 +9,7 @@ import {Logging} from '../lib/logging.js';
 import {Point} from './point.js';
 
 import {Utils} from '../lib/utils.js';
-import {Patterns} from '../lib/patterns.js';
+import {PatternLine, Patterns} from '../lib/patterns.js';
 
 import {DesignCore} from '../designCore.js';
 import {Intersection} from '../lib/intersect.js';
@@ -31,7 +31,7 @@ export class Hatch extends Entity {
       }
     }
 
-    // console.log(data);
+    console.log(data);
   }
 
   static register() {
@@ -100,18 +100,9 @@ export class Hatch extends Entity {
     ctx.save();
     const boundingBox = this.boundingBox();
 
-    const patternString = Patterns.getPattern(this.patternName);
+    const pattern = Patterns.getPattern(this.patternName);
 
-    // split the pattern into seperate lines
-    const patternLines = patternString.pattern.split('\n');
-    // process each pattern line
-    patternLines.forEach((line)=>{
-      const patternArray = line.split(',');
-
-      if (!patternArray.length) {
-        return;
-      }
-
+    pattern.forEach((patternLine)=>{
       // Each pattern line is considered to be the first member of a line family,
       // Patterns are created by applying the delta offsets in both directions to generate an infinite family of parallel lines.
       // originX and originY values are the offsets of the line from the origin and are applied without rotation
@@ -120,44 +111,33 @@ export class Hatch extends Entity {
       // A line is considered to be of infinite length.
       // A dash pattern is superimposed on the line.
 
-      const angle = parseFloat(patternArray[0]);
-      const originX = parseFloat(patternArray[1]);
-      const originY = parseFloat(patternArray[2]);
-      const deltaX = parseFloat(patternArray[3]);
-      const deltaY = parseFloat(patternArray[4]);
-
-      // get dash pattern from the end of the array
-      const lineDash = patternArray.splice(5);
-      const dashPattern = lineDash.map((x) => Math.abs(x) + 0.001);
-
       // define dashlength - i.e. the length of each dash summed
       // where there is no dash defined use half the boundingbox xlength
       let dashLength = boundingBox.xLength / 2;
-      if (lineDash.length) {
-        // sum the length of all the dashes
-        dashLength = dashPattern.reduce((accumulator, currentValue) => accumulator + currentValue);
+      if (patternLine.dashes.length) {
+        dashLength = patternLine.getDashLength();
       }
 
-      ctx.setDash(dashPattern, 0);
+      ctx.setDash(patternLine.dashes, 0);
       ctx.setLineWidth(1/scale);
 
-      const rotation = Utils.degrees2radians(angle);
+      const rotation = Utils.degrees2radians(patternLine.angle);
       const centerPoint = boundingBox.centerPoint;
 
       const xIncrement = Math.abs(Math.ceil((boundingBox.xLength) / dashLength));
-      const yIncrement = Math.abs(Math.ceil((boundingBox.yLength / 1.75) / deltaY));
+      const yIncrement = Math.abs(Math.ceil((boundingBox.yLength / 1.75) / patternLine.yDelta));
 
       for (let i = -yIncrement; i < yIncrement; i++) {
         ctx.save();
         // translate to the center of the shape
         // apply the origin offsets without rotation
-        ctx.translate(centerPoint.x + originX, centerPoint.y + originY);
+        ctx.translate(centerPoint.x + patternLine.xOrigin, centerPoint.y + patternLine.yOrigin);
         // rotate the context
         ctx.rotate(rotation);
         // apply the deltaX offset for odd iterations
         // define offsets for the current iteration
-        const xOffset = deltaX * Math.abs(i) + dashLength * xIncrement;
-        const yOffset = deltaY * i;
+        const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
+        const yOffset = patternLine.yDelta * i;
 
         ctx.moveTo(-xOffset, yOffset);
         ctx.lineTo(xOffset, yOffset);
@@ -208,6 +188,7 @@ export class Hatch extends Entity {
     file.writeGroupCode('97', '1'); // Number of source boundary objects
 
     // Pattern data
+    file.writeGroupCode('52', '0'); // Hatch Pattern angle
     file.writeGroupCode('53', '45'); // Pattern line angle
     file.writeGroupCode('43', '0.0'); // Pattern line base X
     file.writeGroupCode('44', '0.0'); // Pattern line base y
