@@ -21,6 +21,7 @@ export class Hatch extends Entity {
     Object.defineProperty(this, 'patternName', {
       value: 'SOLID',
       writable: true,
+      enumerable: true,
     });
 
     if (data) {
