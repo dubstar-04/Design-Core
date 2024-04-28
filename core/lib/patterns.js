@@ -1,3 +1,43 @@
+export class PatternLine {
+  constructor(patternString) {
+    this.angle=0;
+    this.xOrigin = 0;
+    this.yOrigin = 0;
+    this.xDelta = 0;
+    this.yDelta=0;
+    this.dashes=[];
+
+    this.loadPatternLine(patternString);
+  }
+
+  loadPatternLine(patternString) {
+    const patternArray = patternString.split(',');
+
+    if (!patternArray.length) {
+      return;
+    }
+
+    // get dash pattern from the end of the array
+    const lineDashes = patternArray.splice(5);
+
+    this.angle = parseFloat(patternArray[0]);
+    this.xOrigin = parseFloat(patternArray[1]);
+    this.yOrigin = parseFloat(patternArray[2]);
+    this.xDelta = parseFloat(patternArray[3]);
+    this.yDelta = parseFloat(patternArray[4]);
+    this.dashes = lineDashes.map((x) => Math.abs(x) + 0.001);
+  }
+
+  getDashLength() {
+    if (this.dashes.length) {
+      // sum the length of all the dashes
+      const dashLength = this.dashes.reduce((accumulator, currentValue) => accumulator + currentValue);
+      return dashLength;
+    }
+    return 0;
+  }
+}
+
 export class Patterns {
   /**
      * Get Pattern
