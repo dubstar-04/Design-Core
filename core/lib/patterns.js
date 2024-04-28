@@ -45,7 +45,18 @@ export class Patterns {
      * @returns pattern string for the pattern name
      */
   static getPattern(name) {
-    return Patterns.hatch_patterns[name.toUpperCase()];
+    // create empty pattern
+    const pattern = [];
+    // get the pattern string
+    const patternString = Patterns.hatch_patterns[name.toUpperCase()];
+    // split the pattern into seperate lines
+    const patternLines = patternString.pattern.split('\n');
+
+    patternLines.forEach((line)=>{
+      pattern.push(new PatternLine(line));
+    });
+
+    return pattern;
   }
 
   /**
