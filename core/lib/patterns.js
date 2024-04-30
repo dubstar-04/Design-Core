@@ -218,9 +218,9 @@ export class Patterns {
 0, 0, 3.175, 0, 6.35, 3.175, -1.5875`},
 
     'BRICK': {description: 'Brick or masonry-type surface', pattern:
-`0, 0, 0, 0, 6.35
-90, 0, 0, 0, 12.7, 6.35, -6.35
-90, 6.35, 6.35, 0, 12.7, 6.35, 6.35`},
+`0, 0, 0, 0, 6.35 
+90, 0, 0, 0, 12.7, 6.35, -6.35 
+90, 6.35, 0, 0, 12.7, -6.35, 6.35 `},
 
     'BRSTONE': {description: 'Brick and stone', pattern:
 `0, 0, 0, 0, 8.382
