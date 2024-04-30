@@ -31,7 +31,7 @@ export class PatternLine {
   getDashLength() {
     if (this.dashes.length) {
       // sum the length of all the dashes
-      const dashLength = this.dashes.reduce((accumulator, currentValue) => accumulator + currentValue);
+      const dashLength = this.dashes.reduce((accumulator, currentValue) => Math.abs(accumulator) + Math.abs(currentValue));
       return dashLength;
     }
     return 0;
