@@ -60,6 +60,20 @@ export class Patterns {
   }
 
   /**
+     * Get Pattern line count
+     * @param {string} name
+     * @returns int for the number of pattern lines
+     */
+  static getPatternLineCount(name) {
+    // get the pattern string
+    const patternString = Patterns.hatch_patterns[name.toUpperCase()];
+    // split the pattern into seperate lines
+    const patternLines = patternString.pattern.split('\n');
+
+    return patternLines.length;
+  }
+
+  /**
    * Check if the pattern exists
    * @param {string} name
    * @returns bool
