@@ -118,7 +118,19 @@ export class Hatch extends Entity {
         dashLength = patternLine.getDashLength();
       }
 
-      ctx.setDash(patternLine.dashes, 0);
+      let dashes = patternLine.dashes;
+      let dashOffset = 0;
+
+      if (dashes[0] < 0) {
+        // if the first dash is negative move it to the end
+        const firstIndex = dashes.shift();
+        dashOffset = Math.abs(firstIndex);
+        dashes.push(firstIndex);
+      }
+
+      dashes = dashes.map((x) => Math.abs(x) + 0.00001);
+
+      ctx.setDash(dashes, 0);
       ctx.setLineWidth(1/scale);
 
       const rotation = Utils.degrees2radians(patternLine.angle);
@@ -139,7 +151,7 @@ export class Hatch extends Entity {
         const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
         const yOffset = patternLine.yDelta * i;
 
-        ctx.moveTo(-xOffset, yOffset);
+        ctx.moveTo(-xOffset+dashOffset, yOffset);
         ctx.lineTo(xOffset, yOffset);
 
         ctx.stroke();
