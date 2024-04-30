@@ -164,38 +164,51 @@ export class Hatch extends Entity {
     file.writeGroupCode('230', '1.0'); // Extrusion Direction Z
 
     file.writeGroupCode('2', this.patternName); // Hatch pattern name
-    file.writeGroupCode('70', '1'); // Solid Fill Flag (1 = solid, 0 = pattern)
+    file.writeGroupCode('70', '0'); // Solid Fill Flag (1 = solid, 0 = pattern)
     file.writeGroupCode('71', '1'); // Associativity flag (associative = 1; non-associative = 0); for MPolygon, solid-fill flag (has solidfill = 1; lacks solid fill = 0)
-    file.writeGroupCode('73', '1'); // For MPolygon, boundary annotation flag (boundary is an annotated boundary = 1; boundary is not an annotated boundary = 0)
-    file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
-    file.writeGroupCode('76', '1'); // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
-    file.writeGroupCode('77', '1'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
-    file.writeGroupCode('78', '1'); // Number of pattern definition lines
-    file.writeGroupCode('47', '0.5'); // pixel size
     file.writeGroupCode('91', '1'); // Number of boundary path loops
-    file.writeGroupCode('98', '1'); // Number of seed points
+    file.writeGroupCode('92', '7'); // Boundary path type flag (bit coded): 0 = Default; 1 = External; 2 = Polyline 4 = Derived; 8 = Textbox; 16 = Outermost
+    file.writeGroupCode('72', '1'); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
+    file.writeGroupCode('73', '1'); // For MPolygon, boundary annotation flag (boundary is an annotated boundary = 1; boundary is not an annotated boundary = 0)
+    file.writeGroupCode('93', '2'); // Number of edges in this boundary path (only if boundary is not a polyline)
 
 
-    for (let i = 1; i < this.points.length; i++) {
+    for (let i = 1; i < this.points.length - 1; i++) {
       file.writeGroupCode('10', this.points[i].x); // X
       file.writeGroupCode('20', this.points[i].y); // Y
+      if (this.points[i].bulge) {
+        file.writeGroupCode('42', this.points[i].bulge);
+      }
     }
 
-    // Boundary path data
-    file.writeGroupCode('92', '7'); // Boundary path type flag (bit coded): 0 = Default; 1 = External; 2 = Polyline 4 = Derived; 8 = Textbox; 16 = Outermost
-    file.writeGroupCode('93', '3'); // Number of edges in this boundary path (only if boundary is not a polyline)
-    file.writeGroupCode('72', '0'); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
-    file.writeGroupCode('97', '1'); // Number of source boundary objects
+    file.writeGroupCode('97', '0'); // Number of source boundary objects
+    // file.writeGroupCode('330', '25'); // Handle of source boundary objects
+    file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
+    file.writeGroupCode('76', '1'); // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
+    file.writeGroupCode('52', '0'); // Hatch Pattern angle
+    file.writeGroupCode('41', '1.0'); // Hatch Pattern scale
+    file.writeGroupCode('77', '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
+    file.writeGroupCode('78', Patterns.getPatternLineCount(this.patternName)); // Number of pattern definition lines
 
     // Pattern data
-    file.writeGroupCode('52', '0'); // Hatch Pattern angle
-    file.writeGroupCode('53', '45'); // Pattern line angle
-    file.writeGroupCode('43', '0.0'); // Pattern line base X
-    file.writeGroupCode('44', '0.0'); // Pattern line base y
-    file.writeGroupCode('45', '-2.2'); // Pattern line offset x
-    file.writeGroupCode('46', '2.2'); // Pattern line offset y
-    file.writeGroupCode('79', '0'); // Number of dash length items
-    file.writeGroupCode('49', ''); // Dash length
+    const pattern = Patterns.getPattern(this.patternName);
+    pattern.forEach((patternLine)=>{
+      file.writeGroupCode('53', patternLine.angle); // Pattern line angle
+      file.writeGroupCode('43', patternLine.xOrigin); // Pattern line base X
+      file.writeGroupCode('44', patternLine.yOrigin); // Pattern line base y
+      file.writeGroupCode('45', patternLine.xDelta); // Pattern line offset x
+      file.writeGroupCode('46', patternLine.yDelta); // Pattern line offset y
+      file.writeGroupCode('79', patternLine.dashes.length); // Number of dash length items
+      patternLine.dashes.forEach((dash) =>{
+        file.writeGroupCode('49', dash); // Dash length
+      });
+    });
+
+    file.writeGroupCode('47', '0.5'); // pixel size
+    file.writeGroupCode('98', '1'); // Number of seed points
+    // seed points
+    file.writeGroupCode('10', '1');
+    file.writeGroupCode('20', '1');
   }
 
   snaps(mousePoint, delta) {
