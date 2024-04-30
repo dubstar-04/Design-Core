@@ -9,7 +9,7 @@ import {Logging} from '../lib/logging.js';
 import {Point} from './point.js';
 
 import {Utils} from '../lib/utils.js';
-import {PatternLine, Patterns} from '../lib/patterns.js';
+import {Patterns} from '../lib/patterns.js';
 
 import {DesignCore} from '../designCore.js';
 import {Intersection} from '../lib/intersect.js';
