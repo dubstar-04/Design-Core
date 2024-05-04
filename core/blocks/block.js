@@ -4,6 +4,7 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 import {Strings} from '../lib/strings.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
+import {Flags} from '../properties/flags.js';
 
 import {DesignCore} from '../designCore.js';
 
@@ -14,7 +15,7 @@ export class Block extends Entity {
     this.points = [new Point()];
 
     Object.defineProperty(this, 'flags', {
-      value: 0,
+      value: new Flags(),
       writable: true,
     });
 
@@ -44,7 +45,7 @@ export class Block extends Entity {
         // 32 = This is a resolved external reference, or dependent of an external reference (ignored on input)
         // 64 = This definition is a referenced external reference (ignored on input)
 
-        this.flags = data.flags || data[70];
+        this.flags.setFlagValue(data.flags || data[70]);
       }
     }
   }
@@ -127,7 +128,7 @@ export class Block extends Entity {
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name);
-    file.writeGroupCode('70', this.flags);
+    file.writeGroupCode('70', this.flags.getFlagValue());
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', 0.0);
