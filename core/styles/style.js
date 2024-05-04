@@ -1,4 +1,5 @@
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {Flags} from '../properties/flags.js';
 
 export class Style {
   constructor(data) {
@@ -10,8 +11,8 @@ export class Style {
     this.widthFactor = 1;
     this.obliqueAngle = 0;
     this.lastTextHeight = this.textHeight;
-    this.flags = 0;
-    this.standardFlags = 0;
+    this.flags = new Flags();
+    this.standardFlags = new Flags();
 
     if (data) {
       if (data.hasOwnProperty('name') || data.hasOwnProperty('2') ) {
@@ -59,14 +60,14 @@ export class Style {
         64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
         (This flag is for the benefit of AutoCAD commands. It can be ignored.
         */
-        this.standardFlags = data.standardFlags || data[70];
+        this.standardFlags.setFlagValue(data.standardFlags || data[70]);
       }
 
       if (data.hasOwnProperty('flags') || data.hasOwnProperty('71') ) {
         // DXF Groupcode 71 - flags (bit-coded values):
         // 2 = Text is backward (mirrored in X).
         // 4 = Text is upside down (mirrored in Y).
-        this.flags = data.flags || data[71];
+        this.flags.setFlagValue(data.flags || data[71]);
       }
     }
   }
@@ -77,7 +78,7 @@ export class Style {
    */
   get vertical() {
     // Vertical value is bitmasked in standardflags as value 4
-    return Boolean(this.standardFlags & 4);
+    return this.standardFlags.hasFlag(4);
   }
 
   /**
@@ -86,11 +87,11 @@ export class Style {
    */
   set vertical(bool) {
     if (bool) {
-      // Add vertical flag
-      this.standardFlags = (this.standardFlags | 4);
+      // Add flag
+      this.standardFlags.addValue(4);
     } else {
-      // remove vertical flag
-      this.standardFlags = (this.standardFlags ^ (this.standardFlags & 4));
+      // remove flag
+      this.standardFlags.removeValue(4);
     }
   }
 
@@ -100,7 +101,7 @@ export class Style {
    */
   get backwards() {
     // Upside down value is bitmasked in flags as value 2
-    return Boolean(this.flags & 2);
+    return this.flags.hasFlag(2);
   }
 
   /**
@@ -110,10 +111,10 @@ export class Style {
   set backwards(bool) {
     if (bool) {
       // Add flag
-      this.flags = (this.flags | 2);
+      this.flags.addValue(2);
     } else {
       // remove flag
-      this.flags = (this.flags ^ (this.flags & 2));
+      this.flags.removeValue(2);
     }
   }
 
@@ -123,7 +124,7 @@ export class Style {
    */
   get upsideDown() {
     // Upside down value is bitmasked in flags as value 4
-    return Boolean(this.flags & 4);
+    return this.flags.hasFlag(4);
   }
 
   /**
@@ -133,10 +134,10 @@ export class Style {
   set upsideDown(bool) {
     if (bool) {
       // Add flag
-      this.flags = (this.flags | 4);
+      this.flags.addValue(4);
     } else {
       // remove flag
-      this.flags = (this.flags ^ (this.flags & 4));
+      this.flags.removeValue(4);
     }
   }
 
@@ -152,7 +153,7 @@ export class Style {
     file.writeGroupCode('41', this.widthFactor); // Width Factor
     file.writeGroupCode('42', this.textHeight); // Last Text Height
     file.writeGroupCode('50', this.obliqueAngle);
-    file.writeGroupCode('70', this.standardFlags); // Standard Flags
-    file.writeGroupCode('71', this.flags); // Flags
+    file.writeGroupCode('70', this.standardFlags.getFlagValue()); // Standard Flags
+    file.writeGroupCode('71', this.flags.getFlagValue()); // Flags
   }
 }

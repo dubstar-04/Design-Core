@@ -1,15 +1,16 @@
 import {Colours} from '../lib/colours.js';
 import {Colour} from '../lib/colour.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {Flags} from '../properties/flags.js';
 
 export class Layer {
   constructor(data) {
     // Define Properties
     this.type = 'Layer';
     this.name = '';
-    this.frozen = false;
+    // this.frozen = false;
     this.on = true;
-    this.locked = false;
+    // this.locked = false;
     // this.trueColour; // undefined - only used when non-aci colours are set
     this.lineType = 'CONTINUOUS';
     this.lineWeight = 'DEFAULT';
@@ -25,6 +26,10 @@ export class Layer {
       writable: true,
     });
 
+    Object.defineProperty(this, 'flags', {
+      value: new Flags(),
+      writable: true,
+    });
 
     if (data) {
       if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
@@ -41,27 +46,7 @@ export class Layer {
       // 16 = If set, table entry is externally dependent on an xref
       // 32 = If both this bit and bit 16 are set, the externally dependent xref has been successfully resolved
       // 64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
-
-        const flags = data.flags || data[70];
-        switch (flags) {
-          case 0:
-            break;
-          case 1:
-            this.frozen = true;
-            break;
-          case 2:
-            this.frozen = true;
-            break;
-          case 4:
-            this.locked = true;
-            break;
-          case 16:
-            break;
-          case 32:
-            break;
-          case 64: // (This flag is for the benefit of AutoCAD commands. It can be ignored by most programs that read DXF files and need not be set by programs that write DXF files.)
-            break;
-        }
+        this.flags.setFlagValue(data.flags || data[70]);
       }
 
       if (data.hasOwnProperty('colour') || data.hasOwnProperty('62')) {
@@ -111,6 +96,52 @@ export class Layer {
     }
   }
 
+  /**
+   * Get the frozen value
+   * @returns {bool}
+   */
+  get frozen() {
+    // Frozen value is bitmasked in flags as value 1
+    return this.flags.hasFlag(1);
+  }
+
+  /**
+     * Set the frozen value
+     * @param {boolean} bool
+     */
+  set frozen(bool) {
+    if (bool) {
+      // Add flag
+      this.flags.addValue(1);
+    } else {
+      // remove flag
+      this.flags.removeValue(1);
+    }
+  }
+
+  /**
+   * Get the locked value
+   * @returns {bool}
+   */
+  get locked() {
+    // locked value is bitmasked in flags as value 4
+    return this.flags.hasFlag(4);
+  }
+
+  /**
+       * Set the locked value
+       * @param {boolean} bool
+       */
+  set locked(bool) {
+    if (bool) {
+      // Add flag
+      this.flags.addValue(4);
+    } else {
+      // remove flag
+      this.flags.removeValue(4);
+    }
+  }
+
   get isVisible() {
     if (this.on && !this.frozen) {
       return true;
@@ -143,33 +174,13 @@ export class Layer {
     this.layerColour.setColour(colour);
   }
 
-  getFlags() {
-    // Standard flags (bit-coded values):
-    // 1 = Layer is frozen; otherwise layer is thawed.
-    // 2 = Layer is frozen by default in new viewports.
-    // 4 = Layer is locked.
-    // 16 = If set, table entry is externally dependent on an xref.
-    // 32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved.
-    // 64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited. (This flag is for the benefit of AutoCAD commands. It can be ignored by most programs that read DXF files and need not be set by programs that write DXF files.)
-    let flags = 0;
-
-    if (this.frozen) {
-      flags += 1;
-    }
-    if (this.locked) {
-      flags += 4;
-    }
-
-    return flags;
-  }
-
   dxf(file) {
     file.writeGroupCode('0', 'LAYER');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbLayerTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Layername
-    file.writeGroupCode('70', this.getFlags()); // Flags
+    file.writeGroupCode('70', this.flags.getFlagValue()); // Flags
     const colourValue = this.on ? this.layerColour.aci: (0 - this.layerColour.aci);
     file.writeGroupCode('62', colourValue); // Colour: Negative if layer is off
     if (this.layerColour.isTrueColour) {

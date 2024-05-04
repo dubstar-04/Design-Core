@@ -1,4 +1,5 @@
 import {DXFFile} from '../lib/dxf/dxfFile.js';
+import {Flags} from '../properties/flags.js';
 
 export class LType {
   constructor(data) {
@@ -6,7 +7,11 @@ export class LType {
     this.name = '';
     this.description = '';
     this.pattern = [];
-    this.flags = 0;
+
+    Object.defineProperty(this, 'flags', {
+      value: new Flags(),
+      writable: true,
+    });
 
     if (data) {
       if (data.hasOwnProperty('name') || data.hasOwnProperty('2') ) {
@@ -36,7 +41,7 @@ export class LType {
         // 16 = If set, table entry is externally dependent on an xref
         // 32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved
         // 64 = line type was referenced by at least one entity in the drawing the last time the drawing was edited. (This flag can be ignored by most programs)
-        this.flags = data.flags || data[70];
+        this.flags.setFlagValue(data.flags || data[70]);
       }
     }
   }
@@ -63,7 +68,7 @@ export class LType {
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbLinetypeTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name);
-    file.writeGroupCode('70', this.flags);
+    file.writeGroupCode('70', this.flags.getFlagValue());
     file.writeGroupCode('3', this.description);
     file.writeGroupCode('72', 65); // Alignment code; value is always 65, the ASCII code for A
     file.writeGroupCode('73', this.pattern.length);
@@ -71,9 +76,7 @@ export class LType {
     let patternLength = 0;
 
     if (this.pattern.length) {
-      patternLength = this.pattern.reduce(
-          (accumulator, patternValue) => accumulator + Math.abs(patternValue),
-      );
+      patternLength = this.pattern.reduce((accumulator, patternValue) => accumulator + Math.abs(patternValue));
     }
 
     file.writeGroupCode('40', patternLength);

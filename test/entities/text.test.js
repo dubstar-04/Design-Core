@@ -98,6 +98,47 @@ test('Test Text.getRotation', () => {
 });
 
 
+test('Test Text.flags', () => {
+  // DXF Groupcode 71 - flags (bit-coded values):
+  // 2 = Text is backward (mirrored in X).
+  // 4 = Text is upside down (mirrored in Y).
+  const text = new Text();
+  expect(text.flags.getFlagValue()).toBe(0);
+  // set backwards - set 2 on flags
+  text.backwards = true;
+  expect(text.flags.getFlagValue()).toBe(2);
+  // set upsideDown - set 4 on flags
+  text.upsideDown = true;
+  expect(text.flags.getFlagValue()).toBe(6);
+  // unset backwards - remove 2 on flags
+  text.backwards = false;
+  expect(text.flags.getFlagValue()).toBe(4);
+});
+
+test('Test Text.backwards', () => {
+  // DXF Groupcode 71 - flags (bit-coded values):
+  // 2 = Text is backward (mirrored in X).
+  // 4 = Text is upside down (mirrored in Y).
+  const text = new Text();
+  expect(text.backwards).toBe(false);
+  expect(text.flags.getFlagValue()).toBe(0);
+  text.backwards = true;
+  expect(text.backwards).toBe(true);
+  expect(text.flags.getFlagValue()).toBe(2);
+});
+
+test('Test Text.upsideDown', () => {
+  // DXF Groupcode 71 - flags (bit-coded values):
+  // 2 = Text is backward (mirrored in X).
+  // 4 = Text is upside down (mirrored in Y).
+  const text = new Text();
+  expect(text.upsideDown).toBe(false);
+  expect(text.flags.getFlagValue()).toBe(0);
+  text.upsideDown = true;
+  expect(text.upsideDown).toBe(true);
+  expect(text.flags.getFlagValue()).toBe(4);
+});
+
 test('Test Text.boundingBox', () => {
   const text = new Text({points: [new Point(11, 12)]});
   expect(text.boundingBox().xMin).toBeCloseTo(11);

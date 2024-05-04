@@ -1,11 +1,12 @@
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Logging} from '../lib/logging.js';
+import {Flags} from '../properties/flags.js';
 
 export class DimStyle {
   constructor(data) {
     // Define Properties
     this.type = this.constructor.name;
-    this.standardFlags = 0;
+    this.standardFlags = new Flags();
     this.name = '';
     this.DIMPOST = ''; // 3 - General dimensioning suffix
     this.DIMAPOST = ''; // 4 - Alternate dimensioning suffix
@@ -248,7 +249,7 @@ export class DimStyle {
         64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
         (This flag is for the benefit of AutoCAD commands. It can be ignored.
         */
-        this.standardFlags = data.standardFlags || data[70];
+        this.standardFlags.setFlagValue(data.standardFlags || data[70]);
       }
 
       if (data.hasOwnProperty('71')) {
@@ -623,7 +624,7 @@ export class DimStyle {
    */
   get vertical() {
     // Vertical value is bitmasked in standardflags as value 4
-    return Boolean(this.standardFlags & 4);
+    return this.standardFlags.hasFlag(4);
   }
 
   /**
@@ -632,11 +633,11 @@ export class DimStyle {
    */
   set vertical(bool) {
     if (bool) {
-      // Add vertical flag
-      this.standardFlags = (this.standardFlags | 4);
+      // Add flag
+      this.standardFlags.addValue(4);
     } else {
-      // remove vertical flag
-      this.standardFlags = (this.standardFlags ^ (this.standardFlags & 4));
+      // remove flag
+      this.standardFlags.removeValue(4);
     }
   }
 
@@ -647,7 +648,7 @@ export class DimStyle {
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimStyleTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Stylename
-    file.writeGroupCode('70', this.standardFlags);
+    file.writeGroupCode('70', this.standardFlags.getFlagValue());
     file.writeGroupCode('3', this.DIMPOST);
     file.writeGroupCode('4', this.DIMAPOST);
     file.writeGroupCode('5', this.DIMBLK);
