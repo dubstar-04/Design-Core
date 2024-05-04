@@ -6,6 +6,7 @@ import {Utils} from '../lib/utils.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 import {Point} from './point.js';
+import {Flags} from '../properties/flags.js';
 
 import {DesignCore} from '../designCore.js';
 
@@ -29,7 +30,7 @@ export class BasePolyline extends Entity {
     });
 
     Object.defineProperty(this, 'flags', {
-      value: 0,
+      value: new Flags(),
       writable: true,
     });
 
@@ -57,7 +58,7 @@ export class BasePolyline extends Entity {
         // 64 = The polyline is a polyface mesh
         // 128 = The linetype pattern is generated continuously around the vertices of this polyline
 
-        this.flags = data.flags || data[70];
+        this.flags.setFlagValue(data.flags || data[70]);
       }
     }
   }
@@ -148,7 +149,7 @@ export class BasePolyline extends Entity {
     }
 
     // handle a closed shape
-    if (this.flags % 2 === 1) {
+    if (this.flags.hasFlag(1)) {
       ctx.lineTo(this.points[0].x, this.points[0].y);
     }
 
@@ -165,7 +166,7 @@ export class BasePolyline extends Entity {
     file.writeGroupCode('20', '0');
     file.writeGroupCode('30', '0');
     file.writeGroupCode('39', this.lineWidth);
-    file.writeGroupCode('70', this.flags);
+    file.writeGroupCode('70', this.flags.getFlagValue());
     file.writeGroupCode('66', '1'); // Vertices follow: required for R12, optional for R2000+
     this.vertices(file);
     file.writeGroupCode('0', 'SEQEND');
