@@ -12,7 +12,7 @@ test('Test Block', () => {
   const block = new Block({items: [line], flags: 1});
 
   expect(block.items.length).toBe(1);
-  expect(block.flags).toBe(1);
+  expect(block.flags.getFlagValue()).toBe(1);
 });
 
 test('Test Block.clearItems', () => {
@@ -40,7 +40,7 @@ test('Test Block', () => {
   const block = new Block({items: [line], flags: 1});
 
   expect(block.items.length).toBe(1);
-  expect(block.flags).toBe(1);
+  expect(block.flags.getFlagValue()).toBe(1);
 });
 
 test('Test Block.closestPoint', () => {
