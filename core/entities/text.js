@@ -6,6 +6,7 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
+import {Flags} from '../properties/flags.js';
 
 import {DesignCore} from '../designCore.js';
 
@@ -45,7 +46,7 @@ export class Text extends Entity {
 
     // needs to be non-enumerable as to not appear in the object props
     Object.defineProperty(this, 'flags', {
-      value: 0,
+      value: new Flags(),
       writable: true,
     });
 
@@ -118,7 +119,7 @@ export class Text extends Entity {
         // DXF Groupcode 71 - flags (bit-coded values):
         // 2 = Text is backward (mirrored in X).
         // 4 = Text is upside down (mirrored in Y).
-        this.flags = data.flags || data[71];
+        this.flags.setFlagValue(data.flags || data[71]);
       }
     }
   }
@@ -222,7 +223,7 @@ export class Text extends Entity {
    */
   getBackwards() {
     // Backwards value is bitmasked in flags as value 2
-    return Boolean(this.flags & 2);
+    return this.flags.hasFlag(2);
   }
 
   /**
@@ -232,10 +233,10 @@ export class Text extends Entity {
   setBackwards(bool) {
     if (bool) {
       // Add flag
-      this.flags = (this.flags | 2);
+      this.flags.addValue(2);
     } else {
       // remove flag
-      this.flags = (this.flags ^ (this.flags & 2));
+      this.flags.removeValue(2);
     }
   }
 
@@ -245,7 +246,7 @@ export class Text extends Entity {
    */
   getUpsideDown() {
     // Upside down value is bitmasked in flags as value 4
-    return Boolean(this.flags & 4);
+    return this.flags.hasFlag(4);
   }
 
   /**
@@ -255,10 +256,10 @@ export class Text extends Entity {
   setUpsideDown(bool) {
     if (bool) {
       // Add flag
-      this.flags = (this.flags | 4);
+      this.flags.addValue(4);
     } else {
       // remove flag
-      this.flags = (this.flags ^ (this.flags & 4));
+      this.flags.removeValue(4);
     }
   }
 
@@ -422,7 +423,7 @@ export class Text extends Entity {
     file.writeGroupCode('1', this.string);
     file.writeGroupCode('50', this.rotation);
     // file.writeGroupCode('7', 'STANDARD'); // TEXT STYLE
-    file.writeGroupCode('71', this.flags); // Text generation flags
+    file.writeGroupCode('71', this.flags.getFlagValue()); // Text generation flags
     file.writeGroupCode('72', this.horizontalAlignment); // Horizontal alignment
     file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
     file.writeGroupCode('73', this.verticalAlignment); // Vertical alignment
