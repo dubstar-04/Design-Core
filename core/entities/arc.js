@@ -44,9 +44,9 @@ export class Arc extends Entity {
         this.points[2] = this.points[0].project(angle, this.radius);
       }
 
-      if (data.hasOwnProperty('direction')) {
+      if (data.hasOwnProperty('direction')|| data.hasOwnProperty('73')) {
         // No DXF Groupcode - Arc Direction
-        const direction = data.direction;
+        const direction = data.direction || data[73];
         this.direction = direction;
       }
     }
