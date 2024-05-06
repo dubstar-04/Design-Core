@@ -103,10 +103,13 @@ class BoundaryPathArc {
   }
 
   draw(ctx, scale) {
+    const sA = Utils.degrees2radians(this.startAngle);
+    const eA = Utils.degrees2radians(this.endAngle);
     if (this.direction) {
-      ctx.arc(this.points[0].x, this.points[0].y, this.radius, Utils.degrees2radians(this.startAngle), Utils.degrees2radians(this.endAngle));
+      ctx.arc(this.points[0].x, this.points[0].y, this.radius, sA, eA);
     } else {
-      ctx.arcNegative(this.points[0].x, this.points[0].y, this.radius, Utils.degrees2radians(this.startAngle), Utils.degrees2radians(this.endAngle));
+      const circle = Math.PI * 2;
+      ctx.arcNegative(this.points[0].x, this.points[0].y, this.radius, circle - sA, circle - eA);
     }
   }
 
