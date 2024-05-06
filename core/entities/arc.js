@@ -105,7 +105,7 @@ export class Arc extends Entity {
   }
 
   endAngle() {
-    return this.points[0].angle(this.points[2]);
+    const circle = Math.PI * 2;
   }
 
   getRadius() {
