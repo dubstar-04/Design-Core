@@ -309,7 +309,7 @@ export class Hatch extends Entity {
     ctx.save();
     for (let i = 0; i < this.boundaryShapes.length; i++) {
       const shape = this.boundaryShapes[i];
-      shape.draw(ctx, scale, false);
+      shape.draw(ctx, scale);
     }
 
     if (Patterns.patternExists(this.patternName)) {
