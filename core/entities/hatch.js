@@ -143,6 +143,10 @@ export class Hatch extends Entity {
         this.patternName = data.patternName || data[2];
       }
 
+      if (data.hasOwnProperty('boundaryShapes')) {
+        this.boundaryShapes = data.boundaryShapes;
+      }
+
       // 70 - Solid Fill - (solid fill = 1; pattern fill = 0);
       // 71 - Associativity flag (associative = 1; non-associative = 0); for MPolygon, solid-fill flag (has solid fill= 1; lacks solid fill = 0)
       // 91 - Boundary Path Count
@@ -292,9 +296,7 @@ export class Hatch extends Entity {
         await DesignCore.Scene.inputManager.requestInput(op);
       }
 
-      // const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);
-      // const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
-      // this.points.push(pt1);
+      this.boundaryShapes = this.processSelection();
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -303,9 +305,66 @@ export class Hatch extends Entity {
   }
 
   preview() {
-    // const mousePoint = DesignCore.Mouse.pointOnScene();
-    // const points = [this.points.at(-1), mousePoint];
-    // DesignCore.Scene.createTempItem(this.type, {points: points});
+    const shapes = this.processSelection();
+    if (shapes.length) {
+      DesignCore.Scene.createTempItem(this.type, {boundaryShapes: this.processSelection()});
+    }
+  }
+
+  processSelection() {
+    const selectedBoundaryShapes = [];
+
+    // get a copy of the selected items
+    let selectedItemIndicies = DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice(0);
+
+    let iterationPoints = [];
+
+    // track the last index count to make sure the loop is closed
+    let lastIndexCount = selectedItemIndicies.length + 1;
+
+    while (selectedItemIndicies.length) {
+      if (selectedItemIndicies.length === lastIndexCount) {
+        const msg = `${this.type} - Invalid boundary`;
+        DesignCore.Core.notify(msg);
+        return [];
+      }
+
+      lastIndexCount = selectedItemIndicies.length;
+
+      for (let i = 0; i < selectedItemIndicies.length; i++) {
+        // no points collected - get the first index from selected items
+        if (!iterationPoints.length) {
+          const item = DesignCore.Scene.items[selectedItemIndicies.shift()];
+          iterationPoints.push(...item.decompose());
+          break;
+        }
+
+        const currentItem = DesignCore.Scene.items[selectedItemIndicies[i]];
+        let currentPoints = currentItem.decompose();
+
+        // check if the start or end point of the item are connected to the end of the iteration points
+        if (currentPoints.at(0).isSame(iterationPoints.at(-1)) || currentPoints.at(-1).isSame(iterationPoints.at(-1))) {
+          // check if the item is reversed
+          if (currentPoints.at(-1).isSame(iterationPoints.at(-1))) {
+            currentPoints = currentPoints.reverse();
+          }
+
+          iterationPoints.push(...currentPoints);
+          // remove the index from selected items
+          selectedItemIndicies = selectedItemIndicies.filter((index) => index !== selectedItemIndicies[i]);
+
+          if (iterationPoints.at(0).isSame(iterationPoints.at(-1)) ) {
+            const shape = new BoundaryPathPolyline();
+            shape.points = iterationPoints;
+            selectedBoundaryShapes.push(shape);
+            iterationPoints = [];
+            break;
+          }
+        }
+      }
+    }
+
+    return selectedBoundaryShapes;
   }
 
   draw(ctx, scale) {
