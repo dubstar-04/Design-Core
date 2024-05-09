@@ -132,7 +132,7 @@ export class Hatch extends Entity {
     });
 
     Object.defineProperty(this, 'patternName', {
-      value: 'SOLID',
+      value: 'ANSI31',
       writable: true,
       enumerable: true,
     });
