@@ -336,19 +336,14 @@ export class Hatch extends Entity {
 
       for (let i = 0; i < selectedItemIndicies.length; i++) {
         // no points collected - get the first index from selected items
-        if (!iterationPoints.length) {
-          const item = DesignCore.Scene.items[selectedItemIndicies.shift()];
-          iterationPoints.push(...item.decompose());
-          break;
-        }
 
         const currentItem = DesignCore.Scene.items[selectedItemIndicies[i]];
         let currentPoints = currentItem.decompose();
 
         // check if the start or end point of the item are connected to the end of the iteration points
-        if (currentPoints.at(0).isSame(iterationPoints.at(-1)) || currentPoints.at(-1).isSame(iterationPoints.at(-1))) {
+        if (!iterationPoints.length || currentPoints.at(0).isSame(iterationPoints.at(-1)) || currentPoints.at(-1).isSame(iterationPoints.at(-1))) {
           // check if the item is reversed
-          if (currentPoints.at(-1).isSame(iterationPoints.at(-1))) {
+          if (iterationPoints.length && currentPoints.at(-1).isSame(iterationPoints.at(-1))) {
             currentPoints = currentPoints.reverse();
           }
 
