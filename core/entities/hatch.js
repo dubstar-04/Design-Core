@@ -13,7 +13,6 @@ import {Utils} from '../lib/utils.js';
 import {Patterns} from '../lib/patterns.js';
 
 import {DesignCore} from '../designCore.js';
-import {Intersection} from '../lib/intersect.js';
 
 class BoundaryPathPolyline {
   constructor() {
