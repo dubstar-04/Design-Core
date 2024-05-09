@@ -106,6 +106,18 @@ export class Arc extends Entity {
 
   endAngle() {
     const circle = Math.PI * 2;
+  /**
+   * Calculate the angle between the start and end of the arc
+   * @returns angle in degrees
+   */
+  get totalAngle() {
+    let totalAngle = Math.abs(this.endAngle() - this.startAngle());
+
+    if (!this.direction) {
+      totalAngle = Math.PI * 2 - totalAngle;
+    }
+
+    return Utils.radians2degrees(totalAngle);
   }
 
   getRadius() {
