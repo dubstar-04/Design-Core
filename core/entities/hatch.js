@@ -160,6 +160,10 @@ export class Hatch extends Entity {
   }
 
   processBoundaryData(data) {
+    if (!data.hasOwnProperty('points')) {
+      return;
+    }
+
     // copy this.points and remove first and last points
     const points = data.points.slice(1, -1);
 
