@@ -179,7 +179,7 @@ test('Test BasePolyline.getBulgeFromSegment', () => {
   expect(polyline.getBulgeFromSegment(new Point(64.6447, -14.6447))).toBeCloseTo(bulge);
 });
 
-test('Test Text.dxf', () => {
+test('Test BasePolyline.dxf', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
   const polyline = new BasePolyline({points: points});
@@ -280,4 +280,23 @@ AcDbEntity
 `;
 
   expect(file.contents).toEqual(dxfString);
+});
+
+test('Test BasePolyline.decompose', () => {
+  const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
+  points[1].bulge = -1;
+  const polyline = new BasePolyline({points: points});
+
+  const decomposedPolyline = polyline.decompose();
+  expect(decomposedPolyline[0].x).toBe(100);
+  expect(decomposedPolyline[0].y).toBe(100);
+  expect(decomposedPolyline[0].bulge).toBe(0);
+
+  expect(decomposedPolyline[1].x).toBe(200);
+  expect(decomposedPolyline[1].y).toBe(100);
+  expect(decomposedPolyline[1].bulge).toBe(-1);
+
+  expect(decomposedPolyline[2].x).toBe(200);
+  expect(decomposedPolyline[2].y).toBe(50);
+  expect(decomposedPolyline[2].bulge).toBe(0);
 });

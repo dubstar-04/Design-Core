@@ -161,3 +161,16 @@ AcDbArc
 
   expect(file.contents).toEqual(dxfString);
 });
+
+test('Test Arc.decompose', () => {
+  // clockwise 45 degrees 0 - 45
+  const arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
+  const decomposedArc = arc.decompose();
+  expect(decomposedArc[0].x).toBe(200);
+  expect(decomposedArc[0].y).toBe(100);
+  expect(decomposedArc[0].bulge).toBeCloseTo(0.199);
+
+  expect(decomposedArc[1].x).toBeCloseTo(170.71);
+  expect(decomposedArc[1].y).toBeCloseTo(170.71);
+  expect(decomposedArc[1].bulge).toBeCloseTo(0);
+});

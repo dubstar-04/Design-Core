@@ -60,3 +60,15 @@ AcDbLine
 
   expect(file.contents).toEqual(dxfString);
 });
+
+test('Test Line.decompose', () => {
+  const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
+  const decomposedLine = line.decompose();
+  expect(decomposedLine[0].x).toBe(101);
+  expect(decomposedLine[0].y).toBe(102);
+  expect(decomposedLine[0].bulge).toBe(0);
+
+  expect(decomposedLine[1].x).toBe(201);
+  expect(decomposedLine[1].y).toBe(202);
+  expect(decomposedLine[1].bulge).toBe(0);
+});
