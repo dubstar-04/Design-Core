@@ -372,25 +372,26 @@ export class Hatch extends Entity {
   }
 
   draw(ctx, scale) {
-    ctx.save();
     for (let i = 0; i < this.boundaryShapes.length; i++) {
       const shape = this.boundaryShapes[i];
+      ctx.save();
       shape.draw(ctx, scale);
-    }
 
-    if (Patterns.patternExists(this.patternName)) {
-      ctx.clip();
-      this.createPattern(ctx, scale);
-    } else {
-      ctx.fill();
+      if (Patterns.patternExists(this.patternName)) {
+        ctx.clip();
+        this.createPattern(ctx, scale, shape);
+      } else {
+        ctx.fill();
+      }
+      ctx.restore();
     }
-
-    ctx.restore();
   }
 
-  createPattern(ctx, scale) {
+  createPattern(ctx, scale, shape) {
+    const boundingBox = shape.boundingBox();
+
     ctx.save();
-    const boundingBox = this.boundingBox();
+
     const pattern = Patterns.getPattern(this.patternName);
 
     pattern.forEach((patternLine)=>{
