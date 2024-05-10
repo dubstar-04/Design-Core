@@ -543,6 +543,10 @@ export class Hatch extends Entity {
   }
 
   boundingBox() {
+    if (this.boundaryShapes.length === 0) {
+      return new BoundingBox();
+    }
+
     let xmin = Infinity;
     let xmax = -Infinity;
     let ymin = Infinity;
