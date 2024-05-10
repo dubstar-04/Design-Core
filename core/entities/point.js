@@ -254,7 +254,7 @@ export class Point {
           return true;
         }
       }
-    } else if (direction < 0) {
+    } else if (direction <= 0) {
       if (startAngle < endAngle) {
         if (snapAngle <= startAngle || snapAngle >= endAngle) {
           return true;
