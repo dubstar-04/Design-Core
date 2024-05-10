@@ -137,6 +137,11 @@ export class Hatch extends Entity {
       enumerable: true,
     });
 
+    // add a single point to this.points if no other points exist
+    if (!this.points.length) {
+      this.points.push(new Point());
+    }
+
     if (data) {
       if (data.hasOwnProperty('patternName') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - Hatch pattern name
