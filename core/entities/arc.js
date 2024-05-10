@@ -193,9 +193,8 @@ export class Arc extends Entity {
     const startPoint = this.points[1];
     const endPoint = this.points[2];
     const centerPoint = this.points[0];
-    // TODO: enable defining clockwise arcs
-    const direction = 1;
-    const pnt = P.closestPointOnArc(startPoint, endPoint, centerPoint, direction);
+
+    const pnt = P.closestPointOnArc(startPoint, endPoint, centerPoint, this.direction);
 
     if (pnt !== null) {
       const distance = P.distance(pnt);
