@@ -121,9 +121,7 @@ export class BasePolyline extends Entity {
   }
 
   draw(ctx, scale) {
-    ctx.moveTo(this.points[0].x, this.points[0].y);
-
-    for (let i = 1; i < this.points.length; i++) {
+    for (let i = 0; i < this.points.length; i++) {
       if (this.points[i].bulge === 0) {
         ctx.lineTo(this.points[i].x, this.points[i].y);
       } else {
@@ -142,9 +140,6 @@ export class BasePolyline extends Entity {
             ctx.arcNegative(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
           }
         }
-
-        // debug centerpoint
-        // ctx.arc(centerPoint.x, centerPoint.y, 3, 0, 2 * Math.PI);
       }
     }
 
