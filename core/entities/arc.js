@@ -152,6 +152,20 @@ export class Arc extends Entity {
     file.writeGroupCode('51', Utils.radians2degrees(this.endAngle())); // End Angle
   }
 
+  /**
+   * Return a list of points representing a polyline version of this entity
+   */
+  decompose() {
+    const startPoint = this.points[0].project(this.startAngle(), this.radius);
+    // clockwise bulge = -ve, counter clockwise bulge = +ve
+    // ccw arc = 0, clockwise arc = 1
+    const directionMultiplier = this.direction <= 0 ? -1 : 1;
+    startPoint.bulge = Math.tan(Utils.degrees2radians(this.totalAngle * directionMultiplier) / 4);
+
+    const endPoint = this.points[0].project(this.endAngle(), this.radius);
+    return [startPoint, endPoint];
+  }
+
   intersectPoints() {
     return {
       centre: this.points[0],

@@ -77,6 +77,13 @@ export class Line extends Entity {
     file.writeGroupCode('31', '0.0');
   }
 
+  /**
+   * Return a list of points representing a polyline version of this entity
+   */
+  decompose() {
+    return this.points;
+  }
+
   trim(points) {
     function trimOneEnd(intersectPnts, line) {
       let originPoint;

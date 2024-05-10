@@ -190,6 +190,13 @@ export class BasePolyline extends Entity {
     }
   }
 
+  /**
+   * Return a list of points representing a polyline version of this entity
+   */
+  decompose() {
+    return this.points;
+  }
+
   intersectPoints() {
     return {
       points: this.points,
