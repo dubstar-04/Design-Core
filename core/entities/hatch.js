@@ -15,7 +15,7 @@ import {Intersection} from '../lib/intersect.js';
 
 import {DesignCore} from '../designCore.js';
 
-class BoundaryPathPolyline {
+export class BoundaryPathPolyline {
   constructor() {
     this.edgeType = 0;
     this.points = [];
