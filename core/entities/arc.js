@@ -106,6 +106,14 @@ export class Arc extends Entity {
 
   endAngle() {
     const circle = Math.PI * 2;
+    let endAngle = this.points[0].angle(this.points[2]);
+
+    if (endAngle === 0) {
+      endAngle += circle;
+    }
+    return endAngle;
+  }
+
   /**
    * Calculate the angle between the start and end of the arc
    * @returns angle in degrees
