@@ -470,18 +470,22 @@ export class Hatch extends Entity {
     file.writeGroupCode('2', this.patternName); // Hatch pattern name
     file.writeGroupCode('70', '0'); // Solid Fill Flag (1 = solid, 0 = pattern)
     file.writeGroupCode('71', '1'); // Associativity flag (associative = 1; non-associative = 0); for MPolygon, solid-fill flag (has solidfill = 1; lacks solid fill = 0)
-    file.writeGroupCode('91', '1'); // Number of boundary path loops
-    file.writeGroupCode('92', '7'); // Boundary path type flag (bit coded): 0 = Default; 1 = External; 2 = Polyline 4 = Derived; 8 = Textbox; 16 = Outermost
-    file.writeGroupCode('72', '1'); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
-    file.writeGroupCode('73', '1'); // For MPolygon, boundary annotation flag (boundary is an annotated boundary = 1; boundary is not an annotated boundary = 0)
-    file.writeGroupCode('93', '2'); // Number of edges in this boundary path (only if boundary is not a polyline)
 
 
-    for (let i = 1; i < this.points.length - 1; i++) {
-      file.writeGroupCode('10', this.points[i].x); // X
-      file.writeGroupCode('20', this.points[i].y); // Y
-      if (this.points[i].bulge) {
-        file.writeGroupCode('42', this.points[i].bulge);
+    file.writeGroupCode('91', this.boundaryShapes.length); // Number of boundary path loops
+
+    for (let i = 0; i < this.boundaryShapes.length; i++) {
+      const shape = this.boundaryShapes[i];
+      file.writeGroupCode('92', '7'); // Boundary path type flag (bit coded): 0 = Default; 1 = External; 2 = Polyline 4 = Derived; 8 = Textbox; 16 = Outermost
+      file.writeGroupCode('72', '1'); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
+      file.writeGroupCode('73', '1'); // For MPolygon, boundary annotation flag (boundary is an annotated boundary = 1; boundary is not an annotated boundary = 0)
+      file.writeGroupCode('93', shape.points.length); // Number of edges in this boundary path (only if boundary is not a polyline)
+
+
+      for (let j = 0; j < shape.points.length; j++) {
+        file.writeGroupCode('10', shape.points[j].x); // X
+        file.writeGroupCode('20', shape.points[j].y); // Y
+        file.writeGroupCode('42', shape.points[j].bulge);
       }
     }
 
