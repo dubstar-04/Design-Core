@@ -11,6 +11,7 @@ import {Flags} from '../properties/flags.js';
 
 import {Utils} from '../lib/utils.js';
 import {Patterns} from '../lib/patterns.js';
+import {Intersection} from '../lib/intersect.js';
 
 import {DesignCore} from '../designCore.js';
 
@@ -521,19 +522,24 @@ export class Hatch extends Entity {
   }
 
   isInside(P) {
-    const points = this.points.slice(1, -1);
+    for (let i = 0; i < this.boundaryShapes.length; i++) {
+      const shape = this.boundaryShapes[i];
 
-    if (!points[0].isSame(points[points.length-1])) {
-      points.push(points[0]);
+      if (shape.boundingBox().isInside(P)) {
+        const polyline = {points: shape.points};
+        // create a line from P, twice the length of the bounding box
+        const line = {start: P, end: new Point(P.x + shape.boundingBox().xLength, P.y)};
+
+        const intersect = Intersection.intersectPolylineLine(polyline, line);
+        const intersects = intersect.points.length;
+        // P is inside shape if there is a odd number of intersects
+        if (Math.abs(intersects % 2) == 1) {
+          return true;
+        }
+      }
     }
 
-    const polyline = {points: points};
-    // create a line from P, twice the length of the bounding box
-    const line = {start: P, end: new Point(P.x + this.boundingBox().xLength * 2, P.y)};
-
-    const intersect = Intersection.intersectPolylineLine(polyline, line);
-    const intersects = intersect.points.length;
-    return Math.abs(intersects % 2) == 1;
+    return false;
   }
 
   boundingBox() {
