@@ -103,6 +103,7 @@ export class Patterns {
     'ANSI33': {description: 'ANSI Bronze, Brass, Copper', pattern:
 `45, 0, 0, 0, 6.35
 45, 4.49013, 0, 0, 6.35, 3.175, -1.5875`},
+
     'ANSI34': {description: 'ANSI Plastic, Rubber', pattern:
 `45, 0, 0, 0, 19.05
 45, 4.49013, 0, 0, 19.05
