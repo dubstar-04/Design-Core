@@ -160,7 +160,7 @@ export class Hatch extends Entity {
       // 93 - Number of Edges
       // 97 - Number of souce objects
 
-      this.processBoundaryData(data);
+      this.boundaryShapes = this.processBoundaryData(data);
     }
   }
 
@@ -168,6 +168,8 @@ export class Hatch extends Entity {
     if (!data.hasOwnProperty('points')) {
       return;
     }
+
+    const boundaryShapes = [];
 
     // copy this.points and remove first and last points
     const points = data.points.slice(1, -1);
@@ -212,7 +214,7 @@ export class Hatch extends Entity {
                   shape.points.push(points.shift());
                   edgeNum++;
                 }
-                this.boundaryShapes.push(shape);
+                boundaryShapes.push(shape);
               } else if (edgeType === 1) {
                 // Line
                 // 10 - X
@@ -222,7 +224,7 @@ export class Hatch extends Entity {
                 const shape = new BoundaryPathLine();
                 shape.points.push(points.shift());
                 shape.points.push(points.shift());
-                this.boundaryShapes.push(shape);
+                boundaryShapes.push(shape);
               } else if (edgeType === 2) {
                 // ARC
                 // 10 - X
@@ -237,7 +239,7 @@ export class Hatch extends Entity {
                 shape.startAngle = this.getDataValue(data, 50);
                 shape.endAngle = this.getDataValue(data, 51);
                 shape.direction = this.getDataValue(data, 73);
-                this.boundaryShapes.push(shape);
+                boundaryShapes.push(shape);
               } else if (edge.edgeType === 3) {
                 // Ellipse
                 // 10 - X
@@ -278,6 +280,8 @@ export class Hatch extends Entity {
         }
       }
     }
+
+    return boundaryShapes;
   }
 
   // get value from incomming data
