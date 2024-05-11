@@ -37,7 +37,7 @@ test('Test Hatch.boundingBox', () => {
 test('Test Hatch.dxf', () => {
   const file = new File();
   hatch.dxf(file);
-  console.log(file.contents);
+  // console.log(file.contents);
 
   const dxfString = `0
 HATCH
