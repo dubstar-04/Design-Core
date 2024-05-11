@@ -11,6 +11,17 @@ boundaryShape.points = points;
 const hatch = new Hatch();
 hatch.boundaryShapes = [boundaryShape];
 
+test('Test Hatch.getDataValue', () => {
+  const data =
+  {
+    '2': 'ANSI31', // hatch name
+    '72': [0, 1], // Edge type
+  };
+
+  expect(hatch.getDataValue(data, 2)).toBe('ANSI31');
+  expect(hatch.getDataValue(data, 72)).toBe(0);
+});
+
 test('Test Hatch.closestPoint', () => {
   // inside
   const point1 = new Point(150, 100);
