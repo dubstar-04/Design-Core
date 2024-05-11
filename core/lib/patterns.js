@@ -85,7 +85,7 @@ export class Patterns {
    * @returns bool
    */
   static patternExists(name) {
-    return Object.hasOwn(Patterns.hatch_patterns, name);
+    return Object.hasOwn(Patterns.hatch_patterns, name.toUpperCase());
   }
 
   static hatch_patterns = {
