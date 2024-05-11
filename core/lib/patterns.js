@@ -7,7 +7,9 @@ export class PatternLine {
     this.yDelta=0;
     this.dashes=[];
 
-    this.loadPatternLine(patternString);
+    if (patternString) {
+      this.loadPatternLine(patternString);
+    }
   }
 
   loadPatternLine(patternString) {
