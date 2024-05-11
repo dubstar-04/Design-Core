@@ -19,15 +19,19 @@ export class PatternLine {
       return;
     }
 
-    // get dash pattern from the end of the array
-    // const lineDashes = patternArray.splice(5);
-
     this.angle = parseFloat(patternArray[0]);
     this.xOrigin = parseFloat(patternArray[1]);
     this.yOrigin = parseFloat(patternArray[2]);
     this.xDelta = parseFloat(patternArray[3]);
     this.yDelta = parseFloat(patternArray[4]);
-    this.dashes = patternArray.splice(5);
+
+    const dashes = [];
+    // convert each dash to a float and push to dashes
+    patternArray.splice(5).forEach((item) => {
+      dashes.push(parseFloat(item));
+    });
+
+    this.dashes = dashes;
   }
 
   getDashLength() {
