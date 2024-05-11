@@ -5,9 +5,7 @@ import {Point} from '../../core/entities/point.js';
 import {File} from '../test-helpers/test-helpers.js';
 
 const boundaryShape = new BoundaryPathPolyline();
-const points = [new Point(100, 100), new Point(200, 100)];
-points[0].bulge = 1;
-points[1].bulge = 1;
+const points = [new Point(100, 100, 1), new Point(200, 100, 1)];
 boundaryShape.points = points;
 
 const hatch = new Hatch();
