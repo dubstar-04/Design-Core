@@ -1,9 +1,10 @@
 export class Point {
   /**
    * @param  {Number} x
-   * @param  {number} y
+   * @param  {Number} y
+   * @param  {Number} bulge
    */
-  constructor(x, y) {
+  constructor(x, y, bulge=0) {
     this.type = this.constructor.name;
     this.x = 0;
     this.y = 0;
@@ -14,7 +15,7 @@ export class Point {
 
     // bulge value used for defining arcs in polylines
     // arc is ccw if positive
-    this.bulge = 0;
+    this.bulge = bulge;
 
     if (x !== undefined) {
       this.x = x;
