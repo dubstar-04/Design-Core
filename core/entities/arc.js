@@ -15,9 +15,9 @@ export class Arc extends Entity {
     super(data);
     this.radius = 1;
 
-    // direction: - ccw > 0, cw < 0
+    // direction: - ccw > 0, cw <= 0
     Object.defineProperty(this, 'direction', {
-      value: 1,
+      value: 0,
       writable: true,
     });
 
