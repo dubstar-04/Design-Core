@@ -165,10 +165,10 @@ export class Arc extends Entity {
    */
   decompose() {
     const startPoint = this.points[0].project(this.startAngle(), this.radius);
-    // clockwise bulge = -ve, counter clockwise bulge = +ve
+    // counter clockwise bulge = +ve, clockwise bulge = -ve,
     // ccw arc = 0, clockwise arc = 1
-    const directionMultiplier = this.direction <= 0 ? -1 : 1;
-    startPoint.bulge = Math.tan(Utils.degrees2radians(this.totalAngle * directionMultiplier) / 4);
+    const directionMultiplier = this.direction <= 0 ? 1 : -1;
+    startPoint.bulge = Math.tan(Utils.degrees2radians(Math.abs(this.totalAngle) * directionMultiplier) / 4);
 
     const endPoint = this.points[0].project(this.endAngle(), this.radius);
     return [startPoint, endPoint];
