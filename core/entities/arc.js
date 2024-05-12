@@ -46,8 +46,13 @@ export class Arc extends Entity {
 
       if (data.hasOwnProperty('direction')|| data.hasOwnProperty('73')) {
         // No DXF Groupcode - Arc Direction
-        const direction = data.direction || data[73];
-        this.direction = direction;
+        if (data.direction !== undefined) {
+          this.direction = data.direction;
+        }
+
+        if (data[73] !== undefined) {
+          this.direction = data[73];
+        }
       }
     }
   }
