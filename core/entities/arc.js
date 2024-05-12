@@ -110,12 +110,7 @@ export class Arc extends Entity {
   }
 
   endAngle() {
-    const circle = Math.PI * 2;
-    let endAngle = this.points[0].angle(this.points[2]);
-
-    if (endAngle === 0) {
-      endAngle += circle;
-    }
+    const endAngle = this.points[0].angle(this.points[2]);
     return endAngle;
   }
 
