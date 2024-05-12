@@ -15,115 +15,15 @@ import {Intersection} from '../lib/intersect.js';
 
 import {DesignCore} from '../designCore.js';
 
-export class BoundaryPathPolyline {
-  constructor() {
-    this.edgeType = 0;
-    this.points = [];
-  }
-
-  draw(ctx, scale) {
-    for (let i = 0; i < this.points.length; i++) {
-      if (this.points[i].bulge === 0) {
-        ctx.lineTo(this.points[i].x, this.points[i].y);
-      } else {
-        // define the next point or the first point for closed shapes
-        const nextPoint = this.points[i + 1] || this.points[0];
-        const centerPoint = this.points[i].bulgeCentrePoint(nextPoint);
-        const radius = this.points[i].bulgeRadius(nextPoint);
-
-        if (this.points[i].bulge > 0) {
-          // TODO: make this work with canvas
-          ctx.arc(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
-        } else {
-          try { // HTML
-            ctx.arc(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint), true);
-          } catch { // Cairo
-            ctx.arcNegative(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
-          }
-        }
-      }
-    }
-  }
-
-  boundingBox() {
-    // TODO: Move this to the bounding box class
-    // return BoundingBox.fromPoints(points);
-
-    let xmin = Infinity;
-    let xmax = -Infinity;
-    let ymin = Infinity;
-    let ymax = -Infinity;
-
-    for (let i = 0; i < this.points.length; i++) {
-      const nextPoint = this.points[i + 1] || this.points[0];
-
-      let boundingBox = BoundingBox.lineBoundingBox(this.points[i], nextPoint);
-
-      if (this.points[i].bulge !== 0) {
-        const centerPoint = this.points[i].bulgeCentrePoint(nextPoint);
-        boundingBox = BoundingBox.arcBoundingBox(centerPoint, this.points[i], nextPoint, this.points[i].bulge);
-      }
-
-      xmin = Math.min(xmin, boundingBox.xMin);
-      xmax = Math.max(xmax, boundingBox.xMax);
-      ymin = Math.min(ymin, boundingBox.yMin);
-      ymax = Math.max(ymax, boundingBox.yMax);
-    }
-
-    const topLeft = new Point(xmin, ymax);
-    const bottomRight = new Point(xmax, ymin);
-
-    return new BoundingBox(topLeft, bottomRight);
-  }
-}
-
-class BoundaryPathLine {
-  constructor() {
-    this.edgeType = 1;
-    this.points = [];
-  }
-
-  draw(ctx, scale) {
-    ctx.lineTo(this.points[1].x, this.points[1].y);
-  }
-
-  boundingBox() {
-    return BoundingBox.lineBoundingBox(this.points[0], this.points[1]);
-  }
-}
-
-class BoundaryPathArc {
-  constructor() {
-    this.edgeType = 2;
-    this.points = [];
-    this.radius = 1;
-    this.startAngle = 0;
-    this.endAngle = 360;
-    this.direction = 1;
-  }
-
-  draw(ctx, scale) {
-    const sA = Utils.degrees2radians(this.startAngle);
-    const eA = Utils.degrees2radians(this.endAngle);
-    if (this.direction) {
-      ctx.arc(this.points[0].x, this.points[0].y, this.radius, sA, eA);
-    } else {
-      const circle = Math.PI * 2;
-      ctx.arcNegative(this.points[0].x, this.points[0].y, this.radius, circle - sA, circle - eA);
-    }
-  }
-
-  boundingBox() {
-    const startPoint = this.points[0].project(Utils.degrees2radians(this.startAngle), this.radius);
-    const endPoint = this.points[0].project(Utils.degrees2radians(this.endAngle), this.radius);
-
-    return BoundingBox.arcBoundingBox(this.points[0], startPoint, endPoint, this.direction);
-  }
-}
+import {Line} from './line.js';
+import {Arc} from './arc.js';
+import {BasePolyline} from './basePolyline.js';
 
 export class Hatch extends Entity {
   constructor(data) {
     super(data);
+
+    // console.log(data);
 
     // store the boundary shapes
     Object.defineProperty(this, 'boundaryShapes', {
@@ -149,24 +49,21 @@ export class Hatch extends Entity {
       }
 
       if (data.hasOwnProperty('boundaryShapes')) {
-        this.boundaryShapes = data.boundaryShapes;
+        if (Array.isArray(data.boundaryShapes)) {
+          this.boundaryShapes = data.boundaryShapes;
+        }
+      } else {
+        const shapes = this.processBoundaryData(data);
+        if (shapes.length) {
+          this.boundaryShapes = shapes;
+        }
       }
-
-      // 70 - Solid Fill - (solid fill = 1; pattern fill = 0);
-      // 71 - Associativity flag (associative = 1; non-associative = 0); for MPolygon, solid-fill flag (has solid fill= 1; lacks solid fill = 0)
-      // 91 - Boundary Path Count
-      // 92 - Boundary path type flag (bit coded): 0 = Default; 1 = External; 2 = Polyline 4 = Derived; 8 = Textbox; 16 = Outermost
-      // 72 - Edge Type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
-      // 93 - Number of Edges
-      // 97 - Number of souce objects
-
-      this.boundaryShapes = this.processBoundaryData(data);
     }
   }
 
   processBoundaryData(data) {
     if (!data.hasOwnProperty('points')) {
-      return;
+      return [];
     }
 
     const boundaryShapes = [];
@@ -192,6 +89,8 @@ export class Hatch extends Entity {
           // const edgeCountData = data[93];
           const edgeCount = this.getDataValue(data, 93);
 
+          const shape = new BasePolyline();
+
           for (let edgeNum=0; edgeNum < edgeCount; edgeNum++) {
             if (data.hasOwnProperty('72')) {
               // DXF Groupcode 72 - Edge type (only if boundary is not a polyline):
@@ -201,82 +100,84 @@ export class Hatch extends Entity {
 
               if (isPolyline) {
                 // Polyline
-                // 72 - Has Bulge Flag
-                // 73 - Is Closed Flag
-                // 93 - Number of vertices
-                // 10 - X
-                // 20 - Y
-                // 42 - Bulge
-                const shape = new BoundaryPathPolyline();
-                // dxf code 93 reprensents the number of points in the polyline
-                // collect all the polyline points
-                for (let pointNum=0; pointNum < edgeCount; pointNum++) {
-                  shape.points.push(points.shift());
-                  edgeNum++;
+                // 72 - Has Bulge Flag; 73 - Is Closed Flag; 93 - Number of vertices; 10 - X; 20 - Y; 42 - Bulge
+                const polyPoint = points.shift();
+                if (polyPoint.sequence !== 10) {
+                  const msg = 'Invalid point sequence';
+                  const err = (`${this.type} - ${msg}`);
+                  throw Error(err);
                 }
-                boundaryShapes.push(shape);
+
+                shape.points.push(polyPoint);
               } else if (edgeType === 1) {
                 // Line
-                // 10 - X
-                // 20 - Y
-                // 11 - X
-                // 21 - Y
-                const shape = new BoundaryPathLine();
-                shape.points.push(points.shift());
-                shape.points.push(points.shift());
-                boundaryShapes.push(shape);
+                // 10 - X; 20 - Y; 11 - X; 21 - Y
+                const shapePoints = [];
+                const startPoint = points.shift();
+                if (startPoint.sequence !== 10) {
+                  const msg = 'Invalid point sequence';
+                  const err = (`${this.type} - ${msg}`);
+                  throw Error(err);
+                }
+
+                const endPoint = points.shift();
+                if (endPoint.sequence !== 11) {
+                  const msg = 'Invalid point sequence';
+                  const err = (`${this.type} - ${msg}`);
+                  throw Error(err);
+                }
+
+                shapePoints.push(startPoint);
+                shapePoints.push(endPoint);
+                const line = new Line({points: shapePoints});
+                shape.points.push(...line.decompose());
               } else if (edgeType === 2) {
                 // ARC
-                // 10 - X
-                // 20 - Y
-                // 40 - Radius
-                // 50 - Start Angle
-                // 51 - End Angle
-                // 73 - Is Counter Clockwise
-                const shape = new BoundaryPathArc();
-                shape.points.push(points.shift());
-                shape.radius = this.getDataValue(data, 40);
-                shape.startAngle = this.getDataValue(data, 50);
-                shape.endAngle = this.getDataValue(data, 51);
-                shape.direction = this.getDataValue(data, 73);
-                boundaryShapes.push(shape);
+                // 10 - X; 20 - Y;  40 - Radius;  50 - Start Angle;  51 - End Angle; 73 - Is Counter Clockwise
+                const shapeData = {points: []};
+
+                const centerPoint = points.shift();
+                if (centerPoint.sequence !== 10) {
+                  const msg = 'Invalid point sequence';
+                  const err = (`${this.type} - ${msg}`);
+                  throw Error(err);
+                }
+                shapeData.points.push(centerPoint);
+                shapeData[40] = this.getDataValue(data, 40);
+                shapeData.startAngle = this.getDataValue(data, 50);
+                shapeData.endAngle = this.getDataValue(data, 51);
+                shapeData.direction = this.getDataValue(data, 73);
+
+                if (shapeData.direction === 0) {
+                  const circle = 360;
+                  shapeData.startAngle = circle - shapeData.startAngle;
+                  shapeData.endAngle = circle - shapeData.endAngle;
+                }
+
+                const arc = new Arc(shapeData);
+                shape.points.push(...arc.decompose());
               } else if (edge.edgeType === 3) {
                 // Ellipse
-                // 10 - X
-                // 20 - Y
-                // 11 - X
-                // 21 - Y
-                // 40 - Length of minor axis (percentage of major axis length)
-                // 50 - Start angle
-                // 51 - End angle
-                // 73 - Is counterclockwise flag
+                // 10 - X; 20 - Y; 11 - X; 21 - Y; 40 - Length of minor axis (percentage of major axis length);
+                // 50 - Start angle; 51 - End angle; 73 - Is counterclockwise flag
                 const msg = 'Ellipse not supported';
                 const err = (`${this.type} - ${msg}`);
                 throw Error(err);
               } else if (edgeType === 4) {
                 // Spline
-                // 94 - Degree
-                // 73 - Rational
-                // 74 - Periodic
-                // 95 - Number of knots
-                // 96 - Number of control points
-                // 40 - Knot values (multiple entries)
-                // 10 - X of Control Point
-                // 20 - Y of Control Point
-                // 42 - Weights (optional, default = 1)
-                // 97 - Number of fit data
-                // 11 - X of Fit datum
-                // 21 - Y of Fit datum
-                // 12 - X of Start Tangent
-                // 22 - Y of Start Tangent
-                // 13 - X of End tangent
-                // 23 - Y of End tangent
+                // 94 - Degree; 73 - Rational; 74 - Periodic; 95 - Number of knots; 96 - Number of control points; 40 - Knot values (multiple entries)
+                // 10 - X of Control Point; 20 - Y of Control Point; 42 - Weights (optional, default = 1); 97 - Number of fit data
+                // 11 - X of Fit datum; 21 - Y of Fit datum; 12 - X of Start Tangent; 22 - Y of Start Tangent
+                // 13 - X of End tangent; 23 - Y of End tangent
                 const msg = 'Spline not supported';
                 const err = (`${this.type} - ${msg}`);
                 throw Error(err);
               }
             }
           }
+
+          // console.log('shape', shape);
+          boundaryShapes.push(shape);
         }
       }
     }
@@ -284,8 +185,14 @@ export class Hatch extends Entity {
     return boundaryShapes;
   }
 
-  // get value from incomming data
-  // handle arrays and single values
+
+  /**
+   * Get value from incoming data
+   * handle arrays and single values
+   * @param {*} data
+   * @param {*} dxfCode
+   * @returns
+   */
   getDataValue(data, dxfCode) {
     let value;
     if (Array.isArray(data[dxfCode])) {
@@ -310,7 +217,7 @@ export class Hatch extends Entity {
       }
 
       this.boundaryShapes = this.processSelection();
-
+      // TODO: Check if there are boundary shapes
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
@@ -320,7 +227,7 @@ export class Hatch extends Entity {
   preview() {
     const shapes = this.processSelection();
     if (shapes.length) {
-      DesignCore.Scene.createTempItem(this.type, {boundaryShapes: this.processSelection()});
+      DesignCore.Scene.createTempItem(this.type, {boundaryShapes: shapes});
     }
   }
 
@@ -348,6 +255,15 @@ export class Hatch extends Entity {
         // no points collected - get the first index from selected items
 
         const currentItem = DesignCore.Scene.items[selectedItemIndicies[i]];
+        // if the item can't be decomposed to a polyline, remove from selected items and go again
+        /*
+        if (!currentItem.hasOwn('decompose')) {
+          console.log('No decompose');
+          selectedItemIndicies = selectedItemIndicies.filter((index) => index !== selectedItemIndicies[i]);
+          break;
+        }
+        */
+
         let currentPoints = currentItem.decompose();
 
         // check if the start or end point of the item are connected to the end of the iteration points
@@ -362,8 +278,8 @@ export class Hatch extends Entity {
           selectedItemIndicies = selectedItemIndicies.filter((index) => index !== selectedItemIndicies[i]);
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1)) ) {
-            const shape = new BoundaryPathPolyline();
-            shape.points = iterationPoints;
+            const shape = new BasePolyline();
+            shape.points.push(...iterationPoints);
             selectedBoundaryShapes.push(shape);
             iterationPoints = [];
             break;
@@ -379,7 +295,8 @@ export class Hatch extends Entity {
     for (let i = 0; i < this.boundaryShapes.length; i++) {
       const shape = this.boundaryShapes[i];
       ctx.save();
-      shape.draw(ctx, scale);
+      shape.draw(ctx, scale, false);
+      // ctx.stroke();
 
       if (Patterns.patternExists(this.patternName)) {
         ctx.clip();
@@ -483,7 +400,7 @@ export class Hatch extends Entity {
       file.writeGroupCode('92', '7'); // Boundary path type flag (bit coded): 0 = Default; 1 = External; 2 = Polyline 4 = Derived; 8 = Textbox; 16 = Outermost
       file.writeGroupCode('72', '1'); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
       file.writeGroupCode('73', '1'); // For MPolygon, boundary annotation flag (boundary is an annotated boundary = 1; boundary is not an annotated boundary = 0)
-      file.writeGroupCode('93', shape.points.length); // Number of edges in this boundary path (only if boundary is not a polyline)
+      file.writeGroupCode('93', shape.points.length); // Number of edges in this boundary path / number of points in polyline
 
 
       for (let j = 0; j < shape.points.length; j++) {
