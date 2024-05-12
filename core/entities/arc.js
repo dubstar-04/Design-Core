@@ -116,15 +116,23 @@ export class Arc extends Entity {
 
   /**
    * Calculate the angle between the start and end of the arc
+   * Clockwise returns positive angle
+   * Counter clockwise returns negtive
    * @returns angle in degrees
    */
   get totalAngle() {
-    let totalAngle = Math.abs(this.endAngle() - this.startAngle());
+    let startAngle = this.startAngle();
+    let endAngle = this.endAngle();
 
-    if (!this.direction) {
-      totalAngle = Math.PI * 2 - totalAngle;
+    if (this.direction > 0) {
+      if (startAngle > endAngle) {
+        endAngle += (Math.PI * 2);
+      }
+    } else {
+      startAngle += (Math.PI * 2);
     }
 
+    const totalAngle = (startAngle - endAngle); // % (Math.PI * 2);
     return Utils.radians2degrees(totalAngle);
   }
 
