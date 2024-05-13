@@ -37,6 +37,22 @@ export class Hatch extends Entity {
       enumerable: true,
     });
 
+    Object.defineProperty(this, 'scale', {
+      value: 1,
+      writable: true,
+      enumerable: true,
+    });
+
+    // hide inherited properties
+    // needs to be enumerable=false to not appear in the object props
+    Object.defineProperty(this, 'lineType', {
+      enumerable: false,
+    });
+
+    Object.defineProperty(this, 'lineWidth', {
+      enumerable: false,
+    });
+
     // add a single point to this.points if no other points exist
     if (!this.points.length) {
       this.points.push(new Point());
