@@ -4,8 +4,7 @@ import {Point} from '../../core/entities/point';
 import {File} from '../test-helpers/test-helpers.js';
 
 test('Test BasePolyline.closestPoint', () => {
-  const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
-  points[1].bulge = -1;
+  const points = [new Point(100, 100), new Point(200, 100, -1), new Point(200, 50)];
   const polyline = new BasePolyline({points: points});
   // line segment
   const point1 = new Point(150, 85);
