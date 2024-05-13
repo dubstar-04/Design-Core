@@ -6,6 +6,8 @@ test('Test Utils.degrees2radians', () => {
   expect(Utils.degrees2radians(45)).toBe(Math.PI/4);
   expect(Utils.degrees2radians(90)).toBe(Math.PI/2);
   expect(Utils.degrees2radians(180)).toBe(Math.PI);
+  expect(Utils.degrees2radians(270)).toBe(Math.PI * 1.5);
+  expect(Utils.degrees2radians(360)).toBe(Math.PI * 2);
 
   // Negative
   expect(Utils.degrees2radians(-22.5)).toBe(-Math.PI/8);
