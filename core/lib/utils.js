@@ -76,7 +76,4 @@ export class Utils {
     }
     return m[b.length][a.length];
   };
-
-  /**
-   * Returns an array of points sorted in clockwise order
 }
