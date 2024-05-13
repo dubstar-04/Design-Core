@@ -35,14 +35,33 @@ export class Arc extends Entity {
 
       if (data.hasOwnProperty('startAngle') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Start Angle
-        const angle = Utils.degrees2radians(data.startAngle || data[50]);
-        this.points[1] = this.points[0].project(angle, this.radius);
+
+        let angle = 0;
+        if (data.startAngle !== undefined) {
+          angle = data.startAngle;
+        }
+
+        if (data[50] !== undefined) {
+          angle = data[50];
+        }
+
+        const projectionAngle = Utils.degrees2radians(angle);
+        this.points[1] = this.points[0].project(projectionAngle, this.radius);
       }
 
       if (data.hasOwnProperty('endAngle') || data.hasOwnProperty('51')) {
         // DXF Groupcode 51 - End Angle
-        const angle = Utils.degrees2radians(data.endAngle || data[51]);
-        this.points[2] = this.points[0].project(angle, this.radius);
+
+        let angle = 0;
+        if (data.endAngle !== undefined) {
+          angle = data.endAngle;
+        }
+
+        if (data[51] !== undefined) {
+          angle = data[51];
+        }
+        const projectionAngle = Utils.degrees2radians(angle);
+        this.points[2] = this.points[0].project(projectionAngle, this.radius);
       }
 
       if (data.hasOwnProperty('direction')|| data.hasOwnProperty('73')) {
