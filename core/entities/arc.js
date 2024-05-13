@@ -9,7 +9,6 @@ import {BoundingBox} from '../lib/boundingBox.js';
 
 import {DesignCore} from '../designCore.js';
 
-
 export class Arc extends Entity {
   constructor(data) {
     super(data);
@@ -144,15 +143,16 @@ export class Arc extends Entity {
     let startAngle = this.startAngle();
     let endAngle = this.endAngle();
 
+
     if (this.direction > 0) {
-      if (startAngle > endAngle) {
+      if (startAngle > endAngle || startAngle === endAngle) {
         endAngle += (Math.PI * 2);
       }
     } else {
       startAngle += (Math.PI * 2);
     }
 
-    const totalAngle = (startAngle - endAngle); // % (Math.PI * 2);
+    const totalAngle = (startAngle - endAngle);
     return Utils.radians2degrees(totalAngle);
   }
 
@@ -184,12 +184,23 @@ export class Arc extends Entity {
    * Return a list of points representing a polyline version of this entity
    */
   decompose() {
-    const startPoint = this.points[0].project(this.startAngle(), this.radius);
     // counter clockwise bulge = +ve, clockwise bulge = -ve,
     // ccw arc = 0, clockwise arc = 1
-    const directionMultiplier = this.direction <= 0 ? 1 : -1;
-    startPoint.bulge = Math.tan(Utils.degrees2radians(Math.abs(this.totalAngle) * directionMultiplier) / 4);
 
+    // If the arc forms a complete circle
+    // Split into two seperate polyline arcs
+    if (Math.abs(this.totalAngle) === 360) {
+      const startPoint = this.points[0].project(0, this.radius);
+      startPoint.bulge = 1;
+      const endPoint = this.points[0].project(0, -this.radius);
+      endPoint.bulge = 1;
+      const closurePoint = this.points[0].project(0, this.radius);
+      return [startPoint, endPoint, closurePoint];
+    }
+
+    const startPoint = this.points[0].project(this.startAngle(), this.radius);
+    const bulge = Math.tan(Utils.degrees2radians(-this.totalAngle % 360) / 4);
+    startPoint.bulge = bulge;
     const endPoint = this.points[0].project(this.endAngle(), this.radius);
     return [startPoint, endPoint];
   }
