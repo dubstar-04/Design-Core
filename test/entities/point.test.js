@@ -289,44 +289,108 @@ test('Test Point.closestPointOnLine', () => {
 });
 
 test('Test Point.closestPointOnArc', () => {
-  const arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
+  // clockwise 270 degrees 45 - 135
+  // direction: ccw > 0, cw <= 0
+  let arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
 
-  const pt3 = new Point(5, 5);
-  const closest1 = pt3.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
-  expect(closest1.x).toBe(10);
-  expect(closest1.y).toBe(10);
+  let point = new Point(5, 5);
+  let closest = point.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(closest.x).toBe(10);
+  expect(closest.y).toBe(10);
 
-  const pt4 = new Point(0, 5);
-  const closest2 = pt4.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
-  expect(closest2.x).toBe(0);
-  expect(closest2.y).toBeCloseTo(14.14);
+  point = new Point(0, 5);
+  closest = point.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(closest).toBe(null);
 
-  const pt5 = new Point(20, 10);
-  const closest3 = pt5.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
-  expect(closest3).toBe(null);
+  point = new Point(20, 10);
+  closest = point.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre, 0);
+  expect(closest.x).toBeCloseTo(12.649);
+  expect(closest.y).toBeCloseTo(6.3245);
 
   // test circle i.e. start and end points are the same
-  const pt6 = new Point(5, 5);
-  const onCircle = pt6.closestPointOnArc(arc.startPoint, arc.startPoint, arc.centre);
+  point = new Point(5, 5);
+  const onCircle = point.closestPointOnArc(arc.startPoint, arc.startPoint, arc.centre);
   expect(onCircle.x).toBe(10);
   expect(onCircle.y).toBe(10);
+
+
+  // counter clockwise 90 degrees 45 - 135
+  // direction: ccw > 0, cw <= 0
+  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10), direction: 1};
+
+  point = new Point(5, 5);
+  closest = point.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(closest.x).toBe(10);
+  expect(closest.y).toBe(10);
+
+  point = new Point(0, 10);
+  closest = point.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(closest.x).toBeCloseTo(0);
+  expect(closest.y).toBeCloseTo(14.14);
 });
 
 
 test('Test Point.isOnArc', () => {
-  const arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
+  // clockwise arc 270: 45 - 135
+  // direction: ccw > 0, cw <= 0
+  let arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
 
-  const pt3 = new Point(5, 5);
-  const onArc1 = pt3.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
-  expect(onArc1).toBe(true);
+  let point = new Point(5, 5);
+  let onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc).toBe(true);
 
-  const pt4 = new Point(0, 5);
-  const onArc2 = pt4.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
-  expect(onArc2).toBe(true);
+  point = new Point(0, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc).toBe(false);
 
-  const pt5 = new Point(20, 10);
-  const onArc3 = pt5.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
-  expect(onArc3).toBe(false);
+  point = new Point(20, 10);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc).toBe(true);
+
+  point = new Point(0, 14.14);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
+  expect(onArc).toBe(false);
+
+
+  // clockwise arc 90 degrees: 45 - 135
+  // direction: ccw > 0, cw <= 0
+  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10), direction: 1};
+
+  point = new Point(5, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(0, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(20, 10);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(false);
+
+  point = new Point(0, 14.14);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  // clockwise arc 270 degrees: 135 - 45
+  // direction: ccw > 0, cw <= 0
+  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(-10, 10), endPoint: new Point(10, 10), direction: 1};
+
+  point = new Point(5, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(0, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(false);
+
+  point = new Point(20, 10);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(0, 14.14);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(false);
 });
 
 test('Test Point.isOnLine', () => {
