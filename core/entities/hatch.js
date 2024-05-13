@@ -23,8 +23,6 @@ export class Hatch extends Entity {
   constructor(data) {
     super(data);
 
-    // console.log(data);
-
     // store the boundary shapes
     Object.defineProperty(this, 'boundaryShapes', {
       value: [],
