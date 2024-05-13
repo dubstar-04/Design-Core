@@ -247,7 +247,11 @@ export class BasePolyline extends Entity {
       let pnt;
       if (A.bulge !== 0) {
         const C = A.bulgeCentrePoint(B);
-        const direction = A.bulge > 0 ? -1 : 1;
+        // -ve bulge is clockwise
+        // +ve bulge is counter clockwise
+        // -ve arc is clockwise
+        // +ve arc is counter clockwise
+        const direction = A.bulge > 0 ? 1 : -1;
         pnt = P.closestPointOnArc(A, B, C, direction);
       } else {
         pnt = P.closestPointOnLine(A, B);
