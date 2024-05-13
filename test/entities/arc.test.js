@@ -57,31 +57,31 @@ test('Test Arc.endAngle', () => {
 
 test('Test Arc.totalAngle', () => {
   // clockwise 45 degrees 0 - 45
-  let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
+  let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)], direction: 0});
   expect(arc.totalAngle).toBe(315);
 
   // clockwise 45 degrees 45 - 90
-  arc = new Arc({points: [new Point(100, 100), new Point(170.71, 170.71), new Point(100, 200)]});
+  arc = new Arc({points: [new Point(100, 100), new Point(170.71, 170.71), new Point(100, 200)], direction: 0});
   expect(arc.totalAngle).toBeCloseTo(315);
 
   // clockwise 90 degrees 0 - 90
-  arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(100, 200)]});
+  arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(100, 200)], direction: 0});
   expect(arc.totalAngle).toBeCloseTo(270);
 
   // clockwise 90 degrees 45 - 315
-  arc = new Arc({points: [new Point(100, 100), new Point(170.71, 170.71), new Point(170.71, 29.29)]});
+  arc = new Arc({points: [new Point(100, 100), new Point(170.71, 170.71), new Point(170.71, 29.29)], direction: 0});
   expect(arc.totalAngle).toBeCloseTo(90);
 
   // clockwise 180 degrees 0 - 180
-  arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(0, 100)]});
+  arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(0, 100)], direction: 0});
   expect(arc.totalAngle).toBeCloseTo(180);
 
   // clockwise 180 degrees 90 - 270
-  arc = new Arc({points: [new Point(100, 100), new Point(100, 200), new Point(100, 0)]});
+  arc = new Arc({points: [new Point(100, 100), new Point(100, 200), new Point(100, 0)], direction: 0});
   expect(arc.totalAngle).toBeCloseTo(180);
 
   // clockwise 360 degrees 0 - 360
-  arc = new Arc({points: [new Point(100, 100), new Point(100, 200), new Point(100, 200)]});
+  arc = new Arc({points: [new Point(100, 100), new Point(100, 200), new Point(100, 200)], direction: 0});
   expect(arc.totalAngle).toBeCloseTo(360);
 
   /* counter clockwise */
@@ -108,30 +108,48 @@ test('Test Arc.totalAngle', () => {
 
   // clockwise 0 degrees 0 - 360
   arc = new Arc({points: [new Point(100, 100), new Point(100, 200), new Point(100, 200)], direction: 1});
-  expect(arc.totalAngle).toBeCloseTo(0);
+  expect(arc.totalAngle).toBeCloseTo(-360);
 });
 
 
 test('Test Arc.closestPoint', () => {
-  // clockwise 45 degrees 0 - 45
-  const arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
+  // clockwise 315 degrees 0 - 45
+  // direction: ccw > 0, cw <= 0
+  let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)], direction: 0});
   // inside
-  const point1 = new Point(128.3525, 169.4344);
-  const closest1 = arc.closestPoint(point1);
-  expect(closest1[0].x).toBeCloseTo(137.8);
-  expect(closest1[0].y).toBeCloseTo(192.578);
-  expect(closest1[1]).toBeCloseTo(25);
+  let point = new Point(128.3525, 169.4344);
+  let closest = arc.closestPoint(point);
+  expect(closest[0].x).toBeCloseTo(137.8);
+  expect(closest[0].y).toBeCloseTo(192.578);
+  expect(closest[1]).toBeCloseTo(25);
 
   // outside
-  const point2 = new Point(147.2541, 215.7240);
-  const closest2 = arc.closestPoint(point2);
-  expect(closest2[0].x).toBeCloseTo(137.8);
-  expect(closest2[0].y).toBeCloseTo(192.578);
-  expect(closest2[1]).toBeCloseTo(25);
+  point = new Point(147.2541, 215.7240);
+  closest = arc.closestPoint(point);
+  expect(closest[0].x).toBeCloseTo(137.8);
+  expect(closest[0].y).toBeCloseTo(192.578);
+  expect(closest[1]).toBeCloseTo(25);
+
+  // counter clockwise 45 degrees 0 - 45
+  // direction: ccw > 0, cw <= 0
+  arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)], direction: 1});
+  // inside
+  point = new Point(128.3525, 169.4344);
+  closest = arc.closestPoint(point);
+  expect(closest[0].x).toBeCloseTo(point.x);
+  expect(closest[0].y).toBeCloseTo(point.y);
+  expect(closest[1]).toBeCloseTo(Infinity);
+
+  // outside
+  point = new Point(147.2541, 215.7240);
+  closest = arc.closestPoint(point);
+  expect(closest[0].x).toBeCloseTo(point.x);
+  expect(closest[0].y).toBeCloseTo(point.y);
+  expect(closest[1]).toBeCloseTo(Infinity);
 });
 
 test('Test Arc.boundingBox', () => {
-  // clockwise 45 degrees 45 - 0
+  // clockwise 315 degrees 0 - 45
   let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
   expect(arc.boundingBox().xMin).toBeCloseTo(170.71);
   expect(arc.boundingBox().xMax).toBeCloseTo(200);
@@ -184,11 +202,11 @@ AcDbArc
 
 test('Test Arc.decompose', () => {
   // clockwise 45 degrees 0 - 45
-  let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
+  let arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)], direction: 0});
   let decomposedArc = arc.decompose();
   expect(decomposedArc[0].x).toBe(200);
   expect(decomposedArc[0].y).toBe(100);
-  expect(decomposedArc[0].bulge).toBeCloseTo(5.02734);
+  expect(decomposedArc[0].bulge).toBeCloseTo(-5.02734);
 
   expect(decomposedArc[1].x).toBeCloseTo(170.71);
   expect(decomposedArc[1].y).toBeCloseTo(170.71);
@@ -200,7 +218,7 @@ test('Test Arc.decompose', () => {
   decomposedArc = arc.decompose();
   expect(decomposedArc[0].x).toBe(200);
   expect(decomposedArc[0].y).toBe(100);
-  expect(decomposedArc[0].bulge).toBeCloseTo(-0.1989);
+  expect(decomposedArc[0].bulge).toBeCloseTo(0.1989);
 
   expect(decomposedArc[1].x).toBeCloseTo(170.71);
   expect(decomposedArc[1].y).toBeCloseTo(170.71);
