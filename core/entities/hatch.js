@@ -116,7 +116,7 @@ export class Hatch extends Entity {
                 // Polyline
                 // 72 - Has Bulge Flag; 73 - Is Closed Flag; 93 - Number of vertices; 10 - X; 20 - Y; 42 - Bulge
                 const polyPoint = points.shift();
-                if (polyPoint.sequence !== 10) {
+                if (polyPoint.sequence !== undefined && polyPoint.sequence !== 10) {
                   const msg = 'Invalid point sequence';
                   const err = (`${this.type} - ${msg}`);
                   throw Error(err);
@@ -128,14 +128,14 @@ export class Hatch extends Entity {
                 // 10 - X; 20 - Y; 11 - X; 21 - Y
                 const shapePoints = [];
                 const startPoint = points.shift();
-                if (startPoint.sequence !== 10) {
+                if (startPoint.sequence !== undefined && startPoint.sequence !== 10) {
                   const msg = 'Invalid point sequence';
                   const err = (`${this.type} - ${msg}`);
                   throw Error(err);
                 }
 
                 const endPoint = points.shift();
-                if (endPoint.sequence !== 11) {
+                if (endPoint.sequence !== undefined && endPoint.sequence !== 11) {
                   const msg = 'Invalid point sequence';
                   const err = (`${this.type} - ${msg}`);
                   throw Error(err);
@@ -151,7 +151,7 @@ export class Hatch extends Entity {
                 const shapeData = {points: []};
 
                 const centerPoint = points.shift();
-                if (centerPoint.sequence !== 10) {
+                if (centerPoint.sequence !== undefined && centerPoint.sequence !== 10) {
                   const msg = 'Invalid point sequence';
                   const err = (`${this.type} - ${msg}`);
                   throw Error(err);
@@ -160,6 +160,7 @@ export class Hatch extends Entity {
                 shapeData[40] = this.getDataValue(data, 40);
                 shapeData.startAngle = this.getDataValue(data, 50);
                 shapeData.endAngle = this.getDataValue(data, 51);
+                // arc direction: - ccw > 0, cw <= 0 default 1
                 shapeData.direction = this.getDataValue(data, 73);
 
                 if (shapeData.direction === 0) {
@@ -190,7 +191,6 @@ export class Hatch extends Entity {
             }
           }
 
-          // console.log('shape', shape);
           boundaryShapes.push(shape);
         }
       }
