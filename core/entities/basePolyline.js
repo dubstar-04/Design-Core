@@ -120,7 +120,13 @@ export class BasePolyline extends Entity {
     }
   }
 
-  draw(ctx, scale) {
+  /**
+   * Draw the polyline
+   * @param {Object} ctx
+   * @param {Number} scale
+   * @param {Boolean} stroke - don't stroke hatch boundary shapes
+   */
+  draw(ctx, scale, stroke=true) {
     for (let i = 0; i < this.points.length; i++) {
       if (this.points[i].bulge === 0) {
         ctx.lineTo(this.points[i].x, this.points[i].y);
@@ -148,7 +154,9 @@ export class BasePolyline extends Entity {
       ctx.lineTo(this.points[0].x, this.points[0].y);
     }
 
-    ctx.stroke();
+    if (stroke) {
+      ctx.stroke();
+    }
   }
 
   dxf(file) {
