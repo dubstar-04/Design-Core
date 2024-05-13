@@ -1,12 +1,11 @@
+import {BasePolyline} from '../../core/entities/basePolyline.js';
 import {Hatch} from '../../core/entities/hatch.js';
-import {BoundaryPathPolyline} from '../../core/entities/hatch.js';
 import {Point} from '../../core/entities/point.js';
 
 import {File} from '../test-helpers/test-helpers.js';
 
-const boundaryShape = new BoundaryPathPolyline();
 const points = [new Point(100, 100, 1), new Point(200, 100, 1)];
-boundaryShape.points = points;
+const boundaryShape = new BasePolyline({points: points});
 
 const hatch = new Hatch();
 hatch.boundaryShapes = [boundaryShape];
@@ -173,6 +172,7 @@ test('Test Hatch.processBoundaryData', () => {
 };
 
   const hatch = new Hatch();
+
   const boundaryData = hatch.processBoundaryData(data);
 
   // console.log(boundaryData);
