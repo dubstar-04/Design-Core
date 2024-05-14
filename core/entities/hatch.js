@@ -62,6 +62,11 @@ export class Hatch extends Entity {
         this.patternName = data.patternName || data[2];
       }
 
+      if (data.hasOwnProperty('scale') || data.hasOwnProperty('41')) {
+        // DXF Groupcode 41 - Hatch pattern scale
+        this.scale = data.scale || data[41];
+      }
+
       if (data.hasOwnProperty('boundaryShapes')) {
         if (Array.isArray(data.boundaryShapes)) {
           this.boundaryShapes = data.boundaryShapes;
@@ -355,10 +360,10 @@ export class Hatch extends Entity {
         dashes.push(firstIndex);
       }
 
-      dashes = dashes.map((x) => Math.abs(x) + 0.00001);
+      dashes = dashes.map((x) => Math.abs(x) + 0.00001 );
 
       ctx.setDash(dashes, 0);
-      ctx.setLineWidth(1/scale);
+      ctx.setLineWidth(1/scale/this.scale);
 
       const rotation = Utils.degrees2radians(patternLine.angle);
       const centerPoint = boundingBox.centerPoint;
@@ -371,6 +376,8 @@ export class Hatch extends Entity {
         // translate to the center of the shape
         // apply the origin offsets without rotation
         ctx.translate(centerPoint.x + patternLine.xOrigin, centerPoint.y + patternLine.yOrigin);
+        // scale the context
+        ctx.scale(this.scale, this.scale);
         // rotate the context
         ctx.rotate(rotation);
         // apply the deltaX offset for odd iterations
@@ -429,7 +436,7 @@ export class Hatch extends Entity {
     file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
     file.writeGroupCode('76', '1'); // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
     file.writeGroupCode('52', '0'); // Hatch Pattern angle
-    file.writeGroupCode('41', '1.0'); // Hatch Pattern scale
+    file.writeGroupCode('41', this.scale); // Hatch Pattern scale
     file.writeGroupCode('77', '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
     file.writeGroupCode('78', Patterns.getPatternLineCount(this.patternName)); // Number of pattern definition lines
 
