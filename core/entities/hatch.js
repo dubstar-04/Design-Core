@@ -478,7 +478,13 @@ export class Hatch extends Entity {
       const shape = this.boundaryShapes[i];
 
       if (shape.boundingBox().isInside(P)) {
-        const polyline = {points: shape.points};
+        const polyline = {points: [...shape.points]};
+
+        // check the polyline is closed
+        if (!shape.points.at(0).isSame(shape.points.at(-1))) {
+          polyline.points.push(shape.points.at(0));
+        }
+
         // create a line from P, twice the length of the bounding box
         const line = {start: P, end: new Point(P.x + shape.boundingBox().xLength, P.y)};
 
