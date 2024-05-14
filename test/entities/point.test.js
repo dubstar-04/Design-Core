@@ -372,7 +372,7 @@ test('Test Point.isOnArc', () => {
   onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
   expect(onArc).toBe(true);
 
-  // clockwise arc 270 degrees: 135 - 45
+  // counter clockwise arc 270 degrees: 135 - 45
   // direction: ccw > 0, cw <= 0
   arc = {centre: new Point(), radius: 14.14, startPoint: new Point(-10, 10), endPoint: new Point(10, 10), direction: 1};
 
@@ -391,6 +391,71 @@ test('Test Point.isOnArc', () => {
   point = new Point(0, 14.14);
   onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
   expect(onArc).toBe(false);
+
+
+  // clockwise arc 180 degrees: 180 - 0
+  // direction: ccw > 0, cw <= 0
+  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(-10, 0), endPoint: new Point(10, 0), direction: 0};
+
+
+  point = new Point(5, 0);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(-5, 0);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(5, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(0, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(-5, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(5, -5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(false);
+
+  // Counter clockwise arc 180 degrees: 180 - 0
+  // direction: ccw > 0, cw <= 0
+  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(-10, 0), endPoint: new Point(10, 0), direction: 1};
+
+  point = new Point(5, 0);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(-5, 0);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  point = new Point(5, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(false);
+
+  point = new Point(0, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(false);
+
+  point = new Point(-5, 5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(false);
+
+  point = new Point(5, -5);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
+
+  // clockwise arc 180 degrees: 180 - 0
+  // direction: ccw > 0, cw <= 0
+  arc = {centre: new Point(0, 5), radius: 5, startPoint: new Point(-5, 5), endPoint: new Point(5, 5), direction: -1};
+  point = new Point(5, 7);
+  onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
+  expect(onArc).toBe(true);
 });
 
 test('Test Point.isOnLine', () => {
