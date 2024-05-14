@@ -240,11 +240,13 @@ export class Point {
    */
 
   isOnArc(startPoint, endPoint, centerPoint, direction=0) {
+    // direction: ccw arc > 0, clockwise arc <= 0
     const snapAngle = centerPoint.angle(this);
     const startAngle = centerPoint.angle(startPoint);
     const endAngle = centerPoint.angle(endPoint);
 
     if (direction > 0) {
+      // Counter Clockwise Arc
       if (startAngle < endAngle) {
         if (snapAngle >= startAngle && snapAngle <= endAngle) {
           return true;
@@ -257,6 +259,7 @@ export class Point {
         }
       }
     } else if (direction <= 0) {
+      // Clockwise Arc
       if (startAngle < endAngle) {
         if (snapAngle <= startAngle || snapAngle >= endAngle) {
           return true;
