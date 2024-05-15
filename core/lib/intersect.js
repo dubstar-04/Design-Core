@@ -15,6 +15,15 @@ export class Intersection {
    * @param {point} point
    */
   appendPoint(point) {
+    // check if point already exists in the array
+    for (let i = 0; i < this.points.length; i++) {
+      if (this.points[i].isSame(point)) {
+        // point already exists - return
+        return;
+      }
+    }
+
+    // push point to points if it doesn't exist
     this.points.push(point);
   };
 
@@ -23,7 +32,10 @@ export class Intersection {
    * @param {array} points
    */
   appendPoints(points) {
-    this.points = this.points.concat(points);
+    // Forward all points through appendPoint
+    points.forEach((point)=>{
+      this.appendPoint(point);
+    });
   };
 
   /**
@@ -64,25 +76,25 @@ export class Intersection {
         if ((u1 < 0 && u2 < 0) || (u1 > 1 && u2 > 1)) {
           result = new Intersection('Outside');
           if (extend) {
-            result.points.push(a1.lerp(a2, u1));
-            result.points.push(a1.lerp(a2, u2));
+            result.appendPoint(a1.lerp(a2, u1));
+            result.appendPoint(a1.lerp(a2, u2));
           }
         } else {
           result = new Intersection('Inside');
           if (extend) {
-            result.points.push(a1.lerp(a2, u1));
-            result.points.push(a1.lerp(a2, u2));
+            result.appendPoint(a1.lerp(a2, u1));
+            result.appendPoint(a1.lerp(a2, u2));
           }
         }
       } else {
         result = new Intersection('Intersection');
 
         if (0 <= u1 && u1 <= 1 || extend) {
-          result.points.push(a1.lerp(a2, u1));
+          result.appendPoint(a1.lerp(a2, u1));
         }
 
         if (0 <= u2 && u2 <= 1 || extend) {
-          result.points.push(a1.lerp(a2, u2));
+          result.appendPoint(a1.lerp(a2, u2));
         }
       }
     }
@@ -134,18 +146,14 @@ export class Intersection {
       const p = c1.lerp(c2, a / cDist);
       const b = h / cDist;
 
-      result.points.push(
-          new Point(
-              p.x - b * (c2.y - c1.y),
-              p.y + b * (c2.x - c1.x),
-          ),
-      );
-      result.points.push(
-          new Point(
-              p.x + b * (c2.y - c1.y),
-              p.y - b * (c2.x - c1.x),
-          ),
-      );
+      result.appendPoint(new Point(
+          p.x - b * (c2.y - c1.y),
+          p.y + b * (c2.x - c1.x),
+      ));
+      result.appendPoint(new Point(
+          p.x + b * (c2.y - c1.y),
+          p.y - b * (c2.x - c1.x),
+      ));
     }
 
     return result;
@@ -210,7 +218,7 @@ export class Intersection {
     if (!extend) {
       for (let i = 0; i < inter1.points.length; i++) {
         if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
-          result.appendPoints(inter1.points[i]);
+          result.appendPoint(inter1.points[i]);
         }
       }
 
@@ -247,7 +255,7 @@ export class Intersection {
     if (!extend) {
       for (let i = 0; i < inter1.points.length; i++) {
         if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
-          result.points.push(inter1.points[i]);
+          result.appendPoint(inter1.points[i]);
         }
       }
 
@@ -341,12 +349,10 @@ export class Intersection {
 
       if ((0 <= ua && ua <= 1) && (0 <= ub && ub <= 1) || (0 <= ua && ua <= 1) && extend) {
         result = new Intersection('Intersection');
-        result.points.push(
-            new Point(
-                a1.x + ua * (a2.x - a1.x),
-                a1.y + ua * (a2.y - a1.y),
-            ),
-        );
+        result.appendPoint(new Point(
+            a1.x + ua * (a2.x - a1.x),
+            a1.y + ua * (a2.y - a1.y),
+        ));
       } else {
         result = new Intersection('No Intersection');
       }
