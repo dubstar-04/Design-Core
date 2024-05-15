@@ -37,6 +37,32 @@ test('Test Hatch.closestPoint', () => {
   expect(closest2[1]).toBeCloseTo(Infinity);
 });
 
+test('Test Hatch.isInside', () => {
+  // Inside Points
+  // upper right quad of circle
+  expect(hatch.isInside(new Point(165, 115))).toBe(true);
+  // upper left quad of circle
+  expect(hatch.isInside(new Point(130, 115))).toBe(true);
+  // lower left quad of circle
+  expect(hatch.isInside(new Point(130, 80))).toBe(true);
+  // lower right quad of circle
+  expect(hatch.isInside(new Point(165, 80))).toBe(true);
+  // middle of circle
+  expect(hatch.isInside(new Point(150, 100))).toBe(true);
+
+  // Outside Points
+  // upper right quad of circle
+  expect(hatch.isInside(new Point(190, 140))).toBe(false);
+  // upper left quad of circle
+  expect(hatch.isInside(new Point(110, 140))).toBe(false);
+  // lower left quad of circle
+  expect(hatch.isInside(new Point(110, 60))).toBe(false);
+  // lower right quad of circle
+  expect(hatch.isInside(new Point(190, 60))).toBe(false);
+  // middle of circle
+  expect(hatch.isInside(new Point(205, 100))).toBe(false);
+});
+
 test('Test Hatch.boundingBox', () => {
   expect(hatch.boundingBox().xMin).toBe(100);
   expect(hatch.boundingBox().xMax).toBe(200);
