@@ -1,8 +1,13 @@
 import {BasePolyline} from '../../core/entities/basePolyline.js';
+import {Circle} from '../../core/entities/circle.js';
 import {Hatch} from '../../core/entities/hatch.js';
+import {Line} from '../../core/entities/line.js';
 import {Point} from '../../core/entities/point.js';
 
 import {File} from '../test-helpers/test-helpers.js';
+import {Polyline} from '../../core/entities/polyline.js';
+import {Arc} from '../../core/entities/arc.js';
+import {Text} from '../../core/entities/text.js';
 
 const points = [new Point(100, 100, 1), new Point(200, 100, 1)];
 const boundaryShape = new BasePolyline({points: points});
@@ -204,4 +209,61 @@ test('Test Hatch.processBoundaryData', () => {
   // console.log(boundaryData);
   expect(boundaryData[0].points.length).toEqual(4);
   expect(boundaryData[1].points.length).toEqual(2);
+});
+
+
+test('Test Hatch.processSelection', () => {
+  // create selected items defining a square
+  let selectedItems = [];
+  selectedItems.push(new Line({points: [new Point(100, 100), new Point(200, 100)]}));
+  selectedItems.push(new Line({points: [new Point(200, 100), new Point(200, 200)]}));
+  selectedItems.push(new Line({points: [new Point(200, 200), new Point(100, 200)]}));
+  selectedItems.push(new Line({points: [new Point(100, 200), new Point(100, 100)]}));
+
+  let hatch = new Hatch();
+  let boundaryData = hatch.processSelection(selectedItems);
+  expect(boundaryData.length).toEqual(1);
+  expect(boundaryData[0].points.length).toEqual(8);
+
+
+  // create selected items defining a circle
+  selectedItems = [];
+  selectedItems.push(new Circle({points: [new Point(100, 100), new Point(200, 100)]}));
+
+  hatch = new Hatch();
+  boundaryData = hatch.processSelection(selectedItems);
+  expect(boundaryData.length).toEqual(1);
+  expect(boundaryData[0].points.length).toEqual(3);
+
+  // create selected items defining a square (polyline)
+  selectedItems = [];
+  selectedItems.push( new Polyline({points: [new Point(100, 100), new Point(200, 100), new Point(200, 200),
+    new Point(100, 200), new Point(100, 100)]}));
+
+  hatch = new Hatch();
+  boundaryData = hatch.processSelection(selectedItems);
+  expect(boundaryData.length).toEqual(1);
+  expect(boundaryData[0].points.length).toEqual(5);
+
+  // create selected items defining a pill shape
+  selectedItems = [];
+  selectedItems.push(new Line({points: [new Point(100, 100), new Point(200, 100)]}));
+  selectedItems.push(new Arc({points: [new Point(200, 150), new Point(200, 100), new Point(200, 200)]}));
+  selectedItems.push(new Line({points: [new Point(200, 200), new Point(100, 200)]}));
+  selectedItems.push(new Arc({points: [new Point(100, 150), new Point(100, 200), new Point(100, 100)]}));
+
+  hatch = new Hatch();
+  boundaryData = hatch.processSelection(selectedItems);
+  expect(boundaryData.length).toEqual(1);
+  expect(boundaryData[0].points.length).toEqual(8);
+
+  // Test a selection with invalid items
+  selectedItems = [];
+  selectedItems.push(new Text({points: [new Point(100, 100), new Point(200, 100)]}));
+  selectedItems.push(new Circle({points: [new Point(100, 100), new Point(200, 100)]}));
+
+  hatch = new Hatch();
+  boundaryData = hatch.processSelection(selectedItems);
+  expect(boundaryData.length).toEqual(1);
+  expect(boundaryData[0].points.length).toEqual(3);
 });
