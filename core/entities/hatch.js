@@ -306,6 +306,11 @@ export class Hatch extends Entity {
   }
 
   draw(ctx, scale) {
+    // ensure the scale is value
+    if (this.scale < 0.01) {
+      this.scale = 1;
+    }
+
     for (let i = 0; i < this.boundaryShapes.length; i++) {
       const shape = this.boundaryShapes[i];
       ctx.save();
