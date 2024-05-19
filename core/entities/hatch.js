@@ -273,13 +273,10 @@ export class Hatch extends Entity {
 
         const currentItem = selectedItems[i];
         // if the item can't be decomposed to a polyline, remove from selected items and go again
-        /*
-        if (!currentItem.hasOwn('decompose')) {
-          console.log('No decompose');
-          selectedItemIndicies = selectedItemIndicies.filter((index) => index !== selectedItemIndicies[i]);
+        if (typeof currentItem.decompose === 'undefined') {
+          selectedItems.splice(i, 1);
           break;
         }
-        */
 
         let currentPoints = currentItem.decompose();
 
