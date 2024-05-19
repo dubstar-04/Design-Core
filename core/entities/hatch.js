@@ -370,7 +370,7 @@ export class Hatch extends Entity {
         ctx.save();
         // translate to the center of the shape
         // apply the origin offsets without rotation
-        ctx.translate(centerPoint.x + patternLine.xOrigin, centerPoint.y + patternLine.yOrigin);
+        ctx.translate(centerPoint.x + patternLine.xOrigin * this.scale, centerPoint.y + patternLine.yOrigin * this.scale);
         // scale the context
         ctx.scale(this.scale, this.scale);
         // rotate the context
