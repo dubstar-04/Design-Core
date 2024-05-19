@@ -1,3 +1,5 @@
+import {Utils} from '../lib/utils';
+
 export class Point {
   /**
    * @param  {Number} x
@@ -176,7 +178,7 @@ export class Point {
    * @param  {Point} that
    */
   isSame(that) {
-    if (this.x == that.x && this.y == that.y) return true;
+    if (Utils.round(this.x) == Utils.round(that.x) && Utils.round(this.y) == Utils.round(that.y)) return true;
     return false;
   }
 
