@@ -234,8 +234,8 @@ export class Hatch extends Entity {
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
         await DesignCore.Scene.inputManager.requestInput(op);
       }
-
-      this.boundaryShapes = this.processSelection();
+      const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
+      this.boundaryShapes = this.processSelection(selectedItems);
       // TODO: Check if there are boundary shapes
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -244,36 +244,34 @@ export class Hatch extends Entity {
   }
 
   preview() {
-    const shapes = this.processSelection();
+    const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
+    const shapes = this.processSelection(selectedItems);
     if (shapes.length) {
       DesignCore.Scene.createTempItem(this.type, {boundaryShapes: shapes});
     }
   }
 
-  processSelection() {
+  processSelection(selectedItems) {
     const selectedBoundaryShapes = [];
-
-    // get a copy of the selected items
-    let selectedItemIndicies = DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice(0);
 
     let iterationPoints = [];
 
     // track the last index count to make sure the loop is closed
-    let lastIndexCount = selectedItemIndicies.length + 1;
+    let lastIndexCount = selectedItems.length + 1;
 
-    while (selectedItemIndicies.length) {
-      if (selectedItemIndicies.length === lastIndexCount) {
+    while (selectedItems.length) {
+      if (selectedItems.length === lastIndexCount) {
         const msg = `${this.type} - Invalid boundary`;
         DesignCore.Core.notify(msg);
         return [];
       }
 
-      lastIndexCount = selectedItemIndicies.length;
+      lastIndexCount = selectedItems.length;
 
-      for (let i = 0; i < selectedItemIndicies.length; i++) {
+      for (let i = 0; i < selectedItems.length; i++) {
         // no points collected - get the first index from selected items
 
-        const currentItem = DesignCore.Scene.items[selectedItemIndicies[i]];
+        const currentItem = selectedItems[i];
         // if the item can't be decomposed to a polyline, remove from selected items and go again
         /*
         if (!currentItem.hasOwn('decompose')) {
@@ -294,7 +292,7 @@ export class Hatch extends Entity {
 
           iterationPoints.push(...currentPoints);
           // remove the index from selected items
-          selectedItemIndicies = selectedItemIndicies.filter((index) => index !== selectedItemIndicies[i]);
+          selectedItems = selectedItems.filter((index) => index !== selectedItems[i]);
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1)) ) {
             const shape = new BasePolyline();
