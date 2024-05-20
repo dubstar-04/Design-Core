@@ -35,6 +35,12 @@ export class Hatch extends Entity {
       enumerable: true,
     });
 
+    Object.defineProperty(this, 'angle', {
+      value: 0,
+      writable: true,
+      enumerable: true,
+    });
+
     Object.defineProperty(this, 'scale', {
       value: 1,
       writable: true,
@@ -65,6 +71,20 @@ export class Hatch extends Entity {
       if (data.hasOwnProperty('scale') || data.hasOwnProperty('41')) {
         // DXF Groupcode 41 - Hatch pattern scale
         this.scale = data.scale || data[41];
+      }
+
+      if (data.hasOwnProperty('angle') || data.hasOwnProperty('52')) {
+        // DXF Groupcode 42 - Hatch pattern angle
+        let angle = 0;
+        if (data.angle !== undefined) {
+          angle = data.angle;
+        }
+
+        if (data[52] !== undefined) {
+          angle = data[52];
+        }
+
+        this.angle = angle;
       }
 
       if (data.hasOwnProperty('boundaryShapes')) {
@@ -365,7 +385,7 @@ export class Hatch extends Entity {
       ctx.setDash(dashes, 0);
       ctx.setLineWidth(1/scale/this.scale);
 
-      const rotation = Utils.degrees2radians(patternLine.angle);
+      const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
       const centerPoint = boundingBox.centerPoint;
 
       const xIncrement = Math.abs(Math.ceil((boundingBox.xLength) / dashLength));
@@ -435,7 +455,7 @@ export class Hatch extends Entity {
     // file.writeGroupCode('330', '25'); // Handle of source boundary objects
     file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
     file.writeGroupCode('76', '1'); // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
-    file.writeGroupCode('52', '0'); // Hatch Pattern angle
+    file.writeGroupCode('52', this.angle); // Hatch Pattern angle
     file.writeGroupCode('41', this.scale); // Hatch Pattern scale
     file.writeGroupCode('77', '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
     file.writeGroupCode('78', Patterns.getPatternLineCount(this.patternName)); // Number of pattern definition lines
