@@ -388,8 +388,10 @@ export class Hatch extends Entity {
       const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
       const centerPoint = boundingBox.centerPoint;
 
-      const xIncrement = Math.abs(Math.ceil((boundingBox.xLength) / dashLength));
-      const yIncrement = Math.abs(Math.ceil((boundingBox.yLength / 1.75) / patternLine.yDelta));
+      // TODO: Optimise the size of the hatch to reduce drawing
+      const hatchSize = Math.max(boundingBox.xLength, boundingBox.yLength, dashLength) / this.scale;
+      const xIncrement = Math.abs(Math.ceil((hatchSize) / dashLength));
+      const yIncrement = Math.abs(Math.ceil((hatchSize) / patternLine.yDelta));
 
       for (let i = -yIncrement; i < yIncrement; i++) {
         ctx.save();
