@@ -502,14 +502,16 @@ export class Hatch extends Entity {
       // Pattern data
       const pattern = Patterns.getPattern(this.patternName);
       pattern.forEach((patternLine)=>{
-        file.writeGroupCode('53', patternLine.angle); // Pattern line angle
+        file.writeGroupCode('53', patternLine.angle + this.angle); // Pattern line angle
         file.writeGroupCode('43', patternLine.xOrigin); // Pattern line base X
         file.writeGroupCode('44', patternLine.yOrigin); // Pattern line base y
-        file.writeGroupCode('45', patternLine.xDelta); // Pattern line offset x
-        file.writeGroupCode('46', patternLine.yDelta); // Pattern line offset y
+        const deltaPoint = new Point(patternLine.xDelta * this.scale, patternLine.yDelta * this.scale);
+        const rotatedDelta = deltaPoint.rotate(new Point(), Utils.degrees2radians(patternLine.angle + this.angle));
+        file.writeGroupCode('45', rotatedDelta.x); // Pattern line offset x
+        file.writeGroupCode('46', rotatedDelta.y); // Pattern line offset y
         file.writeGroupCode('79', patternLine.dashes.length); // Number of dash length items
         patternLine.dashes.forEach((dash) =>{
-          file.writeGroupCode('49', dash); // Dash length
+          file.writeGroupCode('49', dash * this.scale); // Dash length
         });
       });
     }
