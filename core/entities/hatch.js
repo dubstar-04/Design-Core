@@ -549,4 +549,9 @@ export class Hatch extends Entity {
 
     return new BoundingBox(topLeft, bottomRight);
   }
+
+  intersectPoints() {
+    // return all the polyline boundary shapes
+    return this.boundaryShapes;
+  }
 }

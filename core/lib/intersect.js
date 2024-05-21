@@ -416,6 +416,25 @@ export class Intersection {
   };
 
   /**
+   * Find intersections between hatch and rectangle
+   * @param {Array} polylines
+   * @param {rectangle} rectangle
+   * @param {boolean} extend
+   * @returns
+   */
+  static intersectHatchRectangle(polylines, rectangle, extend) {
+    for (let i = 0; i < polylines.length; i++) {
+      const intersect = this.intersectPolylineRectangle(polylines[i], rectangle, extend);
+
+      if (intersect.points.length > 0) {
+        return intersect;
+      }
+    }
+
+    return new Intersection('No Intersection');
+  }
+
+  /**
    * Find intersections between lwpolyline and rectangle
    * @param {polyline} polyline
    * @param {rectangle} rectangle
