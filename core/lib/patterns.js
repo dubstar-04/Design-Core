@@ -89,6 +89,9 @@ export class Patterns {
   }
 
   static hatch_patterns = {
+    'SOLID': {description: 'Solid Fill', pattern:
+    `45, 0,0, 0,3.175`},
+
     'ANGLE': {description: 'Angle steel', pattern:
 `0, 0, 0, 0, 6.985, 5.08, -1.905 
 90, 0, 0, 0, 6.985, 5.08, -1.905`},

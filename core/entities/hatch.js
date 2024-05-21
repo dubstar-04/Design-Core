@@ -29,10 +29,22 @@ export class Hatch extends Entity {
       writable: true,
     });
 
-    Object.defineProperty(this, 'patternName', {
+    Object.defineProperty(this, 'pattern', {
       value: 'ANSI31',
       writable: true,
+    });
+
+    Object.defineProperty(this, 'solid', {
+      value: false,
+      writable: true,
+    });
+
+    Object.defineProperty(this, 'patternName', {
+      // value: 'ANSI31',
+      // writable: true,
       enumerable: true,
+      get: this.getPatternName,
+      set: this.setPatternName,
     });
 
     Object.defineProperty(this, 'angle', {
@@ -87,6 +99,20 @@ export class Hatch extends Entity {
         this.angle = angle;
       }
 
+      if (data.hasOwnProperty('solid') || data.hasOwnProperty('70')) {
+        // DXF Groupcode 70 - Solid Fill Flag (1 = solid, 0 = pattern)
+
+        let solid = 0;
+        if (data.solid !== undefined) {
+          solid = data.solid;
+        }
+
+        if (data[70] !== undefined) {
+          solid = data[70];
+        }
+        this.solid = Boolean(solid);
+      }
+
       if (data.hasOwnProperty('boundaryShapes')) {
         if (Array.isArray(data.boundaryShapes)) {
           this.boundaryShapes = data.boundaryShapes;
@@ -98,6 +124,15 @@ export class Hatch extends Entity {
         }
       }
     }
+  }
+
+  getPatternName() {
+    return this.pattern;
+  }
+
+  setPatternName(name) {
+    this.pattern = name.toUpperCase();
+    this.solid = this.pattern === 'SOLID';
   }
 
   processBoundaryData(data) {
@@ -337,7 +372,7 @@ export class Hatch extends Entity {
       shape.draw(ctx, scale, false);
       // ctx.stroke();
 
-      if (Patterns.patternExists(this.patternName)) {
+      if (Patterns.patternExists(this.patternName) && !this.solid) {
         ctx.clip();
         this.createPattern(ctx, scale, shape);
       } else {
@@ -432,8 +467,8 @@ export class Hatch extends Entity {
     file.writeGroupCode('230', '1.0'); // Extrusion Direction Z
 
     file.writeGroupCode('2', this.patternName); // Hatch pattern name
-    file.writeGroupCode('70', '0'); // Solid Fill Flag (1 = solid, 0 = pattern)
-    file.writeGroupCode('71', '1'); // Associativity flag (associative = 1; non-associative = 0); for MPolygon, solid-fill flag (has solidfill = 1; lacks solid fill = 0)
+    file.writeGroupCode('70', this.solid ? 1 : 0); // Solid Fill Flag (1 = solid, 0 = pattern)
+    file.writeGroupCode('71', '0'); // Associativity flag (associative = 1; non-associative = 0); for MPolygon, solid-fill flag (has solidfill = 1; lacks solid fill = 0)
 
 
     file.writeGroupCode('91', this.boundaryShapes.length); // Number of boundary path loops
@@ -457,24 +492,27 @@ export class Hatch extends Entity {
     // file.writeGroupCode('330', '25'); // Handle of source boundary objects
     file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
     file.writeGroupCode('76', '1'); // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
-    file.writeGroupCode('52', this.angle); // Hatch Pattern angle
-    file.writeGroupCode('41', this.scale); // Hatch Pattern scale
-    file.writeGroupCode('77', '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
-    file.writeGroupCode('78', Patterns.getPatternLineCount(this.patternName)); // Number of pattern definition lines
 
-    // Pattern data
-    const pattern = Patterns.getPattern(this.patternName);
-    pattern.forEach((patternLine)=>{
-      file.writeGroupCode('53', patternLine.angle); // Pattern line angle
-      file.writeGroupCode('43', patternLine.xOrigin); // Pattern line base X
-      file.writeGroupCode('44', patternLine.yOrigin); // Pattern line base y
-      file.writeGroupCode('45', patternLine.xDelta); // Pattern line offset x
-      file.writeGroupCode('46', patternLine.yDelta); // Pattern line offset y
-      file.writeGroupCode('79', patternLine.dashes.length); // Number of dash length items
-      patternLine.dashes.forEach((dash) =>{
-        file.writeGroupCode('49', dash); // Dash length
+    if (!this.solid) {
+      file.writeGroupCode('52', this.angle); // Hatch Pattern angle
+      file.writeGroupCode('41', this.scale); // Hatch Pattern scale
+      file.writeGroupCode('77', '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
+      file.writeGroupCode('78', Patterns.getPatternLineCount(this.patternName)); // Number of pattern definition lines
+
+      // Pattern data
+      const pattern = Patterns.getPattern(this.patternName);
+      pattern.forEach((patternLine)=>{
+        file.writeGroupCode('53', patternLine.angle); // Pattern line angle
+        file.writeGroupCode('43', patternLine.xOrigin); // Pattern line base X
+        file.writeGroupCode('44', patternLine.yOrigin); // Pattern line base y
+        file.writeGroupCode('45', patternLine.xDelta); // Pattern line offset x
+        file.writeGroupCode('46', patternLine.yDelta); // Pattern line offset y
+        file.writeGroupCode('79', patternLine.dashes.length); // Number of dash length items
+        patternLine.dashes.forEach((dash) =>{
+          file.writeGroupCode('49', dash); // Dash length
+        });
       });
-    });
+    }
 
     file.writeGroupCode('47', '0.5'); // pixel size
     file.writeGroupCode('98', '1'); // Number of seed points
