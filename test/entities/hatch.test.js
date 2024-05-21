@@ -76,11 +76,11 @@ test('Test Hatch.boundingBox', () => {
 });
 
 test('Test Hatch.dxf', () => {
-  const file = new File();
+  let file = new File();
   hatch.dxf(file);
   // console.log(file.contents);
 
-  const dxfString = `0
+  let dxfString = `0
 HATCH
 5
 1
@@ -107,7 +107,7 @@ ANSI31
 70
 0
 71
-1
+0
 91
 1
 92
@@ -151,9 +151,9 @@ ANSI31
 44
 0
 45
-0
+-2.245064030267288
 46
-3.175
+2.2450640302672884
 79
 0
 47
@@ -165,7 +165,82 @@ ANSI31
 20
 1
 `;
+  expect(file.contents).toEqual(dxfString);
 
+  // Export rotated and scaled
+  const rotatedScaleHatch = new Hatch();
+  rotatedScaleHatch.angle = 45;
+  rotatedScaleHatch.scale = 2;
+
+  file = new File();
+  rotatedScaleHatch.dxf(file);
+  // console.log(file.contents);
+
+  dxfString = `0
+HATCH
+5
+1
+100
+AcDbEntity
+8
+0
+100
+AcDbHatch
+10
+0
+20
+0
+30
+0.0
+210
+0.0
+220
+0.0
+230
+1.0
+2
+ANSI31
+70
+0
+71
+0
+91
+0
+97
+0
+75
+1
+76
+1
+52
+45
+41
+2
+77
+0
+78
+1
+53
+90
+43
+0
+44
+0
+45
+-6.35
+46
+3.888253587292846e-16
+79
+0
+47
+0.5
+98
+1
+10
+1
+20
+1
+`;
   expect(file.contents).toEqual(dxfString);
 });
 
