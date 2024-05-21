@@ -15,6 +15,43 @@ const boundaryShape = new BasePolyline({points: points});
 const hatch = new Hatch();
 hatch.boundaryShapes = [boundaryShape];
 
+test('Test Hatch', () => {
+  const data =
+{'0': 'HATCH',
+  '2': 'HONEY', // hatch name
+  // '8': '0', // layer name
+  '41': 2, // Pattern scale
+  // '43': 0, // Pattern line base X
+  // '44': 0, // Pattern line base Y
+  // '45': -2.245064030267288, // Pattern line offset x
+  // '46': 2.245064030267288, // Pattern line offset y
+  // '47': 0.5126851563522042, // pixel size
+  '52': 45, // pattern angle
+  // '53': 45, // Pattern line angle
+  '70': 0, // Solid fill flag
+  // '71': 1, // Associativity flag
+  // '72': [0, 1], // Edge type
+  // '73': [1, 1], // Boundary annotation flag
+  // '75': 1, // Hatch style
+  // '76': 1, // Hatch pattern type
+  // '77': 0, // Hatch pattern double flag
+  // '78': 1, // Number of pattern definition lines
+  // '79': 0, // Number of dash length items
+  // '91': 2, // Number of boundary path loops
+  // '92': [7, 7], // Boundary path type flag
+  // '93': [4, 2], // Number of edges in this boundary path / number of points in polyline
+  // '97': [1, 1], // Number of source boundary objects
+  // '98': 2, // Number of seed points
+};
+
+  const newHatch = new Hatch(data);
+
+  expect(newHatch.patternName).toBe('HONEY');
+  expect(newHatch.angle).toBe(45);
+  expect(newHatch.scale).toBe(2);
+  expect(newHatch.solid).toBe(false);
+});
+
 test('Test Hatch.getDataValue', () => {
   const data =
   {
@@ -24,6 +61,21 @@ test('Test Hatch.getDataValue', () => {
 
   expect(hatch.getDataValue(data, 2)).toBe('ANSI31');
   expect(hatch.getDataValue(data, 72)).toBe(0);
+});
+
+test('Test Hatch.getPatternName', () => {
+  expect(hatch.getPatternName()).toBe('ANSI31');
+});
+
+test('Test Hatch.setPatternName', () => {
+  expect(hatch.solid).toBe(false);
+  hatch.setPatternName('Solid');
+  expect(hatch.pattern).toBe('SOLID');
+  expect(hatch.solid).toBe(true);
+
+  hatch.setPatternName('Ansi31');
+  expect(hatch.pattern).toBe('ANSI31');
+  expect(hatch.solid).toBe(false);
 });
 
 test('Test Hatch.closestPoint', () => {
@@ -272,7 +324,7 @@ test('Test Hatch.processBoundaryData', () => {
   '93': [4, 2], // Number of edges in this boundary path / number of points in polyline
   // '97': [1, 1], // Number of source boundary objects
   // '98': 2, // Number of seed points
-  // Points 0 and -1 are stripped before processings
+  // Points 0 and -1 are stripped before processing
   'points': [new Point(), new Point(200, 200), new Point(100, 200), new Point(100, 100), new Point(200, 100), new Point(350, 300, 1),
     new Point(250, 300, 1), new Point(350, 300, 1)],
 };
