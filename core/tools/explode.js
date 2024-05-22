@@ -13,7 +13,7 @@ export class Explode extends Tool {
   }
 
   static register() {
-    const command = {command: 'Explode', shortcut: 'X', type: 'Tool'};
+    const command = {command: 'Explode', shortcut: 'X'};
     return command;
   }
 

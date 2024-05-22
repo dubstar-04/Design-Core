@@ -49,6 +49,28 @@ export class BoundingBox {
   }
 
   /**
+   * return bounding box center point
+   */
+  get centerPoint() {
+    return new Point(this.xMin + this.xLength / 2, this.yMin + this.yLength / 2);
+  }
+
+  /**
+   * Determin if point is inside bounding box
+   * @param {Object} point
+   * @returns boolean true if point is inside false if not
+   */
+  isInside(point) {
+    if (point.x > this.xMin && point.x < this.xMax) {
+      if (point.y > this.yMin && point.y < this.yMax) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Return the bounding box for points
    * @param {Array} points
    */

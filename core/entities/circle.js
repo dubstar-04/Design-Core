@@ -92,6 +92,18 @@ export class Circle extends Entity {
     file.writeGroupCode('40', this.radius);
   }
 
+  /**
+   * Return a list of points representing a polyline version of this entity
+   */
+  decompose() {
+    const startPoint = this.points[0].project(0, this.radius);
+    startPoint.bulge = 1;
+    const endPoint = this.points[0].project(0, -this.radius);
+    endPoint.bulge = 1;
+    const closurePoint = this.points[0].project(0, this.radius);
+    return [startPoint, endPoint, closurePoint];
+  }
+
   trim(points) {
     if (points.length > 1) {
       const start = points[0];

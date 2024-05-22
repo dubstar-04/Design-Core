@@ -29,6 +29,30 @@ test('Test BoundingBox.yLength', () => {
   expect(bb.yLength).toBe(100);
 });
 
+test('Test BoundingBox.centerPoint', () => {
+  expect(bb.centerPoint.x).toBe(151);
+  expect(bb.centerPoint.y).toBe(152);
+});
+
+test('Test BoundingBox.isInside', () => {
+  const outsidePoint = new Point();
+  expect(bb.isInside(outsidePoint)).toBe(false);
+
+  const outsidePointLessX = new Point(100, 152);
+  expect(bb.isInside(outsidePointLessX)).toBe(false);
+
+  const outsidePointMoreX = new Point(101, 152);
+  expect(bb.isInside(outsidePointMoreX)).toBe(false);
+
+  const outsidePointLessY = new Point(151, 101);
+  expect(bb.isInside(outsidePointLessY)).toBe(false);
+
+  const outsidePointMoreY = new Point(151, 203);
+  expect(bb.isInside(outsidePointMoreY)).toBe(false);
+
+  const insidePoint = new Point(151, 152);
+  expect(bb.isInside(insidePoint)).toBe(true);
+});
 
 test('Test BoundingBox.arcBoundingBox', () => {
   // circle

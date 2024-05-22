@@ -9,13 +9,13 @@ import {BoundingBox} from '../lib/boundingBox.js';
 
 import {DesignCore} from '../designCore.js';
 
-
 export class Arc extends Entity {
   constructor(data) {
     super(data);
     this.radius = 1;
 
-    // direction: - ccw > 0, cw < 0
+    // direction: - ccw > 0, cw <= 0
+    // default to 1 - counter clockwise
     Object.defineProperty(this, 'direction', {
       value: 1,
       writable: true,
@@ -34,20 +34,44 @@ export class Arc extends Entity {
 
       if (data.hasOwnProperty('startAngle') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Start Angle
-        const angle = Utils.degrees2radians(data.startAngle || data[50]);
-        this.points[1] = this.points[0].project(angle, this.radius);
+
+        let angle = 0;
+        if (data.startAngle !== undefined) {
+          angle = data.startAngle;
+        }
+
+        if (data[50] !== undefined) {
+          angle = data[50];
+        }
+
+        const projectionAngle = Utils.degrees2radians(angle);
+        this.points[1] = this.points[0].project(projectionAngle, this.radius);
       }
 
       if (data.hasOwnProperty('endAngle') || data.hasOwnProperty('51')) {
         // DXF Groupcode 51 - End Angle
-        const angle = Utils.degrees2radians(data.endAngle || data[51]);
-        this.points[2] = this.points[0].project(angle, this.radius);
+
+        let angle = 0;
+        if (data.endAngle !== undefined) {
+          angle = data.endAngle;
+        }
+
+        if (data[51] !== undefined) {
+          angle = data[51];
+        }
+        const projectionAngle = Utils.degrees2radians(angle);
+        this.points[2] = this.points[0].project(projectionAngle, this.radius);
       }
 
-      if (data.hasOwnProperty('direction')) {
+      if (data.hasOwnProperty('direction')|| data.hasOwnProperty('73')) {
         // No DXF Groupcode - Arc Direction
-        const direction = data.direction;
-        this.direction = direction;
+        if (data.direction !== undefined) {
+          this.direction = data.direction;
+        }
+
+        if (data[73] !== undefined) {
+          this.direction = data[73];
+        }
       }
     }
   }
@@ -105,7 +129,31 @@ export class Arc extends Entity {
   }
 
   endAngle() {
-    return this.points[0].angle(this.points[2]);
+    const endAngle = this.points[0].angle(this.points[2]);
+    return endAngle;
+  }
+
+  /**
+   * Calculate the angle between the start and end of the arc
+   * Clockwise returns positive angle
+   * Counter clockwise returns negtive
+   * @returns angle in degrees
+   */
+  get totalAngle() {
+    let startAngle = this.startAngle();
+    let endAngle = this.endAngle();
+
+
+    if (this.direction > 0) {
+      if (startAngle > endAngle || startAngle === endAngle) {
+        endAngle += (Math.PI * 2);
+      }
+    } else {
+      startAngle += (Math.PI * 2);
+    }
+
+    const totalAngle = (startAngle - endAngle);
+    return Utils.radians2degrees(totalAngle);
   }
 
   getRadius() {
@@ -130,6 +178,31 @@ export class Arc extends Entity {
     file.writeGroupCode('100', 'AcDbArc', DXFFile.Version.R2000);
     file.writeGroupCode('50', Utils.radians2degrees(this.startAngle())); // Start Angle
     file.writeGroupCode('51', Utils.radians2degrees(this.endAngle())); // End Angle
+  }
+
+  /**
+   * Return a list of points representing a polyline version of this entity
+   */
+  decompose() {
+    // counter clockwise bulge = +ve, clockwise bulge = -ve,
+    // ccw arc = 0, clockwise arc = 1
+
+    // If the arc forms a complete circle
+    // Split into two seperate polyline arcs
+    if (Math.abs(this.totalAngle) === 360) {
+      const startPoint = this.points[0].project(0, this.radius);
+      startPoint.bulge = 1;
+      const endPoint = this.points[0].project(0, -this.radius);
+      endPoint.bulge = 1;
+      const closurePoint = this.points[0].project(0, this.radius);
+      return [startPoint, endPoint, closurePoint];
+    }
+
+    const startPoint = this.points[0].project(this.startAngle(), this.radius);
+    const bulge = Math.tan(Utils.degrees2radians(-this.totalAngle % 360) / 4);
+    startPoint.bulge = bulge;
+    const endPoint = this.points[0].project(this.endAngle(), this.radius);
+    return [startPoint, endPoint];
   }
 
   intersectPoints() {
@@ -181,9 +254,8 @@ export class Arc extends Entity {
     const startPoint = this.points[1];
     const endPoint = this.points[2];
     const centerPoint = this.points[0];
-    // TODO: enable defining clockwise arcs
-    const direction = 1;
-    const pnt = P.closestPointOnArc(startPoint, endPoint, centerPoint, direction);
+
+    const pnt = P.closestPointOnArc(startPoint, endPoint, centerPoint, this.direction);
 
     if (pnt !== null) {
       const distance = P.distance(pnt);

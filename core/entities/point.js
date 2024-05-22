@@ -1,9 +1,12 @@
+import {Utils} from '../lib/utils.js';
+
 export class Point {
   /**
    * @param  {Number} x
-   * @param  {number} y
+   * @param  {Number} y
+   * @param  {Number} bulge
    */
-  constructor(x, y) {
+  constructor(x, y, bulge=0) {
     this.type = this.constructor.name;
     this.x = 0;
     this.y = 0;
@@ -14,7 +17,7 @@ export class Point {
 
     // bulge value used for defining arcs in polylines
     // arc is ccw if positive
-    this.bulge = 0;
+    this.bulge = bulge;
 
     if (x !== undefined) {
       this.x = x;
@@ -175,7 +178,7 @@ export class Point {
    * @param  {Point} that
    */
   isSame(that) {
-    if (this.x == that.x && this.y == that.y) return true;
+    if (Utils.round(this.x) == Utils.round(that.x) && Utils.round(this.y) == Utils.round(that.y)) return true;
     return false;
   }
 
@@ -208,7 +211,7 @@ export class Point {
    * @param {number} direction - CCW if > 0
    * @returns the closest point on the arc or null
    */
-  closestPointOnArc(startPoint, endPoint, centerPoint, direction=1) {
+  closestPointOnArc(startPoint, endPoint, centerPoint, direction=0) {
     const length = this.distance(centerPoint);
     const radius = centerPoint.distance(startPoint);
 
@@ -237,12 +240,15 @@ export class Point {
    * @param {number} direction - CCW if > 0
    * @returns true or false
    */
-  isOnArc(startPoint, endPoint, centerPoint, direction=1) {
+
+  isOnArc(startPoint, endPoint, centerPoint, direction=0) {
+    // direction: ccw arc > 0, clockwise arc <= 0
     const snapAngle = centerPoint.angle(this);
     const startAngle = centerPoint.angle(startPoint);
     const endAngle = centerPoint.angle(endPoint);
 
     if (direction > 0) {
+      // Counter Clockwise Arc
       if (startAngle < endAngle) {
         if (snapAngle >= startAngle && snapAngle <= endAngle) {
           return true;
@@ -254,7 +260,8 @@ export class Point {
           return true;
         }
       }
-    } else if (direction < 0) {
+    } else if (direction <= 0) {
+      // Clockwise Arc
       if (startAngle < endAngle) {
         if (snapAngle <= startAngle || snapAngle >= endAngle) {
           return true;

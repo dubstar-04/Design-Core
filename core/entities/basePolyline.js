@@ -120,10 +120,14 @@ export class BasePolyline extends Entity {
     }
   }
 
-  draw(ctx, scale) {
-    ctx.moveTo(this.points[0].x, this.points[0].y);
-
-    for (let i = 1; i < this.points.length; i++) {
+  /**
+   * Draw the polyline
+   * @param {Object} ctx
+   * @param {Number} scale
+   * @param {Boolean} stroke - don't stroke hatch boundary shapes
+   */
+  draw(ctx, scale, stroke=true) {
+    for (let i = 0; i < this.points.length; i++) {
       if (this.points[i].bulge === 0) {
         ctx.lineTo(this.points[i].x, this.points[i].y);
       } else {
@@ -142,9 +146,6 @@ export class BasePolyline extends Entity {
             ctx.arcNegative(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
           }
         }
-
-        // debug centerpoint
-        // ctx.arc(centerPoint.x, centerPoint.y, 3, 0, 2 * Math.PI);
       }
     }
 
@@ -153,7 +154,9 @@ export class BasePolyline extends Entity {
       ctx.lineTo(this.points[0].x, this.points[0].y);
     }
 
-    ctx.stroke();
+    if (stroke) {
+      ctx.stroke();
+    }
   }
 
   dxf(file) {
@@ -188,6 +191,13 @@ export class BasePolyline extends Entity {
       file.writeGroupCode('30', '0.0');
       file.writeGroupCode('42', this.points[i].bulge);
     }
+  }
+
+  /**
+   * Return a list of points representing a polyline version of this entity
+   */
+  decompose() {
+    return this.points;
   }
 
   intersectPoints() {
@@ -245,7 +255,11 @@ export class BasePolyline extends Entity {
       let pnt;
       if (A.bulge !== 0) {
         const C = A.bulgeCentrePoint(B);
-        const direction = A.bulge;
+        // -ve bulge is clockwise
+        // +ve bulge is counter clockwise
+        // -ve arc is clockwise
+        // +ve arc is counter clockwise
+        const direction = A.bulge > 0 ? 1 : -1;
         pnt = P.closestPointOnArc(A, B, C, direction);
       } else {
         pnt = P.closestPointOnLine(A, B);
