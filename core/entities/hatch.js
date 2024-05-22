@@ -372,23 +372,31 @@ export class Hatch extends Entity {
       shape.draw(ctx, scale, false);
       // ctx.stroke();
 
-      if (Patterns.patternExists(this.patternName) && !this.solid) {
-        ctx.clip();
-        this.createPattern(ctx, scale, shape);
-      } else {
-        ctx.fill();
-      }
+      // Hatch Island Support
+      // Hatch boundarys must be sorted, with internal shape points being clockside and external shape points being counter clockwise
+      // Looks like dxf code 92 states a shape is the outermost when value 16 is set.
+      // clip the current path
+      ctx.clip();
+      // Create a new path because the current path cannot be consumed by a clip
+      ctx.newPath();
+      // Create a shape bigger than the hatch boundary to contain the hatch or fill
+      const bb = shape.boundingBox();
+      ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+      // for islands create the pattern once all boundary paths are drawn (internal and external)
+      this.createPattern(ctx, scale, shape);
       ctx.restore();
     }
   }
 
   createPattern(ctx, scale, shape) {
+    if (!Patterns.patternExists(this.patternName) || this.solid) {
+      ctx.fill();
+      return;
+    }
+
     const boundingBox = shape.boundingBox();
 
-    ctx.save();
-
     const pattern = Patterns.getPattern(this.patternName);
-
     pattern.forEach((patternLine)=>{
       // Each pattern line is considered to be the first member of a line family,
       // Patterns are created by applying the delta offsets in both directions to generate an infinite family of parallel lines.
@@ -449,7 +457,6 @@ export class Hatch extends Entity {
         ctx.restore();
       }
     });
-    ctx.restore();
   }
 
   dxf(file) {
