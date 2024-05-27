@@ -82,7 +82,7 @@ export class StyleManagerBase {
    * @param {number} styleIndex
    * @returns undefined
    */
-  deleteStyle(styleIndex) {
+  deleteStyle(styleIndex, showWarning=true) {
     if (this.styles[styleIndex] === undefined) {
       return;
     }
@@ -91,7 +91,9 @@ export class StyleManagerBase {
 
     // Can't delete indelible styles (Standard Text Style, Layer 0)
     if (this.indelibleStyles.some((style) => style.toUpperCase() === styleToDelete.toUpperCase())) {
-      DesignCore.Core.notify(`${styleToDelete} ${Strings.Message.CANNOTBEDELETED}`);
+      if (showWarning) {
+        DesignCore.Core.notify(`${styleToDelete} ${Strings.Message.CANNOTBEDELETED}`);
+      }
       return;
     }
 
@@ -308,6 +310,6 @@ export class StyleManagerBase {
 
     // sort the selection in descending order
     stylesToPurge.sort((a, b)=>b-a);
-    stylesToPurge.forEach((styleIndex) => this.deleteStyle(styleIndex));
+    stylesToPurge.forEach((styleIndex) => this.deleteStyle(styleIndex, false));
   }
 }

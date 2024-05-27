@@ -64,7 +64,7 @@ export class BlockManager {
    * @param {number} blockIndex
    * @returns undefined
    */
-  deleteBlock(blockIndex) {
+  deleteBlock(blockIndex, showWarning=true) {
     if (this.blocks[blockIndex] === undefined) {
       return;
     }
@@ -73,7 +73,9 @@ export class BlockManager {
 
     // Can't delete indelible styles (Standard Text Style, Layer 0)
     if (this.indelibleBlocks.some((indelibleBlock) => indelibleBlock.toUpperCase() === blockToDelete.toUpperCase())) {
-      DesignCore.Core.notify(`${blockToDelete} ${Strings.Message.CANNOTBEDELETED}`);
+      if (showWarning) {
+        DesignCore.Core.notify(`${blockToDelete} ${Strings.Message.CANNOTBEDELETED}`);
+      }
       return;
     }
 
@@ -129,6 +131,6 @@ export class BlockManager {
 
     // sort the selection in descending order
     blocksToPurge.sort((a, b)=>b-a);
-    blocksToPurge.forEach((blockIndex) => this.deleteBlock(blockIndex));
+    blocksToPurge.forEach((blockIndex) => this.deleteBlock(blockIndex, false));
   }
 }
