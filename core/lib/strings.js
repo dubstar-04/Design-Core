@@ -28,6 +28,7 @@ export class Strings {
     CANNOTBEDELETED: 'cannot be deleted',
     CANNOTBERENAMED: 'cannot be renamed',
     CANNOTBEACTIONED: 'cannot be actioned',
+    COMPLETED: 'completed',
   };
 
   // Strings

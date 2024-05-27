@@ -44,5 +44,7 @@ export class Purge extends Tool {
     if (this.option === 'LTypes'|| this.option === 'All') {
       DesignCore.LTypeManager.purge();
     }
+
+    DesignCore.Core.notify(`${this.type} ${this.option}: ${Strings.Message.COMPLETED}`);
   }
 }
