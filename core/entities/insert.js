@@ -72,8 +72,12 @@ export class Insert extends Entity {
         const rotation = data.rotation || data[50];
         this.setRotation(rotation);
       } else {
-        // create points[1] used to determine the text rotation
-        this.points[1] = data.points[0].add(new Point(10, 0));
+        // create points[1] used to determine the rotation
+        if (this.points[0] === undefined) {
+          this.points.push(new Point());
+        }
+
+        this.points[1] = this.points[0].add(new Point(10, 0));
       }
 
       if (data.hasOwnProperty('70')) {
