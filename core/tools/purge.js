@@ -19,7 +19,7 @@ export class Purge extends Tool {
 
   async execute() {
     try {
-      const op = new PromptOptions(Strings.Input.OPTION, [], this.options);
+      const op = new PromptOptions(`${Strings.Input.OPTION} <${this.options[3]}>`, [], this.options);
       this.option = await DesignCore.Scene.inputManager.requestInput(op);
 
       DesignCore.Scene.inputManager.executeCommand();
