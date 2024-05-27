@@ -7,7 +7,7 @@ export class LTypeManager extends StyleManagerBase {
     super();
 
     this.indelibleStyles.push('CONTINUOUS', 'ByLayer', 'ByBlock');
-    this.styleProperty = 'linetype';
+    this.styleProperty = 'lineType';
   }
 
   createStyle(style) {
