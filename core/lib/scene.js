@@ -111,7 +111,7 @@ export class Scene {
 
   /**
    * Find items in scene
-   * @param {string} type - entity type
+   * @param {string} type - entity type or "ANY"
    * @param {string} prop - object of entity parameters
    * @param {any} value - value of the property
    * @returns - index of items
@@ -120,7 +120,7 @@ export class Scene {
     const filteredItems = [];
 
     this.items.forEach((item, index) => {
-      if (item.type.toUpperCase() === type.toUpperCase() && item.hasOwnProperty(prop) && item[prop] === value) {
+      if ((type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) && item.hasOwnProperty(prop) && item[prop] === value) {
         filteredItems.push(index);
       }
     });
