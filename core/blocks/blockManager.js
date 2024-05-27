@@ -1,4 +1,5 @@
 import {DesignCore} from '../designCore.js';
+import {Strings} from '../lib/strings.js';
 import {Block} from './block.js';
 
 export class BlockManager {
@@ -7,6 +8,12 @@ export class BlockManager {
 
     // populate the default blocks
     this.addDefaultBlocks();
+
+    // list of mandatory styles or layers that cannot be deleted
+    this.indelibleBlocks = [];
+
+    this.indelibleBlocks.push('*Model_Space');
+    this.indelibleBlocks.push('*Paper_Space');
   }
 
   /**
@@ -59,6 +66,14 @@ export class BlockManager {
    */
   deleteBlock(blockIndex) {
     if (this.blocks[blockIndex] === undefined) {
+      return;
+    }
+
+    const blockToDelete = this.blocks[blockIndex].name;
+
+    // Can't delete indelible styles (Standard Text Style, Layer 0)
+    if (this.indelibleBlocks.some((indelibleBlock) => indelibleBlock.toUpperCase() === blockToDelete.toUpperCase())) {
+      DesignCore.Core.notify(`${blockToDelete} ${Strings.Message.CANNOTBEDELETED}`);
       return;
     }
 
