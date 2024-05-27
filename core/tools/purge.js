@@ -9,7 +9,7 @@ export class Purge extends Tool {
   constructor() {
     super();
     this.option = '';
-    this.options = ['Blocks', 'Layers', 'LTypes', 'All']
+    this.options = ['Blocks', 'Layers', 'LTypes', 'All'];
   }
 
   static register() {
@@ -33,8 +33,16 @@ export class Purge extends Tool {
   }
 
   action() {
+    if (this.option === 'Blocks' || this.option === 'All') {
+      DesignCore.Scene.blockManager.purge();
+    }
 
-    const msg = (`Purged option: ${this.option}`);
-    DesignCore.Core.notify(msg);
+    if (this.option === 'Layers'|| this.option === 'All') {
+      DesignCore.LayerManager.purge();
+    }
+
+    if (this.option === 'LTypes'|| this.option === 'All') {
+      DesignCore.LTypeManager.purge();
+    }
   }
 }
