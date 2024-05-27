@@ -1,6 +1,6 @@
 import {Strings} from '../lib/strings.js';
 import {Tool} from './tool.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
+import {PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';

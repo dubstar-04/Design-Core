@@ -3,7 +3,7 @@ import {Point} from '../../core/entities/point.js';
 import {Purge} from '../../core/tools/purge.js';
 import {DesignCore} from '../../core/designCore.js';
 
-const core = new Core();
+new Core();
 const purge = new Purge();
 const layerManager = DesignCore.LayerManager;
 const ltypeManager = DesignCore.LTypeManager;
