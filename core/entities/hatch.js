@@ -601,4 +601,8 @@ export class Hatch extends Entity {
     // return all the polyline boundary shapes
     return this.boundaryShapes;
   }
+
+  touched() {
+    console.log('Hatch: touched() Not Implemented');
+  }
 }
