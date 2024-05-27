@@ -101,4 +101,19 @@ export class BlockManager {
     const err = (`${this.constructor.name} - ${msg}: ${blockName}`);
     throw Error(err);
   }
+
+  purge() {
+    const blocksToPurge = [];
+    this.blocks.forEach((block, index) => {
+      // Check of any scene items are using the block
+      const items = DesignCore.Scene.findItem('ANY', 'block', block);
+      if (items.length === 0) {
+        blocksToPurge.push(index);
+      }
+    });
+
+    // sort the selection in descending order
+    blocksToPurge.sort((a, b)=>b-a);
+    blocksToPurge.forEach((blockIndex) => this.deleteBlock(blockIndex));
+  }
 }

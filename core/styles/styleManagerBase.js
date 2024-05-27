@@ -263,7 +263,7 @@ export class StyleManagerBase {
    * @param {string} newStyleName
    */
   updateSceneStyle(oldStyleName, newStyleName) {
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
       if (DesignCore.Scene.items[i][this.styleProperty] === oldStyleName) {
         DesignCore.Scene.items[i][this.styleProperty] = newStyleName;
       }
@@ -295,5 +295,19 @@ export class StyleManagerBase {
     } else {
       this.styles[styleIndex][property] = value;
     }
+  }
+
+  purge() {
+    const stylesToPurge = [];
+    this.styles.forEach((style, index) => {
+      const items = DesignCore.Scene.findItem('ANY', this.styleProperty, style.name);
+      if (items.length === 0) {
+        stylesToPurge.push(index);
+      }
+    });
+
+    // sort the selection in descending order
+    stylesToPurge.sort((a, b)=>b-a);
+    stylesToPurge.forEach((styleIndex) => this.deleteStyle(styleIndex));
   }
 }
