@@ -28,6 +28,7 @@ import {Distance} from '../tools/distance.js';
 import {Identify} from '../tools/identify.js';
 import {Extend} from '../tools/extend.js';
 import {Trim} from '../tools/trim.js';
+import {Purge} from '../tools/purge.js';
 
 import {Utils} from './utils.js';
 import {Strings} from './strings.js';
@@ -62,6 +63,7 @@ const classes = {
   Identify,
   Extend,
   Trim,
+  Purge,
 
 };
 

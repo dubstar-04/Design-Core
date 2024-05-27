@@ -1,4 +1,5 @@
 import {DesignCore} from '../designCore.js';
+import {Strings} from '../lib/strings.js';
 import {Block} from './block.js';
 
 export class BlockManager {
@@ -7,6 +8,12 @@ export class BlockManager {
 
     // populate the default blocks
     this.addDefaultBlocks();
+
+    // list of mandatory styles or layers that cannot be deleted
+    this.indelibleBlocks = [];
+
+    this.indelibleBlocks.push('*Model_Space');
+    this.indelibleBlocks.push('*Paper_Space');
   }
 
   /**
@@ -57,8 +64,18 @@ export class BlockManager {
    * @param {number} blockIndex
    * @returns undefined
    */
-  deleteBlock(blockIndex) {
+  deleteBlock(blockIndex, showWarning=true) {
     if (this.blocks[blockIndex] === undefined) {
+      return;
+    }
+
+    const blockToDelete = this.blocks[blockIndex].name;
+
+    // Can't delete indelible styles (Standard Text Style, Layer 0)
+    if (this.indelibleBlocks.some((indelibleBlock) => indelibleBlock.toUpperCase() === blockToDelete.toUpperCase())) {
+      if (showWarning) {
+        DesignCore.Core.notify(`${blockToDelete} ${Strings.Message.CANNOTBEDELETED}`);
+      }
       return;
     }
 
@@ -100,5 +117,20 @@ export class BlockManager {
     const msg = 'Invalid Block Name';
     const err = (`${this.constructor.name} - ${msg}: ${blockName}`);
     throw Error(err);
+  }
+
+  purge() {
+    const blocksToPurge = [];
+    this.blocks.forEach((block, index) => {
+      // Check of any scene items are using the block
+      const items = DesignCore.Scene.findItem('ANY', 'block', block);
+      if (items.length === 0) {
+        blocksToPurge.push(index);
+      }
+    });
+
+    // sort the selection in descending order
+    blocksToPurge.sort((a, b)=>b-a);
+    blocksToPurge.forEach((blockIndex) => this.deleteBlock(blockIndex, false));
   }
 }

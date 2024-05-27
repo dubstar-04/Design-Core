@@ -28,6 +28,7 @@ export class Strings {
     CANNOTBEDELETED: 'cannot be deleted',
     CANNOTBERENAMED: 'cannot be renamed',
     CANNOTBEACTIONED: 'cannot be actioned',
+    COMPLETED: 'completed',
   };
 
   // Strings
@@ -38,6 +39,8 @@ export class Strings {
     AND: 'and',
     OR: 'or',
     ITEMS: 'item(s)',
+    ADDED: 'added',
+    REMOVED: 'removed',
   };
 
   // colours
