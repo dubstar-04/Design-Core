@@ -39,6 +39,8 @@ export class Strings {
     AND: 'and',
     OR: 'or',
     ITEMS: 'item(s)',
+    ADDED: 'added',
+    REMOVED: 'removed',
   };
 
   // colours
