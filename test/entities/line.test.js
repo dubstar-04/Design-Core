@@ -30,7 +30,7 @@ test('Test Line.boundingBox', () => {
 
 test('Test Line.dxf', () => {
   const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
-  const file = new File();
+  let file = new File();
   line.dxf(file);
   // console.log(file.contents);
 
@@ -58,6 +58,12 @@ AcDbLine
 0.0
 `;
 
+  expect(file.contents).toEqual(dxfString);
+
+  // create new entity from entity data to ensure all props are loaded
+  const newLine = new Line(line);
+  file = new File();
+  newLine.dxf(file);
   expect(file.contents).toEqual(dxfString);
 });
 
