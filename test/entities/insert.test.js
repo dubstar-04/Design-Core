@@ -56,7 +56,7 @@ test('Test Insert.boundingBox', () => {
 });
 
 test('Test Insert.dxf', () => {
-  const file = new File();
+  let file = new File();
   insert.dxf(file);
   // console.log(file.contents);
 
@@ -80,5 +80,11 @@ AcDbBlockReference
 0.0
 `;
 
+  expect(file.contents).toEqual(dxfString);
+
+  // create new entity from entity data to ensure all props are loaded
+  const newInsert = new Insert(insert);
+  file = new File();
+  newInsert.dxf(file);
   expect(file.contents).toEqual(dxfString);
 });
