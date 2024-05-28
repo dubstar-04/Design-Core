@@ -58,7 +58,17 @@ export class BasePolyline extends Entity {
         // 64 = The polyline is a polyface mesh
         // 128 = The linetype pattern is generated continuously around the vertices of this polyline
 
-        this.flags.setFlagValue(data.flags || data[70]);
+        let flags = 0;
+
+        if (data.flags !== undefined) {
+          flags = data.flags.getFlagValue();
+        }
+
+        if (data[70] !== undefined) {
+          flags = data[70];
+        }
+
+        this.flags.setFlagValue(flags);
       }
     }
   }

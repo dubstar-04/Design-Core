@@ -67,7 +67,17 @@ export class Style {
         // DXF Groupcode 71 - flags (bit-coded values):
         // 2 = Text is backward (mirrored in X).
         // 4 = Text is upside down (mirrored in Y).
-        this.flags.setFlagValue(data.flags || data[71]);
+        let flags = 0;
+
+        if (data.flags !== undefined) {
+          flags = data.flags.getFlagValue();
+        }
+
+        if (data[71] !== undefined) {
+          flags = data[71];
+        }
+
+        this.flags.setFlagValue(flags);
       }
     }
   }

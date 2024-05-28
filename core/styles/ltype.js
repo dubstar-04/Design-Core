@@ -41,7 +41,17 @@ export class LType {
         // 16 = If set, table entry is externally dependent on an xref
         // 32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved
         // 64 = line type was referenced by at least one entity in the drawing the last time the drawing was edited. (This flag can be ignored by most programs)
-        this.flags.setFlagValue(data.flags || data[70]);
+        let flags = 0;
+
+        if (data.flags !== undefined) {
+          flags = data.flags.getFlagValue();
+        }
+
+        if (data[70] !== undefined) {
+          flags = data[70];
+        }
+
+        this.flags.setFlagValue(flags);
       }
     }
   }
