@@ -46,7 +46,17 @@ export class Layer {
       // 16 = If set, table entry is externally dependent on an xref
       // 32 = If both this bit and bit 16 are set, the externally dependent xref has been successfully resolved
       // 64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
-        this.flags.setFlagValue(data.flags || data[70]);
+        let flags = 0;
+
+        if (data.flags !== undefined) {
+          flags = data.flags.getFlagValue();
+        }
+
+        if (data[70] !== undefined) {
+          flags = data[70];
+        }
+
+        this.flags.setFlagValue(flags);
       }
 
       if (data.hasOwnProperty('colour') || data.hasOwnProperty('62')) {

@@ -12,7 +12,10 @@ export class Flags {
    * @param {Number} flagValue
    */
   setFlagValue(flagValue) {
-    this.flags = flagValue;
+    const value = Number(flagValue);
+    if (isNaN(value) === false) {
+      this.flags = value;
+    }
   }
 
   /**

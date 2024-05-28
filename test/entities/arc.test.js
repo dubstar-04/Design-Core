@@ -166,7 +166,7 @@ test('Test Arc.boundingBox', () => {
 
 test('Test Arc.dxf', () => {
   const arc = new Arc({points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)]});
-  const file = new File();
+  let file = new File();
   arc.dxf(file);
   // console.log(file.contents);
 
@@ -196,6 +196,12 @@ AcDbArc
 45
 `;
 
+  expect(file.contents).toEqual(dxfString);
+
+  // create new entity from entity data to ensure all props are loaded
+  const newArc = new Arc(arc);
+  file = new File();
+  newArc.dxf(file);
   expect(file.contents).toEqual(dxfString);
 });
 

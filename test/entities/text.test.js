@@ -149,7 +149,7 @@ test('Test Text.boundingBox', () => {
 
 test('Test Text.dxf', () => {
   const text = new Text({points: [new Point(100, 200)]});
-  const file = new File();
+  let file = new File();
   text.dxf(file);
   // console.log(file.contents);
 
@@ -185,5 +185,11 @@ AcDbText
 0
 `;
 
+  expect(file.contents).toEqual(dxfString);
+
+  // create new entity from entity data to ensure all props are loaded
+  const newText = new Text(text);
+  file = new File();
+  newText.dxf(file);
   expect(file.contents).toEqual(dxfString);
 });

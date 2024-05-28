@@ -45,7 +45,17 @@ export class Block extends Entity {
         // 32 = This is a resolved external reference, or dependent of an external reference (ignored on input)
         // 64 = This definition is a referenced external reference (ignored on input)
 
-        this.flags.setFlagValue(data.flags || data[70]);
+        let flags = 0;
+
+        if (data.flags !== undefined) {
+          flags = data.flags.getFlagValue();
+        }
+
+        if (data[70] !== undefined) {
+          flags = data[70];
+        }
+
+        this.flags.setFlagValue(flags);
       }
     }
   }

@@ -51,7 +51,7 @@ test('Test Circle.boundingBox', () => {
 
 test('Test Circle.dxf', () => {
   const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
-  const file = new File();
+  let file = new File();
   circle.dxf(file);
   // console.log(file.contents);
 
@@ -75,6 +75,13 @@ AcDbCircle
 100
 `;
 
+  expect(file.contents).toEqual(dxfString);
+
+
+  // create new entity from entity data to ensure all props are loaded
+  const newCircle = new Circle(circle);
+  file = new File();
+  newCircle.dxf(file);
   expect(file.contents).toEqual(dxfString);
 });
 

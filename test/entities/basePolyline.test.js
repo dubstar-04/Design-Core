@@ -1,5 +1,6 @@
 import {BasePolyline} from '../../core/entities/basePolyline';
 import {Point} from '../../core/entities/point';
+import {Polyline} from '../../core/entities/polyline.js';
 
 import {File} from '../test-helpers/test-helpers.js';
 
@@ -182,7 +183,7 @@ test('Test BasePolyline.dxf', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
   const polyline = new BasePolyline({points: points});
-  const file = new File();
+  let file = new File();
   polyline.dxf(file);
   // console.log(file.contents);
 
@@ -278,6 +279,12 @@ AcDbEntity
 0
 `;
 
+  expect(file.contents).toEqual(dxfString);
+
+  // create new entity from entity data to ensure all props are loaded
+  const newPolyline = new Polyline(polyline);
+  file = new File();
+  newPolyline.dxf(file);
   expect(file.contents).toEqual(dxfString);
 });
 

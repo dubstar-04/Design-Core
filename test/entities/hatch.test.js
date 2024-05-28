@@ -219,6 +219,12 @@ ANSI31
 `;
   expect(file.contents).toEqual(dxfString);
 
+  // create new entity from entity data to ensure all props are loaded
+  const newHatch = new Hatch(hatch);
+  file = new File();
+  newHatch.dxf(file);
+  expect(file.contents).toEqual(dxfString);
+
   // Export rotated and scaled
   const rotatedScaleHatch = new Hatch();
   rotatedScaleHatch.angle = 45;

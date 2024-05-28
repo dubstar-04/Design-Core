@@ -15,8 +15,12 @@ test('Test DXFFile.writeGroupCode', () => {
   file.writeGroupCode('groupCode', 'groupValue');
 
   const output = 'groupCode\ngroupValue\n';
-
   expect(file.contents).toEqual(output);
+
+  // throw on undefined values
+  expect(() => {
+    file.writeGroupCode('groupCode', undefined);
+  }).toThrow();
 });
 
 test('Test DXFFile.clearFile', () => {
