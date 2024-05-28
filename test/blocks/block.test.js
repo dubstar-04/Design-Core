@@ -4,12 +4,15 @@ import {Line} from '../../core/entities/line.js';
 import {Point} from '../../core/entities/point.js';
 
 import {File} from '../test-helpers/test-helpers.js';
+import {Flags} from '../../core/properties/flags.js';
 
 new Core();
 
 test('Test Block', () => {
   const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
-  const block = new Block({items: [line], flags: 1});
+  const flags = new Flags();
+  flags.addValue(1);
+  const block = new Block({items: [line], flags: flags});
 
   expect(block.items.length).toBe(1);
   expect(block.flags.getFlagValue()).toBe(1);
@@ -17,7 +20,7 @@ test('Test Block', () => {
 
 test('Test Block.clearItems', () => {
   const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
-  const block = new Block({items: [line], flags: 1});
+  const block = new Block({items: [line]});
   expect(block.items.length).toBe(1);
 
   block.clearItems();
@@ -37,7 +40,9 @@ test('Test Block.snaps', () => {
 
 test('Test Block', () => {
   const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
-  const block = new Block({items: [line], flags: 1});
+  const flags = new Flags();
+  flags.addValue(1);
+  const block = new Block({items: [line], flags: flags});
 
   expect(block.items.length).toBe(1);
   expect(block.flags.getFlagValue()).toBe(1);
