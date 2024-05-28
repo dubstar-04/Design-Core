@@ -116,6 +116,12 @@ export class DXFFile {
       return;
     }
 
+    if (groupValue === undefined) {
+      const err = `Invalid groupvalue for dxf groupcode ${groupCode}`;
+      Logging.instance.error(`${this.type} - ${err}`);
+      throw Error(Strings.Error.INVALIDDXFFORMAT);
+    }
+
     this.writeLine(groupCode);
     this.writeLine(groupValue);
   }
