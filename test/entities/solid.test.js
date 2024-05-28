@@ -15,7 +15,7 @@ test('Test Solid.boundingBox', () => {
 test('Test Solid.dxf', () => {
   // test solid with 3 points
   const solid = new Solid({points: [new Point(100, 100), new Point(200, 100), new Point(200, 200)]});
-  const file = new File();
+  let file = new File();
   solid.dxf(file);
   // console.log(file.contents);
 
@@ -55,6 +55,12 @@ AcDbTrace
 0.0
 `;
 
+  expect(file.contents).toEqual(dxfString);
+
+  // create new entity from entity data to ensure all props are loaded
+  const newSolid = new Solid(solid);
+  file = new File();
+  newSolid.dxf(file);
   expect(file.contents).toEqual(dxfString);
 
   // test solid with 4 points
