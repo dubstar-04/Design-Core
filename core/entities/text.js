@@ -106,13 +106,35 @@ export class Text extends Entity {
         // 3 = Aligned (if vertical alignment = 0)
         // 4 = Middle (if vertical alignment = 0)
         // 5 = Fit (if vertical alignment = 0)
-        this.horizontalAlignment = data.horizontalAlignment || data[72];
+
+        let horizontalAlignment = 0;
+
+        if (data.horizontalAlignment !== undefined) {
+          horizontalAlignment = data.horizontalAlignment;
+        }
+
+        if (data[72] !== undefined) {
+          horizontalAlignment = data[72];
+        }
+
+        this.horizontalAlignment = horizontalAlignment;
       }
 
       if (data.hasOwnProperty('verticalAlignment') || data.hasOwnProperty('73')) {
         // DXF Groupcode 73 - Vertical Alignment
         // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
-        this.verticalAlignment = data.verticalAlignment || data[73];
+
+        let verticalAlignment = 0;
+
+        if (data.verticalAlignment !== undefined) {
+          verticalAlignment = data.verticalAlignment;
+        }
+
+        if (data[73] !== undefined) {
+          verticalAlignment = data[72];
+        }
+
+        this.verticalAlignment = verticalAlignment;
       }
 
       if (data.hasOwnProperty('flags') || data.hasOwnProperty('71')) {
