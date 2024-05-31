@@ -30,7 +30,7 @@ export class Insert extends Entity {
         // DXF Groupcode 2 - Block name
 
         const blockName = data.blockName || data[2];
-        const block = DesignCore.Scene.blockManager.getBlockByName(blockName);
+        const block = DesignCore.Scene.blockManager.getItemByName(blockName);
         this.block = block;
       }
 

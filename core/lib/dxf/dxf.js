@@ -154,7 +154,7 @@ export class DXF {
         });
       }
 
-      DesignCore.Scene.blockManager.newBlock(block, true);
+      DesignCore.Scene.blockManager.addItem(block, true);
     });
   }
 

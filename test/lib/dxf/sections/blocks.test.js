@@ -91,7 +91,7 @@ test('Test blocks.read', () => {
 test('Test blocks.addTable', () => {
   // block without data
   const blockEntity = {};
-  const blockCount = blocks.blocks.length;
+  const itemCount = blocks.blocks.length;
   blocks.addBlock(blockEntity);
-  expect(blocks.blocks.length).toBe(blockCount);
+  expect(blocks.blocks.length).toBe(itemCount);
 });

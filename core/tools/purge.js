@@ -36,10 +36,10 @@ export class Purge extends Tool {
     let purgedCount = 0;
 
     if (this.option === 'Blocks' || this.option === 'All') {
-      const intialBlockCount = DesignCore.Scene.blockManager.blockCount();
+      const intialitemCount = DesignCore.Scene.blockManager.itemCount();
       DesignCore.Scene.blockManager.purge();
-      const finalBlockCount = DesignCore.Scene.blockManager.blockCount();
-      purgedCount += (intialBlockCount - finalBlockCount);
+      const finalitemCount = DesignCore.Scene.blockManager.itemCount();
+      purgedCount += (intialitemCount - finalitemCount);
     }
 
     if (this.option === 'Layers'|| this.option === 'All') {

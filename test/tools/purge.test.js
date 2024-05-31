@@ -12,8 +12,8 @@ const blockManager = DesignCore.Scene.blockManager;
 // Runc this before each test
 beforeEach(() => {
 // insert needed for block?
-  blockManager.newBlock({name: 'blockWithoutItems'});
-  blockManager.newBlock({name: 'blockWithItems'});
+  blockManager.addItem({name: 'blockWithoutItems'});
+  blockManager.addItem({name: 'blockWithItems'});
 
   layerManager.addStyle({'name': 'layerWithoutItems'});
   layerManager.addStyle({'name': 'layerWithItems'});
@@ -33,12 +33,12 @@ beforeEach(() => {
 });
 
 test('Test purge.action', () => {
-  expect(blockManager.blockCount()).toBe(4);
+  expect(blockManager.itemCount()).toBe(4);
   purge.option = 'Blocks';
   purge.action();
-  expect(blockManager.blockCount()).toBe(3);
-  expect(blockManager.blockExists('blockWithoutItems')).toBe(false);
-  expect(blockManager.blockExists('blockWithItems')).toBe(true);
+  expect(blockManager.itemCount()).toBe(3);
+  expect(blockManager.itemExists('blockWithoutItems')).toBe(false);
+  expect(blockManager.itemExists('blockWithItems')).toBe(true);
 
   expect(layerManager.styleCount()).toBe(4);
   purge.option = 'Layers';
@@ -56,7 +56,7 @@ test('Test purge.action', () => {
 });
 
 test('Test purge.action - All', () => {
-  expect(blockManager.blockCount()).toBe(4);
+  expect(blockManager.itemCount()).toBe(4);
   expect(layerManager.styleCount()).toBe(4);
   expect(ltypeManager.styleCount()).toBe(5);
 
@@ -64,9 +64,9 @@ test('Test purge.action - All', () => {
   purge.action();
 
   // Blocks
-  expect(blockManager.blockCount()).toBe(3);
-  expect(blockManager.blockExists('blockWithoutItems')).toBe(false);
-  expect(blockManager.blockExists('blockWithItems')).toBe(true);
+  expect(blockManager.itemCount()).toBe(3);
+  expect(blockManager.itemExists('blockWithoutItems')).toBe(false);
+  expect(blockManager.itemExists('blockWithItems')).toBe(true);
 
   // Layers
   expect(layerManager.styleCount()).toBe(3);

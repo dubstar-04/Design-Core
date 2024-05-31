@@ -66,7 +66,7 @@ test('Test Layer.dxf', () => {
   const layer = new Layer({name: 'TestLayer'});
   const file = new File();
   layer.dxf(file);
-  console.log(file.contents);
+  // console.log(file.contents);
 
   const dxfString = `0
 LAYER
