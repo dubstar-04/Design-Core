@@ -19,7 +19,7 @@ const tableManagerBase = new TableManagerBase();
 // mock item data
 tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}];
 
-test('Test tableManagerBaseBase.getItems', () => {
+test('Test tableManagerBase.getItems', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}];
 
@@ -27,7 +27,7 @@ test('Test tableManagerBaseBase.getItems', () => {
   expect(tableManagerBase.getItems()).toHaveLength(2);
 });
 
-test('Test tableManagerBaseBase.itemCount', () => {
+test('Test tableManagerBase.itemCount', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}];
 
@@ -35,7 +35,7 @@ test('Test tableManagerBaseBase.itemCount', () => {
   expect(tableManagerBase.itemCount()).toBe(2);
 });
 
-test('Test tableManagerBaseBase.newItem', () => {
+test('Test tableManagerBase.newItem', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}];
 
@@ -45,7 +45,7 @@ test('Test tableManagerBaseBase.newItem', () => {
   expect(tableManagerBase.itemCount()).toBe(3);
 });
 
-test('Test tableManagerBaseBase.getUniqueName', () => {
+test('Test tableManagerBase.getUniqueName', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}];
 
@@ -57,7 +57,7 @@ test('Test tableManagerBaseBase.getUniqueName', () => {
   expect(tableManagerBase.getUniqueName('itemThree')).toBe('itemThree');
 });
 
-test('Test tableManagerBaseBase.addItem', () => {
+test('Test tableManagerBase.addItem', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}];
 
@@ -75,7 +75,7 @@ test('Test tableManagerBaseBase.addItem', () => {
   expect(tableManagerBase.items[0].name).toBe('itemone');
 });
 
-test('Test tableManagerBaseBase.deleteItem', () => {
+test('Test tableManagerBase.deleteItem', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}], {name: 'Standard'};
   tableManagerBase.indelibleItems = ['Standard'];
@@ -97,7 +97,7 @@ test('Test tableManagerBaseBase.deleteItem', () => {
   expect(tableManagerBase.itemCount()).toBe(1);
 });
 
-test('Test tableManagerBaseBase.itemExists', () => {
+test('Test tableManagerBase.itemExists', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}];
 
@@ -106,7 +106,7 @@ test('Test tableManagerBaseBase.itemExists', () => {
   expect(tableManagerBase.itemExists('Non-Existent')).toBe(false);
 });
 
-test('Test tableManagerBaseBase.checkitems', () => {
+test('Test tableManagerBase.checkitems', () => {
   // clear all items
   tableManagerBase.items = [];
 
@@ -116,7 +116,7 @@ test('Test tableManagerBaseBase.checkitems', () => {
   expect(tableManagerBase.itemCount()).toBe(1);
 });
 
-test('Test tableManagerBaseBase.addStandardItems', () => {
+test('Test tableManagerBase.addStandardItems', () => {
   // clear all items
   tableManagerBase.items = [];
 
@@ -130,7 +130,7 @@ test('Test tableManagerBaseBase.addStandardItems', () => {
   expect(tableManagerBase.itemCount()).toBe(1);
 });
 
-test('Test tableManagerBaseBase.getItemByName', () => {
+test('Test tableManagerBase.getItemByName', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}];
 
@@ -141,7 +141,7 @@ test('Test tableManagerBaseBase.getItemByName', () => {
   // expect(tableManagerBase.getItemByName('Non-Existent')).toBeUndefined();
 });
 
-test('Test tableManagerBaseBase.getItemByIndex', () => {
+test('Test tableManagerBase.getItemByIndex', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}];
 
@@ -149,7 +149,7 @@ test('Test tableManagerBaseBase.getItemByIndex', () => {
   expect(tableManagerBase.getItemByIndex(20)).toBeUndefined();
 });
 
-test('Test tableManagerBaseBase.renameitem', () => {
+test('Test tableManagerBase.renameitem', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne'}, {name: 'itemTwo'}];
   tableManagerBase.indelibleItems = ['Standard'];
@@ -171,7 +171,7 @@ test('Test tableManagerBaseBase.renameitem', () => {
 });
 
 
-test('Test tableManagerBaseBase.updateItem', () => {
+test('Test tableManagerBase.updateItem', () => {
   // add some item to the items array property
   tableManagerBase.items = [{name: 'itemOne', textHeight: 2}, {name: 'itemTwo', textHeight: 3}];
 
