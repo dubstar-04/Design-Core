@@ -15,11 +15,11 @@ beforeEach(() => {
   blockManager.addItem({name: 'blockWithoutItems'});
   blockManager.addItem({name: 'blockWithItems'});
 
-  layerManager.addStyle({'name': 'layerWithoutItems'});
-  layerManager.addStyle({'name': 'layerWithItems'});
+  layerManager.addItem({'name': 'layerWithoutItems'});
+  layerManager.addItem({'name': 'layerWithItems'});
 
-  ltypeManager.addStyle({'name': 'ltypeWithoutItems'});
-  ltypeManager.addStyle({'name': 'ltypeWithItems'});
+  ltypeManager.addItem({'name': 'ltypeWithoutItems'});
+  ltypeManager.addItem({'name': 'ltypeWithItems'});
 
   const point1 = new Point();
   const point2 = new Point(0, 100);
@@ -40,25 +40,25 @@ test('Test purge.action', () => {
   expect(blockManager.itemExists('blockWithoutItems')).toBe(false);
   expect(blockManager.itemExists('blockWithItems')).toBe(true);
 
-  expect(layerManager.styleCount()).toBe(4);
+  expect(layerManager.itemCount()).toBe(4);
   purge.option = 'Layers';
   purge.action();
-  expect(layerManager.styleCount()).toBe(3);
-  expect(layerManager.styleExists('layerWithoutItems')).toBe(false);
-  expect(layerManager.styleExists('layerWithItems')).toBe(true);
+  expect(layerManager.itemCount()).toBe(3);
+  expect(layerManager.itemExists('layerWithoutItems')).toBe(false);
+  expect(layerManager.itemExists('layerWithItems')).toBe(true);
 
-  expect(ltypeManager.styleCount()).toBe(5);
+  expect(ltypeManager.itemCount()).toBe(5);
   purge.option = 'LTypes';
   purge.action();
-  expect(ltypeManager.styleCount()).toBe(4);
-  expect(ltypeManager.styleExists('ltypeWithOutItems')).toBe(false);
-  expect(ltypeManager.styleExists('ltypeWithItems')).toBe(true);
+  expect(ltypeManager.itemCount()).toBe(4);
+  expect(ltypeManager.itemExists('ltypeWithOutItems')).toBe(false);
+  expect(ltypeManager.itemExists('ltypeWithItems')).toBe(true);
 });
 
 test('Test purge.action - All', () => {
   expect(blockManager.itemCount()).toBe(4);
-  expect(layerManager.styleCount()).toBe(4);
-  expect(ltypeManager.styleCount()).toBe(5);
+  expect(layerManager.itemCount()).toBe(4);
+  expect(ltypeManager.itemCount()).toBe(5);
 
   purge.option = 'All';
   purge.action();
@@ -69,13 +69,13 @@ test('Test purge.action - All', () => {
   expect(blockManager.itemExists('blockWithItems')).toBe(true);
 
   // Layers
-  expect(layerManager.styleCount()).toBe(3);
-  expect(layerManager.styleExists('layerWithoutItems')).toBe(false);
-  expect(layerManager.styleExists('layerWithItems')).toBe(true);
+  expect(layerManager.itemCount()).toBe(3);
+  expect(layerManager.itemExists('layerWithoutItems')).toBe(false);
+  expect(layerManager.itemExists('layerWithItems')).toBe(true);
 
   // Ltypes
-  expect(ltypeManager.styleCount()).toBe(4);
-  expect(ltypeManager.styleExists('ltypeWithOutItems')).toBe(false);
-  expect(ltypeManager.styleExists('ltypeWithItems')).toBe(true);
+  expect(ltypeManager.itemCount()).toBe(4);
+  expect(ltypeManager.itemExists('ltypeWithOutItems')).toBe(false);
+  expect(ltypeManager.itemExists('ltypeWithItems')).toBe(true);
 });
 

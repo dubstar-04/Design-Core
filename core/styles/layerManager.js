@@ -7,17 +7,17 @@ export class LayerManager extends StyleManagerBase {
   constructor() {
     super();
 
-    this.indelibleStyles.push('0', 'DEFPOINTS');
-    this.styleProperty = 'layer';
+    this.indelibleItems.push('0', 'DEFPOINTS');
+    this.itemProperty = 'layer';
   }
 
-  createStyle(style) {
+  createItem(style) {
     return new Layer(style);
   }
 
-  addStandardStyles() {
-    this.addStyle({'name': '0'});
-    this.addStyle({'name': 'DEFPOINTS', 'plotting': false});
+  addStandardItems() {
+    this.addItem({'name': '0'});
+    this.addItem({'name': 'DEFPOINTS', 'plotting': false});
   }
 
   dxf(file) {
@@ -26,11 +26,11 @@ export class LayerManager extends StyleManagerBase {
     file.writeGroupCode('2', 'LAYER');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', this.styleCount());
+    file.writeGroupCode('70', this.itemCount());
 
-    for (let i = 0; i < this.styleCount(); i++) {
-      if (this.getStyleByIndex(i).name !== 'DEFPOINTS') {
-        this.getStyleByIndex(i).dxf(file);
+    for (let i = 0; i < this.itemCount(); i++) {
+      if (this.getItemByIndex(i).name !== 'DEFPOINTS') {
+        this.getItemByIndex(i).dxf(file);
       }
     }
 

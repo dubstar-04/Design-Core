@@ -2,49 +2,49 @@ import {Core} from '../../core/core/core.js';
 import {StyleManagerBase} from '../../core/styles/styleManagerBase';
 
 
-// mock createStyle method
-StyleManagerBase.prototype.createStyle = function(style) {
+// mock createItem method
+StyleManagerBase.prototype.createItem = function(style) {
   return {name: style.name};
 };
 
-// mock addStandardStyles method
-StyleManagerBase.prototype.addStandardStyles = function() {
-  this.addStyle({'name': 'TEST'});
+// mock addStandardItems method
+StyleManagerBase.prototype.addStandardItems = function() {
+  this.addItem({'name': 'TEST'});
 };
 
 // initialise core
 new Core();
 const styleManager = new StyleManagerBase();
 
-test('Test StyleManagerBase.getStyles', () => {
+test('Test StyleManagerBase.getItems', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}];
 
-  // test getStyles
-  expect(styleManager.getStyles()).toHaveLength(2);
+  // test getItems
+  expect(styleManager.getItems()).toHaveLength(2);
 });
 
-test('Test StyleManagerBase.styleCount', () => {
+test('Test StyleManagerBase.itemCount', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}];
 
-  // test styleCount
-  expect(styleManager.styleCount()).toBe(2);
+  // test itemCount
+  expect(styleManager.itemCount()).toBe(2);
 });
 
-test('Test StyleManagerBase.newStyle', () => {
+test('Test StyleManagerBase.newItem', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}];
 
   // Add new style
-  styleManager.newStyle();
+  styleManager.newItem();
 
-  expect(styleManager.styleCount()).toBe(3);
+  expect(styleManager.itemCount()).toBe(3);
 });
 
 test('Test StyleManagerBase.getUniqueName', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}];
 
   // check existing style name
   expect(styleManager.getUniqueName('styleOne')).toBe('styleOne_1');
@@ -54,44 +54,44 @@ test('Test StyleManagerBase.getUniqueName', () => {
   expect(styleManager.getUniqueName('styleThree')).toBe('styleThree');
 });
 
-test('Test StyleManagerBase.addStyle', () => {
+test('Test StyleManagerBase.addItem', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}];
+  styleManager.items = [{name: 'styleOne'}];
 
   // Add new style
-  styleManager.addStyle({name: 'styleTwo'});
-  expect(styleManager.styleCount()).toBe(2);
+  styleManager.addItem({name: 'styleTwo'});
+  expect(styleManager.itemCount()).toBe(2);
 
   // Try and add existing style
-  styleManager.addStyle({name: 'styleOne'});
-  expect(styleManager.styleCount()).toBe(2);
+  styleManager.addItem({name: 'styleOne'});
+  expect(styleManager.itemCount()).toBe(2);
 
   // OverWrite existing style
-  styleManager.addStyle({name: 'styleone'}, true);
-  expect(styleManager.styleCount()).toBe(2);
-  expect(styleManager.styles[0].name).toBe('styleone');
+  styleManager.addItem({name: 'styleone'}, true);
+  expect(styleManager.itemCount()).toBe(2);
+  expect(styleManager.items[0].name).toBe('styleone');
 });
 
 test('Test StyleManagerBase.deleteStyle', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}], {name: 'Standard'};
-  styleManager.indelibleStyles = ['Standard'];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}], {name: 'Standard'};
+  styleManager.indelibleItems = ['Standard'];
 
   // Delete style
   styleManager.deleteStyle(1);
-  expect(styleManager.styleCount(1)).toBe(1);
+  expect(styleManager.itemCount(1)).toBe(1);
 
   // Try and delete an non-existant index
   styleManager.deleteStyle(10);
-  expect(styleManager.styleCount()).toBe(1);
+  expect(styleManager.itemCount()).toBe(1);
 
 
   // Check style name
-  const styleIndex = styleManager.getStyleIndex('Standard');
+  const styleIndex = styleManager.getItemIndex('Standard');
 
   // Try and delete an indelible styles
   styleManager.deleteStyle(styleIndex);
-  expect(styleManager.styleCount()).toBe(1);
+  expect(styleManager.itemCount()).toBe(1);
 });
 
 
@@ -101,7 +101,7 @@ test('Test StyleManagerBase.getCstyle', () => {
 
 test('Test StyleManagerBase.setCstyle', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}];
 
   styleManager.setCstyle('styleOne');
   expect(styleManager.getCstyle()).toBe('styleOne');
@@ -113,107 +113,111 @@ test('Test StyleManagerBase.setCstyle', () => {
   expect(styleManager.getCstyle()).toBe('styleOne');
 });
 
-test('Test StyleManagerBase.styleExists', () => {
+test('Test StyleManagerBase.itemExists', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}];
 
-  expect(styleManager.styleExists('styleOne')).toBe(true);
-  expect(styleManager.styleExists('styleTwo')).toBe(true);
-  expect(styleManager.styleExists('Non-Existent')).toBe(false);
+  expect(styleManager.itemExists('styleOne')).toBe(true);
+  expect(styleManager.itemExists('styleTwo')).toBe(true);
+  expect(styleManager.itemExists('Non-Existent')).toBe(false);
 });
 
 test('Test StyleManagerBase.checkStyles', () => {
   // clear all styles
-  styleManager.styles = [];
+  styleManager.items = [];
 
-  expect(styleManager.styleCount()).toBe(0);
+  expect(styleManager.itemCount()).toBe(0);
 
   styleManager.checkStyles();
-  expect(styleManager.styleCount()).toBe(1);
+  expect(styleManager.itemCount()).toBe(1);
 });
 
-test('Test StyleManagerBase.addStandardStyles', () => {
+test('Test StyleManagerBase.addStandardItems', () => {
   // clear all styles
-  styleManager.styles = [];
+  styleManager.items = [];
 
-  expect(styleManager.styleCount()).toBe(0);
+  expect(styleManager.itemCount()).toBe(0);
 
-  styleManager.addStandardStyles();
-  expect(styleManager.styleCount()).toBe(1);
+  styleManager.addStandardItems();
+  expect(styleManager.itemCount()).toBe(1);
 
   // check standard styles can't be added multiple times
-  styleManager.addStandardStyles();
-  expect(styleManager.styleCount()).toBe(1);
+  styleManager.addStandardItems();
+  expect(styleManager.itemCount()).toBe(1);
 });
 
-test('Test StyleManagerBase.getStyleByName', () => {
+test('Test StyleManagerBase.getItemByName', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}];
 
-  expect(styleManager.getStyleByName('styleOne').name).toBe('styleOne');
+  expect(styleManager.getItemByName('styleOne').name).toBe('styleOne');
   expect(() => {
-    styleManager.getStyleByName('Non-Existent');
+    styleManager.getItemByName('Non-Existent');
   }).toThrow();
-  // expect(styleManager.getStyleByName('Non-Existent')).toBeUndefined();
+  // expect(styleManager.getItemByName('Non-Existent')).toBeUndefined();
 });
 
-test('Test StyleManagerBase.getStyleByIndex', () => {
+test('Test StyleManagerBase.getItemByIndex', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}];
 
-  expect(styleManager.getStyleByIndex(0).name).toBe('styleOne');
-  expect(styleManager.getStyleByIndex(20)).toBeUndefined();
+  expect(styleManager.getItemByIndex(0).name).toBe('styleOne');
+  expect(styleManager.getItemByIndex(20)).toBeUndefined();
 });
 
 test('Test StyleManagerBase.renameStyle', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne'}, {name: 'styleTwo'}];
-  styleManager.indelibleStyles = ['Standard'];
+  styleManager.items = [{name: 'styleOne'}, {name: 'styleTwo'}];
+  styleManager.indelibleItems = ['Standard'];
 
   // check index name
-  expect(styleManager.getStyleByIndex(0).name).toBe('styleOne');
+  expect(styleManager.getItemByIndex(0).name).toBe('styleOne');
 
   // try and rename to STANDARD
   styleManager.renameStyle(0, 'STANDARD');
-  expect(styleManager.getStyleByIndex(0).name).toBe('styleOne');
+  expect(styleManager.getItemByIndex(0).name).toBe('styleOne');
 
   // valid rename
   styleManager.renameStyle(0, 'styleOneRenamed');
-  expect(styleManager.getStyleByIndex(0).name).toBe('styleOneRenamed');
+  expect(styleManager.getItemByIndex(0).name).toBe('styleOneRenamed');
 
   // try and rename to current name - no change
   styleManager.renameStyle(0, 'styleOneRenamed');
-  expect(styleManager.getStyleByIndex(0).name).toBe('styleOneRenamed');
+  expect(styleManager.getItemByIndex(0).name).toBe('styleOneRenamed');
 
   // try and rename current style
+  // check index name
+  expect(styleManager.getItemByIndex(1).name).toBe('styleTwo');
   styleManager.setCstyle('styleTwo');
+  expect(styleManager.getCstyle()).toBe('styleTwo');
+
   styleManager.renameStyle(1, 'styleTwoRenamed');
-  expect(styleManager.getStyleByIndex(1).name).toBe('styleTwoRenamed');
+  expect(styleManager.getItemByIndex(1).name).toBe('styleTwoRenamed');
   expect(styleManager.getCstyle()).toBe('styleTwoRenamed');
 });
 
 
-test('Test StyleManagerBase.updateStyle', () => {
+test('Test StyleManagerBase.updateItem', () => {
   // add some style to the styles array property
-  styleManager.styles = [{name: 'styleOne', textHeight: 2}, {name: 'styleTwo', textHeight: 3}];
+  styleManager.items = [{name: 'styleOne', textHeight: 2}, {name: 'styleTwo', textHeight: 3}];
 
   // update non-existent style index
   expect(() => {
-    styleManager.updateStyle(10, 'Non-Existent-property', 'value');
+    styleManager.updateItem(10, 'Non-Existent-property', 'value');
   }).toThrow();
 
 
   // update non-existent style property
   expect(() => {
-    styleManager.updateStyle(1, 'Non-Existent-property', 'value');
+    styleManager.updateItem(1, 'Non-Existent-property', 'value');
   }).toThrow();
 
   // update style name
-  styleManager.updateStyle(0, 'name', 'styleOneRenamed');
-  expect(styleManager.getStyleByIndex(0).name).toBe('styleOneRenamed');
+  styleManager.updateItem(0, 'name', 'styleOneRenamed');
+  expect(styleManager.getItemByIndex(0).name).toBe('styleOneRenamed');
 
 
   // update style text height
-  styleManager.updateStyle(0, 'textHeight', 20);
-  expect(styleManager.getStyleByIndex(0).textHeight).toBe(20);
+  styleManager.updateItem(0, 'textHeight', 20);
+  expect(styleManager.getItemByIndex(0).textHeight).toBe(20);
 });

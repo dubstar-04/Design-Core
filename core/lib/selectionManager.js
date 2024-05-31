@@ -128,7 +128,7 @@ export class SelectionManager {
 
     for (let i = 0; i <DesignCore.Scene.items.length; i++) {
       // check the items layer is selectable - i.e. on, thawed, etc...
-      const layer = DesignCore.LayerManager.getStyleByName(DesignCore.Scene.items[i].layer);
+      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.items[i].layer);
 
       if (!layer.isSelectable) {
         continue;

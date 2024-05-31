@@ -183,7 +183,7 @@ export class BaseDimension extends Entity {
   }
 
   draw(ctx, scale) {
-    const style = DesignCore.DimStyleManager.getStyleByName(this.styleName);
+    const style = DesignCore.DimStyleManager.getItemByName(this.styleName);
 
     const entities = this.buildDimension(style);
 

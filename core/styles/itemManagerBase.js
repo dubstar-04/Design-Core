@@ -6,7 +6,7 @@ export class ItemManagerBase {
     this.items = [];
     this.addStandardItems();
 
-    // list of mandatory items or layers that cannot be deleted
+    // list of mandatory items that cannot be deleted
     this.indelibleItems = [];
   }
 
@@ -31,7 +31,7 @@ export class ItemManagerBase {
    */
   newItem() {
     this.addItem({
-      'name': this.getUniqueName('NEW_ITEM'),
+      'name': this.getUniqueName(`NEW_${this.itemProperty}`.toUpperCase()),
     });
   }
 
@@ -79,7 +79,7 @@ export class ItemManagerBase {
   /**
    * Delete a item using the item index
    * @param {number} itemIndex
-   * @returns undefined
+   * @returns array containing deleted item or undefined
    */
   deleteItem(itemIndex, showWarning=true) {
     if (this.items[itemIndex] === undefined) {
@@ -97,7 +97,7 @@ export class ItemManagerBase {
     }
 
     // Delete The item
-    this.items.splice(itemIndex, 1);
+    return this.items.splice(itemIndex, 1);
   }
 
 
@@ -144,6 +144,15 @@ export class ItemManagerBase {
   }
 
   /**
+   * Get the item from an index
+   * @param {number} itemIndex
+   * @returns
+   */
+  getItemByIndex(itemIndex) {
+    return this.items[itemIndex];
+  }
+
+  /**
    * get a item matching itemname
    * @param {string} itemName
    * @returns item object
@@ -176,7 +185,7 @@ export class ItemManagerBase {
    * Rename the item at index with newName
    * @param {number} itemIndex
    * @param {string} newName
-   * @returns undefined
+   * @returns {String} new name or undefined
    */
   renameItem(itemIndex, newName) {
     const itemToRename = this.getItemByIndex(itemIndex).name;
@@ -192,7 +201,7 @@ export class ItemManagerBase {
       return;
     }
 
-    // Can't rename indelible items (Standard Text Item, Layer 0)
+    // Can't use the name of indelible items (Standard Text Item, Layer 0)
     if (this.indelibleItems.some((item) => item.toUpperCase() === newName.toUpperCase())) {
       DesignCore.Core.notify(`${newName} ${Strings.Message.CANNOTBERENAMED}`);
       return;
@@ -200,16 +209,15 @@ export class ItemManagerBase {
 
     const newUniqueName = this.getUniqueName(newName);
 
+    console.log('rename item:', itemToRename, newUniqueName, newName, this.indelibleItems);
+
     const currentItemName = this.items[itemIndex].name;
     this.items[itemIndex].name = newUniqueName;
 
     // update all scene items with the new item value
     this.updateSceneItem(currentItemName, newUniqueName);
 
-    // if the item to change is the current item, update the currentitem property
-    if (currentItemName === this.currentitem) {
-      this.setCitem(newUniqueName);
-    }
+    return newUniqueName;
   }
 
   /**
@@ -256,6 +264,8 @@ export class ItemManagerBase {
     const itemsToPurge = [];
     this.items.forEach((item, index) => {
       const searchTerm = this.itemProperty === 'block' ? item : item.name;
+
+      console.log('searchTerm', searchTerm);
 
       const items = DesignCore.Scene.findItem('ANY', this.itemProperty, searchTerm);
       if (items.length === 0) {

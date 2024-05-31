@@ -6,18 +6,18 @@ export class LTypeManager extends StyleManagerBase {
   constructor() {
     super();
 
-    this.indelibleStyles.push('CONTINUOUS', 'ByLayer', 'ByBlock');
-    this.styleProperty = 'lineType';
+    this.indelibleItems.push('CONTINUOUS', 'ByLayer', 'ByBlock');
+    this.itemProperty = 'lineType';
   }
 
-  createStyle(style) {
+  createItem(style) {
     return new LType(style);
   }
 
-  addStandardStyles() {
-    this.addStyle({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
-    this.addStyle({'name': 'ByLayer'});
-    this.addStyle({'name': 'ByBlock'});
+  addStandardItems() {
+    this.addItem({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
+    this.addItem({'name': 'ByLayer'});
+    this.addItem({'name': 'ByBlock'});
   }
 
   getOptionalStyles() {
@@ -38,11 +38,11 @@ export class LTypeManager extends StyleManagerBase {
     file.writeGroupCode('2', 'LTYPE');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', this.styleCount());
+    file.writeGroupCode('70', this.itemCount());
 
 
-    for (let i = 0; i < this.styleCount(); i++) {
-      this.getStyleByIndex(i).dxf(file);
+    for (let i = 0; i < this.itemCount(); i++) {
+      this.getItemByIndex(i).dxf(file);
     }
 
     file.writeGroupCode('0', 'ENDTAB');
