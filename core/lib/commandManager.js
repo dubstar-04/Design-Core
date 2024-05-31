@@ -13,7 +13,7 @@ import {Text} from '../entities/text.js';
 // import {DiametricDimension} from '../entities/diametricDimension.js';
 // import {RadialDimension} from '../entities/radialDimension.js';
 // import {BaseDimension} from '../entities/basedimension.js';
-import {Block} from '../blocks/block.js';
+import {Block} from '../tables/block.js';
 import {Insert} from '../entities/insert.js';
 import {Hatch} from '../entities/hatch.js';
 

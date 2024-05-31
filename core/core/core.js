@@ -3,10 +3,10 @@ import {CommandManager} from '../lib/commandManager.js';
 import {Mouse} from '../lib/mouse.js';
 import {Canvas} from '../lib/canvas.js';
 import {CommandLine} from '../lib/commandLine.js';
-import {LayerManager} from '../styles/layerManager.js';
-import {LTypeManager} from '../styles/ltypeManager.js';
-import {StyleManager} from '../styles/styleManager.js';
-import {DimStyleManager} from '../styles/dimStyleManager.js';
+import {LayerManager} from '../tables/layerManager.js';
+import {LTypeManager} from '../tables/ltypeManager.js';
+import {StyleManager} from '../tables/styleManager.js';
+import {DimStyleManager} from '../tables/dimStyleManager.js';
 import {PropertyManager} from '../properties/propertyManager.js';
 
 import {FileIO} from '../lib/fileio.js';

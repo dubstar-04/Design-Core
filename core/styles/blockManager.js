@@ -1,9 +1,9 @@
 // import {DesignCore} from '../designCore.js';
 // import {Strings} from '../lib/strings.js';
-import {ItemManagerBase} from '../styles/itemManagerBase.js';
+import {TableManagerBase} from './tableManagerBase.js';
 import {Block} from './block.js';
 
-export class BlockManager extends ItemManagerBase {
+export class BlockManager extends TableManagerBase {
   constructor() {
     super();
     this.itemProperty = 'block';

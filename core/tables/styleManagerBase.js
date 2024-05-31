@@ -1,8 +1,8 @@
 import {DesignCore} from '../designCore.js';
 // import {Strings} from '../lib/strings.js';
-import {ItemManagerBase} from './itemManagerBase.js';
+import {TableManagerBase} from './tableManagerBase.js';
 
-export class StyleManagerBase extends ItemManagerBase {
+export class StyleManagerBase extends TableManagerBase {
   constructor() {
     super();
 

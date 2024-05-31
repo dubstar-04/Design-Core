@@ -1,5 +1,5 @@
 import {Core} from '../../core/core/core.js';
-import {Block} from '../../core/blocks/block.js';
+import {Block} from '../../core/tables/block.js';
 import {Line} from '../../core/entities/line.js';
 import {Point} from '../../core/entities/point.js';
 

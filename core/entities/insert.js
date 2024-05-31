@@ -1,6 +1,6 @@
 import {Entity} from './entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {Block} from '../blocks/block.js';
+import {Block} from '../tables/block.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';

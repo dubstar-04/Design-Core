@@ -7,7 +7,7 @@ import {BoundingBox} from './boundingBox.js';
 import {Point} from '../entities/point.js';
 
 import {DesignCore} from '../designCore.js';
-import {BlockManager} from '../blocks/blockManager.js';
+import {BlockManager} from '../tables/blockManager.js';
 
 export class Scene {
   constructor() {

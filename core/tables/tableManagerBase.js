@@ -1,7 +1,7 @@
 import {DesignCore} from '../designCore.js';
 import {Strings} from '../lib/strings.js';
 
-export class ItemManagerBase {
+export class TableManagerBase {
   constructor() {
     this.items = [];
     this.addStandardItems();

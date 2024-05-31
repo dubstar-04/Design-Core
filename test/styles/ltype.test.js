@@ -1,5 +1,5 @@
 import {DXFFile} from '../../core/lib/dxf/dxfFile.js';
-import {LType} from '../../core/styles/ltype.js';
+import {LType} from '../../core/tables/ltype.js';
 
 const file = new DXFFile();
 const R12File = new DXFFile('R12');

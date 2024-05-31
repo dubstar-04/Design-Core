@@ -1,4 +1,4 @@
-import {Layer} from '../../core/styles/layer';
+import {Layer} from '../../core/tables/layer';
 
 import {File} from '../test-helpers/test-helpers.js';
 

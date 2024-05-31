@@ -1,5 +1,5 @@
 import {Point} from './point.js';
-import {Block} from '../blocks/block.js';
+import {Block} from '../tables/block.js';
 import {Text} from './text.js';
 import {Solid} from './solid.js';
 import {Entity} from './entity.js';

@@ -1,5 +1,5 @@
 import {Core} from '../../core/core/core.js';
-import {StyleManagerBase} from '../../core/styles/styleManagerBase';
+import {StyleManagerBase} from '../../core/tables/styleManagerBase.js';
 
 
 // mock createItem method

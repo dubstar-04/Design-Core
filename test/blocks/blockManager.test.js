@@ -1,4 +1,4 @@
-import {BlockManager} from '../../core/blocks/blockManager.js';
+import {BlockManager} from '../../core/tables/blockManager.js';
 import {Core} from '../../core/core/core.js';
 
 // initialise core
