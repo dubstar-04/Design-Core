@@ -6,20 +6,20 @@ export class StyleManager extends StyleManagerBase {
   constructor() {
     super();
 
-    this.indelibleStyles.push('STANDARD');
-    this.styleProperty = 'style';
+    this.indelibleItems.push('STANDARD');
+    this.itemProperty = 'style';
   }
 
-  createStyle(style) {
+  createItem(style) {
     return new Style(style);
   }
 
-  addStandardStyles() {
-    this.addStyle({
+  addStandardItems() {
+    this.addItem({
       'name': 'STANDARD',
     });
 
-    this.addStyle({
+    this.addItem({
       'name': 'ANNOTATIVE',
     });
 
@@ -32,10 +32,10 @@ export class StyleManager extends StyleManagerBase {
     file.writeGroupCode('2', 'STYLE');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', this.styleCount());
+    file.writeGroupCode('70', this.itemCount());
 
-    for (let i = 0; i < this.styleCount(); i++) {
-      this.getStyleByIndex(i).dxf(file);
+    for (let i = 0; i < this.itemCount(); i++) {
+      this.getItemByIndex(i).dxf(file);
     }
 
     file.writeGroupCode('0', 'ENDTAB');

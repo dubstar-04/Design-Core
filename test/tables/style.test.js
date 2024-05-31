@@ -1,4 +1,4 @@
-import {Style} from '../../core/styles/style';
+import {Style} from '../../core/tables/style';
 
 test('Test Style.vertical', () => {
   const style = new Style();

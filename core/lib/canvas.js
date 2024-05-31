@@ -209,7 +209,7 @@ export class Canvas {
     // Paint the primary scene items
     this.paintState = this.paintStates.ENTITIES;
     for (let i = 0; i < DesignCore.Scene.items.length; i++) {
-      const layer = DesignCore.LayerManager.getStyleByName(DesignCore.Scene.items[i].layer);
+      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.items[i].layer);
 
       if (!layer.isVisible) {
         continue;

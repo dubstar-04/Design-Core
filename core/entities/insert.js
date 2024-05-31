@@ -1,6 +1,6 @@
 import {Entity} from './entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {Block} from '../blocks/block.js';
+import {Block} from '../tables/block.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
@@ -30,7 +30,7 @@ export class Insert extends Entity {
         // DXF Groupcode 2 - Block name
 
         const blockName = data.blockName || data[2];
-        const block = DesignCore.Scene.blockManager.getBlockByName(blockName);
+        const block = DesignCore.Scene.blockManager.getItemByName(blockName);
         this.block = block;
       }
 
@@ -215,7 +215,7 @@ export class Insert extends Entity {
   }
 
   touched(selectionExtremes) {
-    const layer = DesignCore.LayerManager.getStyleByName(this.layer);
+    const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
     if (!layer.isSelectable) {
       return;

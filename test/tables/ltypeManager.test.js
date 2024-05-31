@@ -3,7 +3,7 @@ import {Core} from '../../core/core/core.js';
 const core = new Core();
 const lineTypeManager = core.ltypeManager;
 
-test('Test LineTypeManager.getStyles', () => {
+test('Test LineTypeManager.getItems', () => {
   const layers = lineTypeManager.getOptionalStyles();
   expect(layers).toHaveLength(6);
 

@@ -1,5 +1,5 @@
 import {Point} from './point.js';
-import {Block} from '../blocks/block.js';
+import {Block} from '../tables/block.js';
 import {Text} from './text.js';
 import {Solid} from './solid.js';
 import {Entity} from './entity.js';
@@ -183,7 +183,7 @@ export class BaseDimension extends Entity {
   }
 
   draw(ctx, scale) {
-    const style = DesignCore.DimStyleManager.getStyleByName(this.styleName);
+    const style = DesignCore.DimStyleManager.getItemByName(this.styleName);
 
     const entities = this.buildDimension(style);
 

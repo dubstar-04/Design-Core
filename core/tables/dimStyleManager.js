@@ -6,23 +6,23 @@ export class DimStyleManager extends StyleManagerBase {
   constructor() {
     super();
 
-    this.indelibleStyles.push('STANDARD');
-    this.styleProperty = 'styleName';
+    this.indelibleItems.push('STANDARD');
+    this.itemProperty = 'styleName';
   }
 
-  createStyle(style) {
+  createItem(style) {
     return new DimStyle(style);
   }
 
-  addStandardStyles() {
-    this.addStyle({
+  addStandardItems() {
+    this.addItem({
       'name': 'STANDARD',
       // DIMCLRD - 176 - Dimension line color
       // DIMCLRE - 177 - Dimension extension line color
       // DIMCLRT -  178 - Dimension text color
     });
 
-    this.addStyle({
+    this.addItem({
       'name': 'ANNOTATIVE',
     });
 
@@ -36,10 +36,10 @@ export class DimStyleManager extends StyleManagerBase {
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimStyleTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', this.styleCount());
+    file.writeGroupCode('70', this.itemCount());
 
-    for (let i = 0; i < this.styleCount(); i++) {
-      this.getStyleByIndex(i).dxf(file);
+    for (let i = 0; i < this.itemCount(); i++) {
+      this.getItemByIndex(i).dxf(file);
     }
 
     file.writeGroupCode('0', 'ENDTAB');

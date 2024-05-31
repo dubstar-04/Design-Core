@@ -73,25 +73,25 @@ export class DXF {
     tables.forEach((table) => {
       if (table[2] === 'LAYER') {
         table.children.forEach((layer) => {
-          DesignCore.LayerManager.addStyle(layer, true);
+          DesignCore.LayerManager.addItem(layer, true);
         });
       }
 
       if (table[2] === 'LTYPE') {
         table.children.forEach((ltype) => {
-          DesignCore.LTypeManager.addStyle(ltype, true);
+          DesignCore.LTypeManager.addItem(ltype, true);
         });
       }
 
       if (table[2] === 'STYLE') {
         table.children.forEach((style) => {
-          DesignCore.StyleManager.addStyle(style, true);
+          DesignCore.StyleManager.addItem(style, true);
         });
       }
 
       if (table[2] === 'DIMSTYLE') {
         table.children.forEach((style) => {
-          DesignCore.DimStyleManager.addStyle(style, true);
+          DesignCore.DimStyleManager.addItem(style, true);
         });
       }
     });
@@ -154,7 +154,7 @@ export class DXF {
         });
       }
 
-      DesignCore.Scene.blockManager.newBlock(block, true);
+      DesignCore.Scene.blockManager.addItem(block, true);
     });
   }
 

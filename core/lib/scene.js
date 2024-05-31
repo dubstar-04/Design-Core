@@ -7,7 +7,7 @@ import {BoundingBox} from './boundingBox.js';
 import {Point} from '../entities/point.js';
 
 import {DesignCore} from '../designCore.js';
-import {BlockManager} from '../blocks/blockManager.js';
+import {BlockManager} from '../tables/blockManager.js';
 
 export class Scene {
   constructor() {
@@ -118,6 +118,8 @@ export class Scene {
    */
   findItem(type, prop, value) {
     const filteredItems = [];
+
+    console.log('prop', prop, 'value', value);
 
     this.items.forEach((item, index) => {
       if ((type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) && item.hasOwnProperty(prop) && item[prop] === value) {

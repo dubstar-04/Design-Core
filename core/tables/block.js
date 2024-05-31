@@ -68,7 +68,7 @@ export class Block extends Entity {
   async execute() {
     try {
       // set a name
-      const name = `Block-${DesignCore.Scene.blockManager.blockCount()}`;
+      const name = `Block-${DesignCore.Scene.blockManager.itemCount()}`;
       const nameOp = new PromptOptions(`${Strings.Input.NAME} <${name}>`, [
         Input.Type.STRING,
       ]);
@@ -91,7 +91,7 @@ export class Block extends Entity {
       }
 
       // create block
-      const block = DesignCore.Scene.blockManager.newBlock({
+      const block = DesignCore.Scene.blockManager.addItem({
         name: selectedName,
       });
 

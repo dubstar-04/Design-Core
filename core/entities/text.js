@@ -173,7 +173,7 @@ export class Text extends Entity {
       this.styleName = currentStyle;
 
       // get properties from style
-      const style = DesignCore.StyleManager.getStyleByName(this.styleName);
+      const style = DesignCore.StyleManager.getItemByName(this.styleName);
       if (style.textHeight) {
         this.height = style.textHeight;
       }
@@ -361,7 +361,7 @@ export class Text extends Entity {
     ctx.scale(1, -1);
     ctx.translate(this.points[0].x, -this.points[0].y);
 
-    const style = DesignCore.StyleManager.getStyleByName(this.styleName);
+    const style = DesignCore.StyleManager.getItemByName(this.styleName);
     // style.textHeight
 
     if (this.upsideDown) {
@@ -383,7 +383,7 @@ export class Text extends Entity {
     try { // HTML
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt Arial'; // +DesignCore.StyleManager.getStyleByName(this.styleName).font.toString();
+      ctx.font = this.height + 'pt Arial'; // +DesignCore.StyleManager.getItemByName(this.styleName).font.toString();
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
