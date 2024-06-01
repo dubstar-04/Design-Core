@@ -1,17 +1,24 @@
 import {Strings} from '../lib/strings.js';
 import {DesignCore} from '../designCore.js';
 
+/** Property Manager Class */
 export class PropertyManager {
+  /** Create Property Manager */
   constructor() {
     this.updateCallbackFunction; // set to external callback function
   }
 
+  /**
+   * Set the property callback function
+   * @param {Object} callback
+   */
   setPropertyCallbackFunction(callback) {
     // set the call
     this.updateCallbackFunction = callback;
   }
 
 
+  /** Signal the selection set has changed */
   selectionSetChanged() {
     // If a callback is set - signal that a change has been made
     if (this.updateCallbackFunction) {
@@ -19,6 +26,11 @@ export class PropertyManager {
     }
   }
 
+  /**
+   * Set item properties
+   * @param {String} property
+   * @param {Any} newPropertyValue
+   */
   setItemProperties(property, newPropertyValue) {
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       // check if the item has the selected property
@@ -35,6 +47,7 @@ export class PropertyManager {
     }
   }
 
+  /** Get the types of items selected */
   getItemTypes() {
     // Loop through the items and get a list of item types.
     const itemTypes = [];
@@ -57,6 +70,11 @@ export class PropertyManager {
     return itemTypes;
   }
 
+  /**
+   * Get a list of common propertie
+   * @param {String} itemType
+   * @returns {Array}
+   */
   getItemProperties(itemType) {
     // Loop through the items and get a list of common properties.
 
@@ -96,6 +114,12 @@ export class PropertyManager {
   }
 
 
+  /**
+   * Get a list the property values
+   * @param {String} itemType
+   * @param {String} property
+   * @returns {Array}
+   */
   getItemPropertyValue(itemType, property) {
     // Loop through the items and get a list the property values
     const propertiesValueList = [];
