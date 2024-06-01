@@ -44,10 +44,16 @@ export class Purge extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
-    // No preview
+    // No Preview
   }
 
+  /**
+   * Perform the command
+   */
   action() {
     let purgedCount = 0;
 

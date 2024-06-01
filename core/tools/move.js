@@ -54,6 +54,9 @@ export class Move extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
@@ -75,6 +78,9 @@ export class Move extends Tool {
     }
   }
 
+  /**
+   * Perform the command
+   */
   action() {
     const xDelta = this.points[1].x - this.points[0].x;
     const yDelta = this.points[1].y - this.points[0].y;

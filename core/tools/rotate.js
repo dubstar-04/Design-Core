@@ -75,6 +75,9 @@ export class Rotate extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
     const mousePoint = DesignCore.Mouse.pointOnScene();
 
@@ -101,7 +104,9 @@ export class Rotate extends Tool {
     }
   };
 
-
+  /**
+   * Perform the command
+   */
   action() {
     const ang = this.points[0].angle(this.points[1]);
     const theta = ang - this.baseAngle;

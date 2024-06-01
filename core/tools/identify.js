@@ -43,6 +43,16 @@ export class Identify extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
+  preview() {
+    // No Preview
+  }
+
+  /**
+   * Perform the command
+   */
   action() {
     const x = this.points.at(-1).x.toFixed(1);
     const y = this.points.at(-1).y.toFixed(1);

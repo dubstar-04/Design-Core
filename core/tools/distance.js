@@ -47,10 +47,16 @@ export class Distance extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
     // TODO: Draw a preview of the measurement
   }
 
+  /**
+   * Perform the command
+   */
   action() {
     const length = this.points[0].distance(this.points[1]).toFixed(1);
     const x = (this.points[1].x - this.points[0].x).toFixed(1);

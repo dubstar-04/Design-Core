@@ -47,10 +47,16 @@ export class Explode extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
     // No Preview
   }
 
+  /**
+   * Perform the command
+   */
   action() {
     // count how many items couldn't be exploded
     let counter = 0;

@@ -45,6 +45,16 @@ export class Erase extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
+  preview() {
+    // No Preview
+  }
+
+  /**
+   * Perform the command
+   */
   action() {
     // get a copy of the selection set
     const selections = DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice();

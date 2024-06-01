@@ -52,6 +52,16 @@ export class Trim extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
+  preview() {
+    // No Preview
+  }
+
+  /**
+   * Perform the command
+   */
   action() {
     const item = this.selectedIndex;
 
