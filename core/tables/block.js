@@ -5,6 +5,7 @@ import {BoundingBox} from '../lib/boundingBox.js';
 import {Strings} from '../lib/strings.js';
 import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Flags} from '../properties/flags.js';
+import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
@@ -45,17 +46,7 @@ export class Block extends Entity {
         // 32 = This is a resolved external reference, or dependent of an external reference (ignored on input)
         // 64 = This definition is a referenced external reference (ignored on input)
 
-        let flags = 0;
-
-        if (data.flags !== undefined) {
-          flags = data.flags.getFlagValue();
-        }
-
-        if (data[70] !== undefined) {
-          flags = data[70];
-        }
-
-        this.flags.setFlagValue(flags);
+        this.flags.setFlagValue(Property.loadValue([data.flags, data[70]], 0));
       }
     }
   }

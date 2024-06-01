@@ -18,6 +18,7 @@ import {DesignCore} from '../designCore.js';
 import {Line} from './line.js';
 import {Arc} from './arc.js';
 import {BasePolyline} from './basePolyline.js';
+import {Property} from '../properties/property.js';
 
 export class Hatch extends Entity {
   constructor(data) {
@@ -87,30 +88,12 @@ export class Hatch extends Entity {
 
       if (data.hasOwnProperty('angle') || data.hasOwnProperty('52')) {
         // DXF Groupcode 42 - Hatch pattern angle
-        let angle = 0;
-        if (data.angle !== undefined) {
-          angle = data.angle;
-        }
-
-        if (data[52] !== undefined) {
-          angle = data[52];
-        }
-
-        this.angle = angle;
+        this.angle = Property.loadValue([data.angle, data[52]], 0);
       }
 
       if (data.hasOwnProperty('solid') || data.hasOwnProperty('70')) {
         // DXF Groupcode 70 - Solid Fill Flag (1 = solid, 0 = pattern)
-
-        let solid = 0;
-        if (data.solid !== undefined) {
-          solid = data.solid;
-        }
-
-        if (data[70] !== undefined) {
-          solid = data[70];
-        }
-        this.solid = Boolean(solid);
+        this.solid = Boolean(Property.loadValue([data.solid, data[70]], 0));
       }
 
       if (data.hasOwnProperty('boundaryShapes')) {

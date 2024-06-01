@@ -4,8 +4,10 @@ import {Block} from '../tables/block.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 import {Point} from './point.js';
 import {Utils} from '../lib/utils.js';
+import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
+
 
 export class Insert extends Entity {
   constructor(data) {
@@ -69,8 +71,7 @@ export class Insert extends Entity {
         // if we get rotation data store this as a point[1] at an angle from point[0]
         // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
 
-        const rotation = data.rotation || data[50];
-        this.setRotation(rotation);
+        this.setRotation(Property.loadValue([data.rotation, data[50]], 0));
       } else {
         // create points[1] used to determine the rotation
         if (this.points[0] === undefined) {

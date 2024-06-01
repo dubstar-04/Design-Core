@@ -1,6 +1,7 @@
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Logging} from '../lib/logging.js';
 import {Flags} from '../properties/flags.js';
+import {Property} from '../properties/property.js';
 
 export class DimStyle {
   constructor(data) {
@@ -249,7 +250,7 @@ export class DimStyle {
         64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
         (This flag is for the benefit of AutoCAD commands. It can be ignored.
         */
-        this.standardFlags.setFlagValue(data.standardFlags || data[70]);
+        this.standardFlags.setFlagValue(Property.loadValue([data.standardFlags, data[70]], 0));
       }
 
       if (data.hasOwnProperty('71')) {

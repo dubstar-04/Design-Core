@@ -7,8 +7,10 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 import {Point} from './point.js';
 import {Flags} from '../properties/flags.js';
+import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
+
 
 export class BasePolyline extends Entity {
   constructor(data) {
@@ -58,17 +60,7 @@ export class BasePolyline extends Entity {
         // 64 = The polyline is a polyface mesh
         // 128 = The linetype pattern is generated continuously around the vertices of this polyline
 
-        let flags = 0;
-
-        if (data.flags !== undefined) {
-          flags = data.flags.getFlagValue();
-        }
-
-        if (data[70] !== undefined) {
-          flags = data[70];
-        }
-
-        this.flags.setFlagValue(flags);
+        this.flags.setFlagValue(Property.loadValue([data.flags, data[70]], 0));
       }
     }
   }

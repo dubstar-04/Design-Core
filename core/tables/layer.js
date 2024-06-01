@@ -2,6 +2,7 @@ import {Colours} from '../lib/colours.js';
 import {Colour} from '../lib/colour.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Flags} from '../properties/flags.js';
+import {Property} from '../properties/property.js';
 
 export class Layer {
   constructor(data) {
@@ -46,17 +47,8 @@ export class Layer {
       // 16 = If set, table entry is externally dependent on an xref
       // 32 = If both this bit and bit 16 are set, the externally dependent xref has been successfully resolved
       // 64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
-        let flags = 0;
 
-        if (data.flags !== undefined) {
-          flags = data.flags.getFlagValue();
-        }
-
-        if (data[70] !== undefined) {
-          flags = data[70];
-        }
-
-        this.flags.setFlagValue(flags);
+        this.flags.setFlagValue(Property.loadValue([data.flags, data[70]], 0));
       }
 
       if (data.hasOwnProperty('colour') || data.hasOwnProperty('62')) {

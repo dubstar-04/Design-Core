@@ -5,8 +5,10 @@ import {Input, PromptOptions} from '../lib/inputManager.js';
 import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
+import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
+
 
 export class Circle extends Entity {
   constructor(data) {
@@ -26,8 +28,7 @@ export class Circle extends Entity {
     if (data) {
       if (data.hasOwnProperty('radius') || data.hasOwnProperty('40')) {
         // DXF Groupcode 40 - Radius
-        const radius = data.radius || data[40];
-        this.setRadius(radius);
+        this.setRadius(Property.loadValue([data.radius, data[40]], 0));
       }
     }
   }

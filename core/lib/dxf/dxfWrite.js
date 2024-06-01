@@ -75,12 +75,12 @@ export class DXFWriter {
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
     file.writeGroupCode('70', '2', DXFFile.Version.R2000);
 
-    for (let i = 0; i < DesignCore.Scene.blockManager.blocks.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.blockManager.items.length; i++) {
       file.writeGroupCode('0', 'BLOCK_RECORD', DXFFile.Version.R2000);
       file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
       file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
       file.writeGroupCode('100', 'AcDbBlockTableRecord', DXFFile.Version.R2000);
-      file.writeGroupCode('2', DesignCore.Scene.blockManager.blocks[i].name, DXFFile.Version.R2000);
+      file.writeGroupCode('2', DesignCore.Scene.blockManager.items[i].name, DXFFile.Version.R2000);
       file.writeGroupCode('340', '0', DXFFile.Version.R2000);
       // file.writeGroupCode('70', '4', DXFFile.Version.R2000); // Insertion Units
       // file.writeGroupCode('280', '0', DXFFile.Version.R2000); // Explodeability
@@ -101,8 +101,8 @@ export class DXFWriter {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'BLOCKS');
 
-    for (let i = 0; i < DesignCore.Scene.blockManager.blocks.length; i++) {
-      DesignCore.Scene.blockManager.blocks[i].dxf(file);
+    for (let i = 0; i < DesignCore.Scene.blockManager.items.length; i++) {
+      DesignCore.Scene.blockManager.items[i].dxf(file);
     }
 
     file.writeGroupCode('0', 'ENDSEC');

@@ -7,8 +7,10 @@ import {Logging} from '../lib/logging.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 import {Flags} from '../properties/flags.js';
+import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
+
 
 export class Text extends Entity {
   constructor(data) {
@@ -72,7 +74,7 @@ export class Text extends Entity {
         // DXF Groupcode 1 - Default Value
         // The string of the text entity
 
-        const string = (data.string || data[1]);
+        const string = (Property.loadValue([data.string, data[1]], ''));
         if (string !== undefined) {
           this.string = String(string);
         }
@@ -85,16 +87,14 @@ export class Text extends Entity {
 
       if (data.hasOwnProperty('height') || data.hasOwnProperty('40')) {
         // DXF Groupcode 40 - Text Height
-        this.height = data.height || data[40];
+        this.height = Property.loadValue([data.height, data[40]], 2.5);
       }
 
       if (data.hasOwnProperty('rotation') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Text Rotation, angle in degrees
         // if we get rotation data store this as a point[1] at an angle from point[0]
         // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
-
-        const rotation = data.rotation || data[50];
-        this.setRotation(rotation);
+        this.setRotation(Property.loadValue([data.rotation, data[50]], 0));
       } else {
         // create points[1] used to determine the text rotation
         this.points[1] = data.points[0].add(new Point(this.height, 0));
@@ -107,34 +107,14 @@ export class Text extends Entity {
         // 4 = Middle (if vertical alignment = 0)
         // 5 = Fit (if vertical alignment = 0)
 
-        let horizontalAlignment = 0;
-
-        if (data.horizontalAlignment !== undefined) {
-          horizontalAlignment = data.horizontalAlignment;
-        }
-
-        if (data[72] !== undefined) {
-          horizontalAlignment = data[72];
-        }
-
-        this.horizontalAlignment = horizontalAlignment;
+        this.horizontalAlignment = Property.loadValue([data.horizontalAlignment, data[72]], 0);
       }
 
       if (data.hasOwnProperty('verticalAlignment') || data.hasOwnProperty('73')) {
         // DXF Groupcode 73 - Vertical Alignment
         // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
 
-        let verticalAlignment = 0;
-
-        if (data.verticalAlignment !== undefined) {
-          verticalAlignment = data.verticalAlignment;
-        }
-
-        if (data[73] !== undefined) {
-          verticalAlignment = data[72];
-        }
-
-        this.verticalAlignment = verticalAlignment;
+        this.verticalAlignment = Property.loadValue([data.verticalAlignment, data[73]], 0);
       }
 
       if (data.hasOwnProperty('flags') || data.hasOwnProperty('71')) {
@@ -142,17 +122,7 @@ export class Text extends Entity {
         // 2 = Text is backward (mirrored in X).
         // 4 = Text is upside down (mirrored in Y).
 
-        let flags = 0;
-
-        if (data.flags !== undefined) {
-          flags = data.flags.getFlagValue();
-        }
-
-        if (data[71] !== undefined) {
-          flags = data[71];
-        }
-
-        this.flags.setFlagValue(flags);
+        this.flags.setFlagValue(Property.loadValue([data.flags, data[71]], 0));
       }
     }
   }
