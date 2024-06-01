@@ -165,6 +165,10 @@ export class Arc extends Entity {
     return Utils.radians2degrees(totalAngle);
   }
 
+  /**
+   * Get Arc radius
+   * @returns {Number} - arc radius
+   */
   getRadius() {
     return this.radius;
   }
@@ -269,7 +273,6 @@ export class Arc extends Entity {
         snaps.push(closest[0]);
       }
     }
-
 
     return snaps;
   }
