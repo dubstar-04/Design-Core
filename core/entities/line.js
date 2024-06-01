@@ -302,6 +302,11 @@ export class Line extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @returns {Array} - [Point, distance]
+   */
   closestPoint(P) {
     const pnt = P.closestPointOnLine(this.points[0], this.points[1]);
     if (pnt === null) {

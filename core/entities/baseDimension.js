@@ -224,6 +224,11 @@ export class BaseDimension extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @returns {Array} - [Point, distance]
+   */
   closestPoint(P) {
     return this.block.closestPoint(P);
   }

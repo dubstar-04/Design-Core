@@ -274,6 +274,11 @@ export class BasePolyline extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @returns {Array} - [Point, distance]
+   */
   closestPoint(P) {
     let distance = Infinity;
     let minPnt = P;

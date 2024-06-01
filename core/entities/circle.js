@@ -208,6 +208,11 @@ export class Circle extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @returns {Array} - [Point, distance]
+   */
   closestPoint(P) {
     // find the closest point on the circle
     const closest = P.closestPointOnArc(this.points[1], this.points[1], this.points[0]);

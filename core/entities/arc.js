@@ -281,6 +281,11 @@ export class Arc extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @returns {Array} - [Point, distance]
+   */
   closestPoint(P) {
     const startPoint = this.points[1];
     const endPoint = this.points[2];
