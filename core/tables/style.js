@@ -1,5 +1,6 @@
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Flags} from '../properties/flags.js';
+import {Property} from '../properties/property.js';
 
 export class Style {
   constructor(data) {
@@ -60,24 +61,16 @@ export class Style {
         64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
         (This flag is for the benefit of AutoCAD commands. It can be ignored.
         */
-        this.standardFlags.setFlagValue(data.standardFlags || data[70]);
+
+        this.standardFlags.setFlagValue(Property.loadValue([data.standardFlags, data[70]], 0));
       }
 
       if (data.hasOwnProperty('flags') || data.hasOwnProperty('71') ) {
         // DXF Groupcode 71 - flags (bit-coded values):
         // 2 = Text is backward (mirrored in X).
         // 4 = Text is upside down (mirrored in Y).
-        let flags = 0;
 
-        if (data.flags !== undefined) {
-          flags = data.flags.getFlagValue();
-        }
-
-        if (data[71] !== undefined) {
-          flags = data[71];
-        }
-
-        this.flags.setFlagValue(flags);
+        this.flags.setFlagValue(Property.loadValue([data.flags, data[71]], 0));
       }
     }
   }
