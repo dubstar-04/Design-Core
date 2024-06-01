@@ -9,7 +9,14 @@ import {Point} from '../entities/point.js';
 import {DesignCore} from '../designCore.js';
 import {BlockManager} from '../tables/blockManager.js';
 
+/**
+ * Scene Class
+ * Holds all entity instances
+ */
 export class Scene {
+  /**
+   * Create a scene
+   */
   constructor() {
     // initialise the scene variables
     this.saved = false;
@@ -182,6 +189,10 @@ export class Scene {
     this.addToTempItems(helper);
   }
 
+  /**
+   * Write the scene data to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     let width = 0;
     let height = 0;
