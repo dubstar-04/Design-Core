@@ -27,6 +27,10 @@ export class Identify extends Tool {
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to perform the command
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);

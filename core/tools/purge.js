@@ -29,6 +29,10 @@ export class Purge extends Tool {
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to perform the command
+   */
   async execute() {
     try {
       const op = new PromptOptions(`${Strings.Input.OPTION} <${this.options[3]}>`, [], this.options);
