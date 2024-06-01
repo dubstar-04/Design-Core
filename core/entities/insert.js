@@ -194,6 +194,12 @@ export class Insert extends Entity {
     return 0;
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {Number} delta
+   * @returns {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
     const blockSnaps = this.block.snaps(mousePoint, delta);

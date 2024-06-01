@@ -169,6 +169,12 @@ export class Circle extends Entity {
     };
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {Number} delta
+   * @returns {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
 

@@ -267,6 +267,12 @@ export class Line extends Entity {
     return midPoint;
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {Number} delta
+   * @returns {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
 

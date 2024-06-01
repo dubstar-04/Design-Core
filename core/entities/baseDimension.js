@@ -213,6 +213,12 @@ export class BaseDimension extends Entity {
     this.block.draw(ctx, scale);
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {Number} delta
+   * @returns {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
     return snaps;
