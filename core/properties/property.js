@@ -1,6 +1,8 @@
 import {Flags} from './flags.js';
 
+/** Property Class */
 export class Property {
+  /** Create property */
   constructor() {}
 
   /**
