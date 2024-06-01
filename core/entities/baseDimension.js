@@ -236,6 +236,10 @@ export class BaseDimension extends Entity {
     return this.block.within(selectionExtremes);
   }
 
+  /**
+   * Intersect points
+   * @returns {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return this.block.intersectPoints();
   }

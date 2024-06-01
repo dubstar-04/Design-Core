@@ -517,6 +517,10 @@ export class Text extends Entity {
     return new BoundingBox(topLeft, bottomRight);
   }
 
+  /**
+   * Intersect points
+   * @returns {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     const rect = this.getBoundingRect();
 

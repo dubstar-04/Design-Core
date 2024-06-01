@@ -224,6 +224,10 @@ export class Insert extends Entity {
     return this.block.within(sE);
   }
 
+  /**
+   * Intersect points
+   * @returns {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return {
       start: this.points[0],

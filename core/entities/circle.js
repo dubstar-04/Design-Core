@@ -162,6 +162,10 @@ export class Circle extends Entity {
     }
   }
 
+  /**
+   * Intersect points
+   * @returns {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return {
       centre: this.points[0],

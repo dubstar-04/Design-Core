@@ -245,6 +245,10 @@ export class Line extends Entity {
     }
   }
 
+  /**
+   * Intersect points
+   * @returns {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return {
       start: this.points[0],

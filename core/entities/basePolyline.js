@@ -220,6 +220,10 @@ export class BasePolyline extends Entity {
     return this.points;
   }
 
+  /**
+   * Intersect points
+   * @returns {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return {
       points: this.points,
