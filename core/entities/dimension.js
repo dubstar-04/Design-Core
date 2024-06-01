@@ -77,6 +77,10 @@ export class Dimension extends BaseDimension {
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       let inputValid = false;

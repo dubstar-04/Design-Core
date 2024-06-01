@@ -71,6 +71,10 @@ export class Block extends Entity {
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       // set a name

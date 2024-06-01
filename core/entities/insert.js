@@ -117,6 +117,10 @@ export class Insert extends Entity {
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     DesignCore.Core.notify(`${this.type} - Not Implemented`);
     DesignCore.Scene.inputManager.reset();
