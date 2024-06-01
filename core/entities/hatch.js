@@ -300,6 +300,9 @@ export class Hatch extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
     const shapes = this.processSelection(selectedItems);

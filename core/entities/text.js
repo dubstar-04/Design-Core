@@ -190,6 +190,9 @@ export class Text extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length >= 1) {
       if (DesignCore.Scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {

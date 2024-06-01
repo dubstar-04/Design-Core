@@ -195,6 +195,9 @@ export class Dimension extends BaseDimension {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     // get the dimension class
     const dimensionType = this.dimensionMap[this.dimType];

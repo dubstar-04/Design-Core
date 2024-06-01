@@ -62,6 +62,9 @@ export class AlignedDimension extends BaseDimension {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length == 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();

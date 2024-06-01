@@ -97,6 +97,9 @@ export class AngularDimension extends BaseDimension {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length >= 4) {
       const mousePoint = DesignCore.Mouse.pointOnScene();

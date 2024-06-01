@@ -60,6 +60,9 @@ export class RadialDimension extends BaseDimension {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
       const mousePoint = DesignCore.Mouse.pointOnScene();

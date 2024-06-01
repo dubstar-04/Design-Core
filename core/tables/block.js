@@ -139,6 +139,9 @@ export class Block extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {}
 
   dxf(file) {

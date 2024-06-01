@@ -117,6 +117,9 @@ export class BasePolyline extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     const mousePoint = DesignCore.Mouse.pointOnScene();
 
