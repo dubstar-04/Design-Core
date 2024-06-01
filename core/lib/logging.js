@@ -1,3 +1,4 @@
+/** Logging Class */
 export class Logging {
   static _instance;
 

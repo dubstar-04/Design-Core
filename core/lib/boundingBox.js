@@ -1,5 +1,6 @@
 import {Point} from '../entities/point.js';
 
+/** BoundingBox Class */
 export class BoundingBox {
   constructor(firstCorner = new Point(), secondCorner = new Point()) {
     this.pt1 = firstCorner;

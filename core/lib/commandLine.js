@@ -3,6 +3,7 @@ import {Input} from './inputManager.js';
 
 import {DesignCore} from '../designCore.js';
 
+/** CommandLine Class */
 export class CommandLine {
   /**
    * Commandline Constructor

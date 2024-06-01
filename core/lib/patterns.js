@@ -1,3 +1,7 @@
+/**
+ * Patterns Class
+ * For hatch pattern management
+ */
 export class PatternLine {
   constructor(patternString) {
     this.angle=0;

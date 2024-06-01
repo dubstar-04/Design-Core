@@ -1,3 +1,4 @@
+/** Utils Class */
 export class Utils {
   /**
    * Convert degrees to radians

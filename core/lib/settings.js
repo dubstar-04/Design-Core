@@ -1,5 +1,6 @@
 import {DesignCore} from '../designCore.js';
 
+/** Settings Class */
 export class Settings {
   /**
    * Settings Constructor

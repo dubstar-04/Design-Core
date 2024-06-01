@@ -4,6 +4,7 @@ import {Point} from '../entities/point.js';
 
 import {DesignCore} from '../designCore.js';
 
+/** Canvas Class */
 export class Canvas {
   constructor() {
     this.cvs = null;

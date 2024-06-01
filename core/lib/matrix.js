@@ -1,5 +1,5 @@
 import {Point} from '../entities/point.js';
-
+/** Matrix Class */
 export class Matrix {
   /**
    * Matrix constructor

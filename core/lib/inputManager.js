@@ -6,6 +6,7 @@ import {Strings} from './strings.js';
 import {DesignCore} from '../designCore.js';
 import {Point} from '../entities/point.js';
 
+/** PromptOption Class */
 export class PromptOptions {
   constructor(promptMessage = 'error', types = [], options = []) {
     this.promptMessage = promptMessage;
@@ -118,6 +119,7 @@ export class PromptOptions {
   }
 }
 
+/** Input Class */
 export class Input {
   static Type = {
     POINT: 'Point',
@@ -150,6 +152,7 @@ export class Input {
   }
 }
 
+/** InputManager Class */
 export class InputManager {
   constructor() {
     this.activeCommand = undefined;

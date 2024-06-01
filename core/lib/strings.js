@@ -1,3 +1,8 @@
+
+/**
+ * String Class
+ * Holds common strings for consistency and translation
+ */
 export class Strings {
 // Error Strings
   static Error = {

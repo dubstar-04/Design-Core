@@ -1,5 +1,6 @@
 import {Point} from '../entities/point.js';
 
+/** Intersection Class */
 export class Intersection {
   /**
    * Intersection constructor

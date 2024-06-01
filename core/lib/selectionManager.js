@@ -2,6 +2,7 @@ import {Utils} from './utils.js';
 import {SelectionWindow} from './selectionWindow.js';
 import {DesignCore} from '../designCore.js';
 
+/** SingleSelection Class */
 export class SingleSelection {
   constructor(index, point) {
     this.selectedItemIndex = index;
@@ -9,6 +10,7 @@ export class SingleSelection {
   }
 }
 
+/** SelectionSet Class */
 export class SelectionSet {
   constructor() {
     this.accepted = false;
@@ -17,6 +19,7 @@ export class SelectionSet {
 }
 
 // TODO: Refactor class.
+/** Selection Manager Class */
 export class SelectionManager {
   constructor() {
     this.selectionSet = new SelectionSet(); // store a list of selected items indices

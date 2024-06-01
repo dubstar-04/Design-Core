@@ -4,6 +4,7 @@ import {Strings} from './strings.js';
 
 import {DesignCore} from '../designCore.js';
 
+/** FileIO Class */
 export class FileIO {
   static saveDxf(version) {
     const dxfWriter = new DXF();
