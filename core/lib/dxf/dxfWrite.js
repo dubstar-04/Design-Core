@@ -1,9 +1,10 @@
 import {DXFFile} from './dxfFile.js';
 import {DesignCore} from '../../designCore.js';
 
+/** DXF Writer Class */
 export class DXFWriter {
-  constructor() {
-  }
+  /** Create DXF Writer */
+  constructor() {}
 
   /**
    * Write DXF header section
@@ -125,7 +126,8 @@ export class DXFWriter {
 
   /**
    * Write DXF file
-   * @return dxf formatted string formatted
+   * @param {String} version
+   * @return {String} dxf formatted string formatted
    */
   write(version) {
     if (version === undefined) {

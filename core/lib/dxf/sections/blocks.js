@@ -1,18 +1,32 @@
 import {Section} from './section.js';
 
+/**
+ * Blocks Class
+ * @extends Section
+ */
 export class Blocks extends Section {
+  /** Create Blocks */
   constructor() {
     super();
 
     this.blocks = [];
   }
 
+  /**
+   * Add Block
+   * @param {Object} block
+   */
   addBlock(block) {
     if (Object.keys(block).length) {
       this.blocks.push(block);
     }
   }
 
+  /**
+   * Read
+   * @param {Object} iterator
+   * @return {Array}
+   */
   read(iterator) {
     let currentBlock = {};
     while (iterator.nextPair().value !== 'ENDSEC') {

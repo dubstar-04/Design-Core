@@ -7,7 +7,9 @@ import {Logging} from '../logging.js';
 
 import {DesignCore} from '../../designCore.js';
 
+/** DXF Class */
 export class DXF {
+  /** Create DXF */
   constructor() {
     this.reader;
     this.writer;
@@ -16,17 +18,30 @@ export class DXF {
     this.unsupportedElements = false;
   }
 
+  /**
+   * Read
+   * @param {Object} data
+   */
   read(data) {
     this.reader = new DXFReader();
     this.reader.read(data);
   }
 
+  /**
+   * Write
+   * @param {String} version
+   * @return {Object}
+   */
   write(version) {
     const writer = new DXFWriter();
     const data = writer.write(version);
     return data;
   }
 
+  /**
+   * Load DXF
+   * @param {String} data
+   */
   loadDxf(data) {
     Logging.instance.debug('Loading File');
     this.read(data);
@@ -43,6 +58,9 @@ export class DXF {
     }
   }
 
+  /**
+   * Load Header
+   */
   loadHeader() {
     const header = this.reader.header;
 
@@ -67,6 +85,9 @@ export class DXF {
   }
 
 
+  /**
+   * Load Tables
+   */
   loadTables() {
     const tables = this.reader.tables;
 
@@ -97,6 +118,9 @@ export class DXF {
     });
   }
 
+  /**
+   * Load Blocks
+   */
   loadBlocks() {
     const blocks = this.reader.blocks;
 
@@ -158,6 +182,9 @@ export class DXF {
     });
   }
 
+  /**
+   * Load Entities
+   */
   loadEntities() {
     const entities = this.reader.entities;
 
@@ -171,6 +198,10 @@ export class DXF {
   }
 
 
+  /**
+   * Add Item
+   * @param {Object} item
+   */
   addItem(item) {
     if (item.hasOwnProperty('0') === false) {
       return;
@@ -185,6 +216,11 @@ export class DXF {
     }
   }
 
+  /**
+   * Parse Points
+   * @param {Object} dxfPoints
+   * @return {Array}
+   */
   parsePoints(dxfPoints) {
     const points = [];
     dxfPoints.forEach((point) => {

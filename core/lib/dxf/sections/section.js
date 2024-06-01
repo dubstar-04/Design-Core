@@ -1,11 +1,19 @@
 
 import {DxfIterator} from '../dxfIterator.js';
 import {Strings} from '../../strings.js';
+
+/**
+ * Section Class
+ */
 export class Section {
-  constructor() {
+  /** Create Section */
+  constructor() {}
 
-  }
-
+  /**
+   * Parse value
+   * @param {Object} iterator
+   * @param {Object} object
+   */
   parseValue(iterator, object) {
     const currentPair = iterator.currentPair();
 
@@ -46,6 +54,11 @@ export class Section {
     object[currentPair.code] = value;
   }
 
+  /**
+   * Parse Child
+   * @param {Object} iterator
+   * @return {Object}
+   */
   parseChild(iterator) {
     const child = {};
 
@@ -71,6 +84,11 @@ export class Section {
     }
   }
 
+  /**
+   *
+   * @param {Object} iterator
+   * @return {Point}
+   */
   parsePoint(iterator) {
     const point = {};
 
@@ -113,6 +131,11 @@ export class Section {
     }
   }
 
+  /**
+   * Parse Float
+   * @param {String} value
+   * @return {Number}
+   */
   parseFloat(value) {
     if (isNaN(value)) {
       DxfIterator.instance.dxfError(Strings.Error.INVALIDNUMBER);
@@ -122,6 +145,11 @@ export class Section {
   }
 
 
+  /**
+   * Parse Int
+   * @param {String} value
+   * @return {Number}
+   */
   parseInt(value) {
     if (isNaN(value)) {
       DxfIterator.instance.dxfError(Strings.Error.INVALIDNUMBER);
@@ -130,10 +158,20 @@ export class Section {
     return parseInt(value);
   }
 
+  /**
+   * Parse Bool
+   * @param {String} value
+   * @return {Boolean}
+   */
   parseBoolean(value) {
     return Boolean(parseInt(value.trim()));
   }
 
+  /**
+   *
+   * @param {Object} Pair
+   * @return {Any}
+   */
   getGroupValue(Pair) {
     const code = parseInt(Pair.code);
     const value = Pair.value;

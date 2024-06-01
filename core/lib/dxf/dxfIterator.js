@@ -23,9 +23,11 @@ Example DXF Entity Pairs:
  value: 100.0       - y position
  */
 
+/** DXF Interator Class */
 export class DxfIterator {
   static _instance;
 
+  /** Create DXFInterator */
   constructor() {
     this.currentIndex = 0;
     this.lines = [];
@@ -38,6 +40,9 @@ export class DxfIterator {
     return DxfIterator._instance;
   }
 
+  /**
+   * Get Instance
+   */
   static get instance() {
     if (this._instance === undefined) {
       this._instance = new this();
@@ -91,6 +96,7 @@ export class DxfIterator {
 
   /**
    * Format and return the current value
+   * @return {Any}
    */
   current() {
     const current = this.formatted(this.lines[this.currentIndex]);
@@ -101,6 +107,7 @@ export class DxfIterator {
   /**
    * Format the input value removing line breaks
    * @param  {String} value
+   * @return {String}
    */
   formatted(value) {
     return value.replace(/(\r\n|\n|\r)/gm, '');
@@ -108,6 +115,7 @@ export class DxfIterator {
 
   /**
    * Format and return the next value
+   * @return {Any}
    */
   nextValue() {
     if (this.currentIndex < this.lines.length - 1) {
@@ -118,6 +126,7 @@ export class DxfIterator {
 
   /**
    * Format and return the previous value
+   * @return {Any}
    */
   prevValue() {
     if (this.currentIndex > 0) {
@@ -128,6 +137,7 @@ export class DxfIterator {
 
   /**
    * Format and return the previous groupcode and value pair
+   * @return {Array}
    */
   prevPair() {
     if (this.currentIndex >= 2) {
@@ -140,6 +150,7 @@ export class DxfIterator {
 
   /**
    * Format and return the current groupcode and value pair
+   * @return {Array}
    */
   currentPair() {
     return {code: this.current().trim(), value: this.nextValue()};
@@ -147,6 +158,7 @@ export class DxfIterator {
 
   /**
    * Format and return the next groupcode and value pair
+   * @return {Array}
    */
   nextPair() {
     if (this.currentIndex < this.lines.length - 2) {
