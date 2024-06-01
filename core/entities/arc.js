@@ -8,6 +8,7 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
 import {DesignCore} from '../designCore.js';
+import {Property} from '../properties/property.js';
 
 export class Arc extends Entity {
   constructor(data) {
@@ -35,43 +36,21 @@ export class Arc extends Entity {
       if (data.hasOwnProperty('startAngle') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Start Angle
 
-        let angle = 0;
-        if (data.startAngle !== undefined) {
-          angle = data.startAngle;
-        }
-
-        if (data[50] !== undefined) {
-          angle = data[50];
-        }
-
+        const angle = Property.loadValue([data.startAngle, data[50]], 0);
         const projectionAngle = Utils.degrees2radians(angle);
         this.points[1] = this.points[0].project(projectionAngle, this.radius);
       }
 
       if (data.hasOwnProperty('endAngle') || data.hasOwnProperty('51')) {
         // DXF Groupcode 51 - End Angle
-
-        let angle = 0;
-        if (data.endAngle !== undefined) {
-          angle = data.endAngle;
-        }
-
-        if (data[51] !== undefined) {
-          angle = data[51];
-        }
+        const angle = Property.loadValue([data.endAngle, data[51]], 0);
         const projectionAngle = Utils.degrees2radians(angle);
         this.points[2] = this.points[0].project(projectionAngle, this.radius);
       }
 
       if (data.hasOwnProperty('direction')|| data.hasOwnProperty('73')) {
         // No DXF Groupcode - Arc Direction
-        if (data.direction !== undefined) {
-          this.direction = data.direction;
-        }
-
-        if (data[73] !== undefined) {
-          this.direction = data[73];
-        }
+        this.direction = Property.loadValue([data.direction, data[73]], 1);
       }
     }
   }
