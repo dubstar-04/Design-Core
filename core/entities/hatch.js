@@ -117,15 +117,28 @@ export class Hatch extends Entity {
     }
   }
 
+  /**
+   * Get the hatch pattern name
+   * @returns {String}
+   */
   getPatternName() {
     return this.pattern;
   }
 
+  /**
+   * Set the hatch pattern name
+   * @param {String} name
+   */
   setPatternName(name) {
     this.pattern = name.toUpperCase();
     this.solid = this.pattern === 'SOLID';
   }
 
+  /**
+   * Process the dxf data, creating hatch boundaries
+   * @param {Array} data
+   * @returns {Array} - Array of boundary items
+   */
   processBoundaryData(data) {
     if (!data.hasOwnProperty('points')) {
       return [];
@@ -311,6 +324,11 @@ export class Hatch extends Entity {
     }
   }
 
+  /**
+   * Convert the selection to boundary items
+   * @param {Array} selectedItems
+   * @returns {Array} - Array of boundary items
+   */
   processSelection(selectedItems) {
     const selectedBoundaryShapes = [];
 
@@ -365,6 +383,11 @@ export class Hatch extends Entity {
     return selectedBoundaryShapes;
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {Number} scale
+   */
   draw(ctx, scale) {
     // ensure the scale is value
     if (this.scale < 0.01) {
@@ -393,6 +416,12 @@ export class Hatch extends Entity {
     }
   }
 
+  /**
+   * Draw the hatch pattern to the context
+   * @param {Object} ctx
+   * @param {Number} scale
+   * @param {Polyline} shape
+   */
   createPattern(ctx, scale, shape) {
     if (!Patterns.patternExists(this.patternName) || this.solid) {
       ctx.fill();
@@ -550,6 +579,11 @@ export class Hatch extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @returns {Array} - [Point, distance]
+   */
   closestPoint(P) {
     if (this.isInside(P)) {
       return [P, 0];
@@ -557,6 +591,11 @@ export class Hatch extends Entity {
     return [P, Infinity];
   }
 
+  /**
+   * Determine if point is inside the hatch
+   * @param {Point} P
+   * @returns {Boolean} - true if inside
+   */
   isInside(P) {
     for (let i = 0; i < this.boundaryShapes.length; i++) {
       const shape = this.boundaryShapes[i];
