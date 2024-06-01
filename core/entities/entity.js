@@ -8,7 +8,7 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/** Entity Class */
 export class Entity {
   constructor(data) {
     Object.defineProperty(this, 'type', {

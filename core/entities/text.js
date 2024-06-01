@@ -11,7 +11,7 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/** Text Entity Class */
 export class Text extends Entity {
   constructor(data) {
     super(data);

@@ -9,6 +9,7 @@ import {BaseDimension} from './baseDimension.js';
 
 import {DesignCore} from '../designCore.js';
 
+/** Diametric Dimension Entity Class */
 export class DiametricDimension extends BaseDimension {
   constructor(data) {
     super(data);

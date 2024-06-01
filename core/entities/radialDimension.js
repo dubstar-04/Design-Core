@@ -8,6 +8,7 @@ import {BaseDimension} from './baseDimension.js';
 
 import {DesignCore} from '../designCore.js';
 
+/** Radial Dimension Entity Class */
 export class RadialDimension extends BaseDimension {
   constructor(data) {
     super(data);

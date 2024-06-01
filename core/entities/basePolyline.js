@@ -11,7 +11,7 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/** Base Polyline Entity Class */
 export class BasePolyline extends Entity {
   constructor(data) {
     super(data);

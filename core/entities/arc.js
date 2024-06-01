@@ -10,6 +10,7 @@ import {BoundingBox} from '../lib/boundingBox.js';
 import {DesignCore} from '../designCore.js';
 import {Property} from '../properties/property.js';
 
+/** Arc Entity Class */
 export class Arc extends Entity {
   constructor(data) {
     super(data);

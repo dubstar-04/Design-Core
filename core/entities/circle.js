@@ -9,7 +9,7 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/** Circle Entity Class */
 export class Circle extends Entity {
   constructor(data) {
     super(data);

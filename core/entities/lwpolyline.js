@@ -1,6 +1,7 @@
 import {Logging} from '../lib/logging.js';
 import {BasePolyline} from './basePolyline.js';
 
+/** LWPolyline Entity Class */
 export class Lwpolyline extends BasePolyline {
   constructor(data) {
     super(data);

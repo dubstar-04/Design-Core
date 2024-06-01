@@ -9,9 +9,15 @@ import {Property} from '../properties/property.js';
 import {DesignCore} from '../designCore.js';
 
 
+/** Insert Entity Class */
 export class Insert extends Entity {
+  /**
+   *
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
+
 
     // add block property
     Object.defineProperty(this, 'block', {

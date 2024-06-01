@@ -10,6 +10,7 @@ import {Point} from './point.js';
 
 import {DesignCore} from '../designCore.js';
 
+/** Aligned Dimension Entity Class */
 export class AlignedDimension extends BaseDimension {
   constructor(data) {
     super(data);

@@ -1,5 +1,6 @@
 import {Utils} from '../lib/utils.js';
 
+/** Point Entity Class */
 export class Point {
   /**
    * @param  {Number} x

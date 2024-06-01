@@ -8,6 +8,7 @@ import {BoundingBox} from '../lib/boundingBox.js';
 
 import {DesignCore} from '../designCore.js';
 
+/** Line Entity Class */
 export class Line extends Entity {
   constructor(data) {
     super(data);
