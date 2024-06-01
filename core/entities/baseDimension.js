@@ -112,7 +112,7 @@ export class BaseDimension extends Entity {
       if (data.hasOwnProperty('angle') || data.hasOwnProperty('53')) {
         // DXF Groupcode 53 - Rotation
         // rotation angle of the dimension text away from its default orientation
-        this.angle = data.angle || data[53];
+        this.angle = Property.loadValue([data.angle, data[53]], 0);
       }
 
       if (data.hasOwnProperty('dimType') || data.hasOwnProperty('70')) {
