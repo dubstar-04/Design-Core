@@ -219,6 +219,7 @@ export class BasePolyline extends Entity {
 
   /**
    * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
   decompose() {
     return this.points;
@@ -353,7 +354,7 @@ export class BasePolyline extends Entity {
   /**
    * Get the bulge value from the previous segment and the selected point
    * @param {Point} point
-   * @return polyline bulge value
+   * @return {Number} polyline bulge value
    */
   getBulgeFromSegment(point) {
     const lastSegBulge = this.points.at(-2).bulge;

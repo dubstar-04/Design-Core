@@ -93,7 +93,7 @@ export class Entity {
 
   /**
    * get rgb colour
-   * @return rgb colour object
+   * @return {Number} rgb colour object
    */
   getColour() {
     return this.entityColour.getColour(); ;
@@ -101,7 +101,7 @@ export class Entity {
 
   /**
    * get rgb colour to draw
-   * @return rgb colour object
+   * @return {Number} rgb colour object
    */
   getDrawColour() {
     let rgb = this.getColour();

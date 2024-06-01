@@ -146,7 +146,7 @@ export class Arc extends Entity {
    * Calculate the angle between the start and end of the arc
    * Clockwise returns positive angle
    * Counter clockwise returns negtive
-   * @return angle in degrees
+   * @return {Number} angle in degrees
    */
   get totalAngle() {
     let startAngle = this.startAngle();
@@ -204,6 +204,7 @@ export class Arc extends Entity {
 
   /**
    * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
   decompose() {
     // counter clockwise bulge = +ve, clockwise bulge = -ve,

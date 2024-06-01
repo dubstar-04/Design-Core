@@ -269,7 +269,7 @@ export class Hatch extends Entity {
    * handle arrays and single values
    * @param {Any} data
    * @param {Number} dxfCode
-   * @return
+   * @return {Any}
    */
   getDataValue(data, dxfCode) {
     let value;
@@ -671,5 +671,6 @@ export class Hatch extends Entity {
    */
   touched() {
     console.log('Hatch: touched() Not Implemented');
+    return false;
   }
 }

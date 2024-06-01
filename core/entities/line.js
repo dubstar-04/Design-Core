@@ -109,6 +109,7 @@ export class Line extends Entity {
 
   /**
    * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
   decompose() {
     return this.points;
@@ -158,7 +159,7 @@ export class Line extends Entity {
 
     /**
      * Trim between points
-     * @param {Array} intersectPnts
+     * @param {Array} pnts
      * @param {Line} line
      */
     function trimBetween(pnts, line) {

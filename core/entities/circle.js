@@ -98,7 +98,7 @@ export class Circle extends Entity {
 
   /**
    * Set Circle radius
-   * @return {Number} - circle radius
+   * @param {Number} rad
    */
   setRadius(rad) {
     this.points[1] = this.points[0].project(0, rad);
@@ -133,6 +133,7 @@ export class Circle extends Entity {
 
   /**
    * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
   decompose() {
     const startPoint = this.points[0].project(0, this.radius);
