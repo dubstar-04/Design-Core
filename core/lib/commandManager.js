@@ -67,6 +67,11 @@ const classes = {
 
 };
 
+/**
+ * Command Manager Class
+ * Registers a list of available commands
+ * Creates new commands
+ */
 export class CommandManager {
   /**
    * CommandManager constructor
