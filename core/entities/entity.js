@@ -3,9 +3,11 @@ import {EntityColour} from '../lib/colour.js';
 import {Intersection} from '../lib/intersect.js';
 import {Point} from './point.js';
 import {Strings} from '../lib/strings.js';
+import {Property} from '../properties/property.js';
 
 
 import {DesignCore} from '../designCore.js';
+
 
 export class Entity {
   constructor(data) {
@@ -76,7 +78,7 @@ export class Entity {
 
       if (data.hasOwnProperty('layer') || data.hasOwnProperty('8')) {
         // DXF Groupcode 8 - layername
-        this.layer = data.layer || data[8];
+        this.layer = Property.loadValue([data.layer, data[8]], 0);
       }
     }
   }
