@@ -18,7 +18,7 @@ export class DimStyleManager extends StyleManagerBase {
   /**
  * Create a new DimStyle
  * @param {Object} style
- * @returns {Object}
+ * @return {Object}
  */
   createItem(style) {
     return new DimStyle(style);

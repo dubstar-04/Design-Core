@@ -25,7 +25,7 @@ export class AlignedDimension extends BaseDimension {
 
   /**
    * Register the command
-   * @returns {Object}
+   * @return {Object}
    * command = name of the command
    * shortcut = shortcut for the command
    * type = type to group command in toolbars (omitted if not shown)
@@ -83,7 +83,7 @@ export class AlignedDimension extends BaseDimension {
   /**
    * Get sequenced points from user selection
    * @param {Any} items
-   * @returns {Array} array of points
+   * @return {Array} array of points
    */
   static getPointsFromSelection(items) {
     const points = [];
@@ -103,7 +103,7 @@ export class AlignedDimension extends BaseDimension {
   /**
    * Build the dimension
    * @param {Object} style
-   * @returns {Array} - Array of entities that compose the dimension
+   * @return {Array} - Array of entities that compose the dimension
    */
   buildDimension(style) {
     const Pt1 = this.getPointBySequence(13);

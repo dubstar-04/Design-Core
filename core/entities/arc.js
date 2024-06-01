@@ -65,7 +65,7 @@ export class Arc extends Entity {
 
   /**
    * Register the command
-   * @returns {Object}
+   * @return {Object}
    * command = name of the command
    * shortcut = shortcut for the command
    * type = type to group command in toolbars (omitted if not shown)
@@ -127,7 +127,7 @@ export class Arc extends Entity {
 
   /**
    * Arc start angle
-   * @returns {Number} start angle in radians
+   * @return {Number} start angle in radians
    */
   startAngle() {
     return this.points[0].angle(this.points[1]);
@@ -135,7 +135,7 @@ export class Arc extends Entity {
 
   /**
    * Arc end angle
-   * @returns {Number} end angle in radians
+   * @return {Number} end angle in radians
    */
   endAngle() {
     const endAngle = this.points[0].angle(this.points[2]);
@@ -146,7 +146,7 @@ export class Arc extends Entity {
    * Calculate the angle between the start and end of the arc
    * Clockwise returns positive angle
    * Counter clockwise returns negtive
-   * @returns angle in degrees
+   * @return angle in degrees
    */
   get totalAngle() {
     let startAngle = this.startAngle();
@@ -167,7 +167,7 @@ export class Arc extends Entity {
 
   /**
    * Get Arc radius
-   * @returns {Number} - arc radius
+   * @return {Number} - arc radius
    */
   getRadius() {
     return this.radius;
@@ -229,7 +229,7 @@ export class Arc extends Entity {
 
   /**
    * Intersect points
-   * @returns {Object} - object defining data required by intersect methods
+   * @return {Object} - object defining data required by intersect methods
    */
   intersectPoints() {
     return {
@@ -245,7 +245,7 @@ export class Arc extends Entity {
    * Get snap points
    * @param {Point} mousePoint
    * @param {Number} delta
-   * @returns {Array} - array of snap points
+   * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
     const snaps = [];
@@ -284,7 +284,7 @@ export class Arc extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     const startPoint = this.points[1];
@@ -304,7 +304,7 @@ export class Arc extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     return BoundingBox.arcBoundingBox(this.points[0], this.points[1], this.points[2], this.direction);

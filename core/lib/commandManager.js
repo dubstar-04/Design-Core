@@ -96,7 +96,7 @@ export class CommandManager {
 
   /**
    * Return a list of available commands
-   *  @returns array of commands
+   *  @return {Array} array of commands
    */
   getCommands() {
     return this.commands;
@@ -106,7 +106,7 @@ export class CommandManager {
    * Create a new instance of type using data
    * @param {String} type
    * @param {Array} data
-   * @returns instance of type
+   * @return {Object} instance of type
    */
   createNew(type, data) {
     let newItem;
@@ -123,7 +123,7 @@ export class CommandManager {
   /**
    * Check if input is valid command or shortcut
    * @param {String} input
-   * @returns boolean
+   * @return {Boolean} boolean
    */
   isCommandOrShortcut(input) {
     if (input === undefined) {
@@ -149,7 +149,7 @@ export class CommandManager {
   /**
    * Check if shortcut is valid
    * @param {String} shortcut
-   * @returns boolean
+   * @return {Boolean} boolean
    */
   isShortcut(shortcut) {
     const found = this.commands.some((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === shortcut.toUpperCase());
@@ -159,7 +159,7 @@ export class CommandManager {
   /**
    * Check if command is valid
    * @param {String} command
-   * @returns boolean
+   * @return {Boolean} boolean
    */
   isCommand(command) {
     if (command === undefined || command === null) {
@@ -174,7 +174,7 @@ export class CommandManager {
   /**
   * Returns the command for a valid input
   * @param {String} input
-  * @returns valid type
+  * @return {String} valid type
   */
   getCommand(input) {
     let command;
@@ -198,7 +198,7 @@ export class CommandManager {
   /**
    * Returns the shortcut for a valid command
    * @param {String} command
-   * @returns {String} shortcut
+   * @return {String} shortcut
    */
   getShortcut(command) {
     let shortcut;
@@ -215,7 +215,7 @@ export class CommandManager {
   /**
    * Returns a fuzzy match to the input command
    * @param {String} input
-   * @returns {String} fuzzy matched command
+   * @return {String} fuzzy matched command
    */
   getFuzzyMatch(input) {
     let score = Infinity;

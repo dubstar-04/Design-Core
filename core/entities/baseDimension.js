@@ -168,7 +168,7 @@ export class BaseDimension extends Entity {
 
   /**
    * Get the dimension type
-   * @returns {Number}
+   * @return {Number}
    */
   getBaseDimType() {
     const type = this.dimType % 32;
@@ -178,7 +178,7 @@ export class BaseDimension extends Entity {
   /**
    * Get the points for the sequence number
    * @param {Number} sequenceNumber
-   * @returns {Point}
+   * @return {Point}
    */
   getPointBySequence(sequenceNumber) {
     const point = this.points.find((point) => point.sequence === sequenceNumber);
@@ -190,7 +190,7 @@ export class BaseDimension extends Entity {
    * @param {Point} point
    * @param {Number} angle
    * @param {Number} size
-   * @returns {Solid}
+   * @return {Solid}
    */
   getArrowHead(point, angle, size) {
     let p1 = new Point(point.x + size/4, point.y + size);
@@ -233,7 +233,7 @@ export class BaseDimension extends Entity {
    * Get snap points
    * @param {Point} mousePoint
    * @param {Number} delta
-   * @returns {Array} - array of snap points
+   * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
     const snaps = [];
@@ -243,7 +243,7 @@ export class BaseDimension extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     return this.block.closestPoint(P);
@@ -251,7 +251,7 @@ export class BaseDimension extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     return this.block.boundingBox();
@@ -260,7 +260,7 @@ export class BaseDimension extends Entity {
   /**
    * Determine if the entity is within the selection
    * @param {Array} selectionExtremes
-   * @returns {Boolean} true if within
+   * @return {Boolean} true if within
    */
   within(selectionExtremes) {
     return this.block.within(selectionExtremes);
@@ -268,7 +268,7 @@ export class BaseDimension extends Entity {
 
   /**
    * Intersect points
-   * @returns {Object} - object defining data required by intersect methods
+   * @return {Object} - object defining data required by intersect methods
    */
   intersectPoints() {
     return this.block.intersectPoints();
@@ -277,7 +277,7 @@ export class BaseDimension extends Entity {
   /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
-   * @returns {Boolean} true if touched
+   * @return {Boolean} true if touched
    */
   touched(selectionExtremes) {
     return this.block.touched(selectionExtremes);

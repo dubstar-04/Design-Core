@@ -136,7 +136,7 @@ export class Text extends Entity {
 
   /**
    * Register the command
-   * @returns {Object}
+   * @return {Object}
    * command = name of the command
    * shortcut = shortcut for the command
    * type = type to group command in toolbars (omitted if not shown)
@@ -243,7 +243,7 @@ export class Text extends Entity {
 
   /**
    * Get the backwards value
-   * @returns {Boolean} true if the text is flipped horizontally
+   * @return {Boolean} true if the text is flipped horizontally
    */
   getBackwards() {
     // Backwards value is bitmasked in flags as value 2
@@ -266,7 +266,7 @@ export class Text extends Entity {
 
   /**
    * Get the upside down value
-   * @returns {Boolean} true if the text is flipped vertically
+   * @return {Boolean} true if the text is flipped vertically
    */
   getUpsideDown() {
     // Upside down value is bitmasked in flags as value 4
@@ -289,7 +289,7 @@ export class Text extends Entity {
 
   /**
    * Get a string describing the horizontal text alignment
-   * @returns {String}
+   * @return {String}
    */
   getHorizontalAlignment() {
     /* DXF Data
@@ -319,7 +319,7 @@ export class Text extends Entity {
 
   /**
    * Get a string describing the vertical text alignment
-   * @returns {String}
+   * @return {String}
    */
   getVerticalAlignment() {
     /* DXF Data
@@ -344,7 +344,7 @@ export class Text extends Entity {
 
   /**
    * Get the texts bounding rectangle
-   * @returns {Object}
+   * @return {Object}
    */
   getBoundingRect() {
     const rect = {width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y};
@@ -470,7 +470,7 @@ export class Text extends Entity {
    * Get snap points
    * @param {Point} mousePoint
    * @param {Number} delta
-   * @returns {Array} - array of snap points
+   * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
     const rect = this.getBoundingRect();
@@ -489,7 +489,7 @@ export class Text extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     // TODO: Support rotation
@@ -514,7 +514,7 @@ export class Text extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     const rect = this.getBoundingRect();
@@ -532,7 +532,7 @@ export class Text extends Entity {
 
   /**
    * Intersect points
-   * @returns {Object} - object defining data required by intersect methods
+   * @return {Object} - object defining data required by intersect methods
    */
   intersectPoints() {
     const rect = this.getBoundingRect();

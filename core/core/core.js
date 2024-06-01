@@ -120,7 +120,7 @@ export class Core {
 
   /**
    * Return the supported dxf versions
-   * @returns array js object containing the version
+   * @return array js object containing the version
    */
   supportedDXFVersions() {
     return DXFFile.Version;

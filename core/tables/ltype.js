@@ -56,7 +56,7 @@ export class LType {
   /**
    * Get a dash pattern that cairo and html canvas understand
    * @param {Array} scale
-   * @returns array for dash pattern
+   * @return {Array} array for dash pattern
    */
   getPattern(scale) {
     // DXF Patterns use -ve values for gaps and 0.0 for dots

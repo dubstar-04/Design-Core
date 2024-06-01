@@ -612,7 +612,7 @@ export class DimStyle {
   /**
    * Get valueName property value from dimstyle
    * @param {String} valueName
-   * @returns value or undefined
+   * @return {Any} value or undefined
    */
   getValue(valueName) {
     if (this.hasOwnProperty(valueName)) {
@@ -626,7 +626,7 @@ export class DimStyle {
 
   /**
    * Get the vertical value
-   * @returns {bool}
+   * @return {bool}
    */
   get vertical() {
     // Vertical value is bitmasked in standardflags as value 4

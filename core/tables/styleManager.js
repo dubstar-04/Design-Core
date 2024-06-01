@@ -19,7 +19,7 @@ export class StyleManager extends StyleManagerBase {
   /**
    * Create a new Style
    * @param {Object} style
-   * @returns {Object}
+   * @return {Object}
    */
   createItem(style) {
     return new Style(style);

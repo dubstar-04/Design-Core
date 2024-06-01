@@ -36,7 +36,7 @@ export class Canvas {
 
   /**
    * Get canvas scale
-   * @returns {Number}
+   * @return {Number}
    */
   getScale() {
     return this.matrix.getScale();
@@ -417,7 +417,7 @@ export class Canvas {
   /**
    * Calculate the scene offset from the canvas size
    * i.e at 1:1 its the same as the canvas
-   * @returns {number}
+   * @return {number}
    */
   getSceneOffset() {
     // Calculate the scene offset from the canvas size

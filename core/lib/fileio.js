@@ -9,7 +9,7 @@ export class FileIO {
   /**
    * Save to DXF
    * @param {String} version
-   * @returns {String} dxf file as a string
+   * @return {String} dxf file as a string
    */
   static saveDxf(version) {
     const dxfWriter = new DXF();

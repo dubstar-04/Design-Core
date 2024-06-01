@@ -22,7 +22,7 @@ export class Flags {
 
   /**
  * Get the flag value
- * @returns {Number} flags value
+ * @return {Number} flags value
  */
   getFlagValue() {
     return this.flags;
@@ -31,7 +31,7 @@ export class Flags {
   /**
    * Get the backwards value
    * @param {Number} flagValue
-   * @returns {Boolean} true if flags contains the flagValue
+   * @return {Boolean} true if flags contains the flagValue
    */
   hasFlag(flagValue) {
     // check if the flagValue is bitmasked in flags

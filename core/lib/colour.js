@@ -24,7 +24,7 @@ export class Colour {
 
   /**
    * Get the colour
-   * @returns {Number}
+   * @return {Number}
    */
   getColour() {
     return this.rgb;
@@ -77,7 +77,7 @@ export class EntityColour extends Colour {
 
   /**
    * Determine if colour byLayer
-   * @returns {Boolean}
+   * @return {Boolean}
    */
   get byLayer() {
     if (this.aci === 256) {
@@ -98,7 +98,7 @@ export class EntityColour extends Colour {
 
   /**
    * Determine if colour byBlock
-   * @returns {Boolean}
+   * @return {Boolean}
    */
   get byBlock() {
     if (this.aci === 0) {

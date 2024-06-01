@@ -42,7 +42,7 @@ export class Circle extends Entity {
 
   /**
    * Register the command
-   * @returns {Object}
+   * @return {Object}
    * command = name of the command
    * shortcut = shortcut for the command
    * type = type to group command in toolbars (omitted if not shown)
@@ -90,7 +90,7 @@ export class Circle extends Entity {
 
   /**
    * Get Circle radius
-   * @returns {Number} - circle radius
+   * @return {Number} - circle radius
    */
   getRadius() {
     return this.points[0].distance(this.points[1]);
@@ -98,7 +98,7 @@ export class Circle extends Entity {
 
   /**
    * Set Circle radius
-   * @returns {Number} - circle radius
+   * @return {Number} - circle radius
    */
   setRadius(rad) {
     this.points[1] = this.points[0].project(0, rad);
@@ -176,7 +176,7 @@ export class Circle extends Entity {
 
   /**
    * Intersect points
-   * @returns {Object} - object defining data required by intersect methods
+   * @return {Object} - object defining data required by intersect methods
    */
   intersectPoints() {
     return {
@@ -189,7 +189,7 @@ export class Circle extends Entity {
    * Get snap points
    * @param {Point} mousePoint
    * @param {Number} delta
-   * @returns {Array} - array of snap points
+   * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
     const snaps = [];
@@ -223,7 +223,7 @@ export class Circle extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     // find the closest point on the circle
@@ -235,7 +235,7 @@ export class Circle extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     const xmin = this.points[0].x - this.radius;

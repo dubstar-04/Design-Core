@@ -18,7 +18,7 @@ export class LTypeManager extends StyleManagerBase {
   /**
    * Create a new LineType
    * @param {Object} style
-   * @returns {Object}
+   * @return {Object}
    */
   createItem(style) {
     return new LType(style);
@@ -33,7 +33,7 @@ export class LTypeManager extends StyleManagerBase {
 
   /**
    * Get a list of optional line types
-   * @returns {Array}
+   * @return {Array}
    */
   getOptionalStyles() {
     const styles = [];

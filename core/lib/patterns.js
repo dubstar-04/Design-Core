@@ -45,7 +45,7 @@ export class PatternLine {
 
   /**
    * Get the length of all dash elements
-   * @returns {Number}
+   * @return {Number}
    */
   getDashLength() {
     if (this.dashes.length) {
@@ -62,7 +62,7 @@ export class Patterns {
   /**
      * Get Pattern
      * @param {String} name
-     * @returns pattern string for the pattern name
+     * @return pattern string for the pattern name
      */
   static getPattern(name) {
     // create empty pattern
@@ -82,7 +82,7 @@ export class Patterns {
   /**
      * Get Pattern line count
      * @param {String} name
-     * @returns int for the number of pattern lines
+     * @return int for the number of pattern lines
      */
   static getPatternLineCount(name) {
     // get the pattern string
@@ -96,7 +96,7 @@ export class Patterns {
   /**
    * Check if the pattern exists
    * @param {String} name
-   * @returns bool
+   * @return bool
    */
   static patternExists(name) {
     return Object.hasOwn(Patterns.hatch_patterns, name.toUpperCase());

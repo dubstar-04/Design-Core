@@ -53,7 +53,7 @@ export class PromptOptions {
   /**
    * Match the input to a command option
    * @param {Any} input
-   * @returns undefined or the matched option
+   * @return undefined or the matched option
    */
   parseInputToOption(input) {
     if (this.options.length === 0) {
@@ -81,7 +81,7 @@ export class PromptOptions {
 
   /**
    * Return the prompt for the input request
-   * @returns
+   * @return
    */
   getPrompt() {
     let msg = `${this.promptMessage}`;
@@ -96,7 +96,7 @@ export class PromptOptions {
   /**
    * Underline the shortcut key for the prompt option
    * @param {String} option
-   * @returns - option with shortcut underlined
+   * @return - option with shortcut underlined
    */
   getOptionWithShortcut(option) {
     const optionWithShortcut = `${option.substring(0, 1)}\u0332${option.substring(1, option.length)}`;
@@ -134,7 +134,7 @@ export class Input {
   /**
    * Return the Input.Type for value
    * @param {Any} value
-   * @returns
+   * @return
    */
   static getType(value) {
     if (value === undefined) {
@@ -184,7 +184,7 @@ export class InputManager {
   /**
  * Create input request
  * @param {PromptOption} promptOption
- * @returns promise
+ * @return promise
  */
   requestInput(promptOption) {
     this.promptOption = promptOption;

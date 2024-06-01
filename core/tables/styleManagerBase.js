@@ -17,8 +17,8 @@ export class StyleManagerBase extends TableManagerBase {
 
   /**
    * Delete a style using the style index
-   * @param {Number} styleIndex
-   * @returns undefined
+   * @param {Number} itemIndex
+   * @param {Boolean} showWarning
    */
   deleteStyle(itemIndex, showWarning=true) {
     // call the super class delete
@@ -53,6 +53,7 @@ export class StyleManagerBase extends TableManagerBase {
 
   /**
    * Get the name of the current style
+   * @return {Object}
    */
   getCstyle() {
     return this.currentstyle;
@@ -89,7 +90,6 @@ export class StyleManagerBase extends TableManagerBase {
    * Rename the style at index with newName
    * @param {Number} styleIndex
    * @param {String} newName
-   * @returns undefined
    */
   renameStyle(styleIndex, newName) {
     // get the existing name

@@ -24,7 +24,7 @@ export class Rectangle extends Entity {
 
   /**
    * Register the command
-   * @returns {Object}
+   * @return {Object}
    * command = name of the command
    * shortcut = shortcut for the command
    * type = type to group command in toolbars (omitted if not shown)
@@ -72,7 +72,7 @@ export class Rectangle extends Entity {
    * Get the rectangle points
    * @param {Point} pt1
    * @param {Point} pt2
-   * @returns {Array} array of points for each corner
+   * @return {Array} array of points for each corner
    */
   rectPoints(pt1, pt2) {
     const points = [];

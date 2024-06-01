@@ -93,7 +93,7 @@ export class Entity {
 
   /**
    * get rgb colour
-   * @returns rgb colour object
+   * @return rgb colour object
    */
   getColour() {
     return this.entityColour.getColour(); ;
@@ -101,7 +101,7 @@ export class Entity {
 
   /**
    * get rgb colour to draw
-   * @returns rgb colour object
+   * @return rgb colour object
    */
   getDrawColour() {
     let rgb = this.getColour();
@@ -124,7 +124,7 @@ export class Entity {
 
   /**
    * Get the line type
-   * @returns {LType}
+   * @return {LType}
    */
   getLineType() {
     let lineTypeName = this.lineType;
@@ -155,7 +155,7 @@ export class Entity {
   /**
    * Determine if the entity is within the selection
    * @param {Array} selectionExtremes
-   * @returns {Boolean} true if within
+   * @return {Boolean} true if within
    */
   within(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
@@ -180,7 +180,7 @@ export class Entity {
   /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
-   * @returns {Boolean} true if touched
+   * @return {Boolean} true if touched
    */
   touched(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);

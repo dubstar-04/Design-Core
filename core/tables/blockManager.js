@@ -18,7 +18,7 @@ export class BlockManager extends TableManagerBase {
   /**
    * Create a new block
    * @param {Object} block
-   * @returns {Object}
+   * @return {Object}
    */
   createItem(block) {
     return new Block(block);

@@ -43,7 +43,7 @@ export class Scene {
 
   /**
    * Get the scene bounding box
-   * @returns scene bounding box
+   * @return {BoundingBox} scene bounding box
    */
   boundingBox() {
     let xmin = Infinity;
@@ -84,7 +84,7 @@ export class Scene {
    * @param {String} type - entity type
    * @param {Object} data - object of entity parameters
    * @param {Number} index - integer of item to replace
-   * @returns - index of created item
+   * @return {Number} - index of created item
    */
   addItem(type, data, index) {
     // TODO: validate data is valid for type
@@ -119,7 +119,7 @@ export class Scene {
    * @param {String} type - entity type or "ANY"
    * @param {String} prop - object of entity parameters
    * @param {Any} value - value of the property
-   * @returns - index of items
+   * @return {Number} - index of items
    */
   findItem(type, prop, value) {
     const filteredItems = [];
@@ -137,8 +137,8 @@ export class Scene {
 
   /**
    * Get Item
-   * @param {Number} type - items index
-   * @returns - item
+   * @param {Number} index - items index
+   * @return {Object} - item
    */
   getItem(index) {
     return this.items[index];
@@ -146,8 +146,8 @@ export class Scene {
 
   /**
    * Remove Item
-   * @param {Number} type - items index
-   * @returns - success status
+   * @param {Number} index - items index
+   * @return {Boolean} - success status
    */
   removeItem(index) {
     const count = this.items.length;

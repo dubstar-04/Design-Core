@@ -17,7 +17,7 @@ export class DXFFile {
   /**
    * Check if a dxf version is valid - 'AC1009' = valid, R12 = not valid
    * @param {String} version
-   * @returns boolean - true if version is valid
+   * @return boolean - true if version is valid
    */
   static validDxfVersion(version) {
     if (Object.values(DXFFile.Version).indexOf(version) === -1) {
@@ -30,7 +30,7 @@ export class DXFFile {
   /**
    * Check if a dxf key is valid - R12 = valid, 'AC1009' = not valid
    * @param {String} key
-   * @returns boolean - true if version is valid
+   * @return boolean - true if version is valid
    */
   static validDxfKey(key) {
     if (Object.keys(DXFFile.Version).indexOf(key) === -1) {
@@ -42,7 +42,7 @@ export class DXFFile {
   /**
    * Return the dxf key for the dxf version e.g key = R12 version = 'AC1009'
    * @param {String} dxfVersion
-   * @returns dxf key (R Number) for valid dxf versions
+   * @return dxf key (R Number) for valid dxf versions
    */
   static getVersionKey(dxfVersion) {
     if (DXFFile.validDxfVersion(dxfVersion)) {
@@ -85,7 +85,7 @@ export class DXFFile {
    * R12 handles are optional.
    * R13+ handles are mandatory.
    * The header variable $HANDSEED must be greater than the largest handle value
-   * @returns handle value
+   * @return handle value
    */
   nextHandle() {
     const handle = this.formatHandle(this.handleCounter);
@@ -97,7 +97,7 @@ export class DXFFile {
    * Format a handle value
    * A handle is an arbitrary but unique hex value as string up to 16 hexadecimal digits (8 bytes).
    * @param {Number} value
-   * @returns handle hex value
+   * @return handle hex value
    */
   formatHandle(value) {
     return value.toString(16).toUpperCase();
@@ -108,7 +108,7 @@ export class DXFFile {
    * @param {String} groupCode
    * @param {String} groupValue
    * @param {String} version - DXFFile.Version
-   * @returns
+   * @return
    */
   writeGroupCode(groupCode, groupValue, version=DXFFile.Version.R12) {
     // return if the groupcode is required for a later version

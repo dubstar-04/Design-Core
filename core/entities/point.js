@@ -158,7 +158,7 @@ export class Point {
    * Find the closest point to this on the ray formed by Pt1 and Pt2
    * @param  {Point} Pt1
    * @param  {Point} Pt2
-   * @returns the closest point on the ray
+   * @return the closest point on the ray
    */
   perpendicular(Pt1, Pt2) {
     const APx = this.x - Pt1.x;
@@ -188,7 +188,7 @@ export class Point {
    * Find the closest point on a line between start and end points
    * @param {Point} startPoint
    * @param {Point} endPoint
-   * @returns the closest point on the line
+   * @return the closest point on the line
    */
   closestPointOnLine(startPoint, endPoint) {
     const pnt = this.perpendicular(startPoint, endPoint);
@@ -211,7 +211,7 @@ export class Point {
    * @param {Point} endPoint
    * @param {Point} centerPoint
    * @param {Number} direction - CCW if > 0
-   * @returns the closest point on the arc or null
+   * @return the closest point on the arc or null
    */
   closestPointOnArc(startPoint, endPoint, centerPoint, direction=0) {
     const length = this.distance(centerPoint);
@@ -240,7 +240,7 @@ export class Point {
    * @param {Point} endPoint
    * @param {Point} centerPoint
    * @param {Number} direction - CCW if > 0
-   * @returns true or false
+   * @return true or false
    */
   isOnArc(startPoint, endPoint, centerPoint, direction=0) {
     // direction: ccw arc > 0, clockwise arc <= 0
@@ -284,7 +284,7 @@ export class Point {
    * Determine if point is on line segment
    * @param {Point} startPoint
    * @param {Point} endPoint
-   * @returns true or false
+   * @return true or false
    */
   isOnLine(startPoint, endPoint) {
     // check start -> point + point -> end equals start -> end
@@ -296,7 +296,7 @@ export class Point {
 
   /**
    * Get the arc angle in radians from the bulge value
-   * @returns arc angle in radians
+   * @return arc angle in radians
    */
   bulgeAngle() {
     return Math.atan(this.bulge) * 4;
@@ -317,7 +317,7 @@ export class Point {
   /**
    * Returns apothem; the distance from arc center to cord midpoint
    * @param {Point} nextPoint
-   * @returns apothem
+   * @return apothem
    */
   apothem(nextPoint) {
     if (this.bulge == 0) {
@@ -331,7 +331,7 @@ export class Point {
   /**
    * Return the centre point of the arc
    * @param {Point} nextPoint
-   * @returns Point
+   * @return Point
    */
   bulgeCentrePoint(nextPoint) {
     const midp = this.midPoint(nextPoint);

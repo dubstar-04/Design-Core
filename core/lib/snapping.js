@@ -43,7 +43,7 @@ export class Snapping {
 
   /**
    * Get snap point and draw to the scene
-   * @returns Point or undefined
+   * @return Point or undefined
    */
   snap() {
     if (this.active) {
@@ -71,7 +71,7 @@ export class Snapping {
 
   /**
    * Get the closest snap point
-   * @returns Point or undefined
+   * @return Point or undefined
    */
   getSnapPoint() {
     let snapPoint;
@@ -102,7 +102,7 @@ export class Snapping {
   /**
    * Get the polar snap point from the current mouse position
    * @param {Point} previousPoint
-   * @returns Point or undefined
+   * @return Point or undefined
    */
   polarSnap(previousPoint) {
     if (!this.active) {
@@ -129,7 +129,7 @@ export class Snapping {
   /**
    * Get the ortho snap point from the current mouse position
    * @param {Point} previousPoint
-   * @returns Point or undefined
+   * @return Point or undefined
    */
   orthoSnap(previousPoint) {
     if (!this.active) {

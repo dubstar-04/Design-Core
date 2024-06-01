@@ -12,7 +12,7 @@
     },
     "rules": {
         "require-jsdoc" : 1,
-        "valid-jsdoc" : 0,
+        "valid-jsdoc" : 1,
         "max-len" : 0,
         "function-paren-newline":"warn"
     }

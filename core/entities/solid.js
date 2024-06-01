@@ -64,7 +64,7 @@ export class Solid extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     return [P, Infinity];
@@ -72,7 +72,7 @@ export class Solid extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     return BoundingBox.fromPoints(this.points);

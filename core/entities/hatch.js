@@ -119,7 +119,7 @@ export class Hatch extends Entity {
 
   /**
    * Get the hatch pattern name
-   * @returns {String}
+   * @return {String}
    */
   getPatternName() {
     return this.pattern;
@@ -137,7 +137,7 @@ export class Hatch extends Entity {
   /**
    * Process the dxf data, creating hatch boundaries
    * @param {Array} data
-   * @returns {Array} - Array of boundary items
+   * @return {Array} - Array of boundary items
    */
   processBoundaryData(data) {
     if (!data.hasOwnProperty('points')) {
@@ -269,7 +269,7 @@ export class Hatch extends Entity {
    * handle arrays and single values
    * @param {Any} data
    * @param {Number} dxfCode
-   * @returns
+   * @return
    */
   getDataValue(data, dxfCode) {
     let value;
@@ -283,7 +283,7 @@ export class Hatch extends Entity {
 
   /**
    * Register the command
-   * @returns {Object}
+   * @return {Object}
    * command = name of the command
    * shortcut = shortcut for the command
    * type = type to group command in toolbars (omitted if not shown)
@@ -327,7 +327,7 @@ export class Hatch extends Entity {
   /**
    * Convert the selection to boundary items
    * @param {Array} selectedItems
-   * @returns {Array} - Array of boundary items
+   * @return {Array} - Array of boundary items
    */
   processSelection(selectedItems) {
     const selectedBoundaryShapes = [];
@@ -572,7 +572,7 @@ export class Hatch extends Entity {
    * Get snap points
    * @param {Point} mousePoint
    * @param {Number} delta
-   * @returns {Array} - array of snap points
+   * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
     const snaps = [];
@@ -582,7 +582,7 @@ export class Hatch extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     if (this.isInside(P)) {
@@ -594,7 +594,7 @@ export class Hatch extends Entity {
   /**
    * Determine if point is inside the hatch
    * @param {Point} P
-   * @returns {Boolean} - true if inside
+   * @return {Boolean} - true if inside
    */
   isInside(P) {
     for (let i = 0; i < this.boundaryShapes.length; i++) {
@@ -625,7 +625,7 @@ export class Hatch extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     if (this.boundaryShapes.length === 0) {
@@ -657,7 +657,7 @@ export class Hatch extends Entity {
 
   /**
    * Intersect points
-   * @returns {Object} - object defining data required by intersect methods
+   * @return {Object} - object defining data required by intersect methods
    */
   intersectPoints() {
     // return all the polyline boundary shapes
@@ -667,7 +667,7 @@ export class Hatch extends Entity {
   /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
-   * @returns {Boolean} true if touched
+   * @return {Boolean} true if touched
    */
   touched() {
     console.log('Hatch: touched() Not Implemented');

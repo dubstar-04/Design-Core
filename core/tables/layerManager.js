@@ -18,7 +18,7 @@ export class LayerManager extends StyleManagerBase {
   /**
    * Create a new layer
    * @param {Object} style
-   * @returns {Object}
+   * @return {Object}
    */
   createItem(style) {
     return new Layer(style);

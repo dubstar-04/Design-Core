@@ -108,7 +108,7 @@ export class SelectionManager {
 
   /**
    * Select the item closest to the mouse and add it to the selection set
-   * @returns {SingleSelection} - return single selection
+   * @return {SingleSelection} - return single selection
    */
   singleSelect(point) {
     const closestItemIndex = this.findClosestItem(point);
@@ -126,7 +126,7 @@ export class SelectionManager {
   /**
    * Find closest item to point
    * @param  {Point} point
-   * @returns {Number} - return index of closest item or undefined
+   * @return {Number} - return index of closest item or undefined
    */
   findClosestItem(point) {
     let delta = 1.65 /DesignCore.Core.canvas.getScale(); // find a more suitable starting value

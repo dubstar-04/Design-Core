@@ -82,7 +82,7 @@ export class Style {
 
   /**
    * Get the vertical value
-   * @returns {bool}
+   * @return {bool}
    */
   get vertical() {
     // Vertical value is bitmasked in standardflags as value 4
@@ -105,7 +105,7 @@ export class Style {
 
   /**
    * Get the backwards value
-   * @returns {bool}
+   * @return {bool}
    */
   get backwards() {
     // Upside down value is bitmasked in flags as value 2
@@ -128,7 +128,7 @@ export class Style {
 
   /**
    * Get the upside down value
-   * @returns {bool}
+   * @return {bool}
    */
   get upsideDown() {
     // Upside down value is bitmasked in flags as value 4

@@ -35,7 +35,7 @@ export class Line extends Entity {
 
   /**
    * Register the command
-   * @returns {Object}
+   * @return {Object}
    * command = name of the command
    * shortcut = shortcut for the command
    * type = type to group command in toolbars (omitted if not shown)
@@ -191,7 +191,7 @@ export class Line extends Entity {
      * @param {Point} mousePnt
      * @param {Array} pntsArray
      * @param {Array} returnPoints
-     * @returns {Boolean}
+     * @return {Boolean}
      */
     function betweenPoints(mousePnt, pntsArray, returnPoints) {
       for (let i = 0; i < pntsArray.length - 1; i++) {
@@ -272,7 +272,7 @@ export class Line extends Entity {
 
   /**
    * Intersect points
-   * @returns {Object} - object defining data required by intersect methods
+   * @return {Object} - object defining data required by intersect methods
    */
   intersectPoints() {
     return {
@@ -283,7 +283,7 @@ export class Line extends Entity {
 
   /**
    * Get the length of a line
-   * @returns {Number}
+   * @return {Number}
    */
   length() {
     const A = (this.points[0].x - this.points[1].x);
@@ -297,7 +297,7 @@ export class Line extends Entity {
 
   /**
    * Get the lines mid point
-   * @returns {Point}
+   * @return {Point}
    */
   midPoint() {
     const midPoint = this.points[0].midPoint(this.points[1]);
@@ -308,7 +308,7 @@ export class Line extends Entity {
    * Get snap points
    * @param {Point} mousePoint
    * @param {Number} delta
-   * @returns {Array} - array of snap points
+   * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
     const snaps = [];
@@ -338,7 +338,7 @@ export class Line extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     const pnt = P.closestPointOnLine(this.points[0], this.points[1]);
@@ -352,7 +352,7 @@ export class Line extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     return BoundingBox.lineBoundingBox(this.points[0], this.points[1]);

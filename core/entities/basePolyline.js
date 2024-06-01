@@ -226,7 +226,7 @@ export class BasePolyline extends Entity {
 
   /**
    * Intersect points
-   * @returns {Object} - object defining data required by intersect methods
+   * @return {Object} - object defining data required by intersect methods
    */
   intersectPoints() {
     return {
@@ -238,7 +238,7 @@ export class BasePolyline extends Entity {
    * Get snap points
    * @param {Point} mousePoint
    * @param {Number} delta
-   * @returns {Array} - array of snap points
+   * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
     const snaps = [];
@@ -281,7 +281,7 @@ export class BasePolyline extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     let distance = Infinity;
@@ -319,7 +319,7 @@ export class BasePolyline extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     let xmin = Infinity;
@@ -353,7 +353,7 @@ export class BasePolyline extends Entity {
   /**
    * Get the bulge value from the previous segment and the selected point
    * @param {Point} point
-   * @returns polyline bulge value
+   * @return polyline bulge value
    */
   getBulgeFromSegment(point) {
     const lastSegBulge = this.points.at(-2).bulge;

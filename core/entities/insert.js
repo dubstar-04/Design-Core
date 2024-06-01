@@ -107,7 +107,7 @@ export class Insert extends Entity {
 
   /**
    * Register the command
-   * @returns {Object}
+   * @return {Object}
    * command = name of the command
    * shortcut = shortcut for the command
    * type = type to group command in toolbars (omitted if not shown)
@@ -205,7 +205,7 @@ export class Insert extends Entity {
    * Get snap points
    * @param {Point} mousePoint
    * @param {Number} delta
-   * @returns {Array} - array of snap points
+   * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
     const snaps = [];
@@ -226,7 +226,7 @@ export class Insert extends Entity {
   /**
    * Determine if the entity is within the selection
    * @param {Array} selectionExtremes
-   * @returns {Boolean} true if within
+   * @return {Boolean} true if within
    */
   within(selectionExtremes) {
     // adjust selectionExtremes by the insert position
@@ -238,7 +238,7 @@ export class Insert extends Entity {
 
   /**
    * Intersect points
-   * @returns {Object} - object defining data required by intersect methods
+   * @return {Object} - object defining data required by intersect methods
    */
   intersectPoints() {
     return {
@@ -250,7 +250,7 @@ export class Insert extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     // get the closest point from the blocks entities
@@ -263,7 +263,7 @@ export class Insert extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     const blockBB = this.block.boundingBox();
@@ -275,7 +275,7 @@ export class Insert extends Entity {
   /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
-   * @returns {Boolean} true if touched
+   * @return {Boolean} true if touched
    */
   touched(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);

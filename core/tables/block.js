@@ -61,7 +61,7 @@ export class Block extends Entity {
 
   /**
    * Register the command
-   * @returns {Object}
+   * @return {Object}
    * command = name of the command
    * shortcut = shortcut for the command
    * type = type to group command in toolbars (omitted if not shown)
@@ -191,6 +191,7 @@ export class Block extends Entity {
    * Draw the entity
    * @param {Object} ctx - context
    * @param {Number} scale
+   * @param {Object} insert - insert entity
    */
   draw(ctx, scale, insert = undefined) {
     if (!this.items.length) {
@@ -225,7 +226,7 @@ export class Block extends Entity {
    * Get snap points
    * @param {Point} mousePoint
    * @param {Number} delta
-   * @returns {Array} - array of snap points
+   * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
     const snaps = [];
@@ -247,7 +248,7 @@ export class Block extends Entity {
   /**
    * Get closest point on entity
    * @param {Point} P
-   * @returns {Array} - [Point, distance]
+   * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
     let distance = Infinity;
@@ -274,7 +275,7 @@ export class Block extends Entity {
 
   /**
    * Return boundingbox for entity
-   * @returns {BoundingBox}
+   * @return {BoundingBox}
    */
   boundingBox() {
     let xmin = Infinity;
@@ -300,7 +301,7 @@ export class Block extends Entity {
   /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
-   * @returns {Boolean} true if touched
+   * @return {Boolean} true if touched
    */
   touched(selectionExtremes) {
     for (let idx = 0; idx < this.items.length; idx++) {

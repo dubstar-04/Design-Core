@@ -13,7 +13,7 @@ export class Colours {
 /**
  * Check rgb is a valid rgb object
  * @param {Object} rgb
- * @returns bool - true if the object is an rgb colour, otherwise false.
+ * @return bool - true if the object is an rgb colour, otherwise false.
  */
   static isRGB(rgb) {
     if (rgb) {
@@ -48,7 +48,7 @@ export class Colours {
   /**
    * Convert a rgb colour to an AutoCAD colour index (ACI)
    * @param {Object} rgb
-   * @returns
+   * @return
    */
   static rgbToACI(rgb) {
     if (!this.isRGB(rgb)) {
@@ -73,7 +73,7 @@ export class Colours {
   /**
    * Convert rgb colour to formatted string
    * @param {Object} rgb
-   * @returns
+   * @return
    */
   static rgbToString(rgb) {
     if (this.isRGB(rgb)) {
@@ -124,7 +124,7 @@ export class Colours {
   /**
    * Get the trueColour value for rgb colour
    * @param {Object} rgb
-   * @returns integer representing the rgb value as a trueColor
+   * @return integer representing the rgb value as a trueColor
    */
   static rgbToTrueColour(rgb) {
     if (this.isRGB(rgb)) {

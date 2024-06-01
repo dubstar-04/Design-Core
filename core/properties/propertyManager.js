@@ -73,7 +73,7 @@ export class PropertyManager {
   /**
    * Get a list of common propertie
    * @param {String} itemType
-   * @returns {Array}
+   * @return {Array}
    */
   getItemProperties(itemType) {
     // Loop through the items and get a list of common properties.
@@ -118,7 +118,7 @@ export class PropertyManager {
    * Get a list the property values
    * @param {String} itemType
    * @param {String} property
-   * @returns {Array}
+   * @return {Array}
    */
   getItemPropertyValue(itemType, property) {
     // Loop through the items and get a list the property values

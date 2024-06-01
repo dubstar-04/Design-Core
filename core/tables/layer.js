@@ -105,7 +105,7 @@ export class Layer {
 
   /**
    * Get the frozen value
-   * @returns {bool}
+   * @return {bool}
    */
   get frozen() {
     // Frozen value is bitmasked in flags as value 1
@@ -128,7 +128,7 @@ export class Layer {
 
   /**
    * Get the locked value
-   * @returns {bool}
+   * @return {bool}
    */
   get locked() {
     // locked value is bitmasked in flags as value 4
@@ -151,7 +151,7 @@ export class Layer {
 
   /**
    * Determine if layer is visible
-   * @returns {Boolean}
+   * @return {Boolean}
    */
   get isVisible() {
     if (this.on && !this.frozen) {
@@ -163,7 +163,7 @@ export class Layer {
 
   /**
    * Determine if layer is selectable
-   * @returns {Boolean}
+   * @return {Boolean}
    */
   get isSelectable() {
     if (this.isVisible && !this.locked) {
@@ -175,7 +175,7 @@ export class Layer {
 
   /**
    * Get the layer colour
-   * @returns rgb colour
+   * @return {Number} rgb colour
    */
   getColour() {
     return this.layerColour.getColour();
