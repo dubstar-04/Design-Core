@@ -133,6 +133,10 @@ export class Arc extends Entity {
     return this.points[0].angle(this.points[1]);
   }
 
+  /**
+   * Arc end angle
+   * @returns {Number} end angle in radians
+   */
   endAngle() {
     const endAngle = this.points[0].angle(this.points[2]);
     return endAngle;
