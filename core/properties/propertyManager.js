@@ -47,7 +47,10 @@ export class PropertyManager {
     }
   }
 
-  /** Get the types of items selected */
+  /**
+   * Get the types of items selected
+   * @return {Array}
+   */
   getItemTypes() {
     // Loop through the items and get a list of item types.
     const itemTypes = [];

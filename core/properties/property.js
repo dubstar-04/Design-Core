@@ -9,6 +9,7 @@ export class Property {
    * Parse the input values and return a value
    * @param {Array} values - list of values
    * @param {Any} def - default value
+   * @return {Any}
    */
   static loadValue(values, def) {
     // return any value in values
