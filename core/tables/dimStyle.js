@@ -3,7 +3,12 @@ import {Logging} from '../lib/logging.js';
 import {Flags} from '../properties/flags.js';
 import {Property} from '../properties/property.js';
 
+/** DimStyle Class */
 export class DimStyle {
+  /**
+   * Create a DimStyle
+   * @param {Object} data
+   */
   constructor(data) {
     // Define Properties
     this.type = this.constructor.name;

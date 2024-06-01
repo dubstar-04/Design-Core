@@ -2,7 +2,12 @@ import {DesignCore} from '../designCore.js';
 // import {Strings} from '../lib/strings.js';
 import {TableManagerBase} from './tableManagerBase.js';
 
+/**
+ * StyleManagerBase Class
+ * @extends TableManagerBase
+ */
 export class StyleManagerBase extends TableManagerBase {
+  /** Create Style Manager */
   constructor() {
     super();
 

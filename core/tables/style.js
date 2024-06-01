@@ -2,7 +2,12 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Flags} from '../properties/flags.js';
 import {Property} from '../properties/property.js';
 
+/** Style Class */
 export class Style {
+  /**
+   * Create Style
+   * @param {Object} data
+   */
   constructor(data) {
     // Define Properties
     this.type = this.constructor.name;
@@ -145,7 +150,7 @@ export class Style {
   }
 
   /**
-   * Write the entity to file in the dxf format
+   * Write the table to file in the dxf format
    * @param {DXFFile} file
    */
   dxf(file) {

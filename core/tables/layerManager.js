@@ -2,8 +2,12 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Layer} from './layer.js';
 import {StyleManagerBase} from './styleManagerBase.js';
 
-
+/**
+ * LayerManager Class
+ * @extends StyleManagerBase
+ */
 export class LayerManager extends StyleManagerBase {
+  /** Create a LayerManager */
   constructor() {
     super();
 
@@ -11,10 +15,16 @@ export class LayerManager extends StyleManagerBase {
     this.itemProperty = 'layer';
   }
 
+  /**
+   * Create a new layer
+   * @param {Object} style
+   * @returns {Object}
+   */
   createItem(style) {
     return new Layer(style);
   }
 
+  /** Add standard layers */
   addStandardItems() {
     this.addItem({'name': '0'});
     this.addItem({'name': 'DEFPOINTS', 'plotting': false});

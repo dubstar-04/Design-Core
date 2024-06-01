@@ -1,7 +1,11 @@
 import {DesignCore} from '../designCore.js';
 import {Strings} from '../lib/strings.js';
 
+/**
+ * Table Manager Base Class
+ */
 export class TableManagerBase {
+  /** Create a Table Manager */
   constructor() {
     this.items = [];
     this.addStandardItems();
@@ -260,6 +264,7 @@ export class TableManagerBase {
     }
   }
 
+  /** Purge unused items */
   purge() {
     const itemsToPurge = [];
     this.items.forEach((item, index) => {

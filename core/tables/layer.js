@@ -4,7 +4,12 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Flags} from '../properties/flags.js';
 import {Property} from '../properties/property.js';
 
+/** later Class */
 export class Layer {
+  /**
+   * Create a new Layer
+   * @param {Object} data
+   */
   constructor(data) {
     // Define Properties
     this.type = 'Layer';
@@ -144,6 +149,10 @@ export class Layer {
     }
   }
 
+  /**
+   * Determine if layer is visible
+   * @returns {Boolean}
+   */
   get isVisible() {
     if (this.on && !this.frozen) {
       return true;
@@ -152,6 +161,10 @@ export class Layer {
     return false;
   }
 
+  /**
+   * Determine if layer is selectable
+   * @returns {Boolean}
+   */
   get isSelectable() {
     if (this.isVisible && !this.locked) {
       return true;

@@ -172,10 +172,17 @@ export class Block extends Entity {
     file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
   }
 
+  /**
+   * Clear items from the block
+   */
   clearItems() {
     this.items = [];
   }
 
+  /**
+   * Add an item to the block
+   * @param {Object} item
+   */
   addItem(item) {
     this.items.push(item);
   }

@@ -2,7 +2,12 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {DimStyle} from './dimStyle.js';
 import {StyleManagerBase} from './styleManagerBase.js';
 
+/**
+ * DimStyleManager Class
+ * @extends StyleManagerBase
+ */
 export class DimStyleManager extends StyleManagerBase {
+  /** Create a DimStyleManager */
   constructor() {
     super();
 
@@ -10,10 +15,18 @@ export class DimStyleManager extends StyleManagerBase {
     this.itemProperty = 'styleName';
   }
 
+  /**
+ * Create a new DimStyle
+ * @param {Object} style
+ * @returns {Object}
+ */
   createItem(style) {
     return new DimStyle(style);
   }
 
+  /**
+   * Add standard dimension styles
+   */
   addStandardItems() {
     this.addItem({
       'name': 'STANDARD',

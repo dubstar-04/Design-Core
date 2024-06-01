@@ -2,7 +2,13 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {StyleManagerBase} from './styleManagerBase.js';
 import {Style} from './style.js';
 
+/**
+ * StyleManager Class
+ * Manages text styles
+ * @extends StyleManagerBase
+ */
 export class StyleManager extends StyleManagerBase {
+  /** Create Style Manager */
   constructor() {
     super();
 
@@ -10,10 +16,16 @@ export class StyleManager extends StyleManagerBase {
     this.itemProperty = 'style';
   }
 
+  /**
+   * Create a new Style
+   * @param {Object} style
+   * @returns {Object}
+   */
   createItem(style) {
     return new Style(style);
   }
 
+  /** Add standard text styles */
   addStandardItems() {
     this.addItem({
       'name': 'STANDARD',
