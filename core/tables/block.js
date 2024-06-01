@@ -9,7 +9,15 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Block Entity Class
+ * @extends Entity
+ */
 export class Block extends Entity {
+  /**
+   * Create a Block Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
     this.name = '';
@@ -51,6 +59,13 @@ export class Block extends Entity {
     }
   }
 
+  /**
+   * Register the command
+   * @returns {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Block', shortcut: 'B'};
     return command;

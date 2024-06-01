@@ -134,6 +134,13 @@ export class Text extends Entity {
     }
   }
 
+  /**
+   * Register the command
+   * @returns {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Text', shortcut: 'DT', type: 'Entity'};
     return command;
