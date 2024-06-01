@@ -482,6 +482,11 @@ export class Text extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @returns {Array} - [Point, distance]
+   */
   closestPoint(P) {
     // TODO: Support rotation
     const rect = this.getBoundingRect();
