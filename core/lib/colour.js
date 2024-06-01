@@ -11,6 +11,9 @@ export class Colour {
     this.rgb = Colours.aciToRGB(this.aci);
   }
 
+  /**
+   * Determine is colour uses dxf true colours
+   */
   get isTrueColour() {
     const aci = Colours.rgbToACI(this.rgb);
     if (aci != undefined) {
@@ -19,10 +22,18 @@ export class Colour {
     return true;
   }
 
+  /**
+   * Get the colour
+   * @returns {Number}
+   */
   getColour() {
     return this.rgb;
   }
 
+  /**
+   * Set the colour
+   * @param {Any} colour
+   */
   setColour(colour) {
     if (Colours.isRGB(colour)) {
       this.rgb = colour;
@@ -58,11 +69,16 @@ export class Colour {
    * BYLAYER aci = 256
    */
 export class EntityColour extends Colour {
+  /** Create an EntityColour */
   constructor(aci=256) {
     super(aci);
     // default to aci 256 - ByLayer
   }
 
+  /**
+   * Determine if colour byLayer
+   * @returns {Boolean}
+   */
   get byLayer() {
     if (this.aci === 256) {
       return true;
@@ -71,12 +87,19 @@ export class EntityColour extends Colour {
     return false;
   }
 
+  /**
+   * Set if colour byLayer
+   */
   set byLayer(bool) {
     if (bool) {
       this.aci = 256;
     }
   }
 
+  /**
+   * Determine if colour byBlock
+   * @returns {Boolean}
+   */
   get byBlock() {
     if (this.aci === 0) {
       return true;
@@ -85,12 +108,19 @@ export class EntityColour extends Colour {
     return false;
   }
 
+  /**
+   * Set if colour byBlock
+   */
   set byBlock(bool) {
     if (bool) {
       this.aci = 0;
     }
   }
 
+  /**
+   * Set the colour
+   * @param {Any} colour
+   */
   setColour(colour) {
     if (typeof colour === 'string' || colour instanceof String) {
       if (colour.toUpperCase() === 'BYLAYER') {
