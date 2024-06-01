@@ -144,6 +144,10 @@ export class Block extends Entity {
    */
   preview() {}
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'BLOCK');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle

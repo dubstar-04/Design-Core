@@ -101,6 +101,10 @@ export class Circle extends Entity {
     ctx.stroke();
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'CIRCLE');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle

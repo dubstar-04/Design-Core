@@ -176,6 +176,10 @@ export class Layer {
     this.layerColour.setColour(colour);
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'LAYER');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);

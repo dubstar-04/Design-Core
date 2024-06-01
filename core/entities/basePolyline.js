@@ -175,6 +175,10 @@ export class BasePolyline extends Entity {
     }
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'POLYLINE');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle

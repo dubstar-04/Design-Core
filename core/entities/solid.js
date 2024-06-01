@@ -28,6 +28,10 @@ export class Solid extends Entity {
     ctx.fill();
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'SOLID');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle

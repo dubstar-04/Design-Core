@@ -177,6 +177,10 @@ export class AngularDimension extends BaseDimension {
     return entities;
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     const Pt10 = this.getPointBySequence(10);
     const Pt11 = this.text.points[0];

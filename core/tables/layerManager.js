@@ -20,6 +20,10 @@ export class LayerManager extends StyleManagerBase {
     this.addItem({'name': 'DEFPOINTS', 'plotting': false});
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     // Create table data for layers
     file.writeGroupCode('0', 'TABLE');

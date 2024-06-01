@@ -26,6 +26,10 @@ export class StyleManager extends StyleManagerBase {
     // DesignCore.scene.saveRequired();
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     // Create table data for text styles
     file.writeGroupCode('0', 'TABLE');
