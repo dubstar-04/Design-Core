@@ -242,7 +242,6 @@ export class Point {
    * @param {Number} direction - CCW if > 0
    * @returns true or false
    */
-
   isOnArc(startPoint, endPoint, centerPoint, direction=0) {
     // direction: ccw arc > 0, clockwise arc <= 0
     const snapAngle = centerPoint.angle(this);

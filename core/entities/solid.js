@@ -61,6 +61,11 @@ export class Solid extends Entity {
     file.writeGroupCode('33', '0.0');
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @returns {Array} - [Point, distance]
+   */
   closestPoint(P) {
     return [P, Infinity];
   }

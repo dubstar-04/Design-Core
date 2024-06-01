@@ -198,6 +198,10 @@ export class BasePolyline extends Entity {
     file.writeGroupCode('8', this.layer);
   }
 
+  /**
+   * Write the vertices to file in the dxf format
+   * @param {DXFFile} file
+   */
   vertices(file) {
     for (let i = 0; i < this.points.length; i++) {
       file.writeGroupCode('0', 'VERTEX');

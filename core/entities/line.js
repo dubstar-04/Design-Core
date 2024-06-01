@@ -114,7 +114,16 @@ export class Line extends Entity {
     return this.points;
   }
 
+  /**
+   * Trim the entity
+   * @param {Array} points
+   */
   trim(points) {
+    /**
+     * Trim one end
+     * @param {Array} intersectPnts
+     * @param {Line} line
+     */
     function trimOneEnd(intersectPnts, line) {
       let originPoint;
       let destinationPoint;
@@ -147,6 +156,11 @@ export class Line extends Entity {
       }
     }
 
+    /**
+     * Trim between points
+     * @param {Array} intersectPnts
+     * @param {Line} line
+     */
     function trimBetween(pnts, line) {
       const a = Math.round(line.points[0].distance(pnts[0]));
       const b = Math.round(line.points[0].distance(pnts[1]));
@@ -172,6 +186,13 @@ export class Line extends Entity {
       }
     }
 
+    /**
+     * Check if the trim is between two points
+     * @param {Point} mousePnt
+     * @param {Array} pntsArray
+     * @param {Array} returnPoints
+     * @returns {Boolean}
+     */
     function betweenPoints(mousePnt, pntsArray, returnPoints) {
       for (let i = 0; i < pntsArray.length - 1; i++) {
         const a = pntsArray[i].distance(mousePnt);
@@ -202,6 +223,10 @@ export class Line extends Entity {
     }
   }
 
+  /**
+   * Extend the entity
+   * @param {Array} points
+   */
   extend(points) {
     let originPoint;
     let destinationPoint;
@@ -256,6 +281,10 @@ export class Line extends Entity {
     };
   }
 
+  /**
+   * Get the length of a line
+   * @returns {Number}
+   */
   length() {
     const A = (this.points[0].x - this.points[1].x);
     const B = (this.points[0].y - this.points[1].y);
@@ -266,6 +295,10 @@ export class Line extends Entity {
     return dist;
   }
 
+  /**
+   * Get the lines mid point
+   * @returns {Point}
+   */
   midPoint() {
     const midPoint = this.points[0].midPoint(this.points[1]);
     return midPoint;

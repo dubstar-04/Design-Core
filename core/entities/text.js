@@ -342,6 +342,10 @@ export class Text extends Entity {
     }
   }
 
+  /**
+   * Get the texts bounding rectangle
+   * @returns {Object}
+   */
   getBoundingRect() {
     const rect = {width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y};
     return rect;

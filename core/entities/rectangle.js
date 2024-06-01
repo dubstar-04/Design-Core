@@ -68,6 +68,12 @@ export class Rectangle extends Entity {
     }
   }
 
+  /**
+   * Get the rectangle points
+   * @param {Point} pt1
+   * @param {Point} pt2
+   * @returns {Array} array of points for each corner
+   */
   rectPoints(pt1, pt2) {
     const points = [];
     points.push( new Point(pt1.x, pt1.y));

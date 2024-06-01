@@ -88,10 +88,18 @@ export class Circle extends Entity {
     }
   }
 
+  /**
+   * Get Circle radius
+   * @returns {Number} - circle radius
+   */
   getRadius() {
     return this.points[0].distance(this.points[1]);
   }
 
+  /**
+   * Set Circle radius
+   * @returns {Number} - circle radius
+   */
   setRadius(rad) {
     this.points[1] = this.points[0].project(0, rad);
   }
@@ -135,6 +143,10 @@ export class Circle extends Entity {
     return [startPoint, endPoint, closurePoint];
   }
 
+  /**
+   * Trim the entity
+   * @param {Array} points
+   */
   trim(points) {
     if (points.length > 1) {
       const start = points[0];

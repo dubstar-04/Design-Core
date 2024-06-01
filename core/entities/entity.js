@@ -122,6 +122,10 @@ export class Entity {
     this.entityColour.setColour(rgb);
   }
 
+  /**
+   * Get the line type
+   * @returns {LType}
+   */
   getLineType() {
     let lineTypeName = this.lineType;
 
@@ -135,6 +139,10 @@ export class Entity {
     return lineType;
   }
 
+  /**
+   * Write the colour to file in the dxf format
+   * @param {DXFFile} file
+   */
   writeDxfColour(file) {
     if (this.entityColour.aci != 256) {
       file.writeGroupCode('62', this.entityColour.aci);
@@ -206,10 +214,18 @@ export class Entity {
     return false;
   }
 
+  /**
+   * Extend the entity
+   * @param {Array} points
+   */
   extend(points) {
     // extend function to be overidden by implementation
   }
 
+  /**
+   * Trim the entity
+   * @param {Array} points
+   */
   trim(points) {
     // trim function to be overidden by implementation
   }

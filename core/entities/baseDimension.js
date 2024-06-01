@@ -166,16 +166,32 @@ export class BaseDimension extends Entity {
     }
   }
 
+  /**
+   * Get the dimension type
+   * @returns {Number}
+   */
   getBaseDimType() {
     const type = this.dimType % 32;
     return type;
   }
 
+  /**
+   * Get the points for the sequence number
+   * @param {Number} sequenceNumber
+   * @returns {Point}
+   */
   getPointBySequence(sequenceNumber) {
     const point = this.points.find((point) => point.sequence === sequenceNumber);
     return point;
   }
 
+  /**
+   * Define the arrow head
+   * @param {Point} point
+   * @param {Number} angle
+   * @param {Number} size
+   * @returns {Solid}
+   */
   getArrowHead(point, angle, size) {
     let p1 = new Point(point.x + size/4, point.y + size);
     let p2 = new Point(point.x - size/4, point.y + size);
