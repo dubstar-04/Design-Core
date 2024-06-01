@@ -73,9 +73,7 @@ const classes = {
  * Creates new commands
  */
 export class CommandManager {
-  /**
-   * CommandManager constructor
-   */
+/** Create CommandManager */
   constructor() {
     // store a list of the available commands
     this.commands = [];

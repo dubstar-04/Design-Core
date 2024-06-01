@@ -7,6 +7,7 @@ import {DesignCore} from '../designCore.js';
 
 /** SnapPoint Class */
 class SnapPoint {
+  /** Create SnapPoint */
   constructor(snapPoint) {
     this.snapPoint = snapPoint;
   }

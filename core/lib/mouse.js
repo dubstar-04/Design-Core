@@ -3,9 +3,7 @@ import {DesignCore} from '../designCore.js';
 
 /** Mouse Class */
 export class Mouse {
-  /**
-   * Mouse Constructor
-   */
+/** Create Mouse */
   constructor() {
     this.x = 0;
     this.y = 0;

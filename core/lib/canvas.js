@@ -6,6 +6,7 @@ import {DesignCore} from '../designCore.js';
 
 /** Canvas Class */
 export class Canvas {
+  /** Create Canvas */
   constructor() {
     this.cvs = null;
     this.matrix = new Matrix();

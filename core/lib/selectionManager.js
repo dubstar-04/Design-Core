@@ -4,6 +4,7 @@ import {DesignCore} from '../designCore.js';
 
 /** SingleSelection Class */
 export class SingleSelection {
+  /** Create a SingleSelection */
   constructor(index, point) {
     this.selectedItemIndex = index;
     this.selectedPoint = point;
@@ -12,6 +13,7 @@ export class SingleSelection {
 
 /** SelectionSet Class */
 export class SelectionSet {
+  /** Create SelectionSet */
   constructor() {
     this.accepted = false;
     this.selectionSet = [];
@@ -21,6 +23,7 @@ export class SelectionSet {
 // TODO: Refactor class.
 /** Selection Manager Class */
 export class SelectionManager {
+  /** Create a SelectionManager */
   constructor() {
     this.selectionSet = new SelectionSet(); // store a list of selected items indices
     this.selectedItems = []; // store a copy of selected items

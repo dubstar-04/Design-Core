@@ -8,6 +8,7 @@ import {Point} from '../entities/point.js';
 
 /** PromptOption Class */
 export class PromptOptions {
+  /** Create PromptOptions */
   constructor(promptMessage = 'error', types = [], options = []) {
     this.promptMessage = promptMessage;
     this.types = types;
@@ -154,6 +155,7 @@ export class Input {
 
 /** InputManager Class */
 export class InputManager {
+  /** Create InputManager */
   constructor() {
     this.activeCommand = undefined;
 

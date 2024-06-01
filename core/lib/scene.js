@@ -14,9 +14,7 @@ import {BlockManager} from '../tables/blockManager.js';
  * Holds all entity instances
  */
 export class Scene {
-  /**
-   * Create a scene
-   */
+  /** Create a scene */
   constructor() {
     // initialise the scene variables
     this.saved = false;

@@ -3,6 +3,7 @@
  * For hatch pattern management
  */
 export class PatternLine {
+  /** Create PatternLine */
   constructor(patternString) {
     this.angle=0;
     this.xOrigin = 0;
@@ -48,6 +49,7 @@ export class PatternLine {
   }
 }
 
+/** Pattern Class */
 export class Patterns {
   /**
      * Get Pattern

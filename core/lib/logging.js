@@ -1,7 +1,7 @@
 /** Logging Class */
 export class Logging {
   static _instance;
-
+  /** Create Logger */
   constructor() {
     this.logLevel = ['OFF', 'ERROR', 'WARN', 'DEBUG', 'TRACE'];
     this.level = 'DEBUG';

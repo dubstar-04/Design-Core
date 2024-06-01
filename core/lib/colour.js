@@ -5,6 +5,7 @@ import {Colours} from './colours.js';
  * used by layers
  */
 export class Colour {
+  /** Create Colour */
   constructor(aci=7) {
     this.aci = aci;
     this.rgb = Colours.aciToRGB(this.aci);

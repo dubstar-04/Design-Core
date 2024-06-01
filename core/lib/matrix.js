@@ -1,9 +1,7 @@
 import {Point} from '../entities/point.js';
 /** Matrix Class */
 export class Matrix {
-  /**
-   * Matrix constructor
-   */
+/** Create Matrix */
   constructor() {
     this.a = 1; // x scale
     this.b = 0; // x skew

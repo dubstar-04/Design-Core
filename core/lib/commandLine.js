@@ -5,9 +5,7 @@ import {DesignCore} from '../designCore.js';
 
 /** CommandLine Class */
 export class CommandLine {
-  /**
-   * Commandline Constructor
-   */
+/** Create Commandline */
   constructor() {
     this.cmdLine = ''; // display string
     this.prompt = 'Command:';
