@@ -584,6 +584,10 @@ export class Hatch extends Entity {
     return false;
   }
 
+  /**
+   * Return boundingbox for entity
+   * @returns {BoundingBox}
+   */
   boundingBox() {
     if (this.boundaryShapes.length === 0) {
       return new BoundingBox();

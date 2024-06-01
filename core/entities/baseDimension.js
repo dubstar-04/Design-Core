@@ -233,6 +233,10 @@ export class BaseDimension extends Entity {
     return this.block.closestPoint(P);
   }
 
+  /**
+   * Return boundingbox for entity
+   * @returns {BoundingBox}
+   */
   boundingBox() {
     return this.block.boundingBox();
   }

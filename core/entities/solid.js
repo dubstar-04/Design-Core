@@ -65,6 +65,10 @@ export class Solid extends Entity {
     return [P, Infinity];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @returns {BoundingBox}
+   */
   boundingBox() {
     return BoundingBox.fromPoints(this.points);
   }

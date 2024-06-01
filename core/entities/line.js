@@ -317,6 +317,10 @@ export class Line extends Entity {
     return [pnt, distance];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @returns {BoundingBox}
+   */
   boundingBox() {
     return BoundingBox.lineBoundingBox(this.points[0], this.points[1]);
   }

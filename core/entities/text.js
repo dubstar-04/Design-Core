@@ -503,6 +503,10 @@ export class Text extends Entity {
     return [mid, distance];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @returns {BoundingBox}
+   */
   boundingBox() {
     const rect = this.getBoundingRect();
 

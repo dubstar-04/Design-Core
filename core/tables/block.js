@@ -265,6 +265,10 @@ export class Block extends Entity {
     return [minPnt, distance];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @returns {BoundingBox}
+   */
   boundingBox() {
     let xmin = Infinity;
     let xmax = -Infinity;

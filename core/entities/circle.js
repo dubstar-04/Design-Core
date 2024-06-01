@@ -221,6 +221,10 @@ export class Circle extends Entity {
     return [closest, distance];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @returns {BoundingBox}
+   */
   boundingBox() {
     const xmin = this.points[0].x - this.radius;
     const xmax = this.points[0].x + this.radius;

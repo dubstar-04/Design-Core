@@ -303,8 +303,8 @@ export class Arc extends Entity {
   }
 
   /**
-   * Return boundingbox
-   * @returns BoundingBox
+   * Return boundingbox for entity
+   * @returns {BoundingBox}
    */
   boundingBox() {
     return BoundingBox.arcBoundingBox(this.points[0], this.points[1], this.points[2], this.direction);
