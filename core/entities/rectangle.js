@@ -7,7 +7,10 @@ import {Polyline} from './polyline.js';
 
 import {DesignCore} from '../designCore.js';
 
-/** Rectangle Entity Class */
+/**
+ * Rectangle Entity Class
+ * @extends Entity
+ */
 export class Rectangle extends Entity {
   constructor(data) {
     super(data);

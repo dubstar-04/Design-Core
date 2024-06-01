@@ -16,7 +16,10 @@ import {Logging} from '../lib/logging.js';
 import {DesignCore} from '../designCore.js';
 import {SingleSelection} from '../lib/selectionManager.js';
 
-/** Dimension Entity Class */
+/**
+ * Dimension Entity Class
+ * @extends BaseDimension
+ */
 export class Dimension extends BaseDimension {
   constructor(data) {
     super(data);

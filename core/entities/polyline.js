@@ -1,7 +1,10 @@
 import {BasePolyline} from './basePolyline.js';
 import {Point} from './point.js';
 
-/** Polyline Entity Class */
+/**
+ * Polyline Entity Class
+ * @extends BasePolyline
+ */
 export class Polyline extends BasePolyline {
   constructor(data) {
     super(data);

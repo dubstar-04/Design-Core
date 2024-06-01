@@ -7,7 +7,10 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
-/** Base Dimension Entity Class */
+/**
+ * Base Dimension Entity Class
+ * @extends Entity
+ */
 export class BaseDimension extends Entity {
   constructor(data) {
     super(data);

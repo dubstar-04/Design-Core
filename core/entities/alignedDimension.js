@@ -10,8 +10,15 @@ import {Point} from './point.js';
 
 import {DesignCore} from '../designCore.js';
 
-/** Aligned Dimension Entity Class */
+/**
+ * Aligned Dimension Entity Class
+ * @extends BaseDimension
+ */
 export class AlignedDimension extends BaseDimension {
+  /**
+   *
+   * @param {*} data
+   */
   constructor(data) {
     super(data);
   }

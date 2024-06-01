@@ -9,7 +9,10 @@ import {Property} from '../properties/property.js';
 import {DesignCore} from '../designCore.js';
 
 
-/** Insert Entity Class */
+/**
+ * Insert Entity Class
+ * @extends Entity
+ */
 export class Insert extends Entity {
   /**
    *

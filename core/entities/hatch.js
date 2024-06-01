@@ -20,7 +20,10 @@ import {Arc} from './arc.js';
 import {BasePolyline} from './basePolyline.js';
 import {Property} from '../properties/property.js';
 
-/** Hatch Entity Class */
+/**
+ * Hatch Entity Class
+ * @extends Entity
+ */
 export class Hatch extends Entity {
   constructor(data) {
     super(data);

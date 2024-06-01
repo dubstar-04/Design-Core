@@ -2,7 +2,10 @@ import {Entity} from './entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
-/** Solid Entity Class */
+/**
+ * Solid Entity Class
+ * @extends Entity
+ */
 export class Solid extends Entity {
   constructor(data) {
     super(data);

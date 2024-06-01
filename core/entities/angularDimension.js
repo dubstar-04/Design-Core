@@ -11,7 +11,10 @@ import {Intersection} from '../lib/intersect.js';
 
 import {DesignCore} from '../designCore.js';
 
-/** Angular Dimension Entity Class */
+/**
+ * Angular Dimension Entity Class
+ * @extends BaseDimension
+ */
 export class AngularDimension extends BaseDimension {
   constructor(data) {
     super(data);
