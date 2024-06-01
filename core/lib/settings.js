@@ -45,7 +45,7 @@ export class Settings {
   /**
    * Returns the value of the setting
    * @param {String} setting
-   * @return
+   * @return {String}
    */
   getSetting(setting) {
     // TODO: Validate setting exists

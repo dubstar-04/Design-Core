@@ -8,7 +8,12 @@ import {Point} from '../entities/point.js';
 
 /** PromptOption Class */
 export class PromptOptions {
-  /** Create PromptOptions */
+  /**
+   * Create PromptOptions
+   * @param {String} promptMessage
+   * @param {Array} types
+   * @param {Array} options
+   */
   constructor(promptMessage = 'error', types = [], options = []) {
     this.promptMessage = promptMessage;
     this.types = types;
@@ -53,7 +58,7 @@ export class PromptOptions {
   /**
    * Match the input to a command option
    * @param {Any} input
-   * @return undefined or the matched option
+   * @return {String} undefined or the matched option
    */
   parseInputToOption(input) {
     if (this.options.length === 0) {
@@ -81,7 +86,7 @@ export class PromptOptions {
 
   /**
    * Return the prompt for the input request
-   * @return
+   * @return {String}
    */
   getPrompt() {
     let msg = `${this.promptMessage}`;
@@ -96,7 +101,7 @@ export class PromptOptions {
   /**
    * Underline the shortcut key for the prompt option
    * @param {String} option
-   * @return - option with shortcut underlined
+   * @return {String} option with shortcut underlined
    */
   getOptionWithShortcut(option) {
     const optionWithShortcut = `${option.substring(0, 1)}\u0332${option.substring(1, option.length)}`;
@@ -134,7 +139,7 @@ export class Input {
   /**
    * Return the Input.Type for value
    * @param {Any} value
-   * @return
+   * @return {Object}
    */
   static getType(value) {
     if (value === undefined) {
@@ -184,7 +189,7 @@ export class InputManager {
   /**
  * Create input request
  * @param {PromptOption} promptOption
- * @return promise
+ * @return {Object} promise
  */
   requestInput(promptOption) {
     this.promptOption = promptOption;
@@ -444,6 +449,7 @@ export class InputManager {
    * Execute the currently active command without reset
    * @param {Object} item - item to create
    * @param {Number} index - index of item in scene.items
+   * @return {Number}
    */
   actionCommand(item, index = undefined) {
     if (this.activeCommand instanceof Tool) {

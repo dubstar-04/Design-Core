@@ -4,7 +4,10 @@ import {Colours} from './colours.js';
 
 /** SelectionWindow Class */
 export class SelectionWindow {
-  /** Create a SelectionWindow */
+  /**
+   * Create a SelectionWindow
+   * @param {Object} data
+   */
   constructor(data) {
     this.colour = DesignCore.Settings.selectionWindow;
     this.lineWidth = 1;

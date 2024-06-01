@@ -17,7 +17,7 @@ export class Mouse {
 
   /**
    * Returns the point on the design canvas
-   * @return
+   * @return {Point}
    */
   pointOnCanvas() {
     return new Point(this.x, this.y);
@@ -25,7 +25,7 @@ export class Mouse {
 
   /**
    * Returns the point on the scene
-   * @return
+   * @return {Point}
    */
   pointOnScene() {
     return this.transformToScene(this.pointOnCanvas());
@@ -34,7 +34,7 @@ export class Mouse {
   /**
    * Transforms the point location from canvas to scene space
    * @param {Point} point
-   * @return
+   * @return {Point}
    */
   transformToScene(point) {
     const scenePoint = DesignCore.Canvas.matrix.invert().transformPoint(point.x, 0 - point.y +DesignCore.Canvas.height);
@@ -44,7 +44,7 @@ export class Mouse {
   /**
    * Transforms the point location from scene to canvas space
    * @param {Point} point
-   * @return
+   * @return {Point}
    */
   transformToCanvas(point) {
     const canvasPoint = DesignCore.Canvas.matrix.transformPoint(point.x, point.y);
@@ -55,7 +55,7 @@ export class Mouse {
   // TODO: This should be done outside of core in the ui.
   /**
    * Calculates the mouse position and angle string.
-   * @return
+   * @return {String}
    */
   positionString() {
     // return a string showing the position of the mouse on the canvas
@@ -121,7 +121,7 @@ export class Mouse {
   /**
    * Timer function for recognizing double clicks
    * @param {Number} button  - 0 = left, 1 = wheel, 2 = right;
-   * @return
+   * @return {Boolean}
    */
   isDoubleClick(button) {
     // measure time between clicks to check for double clicks in a generic way

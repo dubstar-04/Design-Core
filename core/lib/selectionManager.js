@@ -4,7 +4,11 @@ import {DesignCore} from '../designCore.js';
 
 /** SingleSelection Class */
 export class SingleSelection {
-  /** Create a SingleSelection */
+  /**
+   * Create a SingleSelection
+   * @param {Number} index
+   * @param {Point} point
+   */
   constructor(index, point) {
     this.selectedItemIndex = index;
     this.selectedPoint = point;
@@ -108,6 +112,7 @@ export class SelectionManager {
 
   /**
    * Select the item closest to the mouse and add it to the selection set
+   * @param {Point} point
    * @return {SingleSelection} - return single selection
    */
   singleSelect(point) {

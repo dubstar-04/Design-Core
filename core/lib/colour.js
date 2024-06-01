@@ -5,7 +5,10 @@ import {Colours} from './colours.js';
  * used by layers
  */
 export class Colour {
-  /** Create Colour */
+  /**
+   * Create Colour
+   * @param {Number} aci
+   */
   constructor(aci=7) {
     this.aci = aci;
     this.rgb = Colours.aciToRGB(this.aci);
@@ -69,7 +72,10 @@ export class Colour {
    * BYLAYER aci = 256
    */
 export class EntityColour extends Colour {
-  /** Create an EntityColour */
+  /**
+   * Create an EntityColour
+   * @param {Number} aci
+   */
   constructor(aci=256) {
     super(aci);
     // default to aci 256 - ByLayer
@@ -89,6 +95,7 @@ export class EntityColour extends Colour {
 
   /**
    * Set if colour byLayer
+   * @param {Boolean} bool
    */
   set byLayer(bool) {
     if (bool) {
@@ -110,6 +117,7 @@ export class EntityColour extends Colour {
 
   /**
    * Set if colour byBlock
+   * @param {Boolean} bool
    */
   set byBlock(bool) {
     if (bool) {

@@ -7,7 +7,10 @@ import {DesignCore} from '../designCore.js';
 
 /** SnapPoint Class */
 class SnapPoint {
-  /** Create SnapPoint */
+  /**
+   * Create SnapPoint
+   * @param {Point} snapPoint
+   */
   constructor(snapPoint) {
     this.snapPoint = snapPoint;
   }
@@ -43,7 +46,7 @@ export class Snapping {
 
   /**
    * Get snap point and draw to the scene
-   * @return Point or undefined
+   * @return {Point} or undefined
    */
   snap() {
     if (this.active) {
@@ -71,7 +74,7 @@ export class Snapping {
 
   /**
    * Get the closest snap point
-   * @return Point or undefined
+   * @return {Point} or undefined
    */
   getSnapPoint() {
     let snapPoint;
@@ -102,7 +105,7 @@ export class Snapping {
   /**
    * Get the polar snap point from the current mouse position
    * @param {Point} previousPoint
-   * @return Point or undefined
+   * @return {Point} or undefined
    */
   polarSnap(previousPoint) {
     if (!this.active) {
@@ -129,7 +132,7 @@ export class Snapping {
   /**
    * Get the ortho snap point from the current mouse position
    * @param {Point} previousPoint
-   * @return Point or undefined
+   * @return {Point} or undefined
    */
   orthoSnap(previousPoint) {
     if (!this.active) {

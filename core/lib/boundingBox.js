@@ -2,7 +2,11 @@ import {Point} from '../entities/point.js';
 
 /** BoundingBox Class */
 export class BoundingBox {
-  /** Create BoundingBox */
+  /**
+   * Create BoundingBox
+   * @param {Point} firstCorner
+   * @param {Point} secondCorner
+   */
   constructor(firstCorner = new Point(), secondCorner = new Point()) {
     this.pt1 = firstCorner;
     this.pt2 = secondCorner;
@@ -60,7 +64,7 @@ export class BoundingBox {
   /**
    * Determine if point is inside bounding box
    * @param {Object} point
-   * @return boolean true if point is inside false if not
+   * @return {Boolean} true if point is inside false if not
    */
   isInside(point) {
     if (point.x > this.xMin && point.x < this.xMax) {
@@ -75,6 +79,7 @@ export class BoundingBox {
   /**
    * Return the bounding box for points
    * @param {Array} points
+   * @return {BoundingBox}
    */
   static fromPoints(points) {
     if (!points.length) {
@@ -92,7 +97,7 @@ export class BoundingBox {
    * Calculate the boundingbox for a line
    * @param {Point} startPoint
    * @param {Point} endPoint
-   * @return - BoundingBox
+   * @return {BoundingBox}
    */
   static lineBoundingBox( startPoint, endPoint) {
     return new BoundingBox(startPoint, endPoint);
@@ -104,7 +109,7 @@ export class BoundingBox {
    * @param {Point} startPoint
    * @param {Point} endPoint
    * @param {Number} direction - ccw > 0, cw < 0
-   * @return - BoundingBox
+   * @return {BoundingBox}
    */
   static arcBoundingBox(centerPoint, startPoint, endPoint, direction=1) {
     const startAngle = centerPoint.angle(startPoint);
@@ -146,7 +151,7 @@ export class BoundingBox {
    * @param {Number} endAngle - angle in radians
    * @param {Number} axisAngle - angle in radians. i.e 90 deg = Math.PI / 2.
    * @param {Number} direction - ccw > 0, cw < 0
-   * @return bool
+   * @return {Boolean}
    */
   static crossesAxis(startAngle, endAngle, axisAngle, direction=1) {
     const circle = Math.PI * 2;

@@ -13,7 +13,7 @@ export class Colours {
 /**
  * Check rgb is a valid rgb object
  * @param {Object} rgb
- * @return bool - true if the object is an rgb colour, otherwise false.
+ * @return {Boolean} true if the object is an rgb colour, otherwise false.
  */
   static isRGB(rgb) {
     if (rgb) {
@@ -33,6 +33,7 @@ export class Colours {
   /**
    * Convert an AutoCAD colour index (ACI) to a rgb colour
    * @param  {Number} aci
+   * @return {Number}
    */
   static aciToRGB(aci) {
     if ((typeof aci === 'number' || aci instanceof Number)) {
@@ -48,7 +49,7 @@ export class Colours {
   /**
    * Convert a rgb colour to an AutoCAD colour index (ACI)
    * @param {Object} rgb
-   * @return
+   * @return {Number}
    */
   static rgbToACI(rgb) {
     if (!this.isRGB(rgb)) {
@@ -73,7 +74,7 @@ export class Colours {
   /**
    * Convert rgb colour to formatted string
    * @param {Object} rgb
-   * @return
+   * @return {Number}
    */
   static rgbToString(rgb) {
     if (this.isRGB(rgb)) {
@@ -85,8 +86,8 @@ export class Colours {
 
   /**
    * Get RGB colour components scaled 0 - 1 from rgb colour
-   * @param  {Object} object with r, g, and b values
-   * @return - scaled rgb object or undefined
+   * @param  {Object} rgb - object with r, g, and b values
+   * @return {Number} scaled rgb object or undefined
    */
   static rgbToScaledRGB(rgb) {
     if (this.isRGB(rgb)) {
@@ -109,6 +110,7 @@ export class Colours {
    * Converting this integer value to hexadecimal yields the following bit mask: 0x00RRGGBB.
    * For example:
    * true color with Red==200, Green==100 and Blue==50 is 0x00C86432, and in DXF, in decimal, 13132850
+   * @return {Number}
    */
   static trueColourToRGB(trueColour) {
     if (trueColour) {
@@ -124,7 +126,7 @@ export class Colours {
   /**
    * Get the trueColour value for rgb colour
    * @param {Object} rgb
-   * @return integer representing the rgb value as a trueColor
+   * @return {Number} representing the rgb value as a trueColor
    */
   static rgbToTrueColour(rgb) {
     if (this.isRGB(rgb)) {

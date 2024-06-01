@@ -3,7 +3,7 @@ export class Utils {
   /**
    * Convert degrees to radians
    * @param {Number} degrees
-   * @return angle in radians
+   * @return {Number} angle in radians
    */
   static degrees2radians(degrees) {
     return degrees * Math.PI / 180;
@@ -12,7 +12,7 @@ export class Utils {
   /**
    * Convert radians to degrees
    * @param {Number} radians
-   * @return angle in degrees
+   * @return {Number} angle in degrees
    */
   static radians2degrees(radians) {
     return radians * 180 / Math.PI;
@@ -21,7 +21,7 @@ export class Utils {
   /**
    * Round to 5 decimal places
    * @param {Number} number
-   * @return rounded number
+   * @return {Number} rounded number
    */
   static round(number) {
     return Number(number.toFixed(5));
@@ -30,7 +30,7 @@ export class Utils {
   /**
    * Deep clone object
    * @param {Object} obj - object to clone
-   * @return - new cloned object
+   * @return {Object} - new cloned object
    */
   static cloneObject(obj) {
     // deep clone obj and all its attributes

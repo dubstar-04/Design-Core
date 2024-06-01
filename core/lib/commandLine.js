@@ -54,7 +54,7 @@ export class CommandLine {
   /**
    * Checks there is only a single default value supplied and removes the <>
    * @param {Array} commandDefault - Array containing the <default> value
-   * @return value contained within the <>
+   * @return {Any} value contained within the <>
    */
   parseCommandDefault(commandDefault) {
     if (commandDefault && commandDefault.length > 1) {
@@ -206,6 +206,7 @@ export class CommandLine {
   /**
    * Converts input to a type
    * @param {String} input
+   * @return {Any}
    */
   parseInput(input) {
     const isNumber = /^[-]?\d+(?:\.\d+)?$/.test(input);

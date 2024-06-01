@@ -3,7 +3,10 @@
  * For hatch pattern management
  */
 export class PatternLine {
-  /** Create PatternLine */
+  /**
+   * Create PatternLine
+   * @param {String} patternString
+   */
   constructor(patternString) {
     this.angle=0;
     this.xOrigin = 0;
@@ -62,7 +65,7 @@ export class Patterns {
   /**
      * Get Pattern
      * @param {String} name
-     * @return pattern string for the pattern name
+     * @return {String} pattern string for the pattern name
      */
   static getPattern(name) {
     // create empty pattern
@@ -82,7 +85,7 @@ export class Patterns {
   /**
      * Get Pattern line count
      * @param {String} name
-     * @return int for the number of pattern lines
+     * @return {Number} for the number of pattern lines
      */
   static getPatternLineCount(name) {
     // get the pattern string
@@ -96,7 +99,7 @@ export class Patterns {
   /**
    * Check if the pattern exists
    * @param {String} name
-   * @return bool
+   * @return {Boolean}
    */
   static patternExists(name) {
     return Object.hasOwn(Patterns.hatch_patterns, name.toUpperCase());

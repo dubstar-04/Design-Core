@@ -13,7 +13,7 @@ export class Matrix {
 
   /**
    * Returns the current scale
-   * @return
+   * @return {Number}
    */
   getScale() {
     // return the x scale
@@ -22,7 +22,7 @@ export class Matrix {
 
   /**
    * Returns inverted matrix
-   * @return
+   * @return {Matrix}
    */
   invert() {
     const d = 1 / (this.a * this.d - this.b * this.c);
@@ -62,7 +62,7 @@ export class Matrix {
    * Returns px and py transformed to matrix (scene) co-ordinates
    * @param {Number} px
    * @param {Number} py
-   * @return
+   * @return {Point}
    */
   transformPoint(px, py) {
     const tpx = px * this.a + py * this.c + this.e;

@@ -44,7 +44,7 @@ export class Intersection {
    * @param {Circle} circle
    * @param {Line} line
    * @param {Boolean} extend - extend the line as a ray
-   * @return
+   * @return {Intersect}
    */
   static intersectCircleLine(circle, line, extend) {
     const c = circle.centre;
@@ -108,7 +108,7 @@ export class Intersection {
    * @param {Line} line
    * @param {Circle} circle
    * @param {Boolean} extend - extend the line as a ray
-   * @return
+   * @return {Intersect}
    */
   static intersectLineCircle(line, circle, extend) {
     return this.intersectCircleLine(circle, line, extend);
@@ -119,7 +119,7 @@ export class Intersection {
    * @param {Circle} circle1
    * @param {Circle} circle2
    * @param {Boolean} extend  - unused
-   * @return
+   * @return {Intersect}
    */
   static intersectCircleCircle(circle1, circle2, extend) {
     const c1 = circle1.centre;
@@ -165,7 +165,7 @@ export class Intersection {
    * @param {Arc} arc
    * @param {Rectangle} rectangle
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectArcRectangle(arc, rectangle, extend) {
     const r1 = rectangle.start;
@@ -210,7 +210,7 @@ export class Intersection {
    * @param {Arc} arc
    * @param {Line} line
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectArcLine(arc, line, extend) {
     const inter1 = this.intersectCircleLine(arc, line, extend);
@@ -236,7 +236,7 @@ export class Intersection {
    * @param {Line} line
    * @param {Arc} arc
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectLineArc(line, arc, extend) {
     return this.intersectArcLine(arc, line, extend);
@@ -247,7 +247,7 @@ export class Intersection {
    * @param {Circle} circle
    * @param {Arc} arc
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectCircleArc(circle, arc, extend) {
     const inter1 = this.intersectCircleCircle(circle, arc, extend);
@@ -273,7 +273,7 @@ export class Intersection {
    * @param {Arc} arc
    * @param {Circle} circle
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectArcCircle(arc, circle, extend) {
     return this.intersectCircleArc(circle, arc, extend);
@@ -284,7 +284,7 @@ export class Intersection {
    * @param {Circle} circle
    * @param {Rectangle} rectangle
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectCircleRectangle(circle, rectangle, extend) {
     const r1 = rectangle.start;
@@ -329,7 +329,7 @@ export class Intersection {
    * @param {Line} line1
    * @param {Line} line2
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectLineLine(line1, line2, extend) {
     const a1 = line1.start;
@@ -373,7 +373,7 @@ export class Intersection {
    * @param {Polyline} polyline
    * @param {Line} line
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectLwpolylineLine(polyline, line, extend) {
     return this.intersectPolylineLine(polyline, line, extend);
@@ -384,7 +384,7 @@ export class Intersection {
    * @param {Polyline} polyline
    * @param {Line} line
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectPolylineLine(polyline, line, extend) {
     const result = new Intersection('No Intersection');
@@ -421,7 +421,7 @@ export class Intersection {
    * @param {Array} polylines
    * @param {Rectangle} rectangle
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectHatchRectangle(polylines, rectangle, extend) {
     for (let i = 0; i < polylines.length; i++) {
@@ -440,7 +440,7 @@ export class Intersection {
    * @param {Polyline} polyline
    * @param {Rectangle} rectangle
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectLwpolylineRectangle(polyline, rectangle, extend) {
     return this.intersectPolylineRectangle(polyline, rectangle, extend);
@@ -451,7 +451,7 @@ export class Intersection {
    * @param {Polyline} polyline
    * @param {Rectangle} rectangle
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectPolylineRectangle(polyline, rectangle, extend) {
     const r1 = rectangle.start;
@@ -495,7 +495,7 @@ export class Intersection {
    * @param {Line} line
    * @param {Rectangle} rectangle
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectLineRectangle(line, rectangle, extend) {
     const r1 = rectangle.start;
@@ -538,7 +538,7 @@ export class Intersection {
    * @param {Rectangle} rectangle
    * @param {Line} line
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectRectangleLine(rectangle, line, extend) {
     return this.intersectLineRectangle(line, rectangle, extend);
@@ -550,7 +550,7 @@ export class Intersection {
    * @param {Text} text
    * @param {Rectangle} rectangle
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectTextRectangle(text, rectangle, extend) {
     return this.intersectRectangleRectangle(text, rectangle, extend);
@@ -561,7 +561,7 @@ export class Intersection {
    * @param {Rectangle} rectangle1
    * @param {Rectangle} rectangle2
    * @param {Boolean} extend
-   * @return
+   * @return {Intersect}
    */
   static intersectRectangleRectangle(rectangle1, rectangle2, extend) {
     const a1 = rectangle1.start;
