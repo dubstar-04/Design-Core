@@ -10,6 +10,7 @@ import {DesignCore} from '../designCore.js';
  * @extends Tool
  */
 export class Move extends Tool {
+  /** Create a Move command */
   constructor() {
     super();
   }

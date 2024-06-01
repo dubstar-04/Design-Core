@@ -11,6 +11,7 @@ import {DesignCore} from '../designCore.js';
  * @extends Tool
  */
 export class Rotate extends Tool {
+  /** Create a Rotate command */
   constructor() {
     super();
     this.baseAngle = 0;

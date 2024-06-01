@@ -12,6 +12,7 @@ import {DesignCore} from '../designCore.js';
  * @extends Tool
  */
 export class Explode extends Tool {
+  /** Create an Explode command */
   constructor() {
     super();
   }

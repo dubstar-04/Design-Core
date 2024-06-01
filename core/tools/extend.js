@@ -11,6 +11,7 @@ import {DesignCore} from '../designCore.js';
  * @extends Tool
  */
 export class Extend extends Tool {
+  /** Create an Extend command */
   constructor() {
     super();
     this.selectedIndex;

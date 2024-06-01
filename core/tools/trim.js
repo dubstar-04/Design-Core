@@ -11,6 +11,7 @@ import {DesignCore} from '../designCore.js';
  * @extends Tool
  */
 export class Trim extends Tool {
+  /** Create a Trim command */
   constructor() {
     super();
     this.selectedIndex;

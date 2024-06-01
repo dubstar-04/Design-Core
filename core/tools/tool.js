@@ -2,6 +2,7 @@
  * Tool Class
  */
 export class Tool {
+  /** Create a Tool command */
   constructor() {
     Object.defineProperty(this, 'type', {
       value: this.constructor.name,

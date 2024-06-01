@@ -11,6 +11,9 @@ import {DesignCore} from '../designCore.js';
  * @extends Tool
  */
 export class Copy extends Tool {
+  /**
+   * Create a Diametric Dimension
+   */
   constructor() {
     super();
   }

@@ -10,6 +10,7 @@ import {DesignCore} from '../designCore.js';
  * @extends Tool
  */
 export class Purge extends Tool {
+  /** Create a Purge command */
   constructor() {
     super();
     this.option = '';
