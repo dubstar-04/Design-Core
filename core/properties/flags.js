@@ -1,4 +1,6 @@
+/** Flags Class */
 export class Flags {
+  /** Create Flags */
   constructor() {
     /* flags - bit-coded values
     | 128 | 64 | 32 | 16 | 8 | 4 | 2 | 1 |
