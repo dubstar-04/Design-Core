@@ -7,6 +7,10 @@ import {Insert} from '../entities/insert.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Explode Command Class
+ * @extends Tool
+ */
 export class Explode extends Tool {
   constructor() {
     super();

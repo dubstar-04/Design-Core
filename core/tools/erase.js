@@ -5,6 +5,10 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Erase Command Class
+ * @extends Tool
+ */
 export class Erase extends Tool {
   constructor() {
     super();

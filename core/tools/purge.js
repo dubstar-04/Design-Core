@@ -5,6 +5,10 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Purge Command Class
+ * @extends Tool
+ */
 export class Purge extends Tool {
   constructor() {
     super();

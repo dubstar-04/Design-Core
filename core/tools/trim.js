@@ -6,6 +6,10 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Trim Command Class
+ * @extends Tool
+ */
 export class Trim extends Tool {
   constructor() {
     super();

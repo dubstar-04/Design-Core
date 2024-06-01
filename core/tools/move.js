@@ -5,6 +5,10 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Move Command Class
+ * @extends Tool
+ */
 export class Move extends Tool {
   constructor() {
     super();

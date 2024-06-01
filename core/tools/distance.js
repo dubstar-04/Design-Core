@@ -5,6 +5,10 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Point Entity Class
+ * @extends Tool
+ */
 export class Distance extends Tool {
   constructor() {
     super();

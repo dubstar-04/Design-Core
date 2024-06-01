@@ -6,6 +6,10 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Copy Command Class
+ * @extends Tool
+ */
 export class Copy extends Tool {
   constructor() {
     super();

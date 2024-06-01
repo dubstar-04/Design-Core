@@ -6,7 +6,10 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/**
+ * Rotate Command Class
+ * @extends Tool
+ */
 export class Rotate extends Tool {
   constructor() {
     super();

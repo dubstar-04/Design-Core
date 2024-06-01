@@ -1,3 +1,6 @@
+/**
+ * Tool Class
+ */
 export class Tool {
   constructor() {
     Object.defineProperty(this, 'type', {
