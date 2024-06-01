@@ -1,3 +1,5 @@
+import {Flags} from './flags.js';
+
 export class Property {
   constructor() {}
 
@@ -10,7 +12,8 @@ export class Property {
     // return any value in values
     for (let i = 0; i < values.length; i++) {
       if (values[i] !== undefined) {
-        return values[i];
+        // check if the value is a flags object
+        return (values[i] instanceof Flags) ? values[i].getFlagValue() : values[i];
       }
     };
 
