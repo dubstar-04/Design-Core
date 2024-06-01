@@ -241,6 +241,11 @@ export class BaseDimension extends Entity {
     return this.block.boundingBox();
   }
 
+  /**
+   * Determine if the entity is within the selection
+   * @param {Array} selectionExtremes
+   * @returns {Boolean} true if within
+   */
   within(selectionExtremes) {
     return this.block.within(selectionExtremes);
   }

@@ -56,7 +56,7 @@ export class BoundingBox {
   }
 
   /**
-   * Determin if point is inside bounding box
+   * Determine if point is inside bounding box
    * @param {Object} point
    * @returns boolean true if point is inside false if not
    */

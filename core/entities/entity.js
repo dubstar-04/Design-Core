@@ -144,7 +144,11 @@ export class Entity {
     }
   }
 
-
+  /**
+   * Determine if the entity is within the selection
+   * @param {Array} selectionExtremes
+   * @returns {Boolean} true if within
+   */
   within(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
@@ -152,7 +156,7 @@ export class Entity {
       return;
     }
 
-    // determin if this entities is within a the window specified by selectionExtremes
+    // Determine if this entities is within a the window specified by selectionExtremes
     const boundingBox = this.boundingBox();
     if ( boundingBox.xMin > selectionExtremes[0] &&
           boundingBox.xMax < selectionExtremes[1] &&

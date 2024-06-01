@@ -126,10 +126,17 @@ export class Insert extends Entity {
     DesignCore.Scene.inputManager.reset();
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     // not implemented
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'INSERT');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -182,9 +189,9 @@ export class Insert extends Entity {
   }
 
   /**
-     * Get the insert rotation
-     * @return {Number} angle - degrees
-     */
+   * Get the insert rotation
+   * @return {Number} angle - degrees
+   */
   getRotation() {
     if (this.points[1] !== undefined) {
       const angle = Utils.radians2degrees(this.points[0].angle(this.points[1]));
@@ -216,6 +223,11 @@ export class Insert extends Entity {
     return snaps;
   }
 
+  /**
+   * Determine if the entity is within the selection
+   * @param {Array} selectionExtremes
+   * @returns {Boolean} true if within
+   */
   within(selectionExtremes) {
     // adjust selectionExtremes by the insert position
     const [xmin, xmax, ymin, ymax] = selectionExtremes;
@@ -235,6 +247,11 @@ export class Insert extends Entity {
     };
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @returns {Array} - [Point, distance]
+   */
   closestPoint(P) {
     // get the closest point from the blocks entities
     // rotate P to match the block rotation
@@ -244,6 +261,10 @@ export class Insert extends Entity {
     return this.block.closestPoint(adjustedPoint);
   }
 
+  /**
+   * Return boundingbox for entity
+   * @returns {BoundingBox}
+   */
   boundingBox() {
     const blockBB = this.block.boundingBox();
     const topLeft = blockBB.pt1.add(this.points[0]);
