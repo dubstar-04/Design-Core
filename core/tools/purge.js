@@ -17,6 +17,13 @@ export class Purge extends Tool {
     this.options = ['Blocks', 'Layers', 'LTypes', 'All'];
   }
 
+  /**
+   * Register the command
+   * @returns {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Purge', shortcut: 'PU'};
     return command;

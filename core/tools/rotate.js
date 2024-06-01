@@ -17,6 +17,13 @@ export class Rotate extends Tool {
     this.baseAngle = 0;
   }
 
+  /**
+   * Register the command
+   * @returns {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Rotate', shortcut: 'RO', type: 'Tool'};
     return command;
