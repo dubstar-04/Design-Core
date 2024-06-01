@@ -66,6 +66,10 @@ export class SelectionWindow {
     }
   }
 
+  /**
+   * Draw a rectangle
+   * @param {Object} ctx
+   */
   drawRect(ctx) {
     ctx.moveTo(this.points[0].x, this.points[0].y);
     ctx.lineTo(this.points[1].x, this.points[0].y);
