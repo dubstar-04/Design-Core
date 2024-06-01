@@ -125,6 +125,10 @@ export class Arc extends Entity {
     }
   }
 
+  /**
+   * Arc start angle
+   * @returns {Number} start angle in radians
+   */
   startAngle() {
     return this.points[0].angle(this.points[1]);
   }
