@@ -34,7 +34,9 @@ class SnapPoint {
   }
 }
 
+/** Snapping Class */
 export class Snapping {
+  /** Create snapping */
   constructor() {
     this.active = false;
   }
