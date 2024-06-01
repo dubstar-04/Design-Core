@@ -290,6 +290,11 @@ export class Block extends Entity {
     return new BoundingBox(topLeft, bottomRight);
   }
 
+  /**
+   * Determine if the entity is touch the selection window
+   * @param {Array} selectionExtremes
+   * @returns {Boolean} true if touched
+   */
   touched(selectionExtremes) {
     for (let idx = 0; idx < this.items.length; idx++) {
       const touched = this.items[idx].touched(selectionExtremes);

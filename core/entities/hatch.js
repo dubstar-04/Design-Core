@@ -625,6 +625,11 @@ export class Hatch extends Entity {
     return this.boundaryShapes;
   }
 
+  /**
+   * Determine if the entity is touch the selection window
+   * @param {Array} selectionExtremes
+   * @returns {Boolean} true if touched
+   */
   touched() {
     console.log('Hatch: touched() Not Implemented');
   }

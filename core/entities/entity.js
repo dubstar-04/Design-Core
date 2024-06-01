@@ -169,6 +169,11 @@ export class Entity {
     return false;
   }
 
+  /**
+   * Determine if the entity is touch the selection window
+   * @param {Array} selectionExtremes
+   * @returns {Boolean} true if touched
+   */
   touched(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 

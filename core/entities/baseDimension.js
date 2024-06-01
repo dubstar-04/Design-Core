@@ -258,6 +258,11 @@ export class BaseDimension extends Entity {
     return this.block.intersectPoints();
   }
 
+  /**
+   * Determine if the entity is touch the selection window
+   * @param {Array} selectionExtremes
+   * @returns {Boolean} true if touched
+   */
   touched(selectionExtremes) {
     return this.block.touched(selectionExtremes);
   }
