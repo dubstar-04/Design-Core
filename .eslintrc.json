@@ -11,7 +11,7 @@
         "sourceType": "module"
     },
     "rules": {
-        "require-jsdoc" : 0,
+        "require-jsdoc" : 1,
         "valid-jsdoc" : 0,
         "max-len" : 0,
         "function-paren-newline":"warn"
