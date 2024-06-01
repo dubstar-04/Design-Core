@@ -34,19 +34,27 @@ export class Canvas {
     this.externalPaintCallbackFunction;
   }
 
+  /**
+   * Get canvas scale
+   * @returns {Number}
+   */
   getScale() {
     return this.matrix.getScale();
   }
 
+  /**
+   * Set external paint callback
+   * This is called when painting is required
+   * @param {Object} callback
+   */
   setExternalPaintCallbackFunction(callback) {
     // set the callback
     this.externalPaintCallbackFunction = callback;
   }
 
-  setCanvasWidget(cnvs) {
-    this.cvs = cnvs;
-  }
-
+  /**
+   * Handle mouse movement
+   */
   mouseMoved() {
     if (DesignCore.Mouse.buttonTwoDown) {
       this.pan();
@@ -55,6 +63,10 @@ export class Canvas {
     DesignCore.Scene.inputManager.mouseMoved();
   }
 
+  /**
+   * Handle mouse down
+   * @param {Number} button
+   */
   mouseDown(button) {
     switch (button) {
       case 0: // left button
@@ -70,6 +82,10 @@ export class Canvas {
     DesignCore.Scene.inputManager.mouseDown(button);
   };
 
+  /**
+   * Handle mouse up
+   * @param {Number} button
+   */
   mouseUp(button) {
     switch (button) {
       case 0: // left buttonbreak;
@@ -86,6 +102,10 @@ export class Canvas {
     DesignCore.Scene.inputManager.mouseUp(button);
   };
 
+  /**
+   * Handle double click
+   * @param {Number} button
+   */
   doubleClick(button) {
     switch (button) {
       case 0: // left button
@@ -98,6 +118,9 @@ export class Canvas {
     }
   };
 
+  /**
+   * Pan the canvas
+   */
   pan() {
     // pandelta: mouse drag distance in scene scale
     this.panDelta = DesignCore.Mouse.pointOnScene().subtract(DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint));
@@ -110,6 +133,10 @@ export class Canvas {
     this.requestPaint();
   }
 
+  /**
+   * Handle mouse wheel - Zoom
+   * @param {Number} delta
+   */
   wheel(delta) {
     const scale = Math.pow(1 + Math.abs(delta), delta > 0 ? 1 : -1);
     if (scale < 1 && this.getScale() > this.minScaleFactor || scale > 1 && this.getScale() < this.maxScaleFactor) {
@@ -117,6 +144,10 @@ export class Canvas {
     }
   };
 
+  /**
+   * Zoom the canvas
+   * @param {Number} scale
+   */
   zoom(scale) {
     const zoomPoint = DesignCore.Mouse.pointOnScene();
     this.matrix.scale(scale, scale);
@@ -124,6 +155,9 @@ export class Canvas {
     this.requestPaint();
   }
 
+  /**
+   * Set the zoom to include all scene items
+   */
   zoomExtents() {
     const extents = DesignCore.Scene.boundingBox();
 
@@ -149,6 +183,9 @@ export class Canvas {
     }
   }
 
+  /**
+   * Request the canvas is painted
+   */
   requestPaint() {
     // paint request is passed to an external paint function
     // This function then calls this.paint(), the canvas paint function
@@ -158,6 +195,12 @@ export class Canvas {
     }
   }
 
+  /**
+   * Paint the canvas
+   * @param {object} context
+   * @param {Number} width
+   * @param {Number} height
+   */
   paint(context, width, height) {
     // This paint request is called by an external paint function
     // some ui framework create and destroy the context for every paint
@@ -287,6 +330,10 @@ export class Canvas {
     }
   }
 
+  /**
+   * Paint the background grid
+   * @param {object} context
+   */
   paintGrid(context) {
     // TODO: Move grid linewidth to settings?
     let lineWidth = 0.75;
@@ -367,6 +414,11 @@ export class Canvas {
     }
   }
 
+  /**
+   * Calculate the scene offset from the canvas size
+   * i.e at 1:1 its the same as the canvas
+   * @returns {number}
+   */
   getSceneOffset() {
     // Calculate the scene offset from the canvas size
     // i.e at 1:1 its the same as the canvas
