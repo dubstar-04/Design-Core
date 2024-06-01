@@ -196,7 +196,7 @@ export class Text extends Entity {
 
   /**
    * Set the text rotation
-   * @param {number} angle - degrees
+   * @param {Number} angle - degrees
    */
   setRotation(angle) {
     // This overwrites the rotation rather than add to it.
@@ -212,7 +212,7 @@ export class Text extends Entity {
 
   /**
    * Get the text rotation
-   * @return {number} angle - degrees
+   * @return {Number} angle - degrees
    */
   getRotation() {
     if (this.points[1] !== undefined) {
@@ -225,7 +225,7 @@ export class Text extends Entity {
 
   /**
    * Get the backwards value
-   * @returns {boolean} true if the text is flipped horizontally
+   * @returns {Boolean} true if the text is flipped horizontally
    */
   getBackwards() {
     // Backwards value is bitmasked in flags as value 2
@@ -234,7 +234,7 @@ export class Text extends Entity {
 
   /**
    * Set the backwards value
-   * @param {boolean} bool
+   * @param {Boolean} bool
    */
   setBackwards(bool) {
     if (bool) {
@@ -248,7 +248,7 @@ export class Text extends Entity {
 
   /**
    * Get the upside down value
-   * @returns {boolean} true if the text is flipped vertically
+   * @returns {Boolean} true if the text is flipped vertically
    */
   getUpsideDown() {
     // Upside down value is bitmasked in flags as value 4
@@ -257,7 +257,7 @@ export class Text extends Entity {
 
   /**
    * Set the upside down value
-   * @param {boolean} bool
+   * @param {Boolean} bool
    */
   setUpsideDown(bool) {
     if (bool) {
@@ -271,7 +271,7 @@ export class Text extends Entity {
 
   /**
    * Get a string describing the horizontal text alignment
-   * @returns {string}
+   * @returns {String}
    */
   getHorizontalAlignment() {
     /* DXF Data
@@ -301,7 +301,7 @@ export class Text extends Entity {
 
   /**
    * Get a string describing the vertical text alignment
-   * @returns {string}
+   * @returns {String}
    */
   getVerticalAlignment() {
     /* DXF Data

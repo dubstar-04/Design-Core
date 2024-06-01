@@ -16,7 +16,7 @@ export class DXFFile {
 
   /**
    * Check if a dxf version is valid - 'AC1009' = valid, R12 = not valid
-   * @param {string} version
+   * @param {String} version
    * @returns boolean - true if version is valid
    */
   static validDxfVersion(version) {
@@ -29,7 +29,7 @@ export class DXFFile {
 
   /**
    * Check if a dxf key is valid - R12 = valid, 'AC1009' = not valid
-   * @param {string} key
+   * @param {String} key
    * @returns boolean - true if version is valid
    */
   static validDxfKey(key) {
@@ -96,7 +96,7 @@ export class DXFFile {
   /**
    * Format a handle value
    * A handle is an arbitrary but unique hex value as string up to 16 hexadecimal digits (8 bytes).
-   * @param {number} value
+   * @param {Number} value
    * @returns handle hex value
    */
   formatHandle(value) {

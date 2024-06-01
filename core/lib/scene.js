@@ -76,9 +76,9 @@ export class Scene {
 
   /**
    * Create and add new items to the scene
-   * @param {string} type - entity type
-   * @param {object} data - object of entity parameters
-   * @param {number} index - integer of item to replace
+   * @param {String} type - entity type
+   * @param {Object} data - object of entity parameters
+   * @param {Number} index - integer of item to replace
    * @returns - index of created item
    */
   addItem(type, data, index) {
@@ -111,9 +111,9 @@ export class Scene {
 
   /**
    * Find items in scene
-   * @param {string} type - entity type or "ANY"
-   * @param {string} prop - object of entity parameters
-   * @param {any} value - value of the property
+   * @param {String} type - entity type or "ANY"
+   * @param {String} prop - object of entity parameters
+   * @param {Any} value - value of the property
    * @returns - index of items
    */
   findItem(type, prop, value) {
@@ -132,7 +132,7 @@ export class Scene {
 
   /**
    * Get Item
-   * @param {number} type - items index
+   * @param {Number} type - items index
    * @returns - item
    */
   getItem(index) {
@@ -141,7 +141,7 @@ export class Scene {
 
   /**
    * Remove Item
-   * @param {number} type - items index
+   * @param {Number} type - items index
    * @returns - success status
    */
   removeItem(index) {
@@ -157,7 +157,7 @@ export class Scene {
 
   /**
    * Add items to the scenes tempItems
-   * @param {object} item
+   * @param {Object} item
    */
   addToTempItems(item) {
     this.tempItems.push(item); // Add it to the tempItems Array
@@ -165,7 +165,7 @@ export class Scene {
 
   /**
    * Add items to the scenes auxiliary items
-   * @param {object} item
+   * @param {Object} item
    */
   addToAuxiliaryItems(item) {
     this.auxiliaryItems.push(item); // Add it to the auxiliary Array
@@ -173,8 +173,8 @@ export class Scene {
 
   /**
    * Create a new temp item and add to scenes tempItems
-   * @param {string} type - entity type
-   * @param {object} data - object of entity parameters
+   * @param {String} type - entity type
+   * @param {Object} data - object of entity parameters
    */
   createTempItem(type, data) {
     data.layer = DesignCore.LayerManager.getCstyle();

@@ -112,7 +112,7 @@ export class Entity {
 
   /**
    * Set the entity colour
-   * @param {object} rgb
+   * @param {Object} rgb
    */
   setColour(rgb) {
     this.entityColour.setColour(rgb);

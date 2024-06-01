@@ -12,7 +12,7 @@ export class StyleManagerBase extends TableManagerBase {
 
   /**
    * Delete a style using the style index
-   * @param {number} styleIndex
+   * @param {Number} styleIndex
    * @returns undefined
    */
   deleteStyle(itemIndex, showWarning=true) {
@@ -27,7 +27,7 @@ export class StyleManagerBase extends TableManagerBase {
 
   /**
    * Delete all items that use style
-   * @param {string} style
+   * @param {String} style
    */
   deleteStyleFromScene(style) {
     const selectionSet = [];
@@ -55,7 +55,7 @@ export class StyleManagerBase extends TableManagerBase {
 
   /**
    * Set the current style
-   * @param {string} cstyle
+   * @param {String} cstyle
    */
   setCstyle(cstyle) {
     if (this.getItemByName(cstyle) !== undefined) {
@@ -82,8 +82,8 @@ export class StyleManagerBase extends TableManagerBase {
 
   /**
    * Rename the style at index with newName
-   * @param {number} styleIndex
-   * @param {string} newName
+   * @param {Number} styleIndex
+   * @param {String} newName
    * @returns undefined
    */
   renameStyle(styleIndex, newName) {

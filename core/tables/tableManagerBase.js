@@ -37,7 +37,7 @@ export class TableManagerBase {
 
   /**
    * Generate a unique name
-   * @param {string} name
+   * @param {String} name
    * @returns unique name
    */
   getUniqueName(name) {
@@ -78,7 +78,7 @@ export class TableManagerBase {
 
   /**
    * Delete a item using the item index
-   * @param {number} itemIndex
+   * @param {Number} itemIndex
    * @returns array containing deleted item or undefined
    */
   deleteItem(itemIndex, showWarning=true) {
@@ -103,7 +103,7 @@ export class TableManagerBase {
 
   /**
    * Check if a item with itemName exists
-   * @param {string} itemName
+   * @param {String} itemName
    * @returns true or false
    */
   itemExists(itemName) {
@@ -136,7 +136,7 @@ export class TableManagerBase {
 
   /**
    * Find the index of itemName
-   * @param {string} itemName
+   * @param {String} itemName
    * @returns index of the item or -1 if item doesn't exist
    */
   getItemIndex(itemName) {
@@ -145,7 +145,7 @@ export class TableManagerBase {
 
   /**
    * Get the item from an index
-   * @param {number} itemIndex
+   * @param {Number} itemIndex
    * @returns
    */
   getItemByIndex(itemIndex) {
@@ -154,7 +154,7 @@ export class TableManagerBase {
 
   /**
    * get a item matching itemname
-   * @param {string} itemName
+   * @param {String} itemName
    * @returns item object
    */
   getItemByName(itemName) {
@@ -173,7 +173,7 @@ export class TableManagerBase {
 
   /**
    * Get the item from an index
-   * @param {number} itemIndex
+   * @param {Number} itemIndex
    * @returns
    */
   getItemByIndex(itemIndex) {
@@ -183,8 +183,8 @@ export class TableManagerBase {
 
   /**
    * Rename the item at index with newName
-   * @param {number} itemIndex
-   * @param {string} newName
+   * @param {Number} itemIndex
+   * @param {String} newName
    * @returns {String} new name or undefined
    */
   renameItem(itemIndex, newName) {
@@ -222,8 +222,8 @@ export class TableManagerBase {
 
   /**
    * Update all items that use item
-   * @param {string} oldItemName
-   * @param {string} newItemName
+   * @param {String} oldItemName
+   * @param {String} newItemName
    */
   updateSceneItem(oldItemName, newItemName) {
     for (let i = 0; i < DesignCore.Scene.items.length; i++) {
@@ -235,9 +235,9 @@ export class TableManagerBase {
 
   /**
    * Update the item property with value
-   * @param {number} itemIndex
-   * @param {string} property
-   * @param {any} value
+   * @param {Number} itemIndex
+   * @param {String} property
+   * @param {Any} value
    */
   updateItem(itemIndex, property, value) {
     // check of the index exists

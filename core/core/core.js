@@ -82,7 +82,7 @@ export class Core {
 
   /**
    * Set the external notification callback
-   * @param  {object} function
+   * @param  {Object} function
    */
   setExternalNotifyCallbackFunction(callback) {
     // set the callback
@@ -91,7 +91,7 @@ export class Core {
 
   /**
    * Call the external notification callback
-   * @param  {string} message
+   * @param  {String} message
    */
   notify(message) {
     if (this.externalNotifyCallbackFunction) {
@@ -103,7 +103,7 @@ export class Core {
 
   /**
    * Open the dxf file represented by the file parameter
-   * @param  {string} file
+   * @param  {String} file
    */
   openFile(file) {
     FileIO.openFile(file);
@@ -112,7 +112,7 @@ export class Core {
 
   /**
    * Save the current scene to a dxf string
-   * @return {string} The dxf file as a string.
+   * @return {String} The dxf file as a string.
    */
   saveFile(version) {
     return FileIO.saveDxf(version);

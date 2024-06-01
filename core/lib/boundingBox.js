@@ -88,8 +88,8 @@ export class BoundingBox {
 
   /**
    * Calculate the boundingbox for a line
-   * @param {point} startPoint
-   * @param {point} endPoint
+   * @param {Point} startPoint
+   * @param {Point} endPoint
    * @returns - BoundingBox
    */
   static lineBoundingBox( startPoint, endPoint) {
@@ -98,10 +98,10 @@ export class BoundingBox {
 
   /**
    * Calculate the boundingbox for an arc
-   * @param {point} centerPoint
-   * @param {point} startPoint
-   * @param {point} endPoint
-   * @param {number} direction - ccw > 0, cw < 0
+   * @param {Point} centerPoint
+   * @param {Point} startPoint
+   * @param {Point} endPoint
+   * @param {Number} direction - ccw > 0, cw < 0
    * @returns - BoundingBox
    */
   static arcBoundingBox(centerPoint, startPoint, endPoint, direction=1) {
@@ -140,10 +140,10 @@ export class BoundingBox {
    * start: 45 - 90 + 360 % 360 = 315
    * end: 95 -90 + 360 = 5
    * if start > end; arc crosses axis
-   * @param {number} startAngle - angle in radians
-   * @param {number} endAngle - angle in radians
-   * @param {number} axisAngle - angle in radians. i.e 90 deg = Math.PI / 2.
-   * @param {number} direction - ccw > 0, cw < 0
+   * @param {Number} startAngle - angle in radians
+   * @param {Number} endAngle - angle in radians
+   * @param {Number} axisAngle - angle in radians. i.e 90 deg = Math.PI / 2.
+   * @param {Number} direction - ccw > 0, cw < 0
    * @returns bool
    */
   static crossesAxis(startAngle, endAngle, axisAngle, direction=1) {

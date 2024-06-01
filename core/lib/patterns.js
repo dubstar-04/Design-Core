@@ -47,7 +47,7 @@ export class PatternLine {
 export class Patterns {
   /**
      * Get Pattern
-     * @param {string} name
+     * @param {String} name
      * @returns pattern string for the pattern name
      */
   static getPattern(name) {
@@ -67,7 +67,7 @@ export class Patterns {
 
   /**
      * Get Pattern line count
-     * @param {string} name
+     * @param {String} name
      * @returns int for the number of pattern lines
      */
   static getPatternLineCount(name) {
@@ -81,7 +81,7 @@ export class Patterns {
 
   /**
    * Check if the pattern exists
-   * @param {string} name
+   * @param {String} name
    * @returns bool
    */
   static patternExists(name) {

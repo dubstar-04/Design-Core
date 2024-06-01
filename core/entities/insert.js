@@ -15,7 +15,8 @@ import {DesignCore} from '../designCore.js';
  */
 export class Insert extends Entity {
   /**
-   *
+   * Create an Insert
+   * Inserts are used to define the location of blocks
    * @param {Array} data
    */
   constructor(data) {
@@ -150,7 +151,7 @@ export class Insert extends Entity {
 
   /**
    * Set the insert rotation
-   * @param {number} angle - degrees
+   * @param {Number} angle - degrees
    */
   setRotation(angle) {
     // This overwrites the rotation rather than add to it.
@@ -166,7 +167,7 @@ export class Insert extends Entity {
 
   /**
      * Get the insert rotation
-     * @return {number} angle - degrees
+     * @return {Number} angle - degrees
      */
   getRotation() {
     if (this.points[1] !== undefined) {

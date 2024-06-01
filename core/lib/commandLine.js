@@ -39,7 +39,7 @@ export class CommandLine {
 
   /**
    * Sets the commandline prompt
-   * @param {string} prompt
+   * @param {String} prompt
    */
   setPrompt(prompt) {
     // Parse default options from prompt. Defaults are enclosed in arrows <>
@@ -86,7 +86,7 @@ export class CommandLine {
 
   /**
    * Handles keypresses at the commandline
-   * @param {string} key
+   * @param {String} key
    */
   handleKeys(key) {
     switch (key) {
@@ -206,7 +206,7 @@ export class CommandLine {
 
   /**
    * Converts input to a type
-   * @param {string} input
+   * @param {String} input
    */
   parseInput(input) {
     const isNumber = /^[-]?\d+(?:\.\d+)?$/.test(input);
@@ -246,7 +246,7 @@ export class CommandLine {
 
   /**
    * Adds commands to the command history
-   * @param {string} item
+   * @param {String} item
    */
   addToCommandHistory(item) {
     // add the command to the commandline history stored in last command
@@ -261,7 +261,7 @@ export class CommandLine {
 
   /**
    * Handles cycling the command history
-   * @param {string} direction - up/down
+   * @param {String} direction - up/down
    */
   previousCommand(direction) {
     if (direction === 'up') {

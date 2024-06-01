@@ -314,7 +314,7 @@ export class BasePolyline extends Entity {
 
   /**
    * Get the bulge value from the previous segment and the selected point
-   * @param {point} point
+   * @param {Point} point
    * @returns polyline bulge value
    */
   getBulgeFromSegment(point) {

@@ -247,8 +247,8 @@ export class Canvas {
   /**
    * Set the scene context
    * @param {entity} item
-   * @param {object} context - scene painting context from ui
-   * @param {object} block - insert element for the current block, required for colour ByBlock
+   * @param {Object} context - scene painting context from ui
+   * @param {Object} block - insert element for the current block, required for colour ByBlock
    */
   setContext(item, context, block = undefined) {
     let colour = item.getDrawColour();

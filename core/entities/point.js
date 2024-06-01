@@ -209,7 +209,7 @@ export class Point {
    * @param {Point} startPoint
    * @param {Point} endPoint
    * @param {Point} centerPoint
-   * @param {number} direction - CCW if > 0
+   * @param {Number} direction - CCW if > 0
    * @returns the closest point on the arc or null
    */
   closestPointOnArc(startPoint, endPoint, centerPoint, direction=0) {
@@ -238,7 +238,7 @@ export class Point {
    * @param {Point} startPoint
    * @param {Point} endPoint
    * @param {Point} centerPoint
-   * @param {number} direction - CCW if > 0
+   * @param {Number} direction - CCW if > 0
    * @returns true or false
    */
 

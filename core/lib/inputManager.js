@@ -17,7 +17,7 @@ export class PromptOptions {
 
   /**
    * Return data to the input request
-   * @param {any} input
+   * @param {Any} input
    */
   respond(input) {
     if (this.types.includes(Input.getType(input))) {
@@ -50,7 +50,7 @@ export class PromptOptions {
 
   /**
    * Match the input to a command option
-   * @param {any} input
+   * @param {Any} input
    * @returns undefined or the matched option
    */
   parseInputToOption(input) {
@@ -93,7 +93,7 @@ export class PromptOptions {
 
   /**
    * Underline the shortcut key for the prompt option
-   * @param {string} option
+   * @param {String} option
    * @returns - option with shortcut underlined
    */
   getOptionWithShortcut(option) {
@@ -103,7 +103,7 @@ export class PromptOptions {
 
   /**
    * Set the resolve callback
-   * @param {any} resolve - callback function
+   * @param {Any} resolve - callback function
    */
   setResolve(resolve) {
     this.resolve = resolve;
@@ -111,7 +111,7 @@ export class PromptOptions {
 
   /**
    * Set the reject callback
-   * @param {any} reject - callback function
+   * @param {Any} reject - callback function
    */
   setReject(reject) {
     this.reject = reject;
@@ -130,7 +130,7 @@ export class Input {
 
   /**
    * Return the Input.Type for value
-   * @param {any} value
+   * @param {Any} value
    * @returns
    */
   static getType(value) {
@@ -209,7 +209,7 @@ export class InputManager {
 
   /**
    * Handle command input
-   * @param {any} input
+   * @param {Any} input
    */
   onCommand(input) {
     if (this.activeCommand !== undefined) {
@@ -343,7 +343,7 @@ export class InputManager {
 
   /**
  * Handle mouse down
- * @param {integer} button
+ * @param {Number} button
  */
   mouseDown(button) {
     switch (button) {
@@ -361,7 +361,7 @@ export class InputManager {
 
   /**
  * Handle mouse up
- * @param {integer} button
+ * @param {Number} button
  */
   mouseUp(button) {
     switch (button) {
@@ -408,7 +408,7 @@ export class InputManager {
 
   /**
  * Initialise commands
- * @param {string} command
+ * @param {String} command
  */
   initialiseItem(command) {
     DesignCore.Scene.saveRequired();
@@ -418,7 +418,7 @@ export class InputManager {
 
   /**
    * Set the command prompt
-   * @param {string} prompt
+   * @param {String} prompt
    */
   setPrompt(prompt) {
     // TODO: single line method required?

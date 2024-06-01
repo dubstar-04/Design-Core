@@ -1,7 +1,7 @@
 export class Utils {
   /**
    * Convert degrees to radians
-   * @param {number} degrees
+   * @param {Number} degrees
    * @returns angle in radians
    */
   static degrees2radians(degrees) {
@@ -10,7 +10,7 @@ export class Utils {
 
   /**
    * Convert radians to degrees
-   * @param {number} radians
+   * @param {Number} radians
    * @returns angle in degrees
    */
   static radians2degrees(radians) {
@@ -19,7 +19,7 @@ export class Utils {
 
   /**
    * Round to 5 decimal places
-   * @param {number} number
+   * @param {Number} number
    * @returns rounded number
    */
   static round(number) {
@@ -28,7 +28,7 @@ export class Utils {
 
   /**
    * Deep clone object
-   * @param {objec} obj - object to clone
+   * @param {Object} obj - object to clone
    * @returns - new cloned object
    */
   static cloneObject(obj) {
@@ -53,9 +53,9 @@ export class Utils {
    * Returns a levenshtein edit distance to the input strings
    * The distance represents the minimum number of character edits required to change one string into the other.
    * a lower number suggests the strings are more similar and value of 0 means they are the same.
-   * @param {string} a
-   * @param {string} b
-   * @returns {integer} levenshtein edit distance
+   * @param {String} a
+   * @param {String} b
+   * @returns {Number} levenshtein edit distance
    * inspired by https://gist.github.com/andrei-m/982927
    */
   static getLevenshteinDistance(a, b) {

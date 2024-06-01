@@ -16,8 +16,8 @@ import {DesignCore} from '../designCore.js';
  */
 export class AlignedDimension extends BaseDimension {
   /**
-   *
-   * @param {*} data
+   * Create an Aligned Dimension
+   * @param {Array} data
    */
   constructor(data) {
     super(data);

@@ -85,7 +85,7 @@ export class SelectionManager {
 
   /**
    * Get the rectangle points formed between mouseDown and current mouse location
-   * @return {array} selectionRect - [x1, x2, y1, y2]
+   * @return {Array} selectionRect - [x1, x2, y1, y2]
    */
   getSelectionRect() {
     // TODO: It would be nice if this returned an object {xmin: xmin, ymin:ymin ...}
@@ -120,7 +120,7 @@ export class SelectionManager {
   /**
    * Find closest item to point
    * @param  {Point} point
-   * @returns {Integer} - return index of closest item or undefined
+   * @returns {Number} - return index of closest item or undefined
    */
   findClosestItem(point) {
     let delta = 1.65 /DesignCore.Core.canvas.getScale(); // find a more suitable starting value
@@ -147,7 +147,7 @@ export class SelectionManager {
 
   /**
   * Remove the item at index from the selectionSet and selectedItems
-  * @param  {Integer} index - index of the item in scene.items
+  * @param  {Number} index - index of the item in scene.items
   */
   removeFromSelectionSet(index) {
     const itemIndex = this.selectionSet.selectionSet.indexOf(index);
@@ -159,7 +159,7 @@ export class SelectionManager {
 
   /**
   * Add the item at index to the selectionSet and selectedItems
-  * @param  {Integer} index
+  * @param  {Number} index
   */
   addToSelectionSet(index) {
     if (index === undefined) {
@@ -174,7 +174,7 @@ export class SelectionManager {
 
   /**
    * Duplicate the item at index and add to selectedItems
-   * @param  {Integer} index
+   * @param  {Number} index
    */
   addToSelectedItems(index) {
     const copyofitem = Utils.cloneObject(DesignCore.Scene.items[index]);

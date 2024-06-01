@@ -40,8 +40,8 @@ export class Matrix {
 
   /**
    * Apply tranlation to matrix
-   * @param {number} x - translation in x
-   * @param {number} y - translation in y
+   * @param {Number} x - translation in x
+   * @param {Number} y - translation in y
    */
   translate(x, y) {
     this.e += this.a * x + this.c * y;
@@ -50,8 +50,8 @@ export class Matrix {
 
   /**
    * Apply scale to matrix
-   * @param {number} sx - scale in x
-   * @param {number} sy - scale in x
+   * @param {Number} sx - scale in x
+   * @param {Number} sy - scale in x
    */
   scale(sx, sy) {
     this.a *= sx;
@@ -62,8 +62,8 @@ export class Matrix {
 
   /**
    * Returns px and py transformed to matrix (scene) co-ordinates
-   * @param {number} px
-   * @param {number} py
+   * @param {Number} px
+   * @param {Number} py
    * @returns
    */
   transformPoint(px, py) {

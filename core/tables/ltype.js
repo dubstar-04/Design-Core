@@ -50,7 +50,7 @@ export class LType {
 
   /**
    * Get a dash pattern that cairo and html canvas understand
-   * @param {array} scale
+   * @param {Array} scale
    * @returns array for dash pattern
    */
   getPattern(scale) {

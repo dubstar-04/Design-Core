@@ -12,7 +12,7 @@ import {Logging} from './logging.js';
 export class Colours {
 /**
  * Check rgb is a valid rgb object
- * @param {object} rgb
+ * @param {Object} rgb
  * @returns bool - true if the object is an rgb colour, otherwise false.
  */
   static isRGB(rgb) {
@@ -47,7 +47,7 @@ export class Colours {
 
   /**
    * Convert a rgb colour to an AutoCAD colour index (ACI)
-   * @param {object} rgb
+   * @param {Object} rgb
    * @returns
    */
   static rgbToACI(rgb) {
@@ -72,7 +72,7 @@ export class Colours {
 
   /**
    * Convert rgb colour to formatted string
-   * @param {object} rgb
+   * @param {Object} rgb
    * @returns
    */
   static rgbToString(rgb) {
@@ -85,7 +85,7 @@ export class Colours {
 
   /**
    * Get RGB colour components scaled 0 - 1 from rgb colour
-   * @param  {object} object with r, g, and b values
+   * @param  {Object} object with r, g, and b values
    * @return - scaled rgb object or undefined
    */
   static rgbToScaledRGB(rgb) {
@@ -123,7 +123,7 @@ export class Colours {
 
   /**
    * Get the trueColour value for rgb colour
-   * @param {object} rgb
+   * @param {Object} rgb
    * @returns integer representing the rgb value as a trueColor
    */
   static rgbToTrueColour(rgb) {

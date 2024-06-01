@@ -38,7 +38,7 @@ export class Colour {
 
   /**
    * Set rgb colour based on autocad colour index
-   * @param {number} aci
+   * @param {Number} aci
    */
   setColourFromACI(aci) {
     // try and get the rgb from the aci

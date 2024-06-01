@@ -31,8 +31,8 @@ export class Settings {
 
   /**
    * Sets the value of the setting
-   * @param {string} setting
-   * @param {any} value
+   * @param {String} setting
+   * @param {Any} value
    */
   setSetting(setting, value) {
     // TODO: Check setting is valid
@@ -45,7 +45,7 @@ export class Settings {
 
   /**
    * Returns the value of the setting
-   * @param {string} setting
+   * @param {String} setting
    * @returns
    */
   getSetting(setting) {

@@ -3,7 +3,7 @@ import {Point} from '../entities/point.js';
 export class Intersection {
   /**
    * Intersection constructor
-   * @param {string} status - defined status of the intersection i.e inside or outside of shape
+   * @param {String} status - defined status of the intersection i.e inside or outside of shape
    */
   constructor(status) {
     this.status = status;
@@ -12,7 +12,7 @@ export class Intersection {
 
   /**
    * Append point to suggested intersecting points
-   * @param {point} point
+   * @param {Point} point
    */
   appendPoint(point) {
     // check if point already exists in the array
@@ -29,7 +29,7 @@ export class Intersection {
 
   /**
    * Append points to suggested intersecting points
-   * @param {array} points
+   * @param {Array} points
    */
   appendPoints(points) {
     // Forward all points through appendPoint
@@ -40,9 +40,9 @@ export class Intersection {
 
   /**
    * Find intersections between circle and line
-   * @param {circle} circle
-   * @param {line} line
-   * @param {boolean} extend - extend the line as a ray
+   * @param {Circle} circle
+   * @param {Line} line
+   * @param {Boolean} extend - extend the line as a ray
    * @returns
    */
   static intersectCircleLine(circle, line, extend) {
@@ -104,9 +104,9 @@ export class Intersection {
 
   /**
    * Find intersections between circle and line
-   * @param {line} line
-   * @param {circle} circle
-   * @param {boolean} extend - extend the line as a ray
+   * @param {Line} line
+   * @param {Circle} circle
+   * @param {Boolean} extend - extend the line as a ray
    * @returns
    */
   static intersectLineCircle(line, circle, extend) {
@@ -115,9 +115,9 @@ export class Intersection {
 
   /**
    * Find intersections between two circles
-   * @param {circle} circle1
-   * @param {circle} circle2
-   * @param {boolean} extend  - unused
+   * @param {Circle} circle1
+   * @param {Circle} circle2
+   * @param {Boolean} extend  - unused
    * @returns
    */
   static intersectCircleCircle(circle1, circle2, extend) {
@@ -161,9 +161,9 @@ export class Intersection {
 
   /**
    * Find intersections between arc segment and rectangle
-   * @param {arc} arc
-   * @param {rectangle} rectangle
-   * @param {boolean} extend
+   * @param {Arc} arc
+   * @param {Rectangle} rectangle
+   * @param {Boolean} extend
    * @returns
    */
   static intersectArcRectangle(arc, rectangle, extend) {
@@ -206,9 +206,9 @@ export class Intersection {
 
   /**
    * Find intersections between arc segment and line
-   * @param {arc} arc
-   * @param {line} line
-   * @param {boolean} extend
+   * @param {Arc} arc
+   * @param {Line} line
+   * @param {Boolean} extend
    * @returns
    */
   static intersectArcLine(arc, line, extend) {
@@ -232,9 +232,9 @@ export class Intersection {
 
   /**
    * Find intersections between line and arc segment
-   * @param {line} line
-   * @param {arc} arc
-   * @param {boolean} extend
+   * @param {Line} line
+   * @param {Arc} arc
+   * @param {Boolean} extend
    * @returns
    */
   static intersectLineArc(line, arc, extend) {
@@ -243,9 +243,9 @@ export class Intersection {
 
   /**
    * Find intersections between circle and arc segment
-   * @param {circle} circle
-   * @param {arc} arc
-   * @param {boolean} extend
+   * @param {Circle} circle
+   * @param {Arc} arc
+   * @param {Boolean} extend
    * @returns
    */
   static intersectCircleArc(circle, arc, extend) {
@@ -269,9 +269,9 @@ export class Intersection {
 
   /**
    * Find intersections between
-   * @param {arc} arc
-   * @param {circle} circle
-   * @param {boolean} extend
+   * @param {Arc} arc
+   * @param {Circle} circle
+   * @param {Boolean} extend
    * @returns
    */
   static intersectArcCircle(arc, circle, extend) {
@@ -280,9 +280,9 @@ export class Intersection {
 
   /**
    * Find intersections between circle and rectangle
-   * @param {circle} circle
-   * @param {rectangle} rectangle
-   * @param {boolean} extend
+   * @param {Circle} circle
+   * @param {Rectangle} rectangle
+   * @param {Boolean} extend
    * @returns
    */
   static intersectCircleRectangle(circle, rectangle, extend) {
@@ -325,9 +325,9 @@ export class Intersection {
 
   /**
    * Find intersections between two lines
-   * @param {line} line1
-   * @param {line} line2
-   * @param {boolean} extend
+   * @param {Line} line1
+   * @param {Line} line2
+   * @param {Boolean} extend
    * @returns
    */
   static intersectLineLine(line1, line2, extend) {
@@ -369,9 +369,9 @@ export class Intersection {
 
   /**
    * Find intersections between lwpolyline and line
-   * @param {polyline} polyline
-   * @param {line} line
-   * @param {boolean} extend
+   * @param {Polyline} polyline
+   * @param {Line} line
+   * @param {Boolean} extend
    * @returns
    */
   static intersectLwpolylineLine(polyline, line, extend) {
@@ -380,9 +380,9 @@ export class Intersection {
 
   /**
    * Find intersections between polyline and line
-   * @param {polyline} polyline
-   * @param {line} line
-   * @param {boolean} extend
+   * @param {Polyline} polyline
+   * @param {Line} line
+   * @param {Boolean} extend
    * @returns
    */
   static intersectPolylineLine(polyline, line, extend) {
@@ -418,8 +418,8 @@ export class Intersection {
   /**
    * Find intersections between hatch and rectangle
    * @param {Array} polylines
-   * @param {rectangle} rectangle
-   * @param {boolean} extend
+   * @param {Rectangle} rectangle
+   * @param {Boolean} extend
    * @returns
    */
   static intersectHatchRectangle(polylines, rectangle, extend) {
@@ -436,9 +436,9 @@ export class Intersection {
 
   /**
    * Find intersections between lwpolyline and rectangle
-   * @param {polyline} polyline
-   * @param {rectangle} rectangle
-   * @param {boolean} extend
+   * @param {Polyline} polyline
+   * @param {Rectangle} rectangle
+   * @param {Boolean} extend
    * @returns
    */
   static intersectLwpolylineRectangle(polyline, rectangle, extend) {
@@ -447,9 +447,9 @@ export class Intersection {
 
   /**
    * Find intersections between polyline and rectangle
-   * @param {polyline} polyline
-   * @param {rectangle} rectangle
-   * @param {boolean} extend
+   * @param {Polyline} polyline
+   * @param {Rectangle} rectangle
+   * @param {Boolean} extend
    * @returns
    */
   static intersectPolylineRectangle(polyline, rectangle, extend) {
@@ -491,9 +491,9 @@ export class Intersection {
 
   /**
    * Find intersections between line and rectangle
-   * @param {line} line
-   * @param {rectangle} rectangle
-   * @param {boolean} extend
+   * @param {Line} line
+   * @param {Rectangle} rectangle
+   * @param {Boolean} extend
    * @returns
    */
   static intersectLineRectangle(line, rectangle, extend) {
@@ -534,9 +534,9 @@ export class Intersection {
 
   /**
    * Find intersections between rectangle and line
-   * @param {rectangle} rectangle
-   * @param {line} line
-   * @param {boolean} extend
+   * @param {Rectangle} rectangle
+   * @param {Line} line
+   * @param {Boolean} extend
    * @returns
    */
   static intersectRectangleLine(rectangle, line, extend) {
@@ -546,9 +546,9 @@ export class Intersection {
   /**
    * Find intersections between text and rectangles
    * Text is represented by its bounding box
-   * @param {text} text
-   * @param {rectangle} rectangle
-   * @param {boolean} extend
+   * @param {Text} text
+   * @param {Rectangle} rectangle
+   * @param {Boolean} extend
    * @returns
    */
   static intersectTextRectangle(text, rectangle, extend) {
@@ -557,9 +557,9 @@ export class Intersection {
 
   /**
    * Find intersections between two rectangles
-   * @param {rectangle} rectangle1
-   * @param {rectangle} rectangle2
-   * @param {boolean} extend
+   * @param {Rectangle} rectangle1
+   * @param {Rectangle} rectangle2
+   * @param {Boolean} extend
    * @returns
    */
   static intersectRectangleRectangle(rectangle1, rectangle2, extend) {

@@ -85,7 +85,7 @@ export class CommandManager {
 
   /**
    * Register each of the available commands
-   * @param {string} command
+   * @param {String} command
    */
   registerCommand(command) {
     this.commands.push(command);
@@ -101,8 +101,8 @@ export class CommandManager {
 
   /**
    * Create a new instance of type using data
-   * @param {string} type
-   * @param {array} data
+   * @param {String} type
+   * @param {Array} data
    * @returns instance of type
    */
   createNew(type, data) {
@@ -119,7 +119,7 @@ export class CommandManager {
 
   /**
    * Check if input is valid command or shortcut
-   * @param {string} input
+   * @param {String} input
    * @returns boolean
    */
   isCommandOrShortcut(input) {
@@ -145,7 +145,7 @@ export class CommandManager {
 
   /**
    * Check if shortcut is valid
-   * @param {string} shortcut
+   * @param {String} shortcut
    * @returns boolean
    */
   isShortcut(shortcut) {
@@ -155,7 +155,7 @@ export class CommandManager {
 
   /**
    * Check if command is valid
-   * @param {string} command
+   * @param {String} command
    * @returns boolean
    */
   isCommand(command) {
@@ -170,7 +170,7 @@ export class CommandManager {
 
   /**
   * Returns the command for a valid input
-  * @param {string} input
+  * @param {String} input
   * @returns valid type
   */
   getCommand(input) {
@@ -194,8 +194,8 @@ export class CommandManager {
 
   /**
    * Returns the shortcut for a valid command
-   * @param {string} command
-   * @returns {string} shortcut
+   * @param {String} command
+   * @returns {String} shortcut
    */
   getShortcut(command) {
     let shortcut;
@@ -211,8 +211,8 @@ export class CommandManager {
 
   /**
    * Returns a fuzzy match to the input command
-   * @param {string} input
-   * @returns {string} fuzzy matched command
+   * @param {String} input
+   * @returns {String} fuzzy matched command
    */
   getFuzzyMatch(input) {
     let score = Infinity;

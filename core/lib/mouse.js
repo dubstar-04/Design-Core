@@ -34,7 +34,7 @@ export class Mouse {
 
   /**
    * Transforms the point location from canvas to scene space
-   * @param {point} point
+   * @param {Point} point
    * @returns
    */
   transformToScene(point) {
@@ -44,7 +44,7 @@ export class Mouse {
 
   /**
    * Transforms the point location from scene to canvas space
-   * @param {point} point
+   * @param {Point} point
    * @returns
    */
   transformToCanvas(point) {
@@ -66,8 +66,8 @@ export class Mouse {
 
   /**
    * Sets the mouse position to x and y
-   * @param {number} x
-   * @param {number} y
+   * @param {Number} x
+   * @param {Number} y
    */
   mouseMoved(x, y) {
     // x: mouse x pos
@@ -97,7 +97,7 @@ export class Mouse {
 
   /**
    * Handles mouse down
-   * @param {number} button - 0 = left, 1 = wheel, 2 = right;
+   * @param {Number} button - 0 = left, 1 = wheel, 2 = right;
    */
   mouseDown(button) {
     this.mouseDownCanvasPoint = this.pointOnCanvas();
@@ -143,7 +143,7 @@ export class Mouse {
 
   /**
    * Handles mouse down
-   * @param {number} button - 0 = left, 1 = wheel, 2 = right;
+   * @param {Number} button - 0 = left, 1 = wheel, 2 = right;
    */
   mouseUp(button) {
     switch (button) {
@@ -163,7 +163,7 @@ export class Mouse {
 
   /**
    * Handles double clicks
-   * @param {number} button - 0 = left, 1 = wheel, 2 = right;
+   * @param {Number} button - 0 = left, 1 = wheel, 2 = right;
    */
   doubleClick(button) {
     DesignCore.Canvas.doubleClick(button);
@@ -171,7 +171,7 @@ export class Mouse {
 
   /**
    * Handles house wheel input for zoom action
-   * @param {number} delta - +/- 1 for zoom in / out
+   * @param {Number} delta - +/- 1 for zoom in / out
    */
   wheel(delta) {
     DesignCore.Canvas.wheel(delta);
@@ -179,7 +179,7 @@ export class Mouse {
 
   /**
    * set mouse position from scene coordinates
-   * @param {point} point
+   * @param {Point} point
    */
   setPosFromScenePoint(point) {
     const mousePos = this.transformToCanvas(point);

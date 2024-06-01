@@ -606,7 +606,7 @@ export class DimStyle {
 
   /**
    * Get valueName property value from dimstyle
-   * @param {string} valueName
+   * @param {String} valueName
    * @returns value or undefined
    */
   getValue(valueName) {
@@ -630,7 +630,7 @@ export class DimStyle {
 
   /**
    * Set the vertical value
-   * @param {boolean} bool
+   * @param {Boolean} bool
    */
   set vertical(bool) {
     if (bool) {

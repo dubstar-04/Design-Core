@@ -109,7 +109,7 @@ export class Layer {
 
   /**
      * Set the frozen value
-     * @param {boolean} bool
+     * @param {Boolean} bool
      */
   set frozen(bool) {
     if (bool) {
@@ -132,7 +132,7 @@ export class Layer {
 
   /**
        * Set the locked value
-       * @param {boolean} bool
+       * @param {Boolean} bool
        */
   set locked(bool) {
     if (bool) {
@@ -170,7 +170,7 @@ export class Layer {
 
   /**
    * Set the layer colour
-   * @param {object} colour - rgb colour
+   * @param {Object} colour - rgb colour
    */
   setColour(colour) {
     this.layerColour.setColour(colour);
