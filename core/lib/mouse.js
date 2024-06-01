@@ -121,7 +121,7 @@ export class Mouse {
 
   /**
    * Timer function for recognizing double clicks
-   * @param {*} button  - 0 = left, 1 = wheel, 2 = right;
+   * @param {Number} button  - 0 = left, 1 = wheel, 2 = right;
    * @returns
    */
   isDoubleClick(button) {
