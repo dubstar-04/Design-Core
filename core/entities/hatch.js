@@ -250,8 +250,8 @@ export class Hatch extends Entity {
   /**
    * Get value from incoming data
    * handle arrays and single values
-   * @param {*} data
-   * @param {*} dxfCode
+   * @param {Any} data
+   * @param {Number} dxfCode
    * @returns
    */
   getDataValue(data, dxfCode) {

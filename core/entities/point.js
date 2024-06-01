@@ -185,8 +185,8 @@ export class Point {
 
   /**
    * Find the closest point on a line between start and end points
-   * @param {*} startPoint
-   * @param {*} endPoint
+   * @param {Point} startPoint
+   * @param {Point} endPoint
    * @returns the closest point on the line
    */
   closestPointOnLine(startPoint, endPoint) {

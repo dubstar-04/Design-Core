@@ -41,7 +41,7 @@ export class DXFFile {
 
   /**
    * Return the dxf key for the dxf version e.g key = R12 version = 'AC1009'
-   * @param {*} dxfVersion
+   * @param {String} dxfVersion
    * @returns dxf key (R Number) for valid dxf versions
    */
   static getVersionKey(dxfVersion) {

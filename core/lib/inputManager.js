@@ -392,7 +392,7 @@ export class InputManager {
 
   /**
    * Handle canvas selection
-   * @param {*} selection
+   * @param {Selection} selection
    */
   onSelection(selection) {
     if (this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
@@ -427,8 +427,8 @@ export class InputManager {
 
   /**
    * Execute the currently active command then reset
-   * @param {*} item - item to create
-   * @param {*} index - index of item in scene.items
+   * @param {Object} item - item to create
+   * @param {Number} index - index of item in scene.items
    */
   executeCommand(item, index = undefined) {
     this.actionCommand(item, index);
@@ -437,8 +437,8 @@ export class InputManager {
 
   /**
    * Execute the currently active command without reset
-   * @param {*} item - item to create
-   * @param {*} index - index of item in scene.items
+   * @param {Object} item - item to create
+   * @param {Number} index - index of item in scene.items
    */
   actionCommand(item, index = undefined) {
     if (this.activeCommand instanceof Tool) {
