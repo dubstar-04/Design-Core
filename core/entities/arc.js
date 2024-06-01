@@ -15,6 +15,10 @@ import {Property} from '../properties/property.js';
  * @extends Entity
  * */
 export class Arc extends Entity {
+  /**
+   * Create an Arc Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
     this.radius = 1;

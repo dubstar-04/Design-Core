@@ -7,6 +7,10 @@ import {BoundingBox} from '../lib/boundingBox.js';
  * @extends Entity
  */
 export class Solid extends Entity {
+  /**
+   * Create a Solid Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
   }

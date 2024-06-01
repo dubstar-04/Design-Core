@@ -6,6 +6,10 @@ import {Point} from './point.js';
  * @extends BasePolyline
  */
 export class Polyline extends BasePolyline {
+  /**
+   * Create a Polyline
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 

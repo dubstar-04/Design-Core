@@ -25,6 +25,10 @@ import {Property} from '../properties/property.js';
  * @extends Entity
  */
 export class Hatch extends Entity {
+  /**
+   * Create a Hatch Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 

@@ -12,6 +12,10 @@ import {DesignCore} from '../designCore.js';
  * @extends Entity
  */
 export class BaseDimension extends Entity {
+  /**
+   * Create a Base Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 

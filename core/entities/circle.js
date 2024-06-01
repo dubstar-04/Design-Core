@@ -14,6 +14,10 @@ import {DesignCore} from '../designCore.js';
  * @extends Entity
  */
 export class Circle extends Entity {
+  /**
+   * Create a Circle Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 

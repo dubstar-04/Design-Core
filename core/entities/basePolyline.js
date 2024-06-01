@@ -16,6 +16,10 @@ import {DesignCore} from '../designCore.js';
  * @extends Entity
  */
 export class BasePolyline extends Entity {
+  /**
+   * Create a Base Polyline
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 

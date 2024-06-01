@@ -16,6 +16,10 @@ import {DesignCore} from '../designCore.js';
  * @extends BaseDimension
  */
 export class AngularDimension extends BaseDimension {
+  /**
+   * Create an Angular Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
   }

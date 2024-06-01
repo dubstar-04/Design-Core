@@ -12,6 +12,10 @@ import {DesignCore} from '../designCore.js';
  * @extends Entity
  */
 export class Rectangle extends Entity {
+  /**
+   * Create a Rectangle
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
     // There is no DXF representation of a Rectangle

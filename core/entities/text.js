@@ -16,6 +16,10 @@ import {DesignCore} from '../designCore.js';
  * @extends Entity
  */
 export class Text extends Entity {
+  /**
+   * Create a Text Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
     this.string = '';

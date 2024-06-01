@@ -14,6 +14,10 @@ import {DesignCore} from '../designCore.js';
  * @extends BaseDimension
  */
 export class DiametricDimension extends BaseDimension {
+  /**
+   * Create a Diametric Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
   }

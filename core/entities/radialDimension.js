@@ -13,6 +13,10 @@ import {DesignCore} from '../designCore.js';
  * @extends BaseDimension
  */
 export class RadialDimension extends BaseDimension {
+  /**
+   * Create a Radial Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
   }

@@ -21,6 +21,10 @@ import {SingleSelection} from '../lib/selectionManager.js';
  * @extends BaseDimension
  */
 export class Dimension extends BaseDimension {
+  /**
+   * Create a Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 

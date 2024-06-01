@@ -6,6 +6,10 @@ import {BasePolyline} from './basePolyline.js';
  * @extends BasePolyline
  */
 export class Lwpolyline extends BasePolyline {
+  /**
+   * Create an LW Polyline
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 

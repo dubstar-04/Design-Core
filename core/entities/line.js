@@ -13,6 +13,10 @@ import {DesignCore} from '../designCore.js';
  * @extends Entity
  */
 export class Line extends Entity {
+  /**
+   * Create a Line Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 

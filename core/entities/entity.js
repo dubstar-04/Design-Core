@@ -13,6 +13,10 @@ import {DesignCore} from '../designCore.js';
  * @extend Entity
  */
 export class Entity {
+  /**
+   * Create a Entity
+   * @param {Array} data
+   */
   constructor(data) {
     Object.defineProperty(this, 'type', {
       value: this.constructor.name,

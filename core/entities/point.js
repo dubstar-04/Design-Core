@@ -3,6 +3,7 @@ import {Utils} from '../lib/utils.js';
 /** Point Entity Class */
 export class Point {
   /**
+   * Create a Point
    * @param  {Number} x
    * @param  {Number} y
    * @param  {Number} bulge
