@@ -96,6 +96,11 @@ export class Circle extends Entity {
     this.points[1] = this.points[0].project(0, rad);
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {Number} scale
+   */
   draw(ctx, scale) {
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, 0, 6.283);
     ctx.stroke();

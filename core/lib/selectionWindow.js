@@ -28,7 +28,11 @@ export class SelectionWindow {
     }
   }
 
-
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {Number} scale
+   */
   draw(ctx, scale) {
     const colour = this.colour;
     ctx.fillStyle = colour;

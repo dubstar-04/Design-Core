@@ -10,6 +10,11 @@ class SnapPoint {
     this.snapPoint = snapPoint;
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {Number} scale
+   */
   draw(ctx, scale) {
     const snapColour = DesignCore.Settings.snapcolour;
     const radius = 4;

@@ -190,6 +190,11 @@ export class BaseDimension extends Entity {
     return arrowHead;
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {Number} scale
+   */
   draw(ctx, scale) {
     const style = DesignCore.DimStyleManager.getItemByName(this.styleName);
 

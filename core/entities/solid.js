@@ -15,6 +15,11 @@ export class Solid extends Entity {
     super(data);
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {Number} scale
+   */
   draw(ctx, scale) {
     this.points.forEach((point, index) => {
       if (index == 0) {

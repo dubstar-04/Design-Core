@@ -180,6 +180,11 @@ export class Block extends Entity {
     this.items.push(item);
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {Number} scale
+   */
   draw(ctx, scale, insert = undefined) {
     if (!this.items.length) {
       // nothing to draw

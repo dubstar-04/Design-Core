@@ -146,6 +146,11 @@ export class Insert extends Entity {
     }
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {Number} scale
+   */
   draw(ctx, scale) {
     // blocks are associated with an insert point.
     // translate ctx by the insert location

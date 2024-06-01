@@ -347,6 +347,11 @@ export class Text extends Entity {
     return rect;
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {Number} scale
+   */
   draw(ctx, scale) {
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
