@@ -146,6 +146,11 @@ export class AngularDimension extends BaseDimension {
     return points;
   }
 
+  /**
+   * Build the dimension
+   * @param {Object} style
+   * @returns {Array} - Array of entities that compose the dimension
+   */
   buildDimension(style) {
     // Angular
     let dimension = 0;

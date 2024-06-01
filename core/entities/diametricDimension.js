@@ -96,7 +96,11 @@ export class DiametricDimension extends BaseDimension {
     return points;
   }
 
-
+  /**
+   * Build the dimension
+   * @param {Object} style
+   * @returns {Array} - Array of entities that compose the dimension
+   */
   buildDimension() {
     // Diameter
     let dimension = 0;

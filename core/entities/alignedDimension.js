@@ -100,6 +100,11 @@ export class AlignedDimension extends BaseDimension {
     return points;
   }
 
+  /**
+   * Build the dimension
+   * @param {Object} style
+   * @returns {Array} - Array of entities that compose the dimension
+   */
   buildDimension(style) {
     const Pt1 = this.getPointBySequence(13);
     const Pt2 = this.getPointBySequence(14);

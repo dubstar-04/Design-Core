@@ -92,6 +92,11 @@ export class RadialDimension extends BaseDimension {
     return points;
   }
 
+  /**
+   * Build the dimension
+   * @param {Object} style
+   * @returns {Array} - Array of entities that compose the dimension
+   */
   buildDimension() {
     // Radius
 
