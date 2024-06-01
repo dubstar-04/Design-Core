@@ -17,6 +17,10 @@ export class PatternLine {
     }
   }
 
+  /**
+   * load the pattern line
+   * @param {String} patternString
+   */
   loadPatternLine(patternString) {
     const patternArray = patternString.split(',');
 
@@ -39,6 +43,10 @@ export class PatternLine {
     this.dashes = dashes;
   }
 
+  /**
+   * Get the length of all dash elements
+   * @returns {Number}
+   */
   getDashLength() {
     if (this.dashes.length) {
       // sum the length of all the dashes
