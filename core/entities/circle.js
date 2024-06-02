@@ -90,7 +90,7 @@ export class Circle extends Entity {
 
   /**
    * Get Circle radius
-   * @return {Number} - circle radius
+   * @return {number} - circle radius
    */
   getRadius() {
     return this.points[0].distance(this.points[1]);
@@ -98,7 +98,7 @@ export class Circle extends Entity {
 
   /**
    * Set Circle radius
-   * @param {Number} rad
+   * @param {number} rad
    */
   setRadius(rad) {
     this.points[1] = this.points[0].project(0, rad);
@@ -107,7 +107,7 @@ export class Circle extends Entity {
   /**
    * Draw the entity
    * @param {Object} ctx - context
-   * @param {Number} scale
+   * @param {number} scale
    */
   draw(ctx, scale) {
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, 0, 6.283);
@@ -189,7 +189,7 @@ export class Circle extends Entity {
   /**
    * Get snap points
    * @param {Point} mousePoint
-   * @param {Number} delta
+   * @param {number} delta
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {

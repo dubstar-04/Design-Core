@@ -6,7 +6,7 @@ import {DesignCore} from '../designCore.js';
 export class SingleSelection {
   /**
    * Create a SingleSelection
-   * @param {Number} index
+   * @param {number} index
    * @param {Point} point
    */
   constructor(index, point) {
@@ -131,7 +131,7 @@ export class SelectionManager {
   /**
    * Find closest item to point
    * @param  {Point} point
-   * @return {Number} - return index of closest item or undefined
+   * @return {number} - return index of closest item or undefined
    */
   findClosestItem(point) {
     let delta = 1.65 /DesignCore.Core.canvas.getScale(); // find a more suitable starting value
@@ -158,7 +158,7 @@ export class SelectionManager {
 
   /**
   * Remove the item at index from the selectionSet and selectedItems
-  * @param  {Number} index - index of the item in scene.items
+  * @param  {number} index - index of the item in scene.items
   */
   removeFromSelectionSet(index) {
     const itemIndex = this.selectionSet.selectionSet.indexOf(index);
@@ -170,7 +170,7 @@ export class SelectionManager {
 
   /**
   * Add the item at index to the selectionSet and selectedItems
-  * @param  {Number} index
+  * @param  {number} index
   */
   addToSelectionSet(index) {
     if (index === undefined) {
@@ -185,7 +185,7 @@ export class SelectionManager {
 
   /**
    * Duplicate the item at index and add to selectedItems
-   * @param  {Number} index
+   * @param  {number} index
    */
   addToSelectedItems(index) {
     const copyofitem = Utils.cloneObject(DesignCore.Scene.items[index]);

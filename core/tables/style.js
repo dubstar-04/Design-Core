@@ -91,7 +91,7 @@ export class Style {
 
   /**
    * Set the vertical value
-   * @param {Boolean} bool
+   * @param {boolean} bool
    */
   set vertical(bool) {
     if (bool) {
@@ -114,7 +114,7 @@ export class Style {
 
   /**
    * set the backwards value
-   * @param {Boolean} bool
+   * @param {boolean} bool
    */
   set backwards(bool) {
     if (bool) {
@@ -137,7 +137,7 @@ export class Style {
 
   /**
    * Set the upside down value
-   * @param {Boolean} bool
+   * @param {boolean} bool
    */
   set upsideDown(bool) {
     if (bool) {

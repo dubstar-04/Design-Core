@@ -2,8 +2,8 @@
 export class Utils {
   /**
    * Convert degrees to radians
-   * @param {Number} degrees
-   * @return {Number} angle in radians
+   * @param {number} degrees
+   * @return {number} angle in radians
    */
   static degrees2radians(degrees) {
     return degrees * Math.PI / 180;
@@ -11,8 +11,8 @@ export class Utils {
 
   /**
    * Convert radians to degrees
-   * @param {Number} radians
-   * @return {Number} angle in degrees
+   * @param {number} radians
+   * @return {number} angle in degrees
    */
   static radians2degrees(radians) {
     return radians * 180 / Math.PI;
@@ -20,8 +20,8 @@ export class Utils {
 
   /**
    * Round to 5 decimal places
-   * @param {Number} number
-   * @return {Number} rounded number
+   * @param {number} number
+   * @return {number} rounded number
    */
   static round(number) {
     return Number(number.toFixed(5));
@@ -54,9 +54,9 @@ export class Utils {
    * Returns a levenshtein edit distance to the input strings
    * The distance represents the minimum number of character edits required to change one string into the other.
    * a lower number suggests the strings are more similar and value of 0 means they are the same.
-   * @param {String} a
-   * @param {String} b
-   * @return {Number} levenshtein edit distance
+   * @param {string} a
+   * @param {string} b
+   * @return {number} levenshtein edit distance
    * inspired by https://gist.github.com/andrei-m/982927
    */
   static getLevenshteinDistance(a, b) {

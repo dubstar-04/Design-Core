@@ -25,7 +25,7 @@ export class Logging {
 
   /**
    * Set logging level
-   * @param {Number} level
+   * @param {number} level
    */
   setLevel(level) {
     if (this.logLevel.includes(level)) {
@@ -44,7 +44,7 @@ export class Logging {
 
   /**
    * Print debug message
-   * @param {String} msg
+   * @param {string} msg
    */
   debug(msg) {
     if (this.levelValue >= 3) {
@@ -55,7 +55,7 @@ export class Logging {
 
   /**
    * Print warning message
-   * @param {String} msg
+   * @param {string} msg
    */
   warn(msg) {
     if (this.levelValue >= 2) {
@@ -66,7 +66,7 @@ export class Logging {
 
   /**
    * Print error message
-   * @param {String} msg
+   * @param {string} msg
    */
   error(msg) {
     if (this.levelValue >= 1) {

@@ -28,8 +28,8 @@ export class PropertyManager {
 
   /**
    * Set item properties
-   * @param {String} property
-   * @param {Any} newPropertyValue
+   * @param {string} property
+   * @param {any} newPropertyValue
    */
   setItemProperties(property, newPropertyValue) {
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
@@ -75,7 +75,7 @@ export class PropertyManager {
 
   /**
    * Get a list of common propertie
-   * @param {String} itemType
+   * @param {string} itemType
    * @return {Array}
    */
   getItemProperties(itemType) {
@@ -119,8 +119,8 @@ export class PropertyManager {
 
   /**
    * Get a list the property values
-   * @param {String} itemType
-   * @param {String} property
+   * @param {string} itemType
+   * @param {string} property
    * @return {Array}
    */
   getItemPropertyValue(itemType, property) {

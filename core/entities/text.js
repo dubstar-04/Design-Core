@@ -214,7 +214,7 @@ export class Text extends Entity {
 
   /**
    * Set the text rotation
-   * @param {Number} angle - degrees
+   * @param {number} angle - degrees
    */
   setRotation(angle) {
     // This overwrites the rotation rather than add to it.
@@ -230,7 +230,7 @@ export class Text extends Entity {
 
   /**
    * Get the text rotation
-   * @return {Number} angle - degrees
+   * @return {number} angle - degrees
    */
   getRotation() {
     if (this.points[1] !== undefined) {
@@ -243,7 +243,7 @@ export class Text extends Entity {
 
   /**
    * Get the backwards value
-   * @return {Boolean} true if the text is flipped horizontally
+   * @return {boolean} true if the text is flipped horizontally
    */
   getBackwards() {
     // Backwards value is bitmasked in flags as value 2
@@ -252,7 +252,7 @@ export class Text extends Entity {
 
   /**
    * Set the backwards value
-   * @param {Boolean} bool
+   * @param {boolean} bool
    */
   setBackwards(bool) {
     if (bool) {
@@ -266,7 +266,7 @@ export class Text extends Entity {
 
   /**
    * Get the upside down value
-   * @return {Boolean} true if the text is flipped vertically
+   * @return {boolean} true if the text is flipped vertically
    */
   getUpsideDown() {
     // Upside down value is bitmasked in flags as value 4
@@ -275,7 +275,7 @@ export class Text extends Entity {
 
   /**
    * Set the upside down value
-   * @param {Boolean} bool
+   * @param {boolean} bool
    */
   setUpsideDown(bool) {
     if (bool) {
@@ -289,7 +289,7 @@ export class Text extends Entity {
 
   /**
    * Get a string describing the horizontal text alignment
-   * @return {String}
+   * @return {string}
    */
   getHorizontalAlignment() {
     /* DXF Data
@@ -319,7 +319,7 @@ export class Text extends Entity {
 
   /**
    * Get a string describing the vertical text alignment
-   * @return {String}
+   * @return {string}
    */
   getVerticalAlignment() {
     /* DXF Data
@@ -354,7 +354,7 @@ export class Text extends Entity {
   /**
    * Draw the entity
    * @param {Object} ctx - context
-   * @param {Number} scale
+   * @param {number} scale
    */
   draw(ctx, scale) {
     ctx.save(); // save current context before scale and translate
@@ -469,7 +469,7 @@ export class Text extends Entity {
   /**
    * Get snap points
    * @param {Point} mousePoint
-   * @param {Number} delta
+   * @param {number} delta
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {

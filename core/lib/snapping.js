@@ -18,7 +18,7 @@ class SnapPoint {
   /**
    * Draw the entity
    * @param {Object} ctx - context
-   * @param {Number} scale
+   * @param {number} scale
    */
   draw(ctx, scale) {
     const snapColour = DesignCore.Settings.snapcolour;

@@ -168,7 +168,7 @@ export class BaseDimension extends Entity {
 
   /**
    * Get the dimension type
-   * @return {Number}
+   * @return {number}
    */
   getBaseDimType() {
     const type = this.dimType % 32;
@@ -177,7 +177,7 @@ export class BaseDimension extends Entity {
 
   /**
    * Get the points for the sequence number
-   * @param {Number} sequenceNumber
+   * @param {number} sequenceNumber
    * @return {Point}
    */
   getPointBySequence(sequenceNumber) {
@@ -188,8 +188,8 @@ export class BaseDimension extends Entity {
   /**
    * Define the arrow head
    * @param {Point} point
-   * @param {Number} angle
-   * @param {Number} size
+   * @param {number} angle
+   * @param {number} size
    * @return {Solid}
    */
   getArrowHead(point, angle, size) {
@@ -209,7 +209,7 @@ export class BaseDimension extends Entity {
   /**
    * Draw the entity
    * @param {Object} ctx - context
-   * @param {Number} scale
+   * @param {number} scale
    */
   draw(ctx, scale) {
     const style = DesignCore.DimStyleManager.getItemByName(this.styleName);
@@ -232,7 +232,7 @@ export class BaseDimension extends Entity {
   /**
    * Get snap points
    * @param {Point} mousePoint
-   * @param {Number} delta
+   * @param {number} delta
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
@@ -260,7 +260,7 @@ export class BaseDimension extends Entity {
   /**
    * Determine if the entity is within the selection
    * @param {Array} selectionExtremes
-   * @return {Boolean} true if within
+   * @return {boolean} true if within
    */
   within(selectionExtremes) {
     return this.block.within(selectionExtremes);
@@ -277,7 +277,7 @@ export class BaseDimension extends Entity {
   /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
-   * @return {Boolean} true if touched
+   * @return {boolean} true if touched
    */
   touched(selectionExtremes) {
     return this.block.touched(selectionExtremes);

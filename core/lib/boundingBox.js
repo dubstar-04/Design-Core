@@ -64,7 +64,7 @@ export class BoundingBox {
   /**
    * Determine if point is inside bounding box
    * @param {Object} point
-   * @return {Boolean} true if point is inside false if not
+   * @return {boolean} true if point is inside false if not
    */
   isInside(point) {
     if (point.x > this.xMin && point.x < this.xMax) {
@@ -108,7 +108,7 @@ export class BoundingBox {
    * @param {Point} centerPoint
    * @param {Point} startPoint
    * @param {Point} endPoint
-   * @param {Number} direction - ccw > 0, cw < 0
+   * @param {number} direction - ccw > 0, cw < 0
    * @return {BoundingBox}
    */
   static arcBoundingBox(centerPoint, startPoint, endPoint, direction=1) {
@@ -147,11 +147,11 @@ export class BoundingBox {
    * start: 45 - 90 + 360 % 360 = 315
    * end: 95 -90 + 360 = 5
    * if start > end; arc crosses axis
-   * @param {Number} startAngle - angle in radians
-   * @param {Number} endAngle - angle in radians
-   * @param {Number} axisAngle - angle in radians. i.e 90 deg = Math.PI / 2.
-   * @param {Number} direction - ccw > 0, cw < 0
-   * @return {Boolean}
+   * @param {number} startAngle - angle in radians
+   * @param {number} endAngle - angle in radians
+   * @param {number} axisAngle - angle in radians. i.e 90 deg = Math.PI / 2.
+   * @param {number} direction - ccw > 0, cw < 0
+   * @return {boolean}
    */
   static crossesAxis(startAngle, endAngle, axisAngle, direction=1) {
     const circle = Math.PI * 2;

@@ -36,7 +36,7 @@ export class Canvas {
 
   /**
    * Get canvas scale
-   * @return {Number}
+   * @return {number}
    */
   getScale() {
     return this.matrix.getScale();
@@ -65,7 +65,7 @@ export class Canvas {
 
   /**
    * Handle mouse down
-   * @param {Number} button
+   * @param {number} button
    */
   mouseDown(button) {
     switch (button) {
@@ -84,7 +84,7 @@ export class Canvas {
 
   /**
    * Handle mouse up
-   * @param {Number} button
+   * @param {number} button
    */
   mouseUp(button) {
     switch (button) {
@@ -104,7 +104,7 @@ export class Canvas {
 
   /**
    * Handle double click
-   * @param {Number} button
+   * @param {number} button
    */
   doubleClick(button) {
     switch (button) {
@@ -135,7 +135,7 @@ export class Canvas {
 
   /**
    * Handle mouse wheel - Zoom
-   * @param {Number} delta
+   * @param {number} delta
    */
   wheel(delta) {
     const scale = Math.pow(1 + Math.abs(delta), delta > 0 ? 1 : -1);
@@ -146,7 +146,7 @@ export class Canvas {
 
   /**
    * Zoom the canvas
-   * @param {Number} scale
+   * @param {number} scale
    */
   zoom(scale) {
     const zoomPoint = DesignCore.Mouse.pointOnScene();
@@ -198,8 +198,8 @@ export class Canvas {
   /**
    * Paint the canvas
    * @param {object} context
-   * @param {Number} width
-   * @param {Number} height
+   * @param {number} width
+   * @param {number} height
    */
   paint(context, width, height) {
     // This paint request is called by an external paint function

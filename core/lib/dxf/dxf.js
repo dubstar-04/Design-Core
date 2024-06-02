@@ -29,7 +29,7 @@ export class DXF {
 
   /**
    * Write
-   * @param {String} version
+   * @param {string} version
    * @return {Object}
    */
   write(version) {
@@ -40,7 +40,7 @@ export class DXF {
 
   /**
    * Load DXF
-   * @param {String} data
+   * @param {string} data
    */
   loadDxf(data) {
     Logging.instance.debug('Loading File');

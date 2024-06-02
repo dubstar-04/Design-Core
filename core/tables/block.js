@@ -190,7 +190,7 @@ export class Block extends Entity {
   /**
    * Draw the entity
    * @param {Object} ctx - context
-   * @param {Number} scale
+   * @param {number} scale
    * @param {Object} insert - insert entity
    */
   draw(ctx, scale, insert = undefined) {
@@ -225,7 +225,7 @@ export class Block extends Entity {
   /**
    * Get snap points
    * @param {Point} mousePoint
-   * @param {Number} delta
+   * @param {number} delta
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
@@ -301,7 +301,7 @@ export class Block extends Entity {
   /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
-   * @return {Boolean} true if touched
+   * @return {boolean} true if touched
    */
   touched(selectionExtremes) {
     for (let idx = 0; idx < this.items.length; idx++) {

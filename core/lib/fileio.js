@@ -8,8 +8,8 @@ import {DesignCore} from '../designCore.js';
 export class FileIO {
   /**
    * Save to DXF
-   * @param {String} version
-   * @return {String} dxf file as a string
+   * @param {string} version
+   * @return {string} dxf file as a string
    */
   static saveDxf(version) {
     const dxfWriter = new DXF();
@@ -19,7 +19,7 @@ export class FileIO {
 
   /**
    * Open data as a dxf file
-   * @param {String} data
+   * @param {string} data
    */
   static openFile(data) {
     const dxf = new DXF();

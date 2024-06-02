@@ -13,7 +13,7 @@ export class Colours {
 /**
  * Check rgb is a valid rgb object
  * @param {Object} rgb
- * @return {Boolean} true if the object is an rgb colour, otherwise false.
+ * @return {boolean} true if the object is an rgb colour, otherwise false.
  */
   static isRGB(rgb) {
     if (rgb) {
@@ -32,8 +32,8 @@ export class Colours {
 
   /**
    * Convert an AutoCAD colour index (ACI) to a rgb colour
-   * @param  {Number} aci
-   * @return {Number}
+   * @param  {number} aci
+   * @return {number}
    */
   static aciToRGB(aci) {
     if ((typeof aci === 'number' || aci instanceof Number)) {
@@ -49,7 +49,7 @@ export class Colours {
   /**
    * Convert a rgb colour to an AutoCAD colour index (ACI)
    * @param {Object} rgb
-   * @return {Number}
+   * @return {number}
    */
   static rgbToACI(rgb) {
     if (!this.isRGB(rgb)) {
@@ -74,7 +74,7 @@ export class Colours {
   /**
    * Convert rgb colour to formatted string
    * @param {Object} rgb
-   * @return {Number}
+   * @return {number}
    */
   static rgbToString(rgb) {
     if (this.isRGB(rgb)) {
@@ -87,7 +87,7 @@ export class Colours {
   /**
    * Get RGB colour components scaled 0 - 1 from rgb colour
    * @param  {Object} rgb - object with r, g, and b values
-   * @return {Number} scaled rgb object or undefined
+   * @return {number} scaled rgb object or undefined
    */
   static rgbToScaledRGB(rgb) {
     if (this.isRGB(rgb)) {
@@ -103,14 +103,14 @@ export class Colours {
 
   /**
    *  Get RGB colour components from true colour
-   * @param  {String} trueColour
+   * @param  {string} trueColour
    * A 32-bit integer representing a 24-bit color value.
    * The high-order byte (8 bits) is 0, the low-order byte an unsigned char holding the Blue value (0-255),
    * then the Green value, and the next-to-high order byte is the Red Value.
    * Converting this integer value to hexadecimal yields the following bit mask: 0x00RRGGBB.
    * For example:
    * true color with Red==200, Green==100 and Blue==50 is 0x00C86432, and in DXF, in decimal, 13132850
-   * @return {Number}
+   * @return {number}
    */
   static trueColourToRGB(trueColour) {
     if (trueColour) {
@@ -126,7 +126,7 @@ export class Colours {
   /**
    * Get the trueColour value for rgb colour
    * @param {Object} rgb
-   * @return {Number} representing the rgb value as a trueColor
+   * @return {number} representing the rgb value as a trueColor
    */
   static rgbToTrueColour(rgb) {
     if (this.isRGB(rgb)) {

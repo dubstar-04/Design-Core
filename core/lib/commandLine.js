@@ -38,7 +38,7 @@ export class CommandLine {
 
   /**
    * Sets the commandline prompt
-   * @param {String} prompt
+   * @param {string} prompt
    */
   setPrompt(prompt) {
     // Parse default options from prompt. Defaults are enclosed in arrows <>
@@ -54,7 +54,7 @@ export class CommandLine {
   /**
    * Checks there is only a single default value supplied and removes the <>
    * @param {Array} commandDefault - Array containing the <default> value
-   * @return {Any} value contained within the <>
+   * @return {any} value contained within the <>
    */
   parseCommandDefault(commandDefault) {
     if (commandDefault && commandDefault.length > 1) {
@@ -85,7 +85,7 @@ export class CommandLine {
 
   /**
    * Handles keypresses at the commandline
-   * @param {String} key
+   * @param {string} key
    */
   handleKeys(key) {
     switch (key) {
@@ -205,8 +205,8 @@ export class CommandLine {
 
   /**
    * Converts input to a type
-   * @param {String} input
-   * @return {Any}
+   * @param {string} input
+   * @return {any}
    */
   parseInput(input) {
     const isNumber = /^[-]?\d+(?:\.\d+)?$/.test(input);
@@ -246,7 +246,7 @@ export class CommandLine {
 
   /**
    * Adds commands to the command history
-   * @param {String} item
+   * @param {string} item
    */
   addToCommandHistory(item) {
     // add the command to the commandline history stored in last command
@@ -261,7 +261,7 @@ export class CommandLine {
 
   /**
    * Handles cycling the command history
-   * @param {String} direction - up/down
+   * @param {string} direction - up/down
    */
   previousCommand(direction) {
     if (direction === 'up') {

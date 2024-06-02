@@ -7,7 +7,7 @@ import {Colours} from './colours.js';
 export class Colour {
   /**
    * Create Colour
-   * @param {Number} aci
+   * @param {number} aci
    */
   constructor(aci=7) {
     this.aci = aci;
@@ -27,7 +27,7 @@ export class Colour {
 
   /**
    * Get the colour
-   * @return {Number}
+   * @return {number}
    */
   getColour() {
     return this.rgb;
@@ -35,7 +35,7 @@ export class Colour {
 
   /**
    * Set the colour
-   * @param {Any} colour
+   * @param {any} colour
    */
   setColour(colour) {
     if (Colours.isRGB(colour)) {
@@ -53,7 +53,7 @@ export class Colour {
 
   /**
    * Set rgb colour based on autocad colour index
-   * @param {Number} aci
+   * @param {number} aci
    */
   setColourFromACI(aci) {
     // try and get the rgb from the aci
@@ -74,7 +74,7 @@ export class Colour {
 export class EntityColour extends Colour {
   /**
    * Create an EntityColour
-   * @param {Number} aci
+   * @param {number} aci
    */
   constructor(aci=256) {
     super(aci);
@@ -83,7 +83,7 @@ export class EntityColour extends Colour {
 
   /**
    * Determine if colour byLayer
-   * @return {Boolean}
+   * @return {boolean}
    */
   get byLayer() {
     if (this.aci === 256) {
@@ -95,7 +95,7 @@ export class EntityColour extends Colour {
 
   /**
    * Set if colour byLayer
-   * @param {Boolean} bool
+   * @param {boolean} bool
    */
   set byLayer(bool) {
     if (bool) {
@@ -105,7 +105,7 @@ export class EntityColour extends Colour {
 
   /**
    * Determine if colour byBlock
-   * @return {Boolean}
+   * @return {boolean}
    */
   get byBlock() {
     if (this.aci === 0) {
@@ -117,7 +117,7 @@ export class EntityColour extends Colour {
 
   /**
    * Set if colour byBlock
-   * @param {Boolean} bool
+   * @param {boolean} bool
    */
   set byBlock(bool) {
     if (bool) {
@@ -127,7 +127,7 @@ export class EntityColour extends Colour {
 
   /**
    * Set the colour
-   * @param {Any} colour
+   * @param {any} colour
    */
   setColour(colour) {
     if (typeof colour === 'string' || colour instanceof String) {

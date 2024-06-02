@@ -156,7 +156,7 @@ export class Insert extends Entity {
   /**
    * Draw the entity
    * @param {Object} ctx - context
-   * @param {Number} scale
+   * @param {number} scale
    */
   draw(ctx, scale) {
     // blocks are associated with an insert point.
@@ -174,7 +174,7 @@ export class Insert extends Entity {
 
   /**
    * Set the insert rotation
-   * @param {Number} angle - degrees
+   * @param {number} angle - degrees
    */
   setRotation(angle) {
     // This overwrites the rotation rather than add to it.
@@ -190,7 +190,7 @@ export class Insert extends Entity {
 
   /**
    * Get the insert rotation
-   * @return {Number} angle - degrees
+   * @return {number} angle - degrees
    */
   getRotation() {
     if (this.points[1] !== undefined) {
@@ -204,7 +204,7 @@ export class Insert extends Entity {
   /**
    * Get snap points
    * @param {Point} mousePoint
-   * @param {Number} delta
+   * @param {number} delta
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
@@ -226,7 +226,7 @@ export class Insert extends Entity {
   /**
    * Determine if the entity is within the selection
    * @param {Array} selectionExtremes
-   * @return {Boolean} true if within
+   * @return {boolean} true if within
    */
   within(selectionExtremes) {
     // adjust selectionExtremes by the insert position
@@ -275,7 +275,7 @@ export class Insert extends Entity {
   /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
-   * @return {Boolean} true if touched
+   * @return {boolean} true if touched
    */
   touched(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);

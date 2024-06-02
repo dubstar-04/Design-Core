@@ -88,7 +88,7 @@ export class CommandManager {
 
   /**
    * Register each of the available commands
-   * @param {String} command
+   * @param {string} command
    */
   registerCommand(command) {
     this.commands.push(command);
@@ -104,7 +104,7 @@ export class CommandManager {
 
   /**
    * Create a new instance of type using data
-   * @param {String} type
+   * @param {string} type
    * @param {Array} data
    * @return {Object} instance of type
    */
@@ -122,8 +122,8 @@ export class CommandManager {
 
   /**
    * Check if input is valid command or shortcut
-   * @param {String} input
-   * @return {Boolean} boolean
+   * @param {string} input
+   * @return {boolean} boolean
    */
   isCommandOrShortcut(input) {
     if (input === undefined) {
@@ -148,8 +148,8 @@ export class CommandManager {
 
   /**
    * Check if shortcut is valid
-   * @param {String} shortcut
-   * @return {Boolean} boolean
+   * @param {string} shortcut
+   * @return {boolean} boolean
    */
   isShortcut(shortcut) {
     const found = this.commands.some((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === shortcut.toUpperCase());
@@ -158,8 +158,8 @@ export class CommandManager {
 
   /**
    * Check if command is valid
-   * @param {String} command
-   * @return {Boolean} boolean
+   * @param {string} command
+   * @return {boolean} boolean
    */
   isCommand(command) {
     if (command === undefined || command === null) {
@@ -173,8 +173,8 @@ export class CommandManager {
 
   /**
   * Returns the command for a valid input
-  * @param {String} input
-  * @return {String} valid type
+  * @param {string} input
+  * @return {string} valid type
   */
   getCommand(input) {
     let command;
@@ -197,8 +197,8 @@ export class CommandManager {
 
   /**
    * Returns the shortcut for a valid command
-   * @param {String} command
-   * @return {String} shortcut
+   * @param {string} command
+   * @return {string} shortcut
    */
   getShortcut(command) {
     let shortcut;
@@ -214,8 +214,8 @@ export class CommandManager {
 
   /**
    * Returns a fuzzy match to the input command
-   * @param {String} input
-   * @return {String} fuzzy matched command
+   * @param {string} input
+   * @return {string} fuzzy matched command
    */
   getFuzzyMatch(input) {
     let score = Infinity;

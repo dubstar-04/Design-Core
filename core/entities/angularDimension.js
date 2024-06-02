@@ -118,7 +118,7 @@ export class AngularDimension extends BaseDimension {
 
   /**
    * Get sequenced points from user selection
-   * @param {Any} items
+   * @param {any} items
    * @return {Array} array of points
    */
   static getPointsFromSelection(items) {

@@ -81,10 +81,10 @@ export class Scene {
 
   /**
    * Create and add new items to the scene
-   * @param {String} type - entity type
+   * @param {string} type - entity type
    * @param {Object} data - object of entity parameters
-   * @param {Number} index - integer of item to replace
-   * @return {Number} - index of created item
+   * @param {number} index - integer of item to replace
+   * @return {number} - index of created item
    */
   addItem(type, data, index) {
     // TODO: validate data is valid for type
@@ -116,10 +116,10 @@ export class Scene {
 
   /**
    * Find items in scene
-   * @param {String} type - entity type or "ANY"
-   * @param {String} prop - object of entity parameters
-   * @param {Any} value - value of the property
-   * @return {Number} - index of items
+   * @param {string} type - entity type or "ANY"
+   * @param {string} prop - object of entity parameters
+   * @param {any} value - value of the property
+   * @return {number} - index of items
    */
   findItem(type, prop, value) {
     const filteredItems = [];
@@ -137,7 +137,7 @@ export class Scene {
 
   /**
    * Get Item
-   * @param {Number} index - items index
+   * @param {number} index - items index
    * @return {Object} - item
    */
   getItem(index) {
@@ -146,8 +146,8 @@ export class Scene {
 
   /**
    * Remove Item
-   * @param {Number} index - items index
-   * @return {Boolean} - success status
+   * @param {number} index - items index
+   * @return {boolean} - success status
    */
   removeItem(index) {
     const count = this.items.length;
@@ -178,7 +178,7 @@ export class Scene {
 
   /**
    * Create a new temp item and add to scenes tempItems
-   * @param {String} type - entity type
+   * @param {string} type - entity type
    * @param {Object} data - object of entity parameters
    */
   createTempItem(type, data) {

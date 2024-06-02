@@ -64,7 +64,7 @@ export class Core {
 
   /**
    * Set the current dxf version
-   * @param {String} version
+   * @param {string} version
    */
   set dxfVersion(version) {
     // version should be the RXXXX format for the dxf version
@@ -92,7 +92,7 @@ export class Core {
 
   /**
    * Call the external notification callback
-   * @param  {String} message
+   * @param  {string} message
    */
   notify(message) {
     if (this.externalNotifyCallbackFunction) {
@@ -104,7 +104,7 @@ export class Core {
 
   /**
    * Open the dxf file represented by the file parameter
-   * @param  {String} file
+   * @param  {string} file
    */
   openFile(file) {
     FileIO.openFile(file);
@@ -113,8 +113,8 @@ export class Core {
 
   /**
    * Save the current scene to a dxf string
-   * @param {String} version
-   * @return {String} The dxf file as a string.
+   * @param {string} version
+   * @return {string} The dxf file as a string.
    */
   saveFile(version) {
     return FileIO.saveDxf(version);
@@ -122,7 +122,7 @@ export class Core {
 
   /**
    * Return the supported dxf versions
-   * @return {String} array js object containing the version
+   * @return {string} array js object containing the version
    */
   supportedDXFVersions() {
     return DXFFile.Version;

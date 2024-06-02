@@ -52,7 +52,7 @@ export class DxfIterator {
 
   /**
    * Load a string object representing the dxf file
-   * @param  {String} file
+   * @param  {string} file
    */
   loadFile(file) {
     // check there is data
@@ -87,7 +87,7 @@ export class DxfIterator {
 
   /**
    * Stop iteration and throw error
-   * @param  {String} msg - error message
+   * @param  {string} msg - error message
    */
   dxfError(msg) {
     throw Error(`${msg} - ${Strings.Strings.LINE}: ${this.currentIndex + 1}`);
@@ -96,7 +96,7 @@ export class DxfIterator {
 
   /**
    * Format and return the current value
-   * @return {Any}
+   * @return {any}
    */
   current() {
     const current = this.formatted(this.lines[this.currentIndex]);
@@ -106,8 +106,8 @@ export class DxfIterator {
 
   /**
    * Format the input value removing line breaks
-   * @param  {String} value
-   * @return {String}
+   * @param  {string} value
+   * @return {string}
    */
   formatted(value) {
     return value.replace(/(\r\n|\n|\r)/gm, '');
@@ -115,7 +115,7 @@ export class DxfIterator {
 
   /**
    * Format and return the next value
-   * @return {Any}
+   * @return {any}
    */
   nextValue() {
     if (this.currentIndex < this.lines.length - 1) {
@@ -126,7 +126,7 @@ export class DxfIterator {
 
   /**
    * Format and return the previous value
-   * @return {Any}
+   * @return {any}
    */
   prevValue() {
     if (this.currentIndex > 0) {

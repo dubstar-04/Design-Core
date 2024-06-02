@@ -119,7 +119,7 @@ export class Hatch extends Entity {
 
   /**
    * Get the hatch pattern name
-   * @return {String}
+   * @return {string}
    */
   getPatternName() {
     return this.pattern;
@@ -127,7 +127,7 @@ export class Hatch extends Entity {
 
   /**
    * Set the hatch pattern name
-   * @param {String} name
+   * @param {string} name
    */
   setPatternName(name) {
     this.pattern = name.toUpperCase();
@@ -267,9 +267,9 @@ export class Hatch extends Entity {
   /**
    * Get value from incoming data
    * handle arrays and single values
-   * @param {Any} data
-   * @param {Number} dxfCode
-   * @return {Any}
+   * @param {any} data
+   * @param {number} dxfCode
+   * @return {any}
    */
   getDataValue(data, dxfCode) {
     let value;
@@ -386,7 +386,7 @@ export class Hatch extends Entity {
   /**
    * Draw the entity
    * @param {Object} ctx - context
-   * @param {Number} scale
+   * @param {number} scale
    */
   draw(ctx, scale) {
     // ensure the scale is value
@@ -419,7 +419,7 @@ export class Hatch extends Entity {
   /**
    * Draw the hatch pattern to the context
    * @param {Object} ctx
-   * @param {Number} scale
+   * @param {number} scale
    * @param {Polyline} shape
    */
   createPattern(ctx, scale, shape) {
@@ -571,7 +571,7 @@ export class Hatch extends Entity {
   /**
    * Get snap points
    * @param {Point} mousePoint
-   * @param {Number} delta
+   * @param {number} delta
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
@@ -594,7 +594,7 @@ export class Hatch extends Entity {
   /**
    * Determine if point is inside the hatch
    * @param {Point} P
-   * @return {Boolean} - true if inside
+   * @return {boolean} - true if inside
    */
   isInside(P) {
     for (let i = 0; i < this.boundaryShapes.length; i++) {
@@ -667,7 +667,7 @@ export class Hatch extends Entity {
   /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
-   * @return {Boolean} true if touched
+   * @return {boolean} true if touched
    */
   touched() {
     console.log('Hatch: touched() Not Implemented');

@@ -127,7 +127,7 @@ export class Arc extends Entity {
 
   /**
    * Arc start angle
-   * @return {Number} start angle in radians
+   * @return {number} start angle in radians
    */
   startAngle() {
     return this.points[0].angle(this.points[1]);
@@ -135,7 +135,7 @@ export class Arc extends Entity {
 
   /**
    * Arc end angle
-   * @return {Number} end angle in radians
+   * @return {number} end angle in radians
    */
   endAngle() {
     const endAngle = this.points[0].angle(this.points[2]);
@@ -146,7 +146,7 @@ export class Arc extends Entity {
    * Calculate the angle between the start and end of the arc
    * Clockwise returns positive angle
    * Counter clockwise returns negtive
-   * @return {Number} angle in degrees
+   * @return {number} angle in degrees
    */
   get totalAngle() {
     let startAngle = this.startAngle();
@@ -167,7 +167,7 @@ export class Arc extends Entity {
 
   /**
    * Get Arc radius
-   * @return {Number} - arc radius
+   * @return {number} - arc radius
    */
   getRadius() {
     return this.radius;
@@ -176,7 +176,7 @@ export class Arc extends Entity {
   /**
    * Draw the entity
    * @param {Object} ctx - context
-   * @param {Number} scale
+   * @param {number} scale
    */
   draw(ctx, scale) {
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, this.startAngle(), this.endAngle());
@@ -245,7 +245,7 @@ export class Arc extends Entity {
   /**
    * Get snap points
    * @param {Point} mousePoint
-   * @param {Number} delta
+   * @param {number} delta
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {

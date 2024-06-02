@@ -133,8 +133,8 @@ export class Section {
 
   /**
    * Parse Float
-   * @param {String} value
-   * @return {Number}
+   * @param {string} value
+   * @return {number}
    */
   parseFloat(value) {
     if (isNaN(value)) {
@@ -147,8 +147,8 @@ export class Section {
 
   /**
    * Parse Int
-   * @param {String} value
-   * @return {Number}
+   * @param {string} value
+   * @return {number}
    */
   parseInt(value) {
     if (isNaN(value)) {
@@ -160,8 +160,8 @@ export class Section {
 
   /**
    * Parse Bool
-   * @param {String} value
-   * @return {Boolean}
+   * @param {string} value
+   * @return {boolean}
    */
   parseBoolean(value) {
     return Boolean(parseInt(value.trim()));
@@ -170,7 +170,7 @@ export class Section {
   /**
    *
    * @param {Object} Pair
-   * @return {Any}
+   * @return {any}
    */
   getGroupValue(Pair) {
     const code = parseInt(Pair.code);

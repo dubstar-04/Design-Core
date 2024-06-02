@@ -126,8 +126,8 @@ export class DXFWriter {
 
   /**
    * Write DXF file
-   * @param {String} version
-   * @return {String} dxf formatted string formatted
+   * @param {string} version
+   * @return {string} dxf formatted string formatted
    */
   write(version) {
     if (version === undefined) {

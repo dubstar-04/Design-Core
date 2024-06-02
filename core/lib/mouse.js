@@ -55,7 +55,7 @@ export class Mouse {
   // TODO: This should be done outside of core in the ui.
   /**
    * Calculates the mouse position and angle string.
-   * @return {String}
+   * @return {string}
    */
   positionString() {
     // return a string showing the position of the mouse on the canvas
@@ -65,8 +65,8 @@ export class Mouse {
 
   /**
    * Sets the mouse position to x and y
-   * @param {Number} x
-   * @param {Number} y
+   * @param {number} x
+   * @param {number} y
    */
   mouseMoved(x, y) {
     // x: mouse x pos
@@ -96,7 +96,7 @@ export class Mouse {
 
   /**
    * Handles mouse down
-   * @param {Number} button - 0 = left, 1 = wheel, 2 = right;
+   * @param {number} button - 0 = left, 1 = wheel, 2 = right;
    */
   mouseDown(button) {
     this.mouseDownCanvasPoint = this.pointOnCanvas();
@@ -120,8 +120,8 @@ export class Mouse {
 
   /**
    * Timer function for recognizing double clicks
-   * @param {Number} button  - 0 = left, 1 = wheel, 2 = right;
-   * @return {Boolean}
+   * @param {number} button  - 0 = left, 1 = wheel, 2 = right;
+   * @return {boolean}
    */
   isDoubleClick(button) {
     // measure time between clicks to check for double clicks in a generic way
@@ -142,7 +142,7 @@ export class Mouse {
 
   /**
    * Handles mouse down
-   * @param {Number} button - 0 = left, 1 = wheel, 2 = right;
+   * @param {number} button - 0 = left, 1 = wheel, 2 = right;
    */
   mouseUp(button) {
     switch (button) {
@@ -162,7 +162,7 @@ export class Mouse {
 
   /**
    * Handles double clicks
-   * @param {Number} button - 0 = left, 1 = wheel, 2 = right;
+   * @param {number} button - 0 = left, 1 = wheel, 2 = right;
    */
   doubleClick(button) {
     DesignCore.Canvas.doubleClick(button);
@@ -170,7 +170,7 @@ export class Mouse {
 
   /**
    * Handles house wheel input for zoom action
-   * @param {Number} delta - +/- 1 for zoom in / out
+   * @param {number} delta - +/- 1 for zoom in / out
    */
   wheel(delta) {
     DesignCore.Canvas.wheel(delta);

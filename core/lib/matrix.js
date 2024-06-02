@@ -13,7 +13,7 @@ export class Matrix {
 
   /**
    * Returns the current scale
-   * @return {Number}
+   * @return {number}
    */
   getScale() {
     // return the x scale
@@ -38,8 +38,8 @@ export class Matrix {
 
   /**
    * Apply tranlation to matrix
-   * @param {Number} x - translation in x
-   * @param {Number} y - translation in y
+   * @param {number} x - translation in x
+   * @param {number} y - translation in y
    */
   translate(x, y) {
     this.e += this.a * x + this.c * y;
@@ -48,8 +48,8 @@ export class Matrix {
 
   /**
    * Apply scale to matrix
-   * @param {Number} sx - scale in x
-   * @param {Number} sy - scale in x
+   * @param {number} sx - scale in x
+   * @param {number} sy - scale in x
    */
   scale(sx, sy) {
     this.a *= sx;
@@ -60,8 +60,8 @@ export class Matrix {
 
   /**
    * Returns px and py transformed to matrix (scene) co-ordinates
-   * @param {Number} px
-   * @param {Number} py
+   * @param {number} px
+   * @param {number} py
    * @return {Point}
    */
   transformPoint(px, py) {

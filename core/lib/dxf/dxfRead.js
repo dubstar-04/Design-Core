@@ -18,7 +18,7 @@ export class DXFReader {
 
   /**
    * Read
-   * @param {String} file
+   * @param {string} file
    */
   read(file) {
     this.iterator.loadFile(file);

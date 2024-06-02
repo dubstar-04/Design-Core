@@ -81,7 +81,7 @@ export class Line extends Entity {
   /**
    * Draw the entity
    * @param {Object} ctx - context
-   * @param {Number} scale
+   * @param {number} scale
    */
   draw(ctx, scale) {
     ctx.moveTo(this.points[0].x, this.points[0].y);
@@ -192,7 +192,7 @@ export class Line extends Entity {
      * @param {Point} mousePnt
      * @param {Array} pntsArray
      * @param {Array} returnPoints
-     * @return {Boolean}
+     * @return {boolean}
      */
     function betweenPoints(mousePnt, pntsArray, returnPoints) {
       for (let i = 0; i < pntsArray.length - 1; i++) {
@@ -284,7 +284,7 @@ export class Line extends Entity {
 
   /**
    * Get the length of a line
-   * @return {Number}
+   * @return {number}
    */
   length() {
     const A = (this.points[0].x - this.points[1].x);
@@ -308,7 +308,7 @@ export class Line extends Entity {
   /**
    * Get snap points
    * @param {Point} mousePoint
-   * @param {Number} delta
+   * @param {number} delta
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {

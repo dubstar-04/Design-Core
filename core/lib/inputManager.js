@@ -10,7 +10,7 @@ import {Point} from '../entities/point.js';
 export class PromptOptions {
   /**
    * Create PromptOptions
-   * @param {String} promptMessage
+   * @param {string} promptMessage
    * @param {Array} types
    * @param {Array} options
    */
@@ -24,7 +24,7 @@ export class PromptOptions {
 
   /**
    * Return data to the input request
-   * @param {Any} input
+   * @param {any} input
    */
   respond(input) {
     if (this.types.includes(Input.getType(input))) {
@@ -57,8 +57,8 @@ export class PromptOptions {
 
   /**
    * Match the input to a command option
-   * @param {Any} input
-   * @return {String} undefined or the matched option
+   * @param {any} input
+   * @return {string} undefined or the matched option
    */
   parseInputToOption(input) {
     if (this.options.length === 0) {
@@ -86,7 +86,7 @@ export class PromptOptions {
 
   /**
    * Return the prompt for the input request
-   * @return {String}
+   * @return {string}
    */
   getPrompt() {
     let msg = `${this.promptMessage}`;
@@ -100,8 +100,8 @@ export class PromptOptions {
 
   /**
    * Underline the shortcut key for the prompt option
-   * @param {String} option
-   * @return {String} option with shortcut underlined
+   * @param {string} option
+   * @return {string} option with shortcut underlined
    */
   getOptionWithShortcut(option) {
     const optionWithShortcut = `${option.substring(0, 1)}\u0332${option.substring(1, option.length)}`;
@@ -110,7 +110,7 @@ export class PromptOptions {
 
   /**
    * Set the resolve callback
-   * @param {Any} resolve - callback function
+   * @param {any} resolve - callback function
    */
   setResolve(resolve) {
     this.resolve = resolve;
@@ -118,7 +118,7 @@ export class PromptOptions {
 
   /**
    * Set the reject callback
-   * @param {Any} reject - callback function
+   * @param {any} reject - callback function
    */
   setReject(reject) {
     this.reject = reject;
@@ -138,7 +138,7 @@ export class Input {
 
   /**
    * Return the Input.Type for value
-   * @param {Any} value
+   * @param {any} value
    * @return {Object}
    */
   static getType(value) {
@@ -219,7 +219,7 @@ export class InputManager {
 
   /**
    * Handle command input
-   * @param {Any} input
+   * @param {any} input
    */
   onCommand(input) {
     if (this.activeCommand !== undefined) {
@@ -353,7 +353,7 @@ export class InputManager {
 
   /**
  * Handle mouse down
- * @param {Number} button
+ * @param {number} button
  */
   mouseDown(button) {
     switch (button) {
@@ -371,7 +371,7 @@ export class InputManager {
 
   /**
  * Handle mouse up
- * @param {Number} button
+ * @param {number} button
  */
   mouseUp(button) {
     switch (button) {
@@ -418,7 +418,7 @@ export class InputManager {
 
   /**
  * Initialise commands
- * @param {String} command
+ * @param {string} command
  */
   initialiseItem(command) {
     DesignCore.Scene.saveRequired();
@@ -428,7 +428,7 @@ export class InputManager {
 
   /**
    * Set the command prompt
-   * @param {String} prompt
+   * @param {string} prompt
    */
   setPrompt(prompt) {
     // TODO: single line method required?
@@ -438,7 +438,7 @@ export class InputManager {
   /**
    * Execute the currently active command then reset
    * @param {Object} item - item to create
-   * @param {Number} index - index of item in scene.items
+   * @param {number} index - index of item in scene.items
    */
   executeCommand(item, index = undefined) {
     this.actionCommand(item, index);
@@ -448,8 +448,8 @@ export class InputManager {
   /**
    * Execute the currently active command without reset
    * @param {Object} item - item to create
-   * @param {Number} index - index of item in scene.items
-   * @return {Number}
+   * @param {number} index - index of item in scene.items
+   * @return {number}
    */
   actionCommand(item, index = undefined) {
     if (this.activeCommand instanceof Tool) {

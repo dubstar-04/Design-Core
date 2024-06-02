@@ -139,8 +139,8 @@ export class BasePolyline extends Entity {
   /**
    * Draw the polyline
    * @param {Object} ctx
-   * @param {Number} scale
-   * @param {Boolean} stroke - don't stroke hatch boundary shapes
+   * @param {number} scale
+   * @param {boolean} stroke - don't stroke hatch boundary shapes
    */
   draw(ctx, scale, stroke=true) {
     for (let i = 0; i < this.points.length; i++) {
@@ -238,7 +238,7 @@ export class BasePolyline extends Entity {
   /**
    * Get snap points
    * @param {Point} mousePoint
-   * @param {Number} delta
+   * @param {number} delta
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
@@ -354,7 +354,7 @@ export class BasePolyline extends Entity {
   /**
    * Get the bulge value from the previous segment and the selected point
    * @param {Point} point
-   * @return {Number} polyline bulge value
+   * @return {number} polyline bulge value
    */
   getBulgeFromSegment(point) {
     const lastSegBulge = this.points.at(-2).bulge;

@@ -114,7 +114,7 @@ export class Layer {
 
   /**
      * Set the frozen value
-     * @param {Boolean} bool
+     * @param {boolean} bool
      */
   set frozen(bool) {
     if (bool) {
@@ -137,7 +137,7 @@ export class Layer {
 
   /**
        * Set the locked value
-       * @param {Boolean} bool
+       * @param {boolean} bool
        */
   set locked(bool) {
     if (bool) {
@@ -151,7 +151,7 @@ export class Layer {
 
   /**
    * Determine if layer is visible
-   * @return {Boolean}
+   * @return {boolean}
    */
   get isVisible() {
     if (this.on && !this.frozen) {
@@ -163,7 +163,7 @@ export class Layer {
 
   /**
    * Determine if layer is selectable
-   * @return {Boolean}
+   * @return {boolean}
    */
   get isSelectable() {
     if (this.isVisible && !this.locked) {
@@ -175,7 +175,7 @@ export class Layer {
 
   /**
    * Get the layer colour
-   * @return {Number} rgb colour
+   * @return {number} rgb colour
    */
   getColour() {
     return this.layerColour.getColour();
