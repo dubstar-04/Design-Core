@@ -2,7 +2,12 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {StyleManagerBase} from './styleManagerBase.js';
 import {LType} from './ltype.js';
 
+/**
+ * Line Type Manager Class
+ * @extends StyleManagerBase
+ */
 export class LTypeManager extends StyleManagerBase {
+  /** Create a LTypeManager */
   constructor() {
     super();
 
@@ -10,16 +15,26 @@ export class LTypeManager extends StyleManagerBase {
     this.itemProperty = 'lineType';
   }
 
+  /**
+   * Create a new LineType
+   * @param {Object} style
+   * @return {Object}
+   */
   createItem(style) {
     return new LType(style);
   }
 
+  /** Add standard line types */
   addStandardItems() {
     this.addItem({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
     this.addItem({'name': 'ByLayer'});
     this.addItem({'name': 'ByBlock'});
   }
 
+  /**
+   * Get a list of optional line types
+   * @return {Array}
+   */
   getOptionalStyles() {
     const styles = [];
     styles.push({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
@@ -31,6 +46,10 @@ export class LTypeManager extends StyleManagerBase {
     return styles;
   }
 
+  /**
+   * Write the table to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     // Create table data for ltype styles
     // The LTYPE Table must preceed the LAYER table

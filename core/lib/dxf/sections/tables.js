@@ -1,18 +1,32 @@
 import {Section} from './section.js';
 
+/**
+ * Tables Class
+ * @extends Section
+ */
 export class Tables extends Section {
+  /** Create Tables */
   constructor() {
     super();
 
     this.tables = [];
   }
 
+  /**
+   * Add Table
+   * @param {Object} table
+   */
   addTable(table) {
     if (Object.keys(table).length) {
       this.tables.push(table);
     }
   }
 
+  /**
+   * Read
+   * @param {Object} iterator
+   * @return {Object}
+   */
   read(iterator) {
     let currentTable;
     while (iterator.nextPair().value !== 'ENDSEC') {

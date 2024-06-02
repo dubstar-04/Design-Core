@@ -1,8 +1,9 @@
+/** Utils Class */
 export class Utils {
   /**
    * Convert degrees to radians
    * @param {number} degrees
-   * @returns angle in radians
+   * @return {number} angle in radians
    */
   static degrees2radians(degrees) {
     return degrees * Math.PI / 180;
@@ -11,7 +12,7 @@ export class Utils {
   /**
    * Convert radians to degrees
    * @param {number} radians
-   * @returns angle in degrees
+   * @return {number} angle in degrees
    */
   static radians2degrees(radians) {
     return radians * 180 / Math.PI;
@@ -20,7 +21,7 @@ export class Utils {
   /**
    * Round to 5 decimal places
    * @param {number} number
-   * @returns rounded number
+   * @return {number} rounded number
    */
   static round(number) {
     return Number(number.toFixed(5));
@@ -28,8 +29,8 @@ export class Utils {
 
   /**
    * Deep clone object
-   * @param {objec} obj - object to clone
-   * @returns - new cloned object
+   * @param {Object} obj - object to clone
+   * @return {Object} - new cloned object
    */
   static cloneObject(obj) {
     // deep clone obj and all its attributes
@@ -55,7 +56,7 @@ export class Utils {
    * a lower number suggests the strings are more similar and value of 0 means they are the same.
    * @param {string} a
    * @param {string} b
-   * @returns {integer} levenshtein edit distance
+   * @return {number} levenshtein edit distance
    * inspired by https://gist.github.com/andrei-m/982927
    */
   static getLevenshteinDistance(a, b) {

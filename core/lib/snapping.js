@@ -5,11 +5,21 @@ import {Utils} from './utils.js';
 
 import {DesignCore} from '../designCore.js';
 
+/** SnapPoint Class */
 class SnapPoint {
+  /**
+   * Create SnapPoint
+   * @param {Point} snapPoint
+   */
   constructor(snapPoint) {
     this.snapPoint = snapPoint;
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     const snapColour = DesignCore.Settings.snapcolour;
     const radius = 4;
@@ -27,14 +37,16 @@ class SnapPoint {
   }
 }
 
+/** Snapping Class */
 export class Snapping {
+  /** Create snapping */
   constructor() {
     this.active = false;
   }
 
   /**
    * Get snap point and draw to the scene
-   * @returns Point or undefined
+   * @return {Point} or undefined
    */
   snap() {
     if (this.active) {
@@ -62,7 +74,7 @@ export class Snapping {
 
   /**
    * Get the closest snap point
-   * @returns Point or undefined
+   * @return {Point} or undefined
    */
   getSnapPoint() {
     let snapPoint;
@@ -93,7 +105,7 @@ export class Snapping {
   /**
    * Get the polar snap point from the current mouse position
    * @param {Point} previousPoint
-   * @returns Point or undefined
+   * @return {Point} or undefined
    */
   polarSnap(previousPoint) {
     if (!this.active) {
@@ -120,7 +132,7 @@ export class Snapping {
   /**
    * Get the ortho snap point from the current mouse position
    * @param {Point} previousPoint
-   * @returns Point or undefined
+   * @return {Point} or undefined
    */
   orthoSnap(previousPoint) {
     if (!this.active) {

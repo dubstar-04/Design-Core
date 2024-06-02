@@ -5,16 +5,32 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Identity Command Class
+ * @extends Tool
+ */
 export class Identify extends Tool {
+  /** Create an Identify command */
   constructor() {
     super();
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Identify', shortcut: 'ID'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to perform the command
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);
@@ -27,6 +43,16 @@ export class Identify extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
+  preview() {
+    // No Preview
+  }
+
+  /**
+   * Perform the command
+   */
   action() {
     const x = this.points.at(-1).x.toFixed(1);
     const y = this.points.at(-1).y.toFixed(1);

@@ -5,16 +5,32 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Move Command Class
+ * @extends Tool
+ */
 export class Move extends Tool {
+  /** Create a Move command */
   constructor() {
     super();
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Move', shortcut: 'M', type: 'Tool'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to perform the command
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
@@ -38,6 +54,9 @@ export class Move extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
@@ -59,6 +78,9 @@ export class Move extends Tool {
     }
   }
 
+  /**
+   * Perform the command
+   */
   action() {
     const xDelta = this.points[1].x - this.points[0].x;
     const yDelta = this.points[1].y - this.points[0].y;

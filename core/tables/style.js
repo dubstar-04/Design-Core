@@ -2,7 +2,12 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Flags} from '../properties/flags.js';
 import {Property} from '../properties/property.js';
 
+/** Style Class */
 export class Style {
+  /**
+   * Create Style
+   * @param {Object} data
+   */
   constructor(data) {
     // Define Properties
     this.type = this.constructor.name;
@@ -77,7 +82,7 @@ export class Style {
 
   /**
    * Get the vertical value
-   * @returns {bool}
+   * @return {bool}
    */
   get vertical() {
     // Vertical value is bitmasked in standardflags as value 4
@@ -100,7 +105,7 @@ export class Style {
 
   /**
    * Get the backwards value
-   * @returns {bool}
+   * @return {bool}
    */
   get backwards() {
     // Upside down value is bitmasked in flags as value 2
@@ -123,7 +128,7 @@ export class Style {
 
   /**
    * Get the upside down value
-   * @returns {bool}
+   * @return {bool}
    */
   get upsideDown() {
     // Upside down value is bitmasked in flags as value 4
@@ -144,6 +149,10 @@ export class Style {
     }
   }
 
+  /**
+   * Write the table to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'STYLE');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle

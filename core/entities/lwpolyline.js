@@ -1,7 +1,15 @@
 import {Logging} from '../lib/logging.js';
 import {BasePolyline} from './basePolyline.js';
 
+/**
+ * LWPolyline Entity Class
+ * @extends BasePolyline
+ */
 export class Lwpolyline extends BasePolyline {
+  /**
+   * Create an LW Polyline
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 
@@ -15,6 +23,13 @@ export class Lwpolyline extends BasePolyline {
     }
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Lwpolyline'};
     return command;

@@ -1,4 +1,6 @@
+/** Flags Class */
 export class Flags {
+  /** Create Flags */
   constructor() {
     /* flags - bit-coded values
     | 128 | 64 | 32 | 16 | 8 | 4 | 2 | 1 |
@@ -9,7 +11,7 @@ export class Flags {
 
   /**
    * Set the flag value
-   * @param {Number} flagValue
+   * @param {number} flagValue
    */
   setFlagValue(flagValue) {
     const value = Number(flagValue);
@@ -20,7 +22,7 @@ export class Flags {
 
   /**
  * Get the flag value
- * @returns {number} flags value
+ * @return {number} flags value
  */
   getFlagValue() {
     return this.flags;
@@ -28,8 +30,8 @@ export class Flags {
 
   /**
    * Get the backwards value
-   * @param {Number} flagValue
-   * @returns {boolean} true if flags contains the flagValue
+   * @param {number} flagValue
+   * @return {boolean} true if flags contains the flagValue
    */
   hasFlag(flagValue) {
     // check if the flagValue is bitmasked in flags
@@ -48,7 +50,7 @@ export class Flags {
 
   /**
    * Set the flag value
-   * @param {Number} flagValue
+   * @param {number} flagValue
    */
   addValue(flagValue) {
     this.flags = (this.flags | Number(flagValue));
@@ -56,7 +58,7 @@ export class Flags {
 
   /**
  * Remove the flag value
- * @param {Number} flagValue
+ * @param {number} flagValue
  */
   removeValue(flagValue) {
     this.flags = (this.flags ^ (this.flags & flagValue));

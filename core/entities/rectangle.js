@@ -7,18 +7,37 @@ import {Polyline} from './polyline.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Rectangle Entity Class
+ * @extends Entity
+ */
 export class Rectangle extends Entity {
+  /**
+   * Create a Rectangle
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
     // There is no DXF representation of a Rectangle
     // Convenience entity to create a polyline from two points
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Rectangle', shortcut: 'REC', type: 'Entity'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
@@ -38,6 +57,9 @@ export class Rectangle extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
@@ -46,6 +68,12 @@ export class Rectangle extends Entity {
     }
   }
 
+  /**
+   * Get the rectangle points
+   * @param {Point} pt1
+   * @param {Point} pt2
+   * @return {Array} array of points for each corner
+   */
   rectPoints(pt1, pt2) {
     const points = [];
     points.push( new Point(pt1.x, pt1.y));

@@ -9,7 +9,15 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Block Entity Class
+ * @extends Entity
+ */
 export class Block extends Entity {
+  /**
+   * Create a Block Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
     this.name = '';
@@ -51,11 +59,22 @@ export class Block extends Entity {
     }
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Block', shortcut: 'B'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       // set a name
@@ -120,8 +139,15 @@ export class Block extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {}
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'BLOCK');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -146,14 +172,27 @@ export class Block extends Entity {
     file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
   }
 
+  /**
+   * Clear items from the block
+   */
   clearItems() {
     this.items = [];
   }
 
+  /**
+   * Add an item to the block
+   * @param {Object} item
+   */
   addItem(item) {
     this.items.push(item);
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   * @param {Object} insert - insert entity
+   */
   draw(ctx, scale, insert = undefined) {
     if (!this.items.length) {
       // nothing to draw
@@ -183,6 +222,12 @@ export class Block extends Entity {
         */
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
 
@@ -200,6 +245,11 @@ export class Block extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     let distance = Infinity;
     let minPnt = P;
@@ -223,6 +273,10 @@ export class Block extends Entity {
     return [minPnt, distance];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
   boundingBox() {
     let xmin = Infinity;
     let xmax = -Infinity;
@@ -244,6 +298,11 @@ export class Block extends Entity {
     return new BoundingBox(topLeft, bottomRight);
   }
 
+  /**
+   * Determine if the entity is touch the selection window
+   * @param {Array} selectionExtremes
+   * @return {boolean} true if touched
+   */
   touched(selectionExtremes) {
     for (let idx = 0; idx < this.items.length; idx++) {
       const touched = this.items[idx].touched(selectionExtremes);

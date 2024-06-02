@@ -1,10 +1,9 @@
 import {Point} from '../entities/point.js';
 import {DesignCore} from '../designCore.js';
 
+/** Mouse Class */
 export class Mouse {
-  /**
-   * Mouse Constructor
-   */
+/** Create Mouse */
   constructor() {
     this.x = 0;
     this.y = 0;
@@ -18,7 +17,7 @@ export class Mouse {
 
   /**
    * Returns the point on the design canvas
-   * @returns
+   * @return {Point}
    */
   pointOnCanvas() {
     return new Point(this.x, this.y);
@@ -26,7 +25,7 @@ export class Mouse {
 
   /**
    * Returns the point on the scene
-   * @returns
+   * @return {Point}
    */
   pointOnScene() {
     return this.transformToScene(this.pointOnCanvas());
@@ -34,8 +33,8 @@ export class Mouse {
 
   /**
    * Transforms the point location from canvas to scene space
-   * @param {point} point
-   * @returns
+   * @param {Point} point
+   * @return {Point}
    */
   transformToScene(point) {
     const scenePoint = DesignCore.Canvas.matrix.invert().transformPoint(point.x, 0 - point.y +DesignCore.Canvas.height);
@@ -44,8 +43,8 @@ export class Mouse {
 
   /**
    * Transforms the point location from scene to canvas space
-   * @param {point} point
-   * @returns
+   * @param {Point} point
+   * @return {Point}
    */
   transformToCanvas(point) {
     const canvasPoint = DesignCore.Canvas.matrix.transformPoint(point.x, point.y);
@@ -56,7 +55,7 @@ export class Mouse {
   // TODO: This should be done outside of core in the ui.
   /**
    * Calculates the mouse position and angle string.
-   * @returns
+   * @return {string}
    */
   positionString() {
     // return a string showing the position of the mouse on the canvas
@@ -121,8 +120,8 @@ export class Mouse {
 
   /**
    * Timer function for recognizing double clicks
-   * @param {*} button  - 0 = left, 1 = wheel, 2 = right;
-   * @returns
+   * @param {number} button  - 0 = left, 1 = wheel, 2 = right;
+   * @return {boolean}
    */
   isDoubleClick(button) {
     // measure time between clicks to check for double clicks in a generic way
@@ -179,7 +178,7 @@ export class Mouse {
 
   /**
    * set mouse position from scene coordinates
-   * @param {point} point
+   * @param {Point} point
    */
   setPosFromScenePoint(point) {
     const mousePos = this.transformToCanvas(point);

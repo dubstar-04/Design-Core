@@ -9,8 +9,15 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/**
+ * Circle Entity Class
+ * @extends Entity
+ */
 export class Circle extends Entity {
+  /**
+   * Create a Circle Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 
@@ -33,11 +40,22 @@ export class Circle extends Entity {
     }
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Circle', shortcut: 'C', type: 'Entity'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
@@ -59,6 +77,9 @@ export class Circle extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
@@ -67,19 +88,36 @@ export class Circle extends Entity {
     }
   }
 
+  /**
+   * Get Circle radius
+   * @return {number} - circle radius
+   */
   getRadius() {
     return this.points[0].distance(this.points[1]);
   }
 
+  /**
+   * Set Circle radius
+   * @param {number} rad
+   */
   setRadius(rad) {
     this.points[1] = this.points[0].project(0, rad);
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, 0, 6.283);
     ctx.stroke();
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'CIRCLE');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -95,6 +133,7 @@ export class Circle extends Entity {
 
   /**
    * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
   decompose() {
     const startPoint = this.points[0].project(0, this.radius);
@@ -105,6 +144,10 @@ export class Circle extends Entity {
     return [startPoint, endPoint, closurePoint];
   }
 
+  /**
+   * Trim the entity
+   * @param {Array} points
+   */
   trim(points) {
     if (points.length > 1) {
       const start = points[0];
@@ -132,6 +175,10 @@ export class Circle extends Entity {
     }
   }
 
+  /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return {
       centre: this.points[0],
@@ -139,6 +186,12 @@ export class Circle extends Entity {
     };
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
 
@@ -168,6 +221,11 @@ export class Circle extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     // find the closest point on the circle
     const closest = P.closestPointOnArc(this.points[1], this.points[1], this.points[0]);
@@ -176,6 +234,10 @@ export class Circle extends Entity {
     return [closest, distance];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
   boundingBox() {
     const xmin = this.points[0].x - this.radius;
     const xmax = this.points[0].x + this.radius;

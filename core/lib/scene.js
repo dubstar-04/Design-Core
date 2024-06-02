@@ -9,7 +9,12 @@ import {Point} from '../entities/point.js';
 import {DesignCore} from '../designCore.js';
 import {BlockManager} from '../tables/blockManager.js';
 
+/**
+ * Scene Class
+ * Holds all entity instances
+ */
 export class Scene {
+  /** Create a scene */
   constructor() {
     // initialise the scene variables
     this.saved = false;
@@ -38,7 +43,7 @@ export class Scene {
 
   /**
    * Get the scene bounding box
-   * @returns scene bounding box
+   * @return {BoundingBox} scene bounding box
    */
   boundingBox() {
     let xmin = Infinity;
@@ -77,9 +82,9 @@ export class Scene {
   /**
    * Create and add new items to the scene
    * @param {string} type - entity type
-   * @param {object} data - object of entity parameters
+   * @param {Object} data - object of entity parameters
    * @param {number} index - integer of item to replace
-   * @returns - index of created item
+   * @return {number} - index of created item
    */
   addItem(type, data, index) {
     // TODO: validate data is valid for type
@@ -114,7 +119,7 @@ export class Scene {
    * @param {string} type - entity type or "ANY"
    * @param {string} prop - object of entity parameters
    * @param {any} value - value of the property
-   * @returns - index of items
+   * @return {number} - index of items
    */
   findItem(type, prop, value) {
     const filteredItems = [];
@@ -132,8 +137,8 @@ export class Scene {
 
   /**
    * Get Item
-   * @param {number} type - items index
-   * @returns - item
+   * @param {number} index - items index
+   * @return {Object} - item
    */
   getItem(index) {
     return this.items[index];
@@ -141,8 +146,8 @@ export class Scene {
 
   /**
    * Remove Item
-   * @param {number} type - items index
-   * @returns - success status
+   * @param {number} index - items index
+   * @return {boolean} - success status
    */
   removeItem(index) {
     const count = this.items.length;
@@ -157,7 +162,7 @@ export class Scene {
 
   /**
    * Add items to the scenes tempItems
-   * @param {object} item
+   * @param {Object} item
    */
   addToTempItems(item) {
     this.tempItems.push(item); // Add it to the tempItems Array
@@ -165,7 +170,7 @@ export class Scene {
 
   /**
    * Add items to the scenes auxiliary items
-   * @param {object} item
+   * @param {Object} item
    */
   addToAuxiliaryItems(item) {
     this.auxiliaryItems.push(item); // Add it to the auxiliary Array
@@ -174,7 +179,7 @@ export class Scene {
   /**
    * Create a new temp item and add to scenes tempItems
    * @param {string} type - entity type
-   * @param {object} data - object of entity parameters
+   * @param {Object} data - object of entity parameters
    */
   createTempItem(type, data) {
     data.layer = DesignCore.LayerManager.getCstyle();
@@ -182,6 +187,10 @@ export class Scene {
     this.addToTempItems(helper);
   }
 
+  /**
+   * Write the scene data to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     let width = 0;
     let height = 0;

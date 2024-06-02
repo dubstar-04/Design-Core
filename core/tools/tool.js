@@ -1,4 +1,8 @@
+/**
+ * Tool Class
+ */
 export class Tool {
+  /** Create a Tool command */
   constructor() {
     Object.defineProperty(this, 'type', {
       value: this.constructor.name,
@@ -11,12 +15,18 @@ export class Tool {
     });
   }
 
-  action() {
-    // action function to be overidden by implementation
-  };
-
+  /**
+   * Preview the command during execution
+   */
   preview() {
     // preview function to be overidden by implementation
+  };
+
+  /**
+   * Perform the command
+   */
+  action() {
+    // action function to be overidden by implementation
   };
 }
 

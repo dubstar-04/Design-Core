@@ -6,17 +6,33 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Trim Command Class
+ * @extends Tool
+ */
 export class Trim extends Tool {
+  /** Create a Trim command */
   constructor() {
     super();
     this.selectedIndex;
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Trim', shortcut: 'TR', type: 'Tool'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to perform the command
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.BOUNDARY, [Input.Type.SELECTIONSET]);
@@ -36,6 +52,16 @@ export class Trim extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
+  preview() {
+    // No Preview
+  }
+
+  /**
+   * Perform the command
+   */
   action() {
     const item = this.selectedIndex;
 

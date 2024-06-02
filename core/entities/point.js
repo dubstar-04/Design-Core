@@ -1,10 +1,12 @@
 import {Utils} from '../lib/utils.js';
 
+/** Point Entity Class */
 export class Point {
   /**
-   * @param  {Number} x
-   * @param  {Number} y
-   * @param  {Number} bulge
+   * Create a Point
+   * @param  {number} x
+   * @param  {number} y
+   * @param  {number} bulge
    */
   constructor(x, y, bulge=0) {
     this.type = this.constructor.name;
@@ -28,6 +30,7 @@ export class Point {
   /**
    * Add this to that
    * @param  {Point} that
+   * @return {Point}
    */
   add(that) {
     return new Point(this.x + that.x, this.y + that.y);
@@ -36,6 +39,7 @@ export class Point {
   /**
    * subtract that from this
    * @param  {Point} that
+   * @return {Point}
    */
   subtract(that) {
     return new Point(this.x - that.x, this.y - that.y);
@@ -44,6 +48,7 @@ export class Point {
   /**
    * Angle between this and that in radians
    * @param  {Point} that
+   * @return {number}
    */
   angle(that) {
     const angle = Math.atan2((this.y - that.y), (this.x - that.x)) + Math.PI;
@@ -53,6 +58,7 @@ export class Point {
 
   /**
    * Returns a deep clone of a point
+   * @return {Point}
    */
   clone() {
     return new Point(this.x, this.y);
@@ -61,6 +67,7 @@ export class Point {
   /**
    * Returns distance between this and that
    * @param  {Point} that
+   * @return {number}
    */
   distance(that) {
     return Math.sqrt((this.x - that.x) * (this.x - that.x) + (this.y - that.y) * (this.y - that.y));
@@ -70,6 +77,7 @@ export class Point {
   /**
    * Return dot product of this and that
    * @param  {Point} that
+   * @return {number}
    */
   dot(that) {
     return this.x * that.x + this.y * that.y;
@@ -78,7 +86,8 @@ export class Point {
   /**
    * Return new point rotated about centre by angle in radians
    * @param  {Point} centre
-   * @param  {Number} angle - in radians
+   * @param  {number} angle - in radians
+   * @return {Point}
    */
   rotate(centre, angle) {
     const x = centre.x + (this.x - centre.x) * Math.cos(angle) - (this.y - centre.y) * Math.sin(angle);
@@ -89,6 +98,7 @@ export class Point {
   /**
    * Return new point with minimum values for x and y from this and that
    * @param  {Point} that
+   * @return {Point}
    */
   min(that) {
     return new Point(
@@ -100,6 +110,7 @@ export class Point {
   /**
    * Return new point with maximum values for x and y from this and that
    * @param  {Point} that
+   * @return {Point}
    */
   max(that) {
     return new Point(
@@ -111,6 +122,7 @@ export class Point {
   /**
    * Return midpoint between this and that
    * @param  {Point} that
+   * @return {Point}
    */
   midPoint(that) {
     // return point midway between this and that
@@ -126,7 +138,8 @@ export class Point {
    * Returns linear interpolation between this and that
    * e.g. t = 0.5 will return midpoint between this and that
    * @param  {Point} that
-   * @param  {Number} t - ratio between 0 and 1
+   * @param  {number} t - ratio between 0 and 1
+   * @return {Point}
    */
   lerp(that, t) {
     return new Point(
@@ -137,8 +150,9 @@ export class Point {
 
   /**
    * Return new point projected from this along angle by distance
-   * @param  {Number} angle - in radians
-   * @param  {Number} distance
+   * @param  {number} angle - in radians
+   * @param  {number} distance
+   * @return {Point}
    */
   project(angle, distance) {
     if (angle === 0) {
@@ -156,7 +170,7 @@ export class Point {
    * Find the closest point to this on the ray formed by Pt1 and Pt2
    * @param  {Point} Pt1
    * @param  {Point} Pt2
-   * @returns the closest point on the ray
+   * @return {Point} the closest point on the ray
    */
   perpendicular(Pt1, Pt2) {
     const APx = this.x - Pt1.x;
@@ -176,6 +190,7 @@ export class Point {
   /**
    * Check if this is the same as that
    * @param  {Point} that
+   * @return {boolean}
    */
   isSame(that) {
     if (Utils.round(this.x) == Utils.round(that.x) && Utils.round(this.y) == Utils.round(that.y)) return true;
@@ -184,9 +199,9 @@ export class Point {
 
   /**
    * Find the closest point on a line between start and end points
-   * @param {*} startPoint
-   * @param {*} endPoint
-   * @returns the closest point on the line
+   * @param {Point} startPoint
+   * @param {Point} endPoint
+   * @return {Point} the closest point on the line
    */
   closestPointOnLine(startPoint, endPoint) {
     const pnt = this.perpendicular(startPoint, endPoint);
@@ -209,7 +224,7 @@ export class Point {
    * @param {Point} endPoint
    * @param {Point} centerPoint
    * @param {number} direction - CCW if > 0
-   * @returns the closest point on the arc or null
+   * @return {Point} the closest point on the arc or null
    */
   closestPointOnArc(startPoint, endPoint, centerPoint, direction=0) {
     const length = this.distance(centerPoint);
@@ -238,9 +253,8 @@ export class Point {
    * @param {Point} endPoint
    * @param {Point} centerPoint
    * @param {number} direction - CCW if > 0
-   * @returns true or false
+   * @return {Point} true or false
    */
-
   isOnArc(startPoint, endPoint, centerPoint, direction=0) {
     // direction: ccw arc > 0, clockwise arc <= 0
     const snapAngle = centerPoint.angle(this);
@@ -283,7 +297,7 @@ export class Point {
    * Determine if point is on line segment
    * @param {Point} startPoint
    * @param {Point} endPoint
-   * @returns true or false
+   * @return {Point} true or false
    */
   isOnLine(startPoint, endPoint) {
     // check start -> point + point -> end equals start -> end
@@ -295,7 +309,7 @@ export class Point {
 
   /**
    * Get the arc angle in radians from the bulge value
-   * @returns arc angle in radians
+   * @return {Point} arc angle in radians
    */
   bulgeAngle() {
     return Math.atan(this.bulge) * 4;
@@ -303,6 +317,8 @@ export class Point {
 
   /**
    * Return the radius of the arc from the next point in the polyline
+   * @param {Point} nextPoint
+   * @return {number}
    */
   bulgeRadius(nextPoint) {
     if (this.bulge == 0) {
@@ -316,7 +332,7 @@ export class Point {
   /**
    * Returns apothem; the distance from arc center to cord midpoint
    * @param {Point} nextPoint
-   * @returns apothem
+   * @return {number} apothem
    */
   apothem(nextPoint) {
     if (this.bulge == 0) {
@@ -330,7 +346,7 @@ export class Point {
   /**
    * Return the centre point of the arc
    * @param {Point} nextPoint
-   * @returns Point
+   * @return {Point} Point
    */
   bulgeCentrePoint(nextPoint) {
     const midp = this.midPoint(nextPoint);

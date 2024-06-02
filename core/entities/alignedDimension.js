@@ -10,16 +10,35 @@ import {Point} from './point.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Aligned Dimension Entity Class
+ * @extends BaseDimension
+ */
 export class AlignedDimension extends BaseDimension {
+  /**
+   * Create an Aligned Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'AlignedDimension', shortcut: 'DIMALIGNED'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
@@ -43,6 +62,9 @@ export class AlignedDimension extends BaseDimension {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length == 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
@@ -58,6 +80,11 @@ export class AlignedDimension extends BaseDimension {
     }
   }
 
+  /**
+   * Get sequenced points from user selection
+   * @param {any} items
+   * @return {Array} array of points
+   */
   static getPointsFromSelection(items) {
     const points = [];
     const item = items[0];
@@ -73,6 +100,11 @@ export class AlignedDimension extends BaseDimension {
     return points;
   }
 
+  /**
+   * Build the dimension
+   * @param {Object} style
+   * @return {Array} - Array of entities that compose the dimension
+   */
   buildDimension(style) {
     const Pt1 = this.getPointBySequence(13);
     const Pt2 = this.getPointBySequence(14);
@@ -248,6 +280,10 @@ export class AlignedDimension extends BaseDimension {
     return entities;
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     const Pt10 = this.getPointBySequence(10);
     const Pt11 = this.text.points[0];

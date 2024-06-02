@@ -2,14 +2,22 @@ import {Utils} from './utils.js';
 import {SelectionWindow} from './selectionWindow.js';
 import {DesignCore} from '../designCore.js';
 
+/** SingleSelection Class */
 export class SingleSelection {
+  /**
+   * Create a SingleSelection
+   * @param {number} index
+   * @param {Point} point
+   */
   constructor(index, point) {
     this.selectedItemIndex = index;
     this.selectedPoint = point;
   }
 }
 
+/** SelectionSet Class */
 export class SelectionSet {
+  /** Create SelectionSet */
   constructor() {
     this.accepted = false;
     this.selectionSet = [];
@@ -17,7 +25,9 @@ export class SelectionSet {
 }
 
 // TODO: Refactor class.
+/** Selection Manager Class */
 export class SelectionManager {
+  /** Create a SelectionManager */
   constructor() {
     this.selectionSet = new SelectionSet(); // store a list of selected items indices
     this.selectedItems = []; // store a copy of selected items
@@ -85,7 +95,7 @@ export class SelectionManager {
 
   /**
    * Get the rectangle points formed between mouseDown and current mouse location
-   * @return {array} selectionRect - [x1, x2, y1, y2]
+   * @return {Array} selectionRect - [x1, x2, y1, y2]
    */
   getSelectionRect() {
     // TODO: It would be nice if this returned an object {xmin: xmin, ymin:ymin ...}
@@ -102,7 +112,8 @@ export class SelectionManager {
 
   /**
    * Select the item closest to the mouse and add it to the selection set
-   * @returns {SingleSelection} - return single selection
+   * @param {Point} point
+   * @return {SingleSelection} - return single selection
    */
   singleSelect(point) {
     const closestItemIndex = this.findClosestItem(point);
@@ -120,7 +131,7 @@ export class SelectionManager {
   /**
    * Find closest item to point
    * @param  {Point} point
-   * @returns {Integer} - return index of closest item or undefined
+   * @return {number} - return index of closest item or undefined
    */
   findClosestItem(point) {
     let delta = 1.65 /DesignCore.Core.canvas.getScale(); // find a more suitable starting value
@@ -147,7 +158,7 @@ export class SelectionManager {
 
   /**
   * Remove the item at index from the selectionSet and selectedItems
-  * @param  {Integer} index - index of the item in scene.items
+  * @param  {number} index - index of the item in scene.items
   */
   removeFromSelectionSet(index) {
     const itemIndex = this.selectionSet.selectionSet.indexOf(index);
@@ -159,7 +170,7 @@ export class SelectionManager {
 
   /**
   * Add the item at index to the selectionSet and selectedItems
-  * @param  {Integer} index
+  * @param  {number} index
   */
   addToSelectionSet(index) {
     if (index === undefined) {
@@ -174,7 +185,7 @@ export class SelectionManager {
 
   /**
    * Duplicate the item at index and add to selectedItems
-   * @param  {Integer} index
+   * @param  {number} index
    */
   addToSelectedItems(index) {
     const copyofitem = Utils.cloneObject(DesignCore.Scene.items[index]);

@@ -8,8 +8,15 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/**
+ * Entity Class
+ * @extend Entity
+ */
 export class Entity {
+  /**
+   * Create a Entity
+   * @param {Array} data
+   */
   constructor(data) {
     Object.defineProperty(this, 'type', {
       value: this.constructor.name,
@@ -86,7 +93,7 @@ export class Entity {
 
   /**
    * get rgb colour
-   * @returns rgb colour object
+   * @return {number} rgb colour object
    */
   getColour() {
     return this.entityColour.getColour(); ;
@@ -94,7 +101,7 @@ export class Entity {
 
   /**
    * get rgb colour to draw
-   * @returns rgb colour object
+   * @return {number} rgb colour object
    */
   getDrawColour() {
     let rgb = this.getColour();
@@ -109,12 +116,16 @@ export class Entity {
 
   /**
    * Set the entity colour
-   * @param {object} rgb
+   * @param {Object} rgb
    */
   setColour(rgb) {
     this.entityColour.setColour(rgb);
   }
 
+  /**
+   * Get the line type
+   * @return {LType}
+   */
   getLineType() {
     let lineTypeName = this.lineType;
 
@@ -128,6 +139,10 @@ export class Entity {
     return lineType;
   }
 
+  /**
+   * Write the colour to file in the dxf format
+   * @param {DXFFile} file
+   */
   writeDxfColour(file) {
     if (this.entityColour.aci != 256) {
       file.writeGroupCode('62', this.entityColour.aci);
@@ -137,7 +152,11 @@ export class Entity {
     }
   }
 
-
+  /**
+   * Determine if the entity is within the selection
+   * @param {Array} selectionExtremes
+   * @return {boolean} true if within
+   */
   within(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
@@ -145,7 +164,7 @@ export class Entity {
       return;
     }
 
-    // determin if this entities is within a the window specified by selectionExtremes
+    // Determine if this entities is within a the window specified by selectionExtremes
     const boundingBox = this.boundingBox();
     if ( boundingBox.xMin > selectionExtremes[0] &&
           boundingBox.xMax < selectionExtremes[1] &&
@@ -158,6 +177,11 @@ export class Entity {
     return false;
   }
 
+  /**
+   * Determine if the entity is touch the selection window
+   * @param {Array} selectionExtremes
+   * @return {boolean} true if touched
+   */
   touched(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
@@ -190,10 +214,18 @@ export class Entity {
     return false;
   }
 
+  /**
+   * Extend the entity
+   * @param {Array} points
+   */
   extend(points) {
     // extend function to be overidden by implementation
   }
 
+  /**
+   * Trim the entity
+   * @param {Array} points
+   */
   trim(points) {
     // trim function to be overidden by implementation
   }

@@ -2,13 +2,22 @@ import {Section} from './section.js';
 import {DxfIterator} from '../dxfIterator.js';
 import {Strings} from '../../strings.js';
 
+/**
+ * Entities Class
+ * @extends Section
+ */
 export class Entities extends Section {
+  /** Create Entities */
   constructor() {
     super();
 
     this.entities = [];
   }
 
+  /**
+   * Add Entity
+   * @param {Object} entity
+   */
   addEntity(entity) {
     if (Object.keys(entity).length) {
       if (!entity.hasOwnProperty('points')) {
@@ -19,6 +28,11 @@ export class Entities extends Section {
     }
   }
 
+  /**
+   * Read
+   * @param {Object} iterator
+   * @return {Array}
+   */
   read(iterator) {
     let currentEntity = {};
     while (iterator.nextPair().value !== 'ENDSEC') {

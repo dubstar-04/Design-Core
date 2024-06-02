@@ -6,7 +6,14 @@ import {Strings} from './strings.js';
 import {DesignCore} from '../designCore.js';
 import {Point} from '../entities/point.js';
 
+/** PromptOption Class */
 export class PromptOptions {
+  /**
+   * Create PromptOptions
+   * @param {string} promptMessage
+   * @param {Array} types
+   * @param {Array} options
+   */
   constructor(promptMessage = 'error', types = [], options = []) {
     this.promptMessage = promptMessage;
     this.types = types;
@@ -51,7 +58,7 @@ export class PromptOptions {
   /**
    * Match the input to a command option
    * @param {any} input
-   * @returns undefined or the matched option
+   * @return {string} undefined or the matched option
    */
   parseInputToOption(input) {
     if (this.options.length === 0) {
@@ -79,7 +86,7 @@ export class PromptOptions {
 
   /**
    * Return the prompt for the input request
-   * @returns
+   * @return {string}
    */
   getPrompt() {
     let msg = `${this.promptMessage}`;
@@ -94,7 +101,7 @@ export class PromptOptions {
   /**
    * Underline the shortcut key for the prompt option
    * @param {string} option
-   * @returns - option with shortcut underlined
+   * @return {string} option with shortcut underlined
    */
   getOptionWithShortcut(option) {
     const optionWithShortcut = `${option.substring(0, 1)}\u0332${option.substring(1, option.length)}`;
@@ -118,6 +125,7 @@ export class PromptOptions {
   }
 }
 
+/** Input Class */
 export class Input {
   static Type = {
     POINT: 'Point',
@@ -131,7 +139,7 @@ export class Input {
   /**
    * Return the Input.Type for value
    * @param {any} value
-   * @returns
+   * @return {Object}
    */
   static getType(value) {
     if (value === undefined) {
@@ -150,7 +158,9 @@ export class Input {
   }
 }
 
+/** InputManager Class */
 export class InputManager {
+  /** Create InputManager */
   constructor() {
     this.activeCommand = undefined;
 
@@ -179,7 +189,7 @@ export class InputManager {
   /**
  * Create input request
  * @param {PromptOption} promptOption
- * @returns promise
+ * @return {Object} promise
  */
   requestInput(promptOption) {
     this.promptOption = promptOption;
@@ -343,7 +353,7 @@ export class InputManager {
 
   /**
  * Handle mouse down
- * @param {integer} button
+ * @param {number} button
  */
   mouseDown(button) {
     switch (button) {
@@ -361,7 +371,7 @@ export class InputManager {
 
   /**
  * Handle mouse up
- * @param {integer} button
+ * @param {number} button
  */
   mouseUp(button) {
     switch (button) {
@@ -392,7 +402,7 @@ export class InputManager {
 
   /**
    * Handle canvas selection
-   * @param {*} selection
+   * @param {Selection} selection
    */
   onSelection(selection) {
     if (this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
@@ -427,8 +437,8 @@ export class InputManager {
 
   /**
    * Execute the currently active command then reset
-   * @param {*} item - item to create
-   * @param {*} index - index of item in scene.items
+   * @param {Object} item - item to create
+   * @param {number} index - index of item in scene.items
    */
   executeCommand(item, index = undefined) {
     this.actionCommand(item, index);
@@ -437,8 +447,9 @@ export class InputManager {
 
   /**
    * Execute the currently active command without reset
-   * @param {*} item - item to create
-   * @param {*} index - index of item in scene.items
+   * @param {Object} item - item to create
+   * @param {number} index - index of item in scene.items
+   * @return {number}
    */
   actionCommand(item, index = undefined) {
     if (this.activeCommand instanceof Tool) {

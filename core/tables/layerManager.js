@@ -2,8 +2,12 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Layer} from './layer.js';
 import {StyleManagerBase} from './styleManagerBase.js';
 
-
+/**
+ * LayerManager Class
+ * @extends StyleManagerBase
+ */
 export class LayerManager extends StyleManagerBase {
+  /** Create a LayerManager */
   constructor() {
     super();
 
@@ -11,15 +15,25 @@ export class LayerManager extends StyleManagerBase {
     this.itemProperty = 'layer';
   }
 
+  /**
+   * Create a new layer
+   * @param {Object} style
+   * @return {Object}
+   */
   createItem(style) {
     return new Layer(style);
   }
 
+  /** Add standard layers */
   addStandardItems() {
     this.addItem({'name': '0'});
     this.addItem({'name': 'DEFPOINTS', 'plotting': false});
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     // Create table data for layers
     file.writeGroupCode('0', 'TABLE');

@@ -2,7 +2,12 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Flags} from '../properties/flags.js';
 import {Property} from '../properties/property.js';
 
+/** LineType Class */
 export class LType {
+  /**
+   * Create a Line Type
+   * @param {Object} data
+   */
   constructor(data) {
     this.type = 'LType';
     this.name = '';
@@ -50,8 +55,8 @@ export class LType {
 
   /**
    * Get a dash pattern that cairo and html canvas understand
-   * @param {array} scale
-   * @returns array for dash pattern
+   * @param {Array} scale
+   * @return {Array} array for dash pattern
    */
   getPattern(scale) {
     // DXF Patterns use -ve values for gaps and 0.0 for dots

@@ -1,7 +1,11 @@
 import {DesignCore} from '../designCore.js';
 import {Strings} from '../lib/strings.js';
 
+/**
+ * Table Manager Base Class
+ */
 export class TableManagerBase {
+  /** Create a Table Manager */
   constructor() {
     this.items = [];
     this.addStandardItems();
@@ -12,7 +16,7 @@ export class TableManagerBase {
 
   /**
    * Get items
-   * @returns list of items
+   * @return {Array} list of items
    */
   getItems() {
     return this.items;
@@ -20,7 +24,7 @@ export class TableManagerBase {
 
   /**
    * Get item count
-   * @returns number of items
+   * @return {number} number of items
    */
   itemCount() {
     return this.items.length;
@@ -38,7 +42,7 @@ export class TableManagerBase {
   /**
    * Generate a unique name
    * @param {string} name
-   * @returns unique name
+   * @return {string} unique name
    */
   getUniqueName(name) {
     let count = 0;
@@ -59,6 +63,8 @@ export class TableManagerBase {
   /**
    * Add a item to the list of items
    * @param {item} item
+   * @param {boolean} overwrite
+   * @return {Objects}
    */
   addItem(item, overwrite=false) {
     // Call the subclass to create a new typed item object
@@ -79,7 +85,8 @@ export class TableManagerBase {
   /**
    * Delete a item using the item index
    * @param {number} itemIndex
-   * @returns array containing deleted item or undefined
+   * @param {boolean} showWarning
+   * @return {Array} array containing deleted item or undefined
    */
   deleteItem(itemIndex, showWarning=true) {
     if (this.items[itemIndex] === undefined) {
@@ -104,7 +111,7 @@ export class TableManagerBase {
   /**
    * Check if a item with itemName exists
    * @param {string} itemName
-   * @returns true or false
+   * @return {boolean}
    */
   itemExists(itemName) {
     const itemExists = this.items.some((el) => el.name.toUpperCase() === itemName.toUpperCase());
@@ -137,7 +144,7 @@ export class TableManagerBase {
   /**
    * Find the index of itemName
    * @param {string} itemName
-   * @returns index of the item or -1 if item doesn't exist
+   * @return {number} index of the item or -1 if item doesn't exist
    */
   getItemIndex(itemName) {
     return this.items.findIndex((item) => item.name.toUpperCase() === itemName.toUpperCase());
@@ -146,7 +153,7 @@ export class TableManagerBase {
   /**
    * Get the item from an index
    * @param {number} itemIndex
-   * @returns
+   * @return {number}
    */
   getItemByIndex(itemIndex) {
     return this.items[itemIndex];
@@ -155,7 +162,7 @@ export class TableManagerBase {
   /**
    * get a item matching itemname
    * @param {string} itemName
-   * @returns item object
+   * @return {Object}
    */
   getItemByName(itemName) {
     for (let i = 0; i < this.itemCount(); i++) {
@@ -174,7 +181,7 @@ export class TableManagerBase {
   /**
    * Get the item from an index
    * @param {number} itemIndex
-   * @returns
+   * @return {Object}
    */
   getItemByIndex(itemIndex) {
     return this.items[itemIndex];
@@ -185,7 +192,7 @@ export class TableManagerBase {
    * Rename the item at index with newName
    * @param {number} itemIndex
    * @param {string} newName
-   * @returns {String} new name or undefined
+   * @return {string} new name or undefined
    */
   renameItem(itemIndex, newName) {
     const itemToRename = this.getItemByIndex(itemIndex).name;
@@ -260,6 +267,7 @@ export class TableManagerBase {
     }
   }
 
+  /** Purge unused items */
   purge() {
     const itemsToPurge = [];
     this.items.forEach((item, index) => {

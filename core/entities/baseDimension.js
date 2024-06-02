@@ -7,7 +7,15 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Base Dimension Entity Class
+ * @extends Entity
+ */
 export class BaseDimension extends Entity {
+  /**
+   * Create a Base Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 
@@ -158,16 +166,32 @@ export class BaseDimension extends Entity {
     }
   }
 
+  /**
+   * Get the dimension type
+   * @return {number}
+   */
   getBaseDimType() {
     const type = this.dimType % 32;
     return type;
   }
 
+  /**
+   * Get the points for the sequence number
+   * @param {number} sequenceNumber
+   * @return {Point}
+   */
   getPointBySequence(sequenceNumber) {
     const point = this.points.find((point) => point.sequence === sequenceNumber);
     return point;
   }
 
+  /**
+   * Define the arrow head
+   * @param {Point} point
+   * @param {number} angle
+   * @param {number} size
+   * @return {Solid}
+   */
   getArrowHead(point, angle, size) {
     let p1 = new Point(point.x + size/4, point.y + size);
     let p2 = new Point(point.x - size/4, point.y + size);
@@ -182,6 +206,11 @@ export class BaseDimension extends Entity {
     return arrowHead;
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     const style = DesignCore.DimStyleManager.getItemByName(this.styleName);
 
@@ -200,27 +229,56 @@ export class BaseDimension extends Entity {
     this.block.draw(ctx, scale);
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     return this.block.closestPoint(P);
   }
 
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
   boundingBox() {
     return this.block.boundingBox();
   }
 
+  /**
+   * Determine if the entity is within the selection
+   * @param {Array} selectionExtremes
+   * @return {boolean} true if within
+   */
   within(selectionExtremes) {
     return this.block.within(selectionExtremes);
   }
 
+  /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return this.block.intersectPoints();
   }
 
+  /**
+   * Determine if the entity is touch the selection window
+   * @param {Array} selectionExtremes
+   * @return {boolean} true if touched
+   */
   touched(selectionExtremes) {
     return this.block.touched(selectionExtremes);
   }

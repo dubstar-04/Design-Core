@@ -11,8 +11,15 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/**
+ * Text Entity Class
+ * @extends Entity
+ */
 export class Text extends Entity {
+  /**
+   * Create a Text Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
     this.string = '';
@@ -127,11 +134,22 @@ export class Text extends Entity {
     }
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Text', shortcut: 'DT', type: 'Entity'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
@@ -172,6 +190,9 @@ export class Text extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length >= 1) {
       if (DesignCore.Scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
@@ -222,7 +243,7 @@ export class Text extends Entity {
 
   /**
    * Get the backwards value
-   * @returns {boolean} true if the text is flipped horizontally
+   * @return {boolean} true if the text is flipped horizontally
    */
   getBackwards() {
     // Backwards value is bitmasked in flags as value 2
@@ -245,7 +266,7 @@ export class Text extends Entity {
 
   /**
    * Get the upside down value
-   * @returns {boolean} true if the text is flipped vertically
+   * @return {boolean} true if the text is flipped vertically
    */
   getUpsideDown() {
     // Upside down value is bitmasked in flags as value 4
@@ -268,7 +289,7 @@ export class Text extends Entity {
 
   /**
    * Get a string describing the horizontal text alignment
-   * @returns {string}
+   * @return {string}
    */
   getHorizontalAlignment() {
     /* DXF Data
@@ -298,7 +319,7 @@ export class Text extends Entity {
 
   /**
    * Get a string describing the vertical text alignment
-   * @returns {string}
+   * @return {string}
    */
   getVerticalAlignment() {
     /* DXF Data
@@ -321,11 +342,20 @@ export class Text extends Entity {
     }
   }
 
+  /**
+   * Get the texts bounding rectangle
+   * @return {Object}
+   */
   getBoundingRect() {
     const rect = {width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y};
     return rect;
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
@@ -413,6 +443,10 @@ export class Text extends Entity {
         */
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'TEXT');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -432,6 +466,12 @@ export class Text extends Entity {
     file.writeGroupCode('73', this.verticalAlignment); // Vertical alignment
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const rect = this.getBoundingRect();
 
@@ -446,6 +486,11 @@ export class Text extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     // TODO: Support rotation
     const rect = this.getBoundingRect();
@@ -467,6 +512,10 @@ export class Text extends Entity {
     return [mid, distance];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
   boundingBox() {
     const rect = this.getBoundingRect();
 
@@ -481,6 +530,10 @@ export class Text extends Entity {
     return new BoundingBox(topLeft, bottomRight);
   }
 
+  /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     const rect = this.getBoundingRect();
 

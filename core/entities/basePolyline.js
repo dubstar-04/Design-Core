@@ -11,8 +11,15 @@ import {Property} from '../properties/property.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/**
+ * Base Polyline Entity Class
+ * @extends Entity
+ */
 export class BasePolyline extends Entity {
+  /**
+   * Create a Base Polyline
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 
@@ -65,6 +72,10 @@ export class BasePolyline extends Entity {
     }
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
@@ -106,6 +117,9 @@ export class BasePolyline extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     const mousePoint = DesignCore.Mouse.pointOnScene();
 
@@ -125,8 +139,8 @@ export class BasePolyline extends Entity {
   /**
    * Draw the polyline
    * @param {Object} ctx
-   * @param {Number} scale
-   * @param {Boolean} stroke - don't stroke hatch boundary shapes
+   * @param {number} scale
+   * @param {boolean} stroke - don't stroke hatch boundary shapes
    */
   draw(ctx, scale, stroke=true) {
     for (let i = 0; i < this.points.length; i++) {
@@ -161,6 +175,10 @@ export class BasePolyline extends Entity {
     }
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'POLYLINE');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -180,6 +198,10 @@ export class BasePolyline extends Entity {
     file.writeGroupCode('8', this.layer);
   }
 
+  /**
+   * Write the vertices to file in the dxf format
+   * @param {DXFFile} file
+   */
   vertices(file) {
     for (let i = 0; i < this.points.length; i++) {
       file.writeGroupCode('0', 'VERTEX');
@@ -197,17 +219,28 @@ export class BasePolyline extends Entity {
 
   /**
    * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
   decompose() {
     return this.points;
   }
 
+  /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return {
       points: this.points,
     };
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
 
@@ -246,6 +279,11 @@ export class BasePolyline extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     let distance = Infinity;
     let minPnt = P;
@@ -280,6 +318,10 @@ export class BasePolyline extends Entity {
     return [minPnt, distance];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
   boundingBox() {
     let xmin = Infinity;
     let xmax = -Infinity;
@@ -311,8 +353,8 @@ export class BasePolyline extends Entity {
 
   /**
    * Get the bulge value from the previous segment and the selected point
-   * @param {point} point
-   * @returns polyline bulge value
+   * @param {Point} point
+   * @return {number} polyline bulge value
    */
   getBulgeFromSegment(point) {
     const lastSegBulge = this.points.at(-2).bulge;

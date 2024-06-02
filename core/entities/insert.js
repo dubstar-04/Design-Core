@@ -9,9 +9,19 @@ import {Property} from '../properties/property.js';
 import {DesignCore} from '../designCore.js';
 
 
+/**
+ * Insert Entity Class
+ * @extends Entity
+ */
 export class Insert extends Entity {
+  /**
+   * Create an Insert
+   * Inserts are used to define the location of blocks
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
+
 
     // add block property
     Object.defineProperty(this, 'block', {
@@ -95,20 +105,38 @@ export class Insert extends Entity {
     }
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Insert'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     DesignCore.Core.notify(`${this.type} - Not Implemented`);
     DesignCore.Scene.inputManager.reset();
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     // not implemented
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'INSERT');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -125,6 +153,11 @@ export class Insert extends Entity {
     }
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     // blocks are associated with an insert point.
     // translate ctx by the insert location
@@ -156,9 +189,9 @@ export class Insert extends Entity {
   }
 
   /**
-     * Get the insert rotation
-     * @return {number} angle - degrees
-     */
+   * Get the insert rotation
+   * @return {number} angle - degrees
+   */
   getRotation() {
     if (this.points[1] !== undefined) {
       const angle = Utils.radians2degrees(this.points[0].angle(this.points[1]));
@@ -168,6 +201,12 @@ export class Insert extends Entity {
     return 0;
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
     const blockSnaps = this.block.snaps(mousePoint, delta);
@@ -184,6 +223,11 @@ export class Insert extends Entity {
     return snaps;
   }
 
+  /**
+   * Determine if the entity is within the selection
+   * @param {Array} selectionExtremes
+   * @return {boolean} true if within
+   */
   within(selectionExtremes) {
     // adjust selectionExtremes by the insert position
     const [xmin, xmax, ymin, ymax] = selectionExtremes;
@@ -192,6 +236,10 @@ export class Insert extends Entity {
     return this.block.within(sE);
   }
 
+  /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return {
       start: this.points[0],
@@ -199,6 +247,11 @@ export class Insert extends Entity {
     };
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     // get the closest point from the blocks entities
     // rotate P to match the block rotation
@@ -208,6 +261,10 @@ export class Insert extends Entity {
     return this.block.closestPoint(adjustedPoint);
   }
 
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
   boundingBox() {
     const blockBB = this.block.boundingBox();
     const topLeft = blockBB.pt1.add(this.points[0]);
@@ -215,6 +272,11 @@ export class Insert extends Entity {
     return new BoundingBox(topLeft, bottomRight);
   }
 
+  /**
+   * Determine if the entity is touch the selection window
+   * @param {Array} selectionExtremes
+   * @return {boolean} true if touched
+   */
   touched(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 

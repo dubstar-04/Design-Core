@@ -23,10 +23,12 @@
 
    ***** End Usage *****/
 
-
+/**
+ * Design Core Class
+ */
 export class DesignCore {
   static _core;
-
+  /** Create a Design Core */
   constructor() {
     const msg = 'DesignCore is a static class and cannot be instantiated';
     const err = (`${this.type} - ${msg}`);
@@ -35,6 +37,7 @@ export class DesignCore {
 
   /**
    * Set the Core Instance
+   * @param {Object} core
    */
   static set Core(core) {
     this._core = core;

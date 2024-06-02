@@ -10,7 +10,15 @@ import {BoundingBox} from '../lib/boundingBox.js';
 import {DesignCore} from '../designCore.js';
 import {Property} from '../properties/property.js';
 
+/**
+ * Arc Entity Class
+ * @extends Entity
+ * */
 export class Arc extends Entity {
+  /**
+   * Create an Arc Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
     this.radius = 1;
@@ -55,11 +63,22 @@ export class Arc extends Entity {
     }
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Arc', shortcut: 'A', type: 'Entity'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.CENTER, [Input.Type.POINT]);
@@ -89,6 +108,9 @@ export class Arc extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
@@ -103,10 +125,18 @@ export class Arc extends Entity {
     }
   }
 
+  /**
+   * Arc start angle
+   * @return {number} start angle in radians
+   */
   startAngle() {
     return this.points[0].angle(this.points[1]);
   }
 
+  /**
+   * Arc end angle
+   * @return {number} end angle in radians
+   */
   endAngle() {
     const endAngle = this.points[0].angle(this.points[2]);
     return endAngle;
@@ -116,7 +146,7 @@ export class Arc extends Entity {
    * Calculate the angle between the start and end of the arc
    * Clockwise returns positive angle
    * Counter clockwise returns negtive
-   * @returns angle in degrees
+   * @return {number} angle in degrees
    */
   get totalAngle() {
     let startAngle = this.startAngle();
@@ -135,15 +165,28 @@ export class Arc extends Entity {
     return Utils.radians2degrees(totalAngle);
   }
 
+  /**
+   * Get Arc radius
+   * @return {number} - arc radius
+   */
   getRadius() {
     return this.radius;
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     ctx.arc(this.points[0].x, this.points[0].y, this.radius, this.startAngle(), this.endAngle());
     ctx.stroke();
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'ARC');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -161,6 +204,7 @@ export class Arc extends Entity {
 
   /**
    * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
   decompose() {
     // counter clockwise bulge = +ve, clockwise bulge = -ve,
@@ -184,6 +228,10 @@ export class Arc extends Entity {
     return [startPoint, endPoint];
   }
 
+  /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return {
       centre: this.points[0],
@@ -194,6 +242,12 @@ export class Arc extends Entity {
     };
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
 
@@ -225,10 +279,14 @@ export class Arc extends Entity {
       }
     }
 
-
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     const startPoint = this.points[1];
     const endPoint = this.points[2];
@@ -246,8 +304,8 @@ export class Arc extends Entity {
   }
 
   /**
-   * Return boundingbox
-   * @returns BoundingBox
+   * Return boundingbox for entity
+   * @return {BoundingBox}
    */
   boundingBox() {
     return BoundingBox.arcBoundingBox(this.points[0], this.points[1], this.points[2], this.direction);

@@ -1,9 +1,7 @@
 import {Point} from '../entities/point.js';
-
+/** Matrix Class */
 export class Matrix {
-  /**
-   * Matrix constructor
-   */
+/** Create Matrix */
   constructor() {
     this.a = 1; // x scale
     this.b = 0; // x skew
@@ -15,7 +13,7 @@ export class Matrix {
 
   /**
    * Returns the current scale
-   * @returns
+   * @return {number}
    */
   getScale() {
     // return the x scale
@@ -24,7 +22,7 @@ export class Matrix {
 
   /**
    * Returns inverted matrix
-   * @returns
+   * @return {Matrix}
    */
   invert() {
     const d = 1 / (this.a * this.d - this.b * this.c);
@@ -64,7 +62,7 @@ export class Matrix {
    * Returns px and py transformed to matrix (scene) co-ordinates
    * @param {number} px
    * @param {number} py
-   * @returns
+   * @return {Point}
    */
   transformPoint(px, py) {
     const tpx = px * this.a + py * this.c + this.e;

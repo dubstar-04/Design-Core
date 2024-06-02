@@ -1,4 +1,12 @@
+/**
+ * Patterns Class
+ * For hatch pattern management
+ */
 export class PatternLine {
+  /**
+   * Create PatternLine
+   * @param {string} patternString
+   */
   constructor(patternString) {
     this.angle=0;
     this.xOrigin = 0;
@@ -12,6 +20,10 @@ export class PatternLine {
     }
   }
 
+  /**
+   * load the pattern line
+   * @param {string} patternString
+   */
   loadPatternLine(patternString) {
     const patternArray = patternString.split(',');
 
@@ -34,6 +46,10 @@ export class PatternLine {
     this.dashes = dashes;
   }
 
+  /**
+   * Get the length of all dash elements
+   * @return {number}
+   */
   getDashLength() {
     if (this.dashes.length) {
       // sum the length of all the dashes
@@ -44,11 +60,12 @@ export class PatternLine {
   }
 }
 
+/** Pattern Class */
 export class Patterns {
   /**
      * Get Pattern
      * @param {string} name
-     * @returns pattern string for the pattern name
+     * @return {string} pattern string for the pattern name
      */
   static getPattern(name) {
     // create empty pattern
@@ -68,7 +85,7 @@ export class Patterns {
   /**
      * Get Pattern line count
      * @param {string} name
-     * @returns int for the number of pattern lines
+     * @return {number} for the number of pattern lines
      */
   static getPatternLineCount(name) {
     // get the pattern string
@@ -82,7 +99,7 @@ export class Patterns {
   /**
    * Check if the pattern exists
    * @param {string} name
-   * @returns bool
+   * @return {boolean}
    */
   static patternExists(name) {
     return Object.hasOwn(Patterns.hatch_patterns, name.toUpperCase());

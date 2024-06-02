@@ -1,6 +1,12 @@
 import {Point} from '../entities/point.js';
 
+/** BoundingBox Class */
 export class BoundingBox {
+  /**
+   * Create BoundingBox
+   * @param {Point} firstCorner
+   * @param {Point} secondCorner
+   */
   constructor(firstCorner = new Point(), secondCorner = new Point()) {
     this.pt1 = firstCorner;
     this.pt2 = secondCorner;
@@ -56,9 +62,9 @@ export class BoundingBox {
   }
 
   /**
-   * Determin if point is inside bounding box
+   * Determine if point is inside bounding box
    * @param {Object} point
-   * @returns boolean true if point is inside false if not
+   * @return {boolean} true if point is inside false if not
    */
   isInside(point) {
     if (point.x > this.xMin && point.x < this.xMax) {
@@ -73,6 +79,7 @@ export class BoundingBox {
   /**
    * Return the bounding box for points
    * @param {Array} points
+   * @return {BoundingBox}
    */
   static fromPoints(points) {
     if (!points.length) {
@@ -88,9 +95,9 @@ export class BoundingBox {
 
   /**
    * Calculate the boundingbox for a line
-   * @param {point} startPoint
-   * @param {point} endPoint
-   * @returns - BoundingBox
+   * @param {Point} startPoint
+   * @param {Point} endPoint
+   * @return {BoundingBox}
    */
   static lineBoundingBox( startPoint, endPoint) {
     return new BoundingBox(startPoint, endPoint);
@@ -98,11 +105,11 @@ export class BoundingBox {
 
   /**
    * Calculate the boundingbox for an arc
-   * @param {point} centerPoint
-   * @param {point} startPoint
-   * @param {point} endPoint
+   * @param {Point} centerPoint
+   * @param {Point} startPoint
+   * @param {Point} endPoint
    * @param {number} direction - ccw > 0, cw < 0
-   * @returns - BoundingBox
+   * @return {BoundingBox}
    */
   static arcBoundingBox(centerPoint, startPoint, endPoint, direction=1) {
     const startAngle = centerPoint.angle(startPoint);
@@ -144,7 +151,7 @@ export class BoundingBox {
    * @param {number} endAngle - angle in radians
    * @param {number} axisAngle - angle in radians. i.e 90 deg = Math.PI / 2.
    * @param {number} direction - ccw > 0, cw < 0
-   * @returns bool
+   * @return {boolean}
    */
   static crossesAxis(startAngle, endAngle, axisAngle, direction=1) {
     const circle = Math.PI * 2;

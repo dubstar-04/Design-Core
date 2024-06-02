@@ -7,16 +7,32 @@ import {Insert} from '../entities/insert.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Explode Command Class
+ * @extends Tool
+ */
 export class Explode extends Tool {
+  /** Create an Explode command */
   constructor() {
     super();
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Explode', shortcut: 'X'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to perform the command
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
@@ -31,10 +47,16 @@ export class Explode extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
     // No Preview
   }
 
+  /**
+   * Perform the command
+   */
   action() {
     // count how many items couldn't be exploded
     let counter = 0;

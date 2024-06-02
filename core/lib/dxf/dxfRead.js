@@ -5,7 +5,9 @@ import {Blocks} from './sections/blocks.js';
 import {Tables} from './sections/tables.js';
 import {DxfIterator} from './dxfIterator.js';
 
+/** DXF Reader Class */
 export class DXFReader {
+  /** Create DXF Reader */
   constructor() {
     this.iterator = new DxfIterator();
     this.blocks = [];
@@ -14,11 +16,18 @@ export class DXFReader {
     this.tables = [];
   }
 
+  /**
+   * Read
+   * @param {string} file
+   */
   read(file) {
     this.iterator.loadFile(file);
     this.parseFile();
   }
 
+  /**
+   * Parse File
+   */
   parseFile() {
     while (this.iterator.nextPair().value !== 'EOF') {
       const currentPair = this.iterator.currentPair();

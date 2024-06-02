@@ -2,7 +2,12 @@ import {DesignCore} from '../designCore.js';
 // import {Strings} from '../lib/strings.js';
 import {TableManagerBase} from './tableManagerBase.js';
 
+/**
+ * StyleManagerBase Class
+ * @extends TableManagerBase
+ */
 export class StyleManagerBase extends TableManagerBase {
+  /** Create Style Manager */
   constructor() {
     super();
 
@@ -12,8 +17,8 @@ export class StyleManagerBase extends TableManagerBase {
 
   /**
    * Delete a style using the style index
-   * @param {number} styleIndex
-   * @returns undefined
+   * @param {number} itemIndex
+   * @param {boolean} showWarning
    */
   deleteStyle(itemIndex, showWarning=true) {
     // call the super class delete
@@ -48,6 +53,7 @@ export class StyleManagerBase extends TableManagerBase {
 
   /**
    * Get the name of the current style
+   * @return {Object}
    */
   getCstyle() {
     return this.currentstyle;
@@ -84,7 +90,6 @@ export class StyleManagerBase extends TableManagerBase {
    * Rename the style at index with newName
    * @param {number} styleIndex
    * @param {string} newName
-   * @returns undefined
    */
   renameStyle(styleIndex, newName) {
     // get the existing name

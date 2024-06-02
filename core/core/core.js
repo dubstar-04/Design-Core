@@ -64,6 +64,7 @@ export class Core {
 
   /**
    * Set the current dxf version
+   * @param {string} version
    */
   set dxfVersion(version) {
     // version should be the RXXXX format for the dxf version
@@ -82,7 +83,7 @@ export class Core {
 
   /**
    * Set the external notification callback
-   * @param  {object} function
+   * @param  {Object} callback
    */
   setExternalNotifyCallbackFunction(callback) {
     // set the callback
@@ -112,6 +113,7 @@ export class Core {
 
   /**
    * Save the current scene to a dxf string
+   * @param {string} version
    * @return {string} The dxf file as a string.
    */
   saveFile(version) {
@@ -120,7 +122,7 @@ export class Core {
 
   /**
    * Return the supported dxf versions
-   * @returns array js object containing the version
+   * @return {string} array js object containing the version
    */
   supportedDXFVersions() {
     return DXFFile.Version;

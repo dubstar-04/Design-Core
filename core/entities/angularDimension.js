@@ -11,16 +11,35 @@ import {Intersection} from '../lib/intersect.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Angular Dimension Entity Class
+ * @extends BaseDimension
+ */
 export class AngularDimension extends BaseDimension {
+  /**
+   * Create an Angular Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'AngularDimension', shortcut: 'DIMANG'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -78,6 +97,9 @@ export class AngularDimension extends BaseDimension {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length >= 4) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
@@ -94,6 +116,11 @@ export class AngularDimension extends BaseDimension {
     }
   }
 
+  /**
+   * Get sequenced points from user selection
+   * @param {any} items
+   * @return {Array} array of points
+   */
   static getPointsFromSelection(items) {
     const points = [];
 
@@ -119,6 +146,11 @@ export class AngularDimension extends BaseDimension {
     return points;
   }
 
+  /**
+   * Build the dimension
+   * @param {Object} style
+   * @return {Array} - Array of entities that compose the dimension
+   */
   buildDimension(style) {
     // Angular
     let dimension = 0;
@@ -155,6 +187,10 @@ export class AngularDimension extends BaseDimension {
     return entities;
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     const Pt10 = this.getPointBySequence(10);
     const Pt11 = this.text.points[0];

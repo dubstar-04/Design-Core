@@ -8,7 +8,15 @@ import {BoundingBox} from '../lib/boundingBox.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Line Entity Class
+ * @extends Entity
+ */
 export class Line extends Entity {
+  /**
+   * Create a Line Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 
@@ -25,12 +33,22 @@ export class Line extends Entity {
     }
   }
 
-
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Line', shortcut: 'L', type: 'Entity'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
@@ -49,6 +67,9 @@ export class Line extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
@@ -57,12 +78,21 @@ export class Line extends Entity {
     }
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     ctx.moveTo(this.points[0].x, this.points[0].y);
     ctx.lineTo(this.points[1].x, this.points[1].y);
     ctx.stroke();
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'LINE');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -79,12 +109,22 @@ export class Line extends Entity {
 
   /**
    * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
   decompose() {
     return this.points;
   }
 
+  /**
+   * Trim the entity
+   * @param {Array} points
+   */
   trim(points) {
+    /**
+     * Trim one end
+     * @param {Array} intersectPnts
+     * @param {Line} line
+     */
     function trimOneEnd(intersectPnts, line) {
       let originPoint;
       let destinationPoint;
@@ -117,6 +157,11 @@ export class Line extends Entity {
       }
     }
 
+    /**
+     * Trim between points
+     * @param {Array} pnts
+     * @param {Line} line
+     */
     function trimBetween(pnts, line) {
       const a = Math.round(line.points[0].distance(pnts[0]));
       const b = Math.round(line.points[0].distance(pnts[1]));
@@ -142,6 +187,13 @@ export class Line extends Entity {
       }
     }
 
+    /**
+     * Check if the trim is between two points
+     * @param {Point} mousePnt
+     * @param {Array} pntsArray
+     * @param {Array} returnPoints
+     * @return {boolean}
+     */
     function betweenPoints(mousePnt, pntsArray, returnPoints) {
       for (let i = 0; i < pntsArray.length - 1; i++) {
         const a = pntsArray[i].distance(mousePnt);
@@ -172,6 +224,10 @@ export class Line extends Entity {
     }
   }
 
+  /**
+   * Extend the entity
+   * @param {Array} points
+   */
   extend(points) {
     let originPoint;
     let destinationPoint;
@@ -215,6 +271,10 @@ export class Line extends Entity {
     }
   }
 
+  /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     return {
       start: this.points[0],
@@ -222,6 +282,10 @@ export class Line extends Entity {
     };
   }
 
+  /**
+   * Get the length of a line
+   * @return {number}
+   */
   length() {
     const A = (this.points[0].x - this.points[1].x);
     const B = (this.points[0].y - this.points[1].y);
@@ -232,11 +296,21 @@ export class Line extends Entity {
     return dist;
   }
 
+  /**
+   * Get the lines mid point
+   * @return {Point}
+   */
   midPoint() {
     const midPoint = this.points[0].midPoint(this.points[1]);
     return midPoint;
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
 
@@ -262,6 +336,11 @@ export class Line extends Entity {
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     const pnt = P.closestPointOnLine(this.points[0], this.points[1]);
     if (pnt === null) {
@@ -272,6 +351,10 @@ export class Line extends Entity {
     return [pnt, distance];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
   boundingBox() {
     return BoundingBox.lineBoundingBox(this.points[0], this.points[1]);
   }

@@ -3,7 +3,12 @@ import {Logging} from '../lib/logging.js';
 import {Flags} from '../properties/flags.js';
 import {Property} from '../properties/property.js';
 
+/** DimStyle Class */
 export class DimStyle {
+  /**
+   * Create a DimStyle
+   * @param {Object} data
+   */
   constructor(data) {
     // Define Properties
     this.type = this.constructor.name;
@@ -607,7 +612,7 @@ export class DimStyle {
   /**
    * Get valueName property value from dimstyle
    * @param {string} valueName
-   * @returns value or undefined
+   * @return {any} value or undefined
    */
   getValue(valueName) {
     if (this.hasOwnProperty(valueName)) {
@@ -621,7 +626,7 @@ export class DimStyle {
 
   /**
    * Get the vertical value
-   * @returns {bool}
+   * @return {bool}
    */
   get vertical() {
     // Vertical value is bitmasked in standardflags as value 4
@@ -642,7 +647,10 @@ export class DimStyle {
     }
   }
 
-
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'DIMSTYLE');
     file.writeGroupCode('105', file.nextHandle(), DXFFile.Version.R2000); // Handle

@@ -5,18 +5,34 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Purge Command Class
+ * @extends Tool
+ */
 export class Purge extends Tool {
+  /** Create a Purge command */
   constructor() {
     super();
     this.option = '';
     this.options = ['Blocks', 'Layers', 'LTypes', 'All'];
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Purge', shortcut: 'PU'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to perform the command
+   */
   async execute() {
     try {
       const op = new PromptOptions(`${Strings.Input.OPTION} <${this.options[3]}>`, [], this.options);
@@ -28,10 +44,16 @@ export class Purge extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
-    // No preview
+    // No Preview
   }
 
+  /**
+   * Perform the command
+   */
   action() {
     let purgedCount = 0;
 

@@ -1,7 +1,15 @@
 import {BasePolyline} from './basePolyline.js';
 import {Point} from './point.js';
 
+/**
+ * Polyline Entity Class
+ * @extends BasePolyline
+ */
 export class Polyline extends BasePolyline {
+  /**
+   * Create a Polyline
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 
@@ -28,6 +36,13 @@ export class Polyline extends BasePolyline {
     }
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Polyline', shortcut: 'PL', type: 'Entity'};
     return command;

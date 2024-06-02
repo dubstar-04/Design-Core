@@ -1,6 +1,7 @@
+/** Logging Class */
 export class Logging {
   static _instance;
-
+  /** Create Logger */
   constructor() {
     this.logLevel = ['OFF', 'ERROR', 'WARN', 'DEBUG', 'TRACE'];
     this.level = 'DEBUG';
@@ -13,6 +14,7 @@ export class Logging {
     return Logging._instance;
   }
 
+  /** Get instance of logger */
   static get instance() {
     if (this._instance === undefined) {
       this._instance = new this();
@@ -21,6 +23,10 @@ export class Logging {
     return this._instance;
   }
 
+  /**
+   * Set logging level
+   * @param {number} level
+   */
   setLevel(level) {
     if (this.logLevel.includes(level)) {
       this.level = level;
@@ -29,10 +35,17 @@ export class Logging {
     }
   }
 
+  /**
+   * Get the logging level
+   */
   get levelValue() {
     return this.logLevel.indexOf(this.level);
   }
 
+  /**
+   * Print debug message
+   * @param {string} msg
+   */
   debug(msg) {
     if (this.levelValue >= 3) {
       console.log(`Debug: ${msg}`);
@@ -40,6 +53,10 @@ export class Logging {
     }
   }
 
+  /**
+   * Print warning message
+   * @param {string} msg
+   */
   warn(msg) {
     if (this.levelValue >= 2) {
       console.log(`Warning: ${msg}`);
@@ -47,6 +64,10 @@ export class Logging {
     }
   }
 
+  /**
+   * Print error message
+   * @param {string} msg
+   */
   error(msg) {
     if (this.levelValue >= 1) {
       console.log(`Error: ${msg}`);
@@ -54,6 +75,9 @@ export class Logging {
     }
   }
 
+  /**
+   * Print trace
+   */
   trace() {
     if (this.levelValue >= 4) {
       console.trace();

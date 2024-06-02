@@ -2,8 +2,12 @@ import {DesignCore} from '../designCore.js';
 import {Point} from '../entities/point.js';
 import {Colours} from './colours.js';
 
-
+/** SelectionWindow Class */
 export class SelectionWindow {
+  /**
+   * Create a SelectionWindow
+   * @param {Object} data
+   */
   constructor(data) {
     this.colour = DesignCore.Settings.selectionWindow;
     this.lineWidth = 1;
@@ -28,7 +32,11 @@ export class SelectionWindow {
     }
   }
 
-
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     const colour = this.colour;
     ctx.fillStyle = colour;
@@ -61,6 +69,10 @@ export class SelectionWindow {
     }
   }
 
+  /**
+   * Draw a rectangle
+   * @param {Object} ctx
+   */
   drawRect(ctx) {
     ctx.moveTo(this.points[0].x, this.points[0].y);
     ctx.lineTo(this.points[1].x, this.points[0].y);

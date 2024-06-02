@@ -1,6 +1,11 @@
 import {Section} from './section.js';
 
+/**
+ * Header Class
+ * @extends Section
+ */
 export class Header extends Section {
+  /** Create Header */
   constructor() {
     super();
 
@@ -10,6 +15,10 @@ export class Header extends Section {
     this.$CLAYER = '0';
   }
 
+  /**
+   * Read
+   * @param {Object} iterator
+   */
   read(iterator) {
     let currentVariable;
     while (iterator.nextPair().value !== 'ENDSEC') {

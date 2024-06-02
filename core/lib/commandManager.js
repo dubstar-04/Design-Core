@@ -67,10 +67,13 @@ const classes = {
 
 };
 
+/**
+ * Command Manager Class
+ * Registers a list of available commands
+ * Creates new commands
+ */
 export class CommandManager {
-  /**
-   * CommandManager constructor
-   */
+/** Create CommandManager */
   constructor() {
     // store a list of the available commands
     this.commands = [];
@@ -93,7 +96,7 @@ export class CommandManager {
 
   /**
    * Return a list of available commands
-   *  @returns array of commands
+   *  @return {Array} array of commands
    */
   getCommands() {
     return this.commands;
@@ -102,8 +105,8 @@ export class CommandManager {
   /**
    * Create a new instance of type using data
    * @param {string} type
-   * @param {array} data
-   * @returns instance of type
+   * @param {Array} data
+   * @return {Object} instance of type
    */
   createNew(type, data) {
     let newItem;
@@ -120,7 +123,7 @@ export class CommandManager {
   /**
    * Check if input is valid command or shortcut
    * @param {string} input
-   * @returns boolean
+   * @return {boolean} boolean
    */
   isCommandOrShortcut(input) {
     if (input === undefined) {
@@ -146,7 +149,7 @@ export class CommandManager {
   /**
    * Check if shortcut is valid
    * @param {string} shortcut
-   * @returns boolean
+   * @return {boolean} boolean
    */
   isShortcut(shortcut) {
     const found = this.commands.some((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === shortcut.toUpperCase());
@@ -156,7 +159,7 @@ export class CommandManager {
   /**
    * Check if command is valid
    * @param {string} command
-   * @returns boolean
+   * @return {boolean} boolean
    */
   isCommand(command) {
     if (command === undefined || command === null) {
@@ -171,7 +174,7 @@ export class CommandManager {
   /**
   * Returns the command for a valid input
   * @param {string} input
-  * @returns valid type
+  * @return {string} valid type
   */
   getCommand(input) {
     let command;
@@ -195,7 +198,7 @@ export class CommandManager {
   /**
    * Returns the shortcut for a valid command
    * @param {string} command
-   * @returns {string} shortcut
+   * @return {string} shortcut
    */
   getShortcut(command) {
     let shortcut;
@@ -212,7 +215,7 @@ export class CommandManager {
   /**
    * Returns a fuzzy match to the input command
    * @param {string} input
-   * @returns {string} fuzzy matched command
+   * @return {string} fuzzy matched command
    */
   getFuzzyMatch(input) {
     let score = Infinity;

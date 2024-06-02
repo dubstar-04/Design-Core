@@ -9,16 +9,35 @@ import {BaseDimension} from './baseDimension.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Diametric Dimension Entity Class
+ * @extends BaseDimension
+ */
 export class DiametricDimension extends BaseDimension {
+  /**
+   * Create a Diametric Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'DiametricDimension', shortcut: 'DIMDIA'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -41,6 +60,9 @@ export class DiametricDimension extends BaseDimension {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
@@ -52,6 +74,11 @@ export class DiametricDimension extends BaseDimension {
     }
   }
 
+  /**
+   * Get sequenced points from user selection
+   * @param {any} items
+   * @return {Array} array of points
+   */
   static getPointsFromSelection(items) {
     const item = items[0];
     const center = item.points[0];
@@ -69,7 +96,11 @@ export class DiametricDimension extends BaseDimension {
     return points;
   }
 
-
+  /**
+   * Build the dimension
+   * @param {Object} style
+   * @return {Array} - Array of entities that compose the dimension
+   */
   buildDimension() {
     // Diameter
     let dimension = 0;
@@ -106,6 +137,10 @@ export class DiametricDimension extends BaseDimension {
     return entities;
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     const Pt10 = this.getPointBySequence(10);
     const Pt11 = this.text.points[0];

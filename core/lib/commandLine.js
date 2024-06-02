@@ -3,10 +3,9 @@ import {Input} from './inputManager.js';
 
 import {DesignCore} from '../designCore.js';
 
+/** CommandLine Class */
 export class CommandLine {
-  /**
-   * Commandline Constructor
-   */
+/** Create Commandline */
   constructor() {
     this.cmdLine = ''; // display string
     this.prompt = 'Command:';
@@ -55,7 +54,7 @@ export class CommandLine {
   /**
    * Checks there is only a single default value supplied and removes the <>
    * @param {Array} commandDefault - Array containing the <default> value
-   * @returns value contained within the <>
+   * @return {any} value contained within the <>
    */
   parseCommandDefault(commandDefault) {
     if (commandDefault && commandDefault.length > 1) {
@@ -207,6 +206,7 @@ export class CommandLine {
   /**
    * Converts input to a type
    * @param {string} input
+   * @return {any}
    */
   parseInput(input) {
     const isNumber = /^[-]?\d+(?:\.\d+)?$/.test(input);

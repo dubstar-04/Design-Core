@@ -4,7 +4,12 @@ import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {Flags} from '../properties/flags.js';
 import {Property} from '../properties/property.js';
 
+/** later Class */
 export class Layer {
+  /**
+   * Create a new Layer
+   * @param {Object} data
+   */
   constructor(data) {
     // Define Properties
     this.type = 'Layer';
@@ -100,7 +105,7 @@ export class Layer {
 
   /**
    * Get the frozen value
-   * @returns {bool}
+   * @return {bool}
    */
   get frozen() {
     // Frozen value is bitmasked in flags as value 1
@@ -123,7 +128,7 @@ export class Layer {
 
   /**
    * Get the locked value
-   * @returns {bool}
+   * @return {bool}
    */
   get locked() {
     // locked value is bitmasked in flags as value 4
@@ -144,6 +149,10 @@ export class Layer {
     }
   }
 
+  /**
+   * Determine if layer is visible
+   * @return {boolean}
+   */
   get isVisible() {
     if (this.on && !this.frozen) {
       return true;
@@ -152,6 +161,10 @@ export class Layer {
     return false;
   }
 
+  /**
+   * Determine if layer is selectable
+   * @return {boolean}
+   */
   get isSelectable() {
     if (this.isVisible && !this.locked) {
       return true;
@@ -162,7 +175,7 @@ export class Layer {
 
   /**
    * Get the layer colour
-   * @returns rgb colour
+   * @return {number} rgb colour
    */
   getColour() {
     return this.layerColour.getColour();
@@ -170,12 +183,16 @@ export class Layer {
 
   /**
    * Set the layer colour
-   * @param {object} colour - rgb colour
+   * @param {Object} colour - rgb colour
    */
   setColour(colour) {
     this.layerColour.setColour(colour);
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'LAYER');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);

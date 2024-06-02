@@ -16,7 +16,15 @@ import {Logging} from '../lib/logging.js';
 import {DesignCore} from '../designCore.js';
 import {SingleSelection} from '../lib/selectionManager.js';
 
+/**
+ * Dimension Entity Class
+ * @extends BaseDimension
+ */
 export class Dimension extends BaseDimension {
+  /**
+   * Create a Dimension
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 
@@ -57,11 +65,22 @@ export class Dimension extends BaseDimension {
     }
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
-    const command = {command: 'Dimension', shortcut: 'DIM', type: 'Entity'};
+    const command = {command: 'Dimension', shortcut: 'DIM'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       let inputValid = false;
@@ -176,6 +195,9 @@ export class Dimension extends BaseDimension {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     // get the dimension class
     const dimensionType = this.dimensionMap[this.dimType];

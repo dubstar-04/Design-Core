@@ -5,16 +5,32 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+/**
+ * Distance Command Class
+ * @extends Tool
+ */
 export class Distance extends Tool {
+/** Create a Distance command */
   constructor() {
     super();
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Distance', shortcut: 'DI'}; // , type: 'Tool'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to perform the command
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
@@ -31,10 +47,16 @@ export class Distance extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
     // TODO: Draw a preview of the measurement
   }
 
+  /**
+   * Perform the command
+   */
   action() {
     const length = this.points[0].distance(this.points[1]).toFixed(1);
     const x = (this.points[1].x - this.points[0].x).toFixed(1);

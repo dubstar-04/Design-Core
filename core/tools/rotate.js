@@ -6,18 +6,33 @@ import {Logging} from '../lib/logging.js';
 
 import {DesignCore} from '../designCore.js';
 
-
+/**
+ * Rotate Command Class
+ * @extends Tool
+ */
 export class Rotate extends Tool {
+  /** Create a Rotate command */
   constructor() {
     super();
     this.baseAngle = 0;
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Rotate', shortcut: 'RO', type: 'Tool'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to perform the command
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
@@ -60,6 +75,9 @@ export class Rotate extends Tool {
     }
   }
 
+  /**
+   * Preview the command during execution
+   */
   preview() {
     const mousePoint = DesignCore.Mouse.pointOnScene();
 
@@ -86,7 +104,9 @@ export class Rotate extends Tool {
     }
   };
 
-
+  /**
+   * Perform the command
+   */
   action() {
     const ang = this.points[0].angle(this.points[1]);
     const theta = ang - this.baseAngle;

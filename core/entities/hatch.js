@@ -20,7 +20,15 @@ import {Arc} from './arc.js';
 import {BasePolyline} from './basePolyline.js';
 import {Property} from '../properties/property.js';
 
+/**
+ * Hatch Entity Class
+ * @extends Entity
+ */
 export class Hatch extends Entity {
+  /**
+   * Create a Hatch Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
 
@@ -109,15 +117,28 @@ export class Hatch extends Entity {
     }
   }
 
+  /**
+   * Get the hatch pattern name
+   * @return {string}
+   */
   getPatternName() {
     return this.pattern;
   }
 
+  /**
+   * Set the hatch pattern name
+   * @param {string} name
+   */
   setPatternName(name) {
     this.pattern = name.toUpperCase();
     this.solid = this.pattern === 'SOLID';
   }
 
+  /**
+   * Process the dxf data, creating hatch boundaries
+   * @param {Array} data
+   * @return {Array} - Array of boundary items
+   */
   processBoundaryData(data) {
     if (!data.hasOwnProperty('points')) {
       return [];
@@ -246,9 +267,9 @@ export class Hatch extends Entity {
   /**
    * Get value from incoming data
    * handle arrays and single values
-   * @param {*} data
-   * @param {*} dxfCode
-   * @returns
+   * @param {any} data
+   * @param {number} dxfCode
+   * @return {any}
    */
   getDataValue(data, dxfCode) {
     let value;
@@ -260,11 +281,22 @@ export class Hatch extends Entity {
     return value;
   }
 
+  /**
+   * Register the command
+   * @return {Object}
+   * command = name of the command
+   * shortcut = shortcut for the command
+   * type = type to group command in toolbars (omitted if not shown)
+   */
   static register() {
     const command = {command: 'Hatch', shortcut: 'H'};
     return command;
   }
 
+  /**
+   * Execute method
+   * executes the workflow, requesting input required to create an entity
+   */
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
@@ -281,6 +313,9 @@ export class Hatch extends Entity {
     }
   }
 
+  /**
+   * Preview the entity during creation
+   */
   preview() {
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
     const shapes = this.processSelection(selectedItems);
@@ -289,6 +324,11 @@ export class Hatch extends Entity {
     }
   }
 
+  /**
+   * Convert the selection to boundary items
+   * @param {Array} selectedItems
+   * @return {Array} - Array of boundary items
+   */
   processSelection(selectedItems) {
     const selectedBoundaryShapes = [];
 
@@ -343,6 +383,11 @@ export class Hatch extends Entity {
     return selectedBoundaryShapes;
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     // ensure the scale is value
     if (this.scale < 0.01) {
@@ -371,6 +416,12 @@ export class Hatch extends Entity {
     }
   }
 
+  /**
+   * Draw the hatch pattern to the context
+   * @param {Object} ctx
+   * @param {number} scale
+   * @param {Polyline} shape
+   */
   createPattern(ctx, scale, shape) {
     if (!Patterns.patternExists(this.patternName) || this.solid) {
       ctx.fill();
@@ -442,6 +493,10 @@ export class Hatch extends Entity {
     });
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'HATCH');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -513,11 +568,22 @@ export class Hatch extends Entity {
     file.writeGroupCode('20', '1');
   }
 
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
   snaps(mousePoint, delta) {
     const snaps = [];
     return snaps;
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     if (this.isInside(P)) {
       return [P, 0];
@@ -525,6 +591,11 @@ export class Hatch extends Entity {
     return [P, Infinity];
   }
 
+  /**
+   * Determine if point is inside the hatch
+   * @param {Point} P
+   * @return {boolean} - true if inside
+   */
   isInside(P) {
     for (let i = 0; i < this.boundaryShapes.length; i++) {
       const shape = this.boundaryShapes[i];
@@ -552,6 +623,10 @@ export class Hatch extends Entity {
     return false;
   }
 
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
   boundingBox() {
     if (this.boundaryShapes.length === 0) {
       return new BoundingBox();
@@ -580,12 +655,22 @@ export class Hatch extends Entity {
     return new BoundingBox(topLeft, bottomRight);
   }
 
+  /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
   intersectPoints() {
     // return all the polyline boundary shapes
     return this.boundaryShapes;
   }
 
+  /**
+   * Determine if the entity is touch the selection window
+   * @param {Array} selectionExtremes
+   * @return {boolean} true if touched
+   */
   touched() {
     console.log('Hatch: touched() Not Implemented');
+    return false;
   }
 }

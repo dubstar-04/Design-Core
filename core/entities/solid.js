@@ -2,11 +2,24 @@ import {Entity} from './entity.js';
 import {DXFFile} from '../lib/dxf/dxfFile.js';
 import {BoundingBox} from '../lib/boundingBox.js';
 
+/**
+ * Solid Entity Class
+ * @extends Entity
+ */
 export class Solid extends Entity {
+  /**
+   * Create a Solid Entity
+   * @param {Array} data
+   */
   constructor(data) {
     super(data);
   }
 
+  /**
+   * Draw the entity
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
   draw(ctx, scale) {
     this.points.forEach((point, index) => {
       if (index == 0) {
@@ -20,6 +33,10 @@ export class Solid extends Entity {
     ctx.fill();
   }
 
+  /**
+   * Write the entity to file in the dxf format
+   * @param {DXFFile} file
+   */
   dxf(file) {
     file.writeGroupCode('0', 'SOLID');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
@@ -44,10 +61,19 @@ export class Solid extends Entity {
     file.writeGroupCode('33', '0.0');
   }
 
+  /**
+   * Get closest point on entity
+   * @param {Point} P
+   * @return {Array} - [Point, distance]
+   */
   closestPoint(P) {
     return [P, Infinity];
   }
 
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
   boundingBox() {
     return BoundingBox.fromPoints(this.points);
   }

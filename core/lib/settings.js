@@ -1,9 +1,8 @@
 import {DesignCore} from '../designCore.js';
 
+/** Settings Class */
 export class Settings {
-  /**
-   * Settings Constructor
-   */
+/** Create Setting */
   constructor() {
     this.canvasbackgroundcolour = {r: 30, g: 30, b: 30};
     this.selecteditemscolour = {r: 0, g: 255, b: 0};
@@ -46,7 +45,7 @@ export class Settings {
   /**
    * Returns the value of the setting
    * @param {string} setting
-   * @returns
+   * @return {string}
    */
   getSetting(setting) {
     // TODO: Validate setting exists
