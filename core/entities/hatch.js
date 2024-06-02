@@ -406,10 +406,18 @@ export class Hatch extends Entity {
       // clip the current path
       ctx.clip();
       // Create a new path because the current path cannot be consumed by a clip
-      ctx.newPath();
+      try {
+        ctx.beginPath();
+      } catch { // Cairo
+        ctx.newPath();
+      }
       // Create a shape bigger than the hatch boundary to contain the hatch or fill
       const bb = shape.boundingBox();
-      ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+      try {
+        ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+      } catch {// Cairo
+        ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+      }
       // for islands create the pattern once all boundary paths are drawn (internal and external)
       this.createPattern(ctx, scale, shape);
       ctx.restore();
@@ -459,8 +467,14 @@ export class Hatch extends Entity {
 
       dashes = dashes.map((x) => Math.abs(x) + 0.00001 );
 
-      ctx.setDash(dashes, 0);
-      ctx.setLineWidth(1/scale/this.scale);
+      try {
+        ctx.setLineDash(dashes, 0);
+        ctx.lineWidth = (1/scale/this.scale);
+      } catch { // Cairo
+        ctx.setDash(dashes, 0);
+        ctx.setLineWidth(1/scale/this.scale);
+      }
+
 
       const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
       const centerPoint = boundingBox.centerPoint;
