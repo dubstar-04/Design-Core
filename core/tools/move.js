@@ -63,17 +63,14 @@ export class Move extends Tool {
 
       // Draw a line
       const points = [this.points.at(-1), mousePoint];
-
       DesignCore.Scene.createTempItem('Line', {points: points});
 
-      const xDelta = mousePoint.x - this.points[0].x;
-      const yDelta = mousePoint.y - this.points[0].y;
+      // Get the delta from the last mouse point
+      const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);
+      this.lastMousePoint = mousePoint;
 
-      for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        for (let j = 0; j <DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
-          DesignCore.Scene.selectionManager.selectedItems[i].points[j].x = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
-          DesignCore.Scene.selectionManager.selectedItems[i].points[j].y = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
-        }
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
+        DesignCore.Scene.selectionManager.selectedItems[i].move(delta.x, delta.y);
       }
     }
   }
@@ -86,10 +83,7 @@ export class Move extends Tool {
     const yDelta = this.points[1].y - this.points[0].y;
 
     for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      for (let j = 0; j <DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
-        DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
-        DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
-      }
+      DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].move(xDelta, yDelta);
     }
   }
 }

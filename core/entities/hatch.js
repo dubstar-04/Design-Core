@@ -17,7 +17,7 @@ import {DesignCore} from '../designCore.js';
 
 import {Line} from './line.js';
 import {Arc} from './arc.js';
-import {BasePolyline} from './basePolyline.js';
+import {Polyline} from './polyline.js';
 import {Property} from '../properties/property.js';
 
 /**
@@ -167,7 +167,7 @@ export class Hatch extends Entity {
           // const edgeCountData = data[93];
           const edgeCount = this.getDataValue(data, 93);
 
-          const shape = new BasePolyline();
+          const shape = new Polyline();
 
           for (let edgeNum=0; edgeNum < edgeCount; edgeNum++) {
             if (data.hasOwnProperty('72')) {
@@ -370,7 +370,7 @@ export class Hatch extends Entity {
           selectedItems = selectedItems.filter((index) => index !== selectedItems[i]);
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1)) ) {
-            const shape = new BasePolyline();
+            const shape = new Polyline();
             shape.points.push(...iterationPoints);
             selectedBoundaryShapes.push(shape);
             iterationPoints = [];
@@ -662,7 +662,6 @@ export class Hatch extends Entity {
       ymax = Math.max(ymax, boundingBox.yMax);
     }
 
-
     const topLeft = new Point(xmin, ymax);
     const bottomRight = new Point(xmax, ymin);
 
@@ -683,8 +682,38 @@ export class Hatch extends Entity {
    * @param {Array} selectionExtremes
    * @return {boolean} true if touched
    */
-  touched() {
-    console.log('Hatch: touched() Not Implemented');
+  touched(selectionExtremes) {
+    for (let i = 0; i < this.boundaryShapes.length; i++) {
+      if (this.boundaryShapes[i].touched(selectionExtremes)) {
+        return true;
+      }
+    }
+
     return false;
+  }
+
+  /**
+   * Move the boundary items
+   * @param {number} xDelta
+   * @param {number} yDelta
+   */
+  move(xDelta, yDelta) {
+    for (let i = 0; i < this.boundaryShapes.length; i++) {
+      const shape = this.boundaryShapes[i];
+      shape.move(xDelta, yDelta);
+    }
+  }
+
+  /**
+   * Rotate the boundary items
+   * @param  {Point} center
+   * @param {number} angle
+   */
+  rotate(center, angle) {
+    for (let i = 0; i < this.boundaryShapes.length; i++) {
+      const shape = this.boundaryShapes[i];
+      shape.rotate(center, angle);
+      this.angle += Utils.radians2degrees(angle);
+    }
   }
 }
