@@ -15,6 +15,7 @@ export class Rotate extends Tool {
   constructor() {
     super();
     this.baseAngle = 0;
+    this.lastAngle = 0;
   }
 
   /**
@@ -90,16 +91,11 @@ export class Rotate extends Tool {
 
     if (this.points.length >= 1 ) {
       const ang = this.points[0].angle(mousePoint);
-      const theta = this.baseAngle === null ? 0 : ang - this.baseAngle;
+      const theta = this.baseAngle === null ? 0 : ang - this.baseAngle - this.lastAngle;
+      this.lastAngle = ang;
 
-      for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        for (let j = 0; j <DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
-          const x = this.points[0].x + (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.cos(theta) - (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.sin(theta);
-          const y = this.points[0].y + (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.sin(theta) + (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.cos(theta);
-
-          DesignCore.Scene.selectionManager.selectedItems[i].points[j].x = x;
-          DesignCore.Scene.selectionManager.selectedItems[i].points[j].y = y;
-        }
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
+        DesignCore.Scene.selectionManager.selectedItems[i].rotate(this.points[0], theta);
       }
     }
   };
@@ -112,13 +108,7 @@ export class Rotate extends Tool {
     const theta = ang - this.baseAngle;
 
     for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      for (let j = 0; j <DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
-        const x = this.points[0].x + (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.cos(theta) - (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.sin(theta);
-        const y = this.points[0].y + (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x - this.points[0].x) * Math.sin(theta) + (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y - this.points[0].y) * Math.cos(theta);
-
-        DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x = x;
-        DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y = y;
-      }
+      DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].rotate(this.points[0], theta);
     }
   };
 }
