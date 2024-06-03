@@ -241,4 +241,15 @@ export class Entity {
       this.points[i] = this.points[i].add(delta);
     }
   }
+
+  /**
+   * Rotate this entity
+   * @param  {Point} center - center of rotation
+   * @param {number} angle - in radians
+   */
+  rotate(center, angle) {
+    for (let i =0; i< this.points.length; i++) {
+      this.points[i] = this.points[i].rotate(center, angle);
+    }
+  }
 }
