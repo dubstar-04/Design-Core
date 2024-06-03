@@ -703,4 +703,17 @@ export class Hatch extends Entity {
       shape.move(xDelta, yDelta);
     }
   }
+
+  /**
+   * Rotate the boundary items
+   * @param  {Point} center
+   * @param {number} angle
+   */
+  rotate(center, angle) {
+    for (let i = 0; i < this.boundaryShapes.length; i++) {
+      const shape = this.boundaryShapes[i];
+      shape.rotate(center, angle);
+      this.angle += Utils.radians2degrees(angle);
+    }
+  }
 }
