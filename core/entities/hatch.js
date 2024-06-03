@@ -691,4 +691,16 @@ export class Hatch extends Entity {
 
     return false;
   }
+
+  /**
+   * Move the boundary items
+   * @param {number} xDelta
+   * @param {number} yDelta
+   */
+  move(xDelta, yDelta) {
+    for (let i = 0; i < this.boundaryShapes.length; i++) {
+      const shape = this.boundaryShapes[i];
+      shape.move(xDelta, yDelta);
+    }
+  }
 }
