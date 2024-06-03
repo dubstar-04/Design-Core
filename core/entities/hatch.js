@@ -683,8 +683,13 @@ export class Hatch extends Entity {
    * @param {Array} selectionExtremes
    * @return {boolean} true if touched
    */
-  touched() {
-    console.log('Hatch: touched() Not Implemented');
+  touched(selectionExtremes) {
+    for (let i = 0; i < this.boundaryShapes.length; i++) {
+      if (this.boundaryShapes[i].touched(selectionExtremes)) {
+        return true;
+      }
+    }
+
     return false;
   }
 }
