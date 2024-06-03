@@ -17,7 +17,7 @@ import {DesignCore} from '../designCore.js';
 
 import {Line} from './line.js';
 import {Arc} from './arc.js';
-import {BasePolyline} from './basePolyline.js';
+import {Polyline} from './polyline.js';
 import {Property} from '../properties/property.js';
 
 /**
@@ -167,7 +167,7 @@ export class Hatch extends Entity {
           // const edgeCountData = data[93];
           const edgeCount = this.getDataValue(data, 93);
 
-          const shape = new BasePolyline();
+          const shape = new Polyline();
 
           for (let edgeNum=0; edgeNum < edgeCount; edgeNum++) {
             if (data.hasOwnProperty('72')) {
@@ -370,7 +370,7 @@ export class Hatch extends Entity {
           selectedItems = selectedItems.filter((index) => index !== selectedItems[i]);
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1)) ) {
-            const shape = new BasePolyline();
+            const shape = new Polyline();
             shape.points.push(...iterationPoints);
             selectedBoundaryShapes.push(shape);
             iterationPoints = [];
@@ -661,7 +661,6 @@ export class Hatch extends Entity {
       ymin = Math.min(ymin, boundingBox.yMin);
       ymax = Math.max(ymax, boundingBox.yMax);
     }
-
 
     const topLeft = new Point(xmin, ymax);
     const bottomRight = new Point(xmax, ymin);
