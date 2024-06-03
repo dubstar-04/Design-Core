@@ -215,9 +215,6 @@ export class TableManagerBase {
     }
 
     const newUniqueName = this.getUniqueName(newName);
-
-    console.log('rename item:', itemToRename, newUniqueName, newName, this.indelibleItems);
-
     const currentItemName = this.items[itemIndex].name;
     this.items[itemIndex].name = newUniqueName;
 
@@ -272,9 +269,6 @@ export class TableManagerBase {
     const itemsToPurge = [];
     this.items.forEach((item, index) => {
       const searchTerm = this.itemProperty === 'block' ? item : item.name;
-
-      console.log('searchTerm', searchTerm);
-
       const items = DesignCore.Scene.findItem('ANY', this.itemProperty, searchTerm);
       if (items.length === 0) {
         itemsToPurge.push(index);

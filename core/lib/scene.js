@@ -124,8 +124,6 @@ export class Scene {
   findItem(type, prop, value) {
     const filteredItems = [];
 
-    console.log('prop', prop, 'value', value);
-
     this.items.forEach((item, index) => {
       if ((type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) && item.hasOwnProperty(prop) && item[prop] === value) {
         filteredItems.push(index);
