@@ -33,7 +33,7 @@ export class Point {
    * @return {Point}
    */
   add(that) {
-    return new Point(this.x + that.x, this.y + that.y);
+    return new Point(this.x + that.x, this.y + that.y, this.bulge);
   }
 
   /**
@@ -42,7 +42,7 @@ export class Point {
    * @return {Point}
    */
   subtract(that) {
-    return new Point(this.x - that.x, this.y - that.y);
+    return new Point(this.x - that.x, this.y - that.y, this.bulge);
   };
 
   /**
@@ -92,7 +92,7 @@ export class Point {
   rotate(centre, angle) {
     const x = centre.x + (this.x - centre.x) * Math.cos(angle) - (this.y - centre.y) * Math.sin(angle);
     const y = centre.y + (this.x - centre.x) * Math.sin(angle) + (this.y - centre.y) * Math.cos(angle);
-    return new Point(x, y);
+    return new Point(x, y, this.bulge);
   }
 
   /**
