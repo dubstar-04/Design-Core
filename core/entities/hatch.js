@@ -146,8 +146,10 @@ export class Hatch extends Entity {
 
     const boundaryShapes = [];
 
-    // copy this.points and remove first and last points
-    const points = data.points.slice(1, -1);
+    // copy this.points and remove first point
+    // First and last points define the hatch, not the hatch boundary
+    // Some CAD systems don't include the last point so leave it in place
+    const points = data.points.slice(1);
 
     // Process the boundary paths into objects
     if (data.hasOwnProperty('91')) {
@@ -363,6 +365,13 @@ export class Hatch extends Entity {
           // check if the item is reversed
           if (iterationPoints.length && currentPoints.at(-1).isSame(iterationPoints.at(-1))) {
             currentPoints = currentPoints.reverse();
+
+            // Reverse the bulge for arcs
+            const startBulge = currentPoints.at(0).bulge;
+            const endBulge = currentPoints.at(-1).bulge;
+
+            currentPoints.at(0).bulge = endBulge * -1;
+            currentPoints.at(-1).bulge = startBulge * -1;
           }
 
           iterationPoints.push(...currentPoints);
