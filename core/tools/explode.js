@@ -88,12 +88,7 @@ export class Explode extends Tool {
 
       blockItems.forEach((blockItem) => {
         const copyofitem = Utils.cloneObject(blockItem);
-
-        for (let j = 0; j < copyofitem.points.length; j++) {
-          copyofitem.points[j].x = copyofitem.points[j].x + insertPoint.x;
-          copyofitem.points[j].y = copyofitem.points[j].y + insertPoint.y;
-        }
-
+        copyofitem.move(insertPoint.x, insertPoint.y);
         DesignCore.Scene.items.push(copyofitem);
       });
     }
