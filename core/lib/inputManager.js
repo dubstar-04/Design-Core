@@ -224,7 +224,7 @@ export class InputManager {
   onCommand(input) {
     if (this.activeCommand !== undefined) {
       this.promptOption.respond(input);
-    } else if (DesignCore.CommandManager.isCommand(input) || DesignCore.CommandManager.isShortcut(input)) {
+    } else if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
       this.initialiseItem(DesignCore.CommandManager.getCommand(input));
       this.activeCommand.execute();
     }
