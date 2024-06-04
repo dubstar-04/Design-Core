@@ -146,8 +146,10 @@ export class Hatch extends Entity {
 
     const boundaryShapes = [];
 
-    // copy this.points and remove first and last points
-    const points = data.points.slice(1, -1);
+    // copy this.points and remove first point
+    // First and last points define the hatch, not the hatch boundary
+    // Some CAD systems don't include the last point so leave it in place
+    const points = data.points.slice(1);
 
     // Process the boundary paths into objects
     if (data.hasOwnProperty('91')) {
