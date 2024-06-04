@@ -363,6 +363,13 @@ export class Hatch extends Entity {
           // check if the item is reversed
           if (iterationPoints.length && currentPoints.at(-1).isSame(iterationPoints.at(-1))) {
             currentPoints = currentPoints.reverse();
+
+            // Reverse the bulge for arcs
+            const startBulge = currentPoints.at(0).bulge;
+            const endBulge = currentPoints.at(-1).bulge;
+
+            currentPoints.at(0).bulge = endBulge * -1;
+            currentPoints.at(-1).bulge = startBulge * -1;
           }
 
           iterationPoints.push(...currentPoints);
