@@ -116,11 +116,7 @@ export class Block extends Entity {
         const item = DesignCore.Scene.items.splice(index, 1)[0];
         // adjust the items points to reflect the insert point
         if (item.hasOwnProperty('points')) {
-          item.points.forEach((point) => {
-            const np = point.subtract(insertPoint);
-            point.x = np.x;
-            point.y = np.y;
-          });
+          item.move(-insertPoint.x, -insertPoint.y);
         }
         block.items.push(item);
       });
