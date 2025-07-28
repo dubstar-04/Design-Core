@@ -123,9 +123,10 @@ export class AlignedDimension extends BaseDimension {
     let P2e = new Point();
     let P3e = new Point();
 
-    const pntPerp = Pt3.closestPointOnLine(Pt1, Pt2);
+    const pntPerp = Pt3.perpendicular(Pt1, Pt2);
+    const isAligned = pntPerp.isOnLine(Pt1, Pt2);
 
-    if (pntPerp !== null) {
+    if (isAligned) {
       const projectionAngle = pntPerp.angle(Pt3);
       const distance = Pt3.distance(pntPerp);
       P1e = Pt1.project(projectionAngle, distance);
