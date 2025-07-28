@@ -301,7 +301,7 @@ export class Point {
    */
   isOnLine(startPoint, endPoint) {
     // check start -> point + point -> end equals start -> end
-    if (startPoint.distance(this) + this.distance(endPoint) === startPoint.distance(endPoint)) {
+    if (Utils.round(startPoint.distance(this) + this.distance(endPoint)) === Utils.round(startPoint.distance(endPoint))) {
       return true;
     }
     return false;
