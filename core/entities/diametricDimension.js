@@ -1,13 +1,13 @@
 
-import {Utils} from '../lib/utils.js';
-import {Strings} from '../lib/strings.js';
-import {Line} from './line.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BaseDimension} from './baseDimension.js';
+import { Utils } from '../lib/utils.js';
+import { Strings } from '../lib/strings.js';
+import { Line } from './line.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BaseDimension } from './baseDimension.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Diametric Dimension Entity Class
@@ -30,7 +30,7 @@ export class DiametricDimension extends BaseDimension {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'DiametricDimension', shortcut: 'DIMDIA'};
+    const command = { command: 'DiametricDimension', shortcut: 'DIMDIA' };
     return command;
   }
 
@@ -70,7 +70,7 @@ export class DiametricDimension extends BaseDimension {
 
       const selectionPoints = DiametricDimension.getPointsFromSelection();
       const points = [...selectionPoints, mousePoint];
-      DesignCore.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
 
@@ -119,14 +119,14 @@ export class DiametricDimension extends BaseDimension {
     if (dimension < Pt1.distance(Pt3) || dimension < Pt2.distance(Pt3)) {
       // Text is outside the radius
       const endPoint = Pt1.project(Pt2.angle(Pt1), Pt1.distance(Pt3));
-      const line1 = new Line({points: [Pt2, endPoint]});
+      const line1 = new Line({ points: [Pt2, endPoint] });
       const arrowHead1 = this.getArrowHead(Pt1, Pt1.angle(Pt2), this.text.height / 2);
       const arrowHead2 = this.getArrowHead(Pt2, Pt2.angle(Pt1), this.text.height / 2);
 
       entities.push(line1, arrowHead1, arrowHead2);
     } else {
       // Text is inside the radius
-      const line1 = new Line({points: [Pt1, Pt3]});
+      const line1 = new Line({ points: [Pt1, Pt3] });
       const arrowHead1 = this.getArrowHead(Pt1, Pt1.angle(Pt3), this.text.height / 2);
       entities.push(line1, arrowHead1);
     }

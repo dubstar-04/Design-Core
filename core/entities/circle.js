@@ -1,13 +1,13 @@
-import {Point} from './point.js';
-import {Strings} from '../lib/strings.js';
-import {Entity} from './entity.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
-import {Property} from '../properties/property.js';
+import { Point } from './point.js';
+import { Strings } from '../lib/strings.js';
+import { Entity } from './entity.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
+import { Property } from '../properties/property.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Circle Entity Class
@@ -48,7 +48,7 @@ export class Circle extends Entity {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Circle', shortcut: 'C', type: 'Entity'};
+    const command = { command: 'Circle', shortcut: 'C', type: 'Entity' };
     return command;
   }
 
@@ -84,7 +84,7 @@ export class Circle extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(-1), mousePoint];
-      DesignCore.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
 

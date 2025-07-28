@@ -1,6 +1,6 @@
-import {Entity} from './entity.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
+import { Entity } from './entity.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
 
 /**
  * Solid Entity Class

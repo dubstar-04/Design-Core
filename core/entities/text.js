@@ -1,15 +1,15 @@
-import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
-import {Strings} from '../lib/strings.js';
-import {Entity} from './entity.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
-import {Flags} from '../properties/flags.js';
-import {Property} from '../properties/property.js';
+import { Point } from './point.js';
+import { Utils } from '../lib/utils.js';
+import { Strings } from '../lib/strings.js';
+import { Entity } from './entity.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
+import { Flags } from '../properties/flags.js';
+import { Property } from '../properties/property.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Text Entity Class
@@ -49,7 +49,7 @@ export class Text extends Entity {
 
     // needs to be non-enumerable as to not appear in the object props
     Object.defineProperty(this, 'boundingRect', {
-      value: {width: 10, height: 10},
+      value: { width: 10, height: 10 },
       writable: true,
     });
 
@@ -142,7 +142,7 @@ export class Text extends Entity {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Text', shortcut: 'DT', type: 'Entity'};
+    const command = { command: 'Text', shortcut: 'DT', type: 'Entity' };
     return command;
   }
 
@@ -207,7 +207,7 @@ export class Text extends Entity {
       } else {
         const mousePoint = DesignCore.Mouse.pointOnScene();
         const points = [this.points.at(-1), mousePoint];
-        DesignCore.Scene.createTempItem('Line', {points: points});
+        DesignCore.Scene.createTempItem('Line', { points: points });
       }
     }
   }
@@ -347,7 +347,7 @@ export class Text extends Entity {
    * @return {Object}
    */
   getBoundingRect() {
-    const rect = {width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y};
+    const rect = { width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y };
     return rect;
   }
 
@@ -400,10 +400,10 @@ export class Text extends Entity {
           x = -this.boundingRect.xBearing;
           break;
         case 1: // 1= Center;
-          x = -this.boundingRect.xBearing-this.boundingRect.width / 2;
+          x = -this.boundingRect.xBearing - this.boundingRect.width / 2;
           break;
         case 2: // 2 = Right
-          x = -this.boundingRect.xBearing-this.boundingRect.width;
+          x = -this.boundingRect.xBearing - this.boundingRect.width;
           break;
       }
 
@@ -502,9 +502,9 @@ export class Text extends Entity {
 
     // if P is inside the bounding box return distance 0
     if (P.x > botLeft.x &&
-            P.x < topRight.x &&
-            P.y > botLeft.y &&
-            P.y < topRight.y
+      P.x < topRight.x &&
+      P.y > botLeft.y &&
+      P.y < topRight.y
     ) {
       distance = 0;
     }

@@ -1,12 +1,12 @@
-import {Colours} from '../lib/colours.js';
-import {EntityColour} from '../lib/colour.js';
-import {Intersection} from '../lib/intersect.js';
-import {Point} from './point.js';
-import {Strings} from '../lib/strings.js';
-import {Property} from '../properties/property.js';
+import { Colours } from '../lib/colours.js';
+import { EntityColour } from '../lib/colour.js';
+import { Intersection } from '../lib/intersect.js';
+import { Point } from './point.js';
+import { Strings } from '../lib/strings.js';
+import { Property } from '../properties/property.js';
 
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Entity Class
@@ -96,7 +96,7 @@ export class Entity {
    * @return {number} rgb colour object
    */
   getColour() {
-    return this.entityColour.getColour(); ;
+    return this.entityColour.getColour();;
   }
 
   /**
@@ -166,10 +166,10 @@ export class Entity {
 
     // Determine if this entities is within a the window specified by selectionExtremes
     const boundingBox = this.boundingBox();
-    if ( boundingBox.xMin > selectionExtremes[0] &&
-          boundingBox.xMax < selectionExtremes[1] &&
-          boundingBox.yMin > selectionExtremes[2] &&
-          boundingBox.yMax < selectionExtremes[3]
+    if (boundingBox.xMin > selectionExtremes[0] &&
+      boundingBox.xMax < selectionExtremes[1] &&
+      boundingBox.yMin > selectionExtremes[2] &&
+      boundingBox.yMax < selectionExtremes[3]
     ) {
       return true;
     }
@@ -237,7 +237,7 @@ export class Entity {
    */
   move(xDelta, yDelta) {
     const delta = new Point(xDelta, yDelta);
-    for (let i =0; i< this.points.length; i++) {
+    for (let i = 0; i < this.points.length; i++) {
       this.points[i] = this.points[i].add(delta);
     }
   }
@@ -248,7 +248,7 @@ export class Entity {
    * @param {number} angle - in radians
    */
   rotate(center, angle) {
-    for (let i =0; i< this.points.length; i++) {
+    for (let i = 0; i < this.points.length; i++) {
       this.points[i] = this.points[i].rotate(center, angle);
     }
   }

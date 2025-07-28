@@ -1,12 +1,12 @@
-import {Point} from './point.js';
-import {Strings} from '../lib/strings.js';
-import {Entity} from './entity.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
+import { Point } from './point.js';
+import { Strings } from '../lib/strings.js';
+import { Entity } from './entity.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Line Entity Class
@@ -41,7 +41,7 @@ export class Line extends Entity {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Line', shortcut: 'L', type: 'Entity'};
+    const command = { command: 'Line', shortcut: 'L', type: 'Entity' };
     return command;
   }
 
@@ -74,7 +74,7 @@ export class Line extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(-1), mousePoint];
-      DesignCore.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
 

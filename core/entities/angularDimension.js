@@ -1,15 +1,15 @@
 
-import {Utils} from '../lib/utils.js';
-import {Strings} from '../lib/strings.js';
-import {Arc} from './arc.js';
-import {Line} from './line.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BaseDimension} from './baseDimension.js';
-import {Intersection} from '../lib/intersect.js';
+import { Utils } from '../lib/utils.js';
+import { Strings } from '../lib/strings.js';
+import { Arc } from './arc.js';
+import { Line } from './line.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BaseDimension } from './baseDimension.js';
+import { Intersection } from '../lib/intersect.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Angular Dimension Entity Class
@@ -32,7 +32,7 @@ export class AngularDimension extends BaseDimension {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'AngularDimension', shortcut: 'DIMANG'};
+    const command = { command: 'AngularDimension', shortcut: 'DIMANG' };
     return command;
   }
 
@@ -112,7 +112,7 @@ export class AngularDimension extends BaseDimension {
       pt16.sequence = 16;
 
       const points = [...this.points, mousePoint, pt16];
-      DesignCore.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
 
@@ -124,7 +124,7 @@ export class AngularDimension extends BaseDimension {
   static getPointsFromSelection(items) {
     const points = [];
 
-    const item1= items[0];
+    const item1 = items[0];
     const item2 = items[1];
 
     const pt15 = item1.points[0];
@@ -163,15 +163,15 @@ export class AngularDimension extends BaseDimension {
     const Pt5 = this.getPointBySequence(11); // 16); // should be point 16 changed to debug
     const Pt6 = this.getPointBySequence(11);
 
-    const line1 = new Line({points: [Pt1, Pt2]});
-    const line2 = new Line({points: [Pt3, Pt4]});
+    const line1 = new Line({ points: [Pt1, Pt2] });
+    const line2 = new Line({ points: [Pt3, Pt4] });
     const arrow1pos = Pt5.perpendicular(Pt1, Pt2);
     const arrow2pos = Pt5.perpendicular(Pt3, Pt4);
     const arrowHead1 = this.getArrowHead(arrow1pos, Pt1.angle(Pt2) + 1.5708, this.text.height / 2);
     const arrowHead2 = this.getArrowHead(arrow2pos, Pt3.angle(Pt4) + 1.5708, this.text.height / 2);
 
-    const intersect = Intersection.intersectLineLine({start: Pt1, end: Pt2}, {start: Pt3, end: Pt4}, true);
-    const arc = new Arc({points: [intersect.points[0], arrow1pos, arrow2pos]});
+    const intersect = Intersection.intersectLineLine({ start: Pt1, end: Pt2 }, { start: Pt3, end: Pt4 }, true);
+    const arc = new Arc({ points: [intersect.points[0], arrow1pos, arrow2pos] });
 
     entities.push(line1, line2, arrowHead1, arrowHead2, arc);
 

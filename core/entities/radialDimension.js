@@ -1,12 +1,12 @@
-import {Utils} from '../lib/utils.js';
-import {Strings} from '../lib/strings.js';
-import {Line} from './line.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BaseDimension} from './baseDimension.js';
+import { Utils } from '../lib/utils.js';
+import { Strings } from '../lib/strings.js';
+import { Line } from './line.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BaseDimension } from './baseDimension.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Radial Dimension Entity Class
@@ -29,7 +29,7 @@ export class RadialDimension extends BaseDimension {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'RadialDimension', shortcut: 'DIMRADIUS'};
+    const command = { command: 'RadialDimension', shortcut: 'DIMRADIUS' };
     return command;
   }
 
@@ -70,7 +70,7 @@ export class RadialDimension extends BaseDimension {
 
       const selectionPoints = this.getPointsFromSelection();
       const points = [...selectionPoints, mousePoint];
-      DesignCore.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
 
@@ -107,7 +107,7 @@ export class RadialDimension extends BaseDimension {
     const Pt2 = this.getPointBySequence(10); // center point
     const Pt3 = this.getPointBySequence(11); // text position
 
-    const line1 = new Line({points: [Pt1, Pt2]});
+    const line1 = new Line({ points: [Pt1, Pt2] });
     const arrowHead1 = this.getArrowHead(Pt1, Pt2.angle(Pt1), this.text.height / 2);
 
     entities.push(line1, arrowHead1);
@@ -122,7 +122,7 @@ export class RadialDimension extends BaseDimension {
     if (dimension < Pt2.distance(Pt3)) {
       const vector = Pt2.angle(Pt1);
       const endPoint = Pt1.project(vector, Pt1.distance(Pt3));
-      const line2 = new Line({points: [Pt1, endPoint]});
+      const line2 = new Line({ points: [Pt1, endPoint] });
       entities.push(line2);
     }
 

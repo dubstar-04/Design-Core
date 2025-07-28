@@ -1,15 +1,15 @@
-import {Strings} from '../lib/strings.js';
-import {Entity} from './entity.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {Utils} from '../lib/utils.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
-import {Point} from './point.js';
-import {Flags} from '../properties/flags.js';
-import {Property} from '../properties/property.js';
+import { Strings } from '../lib/strings.js';
+import { Entity } from './entity.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { Utils } from '../lib/utils.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
+import { Point } from './point.js';
+import { Flags } from '../properties/flags.js';
+import { Property } from '../properties/property.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Base Polyline Entity Class
@@ -125,14 +125,14 @@ export class BasePolyline extends Entity {
 
     if (this.points.length >= 1) {
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, { points: points });
     }
 
     if (this.inputMode === this.modes.ARC) {
-      const arcpoints = Utils.cloneObject( this.points);
+      const arcpoints = Utils.cloneObject(this.points);
       arcpoints.at(-1).bulge = this.getBulgeFromSegment(mousePoint);
       const points = [...arcpoints, mousePoint];
-      DesignCore.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
 
@@ -142,7 +142,7 @@ export class BasePolyline extends Entity {
    * @param {number} scale
    * @param {boolean} stroke - don't stroke hatch boundary shapes
    */
-  draw(ctx, scale, stroke=true) {
+  draw(ctx, scale, stroke = true) {
     for (let i = 0; i < this.points.length; i++) {
       if (this.points[i].bulge === 0) {
         ctx.lineTo(this.points[i].x, this.points[i].y);
@@ -253,16 +253,16 @@ export class BasePolyline extends Entity {
 
     if (DesignCore.Settings.midsnap) {
       for (let i = 1; i < this.points.length; i++) {
-        if (this.points[i-1].bulge === 0) {
-          snaps.push( this.points[i - 1].midPoint(this.points[i]));
+        if (this.points[i - 1].bulge === 0) {
+          snaps.push(this.points[i - 1].midPoint(this.points[i]));
         }
       }
     }
 
     if (DesignCore.Settings.centresnap) {
       for (let i = 1; i < this.points.length; i++) {
-        if (this.points[i-1].bulge !== 0) {
-          snaps.push( this.points[i - 1].bulgeCentrePoint(this.points[i]));
+        if (this.points[i - 1].bulge !== 0) {
+          snaps.push(this.points[i - 1].bulgeCentrePoint(this.points[i]));
         }
       }
     }
@@ -374,7 +374,7 @@ export class BasePolyline extends Entity {
     const mouseAngle = this.points.at(-1).angle(point) % (2 * Math.PI);
     // get the angle delta between point and the previous segment
     // ensure that the angle is always less than 2 * Math.PI
-    const angleDelta = ((mouseAngle - lastSegAngle) + 3 * Math.PI) % (2*Math.PI) - Math.PI;
+    const angleDelta = ((mouseAngle - lastSegAngle) + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
     // angleDelta is 1/2 the included angle
     // bulge is tan of (included angle * 0.25)
     const bulge = Math.tan((angleDelta * 2) / 4);

@@ -1,11 +1,11 @@
-import {Point} from './point.js';
-import {Block} from '../tables/block.js';
-import {Text} from './text.js';
-import {Solid} from './solid.js';
-import {Entity} from './entity.js';
-import {Logging} from '../lib/logging.js';
+import { Point } from './point.js';
+import { Block } from '../tables/block.js';
+import { Text } from './text.js';
+import { Solid } from './solid.js';
+import { Entity } from './entity.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Base Dimension Entity Class
@@ -25,7 +25,7 @@ export class BaseDimension extends Entity {
     });
 
     Object.defineProperty(this, 'block', {
-      value: new Block({points: [new Point(), new Point()]}),
+      value: new Block({ points: [new Point(), new Point()] }),
       writable: true,
     });
 
@@ -193,15 +193,15 @@ export class BaseDimension extends Entity {
    * @return {Solid}
    */
   getArrowHead(point, angle, size) {
-    let p1 = new Point(point.x + size/4, point.y + size);
-    let p2 = new Point(point.x - size/4, point.y + size);
+    let p1 = new Point(point.x + size / 4, point.y + size);
+    let p2 = new Point(point.x - size / 4, point.y + size);
     const ang = angle - Math.PI / 2;
     p1 = p1.rotate(point, ang);
     p2 = p2.rotate(point, ang);
 
     const points = [point, p1, p2];
 
-    const arrowHead = new Solid({points: points});
+    const arrowHead = new Solid({ points: points });
 
     return arrowHead;
   }

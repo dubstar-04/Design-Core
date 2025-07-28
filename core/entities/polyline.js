@@ -1,5 +1,5 @@
-import {BasePolyline} from './basePolyline.js';
-import {Point} from './point.js';
+import { BasePolyline } from './basePolyline.js';
+import { Point } from './point.js';
 
 /**
  * Polyline Entity Class
@@ -15,8 +15,8 @@ export class Polyline extends BasePolyline {
 
     if (data) {
       if (data.hasOwnProperty('children')) {
-      // remove any points
-      // point data comes from the vertices
+        // remove any points
+        // point data comes from the vertices
         if (data.hasOwnProperty('points')) {
           this.points = [];
         }
@@ -44,7 +44,7 @@ export class Polyline extends BasePolyline {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Polyline', shortcut: 'PL', type: 'Entity'};
+    const command = { command: 'Polyline', shortcut: 'PL', type: 'Entity' };
     return command;
   }
 }

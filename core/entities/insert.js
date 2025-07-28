@@ -1,12 +1,12 @@
-import {Entity} from './entity.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {Block} from '../tables/block.js';
-import {BoundingBox} from '../lib/boundingBox.js';
-import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
-import {Property} from '../properties/property.js';
+import { Entity } from './entity.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Block } from '../tables/block.js';
+import { BoundingBox } from '../lib/boundingBox.js';
+import { Point } from './point.js';
+import { Utils } from '../lib/utils.js';
+import { Property } from '../properties/property.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 
 /**
@@ -113,7 +113,7 @@ export class Insert extends Entity {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Insert'};
+    const command = { command: 'Insert' };
     return command;
   }
 

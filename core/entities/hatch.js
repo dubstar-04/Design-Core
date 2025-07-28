@@ -1,24 +1,24 @@
-import {Entity} from './entity.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
+import { Entity } from './entity.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
 
-import {Strings} from '../lib/strings.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
+import { Strings } from '../lib/strings.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
 
-import {Point} from './point.js';
-import {Flags} from '../properties/flags.js';
+import { Point } from './point.js';
+import { Flags } from '../properties/flags.js';
 
-import {Utils} from '../lib/utils.js';
-import {Patterns} from '../lib/patterns.js';
-import {Intersection} from '../lib/intersect.js';
+import { Utils } from '../lib/utils.js';
+import { Patterns } from '../lib/patterns.js';
+import { Intersection } from '../lib/intersect.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
-import {Line} from './line.js';
-import {Arc} from './arc.js';
-import {Polyline} from './polyline.js';
-import {Property} from '../properties/property.js';
+import { Line } from './line.js';
+import { Arc } from './arc.js';
+import { Polyline } from './polyline.js';
+import { Property } from '../properties/property.js';
 
 /**
  * Hatch Entity Class
@@ -158,7 +158,7 @@ export class Hatch extends Entity {
       // 92 - Boundary path type flag (bit coded): 0 = Default; 1 = External; 2 = Polyline 4 = Derived; 8 = Textbox; 16 = Outermost
       const boundaryPathType = this.getDataValue(data, 92);
 
-      for (let i=0; i < boundaryPathCount; i++) {
+      for (let i = 0; i < boundaryPathCount; i++) {
         // check if boundary path is polyline
         const boundaryPathTypeFlag = new Flags();
         boundaryPathTypeFlag.setFlagValue(boundaryPathType);
@@ -171,7 +171,7 @@ export class Hatch extends Entity {
 
           const shape = new Polyline();
 
-          for (let edgeNum=0; edgeNum < edgeCount; edgeNum++) {
+          for (let edgeNum = 0; edgeNum < edgeCount; edgeNum++) {
             if (data.hasOwnProperty('72')) {
               // DXF Groupcode 72 - Edge type (only if boundary is not a polyline):
               // 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
@@ -209,12 +209,12 @@ export class Hatch extends Entity {
 
                 shapePoints.push(startPoint);
                 shapePoints.push(endPoint);
-                const line = new Line({points: shapePoints});
+                const line = new Line({ points: shapePoints });
                 shape.points.push(...line.decompose());
               } else if (edgeType === 2) {
                 // ARC
                 // 10 - X; 20 - Y;  40 - Radius;  50 - Start Angle;  51 - End Angle; 73 - Is Counter Clockwise
-                const shapeData = {points: []};
+                const shapeData = { points: [] };
 
                 const centerPoint = points.shift();
                 if (centerPoint.sequence !== undefined && centerPoint.sequence !== 10) {
@@ -291,7 +291,7 @@ export class Hatch extends Entity {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Hatch', shortcut: 'H'};
+    const command = { command: 'Hatch', shortcut: 'H' };
     return command;
   }
 
@@ -322,7 +322,7 @@ export class Hatch extends Entity {
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
     const shapes = this.processSelection(selectedItems);
     if (shapes.length) {
-      DesignCore.Scene.createTempItem(this.type, {boundaryShapes: shapes});
+      DesignCore.Scene.createTempItem(this.type, { boundaryShapes: shapes });
     }
   }
 
@@ -378,7 +378,7 @@ export class Hatch extends Entity {
           // remove the index from selected items
           selectedItems = selectedItems.filter((index) => index !== selectedItems[i]);
 
-          if (iterationPoints.at(0).isSame(iterationPoints.at(-1)) ) {
+          if (iterationPoints.at(0).isSame(iterationPoints.at(-1))) {
             const shape = new Polyline();
             shape.points.push(...iterationPoints);
             selectedBoundaryShapes.push(shape);
@@ -448,7 +448,7 @@ export class Hatch extends Entity {
     const boundingBox = shape.boundingBox();
 
     const pattern = Patterns.getPattern(this.patternName);
-    pattern.forEach((patternLine)=>{
+    pattern.forEach((patternLine) => {
       // Each pattern line is considered to be the first member of a line family,
       // Patterns are created by applying the delta offsets in both directions to generate an infinite family of parallel lines.
       // originX and originY values are the offsets of the line from the origin and are applied without rotation
@@ -474,14 +474,14 @@ export class Hatch extends Entity {
         dashes.push(firstIndex);
       }
 
-      dashes = dashes.map((x) => Math.abs(x) + 0.00001 );
+      dashes = dashes.map((x) => Math.abs(x) + 0.00001);
 
       try {
         ctx.setLineDash(dashes, 0);
-        ctx.lineWidth = (1/scale/this.scale);
+        ctx.lineWidth = (1 / scale / this.scale);
       } catch { // Cairo
         ctx.setDash(dashes, 0);
-        ctx.setLineWidth(1/scale/this.scale);
+        ctx.setLineWidth(1 / scale / this.scale);
       }
 
 
@@ -507,7 +507,7 @@ export class Hatch extends Entity {
         const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
         const yOffset = patternLine.yDelta * i;
 
-        ctx.moveTo(-xOffset+dashOffset, yOffset);
+        ctx.moveTo(-xOffset + dashOffset, yOffset);
         ctx.lineTo(xOffset, yOffset);
 
         ctx.stroke();
@@ -569,7 +569,7 @@ export class Hatch extends Entity {
 
       // Pattern data
       const pattern = Patterns.getPattern(this.patternName);
-      pattern.forEach((patternLine)=>{
+      pattern.forEach((patternLine) => {
         file.writeGroupCode('53', patternLine.angle + this.angle); // Pattern line angle
         file.writeGroupCode('43', patternLine.xOrigin); // Pattern line base X
         file.writeGroupCode('44', patternLine.yOrigin); // Pattern line base y
@@ -578,7 +578,7 @@ export class Hatch extends Entity {
         file.writeGroupCode('45', rotatedDelta.x); // Pattern line offset x
         file.writeGroupCode('46', rotatedDelta.y); // Pattern line offset y
         file.writeGroupCode('79', patternLine.dashes.length); // Number of dash length items
-        patternLine.dashes.forEach((dash) =>{
+        patternLine.dashes.forEach((dash) => {
           file.writeGroupCode('49', dash * this.scale); // Dash length
         });
       });
@@ -624,7 +624,7 @@ export class Hatch extends Entity {
       const shape = this.boundaryShapes[i];
 
       if (shape.boundingBox().isInside(P)) {
-        const polyline = {points: [...shape.points]};
+        const polyline = { points: [...shape.points] };
 
         // check the polyline is closed
         if (!shape.points.at(0).isSame(shape.points.at(-1))) {
@@ -632,7 +632,7 @@ export class Hatch extends Entity {
         }
 
         // create a line from P, twice the length of the bounding box
-        const line = {start: P, end: new Point(P.x + shape.boundingBox().xLength, P.y)};
+        const line = { start: P, end: new Point(P.x + shape.boundingBox().xLength, P.y) };
 
         const intersect = Intersection.intersectPolylineLine(polyline, line);
         const intersects = intersect.points.length;

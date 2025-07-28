@@ -1,14 +1,14 @@
-import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
-import {Strings} from '../lib/strings.js';
-import {Entity} from './entity.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
+import { Point } from './point.js';
+import { Utils } from '../lib/utils.js';
+import { Strings } from '../lib/strings.js';
+import { Entity } from './entity.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
 
-import {DesignCore} from '../designCore.js';
-import {Property} from '../properties/property.js';
+import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 
 /**
  * Arc Entity Class
@@ -56,7 +56,7 @@ export class Arc extends Entity {
         this.points[2] = this.points[0].project(projectionAngle, this.radius);
       }
 
-      if (data.hasOwnProperty('direction')|| data.hasOwnProperty('73')) {
+      if (data.hasOwnProperty('direction') || data.hasOwnProperty('73')) {
         // No DXF Groupcode - Arc Direction
         this.direction = Property.loadValue([data.direction, data[73]], 1);
       }
@@ -71,7 +71,7 @@ export class Arc extends Entity {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Arc', shortcut: 'A', type: 'Entity'};
+    const command = { command: 'Arc', shortcut: 'A', type: 'Entity' };
     return command;
   }
 
@@ -115,13 +115,13 @@ export class Arc extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(0), mousePoint];
-      DesignCore.Scene.createTempItem('Line', {points: points});
+      DesignCore.Scene.createTempItem('Line', { points: points });
     }
 
     if (this.points.length >= 2) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
 
@@ -254,12 +254,12 @@ export class Arc extends Entity {
     if (DesignCore.Settings.endsnap) {
       // Speed this up by generating the proper start and end points when the arc is initialised
       const startPoint = new Point(
-          this.points[0].x + (this.radius * Math.cos(this.startAngle())),
-          this.points[0].y + (this.radius * Math.sin(this.startAngle())),
+        this.points[0].x + (this.radius * Math.cos(this.startAngle())),
+        this.points[0].y + (this.radius * Math.sin(this.startAngle())),
       );
       const endPoint = new Point(
-          this.points[0].x + (this.radius * Math.cos(this.endAngle())),
-          this.points[0].y + (this.radius * Math.sin(this.endAngle())),
+        this.points[0].x + (this.radius * Math.cos(this.endAngle())),
+        this.points[0].y + (this.radius * Math.sin(this.endAngle())),
       );
 
       snaps.push(startPoint, endPoint);
