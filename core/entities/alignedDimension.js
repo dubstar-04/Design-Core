@@ -1,14 +1,14 @@
 
-import {Utils} from '../lib/utils.js';
-import {Strings} from '../lib/strings.js';
-import {Line} from './line.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BaseDimension} from './baseDimension.js';
-import {Point} from './point.js';
+import { Utils } from '../lib/utils.js';
+import { Strings } from '../lib/strings.js';
+import { Line } from './line.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BaseDimension } from './baseDimension.js';
+import { Point } from './point.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Aligned Dimension Entity Class
@@ -31,7 +31,7 @@ export class AlignedDimension extends BaseDimension {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'AlignedDimension', shortcut: 'DIMALIGNED'};
+    const command = { command: 'AlignedDimension', shortcut: 'DIMALIGNED' };
     return command;
   }
 
@@ -69,14 +69,14 @@ export class AlignedDimension extends BaseDimension {
     if (this.points.length == 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(0), mousePoint];
-      DesignCore.Scene.createTempItem('Line', {points: points});
+      DesignCore.Scene.createTempItem('Line', { points: points });
     }
 
     if (this.points.length > 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(this.type, {points: points});
+      DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
 
@@ -106,6 +106,7 @@ export class AlignedDimension extends BaseDimension {
    * @return {Array} - Array of entities that compose the dimension
    */
   buildDimension(style) {
+
     const Pt1 = this.getPointBySequence(13);
     const Pt2 = this.getPointBySequence(14);
     const Pt3 = this.getPointBySequence(11);
@@ -133,6 +134,7 @@ export class AlignedDimension extends BaseDimension {
       P2e = Pt2.project(projectionAngle, distance);
       dimension = Pt1.distance(Pt2);
     } else {
+
       const dx = Pt2.x - Pt1.x;
       const dy = Pt2.y - Pt1.y;
 
@@ -218,11 +220,11 @@ export class AlignedDimension extends BaseDimension {
     // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
     this.text.verticalAlignment = verticalAlignment;
 
-    if (typeof(dimension) === 'number') {
+    if (typeof (dimension) === 'number') {
       this.text.string = Math.abs(dimension.toFixed(2)).toString(); // TODO: Honor the precision from the style
     }
 
-    if (typeof(dimAngle) === 'number') {
+    if (typeof (dimAngle) === 'number') {
       const angle = Utils.radians2degrees(dimAngle);
       this.text.rotation = angle; // TODO: Honor the style
     }
@@ -249,25 +251,25 @@ export class AlignedDimension extends BaseDimension {
     const dimLineTwoEnd = midPoint;
 
     // generate dimension geometry
-    const extLine1 = new Line({points: [extLineOneStart, extLineOneEnd]});
+    const extLine1 = new Line({ points: [extLineOneStart, extLineOneEnd] });
     // Supress extension line 1 if DIMS1 is true
     if (!style.getValue('DIMSE1')) {
       entities.push(extLine1);
     }
 
-    const extLine2 = new Line({points: [extLineTwoStart, extLineTwoEnd]});
+    const extLine2 = new Line({ points: [extLineTwoStart, extLineTwoEnd] });
     // Supress extendsion line 2 if DIMSE2 is true
     if (!style.getValue('DIMSE2')) {
       entities.push(extLine2);
     }
 
-    const dimLine1 = new Line({points: [dimLineOneStart, dimLineOneEnd]});
+    const dimLine1 = new Line({ points: [dimLineOneStart, dimLineOneEnd] });
     // Supress dimension line 1 if DIMSD1 is true
     if (!style.getValue('DIMSD1')) {
       entities.push(dimLine1);
     }
 
-    const dimLine2 = new Line({points: [dimLineTwoStart, dimLineTwoEnd]});
+    const dimLine2 = new Line({ points: [dimLineTwoStart, dimLineTwoEnd] });
     // Supress dimension line 2 if DIMSD2 is true
     if (!style.getValue('DIMSD2')) {
       entities.push(dimLine2);
