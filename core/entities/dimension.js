@@ -1,20 +1,20 @@
-import {BaseDimension} from './baseDimension.js';
-import {AlignedDimension} from './alignedDimension.js';
-import {DiametricDimension} from './diametricDimension.js';
-import {AngularDimension} from './angularDimension.js';
-import {RadialDimension} from './radialDimension.js';
+import { BaseDimension } from './baseDimension.js';
+import { AlignedDimension } from './alignedDimension.js';
+import { DiametricDimension } from './diametricDimension.js';
+import { AngularDimension } from './angularDimension.js';
+import { RadialDimension } from './radialDimension.js';
 
-import {Arc} from './arc.js';
-import {Circle} from './circle.js';
-import {Line} from './line.js';
-import {Point} from './point.js';
+import { Arc } from './arc.js';
+import { Circle } from './circle.js';
+import { Line } from './line.js';
+import { Point } from './point.js';
 
-import {Strings} from '../lib/strings.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
+import { Strings } from '../lib/strings.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
-import {SingleSelection} from '../lib/selectionManager.js';
+import { DesignCore } from '../designCore.js';
+import { SingleSelection } from '../lib/selectionManager.js';
 
 /**
  * Dimension Entity Class
@@ -51,7 +51,7 @@ export class Dimension extends BaseDimension {
         const linkedBlockIndex = DesignCore.Scene.findItem('BLOCK', 'name', data[2]);
 
         if (linkedBlockIndex.length) {
-        // remove the block from the scene, dimensions manage their block internally
+          // remove the block from the scene, dimensions manage their block internally
           // const removed =
           DesignCore.Scene.removeItem(linkedBlockIndex[0]);
         }
@@ -73,7 +73,7 @@ export class Dimension extends BaseDimension {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Dimension', shortcut: 'DIM'};
+    const command = { command: 'Dimension', shortcut: 'DIM' };
     return command;
   }
 
@@ -144,7 +144,7 @@ export class Dimension extends BaseDimension {
         }
 
         // diametric prompt: select radial or diametric type dimension or location for the the text position
-        if (this.selectedItems[0] instanceof Circle ) {
+        if (this.selectedItems[0] instanceof Circle) {
           const options = this.dimType === 3 ? ['Radius'] : ['Diameter'];
           op2 = new PromptOptions(`${Strings.Input.DIMENSION} or ${Strings.Input.OPTION}`, [Input.Type.POINT], options);
         }
@@ -211,14 +211,14 @@ export class Dimension extends BaseDimension {
       mousePoint.sequence = 11;
 
       const points = [...itemPoints, mousePoint];
-      DesignCore.Scene.createTempItem(dimensionTypeString, {points: points});
+      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points });
     }
 
     if (this.points.length > 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(dimensionTypeString, {points: points});
+      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points });
     }
   }
 }
