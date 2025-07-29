@@ -19,6 +19,17 @@ export class BaseDimension extends Entity {
   constructor(data) {
     super(data);
 
+    // hide inherited property
+    // needs to be enumerable=false to not appear in the object props
+    Object.defineProperty(this, 'lineType', {
+      enumerable: false,
+    });
+
+    // hide inherited property
+    Object.defineProperty(this, 'lineWidth', {
+      enumerable: false,
+    });
+
     Object.defineProperty(this, 'blockName', {
       value: '',
       writable: true,
