@@ -41,6 +41,9 @@ export class AlignedDimension extends BaseDimension {
    */
   async execute() {
     try {
+
+      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle()
+
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt13 = await DesignCore.Scene.inputManager.requestInput(op);
       pt13.sequence = 13;
@@ -107,149 +110,182 @@ export class AlignedDimension extends BaseDimension {
    */
   buildDimension(style) {
 
-    const Pt1 = this.getPointBySequence(13);
-    const Pt2 = this.getPointBySequence(14);
-    const Pt3 = this.getPointBySequence(11);
+    const Pt13 = this.getPointBySequence(13);
+    const Pt14 = this.getPointBySequence(14);
+    const Pt11 = this.getPointBySequence(11);
 
     let dimension = 0;
     const entities = [];
 
     // invalid points
-    if (Pt1.isSame(Pt2) || Pt1.isSame(Pt3) || Pt2.isSame(Pt3)) {
+    if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
       return null;
     }
 
     // extension points
-    let P1e = new Point();
-    let P2e = new Point();
-    let P3e = new Point();
+    let Pt13e = new Point();
+    let Pt14e = new Point();
+    //let P3e = new Point();
 
-    const pntPerp = Pt3.perpendicular(Pt1, Pt2);
-    const isAligned = pntPerp.isOnLine(Pt1, Pt2);
+    const pntPerp = Pt11.perpendicular(Pt13, Pt14);
+    const isAligned = pntPerp.isOnLine(Pt13, Pt14);
 
     if (isAligned) {
-      const projectionAngle = pntPerp.angle(Pt3);
-      const distance = Pt3.distance(pntPerp);
-      P1e = Pt1.project(projectionAngle, distance);
-      P2e = Pt2.project(projectionAngle, distance);
-      dimension = Pt1.distance(Pt2);
+      // Aligned dimension
+      const projectionAngle = pntPerp.angle(Pt11);
+      const distance = Pt11.distance(pntPerp);
+      Pt13e = Pt13.project(projectionAngle, distance);
+      Pt14e = Pt14.project(projectionAngle, distance);
+      dimension = Pt13.distance(Pt14);
     } else {
+      // generate the x and y delta values
+      const dx = Pt14.x - Pt13.x;
+      const dy = Pt14.y - Pt13.y;
 
-      const dx = Pt2.x - Pt1.x;
-      const dy = Pt2.y - Pt1.y;
-
-      const iX = ((Math.abs(Pt3.x - Pt1.x) + Math.abs(Pt2.x - Pt3.x)) - Math.abs(dx));
-      const iY = ((Math.abs(Pt3.y - Pt1.y) + Math.abs(Pt2.y - Pt3.y)) - Math.abs(dy));
+      // get the primary axis x or y
+      const iX = ((Math.abs(Pt11.x - Pt13.x) + Math.abs(Pt14.x - Pt11.x)) - Math.abs(dx));
+      const iY = ((Math.abs(Pt11.y - Pt13.y) + Math.abs(Pt14.y - Pt11.y)) - Math.abs(dy));
 
       if (iX >= iY && dy !== 0) {
-        P1e.x = Pt3.x;
-        P1e.y = Pt1.y;
-        P2e.x = Pt3.x;
-        P2e.y = Pt2.y;
+        Pt13e.x = Pt11.x;
+        Pt13e.y = Pt13.y;
+        Pt14e.x = Pt11.x;
+        Pt14e.y = Pt14.y;
         dimension = dy;
       } else if (iX < iY && dx !== 0) {
-        P1e.x = Pt1.x;
-        P1e.y = Pt3.y;
-        P2e.x = Pt2.x;
-        P2e.y = Pt3.y;
+        Pt13e.x = Pt13.x;
+        Pt13e.y = Pt11.y;
+        Pt14e.x = Pt14.x;
+        Pt14e.y = Pt11.y;
         dimension = dx;
       }
     }
 
+    const projectAngle = Pt13.angle(Pt13e);
+    const midPoint = Pt13e.midPoint(Pt14e);
 
-    const dimAngle = P1e.angle(P2e);
-    const projectAngle = Pt1.angle(P1e);
+    let textPosition = new Point();
+    let textRotation = 0;
 
-    // Text
-    const midPoint = P1e.midPoint(P2e);
-    P3e = midPoint.project(projectAngle, style.getValue('DIMGAP')); // Offset text from baseline
-    this.text.points = [P3e];
-    this.text.setRotation(dimAngle);
-    this.text.height = style.getValue('DIMTXT');
-
-    let horizontalAlignment = 0;
-    switch (style.getValue('DIMJUST')) {
-      case 0:
-        // 0 = Above dimension line and center-justified between extension lines
-        horizontalAlignment = 1;
-        break;
-      case 1:
-        // 1 = Above dimension line and next to first extension line
-        break;
-      case 2:
-        // 2 = Next to second extension line
-        break;
-      case 3:
-        // 3 = Above and center-justified to first extension line
-        break;
-      case 4:
-        // 4 = Above and center-justified to second extension line
-        break;
-    }
-
-    // 0 = Left; 1= Center; 2 = Right
-    // 3 = Aligned (if vertical alignment = 0)
-    // 4 = Middle (if vertical alignment = 0)
-    // 5 = Fit (if vertical alignment = 0)
-
-    this.text.horizontalAlignment = horizontalAlignment;
-
-
-    let verticalAlignment = 1;
-    switch (style.getValue('DIMTAD')) {
-      case 0:
-        // 0 = Centers the dimension text between the extension lines.
-        verticalAlignment = 1;
-        break;
-      case 1:
-        // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1).
-        // The distance from the dimension line to the baseline of the lowest line of text is the current DIMGAP value.
-        verticalAlignment = 2;
-        break;
-      case 2:
-        // 2 = Places the dimension text on the side of the dimension line farthest away from the defining points.
-        break;
-      case 3:
-        // 3 = Places the dimension text to conform to Japanese Industrial Standards (JIS).
-        break;
-      case 4:
-        // 4 = Places the dimension text below the dimension line.
-        break;
-    }
-
-    // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
-    this.text.verticalAlignment = verticalAlignment;
-
+    // set the text value
     if (typeof (dimension) === 'number') {
       const precision = style.getValue('DIMDEC') || 2; // Default precision
       this.text.string = Math.abs(dimension.toFixed(precision)).toString();
     }
+    // set the text override if available
+    if (this.textOverride) {
+      // TODO: support the use of <> to insert dimension value
+      this.text.string = this.textOverride;
+    }
+    // get the text height
+    const textHeight = style.getValue('DIMTXT');
+    // approximate text width based on height
+    const approxTextWidth = textHeight * this.text.string.length * 0.75; // Approximate width based on character count
+    // set the text height
+    this.text.height = textHeight;
+    // Always set text horizontal alignment to center
+    this.text.horizontalAlignment = 1;
+    // Always set text vertical alignment to middle
+    this.text.verticalAlignment = 2
+    // get the arrow size
+    const arrowsize = style.getValue('DIMASZ');
 
-    if (typeof (dimAngle) === 'number') {
-      const angle = Utils.radians2degrees(dimAngle);
-      this.text.rotation = angle; // TODO: Honor the style
+    // Text
+    // Define the text position and orientation
+    // Set the horizontal alignment based on the dimensions DIMJUST value
+    switch (style.getValue('DIMJUST')) {
+      case 0:
+        // 0 = Center-justified between extension lines
+        textPosition = midPoint;
+        textRotation = Pt13e.angle(Pt14e);
+        break;
+      case 1:
+        // 1 = Next to first extension line
+        textPosition = Pt13e;
+
+        textPosition = textPosition.project(Pt13.angle(Pt14), approxTextWidth * 0.75 + arrowsize); // Offset text from the extension line
+        textRotation = Pt13e.angle(Pt14e);
+        break;
+      case 2:
+        // 2 = Next to second extension line
+        textPosition = Pt14e;
+        textPosition = textPosition.project(Pt14.angle(Pt13), approxTextWidth * 0.75 + arrowsize); // Offset text from the extension line
+        textRotation = Pt13e.angle(Pt14e);
+        break;
+      case 3:
+        // 3 = Above first extension line
+        textPosition = Pt13e;
+        textRotation = Pt13e.angle(Pt14e) + Math.PI / 2; // Rotate text 90 degrees
+        break;
+      case 4:
+        // 4 = Above second extension line
+        textPosition = Pt14e;
+        textRotation = Pt13e.angle(Pt14e) + Math.PI / 2; // Rotate text 90 degrees
+        break;
+    }
+
+    let textOffsetDirection = textRotation + Math.PI / 2; // Offset text perpendicular to dimension line
+
+    switch (style.getValue('DIMTAD')) {
+      case 0:
+        // 0 = Centers the dimension text between the extension lines.
+        break;
+      case 1:
+      case 3:
+        // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1).
+        // The distance from the dimension line to the baseline of the lowest line of text is the current DIMGAP value.
+        textPosition = textPosition.project(textOffsetDirection, textHeight * 0.5 + style.getValue('DIMGAP')); // Offset text from baseline
+        break;
+      case 2:
+        // 2 = Places the dimension text on the side of the dimension line farthest away from the defining points.
+        const outsideDirection = Pt13.angle(Pt13e)
+        textPosition = textPosition.project(outsideDirection, textHeight * 0.5 + style.getValue('DIMGAP')); // Offset text from baseline
+        break;
+      // case 3:
+      // 3 = Places the dimension text to conform to Japanese Industrial Standards (JIS).
+      // TODO: Implement JIS dimension text placement
+      // Not supported
+      // break;
+      case 4:
+        // 4 = Places the dimension text below the dimension line.
+        textPosition = textPosition.project(textOffsetDirection, -textHeight * 0.5 - style.getValue('DIMGAP')); // Offset text from baseline
+        break;
+    }
+
+    // Set the text position
+    this.text.points = [textPosition];
+    // set the text rotation
+    if (style.getValue('DIMTIH') === 0) {
+      // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+      // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+      this.text.setRotation(Utils.radians2degrees(textRotation) % 180);
     }
 
 
+
+    // generate extension line points
     // get style properties
     const extension = style.getValue('DIMEXE');
     const offset = style.getValue('DIMEXO');
-    const arrowsize = style.getValue('DIMASZ');
 
-    // generate dimension points
+    const extLineOneStart = Pt13.project(projectAngle, offset);
+    const extLineTwoStart = Pt14.project(projectAngle, offset);
 
+    const extLineOneEnd = Pt13e.project(projectAngle, extension);
+    const extLineTwoEnd = Pt14e.project(projectAngle, extension);
 
-    const extLineOneStart = Pt1.project(projectAngle, offset);
-    const extLineTwoStart = Pt2.project(projectAngle, offset);
+    // generate dimension line points
+    const dimLineOneStart = Pt13e;
+    const dimLineTwoStart = Pt14e;
 
-    const extLineOneEnd = P1e.project(projectAngle, extension);
-    const extLineTwoEnd = P2e.project(projectAngle, extension);
+    let dimLineOneEnd = textPosition.perpendicular(Pt13e, Pt14e);
+    let dimLineTwoEnd = dimLineOneEnd;
 
-    const dimLineOneStart = P1e;
-    const dimLineTwoStart = P2e;
-
-    const dimLineOneEnd = midPoint;
-    const dimLineTwoEnd = midPoint;
+    // split the dimension line when the text is centered vertically
+    if (style.getValue('DIMTAD') === 0) {
+      dimLineOneEnd = dimLineOneEnd.project(Pt14e.angle(Pt13e), approxTextWidth * 0.75);
+      dimLineTwoEnd = dimLineTwoEnd.project(Pt13e.angle(Pt14e), approxTextWidth * 0.75);
+    }
 
     // generate dimension geometry
     const extLine1 = new Line({ points: [extLineOneStart, extLineOneEnd] });
@@ -276,11 +312,23 @@ export class AlignedDimension extends BaseDimension {
       entities.push(dimLine2);
     }
 
-    const arrowHead1 = this.getArrowHead(P1e, P1e.angle(P2e), arrowsize);
-    const arrowHead2 = this.getArrowHead(P2e, P2e.angle(P1e), arrowsize);
+    const arrowHead1 = this.getArrowHead(Pt13e, Pt13e.angle(Pt14e), arrowsize);
+    const arrowHead2 = this.getArrowHead(Pt14e, Pt14e.angle(Pt13e), arrowsize);
+
+    // Add Pt10 to the points array
+    const Pt10 = this.getPointBySequence(10);
+    if (Pt10) {
+      // set the arrow point
+      Pt10.x = Pt13e.x;
+      Pt10.y = Pt13e.y;
+    } else {
+      // create the arrow point
+      const pt10 = new Point(Pt13e.x, Pt13e.y);
+      pt10.sequence = 10;
+      this.points.push(pt10);
+    }
 
     entities.push(arrowHead1, arrowHead2);
-
     return entities;
   }
 
