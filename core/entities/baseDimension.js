@@ -57,7 +57,7 @@ export class BaseDimension extends Entity {
       writable: true,
     });
 
-    Object.defineProperty(this, 'styleName', {
+    Object.defineProperty(this, 'dimensionStyle', {
       value: 'STANDARD',
       writable: true,
       enumerable: true,
@@ -93,7 +93,7 @@ export class BaseDimension extends Entity {
         this.blockName = Property.loadValue([data.blockName, data[2]], '');
       }
 
-      if (data.hasOwnProperty('styleName') || data.hasOwnProperty('3')) {
+      if (data.hasOwnProperty('dimensionStyle') || data.hasOwnProperty('3')) {
         // DXF Groupcode 3 - Dimension Style Name
         this.dimensionStyle = Property.loadValue([data.dimensionStyle, data[3]], 'STANDARD');
       }
@@ -229,7 +229,7 @@ export class BaseDimension extends Entity {
    * @param {number} scale
    */
   draw(ctx, scale) {
-    const style = DesignCore.DimStyleManager.getItemByName(this.styleName);
+    const style = DesignCore.DimStyleManager.getItemByName(this.dimensionStyle);
 
     const entities = this.buildDimension(style);
 
