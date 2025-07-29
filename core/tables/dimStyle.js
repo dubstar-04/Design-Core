@@ -21,7 +21,7 @@ export class DimStyle {
     this.DIMBLK2 = ''; // 7 - Second arrow block name
     this.DIMSCALE = 1.0; // 40 - dimension scale
     this.DIMASZ = 2.5; // 41 - arrow size
-    this.DIMEXO = 1.5; // 42 - offset from origin
+    this.DIMEXO = 0.625; // 42 - offset from origin
     this.DIMDLI = 3.75; // 43 - Baseline spacing
     this.DIMEXE = 1.25; // 44- extend beyond dim lines
     this.DIMRND = 0.0; // 45 - Rounding value for dimension distances

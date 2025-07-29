@@ -42,6 +42,8 @@ export class DiametricDimension extends BaseDimension {
     try {
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
 
+      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle()
+
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
         // const selection =
         await DesignCore.Scene.inputManager.requestInput(op);
@@ -101,7 +103,7 @@ export class DiametricDimension extends BaseDimension {
    * @param {Object} style
    * @return {Array} - Array of entities that compose the dimension
    */
-  buildDimension() {
+  buildDimension(style) {
     // Diameter
     let dimension = 0;
     const entities = [];
