@@ -85,6 +85,8 @@ export class Dimension extends BaseDimension {
     try {
       let inputValid = false;
 
+      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle()
+
       while (!inputValid) {
         const options = new PromptOptions(`${Strings.Input.START} or ${Strings.Input.SELECT}`, [Input.Type.POINT, Input.Type.SINGLESELECTION]);
         const input1 = await DesignCore.Scene.inputManager.requestInput(options);
@@ -211,14 +213,14 @@ export class Dimension extends BaseDimension {
       mousePoint.sequence = 11;
 
       const points = [...itemPoints, mousePoint];
-      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points });
+      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
     }
 
     if (this.points.length > 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points });
+      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 }
