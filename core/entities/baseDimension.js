@@ -45,6 +45,12 @@ export class BaseDimension extends Entity {
       writable: true,
     });
 
+    Object.defineProperty(this, 'textOverride', {
+      value: '',
+      writable: true,
+      enumerable: true,
+    });
+
     Object.defineProperty(this, 'dimType', {
       value: 0,
       writable: true,
