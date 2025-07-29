@@ -131,8 +131,8 @@ export class DiametricDimension extends BaseDimension {
       entities.push(line1, arrowHead1);
     }
 
-
-    this.text.string = `${Strings.Symbol.DIAMETER}${Math.abs(dimension.toFixed(2)).toString()}`;
+    const precision = style.getValue('DIMDEC') || 2; // Default precision
+    this.text.string = `${Strings.Symbol.DIAMETER}${Math.abs(dimension.toFixed(precision)).toString()}`;
 
     return entities;
   }

@@ -182,7 +182,8 @@ export class AngularDimension extends BaseDimension {
     const line1Angle = Pt1.angle(Pt2);
     const line2Angle = Pt3.angle(Pt4);
     dimension = Utils.radians2degrees(line1Angle - line2Angle);
-    this.text.string = `${Math.abs(dimension.toFixed(2)).toString()}${Strings.Symbol.DEGREE}`;
+    const precision = style.getValue('DIMADEC') || 2; // Default precision
+    this.text.string = `${Math.abs(dimension.toFixed(precision)).toString()}${Strings.Symbol.DEGREE}`;
 
     return entities;
   }

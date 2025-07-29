@@ -221,7 +221,8 @@ export class AlignedDimension extends BaseDimension {
     this.text.verticalAlignment = verticalAlignment;
 
     if (typeof (dimension) === 'number') {
-      this.text.string = Math.abs(dimension.toFixed(2)).toString(); // TODO: Honor the precision from the style
+      const precision = style.getValue('DIMDEC') || 2; // Default precision
+      this.text.string = Math.abs(dimension.toFixed(precision)).toString();
     }
 
     if (typeof (dimAngle) === 'number') {
