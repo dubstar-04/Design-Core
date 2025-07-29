@@ -383,7 +383,7 @@ export class Text extends Entity {
     try { // HTML
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt Arial'; // +DesignCore.StyleManager.getItemByName(this.styleName).font.toString();
+      ctx.font = this.height + 'pt Arial'; //TODO: use style.font
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect

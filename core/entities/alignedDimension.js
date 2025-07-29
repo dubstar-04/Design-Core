@@ -177,7 +177,7 @@ export class AlignedDimension extends BaseDimension {
         // 1 = Above dimension line and next to first extension line
         break;
       case 2:
-        // 2 = Above dimension line and next to second extension line
+        // 2 = Next to second extension line
         break;
       case 3:
         // 3 = Above and center-justified to first extension line
