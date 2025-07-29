@@ -1,7 +1,7 @@
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {Logging} from '../lib/logging.js';
-import {Flags} from '../properties/flags.js';
-import {Property} from '../properties/property.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Logging } from '../lib/logging.js';
+import { Flags } from '../properties/flags.js';
+import { Property } from '../properties/property.js';
 
 /** DimStyle Class */
 export class DimStyle {
@@ -54,7 +54,7 @@ export class DimStyle {
     this.DIMCLRE = 0; // 177 - Dimension extension line color, range is 0 = BYBLOCK, 256 = BYLAYER
     this.DIMCLRT = 0; // 178 - Dimension text color, range is 0 = BYBLOCK, 256 = BYLAYER
     this.DIMADEC = 0; // 179 - Number of precision places displayed in angular dimensions - Stored as dictionary
-    this.DIMUNIT= 2; // 270 - (obsolete, now use DIMLUNIT AND DIMFRAC)
+    this.DIMUNIT = 2; // 270 - (obsolete, now use DIMLUNIT AND DIMFRAC)
     this.DIMDEC = 2; // 271 - Number of decimal places for the tolerance values of a primary units dimension
     this.DIMTDEC = 2; // 272 - Number of decimal places to display the tolerance values
     this.DIMALTU = 2; // 273 - Units format for alternate units of all dimension style family members except angular
