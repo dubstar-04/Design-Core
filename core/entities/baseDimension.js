@@ -4,6 +4,7 @@ import { Text } from './text.js';
 import { Solid } from './solid.js';
 import { Entity } from './entity.js';
 import { Logging } from '../lib/logging.js';
+import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -78,8 +79,7 @@ export class BaseDimension extends Entity {
         // The string explicitly entered by the user.
         // Optional; default is the measurement. If null or “<>”, the dimension measurement is drawn as the text,
         // if ““ (one blank space), the text is suppressed. Anything else is drawn as the text
-        const err = 'Groupcode 1 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
+        this.textOverride = Property.loadValue([data[1], data.textOverride], '');
       }
 
       /*
@@ -90,12 +90,12 @@ export class BaseDimension extends Entity {
 
       if (data.hasOwnProperty('blockName') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - Blockname
-        this.blockName = data.blockName || data[2];
+        this.blockName = Property.loadValue([data.blockName, data[2]], '');
       }
 
       if (data.hasOwnProperty('styleName') || data.hasOwnProperty('3')) {
         // DXF Groupcode 3 - Dimension Style Name
-        this.styleName = data.styleName || data[3];
+        this.dimensionStyle = Property.loadValue([data.dimensionStyle, data[3]], 'STANDARD');
       }
 
       if (data.hasOwnProperty('40')) {
@@ -120,7 +120,7 @@ export class BaseDimension extends Entity {
 
       if (data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Angle of rotated, horizontal, or vertical dimensions
-        this.linearDimAngle = data[50];
+        this.linearDimAngle = Property.loadValue([data[50]], 0);
       }
 
       if (data.hasOwnProperty('51')) {
@@ -157,7 +157,7 @@ export class BaseDimension extends Entity {
         // If set, ordinate is X-type; if not set, ordinate is Y-type
         // 128 = This is a bit value (bit 8) added to the other group 70 values if the dimension text
         // has been positioned at a user-defined location rather than at the default location
-        this.dimType = data.dimType || data[70];
+        this.dimType = Property.loadValue([data.dimType, data[70]], 1);
       }
 
       if (data.hasOwnProperty('71')) {
