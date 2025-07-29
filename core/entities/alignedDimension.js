@@ -306,7 +306,7 @@ export class AlignedDimension extends BaseDimension {
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
     file.writeGroupCode('70', 1); // DIMENSION TYPE 0 = rotated, 1 = aligned
-    file.writeGroupCode('3', 'STANDARD'); // DIMENSION STYLE
+    file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbAlignedDimension', DXFFile.Version.R2000);
     file.writeGroupCode('13', Pt13.x); // X - start point of first extension line
     file.writeGroupCode('23', Pt13.y); // Y

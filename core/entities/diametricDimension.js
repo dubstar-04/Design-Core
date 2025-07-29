@@ -159,7 +159,7 @@ export class DiametricDimension extends BaseDimension {
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
     file.writeGroupCode('70', this.dimType); // DIMENSION TYPE
-    file.writeGroupCode('3', 'STANDARD'); // DIMENSION STYLE
+    file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbDiametricDimension', DXFFile.Version.R2000);
     file.writeGroupCode('15', Pt15.x); // X - End of Dimension Line
     file.writeGroupCode('25', Pt15.y); // Y

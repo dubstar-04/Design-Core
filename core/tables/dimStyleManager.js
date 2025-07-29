@@ -12,7 +12,7 @@ export class DimStyleManager extends StyleManagerBase {
     super();
 
     this.indelibleItems.push('STANDARD');
-    this.itemProperty = 'styleName';
+    this.itemProperty = 'dimensionStyle';
   }
 
   /**
