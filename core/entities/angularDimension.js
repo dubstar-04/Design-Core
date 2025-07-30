@@ -51,13 +51,13 @@ export class AngularDimension extends BaseDimension {
 
         const line1 = DesignCore.Scene.getItem(selection.selectedItemIndex);
 
-        const Pt155 = line1.points[0];
-        Pt155.sequence = 15;
-        this.points.push(Pt155);
+        const Pt15 = line1.points[0];
+        Pt15.sequence = 15;
+        this.points.push(Pt15);
 
-        const Pt150 = line1.points[1];
-        Pt150.sequence = 10;
-        this.points.push(Pt150);
+        const Pt10 = line1.points[1];
+        Pt10.sequence = 10;
+        this.points.push(Pt10);
 
         DesignCore.Scene.selectionManager.reset();
       }
@@ -70,28 +70,28 @@ export class AngularDimension extends BaseDimension {
 
         const line2 = DesignCore.Scene.getItem(selection2.selectedItemIndex);
 
-        const Pt153 = line2.points[0];
-        Pt153.sequence = 13;
-        this.points.push(Pt153);
+        const Pt13 = line2.points[0];
+        Pt13.sequence = 13;
+        this.points.push(Pt13);
 
-        const Pt154 = line2.points[1];
-        Pt154.sequence = 14;
-        this.points.push(Pt154);
+        const Pt14 = line2.points[1];
+        Pt14.sequence = 14;
+        this.points.push(Pt14);
 
         DesignCore.Scene.selectionManager.reset();
       }
 
       const op2 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const Pt151 = await DesignCore.Scene.inputManager.requestInput(op2);
-      Pt151.sequence = 11;
-      this.points.push(Pt151);
+      const Pt11 = await DesignCore.Scene.inputManager.requestInput(op2);
+      Pt11.sequence = 11;
+      this.points.push(Pt11);
 
-      const Pt155 = this.points.find((point) => point === 15);
-      const Pt150 = this.getPointBySequence(10);
+      const Pt15 = this.points.find((point) => point === 15);
+      const Pt10 = this.getPointBySequence(10);
 
-      const Pt156 = Pt151.perpendicular(Pt155, Pt150);
-      Pt156.sequence = 16;
-      this.points.push(Pt156);
+      const Pt16 = Pt11.perpendicular(Pt15, Pt10);
+      Pt16.sequence = 16;
+      this.points.push(Pt16);
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -107,13 +107,13 @@ export class AngularDimension extends BaseDimension {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
 
-      const Pt155 = this.getPointBySequence(15);
-      const Pt150 = this.getPointBySequence(10);
+      const Pt15 = this.getPointBySequence(15);
+      const Pt10 = this.getPointBySequence(10);
 
-      const Pt156 = mousePoint.perpendicular(Pt155, Pt150);
-      Pt156.sequence = 16;
+      const Pt16 = mousePoint.perpendicular(Pt15, Pt10);
+      Pt16.sequence = 16;
 
-      const points = [...this.points, mousePoint, Pt156];
+      const points = [...this.points, mousePoint, Pt16];
       DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
@@ -129,21 +129,51 @@ export class AngularDimension extends BaseDimension {
     const item1 = items[0];
     const item2 = items[1];
 
-    const Pt155 = item1.points[0];
-    Pt155.sequence = 15;
-    points.push(Pt155);
+    let tempPt15 = item1.points[0];
+    let tempPt10 = item1.points[1];
 
-    const Pt150 = item1.points[1];
-    Pt150.sequence = 10;
-    points.push(Pt150);
+    let tempPt13 = item2.points[0];
+    let tempPt14 = item2.points[1];
 
-    const Pt153 = item2.points[0];
-    Pt153.sequence = 13;
-    points.push(Pt153);
+    const intersect = Intersection.intersectLineLine({ start: tempPt15, end: tempPt10 }, { start: tempPt13, end: tempPt14 }, true);
+    const intersectPt = intersect.points[0]
 
-    const Pt154 = item2.points[1];
-    Pt154.sequence = 14;
-    points.push(Pt154);
+    if (tempPt10.distance(intersectPt) < tempPt15.distance(intersectPt)) {
+      tempPt15 = item1.points[1];
+      tempPt10 = item1.points[0];
+    }
+
+    if (tempPt14.distance(intersectPt) < tempPt13.distance(intersectPt)) {
+      tempPt13 = item2.points[1];
+      tempPt14 = item2.points[0];
+    }
+
+    // Ensure points are in correct order based on angles
+    if ((intersectPt.angle(tempPt10) + Math.PI) % Math.PI < (intersectPt.angle(tempPt14) + Math.PI) % Math.PI) {
+      let swapPt = tempPt15;
+      tempPt15 = tempPt13;
+      tempPt13 = swapPt;
+
+      swapPt = tempPt10;
+      tempPt10 = tempPt14;
+      tempPt14 = swapPt;
+    }
+
+    const Pt15 = tempPt15
+    Pt15.sequence = 15;
+    points.push(Pt15);
+
+    const Pt10 = tempPt10
+    Pt10.sequence = 10;
+    points.push(Pt10);
+
+    const Pt13 = tempPt13
+    Pt13.sequence = 13;
+    points.push(Pt13);
+
+    const Pt14 = tempPt14
+    Pt14.sequence = 14;
+    points.push(Pt14);
 
     return points;
   }
@@ -162,35 +192,71 @@ export class AngularDimension extends BaseDimension {
     const Pt10 = this.getPointBySequence(10);
     const Pt13 = this.getPointBySequence(13);
     const Pt14 = this.getPointBySequence(14);
-    const Pt16 = this.getPointBySequence(16);
+    const Pt16 = this.getPointBySequence(11); //Temp use 11, should be pt16
     const Pt11 = this.getPointBySequence(11);
 
-    const line1 = new Line({ points: [Pt15, Pt10] });
-    const line2 = new Line({ points: [Pt13, Pt14] });
-
-    const arrow1pos = Pt16.perpendicular(Pt15, Pt10);
-    const arrow2pos = Pt16.perpendicular(Pt13, Pt14);
-
-    const arrowHead1 = this.getArrowHead(arrow1pos, Pt15.angle(Pt10) + 1.5708, this.text.height / 2);
-    const arrowHead2 = this.getArrowHead(arrow2pos, Pt13.angle(Pt14) + 1.5708, this.text.height / 2);
-
+    // get intersection point
     const intersect = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true);
-    const arc = new Arc({ points: [intersect.points[0], arrow1pos, arrow2pos] });
+    const intersectPt = intersect.points[0];
 
-    entities.push(line1, line2, arrowHead1, arrowHead2, arc);
+    const distance = intersectPt.distance(Pt11);
 
-    this.text.points = [Pt11];
-    // this.text.setRotation(Pt15.angle(Pt10));
-    const angle = Utils.radians2degrees(Pt15.angle(Pt10));
-    this.text.rotation = angle;
+    const arrow1pos = intersectPt.project(Pt15.angle(Pt10), distance) //Pt16.perpendicular(Pt15, Pt10);
+    const arrow2pos = intersectPt.project(Pt13.angle(Pt14), distance) //Pt16.perpendicular(Pt13, Pt14);
 
-    const line1Angle = Pt15.angle(Pt10);
-    const line2Angle = Pt13.angle(Pt14);
+    let line1Angle = Pt15.angle(Pt10);
+    let line2Angle = Pt13.angle(Pt14);
 
+    // check if the dimension is inside the arc
+    const inside = Pt11.isOnArc(Pt10, Pt14, intersectPt, 1);
+    console.log(`inside: ${inside}`);
+
+    if (inside) {
+      line1Angle = (line1Angle + Math.PI) % Math.PI;
+      line2Angle = (line2Angle + Math.PI) % Math.PI;
+    }
+
+    // calculate the dimension value
     dimension = Utils.radians2degrees(line1Angle - line2Angle);
+    // get the precision from the style or use default
     const precision = style.getValue('DIMADEC') || 2; // Default precision
+    // get the text height
+    const textHeight = style.getValue('DIMTXT');
+    // approximate text width based on height
+    const approxTextWidth = textHeight * this.text.string.length * 0.75; // Approximate width based on character count
+    // set the text height
+    this.text.height = textHeight;
+    // Always set text horizontal alignment to center
+    this.text.horizontalAlignment = 1;
+    // Always set text vertical alignment to middle
+    this.text.verticalAlignment = 2
+    // set the text value
     this.text.string = `${Math.abs(dimension.toFixed(precision)).toString()}${Strings.Symbol.DEGREE}`;
+    // calculate the text position
+    const textPositionRotation = inside ? ((line2Angle - line1Angle) / 2) : ((line1Angle - line2Angle) / 2);
+    const textPosition = intersectPt.project(Pt15.angle(Pt10) - textPositionRotation, distance + textHeight * 0.5 + style.getValue('DIMGAP'));
+    // set the text position
+    this.text.points = [textPosition];
+    // calculate the text rotation
+    const textRotation = Pt10.angle(Pt14);
 
+    if (style.getValue('DIMTIH') === 0) {
+      // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+      // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+      this.text.setRotation(Utils.radians2degrees(textRotation) % 180);
+    }
+
+    // get the arrow size
+    const arrowsize = style.getValue('DIMASZ');
+    const arrowRotation = inside ? Math.PI / 2 : -Math.PI / 2;
+    const arrowHead1 = this.getArrowHead(arrow1pos, Pt15.angle(Pt10) + arrowRotation, arrowsize);
+    const arrowHead2 = this.getArrowHead(arrow2pos, Pt13.angle(Pt14) - arrowRotation, arrowsize);
+
+    const arc = new Arc({ points: [intersectPt, inside ? arrow1pos : arrow2pos, inside ? arrow2pos : arrow1pos] });
+    //const line1 = new Line({ points: [Pt15, Pt10] });
+    //const line2 = new Line({ points: [Pt13, Pt14] });
+
+    entities.push(/*line1, line2,*/ arrowHead1, arrowHead2, arc);
     return entities;
   }
 
