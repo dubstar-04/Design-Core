@@ -247,10 +247,10 @@ export class AngularDimension extends BaseDimension {
     }
 
     // get the arrow size
-    const arrowsize = style.getValue('DIMASZ');
+    const arrowSize = style.getValue('DIMASZ');
     const arrowRotation = inside ? Math.PI / 2 : -Math.PI / 2;
-    const arrowHead1 = this.getArrowHead(arrow1pos, Pt15.angle(Pt10) + arrowRotation, arrowsize);
-    const arrowHead2 = this.getArrowHead(arrow2pos, Pt13.angle(Pt14) - arrowRotation, arrowsize);
+    const arrowHead1 = this.getArrowHead(arrow1pos, Pt15.angle(Pt10) + arrowRotation, arrowSize);
+    const arrowHead2 = this.getArrowHead(arrow2pos, Pt13.angle(Pt14) - arrowRotation, arrowSize);
 
     const arc = new Arc({ points: [intersectPt, inside ? arrow1pos : arrow2pos, inside ? arrow2pos : arrow1pos] });
     //const line1 = new Line({ points: [Pt15, Pt10] });
