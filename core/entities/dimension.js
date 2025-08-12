@@ -12,6 +12,7 @@ import { Point } from './point.js';
 import { Strings } from '../lib/strings.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Intersection } from '../lib/intersect.js';
 
 import { DesignCore } from '../designCore.js';
 import { SingleSelection } from '../lib/selectionManager.js';
@@ -180,9 +181,20 @@ export class Dimension extends BaseDimension {
         if (Input.getType(input2) === Input.Type.SINGLESELECTION) {
           const selectedItem2 = DesignCore.Scene.getItem(input2.selectedItemIndex);
           if ([Line].some((entity) => selectedItem2 instanceof entity)) {
-            this.selectedItems.push(selectedItem2);
-            // Two lines selected - switch to angular dimension
-            this.dimType = 2;
+
+            // Check lines intersect
+            const line1 = { start: this.selectedItems[0].points[0], end: this.selectedItems[0].points[1] }
+            const line2 = { start: selectedItem2.points[0], end: selectedItem2.points[1] }
+            const intersect = Intersection.intersectLineLine(line1, line2, true);
+            if (intersect.points.length >= 1) {
+              // add line to selection
+              this.selectedItems.push(selectedItem2);
+              // Two lines selected - switch to angular dimension
+              this.dimType = 2;
+            } else {
+              const err = 'Invalid selection - Parallel lines';
+              Logging.instance.warn(`${this.type} - ${err}`);
+            }
           } else {
             const msg = `${this.type} - Unsupported Type: ${selectedItem2.type}`;
             DesignCore.Core.notify(msg);
