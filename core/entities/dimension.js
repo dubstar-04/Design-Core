@@ -88,6 +88,9 @@ export class Dimension extends BaseDimension {
 
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle()
 
+      // TODO: Type needs to be a flag object
+      // Type needs to have value 32 to indicate the dimensions block is owned by the dimension
+
       while (!inputValid) {
         const options = new PromptOptions(`${Strings.Input.START} or ${Strings.Input.SELECT}`, [Input.Type.POINT, Input.Type.SINGLESELECTION]);
         const input1 = await DesignCore.Scene.inputManager.requestInput(options);
