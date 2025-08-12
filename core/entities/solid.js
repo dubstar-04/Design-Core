@@ -71,6 +71,16 @@ export class Solid extends Entity {
   }
 
   /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
+  intersectPoints() {
+    return {
+      points: this.points,
+    };
+  }
+
+  /**
    * Return boundingbox for entity
    * @return {BoundingBox}
    */

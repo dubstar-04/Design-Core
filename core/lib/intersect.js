@@ -601,5 +601,17 @@ export class Intersection {
 
     return result;
   };
+
+
+  /**
+   * Find intersections between solid and rectangle
+   * @param {Solid} solid
+   * @param {Rectangle} rectangle
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+    static intersectSolidRectangle(solid, rectangle, extend) {
+      return this.intersectPolylineRectangle(solid, rectangle, extend);
+    };
 }
 
