@@ -56,8 +56,9 @@ export class Strings {
 
   // Unicode Symbols
   static Symbol = {
-    DIAMETER: '\u2300',
+    DIAMETER: '\u00D8',
     DEGREE: '\u00B0',
+    RADIUS: 'R',
   };
 
   // Input Strings
