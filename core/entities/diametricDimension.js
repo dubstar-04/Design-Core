@@ -112,11 +112,12 @@ export class DiametricDimension extends BaseDimension {
     const Pt2 = this.getPointBySequence(10); // diameter point
     const Pt3 = this.getPointBySequence(11); // text position
 
-    this.text.points = [Pt3];
-    this.text.setRotation(Pt1.angle(Pt2));
-    const angle = Utils.radians2degrees(Pt1.angle(Pt2));
-    this.text.rotation = angle;
+    const textPosition = Pt3;
+    const textRotation = Pt1.angle(Pt2);
     dimension = Pt1.distance(Pt2);
+
+    // Set the text value, position and rotation
+    this.setDimensionValue(dimension, textPosition, textRotation);
 
     if (dimension < Pt1.distance(Pt3) || dimension < Pt2.distance(Pt3)) {
       // Text is outside the radius
@@ -132,9 +133,6 @@ export class DiametricDimension extends BaseDimension {
       const arrowHead1 = this.getArrowHead(Pt1, Pt1.angle(Pt3), this.text.height / 2);
       entities.push(line1, arrowHead1);
     }
-
-    const precision = style.getValue('DIMDEC') || 2; // Default precision
-    this.text.string = `${Strings.Symbol.DIAMETER}${Math.abs(dimension.toFixed(precision)).toString()}`;
 
     return entities;
   }
