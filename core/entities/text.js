@@ -352,6 +352,18 @@ export class Text extends Entity {
   }
 
   /**
+   * Get the approximate width of the text
+   * @return {number} - approximate width of the text
+   * This is a rough estimate based on the string length and height
+   * Actual width depends on the font and style used
+   */
+  getApproximateWidth() {
+    // Approximate width of the text based on the string length and height
+    // This is a rough estimate, as actual width depends on the font and style
+    return this.string.length * this.height * 0.6; // 0.6 is an approximation factor for average character width
+  }
+
+  /**
    * Draw the entity
    * @param {Object} ctx - context
    * @param {number} scale
@@ -383,7 +395,7 @@ export class Text extends Entity {
     try { // HTML
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt Arial'; //TODO: use style.font
+      ctx.font = this.height + 'pt Arial'; // TODO: use style.font
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
