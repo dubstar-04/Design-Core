@@ -164,104 +164,14 @@ export class AlignedDimension extends BaseDimension {
     const projectAngle = Pt13.angle(Pt13e);
     const midPoint = Pt13e.midPoint(Pt14e);
 
-    let textPosition = new Point();
-    let textRotation = 0;
+    const textPosition = midPoint;
+    const textRotation = Pt13e.angle(Pt14e);
 
-    // set the text value
-    if (typeof (dimension) === 'number') {
-      const precision = style.getValue('DIMDEC') || 2; // Default precision
-      this.text.string = Math.abs(dimension.toFixed(precision)).toString();
-    }
-    // set the text override if available
-    if (this.textOverride) {
-      // TODO: support the use of <> to insert dimension value
-      this.text.string = this.textOverride;
-    }
-    // get the text height
-    const textHeight = style.getValue('DIMTXT');
+    // Set the text value, position and rotation
+    this.setDimensionValue(dimension, textPosition, textRotation);
+
     // approximate text width based on height
-    const approxTextWidth = textHeight * this.text.string.length * 0.75; // Approximate width based on character count
-    // set the text height
-    this.text.height = textHeight;
-    // Always set text horizontal alignment to center
-    this.text.horizontalAlignment = 1;
-    // Always set text vertical alignment to middle
-    this.text.verticalAlignment = 2
-    // get the arrow size
-    const arrowsize = style.getValue('DIMASZ');
-
-    // Text
-    // Define the text position and orientation
-    // Set the horizontal alignment based on the dimensions DIMJUST value
-    switch (style.getValue('DIMJUST')) {
-      case 0:
-        // 0 = Center-justified between extension lines
-        textPosition = midPoint;
-        textRotation = Pt13e.angle(Pt14e);
-        break;
-      case 1:
-        // 1 = Next to first extension line
-        textPosition = Pt13e;
-
-        textPosition = textPosition.project(Pt13.angle(Pt14), approxTextWidth * 0.75 + arrowsize); // Offset text from the extension line
-        textRotation = Pt13e.angle(Pt14e);
-        break;
-      case 2:
-        // 2 = Next to second extension line
-        textPosition = Pt14e;
-        textPosition = textPosition.project(Pt14.angle(Pt13), approxTextWidth * 0.75 + arrowsize); // Offset text from the extension line
-        textRotation = Pt13e.angle(Pt14e);
-        break;
-      case 3:
-        // 3 = Above first extension line
-        textPosition = Pt13e;
-        textRotation = Pt13e.angle(Pt14e) + Math.PI / 2; // Rotate text 90 degrees
-        break;
-      case 4:
-        // 4 = Above second extension line
-        textPosition = Pt14e;
-        textRotation = Pt13e.angle(Pt14e) + Math.PI / 2; // Rotate text 90 degrees
-        break;
-    }
-
-    let textOffsetDirection = textRotation + Math.PI / 2; // Offset text perpendicular to dimension line
-
-    switch (style.getValue('DIMTAD')) {
-      case 0:
-        // 0 = Centers the dimension text between the extension lines.
-        break;
-      case 1:
-      case 3:
-        // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1).
-        // The distance from the dimension line to the baseline of the lowest line of text is the current DIMGAP value.
-        textPosition = textPosition.project(textOffsetDirection, textHeight * 0.5 + style.getValue('DIMGAP')); // Offset text from baseline
-        break;
-      case 2:
-        // 2 = Places the dimension text on the side of the dimension line farthest away from the defining points.
-        const outsideDirection = Pt13.angle(Pt13e)
-        textPosition = textPosition.project(outsideDirection, textHeight * 0.5 + style.getValue('DIMGAP')); // Offset text from baseline
-        break;
-      // case 3:
-      // 3 = Places the dimension text to conform to Japanese Industrial Standards (JIS).
-      // TODO: Implement JIS dimension text placement
-      // Not supported
-      // break;
-      case 4:
-        // 4 = Places the dimension text below the dimension line.
-        textPosition = textPosition.project(textOffsetDirection, -textHeight * 0.5 - style.getValue('DIMGAP')); // Offset text from baseline
-        break;
-    }
-
-    // Set the text position
-    this.text.points = [textPosition];
-    // set the text rotation
-    if (style.getValue('DIMTIH') === 0) {
-      // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
-      // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
-      this.text.setRotation(Utils.radians2degrees(textRotation) % 180);
-    }
-
-
+    const approxTextWidth = this.text.getApproximateWidth();
 
     // generate extension line points
     // get style properties
@@ -311,6 +221,9 @@ export class AlignedDimension extends BaseDimension {
     if (!style.getValue('DIMSD2')) {
       entities.push(dimLine2);
     }
+
+    // get the arrow size
+    const arrowsize = style.getValue('DIMASZ');
 
     const arrowHead1 = this.getArrowHead(Pt13e, Pt13e.angle(Pt14e), arrowsize);
     const arrowHead2 = this.getArrowHead(Pt14e, Pt14e.angle(Pt13e), arrowsize);
