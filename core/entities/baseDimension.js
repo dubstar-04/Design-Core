@@ -210,11 +210,11 @@ export class BaseDimension extends Entity {
         formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}`;
         break;
       case 1: // Aligned
-        precision = style.getValue('DIMDEC');
+        precision = this.getDimensionStyle().getValue('DIMDEC');
         formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}`;
         break;
       case 2: // Angular
-        precision = style.getValue('DIMADEC');
+        precision = this.getDimensionStyle().getValue('DIMADEC');
         formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}${Strings.Symbol.DEGREE}`;
         break;
       case 3: // Diameter
@@ -224,7 +224,7 @@ export class BaseDimension extends Entity {
         formattedDimensionValue = `${Strings.Symbol.RADIUS}${Math.abs(dimensionValue.toFixed(precision))}`;
         break;
       case 5: // Angular 3 point
-        precision = style.getValue('DIMADEC');
+        precision = this.getDimensionStyle().getValue('DIMADEC');
         formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}${Strings.Symbol.DEGREE}`;
         break;
       case 6: // Ordinate
@@ -250,10 +250,8 @@ export class BaseDimension extends Entity {
    * @param {number} textRotation - the rotation of the text (radians)
    */
   setDimensionValue(textValue, textPosition, textRotation) {
-    // get the dimension style
-    const style = DesignCore.DimStyleManager.getItemByName(this.dimensionStyle);
     // get the text height
-    const textHeight = style.getValue('DIMTXT');
+    const textHeight = this.getDimensionStyle().getValue('DIMTXT');
     // set the text height
     this.text.height = textHeight;
     // Always set text horizontal alignment to center
@@ -266,12 +264,21 @@ export class BaseDimension extends Entity {
     this.text.points = [textPosition];
 
     // set the text rotation
-    if (style.getValue('DIMTIH') === 0) {
+    if (this.getDimensionStyle().getValue('DIMTIH') === 0) {
       // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
       // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
       this.text.setRotation(Utils.radians2degrees(textRotation) % 180);
     }
   }
+
+  /**
+   * Get the dimension style
+   * @return {Object} - the dimension style object
+   */
+  getDimensionStyle() {
+    return DesignCore.DimStyleManager.getItemByName(this.dimensionStyle);
+  }
+
 
   /**
    * Get the points for the sequence number
