@@ -231,59 +231,96 @@ export class AngularDimension extends BaseDimension {
 
     // Build dimension based on type
     // Type 2 - Angular dimension
-    // Type 5 - 3 Point Angular dimension
+    // Type 5 - 3 Point Angular dimension - Not Supported
 
-    if (this.getBaseDimType() === 2) {
-      //console.log('build extended dimension')
-      return this.buildExtendedDimension(style);
-    } else {
-      console.log('build regular dimension')
-      return this.buildRegularDimension(style);
-    }
-  }
+    //            10
+    //  \        /
+    //          /◤
+    //    \    /   .
+    //        /     .
+    //     15/      . 11
+    //     13\      .
+    //        \    .
+    //    /    \  .
+    //          \◣
+    //  /        \
+    //             14
 
-  /**
-   * Build regular dimension without extension lines
-   * @param {Object} style
-   * @return {Array} - Array of entities that compose the dimension
-   */
-  buildRegularDimension(style) {
-
-    const err = 'Regular angular dimension not implemented';
-    Logging.instance.warn(`${this.type} - ${err}`)
-
-  }
-
-
-  buildExtendedDimension(style) {
-    // Angular
+    // Type 2 - Angular dimension
     let dimension = 0;
     const entities = [];
+    // get the points by sequence
+    const Pt13 = this.getPointBySequence(13); // Pt13 is the first line start point
+    const Pt14 = this.getPointBySequence(14); // Pt14 is the first line end point
+    const Pt15 = this.getPointBySequence(15); // Pt15 is second line start point
+    const Pt10 = this.getPointBySequence(10); // Pt10 is the second line end point
 
-    const Pt15 = this.getPointBySequence(15);
-    const Pt10 = this.getPointBySequence(10);
-    const Pt13 = this.getPointBySequence(13);
-    const Pt14 = this.getPointBySequence(14);
-    const Pt16 = this.getPointBySequence(11); //Temp use 11, should be pt16
-    const Pt11 = this.getPointBySequence(11);
+    //Temp use 11, should be pt16
+    const Pt16 = this.getPointBySequence(11); // Pt16 is the arc position
+    const Pt11 = this.getPointBySequence(11); // Pt11 is the text position
 
-    // get intersection point
+    // Find the line intersection point
     const intersect = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true);
     const intersectPt = intersect.points[0];
 
     const distance = intersectPt.distance(Pt11);
 
-    const arrow1pos = intersectPt.project(Pt13.angle(Pt14), distance) //Pt16.perpendicular(Pt13, Pt14);
-    const arrow2pos = intersectPt.project(Pt15.angle(Pt10), distance) //Pt16.perpendicular(Pt15, Pt10);
+    const quadOneStart = Pt14
+    const quadOneEnd = Pt10
+    const quadTwoStart = Pt14.rotate(intersectPt, Math.PI)
+    const quadTwoEnd = Pt10.rotate(intersectPt, Math.PI)
 
-    let line1Angle = Pt13.angle(Pt14);
-    let line2Angle = Pt15.angle(Pt10);
+    // Define the arrow positions
+    let arrow1pos = intersectPt
+    let arrow2pos = intersectPt
 
-    // check if the dimension is inside the arc
-    const inside = Pt11.isOnArc(Pt14, Pt10, intersectPt, 1);
+    // Define the line extents
+    let line1Extents = Pt14
+    let line2Extents = Pt10
+
+    // Check which quadrant the text is positioned in
+    // Quadrent One
+    if (Pt11.isOnArc(quadOneStart, quadOneEnd, intersectPt, 1)) {
+      //console.log("Pt11 is on arc quad One");
+      arrow1pos = intersectPt.project(intersectPt.angle(quadOneStart), distance)
+      line1Extents = Pt14
+      arrow2pos = intersectPt.project(intersectPt.angle(quadOneEnd), distance)
+      line2Extents = Pt10
+    }
+
+    // Quadrent Two
+    if (Pt11.isOnArc(quadOneEnd, quadTwoStart, intersectPt, 1)) {
+      //console.log("Pt11 is on arc quad Two");
+      arrow1pos = intersectPt.project(intersectPt.angle(quadOneEnd), distance)
+      line1Extents = Pt10
+      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoStart), distance)
+      line2Extents = Pt13
+    }
+
+    // Quadrent Three
+    if (Pt11.isOnArc(quadTwoStart, quadTwoEnd, intersectPt, 1)) {
+      //console.log("Pt11 is on arc quad Three");
+      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoStart), distance)
+      line1Extents = Pt13
+      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoEnd), distance)
+      line2Extents = Pt15
+    }
+
+    // Quadrent Four
+    if (Pt11.isOnArc(quadTwoEnd, quadOneStart, intersectPt, 1)) {
+      //console.log("Pt11 is on arc quad Four");
+      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoEnd), distance)
+      line1Extents = Pt15
+      arrow2pos = intersectPt.project(intersectPt.angle(quadOneStart), distance)
+      line2Extents = Pt14
+    }
+
+    let line1Angle = intersectPt.angle(arrow1pos);
+    let line2Angle = intersectPt.angle(arrow2pos);
 
     // calculate the dimension value
-    dimension = inside ? line2Angle - line1Angle : line1Angle - line2Angle;
+    dimension = line2Angle - line1Angle;
+
     if (dimension < 0) {
       dimension = dimension + Math.PI * 2
     }
@@ -302,7 +339,7 @@ export class AngularDimension extends BaseDimension {
     // set the text value
     this.text.string = `${Math.abs(Utils.radians2degrees(dimension).toFixed(precision)).toString()}${Strings.Symbol.DEGREE}`;
     // calculate the text position
-    const arcMiddle = intersectPt.project(intersectPt.angle(Pt14.midPoint(Pt10)), inside ? distance : -distance)
+    const arcMiddle = intersectPt.project(intersectPt.angle(arrow1pos.midPoint(arrow2pos)), distance)
     //const textOffsetDistance = distance + textHeight * 0.5 + style.getValue('DIMGAP')
     const textPosition = arcMiddle;
     // set the text position
@@ -318,9 +355,9 @@ export class AngularDimension extends BaseDimension {
 
     // get the arrow size
     const arrowSize = style.getValue('DIMASZ');
-    const arrowRotation = inside ? Math.PI / 2 : -Math.PI / 2;
-    const arrowHead1 = this.getArrowHead(arrow1pos, Pt13.angle(Pt14) + arrowRotation, arrowSize);
-    const arrowHead2 = this.getArrowHead(arrow2pos, Pt15.angle(Pt10) - arrowRotation, arrowSize);
+    const arrowRotation = Math.PI / 2
+    const arrowHead1 = this.getArrowHead(arrow1pos, intersectPt.angle(arrow1pos) + arrowRotation, arrowSize);
+    const arrowHead2 = this.getArrowHead(arrow2pos, intersectPt.angle(arrow2pos) - arrowRotation, arrowSize);
 
     // Add the entities to the dimension
     // calculate the radians to mm conversion
@@ -330,16 +367,16 @@ export class AngularDimension extends BaseDimension {
     const arcAdjustment = (approxTextWidth / 2) * circumferencePerRadian
 
     //create the dimension line / arc
-    const arcOneEnd = arcMiddle.rotate(intersectPt, inside ? -arcAdjustment : arcAdjustment)
-    const arcOne = new Arc({ points: [intersectPt, inside ? arrow1pos : arcOneEnd, inside ? arcOneEnd : arrow1pos] });
+    const arcOneEnd = arcMiddle.rotate(intersectPt, -arcAdjustment)
+    const arcOne = new Arc({ points: [intersectPt, arrow1pos, arcOneEnd] });
     // Supress dimension line 1 if DIMSD1 is true
     if (!style.getValue('DIMSD1')) {
       entities.push(arrowHead1, arcOne);
     }
 
     //create the dimension line / arc
-    const arcTwoEnd = arcMiddle.rotate(intersectPt, inside ? arcAdjustment : -arcAdjustment)
-    const arcTwo = new Arc({ points: [intersectPt, inside ? arcTwoEnd : arrow2pos, inside ? arrow2pos : arcTwoEnd] });
+    const arcTwoEnd = arcMiddle.rotate(intersectPt, arcAdjustment)
+    const arcTwo = new Arc({ points: [intersectPt, arcTwoEnd, arrow2pos] });
     // Supress dimension line 2 if DIMSD2 is true
     if (!style.getValue('DIMSD2')) {
       entities.push(arrowHead2, arcTwo);
@@ -366,6 +403,16 @@ export class AngularDimension extends BaseDimension {
       pt15Text.string = "pt15"
       pt15Text.points = [Pt15]
       entities.push(pt15Text)
+
+      const q2s = new Text()
+      q2s.string = "q2s"
+      q2s.points = [quadTwoStart]
+      entities.push(q2s)
+
+      const q2e = new Text()
+      q2e.string = "q2e"
+      q2e.points = [quadTwoEnd]
+      entities.push(q2e)
     }
 
     // generate extension line points
@@ -375,9 +422,9 @@ export class AngularDimension extends BaseDimension {
 
     // check if the dimension is beyond the limits of the selection
     // add extension line one
-    if (distance > intersectPt.distance(Pt14) + offset * 2) {
-      const extensionLineOneStart = intersectPt.project(intersectPt.angle(Pt14), intersectPt.distance(Pt14) + offset)
-      const extensionLineOneEnd = intersectPt.project(intersectPt.angle(Pt14), distance + extension)
+    if (distance > intersectPt.distance(line1Extents) + offset * 2) {
+      const extensionLineOneStart = intersectPt.project(intersectPt.angle(arrow1pos), intersectPt.distance(line1Extents) + offset)
+      const extensionLineOneEnd = intersectPt.project(intersectPt.angle(arrow1pos), distance + extension)
       const extensionLineOne = new Line({ points: [extensionLineOneStart, extensionLineOneEnd] });
       // Supress extension line 1 if DIMS1 is true
       if (!style.getValue('DIMSE1')) {
@@ -387,9 +434,9 @@ export class AngularDimension extends BaseDimension {
 
     // check if the dimension is beyond the limits of the selection
     // add extension line two
-    if (distance > intersectPt.distance(Pt10) + offset * 2) {
-      const extensionLineTwoStart = intersectPt.project(intersectPt.angle(Pt10), intersectPt.distance(Pt10) + offset)
-      const extensionLineTwoEnd = intersectPt.project(intersectPt.angle(Pt10), distance + extension)
+    if (distance > intersectPt.distance(line2Extents) + offset * 2) {
+      const extensionLineTwoStart = intersectPt.project(intersectPt.angle(arrow2pos), intersectPt.distance(line2Extents) + offset)
+      const extensionLineTwoEnd = intersectPt.project(intersectPt.angle(arrow2pos), distance + extension)
       const extensionLineTwo = new Line({ points: [extensionLineTwoStart, extensionLineTwoEnd] });
       // Supress extendsion line 2 if DIMSE2 is true
       if (!style.getValue('DIMSE2')) {
