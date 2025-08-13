@@ -69,9 +69,9 @@ export class Utils {
         m[0][j] = j;
         if (j === 0) continue;
         m[i][j] = b.charAt(i - 1) == a.charAt(j - 1) ? m[i - 1][j - 1] : Math.min(
-          m[i - 1][j - 1] + 1,
-          m[i][j - 1] + 1,
-          m[i - 1][j] + 1,
+            m[i - 1][j - 1] + 1,
+            m[i][j - 1] + 1,
+            m[i - 1][j] + 1,
         );
       }
     }

@@ -188,6 +188,6 @@ test('Test Section.getGroupValue', () => {
 
   // test for throw on invalid group code
   expect(() => {
-    section.getGroupValue({ 'code': 'error', 'value': 'error' });;
+    section.getGroupValue({ 'code': 'error', 'value': 'error' }); ;
   }).toThrow();
 });

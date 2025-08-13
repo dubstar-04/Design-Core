@@ -102,8 +102,8 @@ export class Point {
    */
   min(that) {
     return new Point(
-      Math.min(this.x, that.x),
-      Math.min(this.y, that.y),
+        Math.min(this.x, that.x),
+        Math.min(this.y, that.y),
     );
   };
 
@@ -114,8 +114,8 @@ export class Point {
    */
   max(that) {
     return new Point(
-      Math.max(this.x, that.x),
-      Math.max(this.y, that.y),
+        Math.max(this.x, that.x),
+        Math.max(this.y, that.y),
     );
   };
 
@@ -143,8 +143,8 @@ export class Point {
    */
   lerp(that, t) {
     return new Point(
-      this.x + (that.x - this.x) * t,
-      this.y + (that.y - this.y) * t,
+        this.x + (that.x - this.x) * t,
+        this.y + (that.y - this.y) * t,
     );
   };
 

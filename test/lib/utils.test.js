@@ -1,4 +1,4 @@
-import {Utils} from '../../core/lib/utils.js';
+import { Utils } from '../../core/lib/utils.js';
 
 test('Test Utils.degrees2radians', () => {
   // Positive

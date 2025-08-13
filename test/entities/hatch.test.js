@@ -334,7 +334,7 @@ test('Test Hatch.processBoundaryData', () => {
     // '98': 2, // Number of seed points
     // Points 0 and -1 are stripped before processing
     'points': [new Point(), new Point(200, 200), new Point(100, 200), new Point(100, 100), new Point(200, 100), new Point(350, 300, 1),
-    new Point(250, 300, 1), new Point(350, 300, 1)],
+      new Point(250, 300, 1), new Point(350, 300, 1)],
   };
 
   const hatch = new Hatch();
@@ -374,7 +374,7 @@ test('Test Hatch.processSelection', () => {
   selectedItems = [];
   selectedItems.push(new Polyline({
     points: [new Point(100, 100), new Point(200, 100), new Point(200, 200),
-    new Point(100, 200), new Point(100, 100)],
+      new Point(100, 200), new Point(100, 100)],
   }));
 
   hatch = new Hatch();
