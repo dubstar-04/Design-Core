@@ -264,8 +264,13 @@ export class BaseDimension extends Entity {
     this.text.string = this.getDimensionValue(textValue);
     // set the text position
     this.text.points = [textPosition];
-    // calculate the text rotation
-    this.text.setRotation(Utils.radians2degrees(textRotation) % 180);
+
+    // set the text rotation
+    if (style.getValue('DIMTIH') === 0) {
+      // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+      // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+      this.text.setRotation(Utils.radians2degrees(textRotation) % 180);
+    }
   }
 
   /**
