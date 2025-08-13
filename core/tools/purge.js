@@ -1,9 +1,9 @@
-import {Strings} from '../lib/strings.js';
-import {Tool} from './tool.js';
-import {PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
+import { Strings } from '../lib/strings.js';
+import { Tool } from './tool.js';
+import { PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Purge Command Class
@@ -25,7 +25,7 @@ export class Purge extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Purge', shortcut: 'PU'};
+    const command = { command: 'Purge', shortcut: 'PU' };
     return command;
   }
 
@@ -64,14 +64,14 @@ export class Purge extends Tool {
       purgedCount += (intialitemCount - finalitemCount);
     }
 
-    if (this.option === 'Layers'|| this.option === 'All') {
+    if (this.option === 'Layers' || this.option === 'All') {
       const intialLayerCount = DesignCore.LayerManager.itemCount();
       DesignCore.LayerManager.purge();
       const finalLayerCount = DesignCore.LayerManager.itemCount();
       purgedCount += (intialLayerCount - finalLayerCount);
     }
 
-    if (this.option === 'LTypes'|| this.option === 'All') {
+    if (this.option === 'LTypes' || this.option === 'All') {
       const intialLTypeCount = DesignCore.LTypeManager.itemCount();
       DesignCore.LTypeManager.purge();
       const finalLTypeCount = DesignCore.LTypeManager.itemCount();

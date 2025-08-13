@@ -1,9 +1,9 @@
 
-import {Header} from './sections/header.js';
-import {Entities} from './sections/entities.js';
-import {Blocks} from './sections/blocks.js';
-import {Tables} from './sections/tables.js';
-import {DxfIterator} from './dxfIterator.js';
+import { Header } from './sections/header.js';
+import { Entities } from './sections/entities.js';
+import { Blocks } from './sections/blocks.js';
+import { Tables } from './sections/tables.js';
+import { DxfIterator } from './dxfIterator.js';
 
 /** DXF Reader Class */
 export class DXFReader {
@@ -36,7 +36,7 @@ export class DXFReader {
           this.header.read(this.iterator);
           break;
 
-        case (currentPair.value ==='TABLES'):
+        case (currentPair.value === 'TABLES'):
           const tables = new Tables();
           this.tables = tables.read(this.iterator);
           break;
@@ -46,7 +46,7 @@ export class DXFReader {
           this.blocks = blocks.read(this.iterator);
           break;
 
-        case (currentPair.value ==='ENTITIES'):
+        case (currentPair.value === 'ENTITIES'):
           const entities = new Entities();
           this.entities = entities.read(this.iterator);
           break;

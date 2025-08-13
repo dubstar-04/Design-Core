@@ -1,11 +1,11 @@
-import {Point} from '../entities/point.js';
-import {Input} from './inputManager.js';
+import { Point } from '../entities/point.js';
+import { Input } from './inputManager.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /** CommandLine Class */
 export class CommandLine {
-/** Create Commandline */
+  /** Create Commandline */
   constructor() {
     this.cmdLine = ''; // display string
     this.prompt = 'Command:';

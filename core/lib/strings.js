@@ -4,7 +4,7 @@
  * Holds common strings for consistency and translation
  */
 export class Strings {
-// Error Strings
+  // Error Strings
   static Error = {
     ERROR: 'Error',
     FILEOPEN: 'Error opening file',

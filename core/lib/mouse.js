@@ -1,9 +1,9 @@
-import {Point} from '../entities/point.js';
-import {DesignCore} from '../designCore.js';
+import { Point } from '../entities/point.js';
+import { DesignCore } from '../designCore.js';
 
 /** Mouse Class */
 export class Mouse {
-/** Create Mouse */
+  /** Create Mouse */
   constructor() {
     this.x = 0;
     this.y = 0;
@@ -37,7 +37,7 @@ export class Mouse {
    * @return {Point}
    */
   transformToScene(point) {
-    const scenePoint = DesignCore.Canvas.matrix.invert().transformPoint(point.x, 0 - point.y +DesignCore.Canvas.height);
+    const scenePoint = DesignCore.Canvas.matrix.invert().transformPoint(point.x, 0 - point.y + DesignCore.Canvas.height);
     return scenePoint;
   }
 
@@ -48,7 +48,7 @@ export class Mouse {
    */
   transformToCanvas(point) {
     const canvasPoint = DesignCore.Canvas.matrix.transformPoint(point.x, point.y);
-    canvasPoint.y = 0 - canvasPoint.y +DesignCore.Canvas.height;
+    canvasPoint.y = 0 - canvasPoint.y + DesignCore.Canvas.height;
     return canvasPoint;
   }
 

@@ -1,7 +1,7 @@
 // import {DesignCore} from '../designCore.js';
 // import {Strings} from '../lib/strings.js';
-import {TableManagerBase} from './tableManagerBase.js';
-import {Block} from './block.js';
+import { TableManagerBase } from './tableManagerBase.js';
+import { Block } from './block.js';
 
 /**
  * BlockManager Class
@@ -28,7 +28,7 @@ export class BlockManager extends TableManagerBase {
    * Add standard blocks
    */
   addStandardItems() {
-    this.items.push(new Block({'name': '*Model_Space'}));
-    this.items.push(new Block({'name': '*Paper_Space'}));
+    this.items.push(new Block({ 'name': '*Model_Space' }));
+    this.items.push(new Block({ 'name': '*Paper_Space' }));
   }
 }

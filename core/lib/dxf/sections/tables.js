@@ -1,4 +1,4 @@
-import {Section} from './section.js';
+import { Section } from './section.js';
 
 /**
  * Tables Class
@@ -32,10 +32,10 @@ export class Tables extends Section {
     while (iterator.nextPair().value !== 'ENDSEC') {
       const currentPair = iterator.currentPair();
       switch (true) {
-        case (currentPair.code === '0' ):
+        case (currentPair.code === '0'):
 
           if (['TABLE'].includes(currentPair.value)) {
-            currentTable = {children: []};
+            currentTable = { children: [] };
             this.parseValue(iterator, currentTable);
             break;
           } else if (['ENDTAB'].includes(currentPair.value)) {

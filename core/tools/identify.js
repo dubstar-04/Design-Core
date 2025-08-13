@@ -1,9 +1,9 @@
-import {Strings} from '../lib/strings.js';
-import {Tool} from './tool.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
+import { Strings } from '../lib/strings.js';
+import { Tool } from './tool.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Identity Command Class
@@ -23,7 +23,7 @@ export class Identify extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Identify', shortcut: 'ID'};
+    const command = { command: 'Identify', shortcut: 'ID' };
     return command;
   }
 

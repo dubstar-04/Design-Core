@@ -1,8 +1,8 @@
-import {DXF} from './dxf/dxf.js';
-import {Logging} from './logging.js';
-import {Strings} from './strings.js';
+import { DXF } from './dxf/dxf.js';
+import { Logging } from './logging.js';
+import { Strings } from './strings.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /** FileIO Class */
 export class FileIO {

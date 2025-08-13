@@ -1,9 +1,9 @@
 
-import {Point} from '../entities/point.js';
-import {Colours} from './colours.js';
-import {Utils} from './utils.js';
+import { Point } from '../entities/point.js';
+import { Colours } from './colours.js';
+import { Utils } from './utils.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /** SnapPoint Class */
 class SnapPoint {
@@ -80,7 +80,7 @@ export class Snapping {
     let snapPoint;
     let delta = 25 / DesignCore.Canvas.getScale(); // find a more suitable starting value
 
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
       const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.items[i].layer);
 
       if (!layer.isVisible) {

@@ -1,10 +1,10 @@
-import {DXFFile} from './dxfFile.js';
-import {DesignCore} from '../../designCore.js';
+import { DXFFile } from './dxfFile.js';
+import { DesignCore } from '../../designCore.js';
 
 /** DXF Writer Class */
 export class DXFWriter {
   /** Create DXF Writer */
-  constructor() {}
+  constructor() { }
 
   /**
    * Write DXF header section
@@ -117,7 +117,7 @@ export class DXFWriter {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'ENTITIES');
 
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
       DesignCore.Scene.items[i].dxf(file);
     }
 

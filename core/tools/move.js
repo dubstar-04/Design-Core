@@ -1,9 +1,9 @@
-import {Strings} from '../lib/strings.js';
-import {Tool} from './tool.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
+import { Strings } from '../lib/strings.js';
+import { Tool } from './tool.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Move Command Class
@@ -23,7 +23,7 @@ export class Move extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Move', shortcut: 'M', type: 'Tool'};
+    const command = { command: 'Move', shortcut: 'M', type: 'Tool' };
     return command;
   }
 
@@ -63,7 +63,7 @@ export class Move extends Tool {
 
       // Draw a line
       const points = [this.points.at(-1), mousePoint];
-      DesignCore.Scene.createTempItem('Line', {points: points});
+      DesignCore.Scene.createTempItem('Line', { points: points });
 
       // Get the delta from the last mouse point
       const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);
@@ -82,7 +82,7 @@ export class Move extends Tool {
     const xDelta = this.points[1].x - this.points[0].x;
     const yDelta = this.points[1].y - this.points[0].y;
 
-    for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].move(xDelta, yDelta);
     }
   }

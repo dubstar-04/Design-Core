@@ -1,11 +1,11 @@
-import {DXFReader} from './dxfRead.js';
-import {DXFWriter} from './dxfWrite.js';
-import {DXFFile} from './dxfFile.js';
-import {Point} from '../../entities/point.js';
-import {Strings} from '../strings.js';
-import {Logging} from '../logging.js';
+import { DXFReader } from './dxfRead.js';
+import { DXFWriter } from './dxfWrite.js';
+import { DXFFile } from './dxfFile.js';
+import { Point } from '../../entities/point.js';
+import { Strings } from '../strings.js';
+import { Logging } from '../logging.js';
 
-import {DesignCore} from '../../designCore.js';
+import { DesignCore } from '../../designCore.js';
 
 /** DXF Class */
 export class DXF {

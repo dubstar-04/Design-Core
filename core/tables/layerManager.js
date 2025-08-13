@@ -1,6 +1,6 @@
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {Layer} from './layer.js';
-import {StyleManagerBase} from './styleManagerBase.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Layer } from './layer.js';
+import { StyleManagerBase } from './styleManagerBase.js';
 
 /**
  * LayerManager Class
@@ -26,8 +26,8 @@ export class LayerManager extends StyleManagerBase {
 
   /** Add standard layers */
   addStandardItems() {
-    this.addItem({'name': '0'});
-    this.addItem({'name': 'DEFPOINTS', 'plotting': false});
+    this.addItem({ 'name': '0' });
+    this.addItem({ 'name': 'DEFPOINTS', 'plotting': false });
   }
 
   /**

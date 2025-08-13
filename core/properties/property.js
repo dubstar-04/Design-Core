@@ -1,9 +1,9 @@
-import {Flags} from './flags.js';
+import { Flags } from './flags.js';
 
 /** Property Class */
 export class Property {
   /** Create property */
-  constructor() {}
+  constructor() { }
 
   /**
    * Parse the input values and return a value

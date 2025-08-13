@@ -1,39 +1,39 @@
-import {Line} from '../entities/line.js';
-import {Polyline} from '../entities/polyline.js';
-import {Lwpolyline} from '../entities/lwpolyline.js';
-import {Circle} from '../entities/circle.js';
-import {Arc} from '../entities/arc.js';
-import {Rectangle} from '../entities/rectangle.js';
+import { Line } from '../entities/line.js';
+import { Polyline } from '../entities/polyline.js';
+import { Lwpolyline } from '../entities/lwpolyline.js';
+import { Circle } from '../entities/circle.js';
+import { Arc } from '../entities/arc.js';
+import { Rectangle } from '../entities/rectangle.js';
 // import {Ellipse} from '../entities/ellipse.js';
 // import {Spline} from '../entities/spline.js';
-import {Text} from '../entities/text.js';
-import {Dimension} from '../entities/dimension.js';
-import {AlignedDimension} from '../entities/alignedDimension.js';
-import {AngularDimension} from '../entities/angularDimension.js';
-import {DiametricDimension} from '../entities/diametricDimension.js';
-import {RadialDimension} from '../entities/radialDimension.js';
-import {Block} from '../tables/block.js';
-import {Insert} from '../entities/insert.js';
-import {Hatch} from '../entities/hatch.js';
+import { Text } from '../entities/text.js';
+import { Dimension } from '../entities/dimension.js';
+import { AlignedDimension } from '../entities/alignedDimension.js';
+import { AngularDimension } from '../entities/angularDimension.js';
+import { DiametricDimension } from '../entities/diametricDimension.js';
+import { RadialDimension } from '../entities/radialDimension.js';
+import { Block } from '../tables/block.js';
+import { Insert } from '../entities/insert.js';
+import { Hatch } from '../entities/hatch.js';
 
 // import { Point } from "../entities/point.js"
 
-import {Move} from '../tools/move.js';
-import {Copy} from '../tools/copy.js';
-import {Rotate} from '../tools/rotate.js';
-import {Erase} from '../tools/erase.js';
-import {Explode} from '../tools/explode.js';
-import {Distance} from '../tools/distance.js';
-import {Identify} from '../tools/identify.js';
-import {Extend} from '../tools/extend.js';
-import {Trim} from '../tools/trim.js';
-import {Purge} from '../tools/purge.js';
+import { Move } from '../tools/move.js';
+import { Copy } from '../tools/copy.js';
+import { Rotate } from '../tools/rotate.js';
+import { Erase } from '../tools/erase.js';
+import { Explode } from '../tools/explode.js';
+import { Distance } from '../tools/distance.js';
+import { Identify } from '../tools/identify.js';
+import { Extend } from '../tools/extend.js';
+import { Trim } from '../tools/trim.js';
+import { Purge } from '../tools/purge.js';
 
-import {Utils} from './utils.js';
-import {Strings} from './strings.js';
-import {Logging} from './logging.js';
+import { Utils } from './utils.js';
+import { Strings } from './strings.js';
+import { Logging } from './logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 const classes = {
   Line,
@@ -72,7 +72,7 @@ const classes = {
  * Creates new commands
  */
 export class CommandManager {
-/** Create CommandManager */
+  /** Create CommandManager */
   constructor() {
     // store a list of the available commands
     this.commands = [];
@@ -151,7 +151,7 @@ export class CommandManager {
    * @return {boolean} boolean
    */
   isShortcut(shortcut) {
-    const found = this.commands.some((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === shortcut.toUpperCase());
+    const found = this.commands.some((el) => typeof (el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === shortcut.toUpperCase());
     return found;
   }
 
@@ -165,7 +165,7 @@ export class CommandManager {
       return false;
     }
 
-    const found = this.commands.some((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
+    const found = this.commands.some((el) => typeof (el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
     return found;
   }
 
@@ -179,10 +179,10 @@ export class CommandManager {
     let command;
 
     if (this.isCommand(input)) {
-      const found = this.commands.find((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === input.toUpperCase());
+      const found = this.commands.find((el) => typeof (el.command) !== 'undefined' && el.command.toUpperCase() === input.toUpperCase());
       command = found.command;
     } else if (this.isShortcut(input)) {
-      const found = this.commands.find((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === input.toUpperCase());
+      const found = this.commands.find((el) => typeof (el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === input.toUpperCase());
       command = found.command;
     }
 
@@ -203,7 +203,7 @@ export class CommandManager {
     let shortcut;
 
     if (this.isCommand(command)) {
-      const found = this.commands.find((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
+      const found = this.commands.find((el) => typeof (el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
       shortcut = found.shortcut;
     }
 

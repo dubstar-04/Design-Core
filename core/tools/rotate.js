@@ -1,10 +1,10 @@
-import {Strings} from '../lib/strings.js';
-import {Tool} from './tool.js';
-import {Utils} from '../lib/utils.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
+import { Strings } from '../lib/strings.js';
+import { Tool } from './tool.js';
+import { Utils } from '../lib/utils.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Rotate Command Class
@@ -26,7 +26,7 @@ export class Rotate extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Rotate', shortcut: 'RO', type: 'Tool'};
+    const command = { command: 'Rotate', shortcut: 'RO', type: 'Tool' };
     return command;
   }
 
@@ -51,7 +51,7 @@ export class Rotate extends Tool {
         const input2 = await DesignCore.Scene.inputManager.requestInput(op3);
 
         if (Input.getType(input2) === Input.Type.STRING) {
-        // set the base angle to null to prevent the preview
+          // set the base angle to null to prevent the preview
           this.baseAngle = null;
           const op4 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
           const refBase = await DesignCore.Scene.inputManager.requestInput(op4);
@@ -86,10 +86,10 @@ export class Rotate extends Tool {
       // Draw a line
       const points = [this.points.at(0), mousePoint];
 
-      DesignCore.Scene.createTempItem('Line', {points: points});
+      DesignCore.Scene.createTempItem('Line', { points: points });
     }
 
-    if (this.points.length >= 1 ) {
+    if (this.points.length >= 1) {
       const ang = this.points[0].angle(mousePoint);
       const theta = this.baseAngle === null ? 0 : ang - this.baseAngle - this.lastAngle;
       this.lastAngle = ang;
@@ -107,7 +107,7 @@ export class Rotate extends Tool {
     const ang = this.points[0].angle(this.points[1]);
     const theta = ang - this.baseAngle;
 
-    for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].rotate(this.points[0], theta);
     }
   };

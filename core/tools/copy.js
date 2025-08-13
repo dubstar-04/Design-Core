@@ -1,10 +1,10 @@
-import {Utils} from '../lib/utils.js';
-import {Strings} from '../lib/strings.js';
-import {Tool} from './tool.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
+import { Utils } from '../lib/utils.js';
+import { Strings } from '../lib/strings.js';
+import { Tool } from './tool.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Copy Command Class
@@ -24,7 +24,7 @@ export class Copy extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Copy', shortcut: 'CO', type: 'Tool'};
+    const command = { command: 'Copy', shortcut: 'CO', type: 'Tool' };
     return command;
   }
 
@@ -64,13 +64,13 @@ export class Copy extends Tool {
       // Draw a line
       const points = [this.points.at(-1), mousePoint];
 
-      DesignCore.Scene.createTempItem('Line', {points: points});
+      DesignCore.Scene.createTempItem('Line', { points: points });
 
       const xDelta = mousePoint.x - this.points[0].x;
       const yDelta = mousePoint.y - this.points[0].y;
 
-      for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        for (let j = 0; j <DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        for (let j = 0; j < DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
           DesignCore.Scene.selectionManager.selectedItems[i].points[j].x = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].x + xDelta;
           DesignCore.Scene.selectionManager.selectedItems[i].points[j].y = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].points[j].y + yDelta;
         }
@@ -85,7 +85,7 @@ export class Copy extends Tool {
     const xDelta = this.points[1].x - this.points[0].x;
     const yDelta = this.points[1].y - this.points[0].y;
 
-    for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const copyofitem = Utils.cloneObject(DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]]);
 
       for (let j = 0; j < copyofitem.points.length; j++) {

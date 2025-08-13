@@ -1,9 +1,9 @@
-import {Strings} from '../lib/strings.js';
-import {Tool} from './tool.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
+import { Strings } from '../lib/strings.js';
+import { Tool } from './tool.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Erase Command Class
@@ -23,7 +23,7 @@ export class Erase extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Erase', shortcut: 'E', type: 'Tool'};
+    const command = { command: 'Erase', shortcut: 'E', type: 'Tool' };
     return command;
   }
 
@@ -59,7 +59,7 @@ export class Erase extends Tool {
     // get a copy of the selection set
     const selections = DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice();
     // sort the selection in descending order
-    selections.sort((a, b)=>b-a);
+    selections.sort((a, b) => b - a);
 
     // delete each of the selections from the scene items
     // This is done in descending order to preserve the indices i.e if index 1 is deleted, index 2 becomes index 1

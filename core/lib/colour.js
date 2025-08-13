@@ -1,4 +1,4 @@
-import {Colours} from './colours.js';
+import { Colours } from './colours.js';
 
 /**
  * Colour base class
@@ -9,7 +9,7 @@ export class Colour {
    * Create Colour
    * @param {number} aci
    */
-  constructor(aci=7) {
+  constructor(aci = 7) {
     this.aci = aci;
     this.rgb = Colours.aciToRGB(this.aci);
   }
@@ -76,7 +76,7 @@ export class EntityColour extends Colour {
    * Create an EntityColour
    * @param {number} aci
    */
-  constructor(aci=256) {
+  constructor(aci = 256) {
     super(aci);
     // default to aci 256 - ByLayer
   }

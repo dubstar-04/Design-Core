@@ -1,8 +1,8 @@
-import {Colours} from '../lib/colours.js';
-import {Colour} from '../lib/colour.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {Flags} from '../properties/flags.js';
-import {Property} from '../properties/property.js';
+import { Colours } from '../lib/colours.js';
+import { Colour } from '../lib/colour.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Flags } from '../properties/flags.js';
+import { Property } from '../properties/property.js';
 
 /** later Class */
 export class Layer {
@@ -44,14 +44,14 @@ export class Layer {
       }
 
       if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
-      // DXF Groupcode 70 - Layer Flags
-      // Standard flags (bit-coded values):
-      // 1 = Layer is frozen; otherwise layer is thawed
-      // 2 = Layer is frozen by default in new viewports
-      // 4 = Layer is locked
-      // 16 = If set, table entry is externally dependent on an xref
-      // 32 = If both this bit and bit 16 are set, the externally dependent xref has been successfully resolved
-      // 64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
+        // DXF Groupcode 70 - Layer Flags
+        // Standard flags (bit-coded values):
+        // 1 = Layer is frozen; otherwise layer is thawed
+        // 2 = Layer is frozen by default in new viewports
+        // 4 = Layer is locked
+        // 16 = If set, table entry is externally dependent on an xref
+        // 32 = If both this bit and bit 16 are set, the externally dependent xref has been successfully resolved
+        // 64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
 
         this.flags.setFlagValue(Property.loadValue([data.flags, data[70]], 0));
       }
@@ -200,7 +200,7 @@ export class Layer {
     file.writeGroupCode('100', 'AcDbLayerTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Layername
     file.writeGroupCode('70', this.flags.getFlagValue()); // Flags
-    const colourValue = this.on ? this.layerColour.aci: (0 - this.layerColour.aci);
+    const colourValue = this.on ? this.layerColour.aci : (0 - this.layerColour.aci);
     file.writeGroupCode('62', colourValue); // Colour: Negative if layer is off
     if (this.layerColour.isTrueColour) {
       file.writeGroupCode('420', Colours.rgbToTrueColour(this.colour));

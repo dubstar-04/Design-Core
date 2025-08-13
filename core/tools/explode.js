@@ -1,11 +1,11 @@
-import {Utils} from '../lib/utils.js';
-import {Strings} from '../lib/strings.js';
-import {Tool} from './tool.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {Insert} from '../entities/insert.js';
+import { Utils } from '../lib/utils.js';
+import { Strings } from '../lib/strings.js';
+import { Tool } from './tool.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { Insert } from '../entities/insert.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Explode Command Class
@@ -25,7 +25,7 @@ export class Explode extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Explode', shortcut: 'X'};
+    const command = { command: 'Explode', shortcut: 'X' };
     return command;
   }
 
