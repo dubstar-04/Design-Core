@@ -5,6 +5,8 @@ import { Solid } from './solid.js';
 import { Entity } from './entity.js';
 import { Logging } from '../lib/logging.js';
 import { Property } from '../properties/property.js';
+import { Strings } from '../lib/strings.js';
+import { Utils } from '../lib/utils.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -190,6 +192,80 @@ export class BaseDimension extends Entity {
   getBaseDimType() {
     const type = this.dimType % 32;
     return type;
+  }
+
+  /**
+   * Get the dimension value
+   * @param {number} dimensionValue - the value to format
+   * @return {string} - the formatted dimension value
+   */
+  getDimensionValue(dimensionValue) {
+    let precision = 2; // Default precision
+    const style = DesignCore.DimStyleManager.getItemByName(this.dimensionStyle);
+
+    let formattedDimensionValue = '';
+
+    switch (this.getBaseDimType()) {
+      case 0: // Rotated, horizontal, or vertical
+        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}`;
+        break;
+      case 1: // Aligned
+        precision = style.getValue('DIMDEC');
+        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}`;
+        break;
+      case 2: // Angular
+        precision = style.getValue('DIMADEC');
+        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}${Strings.Symbol.DEGREE}`;
+        break;
+      case 3: // Diameter
+        formattedDimensionValue = `${Strings.Symbol.DIAMETER}${Math.abs(dimensionValue.toFixed(precision))}`;
+        break;
+      case 4: // Radius
+        formattedDimensionValue = `${Strings.Symbol.RADIUS}${Math.abs(dimensionValue.toFixed(precision))}`;
+        break;
+      case 5: // Angular 3 point
+        precision = style.getValue('DIMADEC');
+        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}${Strings.Symbol.DEGREE}`;
+        break;
+      case 6: // Ordinate
+        // Ordinate dimensions are typically used to indicate the X or Y coordinate of a point
+        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))} ${Strings.Symbol.UNITS}`;
+        break;
+      default:
+        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}`;
+    }
+
+    // Handle textOverride
+    if (this.textOverride !== '') {
+      formattedDimensionValue = this.textOverride.replace(/<>/g, formattedDimensionValue);
+    }
+
+    return formattedDimensionValue;
+  }
+
+  /**
+   * set the dimensions text value
+   * @param {string} textValue - the dimension value to set
+   * @param {Point} textPosition - the position of the text
+   * @param {number} textRotation - the rotation of the text (radians)
+   */
+  setDimensionValue(textValue, textPosition, textRotation) {
+    // get the dimension style
+    const style = DesignCore.DimStyleManager.getItemByName(this.dimensionStyle);
+    // get the text height
+    const textHeight = style.getValue('DIMTXT');
+    // set the text height
+    this.text.height = textHeight;
+    // Always set text horizontal alignment to center
+    this.text.horizontalAlignment = 1;
+    // Always set text vertical alignment to middle
+    this.text.verticalAlignment = 2;
+    // set the text value
+    this.text.string = this.getDimensionValue(textValue);
+    // set the text position
+    this.text.points = [textPosition];
+    // calculate the text rotation
+    this.text.setRotation(Utils.radians2degrees(textRotation) % 180);
   }
 
   /**
