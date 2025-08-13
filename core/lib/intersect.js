@@ -351,8 +351,8 @@ export class Intersection {
       if ((0 <= ua && ua <= 1) && (0 <= ub && ub <= 1) || (0 <= ua && ua <= 1) && extend) {
         result = new Intersection('Intersection');
         result.appendPoint(new Point(
-          a1.x + ua * (a2.x - a1.x),
-          a1.y + ua * (a2.y - a1.y),
+            a1.x + ua * (a2.x - a1.x),
+            a1.y + ua * (a2.y - a1.y),
         ));
       } else {
         result = new Intersection('No Intersection');
