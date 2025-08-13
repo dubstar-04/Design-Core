@@ -1,6 +1,6 @@
-import {Layer} from '../../core/tables/layer';
+import { Layer } from '../../core/tables/layer';
 
-import {File} from '../test-helpers/test-helpers.js';
+import { File } from '../test-helpers/test-helpers.js';
 
 test('Test Layer.frozen', () => {
   const layer = new Layer();
@@ -63,7 +63,7 @@ test('Test Layer.isSelectable', () => {
 });
 
 test('Test Layer.dxf', () => {
-  const layer = new Layer({name: 'TestLayer'});
+  const layer = new Layer({ name: 'TestLayer' });
   const file = new File();
   layer.dxf(file);
   // console.log(file.contents);

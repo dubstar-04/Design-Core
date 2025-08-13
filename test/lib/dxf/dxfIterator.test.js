@@ -1,4 +1,4 @@
-import {DxfIterator} from '../../../core/lib/dxf/dxfIterator.js';
+import { DxfIterator } from '../../../core/lib/dxf/dxfIterator.js';
 
 const iterator = new DxfIterator();
 const string = '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n0\nEOF';
@@ -17,22 +17,22 @@ test('Test DxfIterator.loadFile', () => {
 
   // no string
   expect(() => {
-    iterator.loadFile(); ;
+    iterator.loadFile();;
   }).toThrow();
 
   // empty string
   expect(() => {
-    iterator.loadFile(''); ;
+    iterator.loadFile('');;
   }).toThrow();
 
   // unmatched pairs
   expect(() => {
-    iterator.loadFile('1\n2\n3\n4\nEOF'); ;
+    iterator.loadFile('1\n2\n3\n4\nEOF');;
   }).toThrow();
 
   // missing EOF value
   expect(() => {
-    iterator.loadFile('1\n2\n3\n4\n'); ;
+    iterator.loadFile('1\n2\n3\n4\n');;
   }).toThrow();
 });
 

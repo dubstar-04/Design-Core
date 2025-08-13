@@ -1,8 +1,8 @@
-import {Entities} from '../../../../core/lib/dxf/sections/entities.js';
-import {DxfIterator} from '../../../../core/lib/dxf/dxfIterator.js';
+import { Entities } from '../../../../core/lib/dxf/sections/entities.js';
+import { DxfIterator } from '../../../../core/lib/dxf/dxfIterator.js';
 
 const entityData =
-`0
+  `0
 ENTITIES
 0
 CIRCLE
@@ -119,7 +119,7 @@ test('Test Entities.read', () => {
 
 test('Test Entities.addEntity', () => {
   // entity without points
-  const circleEntity = {'0': 'CIRCLE', '40': 100, '8': '0'};
+  const circleEntity = { '0': 'CIRCLE', '40': 100, '8': '0' };
 
   expect(() => {
     entities.addEntity(circleEntity);

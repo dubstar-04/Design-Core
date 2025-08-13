@@ -1,7 +1,7 @@
 
-import {Core} from '../../core/core/core.js';
-import {DesignCore} from '../../core/designCore.js';
-import {Point} from '../../core/entities/point.js';
+import { Core } from '../../core/core/core.js';
+import { DesignCore } from '../../core/designCore.js';
+import { Point } from '../../core/entities/point.js';
 
 const core = new Core();
 const propertiesManager = core.propertyManager;
@@ -11,14 +11,14 @@ const point2 = new Point(0, 100);
 
 const data = {
   points: [point1, point2],
-  colour: {r: 100, g: 100, b: 100},
+  colour: { r: 100, g: 100, b: 100 },
 };
 
 DesignCore.Scene.addItem('Line', data);
 DesignCore.Scene.addItem('Circle', data);
 DesignCore.Scene.addItem('Text', data);
 // Add Arc with a different Colour
-DesignCore.Scene.addItem('Arc', {points: [point1, point2], colour: {r: 130, g: 130, b: 130}});
+DesignCore.Scene.addItem('Arc', { points: [point1, point2], colour: { r: 130, g: 130, b: 130 } });
 
 test('Test propertyManager.getItemTypes', () => {
   // Add an item to the selectionSet

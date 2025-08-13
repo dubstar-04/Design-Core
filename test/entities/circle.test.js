@@ -1,16 +1,16 @@
-import {Circle} from '../../core/entities/circle.js';
-import {Point} from '../../core/entities/point.js';
+import { Circle } from '../../core/entities/circle.js';
+import { Point } from '../../core/entities/point.js';
 
-import {File} from '../test-helpers/test-helpers.js';
+import { File } from '../test-helpers/test-helpers.js';
 
 test('Test Circle.getRadius', () => {
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   expect(circle.getRadius()).toBe(100);
 });
 
 test('Test Circle.setRadius', () => {
   // create a circle with radius 100
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   // set radius to 200
   circle.setRadius(200);
   expect(circle.getRadius()).toBe(200);
@@ -19,7 +19,7 @@ test('Test Circle.setRadius', () => {
 
 test('Test Circle.closestPoint', () => {
   // create a circle with radius 100
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   // inside
   const point1 = new Point(150, 100);
   const closest1 = circle.closestPoint(point1);
@@ -36,13 +36,13 @@ test('Test Circle.closestPoint', () => {
 });
 
 test('Test Circle.boundingBox', () => {
-  let circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  let circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   expect(circle.boundingBox().xMin).toBeCloseTo(0);
   expect(circle.boundingBox().xMax).toBeCloseTo(200);
   expect(circle.boundingBox().yMin).toBeCloseTo(0);
   expect(circle.boundingBox().yMax).toBeCloseTo(200);
 
-  circle = new Circle({points: [new Point(0, 0)], radius: 100});
+  circle = new Circle({ points: [new Point(0, 0)], radius: 100 });
   expect(circle.boundingBox().xMin).toBeCloseTo(-100);
   expect(circle.boundingBox().xMax).toBeCloseTo(100);
   expect(circle.boundingBox().yMin).toBeCloseTo(-100);
@@ -50,7 +50,7 @@ test('Test Circle.boundingBox', () => {
 });
 
 test('Test Circle.dxf', () => {
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   let file = new File();
   circle.dxf(file);
   // console.log(file.contents);
@@ -86,7 +86,7 @@ AcDbCircle
 });
 
 test('Test Circle.decompose', () => {
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   const decomposedCircle = circle.decompose();
   expect(decomposedCircle[0].x).toBe(200);
   expect(decomposedCircle[0].y).toBe(100);

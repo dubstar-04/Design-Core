@@ -1,12 +1,12 @@
-import {BasePolyline} from '../../core/entities/basePolyline';
-import {Point} from '../../core/entities/point';
-import {Polyline} from '../../core/entities/polyline.js';
+import { BasePolyline } from '../../core/entities/basePolyline';
+import { Point } from '../../core/entities/point';
+import { Polyline } from '../../core/entities/polyline.js';
 
-import {File} from '../test-helpers/test-helpers.js';
+import { File } from '../test-helpers/test-helpers.js';
 
 test('Test BasePolyline.closestPoint', () => {
   const points = [new Point(100, 100), new Point(200, 100, -1), new Point(200, 50)];
-  const polyline = new BasePolyline({points: points});
+  const polyline = new BasePolyline({ points: points });
   // line segment
   const point1 = new Point(150, 85);
   const closest1 = polyline.closestPoint(point1);
@@ -23,13 +23,13 @@ test('Test BasePolyline.closestPoint', () => {
 });
 
 test('Test BasePolyline.boundingBox', () => {
-  let polyline = new BasePolyline({points: [new Point(101, 102), new Point(201, 202)]});
+  let polyline = new BasePolyline({ points: [new Point(101, 102), new Point(201, 202)] });
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
   expect(polyline.boundingBox().xMax).toBeCloseTo(201);
   expect(polyline.boundingBox().yMin).toBeCloseTo(102);
   expect(polyline.boundingBox().yMax).toBeCloseTo(202);
 
-  polyline = new BasePolyline({points: [new Point(101, 102), new Point(-201, 202)]});
+  polyline = new BasePolyline({ points: [new Point(101, 102), new Point(-201, 202)] });
   expect(polyline.boundingBox().xMin).toBeCloseTo(-201);
   expect(polyline.boundingBox().xMax).toBeCloseTo(101);
   expect(polyline.boundingBox().yMin).toBeCloseTo(102);
@@ -39,7 +39,7 @@ test('Test BasePolyline.boundingBox', () => {
   let points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
   // set the bulge
   points[1].bulge = -1;
-  polyline = new BasePolyline({points: points});
+  polyline = new BasePolyline({ points: points });
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
   expect(polyline.boundingBox().xMax).toBeCloseTo(251);
   expect(polyline.boundingBox().yMin).toBeCloseTo(0);
@@ -48,7 +48,7 @@ test('Test BasePolyline.boundingBox', () => {
   points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
   // set the bulge
   points[1].bulge = -1;
-  polyline = new BasePolyline({points: points});
+  polyline = new BasePolyline({ points: points });
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
   expect(polyline.boundingBox().xMax).toBeCloseTo(251);
   expect(polyline.boundingBox().yMin).toBeCloseTo(0);
@@ -60,7 +60,7 @@ test('Test BasePolyline.getBulgeFromSegment', () => {
   // center: 100,50
   // radius: 50
   const points = [new Point(), new Point(100, 0)];
-  const polyline = new BasePolyline({points: points});
+  const polyline = new BasePolyline({ points: points });
 
   // zero delta angle:
   // bulge: 0
@@ -182,7 +182,7 @@ test('Test BasePolyline.getBulgeFromSegment', () => {
 test('Test BasePolyline.dxf', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
-  const polyline = new BasePolyline({points: points});
+  const polyline = new BasePolyline({ points: points });
   let file = new File();
   polyline.dxf(file);
   // console.log(file.contents);
@@ -291,7 +291,7 @@ AcDbEntity
 test('Test BasePolyline.decompose', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
-  const polyline = new BasePolyline({points: points});
+  const polyline = new BasePolyline({ points: points });
 
   const decomposedPolyline = polyline.decompose();
   expect(decomposedPolyline[0].x).toBe(100);

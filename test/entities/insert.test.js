@@ -1,19 +1,19 @@
-import {Core} from '../../core/core/core.js';
-import {Insert} from '../../core/entities/insert.js';
-import {Point} from '../../core/entities/point.js';
-import {Line} from '../../core/entities/line.js';
+import { Core } from '../../core/core/core.js';
+import { Insert } from '../../core/entities/insert.js';
+import { Point } from '../../core/entities/point.js';
+import { Line } from '../../core/entities/line.js';
 
-import {File} from '../test-helpers/test-helpers.js';
+import { File } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
 
 
-const insert = new Insert({points: [new Point()]});
-const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
+const insert = new Insert({ points: [new Point()] });
+const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
 insert.block.addItem(line);
 
-const rotatedInsert = new Insert({points: [new Point()], rotation: 45});
+const rotatedInsert = new Insert({ points: [new Point()], rotation: 45 });
 rotatedInsert.block.addItem(line);
 
 test('Test Insert.snaps', () => {
@@ -23,7 +23,7 @@ test('Test Insert.snaps', () => {
   expect(snaps[0].y).toBeCloseTo(102);
 
   // Test snaps for a rotated block
-  const rotatedSnaps= rotatedInsert.snaps(point);
+  const rotatedSnaps = rotatedInsert.snaps(point);
   expect(rotatedSnaps[0].x).toBeCloseTo(-0.7071);
   expect(rotatedSnaps[0].y).toBeCloseTo(143.5426);
 });
@@ -46,7 +46,7 @@ test('Test Insert.boundingBox', () => {
   expect(insert.boundingBox().yMin).toBeCloseTo(102);
   expect(insert.boundingBox().yMax).toBeCloseTo(202);
 
-  const line2 = new Line({points: [new Point(1001, 1002), new Point(2001, 2002)]});
+  const line2 = new Line({ points: [new Point(1001, 1002), new Point(2001, 2002)] });
   insert.block.addItem(line2);
 
   expect(insert.boundingBox().xMin).toBeCloseTo(101);

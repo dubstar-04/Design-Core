@@ -1,13 +1,13 @@
-import {Core} from '../../core/core/core.js';
-import {Point} from '../../core/entities/point.js';
+import { Core } from '../../core/core/core.js';
+import { Point } from '../../core/entities/point.js';
 
 const core = new Core();
 const selectionManager = core.scene.selectionManager;
 
 // Add a valid item to scene
-core.scene.addItem('Line', {points: [new Point(10, 10), new Point(100, 10)]});
-core.scene.addItem('Line', {points: [new Point(10, 20), new Point(100, 20)]});
-core.scene.addItem('Circle', {points: [new Point(), new Point(5, 0)]});
+core.scene.addItem('Line', { points: [new Point(10, 10), new Point(100, 10)] });
+core.scene.addItem('Line', { points: [new Point(10, 20), new Point(100, 20)] });
+core.scene.addItem('Circle', { points: [new Point(), new Point(5, 0)] });
 
 
 test('Test SelectionManager.findClosestItem', () => {

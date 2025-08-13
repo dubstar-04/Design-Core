@@ -1,12 +1,12 @@
-import {Core} from '../../core/core/core.js';
-import {Snapping} from '../../core/lib/snapping.js';
-import {Point} from '../../core/entities/point.js';
+import { Core } from '../../core/core/core.js';
+import { Snapping } from '../../core/lib/snapping.js';
+import { Point } from '../../core/entities/point.js';
 
 const core = new Core();
 const snapping = new Snapping();
 
 // Add a valid item to scene
-core.scene.addItem('Line', {points: [new Point(10, 10), new Point(100, 10)]});
+core.scene.addItem('Line', { points: [new Point(10, 10), new Point(100, 10)] });
 
 
 test('Test Snapping.getSnapPoint', () => {

@@ -1,5 +1,5 @@
-import {Point} from '../../core/entities/point';
-import {BoundingBox} from '../../core/lib/boundingBox';
+import { Point } from '../../core/entities/point';
+import { BoundingBox } from '../../core/lib/boundingBox';
 
 const firstCorner = new Point(101, 102);
 const secondCorner = new Point(201, 202);

@@ -1,5 +1,5 @@
 
-import {Flags} from '../../core/properties/flags';
+import { Flags } from '../../core/properties/flags';
 
 test('Test flags set/get FlagValue', () => {
   const flags = new Flags();

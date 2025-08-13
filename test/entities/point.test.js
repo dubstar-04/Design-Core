@@ -1,5 +1,5 @@
 
-import {Point} from '../../core/entities/point.js';
+import { Point } from '../../core/entities/point.js';
 
 
 test('Test Point.add', () => {
@@ -40,19 +40,19 @@ test('Test Point.angle', () => {
   expect(pt1.angle(new Point(10, 0))).toBe(0);
 
   /* 22.5 degrees */
-  expect(pt1.angle(new Point(13.065629648764, 5.411961001462))).toBeCloseTo(Math.PI/8);
+  expect(pt1.angle(new Point(13.065629648764, 5.411961001462))).toBeCloseTo(Math.PI / 8);
 
   /* 45 degrees */
-  expect(pt1.angle(new Point(10, 10))).toBe(Math.PI/4);
+  expect(pt1.angle(new Point(10, 10))).toBe(Math.PI / 4);
 
   /* 90 degrees */
-  expect(pt1.angle(new Point(0, 10))).toBe(Math.PI/2);
+  expect(pt1.angle(new Point(0, 10))).toBe(Math.PI / 2);
 
   /* 180 degrees */
   expect(pt1.angle(new Point(-10, 0))).toBe(Math.PI);
 
   /* 270 degrees */
-  expect(pt1.angle(new Point(0, -10))).toBe(Math.PI*1.5);
+  expect(pt1.angle(new Point(0, -10))).toBe(Math.PI * 1.5);
 });
 
 test('Test Point.clone', () => {
@@ -91,13 +91,13 @@ test('Test Point.rotate', () => {
 
   /* 90 degrees */
   const pt1 = new Point(10, 0);
-  const result1 = pt1.rotate(centre, Math.PI/2);
+  const result1 = pt1.rotate(centre, Math.PI / 2);
   expect(result1.x).toBeCloseTo(0, 5);
   expect(result1.y).toBeCloseTo(10, 5);
 
   /* -90 degrees */
   const pt2 = new Point(-10, 0);
-  const result2 = pt2.rotate(centre, -Math.PI/2);
+  const result2 = pt2.rotate(centre, -Math.PI / 2);
   expect(result2.x).toBeCloseTo(0, 5);
   expect(result2.y).toBeCloseTo(10, 5);
 
@@ -195,17 +195,17 @@ test('Test Point.project', () => {
   expect(project1.y).toBe(0);
 
   /* 45 degrees */
-  const project2 = pt1.project(Math.PI/4, 10);
+  const project2 = pt1.project(Math.PI / 4, 10);
   expect(project2.x).toBeCloseTo(7.07);
   expect(project2.y).toBeCloseTo(7.07);
 
   /* 90 degrees */
-  const project3 = pt1.project(Math.PI/2, 10);
+  const project3 = pt1.project(Math.PI / 2, 10);
   expect(project3.x).toBeCloseTo(0);
   expect(project3.y).toBeCloseTo(10);
 
   /* -90 degrees */
-  const project4 = pt1.project(-Math.PI/2, 10);
+  const project4 = pt1.project(-Math.PI / 2, 10);
   expect(project4.x).toBeCloseTo(0);
   expect(project4.y).toBeCloseTo(-10);
 
@@ -215,13 +215,13 @@ test('Test Point.project', () => {
   expect(project5.y).toBeCloseTo(0);
 
   /* 270 degrees */
-  const project6 = pt1.project(Math.PI*1.5, 10);
+  const project6 = pt1.project(Math.PI * 1.5, 10);
   expect(project6.x).toBeCloseTo(0);
   expect(project6.y).toBeCloseTo(-10);
 
   const pt2 = new Point(100, 100);
   /* Non-zero 45 degrees */
-  const project7 = pt2.project(Math.PI/4, 100);
+  const project7 = pt2.project(Math.PI / 4, 100);
   expect(project7.x).toBeCloseTo(170.710);
   expect(project7.y).toBeCloseTo(170.710);
 });
@@ -291,7 +291,7 @@ test('Test Point.closestPointOnLine', () => {
 test('Test Point.closestPointOnArc', () => {
   // clockwise 270 degrees 45 - 135
   // direction: ccw > 0, cw <= 0
-  let arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
+  let arc = { centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10) };
 
   let point = new Point(5, 5);
   let closest = point.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre);
@@ -316,7 +316,7 @@ test('Test Point.closestPointOnArc', () => {
 
   // counter clockwise 90 degrees 45 - 135
   // direction: ccw > 0, cw <= 0
-  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10), direction: 1};
+  arc = { centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10), direction: 1 };
 
   point = new Point(5, 5);
   closest = point.closestPointOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
@@ -333,7 +333,7 @@ test('Test Point.closestPointOnArc', () => {
 test('Test Point.isOnArc', () => {
   // clockwise arc 270: 45 - 135
   // direction: ccw > 0, cw <= 0
-  let arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10)};
+  let arc = { centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10) };
 
   let point = new Point(5, 5);
   let onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre);
@@ -354,7 +354,7 @@ test('Test Point.isOnArc', () => {
 
   // clockwise arc 90 degrees: 45 - 135
   // direction: ccw > 0, cw <= 0
-  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10), direction: 1};
+  arc = { centre: new Point(), radius: 14.14, startPoint: new Point(10, 10), endPoint: new Point(-10, 10), direction: 1 };
 
   point = new Point(5, 5);
   onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
@@ -374,7 +374,7 @@ test('Test Point.isOnArc', () => {
 
   // counter clockwise arc 270 degrees: 135 - 45
   // direction: ccw > 0, cw <= 0
-  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(-10, 10), endPoint: new Point(10, 10), direction: 1};
+  arc = { centre: new Point(), radius: 14.14, startPoint: new Point(-10, 10), endPoint: new Point(10, 10), direction: 1 };
 
   point = new Point(5, 5);
   onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
@@ -395,7 +395,7 @@ test('Test Point.isOnArc', () => {
 
   // clockwise arc 180 degrees: 180 - 0
   // direction: ccw > 0, cw <= 0
-  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(-10, 0), endPoint: new Point(10, 0), direction: 0};
+  arc = { centre: new Point(), radius: 14.14, startPoint: new Point(-10, 0), endPoint: new Point(10, 0), direction: 0 };
 
 
   point = new Point(5, 0);
@@ -424,7 +424,7 @@ test('Test Point.isOnArc', () => {
 
   // Counter clockwise arc 180 degrees: 180 - 0
   // direction: ccw > 0, cw <= 0
-  arc = {centre: new Point(), radius: 14.14, startPoint: new Point(-10, 0), endPoint: new Point(10, 0), direction: 1};
+  arc = { centre: new Point(), radius: 14.14, startPoint: new Point(-10, 0), endPoint: new Point(10, 0), direction: 1 };
 
   point = new Point(5, 0);
   onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
@@ -452,7 +452,7 @@ test('Test Point.isOnArc', () => {
 
   // clockwise arc 180 degrees: 180 - 0
   // direction: ccw > 0, cw <= 0
-  arc = {centre: new Point(0, 5), radius: 5, startPoint: new Point(-5, 5), endPoint: new Point(5, 5), direction: -1};
+  arc = { centre: new Point(0, 5), radius: 5, startPoint: new Point(-5, 5), endPoint: new Point(5, 5), direction: -1 };
   point = new Point(5, 7);
   onArc = point.isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction);
   expect(onArc).toBe(true);

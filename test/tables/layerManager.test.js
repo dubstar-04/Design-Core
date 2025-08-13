@@ -1,5 +1,5 @@
-import {Core} from '../../core/core/core.js';
-import {Point} from '../../core/entities/point.js';
+import { Core } from '../../core/core/core.js';
+import { Point } from '../../core/entities/point.js';
 
 const core = new Core();
 const layerManager = core.layerManager;
@@ -37,7 +37,7 @@ test('Test LayerManager.getUniqueName', () => {
 
 test('Test LayerManager.addItem', () => {
   const count = layerManager.itemCount();
-  layerManager.addItem({'name': 'test', 'colour': '#00BFFF'});
+  layerManager.addItem({ 'name': 'test', 'colour': '#00BFFF' });
   expect(layerManager.itemCount()).toBe(count + 1);
 });
 
@@ -115,7 +115,7 @@ test('Test LayerManager.addStandardItems', () => {
 });
 
 test('Test LayerManager.getItemIndex', () => {
-  layerManager.addItem({'name': 'addItem', 'colour': '#00BFFF'});
+  layerManager.addItem({ 'name': 'addItem', 'colour': '#00BFFF' });
   // get index for test layer - should be the last layer
   expect(layerManager.getItemIndex('addItem')).toBe(layerManager.itemCount() - 1);
   // get index for a layer that doesn't exist
@@ -123,7 +123,7 @@ test('Test LayerManager.getItemIndex', () => {
 });
 
 test('Test LayerManager.getItemByName', () => {
-  layerManager.addItem({'name': 'test'});
+  layerManager.addItem({ 'name': 'test' });
   const layer = layerManager.getItemByName('test');
   expect(layer.name).toBe('test');
   // get a layer that doesn't exist

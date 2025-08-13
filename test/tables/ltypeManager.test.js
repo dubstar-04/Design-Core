@@ -1,4 +1,4 @@
-import {Core} from '../../core/core/core.js';
+import { Core } from '../../core/core/core.js';
 
 const core = new Core();
 const lineTypeManager = core.ltypeManager;

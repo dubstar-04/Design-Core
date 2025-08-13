@@ -1,11 +1,11 @@
-import {DXFFile} from '../../core/lib/dxf/dxfFile.js';
-import {LType} from '../../core/tables/ltype.js';
+import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
+import { LType } from '../../core/tables/ltype.js';
 
 const file = new DXFFile();
 const R12File = new DXFFile('R12');
 
-const continuousLType = new LType({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
-const dashedLType = new LType({'name': 'DASHED', 'pattern': [12.7, -6.35], 'description': 'Dashed __ __ __ __ __ __ __ __ __ __ __ __ __ _'});
+const continuousLType = new LType({ 'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________' });
+const dashedLType = new LType({ 'name': 'DASHED', 'pattern': [12.7, -6.35], 'description': 'Dashed __ __ __ __ __ __ __ __ __ __ __ __ __ _' });
 
 
 const continuousDxf = `0
@@ -119,9 +119,9 @@ test('Test LType.dxf', () => {
 });
 
 test('Test LType.getPattern', () => {
-  const patternOneLType = new LType({'name': 'Pattern One', 'pattern': [10, 10]});
-  const patternTwoLType = new LType({'name': 'Pattern Two', 'pattern': [10, -10]});
-  const patternThreeLType = new LType({'name': 'Pattern Three', 'pattern': [10, 0, -1]});
+  const patternOneLType = new LType({ 'name': 'Pattern One', 'pattern': [10, 10] });
+  const patternTwoLType = new LType({ 'name': 'Pattern Two', 'pattern': [10, -10] });
+  const patternThreeLType = new LType({ 'name': 'Pattern Three', 'pattern': [10, 0, -1] });
   // Scale 1
   expect(patternOneLType.getPattern(1)).toEqual([11, 11]);
   expect(patternTwoLType.getPattern(1)).toEqual([11, 11]);

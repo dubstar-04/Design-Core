@@ -1,11 +1,11 @@
-import {Solid} from '../../core/entities/solid.js';
-import {Point} from '../../core/entities/point.js';
+import { Solid } from '../../core/entities/solid.js';
+import { Point } from '../../core/entities/point.js';
 
-import {File} from '../test-helpers/test-helpers.js';
+import { File } from '../test-helpers/test-helpers.js';
 
 
 test('Test Solid.boundingBox', () => {
-  const solid = new Solid({points: [new Point(100, 100), new Point(200, 100), new Point(200, 200)]});
+  const solid = new Solid({ points: [new Point(100, 100), new Point(200, 100), new Point(200, 200)] });
   expect(solid.boundingBox().xMin).toBeCloseTo(100);
   expect(solid.boundingBox().xMax).toBeCloseTo(200);
   expect(solid.boundingBox().yMin).toBeCloseTo(100);
@@ -14,7 +14,7 @@ test('Test Solid.boundingBox', () => {
 
 test('Test Solid.dxf', () => {
   // test solid with 3 points
-  const solid = new Solid({points: [new Point(100, 100), new Point(200, 100), new Point(200, 200)]});
+  const solid = new Solid({ points: [new Point(100, 100), new Point(200, 100), new Point(200, 200)] });
   let file = new File();
   solid.dxf(file);
   // console.log(file.contents);
@@ -64,7 +64,7 @@ AcDbTrace
   expect(file.contents).toEqual(dxfString);
 
   // test solid with 4 points
-  const solid2 = new Solid({points: [new Point(100, 100), new Point(200, 100), new Point(200, 200), new Point(300, 300)]});
+  const solid2 = new Solid({ points: [new Point(100, 100), new Point(200, 100), new Point(200, 200), new Point(300, 300)] });
   const file2 = new File();
   solid2.dxf(file2);
   // console.log(file.contents);

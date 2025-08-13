@@ -1,8 +1,8 @@
-import {Blocks} from '../../../../core/lib/dxf/sections/blocks.js';
-import {DxfIterator} from '../../../../core/lib/dxf/dxfIterator.js';
+import { Blocks } from '../../../../core/lib/dxf/sections/blocks.js';
+import { DxfIterator } from '../../../../core/lib/dxf/dxfIterator.js';
 
 const blockData =
-`2
+  `2
 BLOCKS
   0
 BLOCK

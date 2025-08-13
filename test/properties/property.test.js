@@ -1,5 +1,5 @@
-import {Property} from '../../core/properties/property';
-import {Flags} from '../../core/properties/flags';
+import { Property } from '../../core/properties/property';
+import { Flags } from '../../core/properties/flags';
 
 test('Test property.loadValue', () => {
   expect(Property.loadValue([], 3)).toBe(3);

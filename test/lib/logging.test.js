@@ -1,9 +1,9 @@
-import {Logging} from '../../core/lib/logging';
+import { Logging } from '../../core/lib/logging';
 
 // mock console.log for tests
 const msg = 'testMessage';
 let consoleValue = '';
-console.log = function(msg) {
+console.log = function (msg) {
   consoleValue = msg;
 };
 
@@ -29,7 +29,7 @@ test('Logging setLevel', () => {
 
   // Invalid level
   expect(() => {
-    Logging.instance.setLevel('INVALID'); ;
+    Logging.instance.setLevel('INVALID');;
   }).toThrow();
 });
 

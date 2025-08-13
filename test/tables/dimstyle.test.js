@@ -1,4 +1,4 @@
-import {DimStyle} from '../../core/tables/dimStyle';
+import { DimStyle } from '../../core/tables/dimStyle';
 
 test('Test DimStyle.getValue', () => {
   const style = new DimStyle();

@@ -1,4 +1,4 @@
-import {Matrix} from '../../core/lib/matrix';
+import { Matrix } from '../../core/lib/matrix';
 
 
 test('Test Matrix.scale and Matrix.getScale', () => {

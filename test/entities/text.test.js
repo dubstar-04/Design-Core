@@ -1,10 +1,10 @@
-import {Point} from '../../core/entities/point';
-import {Text} from '../../core/entities/text';
+import { Point } from '../../core/entities/point';
+import { Text } from '../../core/entities/text';
 
-import {File} from '../test-helpers/test-helpers.js';
+import { File } from '../test-helpers/test-helpers.js';
 
 test('Test Text.closestPoint', () => {
-  const text = new Text({points: [new Point(100, 100)]});
+  const text = new Text({ points: [new Point(100, 100)] });
   const point1 = new Point(90, 90);
   const closest1 = text.closestPoint(point1);
   expect(closest1[0].x).toBeCloseTo(105);
@@ -13,7 +13,7 @@ test('Test Text.closestPoint', () => {
 });
 
 test('Test Text.setRotation', () => {
-  const setRotText = new Text({points: [new Point()]});
+  const setRotText = new Text({ points: [new Point()] });
 
   // Zero
   setRotText.setRotation(0);
@@ -140,7 +140,7 @@ test('Test Text.upsideDown', () => {
 });
 
 test('Test Text.boundingBox', () => {
-  const text = new Text({points: [new Point(11, 12)]});
+  const text = new Text({ points: [new Point(11, 12)] });
   expect(text.boundingBox().xMin).toBeCloseTo(11);
   expect(text.boundingBox().xMax).toBeCloseTo(21);
   expect(text.boundingBox().yMin).toBeCloseTo(12);
@@ -148,7 +148,7 @@ test('Test Text.boundingBox', () => {
 });
 
 test('Test Text.dxf', () => {
-  const text = new Text({points: [new Point(100, 200)]});
+  const text = new Text({ points: [new Point(100, 200)] });
   let file = new File();
   text.dxf(file);
   // console.log(file.contents);
