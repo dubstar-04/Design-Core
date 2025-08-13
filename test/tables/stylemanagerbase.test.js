@@ -3,12 +3,12 @@ import { StyleManagerBase } from '../../core/tables/styleManagerBase.js';
 
 
 // mock createItem method
-StyleManagerBase.prototype.createItem = function (style) {
+StyleManagerBase.prototype.createItem = function(style) {
   return { name: style.name };
 };
 
 // mock addStandardItems method
-StyleManagerBase.prototype.addStandardItems = function () {
+StyleManagerBase.prototype.addStandardItems = function() {
   this.addItem({ 'name': 'TEST' });
 };
 

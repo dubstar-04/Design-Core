@@ -148,12 +148,12 @@ export class Intersection {
       const b = h / cDist;
 
       result.appendPoint(new Point(
-        p.x - b * (c2.y - c1.y),
-        p.y + b * (c2.x - c1.x),
+          p.x - b * (c2.y - c1.y),
+          p.y + b * (c2.x - c1.x),
       ));
       result.appendPoint(new Point(
-        p.x + b * (c2.y - c1.y),
-        p.y - b * (c2.x - c1.x),
+          p.x + b * (c2.y - c1.y),
+          p.y - b * (c2.x - c1.x),
       ));
     }
 

@@ -5,12 +5,12 @@ import { TableManagerBase } from '../../core/tables/tableManagerBase.js';
 new Core();
 
 // mock createItem method
-TableManagerBase.prototype.createItem = function (item) {
+TableManagerBase.prototype.createItem = function(item) {
   return { name: item.name };
 };
 
 // mock addStandardItems method
-TableManagerBase.prototype.addStandardItems = function () {
+TableManagerBase.prototype.addStandardItems = function() {
   this.addItem({ 'name': 'TEST' });
 };
 

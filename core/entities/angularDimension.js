@@ -257,7 +257,7 @@ export class AngularDimension extends BaseDimension {
     const Pt10 = this.getPointBySequence(10); // Pt10 is the second line end point
 
     // Temp use 11, should be pt16
-    const Pt16 = this.getPointBySequence(11); // Pt16 is the arc position
+    // const Pt16 = this.getPointBySequence(11); // Pt16 is the arc position
     const Pt11 = this.getPointBySequence(11); // Pt11 is the text position
 
     // Find the line intersection point

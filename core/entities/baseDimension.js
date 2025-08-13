@@ -201,8 +201,6 @@ export class BaseDimension extends Entity {
    */
   getDimensionValue(dimensionValue) {
     let precision = 2; // Default precision
-    const style = DesignCore.DimStyleManager.getItemByName(this.dimensionStyle);
-
     let formattedDimensionValue = '';
 
     switch (this.getBaseDimType()) {
@@ -294,7 +292,6 @@ export class BaseDimension extends Entity {
    * Define the arrow head
    * @param {Point} point
    * @param {number} angle
-   * @param {number} size
    * @return {Solid}
    */
   getArrowHead(point, angle) {
