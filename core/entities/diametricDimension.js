@@ -1,5 +1,3 @@
-
-import { Utils } from '../lib/utils.js';
 import { Strings } from '../lib/strings.js';
 import { Line } from './line.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
@@ -42,7 +40,7 @@ export class DiametricDimension extends BaseDimension {
     try {
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
 
-      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle()
+      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
         // const selection =

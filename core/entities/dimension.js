@@ -185,8 +185,8 @@ export class Dimension extends BaseDimension {
           const selectedItem2 = DesignCore.Scene.getItem(input2.selectedItemIndex);
           if ([Line].some((entity) => selectedItem2 instanceof entity)) {
             // Check lines intersect
-            const line1 = { start: this.selectedItems[0].points[0], end: this.selectedItems[0].points[1] }
-            const line2 = { start: selectedItem2.points[0], end: selectedItem2.points[1] }
+            const line1 = { start: this.selectedItems[0].points[0], end: this.selectedItems[0].points[1] };
+            const line2 = { start: selectedItem2.points[0], end: selectedItem2.points[1] };
             const intersect = Intersection.intersectLineLine(line1, line2, true);
             if (intersect.points.length >= 1) {
               // add line to selection

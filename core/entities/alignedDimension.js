@@ -1,5 +1,3 @@
-
-import { Utils } from '../lib/utils.js';
 import { Strings } from '../lib/strings.js';
 import { Line } from './line.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
@@ -41,8 +39,7 @@ export class AlignedDimension extends BaseDimension {
    */
   async execute() {
     try {
-
-      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle()
+      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt13 = await DesignCore.Scene.inputManager.requestInput(op);
@@ -109,7 +106,6 @@ export class AlignedDimension extends BaseDimension {
    * @return {Array} - Array of entities that compose the dimension
    */
   buildDimension(style) {
-
     const Pt13 = this.getPointBySequence(13);
     const Pt14 = this.getPointBySequence(14);
     const Pt11 = this.getPointBySequence(11);
@@ -125,7 +121,7 @@ export class AlignedDimension extends BaseDimension {
     // extension points
     let Pt13e = new Point();
     let Pt14e = new Point();
-    //let P3e = new Point();
+    // let P3e = new Point();
 
     const pntPerp = Pt11.perpendicular(Pt13, Pt14);
     const isAligned = pntPerp.isOnLine(Pt13, Pt14);
