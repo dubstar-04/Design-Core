@@ -107,7 +107,7 @@ export class RadialDimension extends BaseDimension {
     const Pt3 = this.getPointBySequence(11); // text position
 
     const line1 = new Line({ points: [Pt1, Pt2] });
-    const arrowHead1 = this.getArrowHead(Pt1, Pt2.angle(Pt1), this.text.height / 2);
+    const arrowHead1 = this.getArrowHead(Pt1, Pt2.angle(Pt1));
 
     entities.push(line1, arrowHead1);
 

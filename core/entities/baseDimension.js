@@ -290,9 +290,12 @@ export class BaseDimension extends Entity {
    * @param {number} size
    * @return {Solid}
    */
-  getArrowHead(point, angle, size) {
-    let p1 = new Point(point.x + size / 4, point.y + size);
-    let p2 = new Point(point.x - size / 4, point.y + size);
+  getArrowHead(point, angle) {
+    // TODO: implement arrow styles
+    // get the arrow size
+    const arrowsize = this.getDimensionStyle().getValue('DIMASZ');
+    let p1 = new Point(point.x + arrowsize / 4, point.y + arrowsize);
+    let p2 = new Point(point.x - arrowsize / 4, point.y + arrowsize);
     const ang = angle - Math.PI / 2;
     p1 = p1.rotate(point, ang);
     p2 = p2.rotate(point, ang);

@@ -121,14 +121,14 @@ export class DiametricDimension extends BaseDimension {
       // Text is outside the radius
       const endPoint = Pt1.project(Pt2.angle(Pt1), Pt1.distance(Pt3));
       const line1 = new Line({ points: [Pt2, endPoint] });
-      const arrowHead1 = this.getArrowHead(Pt1, Pt1.angle(Pt2), this.text.height / 2);
-      const arrowHead2 = this.getArrowHead(Pt2, Pt2.angle(Pt1), this.text.height / 2);
+      const arrowHead1 = this.getArrowHead(Pt1, Pt1.angle(Pt2));
+      const arrowHead2 = this.getArrowHead(Pt2, Pt2.angle(Pt1));
 
       entities.push(line1, arrowHead1, arrowHead2);
     } else {
       // Text is inside the radius
       const line1 = new Line({ points: [Pt1, Pt3] });
-      const arrowHead1 = this.getArrowHead(Pt1, Pt1.angle(Pt3), this.text.height / 2);
+      const arrowHead1 = this.getArrowHead(Pt1, Pt1.angle(Pt3));
       entities.push(line1, arrowHead1);
     }
 

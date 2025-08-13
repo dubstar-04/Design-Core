@@ -339,11 +339,9 @@ export class AngularDimension extends BaseDimension {
       // this.text.setRotation(Utils.radians2degrees(textRotation) % 180);
     }
 
-    // get the arrow size
-    const arrowSize = style.getValue('DIMASZ');
     const arrowRotation = Math.PI / 2;
-    const arrowHead1 = this.getArrowHead(arrow1pos, intersectPt.angle(arrow1pos) + arrowRotation, arrowSize);
-    const arrowHead2 = this.getArrowHead(arrow2pos, intersectPt.angle(arrow2pos) - arrowRotation, arrowSize);
+    const arrowHead1 = this.getArrowHead(arrow1pos, intersectPt.angle(arrow1pos) + arrowRotation);
+    const arrowHead2 = this.getArrowHead(arrow2pos, intersectPt.angle(arrow2pos) - arrowRotation);
 
     // Add the entities to the dimension
     // calculate the radians to mm conversion

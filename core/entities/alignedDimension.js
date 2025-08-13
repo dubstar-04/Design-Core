@@ -218,11 +218,8 @@ export class AlignedDimension extends BaseDimension {
       entities.push(dimLine2);
     }
 
-    // get the arrow size
-    const arrowsize = style.getValue('DIMASZ');
-
-    const arrowHead1 = this.getArrowHead(Pt13e, Pt13e.angle(Pt14e), arrowsize);
-    const arrowHead2 = this.getArrowHead(Pt14e, Pt14e.angle(Pt13e), arrowsize);
+    const arrowHead1 = this.getArrowHead(Pt13e, Pt13e.angle(Pt14e));
+    const arrowHead2 = this.getArrowHead(Pt14e, Pt14e.angle(Pt13e));
 
     // Add Pt10 to the points array
     const Pt10 = this.getPointBySequence(10);
