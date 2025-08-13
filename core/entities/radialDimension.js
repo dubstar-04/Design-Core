@@ -1,4 +1,3 @@
-import { Utils } from '../lib/utils.js';
 import { Strings } from '../lib/strings.js';
 import { Line } from './line.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
@@ -112,10 +111,12 @@ export class RadialDimension extends BaseDimension {
 
     entities.push(line1, arrowHead1);
 
-    this.text.points = [Pt3];
-    const angle = Utils.radians2degrees(Pt1.angle(Pt2));
-    this.text.rotation = angle;
+    const textPosition = Pt3;
+    const textRotation = Pt1.angle(Pt2);
     dimension = Pt1.distance(Pt2);
+
+    // Set the text value, position and rotation
+    this.setDimensionValue(dimension, textPosition, textRotation);
 
     // If the text is outside the radius
     // Draw an extra line
