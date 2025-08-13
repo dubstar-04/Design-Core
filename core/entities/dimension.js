@@ -86,7 +86,7 @@ export class Dimension extends BaseDimension {
     try {
       let inputValid = false;
 
-      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle()
+      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
       // TODO: Type needs to be a flag object
       // Type needs to have value 32 to indicate the dimensions block is owned by the dimension
@@ -184,7 +184,6 @@ export class Dimension extends BaseDimension {
         if (Input.getType(input2) === Input.Type.SINGLESELECTION) {
           const selectedItem2 = DesignCore.Scene.getItem(input2.selectedItemIndex);
           if ([Line].some((entity) => selectedItem2 instanceof entity)) {
-
             // Check lines intersect
             const line1 = { start: this.selectedItems[0].points[0], end: this.selectedItems[0].points[1] }
             const line2 = { start: selectedItem2.points[0], end: selectedItem2.points[1] }
@@ -228,14 +227,14 @@ export class Dimension extends BaseDimension {
       mousePoint.sequence = 11;
 
       const points = [...itemPoints, mousePoint];
-      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle, dimType: this.dimType });
     }
 
     if (this.points.length > 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle, dimType: this.dimType });
     }
   }
 }
