@@ -1,4 +1,4 @@
-import {Point} from '../entities/point.js';
+import { Point } from '../entities/point.js';
 
 /** Intersection Class */
 export class Intersection {
@@ -34,7 +34,7 @@ export class Intersection {
    */
   appendPoints(points) {
     // Forward all points through appendPoint
-    points.forEach((point)=>{
+    points.forEach((point) => {
       this.appendPoint(point);
     });
   };
@@ -56,11 +56,11 @@ export class Intersection {
 
     let result;
     const a = (a2.x - a1.x) * (a2.x - a1.x) +
-            (a2.y - a1.y) * (a2.y - a1.y);
+      (a2.y - a1.y) * (a2.y - a1.y);
     const b = 2 * ((a2.x - a1.x) * (a1.x - c.x) +
-            (a2.y - a1.y) * (a1.y - c.y));
+      (a2.y - a1.y) * (a1.y - c.y));
     const cc = c.x * c.x + c.y * c.y + a1.x * a1.x + a1.y * a1.y -
-            2 * (c.x * a1.x + c.y * a1.y) - r * r;
+      2 * (c.x * a1.x + c.y * a1.y) - r * r;
     const deter = b * b - 4 * a * cc;
 
     if (deter < 0) {
@@ -148,12 +148,12 @@ export class Intersection {
       const b = h / cDist;
 
       result.appendPoint(new Point(
-          p.x - b * (c2.y - c1.y),
-          p.y + b * (c2.x - c1.x),
+        p.x - b * (c2.y - c1.y),
+        p.y + b * (c2.x - c1.x),
       ));
       result.appendPoint(new Point(
-          p.x + b * (c2.y - c1.y),
-          p.y - b * (c2.x - c1.x),
+        p.x + b * (c2.y - c1.y),
+        p.y - b * (c2.x - c1.x),
       ));
     }
 
@@ -177,16 +177,16 @@ export class Intersection {
     const bottomLeft = new Point(min.x, max.y);
 
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectArcLine(arc, rectPoints, extend);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectArcLine(arc, rectPoints, extend);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectArcLine(arc, rectPoints, extend);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectArcLine(arc, rectPoints, extend);
 
     const result = new Intersection('No Intersection');
@@ -296,16 +296,16 @@ export class Intersection {
     const topRight = new Point(max.x, min.y);
     const bottomLeft = new Point(min.x, max.y);
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectCircleLine(circle, rectPoints);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectCircleLine(circle, rectPoints);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectCircleLine(circle, rectPoints);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectCircleLine(circle, rectPoints);
 
     const result = new Intersection('No Intersection');
@@ -351,8 +351,8 @@ export class Intersection {
       if ((0 <= ua && ua <= 1) && (0 <= ub && ub <= 1) || (0 <= ua && ua <= 1) && extend) {
         result = new Intersection('Intersection');
         result.appendPoint(new Point(
-            a1.x + ua * (a2.x - a1.x),
-            a1.y + ua * (a2.y - a1.y),
+          a1.x + ua * (a2.x - a1.x),
+          a1.y + ua * (a2.y - a1.y),
         ));
       } else {
         result = new Intersection('No Intersection');
@@ -396,7 +396,7 @@ export class Intersection {
 
 
       if (b1.bulge === 0) {
-        const line2 = {start: b1, end: b2};
+        const line2 = { start: b1, end: b2 };
         const inter = this.intersectLineLine(line2, line, extend);
         result.appendPoints(inter.points);
       } else {
@@ -463,16 +463,16 @@ export class Intersection {
     const topRight = new Point(max.x, min.y);
     const bottomLeft = new Point(min.x, max.y);
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectPolylineLine(polyline, rectPoints, extend);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectPolylineLine(polyline, rectPoints, extend);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectPolylineLine(polyline, rectPoints, extend);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectPolylineLine(polyline, rectPoints, extend);
 
     const result = new Intersection('No Intersection');
@@ -507,16 +507,16 @@ export class Intersection {
     const topRight = new Point(max.x, min.y);
     const bottomLeft = new Point(min.x, max.y);
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectLineLine(rectPoints, line, extend);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectLineLine(rectPoints, line, extend);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectLineLine(rectPoints, line, extend);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectLineLine(rectPoints, line, extend);
 
     const result = new Intersection('No Intersection');
@@ -576,16 +576,16 @@ export class Intersection {
     const topRight = new Point(max.x, min.y);
     const bottomLeft = new Point(min.x, max.y);
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectLineRectangle(rectPoints, rectangle2);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectLineRectangle(rectPoints, rectangle2);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectLineRectangle(rectPoints, rectangle2);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectLineRectangle(rectPoints, rectangle2);
 
     const result = new Intersection('No Intersection');
@@ -610,8 +610,8 @@ export class Intersection {
    * @param {boolean} extend
    * @return {Intersect}
    */
-    static intersectSolidRectangle(solid, rectangle, extend) {
-      return this.intersectPolylineRectangle(solid, rectangle, extend);
-    };
+  static intersectSolidRectangle(solid, rectangle, extend) {
+    return this.intersectPolylineRectangle(solid, rectangle, extend);
+  };
 }
 
