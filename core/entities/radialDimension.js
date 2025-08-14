@@ -102,9 +102,9 @@ export class RadialDimension extends BaseDimension {
     let dimension = 0;
     const entities = [];
 
-    const Pt1 = this.getPointBySequence(15); // radius point
-    const Pt2 = this.getPointBySequence(10); // center point
-    const Pt3 = this.getPointBySequence(11); // text position
+    const Pt15 = this.getPointBySequence(this.points, 15); // radius point
+    const Pt10 = this.getPointBySequence(this.points, 10); // center point
+    const Pt11 = this.getPointBySequence(this.points, 11); // text position
 
     const line1 = new Line({ points: [Pt1, Pt2] });
     const arrowHead1 = this.getArrowHead(Pt1, Pt2.angle(Pt1));
@@ -137,9 +137,9 @@ export class RadialDimension extends BaseDimension {
    * @param {DXFFile} file
    */
   dxf(file) {
-    const Pt10 = this.getPointBySequence(10);
-    const Pt11 = this.text.points[0];
-    const Pt15 = this.getPointBySequence(15);
+    const Pt150 = this.getPointBySequence(this.points, 10);
+    const Pt151 = this.text.points[0];
+    const Pt155 = this.getPointBySequence(this.points, 15);
 
     file.writeGroupCode('0', 'DIMENSION');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle

@@ -106,9 +106,9 @@ export class AlignedDimension extends BaseDimension {
    * @return {Array} - Array of entities that compose the dimension
    */
   buildDimension(style) {
-    const Pt13 = this.getPointBySequence(13);
-    const Pt14 = this.getPointBySequence(14);
-    const Pt11 = this.getPointBySequence(11);
+    const Pt13 = this.getPointBySequence(this.points, 13);
+    const Pt14 = this.getPointBySequence(this.points, 14);
+    const Pt11 = this.getPointBySequence(this.points, 11);
 
     let dimension = 0;
     const entities = [];
@@ -223,7 +223,7 @@ export class AlignedDimension extends BaseDimension {
 
     /*
     // Add Pt10 to the points array
-    const Pt10 = this.getPointBySequence(10);
+    const Pt10 = this.getPointBySequence(this.points, 10);
     if (Pt10) {
       // set the arrow point
       Pt10.x = Pt13e.x;
@@ -234,8 +234,8 @@ export class AlignedDimension extends BaseDimension {
       pt10.sequence = 10;
       this.points.push(pt10);
     }
+    */
 
-    entities.push(arrowHead1, arrowHead2);
     return entities;
   }
 
@@ -244,10 +244,10 @@ export class AlignedDimension extends BaseDimension {
    * @param {DXFFile} file
    */
   dxf(file) {
-    const Pt10 = this.getPointBySequence(10);
+    const Pt10 = this.getPointBySequence(this.points, 10);
     const Pt11 = this.text.points[0];
-    const Pt13 = this.getPointBySequence(13);
-    const Pt14 = this.getPointBySequence(14);
+    const Pt13 = this.getPointBySequence(this.points, 13);
+    const Pt14 = this.getPointBySequence(this.points, 14);
 
     file.writeGroupCode('0', 'DIMENSION');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle

@@ -90,7 +90,7 @@ export class AngularDimension extends BaseDimension {
       this.points.push(Pt11);
 
       const Pt15 = this.points.find((point) => point === 15);
-      const Pt10 = this.getPointBySequence(10);
+      const Pt10 = this.getPointBySequence(this.points, 10);
 
       const Pt16 = Pt11.perpendicular(Pt15, Pt10);
       Pt16.sequence = 16;
@@ -110,8 +110,8 @@ export class AngularDimension extends BaseDimension {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
 
-      const Pt15 = this.getPointBySequence(15);
-      const Pt10 = this.getPointBySequence(10);
+      const Pt15 = this.getPointBySequence(this.points, 15);
+      const Pt10 = this.getPointBySequence(this.points, 10);
 
       const Pt16 = mousePoint.perpendicular(Pt15, Pt10);
       Pt16.sequence = 16;
@@ -251,14 +251,14 @@ export class AngularDimension extends BaseDimension {
     let dimension = 0;
     const entities = [];
     // get the points by sequence
-    const Pt13 = this.getPointBySequence(13); // Pt13 is the first line start point
-    const Pt14 = this.getPointBySequence(14); // Pt14 is the first line end point
-    const Pt15 = this.getPointBySequence(15); // Pt15 is second line start point
-    const Pt10 = this.getPointBySequence(10); // Pt10 is the second line end point
+    const Pt13 = this.getPointBySequence(sortedPoints, 13); // Pt13 is the first line start point
+    const Pt14 = this.getPointBySequence(sortedPoints, 14); // Pt14 is the first line end point
+    const Pt15 = this.getPointBySequence(sortedPoints, 15); // Pt15 is second line start point
+    const Pt10 = this.getPointBySequence(sortedPoints, 10); // Pt10 is the second line end point
 
     // Temp use 11, should be pt16
-    // const Pt16 = this.getPointBySequence(11); // Pt16 is the arc position
-    const Pt11 = this.getPointBySequence(11); // Pt11 is the text position
+    // const Pt16 = this.getPointBySequence(this.points, 11); // Pt16 is the arc position
+    const Pt11 = this.getPointBySequence(this.points, 11); // Pt11 is the text position
 
     // Find the line intersection point
     const intersect = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true);
@@ -437,12 +437,12 @@ export class AngularDimension extends BaseDimension {
    * @param {DXFFile} file
    */
   dxf(file) {
-    const Pt10 = this.getPointBySequence(10);
+    const Pt10 = this.getPointBySequence(this.points, 10);
     const Pt11 = this.text.points[0];
-    const Pt13 = this.getPointBySequence(13);
-    const Pt14 = this.getPointBySequence(14);
-    const Pt15 = this.getPointBySequence(15);
-    const Pt16 = Pt11; // this.getPointBySequence(16);
+    const Pt13 = this.getPointBySequence(this.points, 13);
+    const Pt14 = this.getPointBySequence(this.points, 14);
+    const Pt15 = this.getPointBySequence(this.points, 15);
+    const Pt16 = Pt11; // this.getPointBySequence(this.points, 16);
 
     file.writeGroupCode('0', 'DIMENSION');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
