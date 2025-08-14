@@ -265,7 +265,7 @@ export class BaseDimension extends Entity {
     if (this.getDimensionStyle().getValue('DIMTIH') === 0) {
       // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
       // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
-      this.text.setRotation(Utils.radians2degrees(textRotation) % 180);
+      this.text.setRotation(Utils.radians2degrees(textRotation)); // % 180);
     }
   }
 
