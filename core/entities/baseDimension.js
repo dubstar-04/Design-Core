@@ -279,12 +279,18 @@ export class BaseDimension extends Entity {
 
 
   /**
-   * Get the points for the sequence number
+   * Get the point for the sequence number
+   * @param {Array} points - array of points to search
    * @param {number} sequenceNumber
    * @return {Point}
    */
-  getPointBySequence(sequenceNumber) {
-    const point = this.points.find((point) => point.sequence === sequenceNumber);
+  getPointBySequence(points, sequenceNumber) {
+    const point = points.find((point) => point.sequence === sequenceNumber);
+
+    if (!point) {
+      return null;
+    }
+
     return point;
   }
 
