@@ -46,9 +46,9 @@ export class RadialDimension extends BaseDimension {
       }
 
       const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
-      const pt1 = await DesignCore.Scene.inputManager.requestInput(op1);
-      pt1.sequence = 11;
-      this.points.push(pt1);
+      const Pt11 = await DesignCore.Scene.inputManager.requestInput(op1);
+      Pt11.sequence = 11;
+      this.points.push(Pt11);
 
       const selectionPoints = RadialDimension.getPointsFromSelection();
       this.points.push(...selectionPoints);
@@ -106,28 +106,32 @@ export class RadialDimension extends BaseDimension {
     const Pt10 = this.getPointBySequence(this.points, 10); // center point
     const Pt11 = this.getPointBySequence(this.points, 11); // text position
 
-    const line1 = new Line({ points: [Pt1, Pt2] });
-    const arrowHead1 = this.getArrowHead(Pt1, Pt2.angle(Pt1));
-
-    entities.push(line1, arrowHead1);
-
-    const textPosition = Pt3;
-    const textRotation = Pt1.angle(Pt2);
-    dimension = Pt1.distance(Pt2);
+    const textPosition = Pt11;
+    const textRotation = Pt15.angle(Pt10);
+    dimension = Pt15.distance(Pt10);
 
     // Set the text value, position and rotation
     this.setDimensionValue(dimension, textPosition, textRotation);
 
+    // approximate text width based on height
+    const approxTextWidth = this.text.getApproximateWidth();
+    const lineLength = Pt15.distance(Pt11) - approxTextWidth * 0.6;
+
     // If the text is outside the radius
     // Draw an extra line
-    if (dimension < Pt2.distance(Pt3)) {
-      const vector = Pt2.angle(Pt1);
-      const endPoint = Pt1.project(vector, Pt1.distance(Pt3));
-      const line2 = new Line({ points: [Pt1, endPoint] });
-      entities.push(line2);
+    if (dimension < Pt10.distance(Pt11)) {
+      // Text is outside the radius
+      const endPoint = Pt15.project(Pt10.angle(Pt15), lineLength);
+      const line1 = new Line({ points: [Pt15, endPoint] });
+      const arrowHead1 = this.getArrowHead(Pt15, Pt10.angle(Pt11));
+      entities.push(line1, arrowHead1);
+    } else {
+      // Text is inside the radius
+      const endPoint = Pt15.project(Pt10.angle(Pt15), -lineLength);
+      const line1 = new Line({ points: [Pt15, endPoint] });
+      const arrowHead1 = this.getArrowHead(Pt15, Pt11.angle(Pt10));
+      entities.push(line1, arrowHead1);
     }
-
-    this.text.string = `R${Math.abs(dimension.toFixed(2)).toString()}`;
 
     return entities;
   }
@@ -137,9 +141,9 @@ export class RadialDimension extends BaseDimension {
    * @param {DXFFile} file
    */
   dxf(file) {
-    const Pt150 = this.getPointBySequence(this.points, 10);
-    const Pt151 = this.text.points[0];
-    const Pt155 = this.getPointBySequence(this.points, 15);
+    const Pt10 = this.getPointBySequence(this.points, 10);
+    const Pt11 = this.text.points[0];
+    const Pt15 = this.getPointBySequence(this.points, 15);
 
     file.writeGroupCode('0', 'DIMENSION');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle

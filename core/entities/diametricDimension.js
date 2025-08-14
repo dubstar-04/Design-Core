@@ -48,9 +48,9 @@ export class DiametricDimension extends BaseDimension {
       }
 
       const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
-      const pt1 = await DesignCore.Scene.inputManager.requestInput(op1);
-      pt1.sequence = 11;
-      this.points.push(pt1);
+      const Pt11 = await DesignCore.Scene.inputManager.requestInput(op1);
+      Pt11.sequence = 11;
+      this.points.push(Pt11);
       const selectionPoints = DiametricDimension.getPointsFromSelection();
       this.points.push(...selectionPoints);
 
@@ -110,25 +110,29 @@ export class DiametricDimension extends BaseDimension {
     const Pt10 = this.getPointBySequence(this.points, 10); // diameter point
     const Pt11 = this.getPointBySequence(this.points, 11); // text position
 
-    const textPosition = Pt3;
-    const textRotation = Pt1.angle(Pt2);
-    dimension = Pt1.distance(Pt2);
+    const textPosition = Pt11;
+    const textRotation = Pt15.angle(Pt10);
+    dimension = Pt15.distance(Pt10);
 
     // Set the text value, position and rotation
     this.setDimensionValue(dimension, textPosition, textRotation);
 
-    if (dimension < Pt1.distance(Pt3) || dimension < Pt2.distance(Pt3)) {
-      // Text is outside the radius
-      const endPoint = Pt1.project(Pt2.angle(Pt1), Pt1.distance(Pt3));
-      const line1 = new Line({ points: [Pt2, endPoint] });
-      const arrowHead1 = this.getArrowHead(Pt1, Pt1.angle(Pt2));
-      const arrowHead2 = this.getArrowHead(Pt2, Pt2.angle(Pt1));
+    // approximate text width based on height
+    const approxTextWidth = this.text.getApproximateWidth();
+    const lineLength = Pt15.distance(Pt11) - approxTextWidth * 0.6;
 
+    if (dimension < Pt15.distance(Pt11) || dimension < Pt10.distance(Pt11)) {
+      // Text is outside the radius
+      const endPoint = Pt15.project(Pt10.angle(Pt15), lineLength);
+      const line1 = new Line({ points: [Pt10, endPoint] });
+      const arrowHead1 = this.getArrowHead(Pt15, Pt15.angle(Pt10));
+      const arrowHead2 = this.getArrowHead(Pt10, Pt10.angle(Pt15));
       entities.push(line1, arrowHead1, arrowHead2);
     } else {
       // Text is inside the radius
-      const line1 = new Line({ points: [Pt1, Pt3] });
-      const arrowHead1 = this.getArrowHead(Pt1, Pt1.angle(Pt3));
+      const endPoint = Pt15.project(Pt10.angle(Pt15), -lineLength);
+      const line1 = new Line({ points: [Pt15, endPoint] });
+      const arrowHead1 = this.getArrowHead(Pt15, Pt15.angle(Pt11));
       entities.push(line1, arrowHead1);
     }
 
@@ -140,9 +144,9 @@ export class DiametricDimension extends BaseDimension {
    * @param {DXFFile} file
    */
   dxf(file) {
-    const Pt150 = this.getPointBySequence(this.points, 10);
+    const Pt10 = this.getPointBySequence(this.points, 10);
     const Pt11 = this.text.points[0];
-    const Pt155 = this.getPointBySequence(this.points, 15);
+    const Pt15 = this.getPointBySequence(this.points, 15);
 
     file.writeGroupCode('0', 'DIMENSION');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
