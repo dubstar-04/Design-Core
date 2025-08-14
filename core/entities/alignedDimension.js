@@ -206,21 +206,22 @@ export class AlignedDimension extends BaseDimension {
       entities.push(extLine2);
     }
 
+    const arrowHead1 = this.getArrowHead(Pt13e, Pt13e.angle(Pt14e));
+    const arrowHead2 = this.getArrowHead(Pt14e, Pt14e.angle(Pt13e));
+
     const dimLine1 = new Line({ points: [dimLineOneStart, dimLineOneEnd] });
     // Supress dimension line 1 if DIMSD1 is true
     if (!style.getValue('DIMSD1')) {
-      entities.push(dimLine1);
+      entities.push(dimLine1, arrowHead1);
     }
 
     const dimLine2 = new Line({ points: [dimLineTwoStart, dimLineTwoEnd] });
     // Supress dimension line 2 if DIMSD2 is true
     if (!style.getValue('DIMSD2')) {
-      entities.push(dimLine2);
+      entities.push(dimLine2, arrowHead2);
     }
 
-    const arrowHead1 = this.getArrowHead(Pt13e, Pt13e.angle(Pt14e));
-    const arrowHead2 = this.getArrowHead(Pt14e, Pt14e.angle(Pt13e));
-
+    /*
     // Add Pt10 to the points array
     const Pt10 = this.getPointBySequence(10);
     if (Pt10) {
