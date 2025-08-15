@@ -207,7 +207,7 @@ export class AngularDimension extends BaseDimension {
     if (tempPt14.distance(intersectPt) < tempPt13.distance(intersectPt)) {
       const swapPt = tempPt13;
       tempPt13 = tempPt14;
-      tempPt15 = swapPt;
+      tempPt14 = swapPt;
     }
 
     // Ensure points are in CCW order
