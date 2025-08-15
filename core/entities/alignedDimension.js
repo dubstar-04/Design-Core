@@ -7,6 +7,7 @@ import { BaseDimension } from './baseDimension.js';
 import { Point } from './point.js';
 
 import { DesignCore } from '../designCore.js';
+import { Utils } from '../lib/utils.js';
 
 /**
  * Aligned Dimension Entity Class
@@ -123,22 +124,24 @@ export class AlignedDimension extends BaseDimension {
     let Pt14e = new Point();
     // let P3e = new Point();
 
+    // generate the x and y delta values
+    const dx = Pt14.x - Pt13.x;
+    const dy = Pt14.y - Pt13.y;
+
     const pntPerp = Pt11.perpendicular(Pt13, Pt14);
     const isAligned = pntPerp.isOnLine(Pt13, Pt14);
 
-    if (isAligned) {
-      // Aligned dimension
+    if (isAligned || Utils.round(dx) === 0 || Utils.round(dy) === 0) {
+      // Perpendicular to the selected line or line is vertical or horizontal
       const projectionAngle = pntPerp.angle(Pt11);
       const distance = Pt11.distance(pntPerp);
       Pt13e = Pt13.project(projectionAngle, distance);
       Pt14e = Pt14.project(projectionAngle, distance);
       dimension = Pt13.distance(Pt14);
     } else {
-      // generate the x and y delta values
-      const dx = Pt14.x - Pt13.x;
-      const dy = Pt14.y - Pt13.y;
+      // Not perpendicular to the selected line
 
-      // get the primary axis x or y
+      // get the primary axis: x or y
       const iX = ((Math.abs(Pt11.x - Pt13.x) + Math.abs(Pt14.x - Pt11.x)) - Math.abs(dx));
       const iY = ((Math.abs(Pt11.y - Pt13.y) + Math.abs(Pt14.y - Pt11.y)) - Math.abs(dy));
 
