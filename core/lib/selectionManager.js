@@ -22,6 +22,13 @@ export class SelectionSet {
     this.accepted = false;
     this.selectionSet = [];
   }
+
+  /**
+   * Remove the last selection from the selectionSet
+   */
+  removeLastSelection() {
+    this.selectionSet.pop();
+  }
 }
 
 // TODO: Refactor class.
@@ -39,6 +46,15 @@ export class SelectionManager {
   reset() {
     this.selectedItems = [];
     this.selectionSet = new SelectionSet();
+    this.selectionSetChanged();
+  }
+
+  /**
+   * Remove the last selection from the selected items
+   */
+  removeLastSelection() {
+    this.selectedItems.pop();
+    this.selectionSet.removeLastSelection();
     this.selectionSetChanged();
   }
 
