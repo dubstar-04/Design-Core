@@ -7,8 +7,8 @@ export class Strings {
   // Error Strings
   static Error = {
     ERROR: 'Error',
-    FILEOPEN: 'Error opening file',
-    INPUT: 'Invalid input',
+    FILEOPEN: 'Error Opening File',
+    INPUT: 'Invalid Input',
     INVALIDFILE: 'Invalid File',
     INVALIDDXFFORMAT: 'Invalid DXF Format',
     INVALIDPOINT: 'Invalid Point Data',
