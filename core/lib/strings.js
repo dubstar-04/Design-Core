@@ -16,6 +16,8 @@ export class Strings {
     INVALIDNUMBER: 'Invalid Number',
     INVALIDTYPE: 'Invalid Type',
     INVALIDINTERSECTTYPE: 'Invalid Intersect Type',
+    SELECTION: 'Invalid Selection',
+    PARALLELLINES: 'Parallel Lines',
   };
 
   // Warning Strings
