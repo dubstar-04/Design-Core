@@ -16,6 +16,7 @@ import { Intersection } from '../lib/intersect.js';
 
 import { DesignCore } from '../designCore.js';
 import { SingleSelection } from '../lib/selectionManager.js';
+import { Utils } from '../lib/utils.js';
 
 /**
  * Dimension Entity Class
@@ -187,18 +188,26 @@ export class Dimension extends BaseDimension {
             // Check lines intersect
             const line1 = { start: this.selectedItems[0].points[0], end: this.selectedItems[0].points[1] };
             const line2 = { start: selectedItem2.points[0], end: selectedItem2.points[1] };
-            const intersect = Intersection.intersectLineLine(line1, line2, true);
-            if (intersect.points.length >= 1) {
+
+            // Check the lines are not parallel - Can't dimension parallel lines
+            const lineOneSlope = (line1.end.y - line1.start.y) / (line1.end.x - line1.start.x);
+            const lineTwoSlope = (line2.end.y - line2.start.y) / (line2.end.x - line2.start.x);
+
+            if (Utils.round(lineOneSlope) !== Utils.round(lineTwoSlope)) {
+              const intersect = Intersection.intersectLineLine(line1, line2, true);
+              if (intersect.points.length >= 1) {
               // add line to selection
-              this.selectedItems.push(selectedItem2);
-              // Two lines selected - switch to angular dimension
-              this.dimType = 2;
+                this.selectedItems.push(selectedItem2);
+                // Two lines selected - switch to angular dimension
+                this.dimType = 2;
+              }
             } else {
-              const err = 'Invalid selection - Parallel lines';
-              Logging.instance.warn(`${this.type} - ${err}`);
+              const msg = `${this.type} - ${Strings.Error.SELECTION}: ${Strings.Error.PARALLELLINES}`;
+              DesignCore.Core.notify(msg);
+              DesignCore.Scene.selectionManager.removeLastSelection();
             }
           } else {
-            const msg = `${this.type} - Unsupported Type: ${selectedItem2.type}`;
+            const msg = `${this.type} - ${Strings.Error.INVALIDTYPE}: ${selectedItem2.type}`;
             DesignCore.Core.notify(msg);
             DesignCore.Scene.selectionManager.reset();
           }
