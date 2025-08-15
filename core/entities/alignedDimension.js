@@ -139,9 +139,7 @@ export class AlignedDimension extends BaseDimension {
       Pt14e = Pt14.project(projectionAngle, distance);
       dimension = Pt13.distance(Pt14);
     } else {
-      // Not perpendicular to the selected line
-
-      // get the primary axis: x or y
+      // Not perpendicular to the selected line: get the primary axis (x or y) and calculate the dimension
       const iX = ((Math.abs(Pt11.x - Pt13.x) + Math.abs(Pt14.x - Pt11.x)) - Math.abs(dx));
       const iY = ((Math.abs(Pt11.y - Pt13.y) + Math.abs(Pt14.y - Pt11.y)) - Math.abs(dy));
 
