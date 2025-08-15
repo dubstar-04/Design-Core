@@ -373,7 +373,7 @@ export class AngularDimension extends BaseDimension {
     // Create the arrow heads
     const arrowsize = this.getDimensionStyle().getValue('DIMASZ');
     // Arrow alignement - Calculate the distance from the arc tangent to the arc at <arrow size> along the tangent
-    const arcOffset = distance - Math.sqrt(distance * distance - (arrowsize * arrowsize));
+    const arcOffset = distance - Math.sqrt(distance * distance - arrowsize * arrowsize);
     // Calculate the angle from the arc tangent (perpendicular to the extension line) to the arc at <arrow size> along the tangent
     const arcRotationOffset = Math.asin(arcOffset / arrowsize);
     // Calculate the arrow head rotation to align with the arc
