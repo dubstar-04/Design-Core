@@ -133,6 +133,8 @@ export class RadialDimension extends BaseDimension {
       entities.push(line1, arrowHead1);
     }
 
+    entities.push(...this.getCentreMark(Pt10));
+
     return entities;
   }
 
