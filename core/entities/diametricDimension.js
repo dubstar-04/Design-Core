@@ -88,7 +88,7 @@ export class DiametricDimension extends BaseDimension {
     const radPoint = center.project(angle, item.getRadius());
     radPoint.sequence = 15;
 
-    const angle2 = mousePoint.angle(center);
+    const angle2 = angle + Math.PI;
     const radPoint2 = center.project(angle2, item.getRadius());
     radPoint2.sequence = 10;
 
@@ -120,23 +120,19 @@ export class DiametricDimension extends BaseDimension {
 
     // approximate text width based on height
     const approxTextWidth = this.text.getApproximateWidth();
-    const lineLength = Pt15.distance(Pt11) - approxTextWidth * 0.6;
+    let lineLength = Pt15.distance(Pt11) - approxTextWidth;
+    const radius = dimension * 0.5;
 
-    if (dimension < Pt15.distance(Pt11) || dimension < Pt10.distance(Pt11)) {
-      // Text is outside the radius
-      const endPoint = Pt15.project(Pt10.angle(Pt15), lineLength);
-      const line1 = new Line({ points: [Pt10, endPoint] });
-      const arrowHead1 = this.getArrowHead(Pt15, Pt15.angle(Pt10));
-      const arrowHead2 = this.getArrowHead(Pt10, Pt10.angle(Pt15));
-      entities.push(line1, arrowHead1, arrowHead2);
-    } else {
+    if (centerPoint.distance(Pt11) <= radius) {
       // Text is inside the radius
-      const endPoint = Pt15.project(Pt10.angle(Pt15), -lineLength);
-      const line1 = new Line({ points: [Pt15, endPoint] });
-      const arrowHead1 = this.getArrowHead(Pt15, Pt15.angle(Pt11));
-      entities.push(line1, arrowHead1);
-      entities.push(...this.getCentreMark(centerPoint));
+      lineLength = -lineLength;
     }
+
+    const endPoint = Pt15.project(Pt10.angle(Pt15), lineLength);
+    const line1 = new Line({ points: [Pt15, endPoint] });
+    const arrowHead1 = this.getArrowHead(Pt15, Pt15.angle(Pt11));
+    entities.push(line1, arrowHead1);
+    entities.push(...this.getCentreMark(centerPoint));
 
     return entities;
   }
