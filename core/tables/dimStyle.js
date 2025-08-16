@@ -29,7 +29,18 @@ export class DimStyle {
     this.DIMTP = 0.0; // 47 - Plus tolerance
     this.DIMTM = 0.0; // 48 - Minus tolerance
     this.DIMTXT = 2.5; // 140 - Dimensioning text height
-    this.DIMCEN = 2.5; // 141 - centre marks
+
+    // this.DIMCEN = 2.5; // 141 - centre marks
+    // Add DIMCEN property with getter and setter
+    Object.defineProperty(this, 'DIMCEN', {
+      get: this.getDimcen,
+      set: this.setDimcen,
+    });
+
+    // Add two internal properties to manage the DIMCEN value
+    this.DIMCENSTYL = 1; // internal - Controls the DIMCEN style
+    this.DIMCENVALUE = 2.5;// internal - Holds the DIMCEN value
+
     this.DIMTSZ = 0.0; // 142 - Dimensioning tick size; 0 = no ticks
     this.DIMALTF = 0.0394; // 143 - multiplier for alternate units
     this.DIMLFAC = 1.0; // 144 - Measurement scale factor
@@ -645,6 +656,45 @@ export class DimStyle {
       // remove flag
       this.standardFlags.removeValue(4);
     }
+  }
+
+  /**
+   * get the DIMCEN property for the center mark size
+   * @return {Number} DIMCEN value
+   * This uses two internal values to define the DIMCEN property
+   * DIMCENSTYL & DIMCENVALUE
+   * DIMCEN has 3 states:
+   * - Less than zero = Line Mode (Extended Cross)
+   * - Zero = Off
+   * - Greater than zero = Mark mode (Cross)
+   */
+  getDimcen() {
+    switch (this.DIMCENSTYL) {
+      case 0:
+        return 0;
+      case 1:
+        return Math.abs(this.DIMCENVALUE);
+      case 2:
+        return 0 - Math.abs(this.DIMCENVALUE);
+      default:
+        return 0;
+    }
+  }
+
+  /**
+   * set the DIMCEN value for the centre mark size
+   * @param {String} value
+   */
+  setDimcen(value) {
+    if ( value === 0) {
+      this.DIMCENSTYL = 0;
+    } else if (value > 0) {
+      this.DIMCENSTYL = 1;
+    } else if (value < 0) {
+      this.DIMCENSTYL = 2;
+    }
+
+    this.DIMCENVALUE = Math.abs(value);
   }
 
   /**
