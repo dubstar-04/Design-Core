@@ -627,7 +627,8 @@ export class DimStyle {
    */
   getValue(valueName) {
     if (this.hasOwnProperty(valueName)) {
-      return this[valueName];
+      // Ensure a number value is returned - Not 100% certain all values are numbers.
+      return Number(this[valueName]);
     }
 
     const err = `Getting Value - ${valueName}`;
