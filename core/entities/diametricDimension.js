@@ -112,6 +112,7 @@ export class DiametricDimension extends BaseDimension {
 
     const textPosition = Pt11;
     const textRotation = Pt15.angle(Pt10);
+    const centerPoint = Pt15.midPoint(Pt10);
     dimension = Pt15.distance(Pt10);
 
     // Set the text value, position and rotation
@@ -134,6 +135,7 @@ export class DiametricDimension extends BaseDimension {
       const line1 = new Line({ points: [Pt15, endPoint] });
       const arrowHead1 = this.getArrowHead(Pt15, Pt15.angle(Pt11));
       entities.push(line1, arrowHead1);
+      entities.push(...this.getCentreMark(centerPoint));
     }
 
     return entities;
