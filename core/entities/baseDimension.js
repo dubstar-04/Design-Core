@@ -338,17 +338,10 @@ export class BaseDimension extends Entity {
     */
 
     const centreMark = [];
-
     // get the center mark style
     const markStyle = this.getDimensionStyle().getValue('DIMCENSTYL');
-
     // get the centre mark size
     const markSize = this.getDimensionStyle().getValue('DIMCENVALUE');
-
-    // get the centre mark size
-    const DIMCEN = this.getDimensionStyle().getValue('DIMCEN');
-
-    console.log('mark style', markStyle, 'marksize', markSize, 'DIMCEN', DIMCEN);
 
     if (markStyle === 0) {
       return centreMark;
