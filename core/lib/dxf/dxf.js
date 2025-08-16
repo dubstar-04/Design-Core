@@ -72,6 +72,14 @@ export class DXF {
       }
     }
 
+    if (header.hasOwnProperty('$DIMSTYLE')) {
+      const dimstyle = header['$DIMSTYLE'];
+      if (dimstyle.hasOwnProperty('2')) {
+        const styleName = dimstyle['2'];
+        DesignCore.DimStyleManager.setCstyle(styleName);
+      }
+    }
+
     if (header.hasOwnProperty('$ACADVER')) {
       const version = header['$ACADVER'];
       if (version.hasOwnProperty('1')) {
