@@ -2,6 +2,7 @@ import { Point } from './point.js';
 import { Block } from '../tables/block.js';
 import { Text } from './text.js';
 import { Solid } from './solid.js';
+import { Line } from './line.js';
 import { Entity } from './entity.js';
 import { Logging } from '../lib/logging.js';
 import { Property } from '../properties/property.js';
@@ -321,6 +322,54 @@ export class BaseDimension extends Entity {
     const arrowHead = new Solid({ points: points });
 
     return arrowHead;
+  }
+
+  /**
+   * Get the geometry for the centre mark
+   * @param {Point} point centre point for center mark
+   * @return {Array} array of entities representing the center mark
+   */
+  getCentreMark(point) {
+    /*
+    DIMCEN value defines the centre mark type and size
+    0 = No center marks or lines are drawn
+    <0 = Centerlines are drawn
+    >0 = Center marks are drawn
+    */
+
+    const centreMark = [];
+
+    // get the center mark style
+    const markStyle = this.getDimensionStyle().getValue('DIMCENSTYL');
+
+    // get the centre mark size
+    const markSize = this.getDimensionStyle().getValue('DIMCENVALUE');
+
+    // get the centre mark size
+    const DIMCEN = this.getDimensionStyle().getValue('DIMCEN');
+
+    console.log('mark style', markStyle, 'marksize', markSize, 'DIMCEN', DIMCEN);
+
+    if (markStyle === 0) {
+      return centreMark;
+    }
+
+    if (markStyle > 0) {
+      const lineOne = new Line({ points: [new Point(point.x - markSize, point.y), new Point(point.x + markSize, point.y)] });
+      const lineTwo = new Line({ points: [new Point(point.x, point.y - markSize), new Point(point.x, point.y + markSize)] });
+      centreMark.push(lineOne, lineTwo);
+
+      if (markStyle > 1) {
+        const lineThree = new Line({ points: [new Point(point.x, point.y + markSize * 2), new Point(point.x, point.y + markSize * 5)] });
+        const lineFour = new Line({ points: [new Point(point.x - markSize * 2, point.y), new Point(point.x - markSize * 5, point.y)] });
+        const lineFive = new Line({ points: [new Point(point.x, point.y - markSize * 2), new Point(point.x, point.y - markSize * 5)] });
+        const lineSix = new Line({ points: [new Point(point.x + markSize * 2, point.y), new Point(point.x + markSize * 5, point.y)] });
+
+        centreMark.push(lineThree, lineFour, lineFive, lineSix);
+      }
+    }
+
+    return centreMark;
   }
 
   /**
