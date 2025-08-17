@@ -164,11 +164,12 @@ export class AlignedDimension extends BaseDimension {
     const textPosition = midPoint;
     const textRotation = Pt13e.angle(Pt14e);
 
-    // Set the text value, position and rotation
-    this.setDimensionValue(dimension, textPosition, textRotation);
+    // Get the dimension text using the value, position and rotation
+    const text = this.getDimensionText(dimension, textPosition, textRotation);
+    entities.push(text);
 
     // approximate text width based on height
-    const approxTextWidth = this.text.getApproximateWidth();
+    const approxTextWidth = text.getApproximateWidth();
 
     // generate extension line points
     // get style properties
@@ -246,7 +247,7 @@ export class AlignedDimension extends BaseDimension {
    */
   dxf(file) {
     const Pt10 = this.getPointBySequence(this.points, 10);
-    const Pt11 = this.text.points[0];
+    const Pt11 = this.getPointBySequence(this.points, 11);
     const Pt13 = this.getPointBySequence(this.points, 13);
     const Pt14 = this.getPointBySequence(this.points, 14);
 

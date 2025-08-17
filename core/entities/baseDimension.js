@@ -44,10 +44,12 @@ export class BaseDimension extends Entity {
       writable: true,
     });
 
+    /*
     Object.defineProperty(this, 'text', {
       value: new Text(),
       writable: true,
     });
+    */
 
     Object.defineProperty(this, 'textOverride', {
       value: '',
@@ -247,20 +249,22 @@ export class BaseDimension extends Entity {
    * @param {string} textValue - the dimension value to set
    * @param {Point} textPosition - the position of the text
    * @param {number} textRotation - the rotation of the text (radians)
+   * @return {Text} Dimension Text
    */
-  setDimensionValue(textValue, textPosition, textRotation) {
+  getDimensionText(textValue, textPosition, textRotation) {
+    const text = new Text();
     // get the text height
     const textHeight = this.getDimensionStyle().getValue('DIMTXT');
     // set the text height
-    this.text.height = textHeight;
+    text.height = textHeight;
     // Always set text horizontal alignment to center
-    this.text.horizontalAlignment = 1;
+    text.horizontalAlignment = 1;
     // Always set text vertical alignment to middle
-    this.text.verticalAlignment = 2;
+    text.verticalAlignment = 2;
     // set the text value
-    this.text.string = this.getDimensionValue(textValue);
+    text.string = this.getDimensionValue(textValue);
     // set the text position
-    this.text.points = [textPosition];
+    text.points = [textPosition];
 
     // set the text rotation
     if (this.getDimensionStyle().getValue('DIMTIH') === 0) {
@@ -272,8 +276,9 @@ export class BaseDimension extends Entity {
         textRotation = textRotation + Math.PI;
       }
 
-      this.text.setRotation(Utils.radians2degrees(textRotation));
+      text.setRotation(Utils.radians2degrees(textRotation));
     }
+    return text;
   }
 
   /**
@@ -383,8 +388,6 @@ export class BaseDimension extends Entity {
         element.setColour('BYBLOCK');
         this.block.addItem(element);
       });
-
-      this.block.addItem(this.text);
     }
 
     this.block.draw(ctx, scale, this);

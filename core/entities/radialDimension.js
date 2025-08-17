@@ -110,12 +110,13 @@ export class RadialDimension extends BaseDimension {
     const textRotation = Pt15.angle(Pt10);
     dimension = Pt15.distance(Pt10);
 
-    // Set the text value, position and rotation
-    this.setDimensionValue(dimension, textPosition, textRotation);
+    // Get the dimension text using the value, position and rotation
+    const text = this.getDimensionText(dimension, textPosition, textRotation);
+    entities.push(text);
 
     // approximate text width based on height
-    const approxTextWidth = this.text.getApproximateWidth();
-    const lineLength = Pt15.distance(Pt11) - approxTextWidth * 0.6;
+    const approxTextWidth = text.getApproximateWidth();
+    const lineLength = Pt15.distance(Pt11) - approxTextWidth;
 
     // If the text is outside the radius
     // Draw an extra line
@@ -144,7 +145,7 @@ export class RadialDimension extends BaseDimension {
    */
   dxf(file) {
     const Pt10 = this.getPointBySequence(this.points, 10);
-    const Pt11 = this.text.points[0];
+    const Pt11 = this.getPointBySequence(this.points, 10);
     const Pt15 = this.getPointBySequence(this.points, 15);
 
     file.writeGroupCode('0', 'DIMENSION');

@@ -367,8 +367,9 @@ export class AngularDimension extends BaseDimension {
     const textPosition = arcMiddle;
     const textRotation = arrow1pos.angle(arrow2pos);
 
-    // Set the text value, position and rotation
-    this.setDimensionValue(Utils.radians2degrees(dimension), textPosition, textRotation);
+    // Get the dimension text using the value, position and rotation
+    const text = this.getDimensionText(Utils.radians2degrees(dimension), textPosition, textRotation);
+    entities.push(text);
 
     // Create the arrow heads
     const arrowsize = this.getDimensionStyle().getValue('DIMASZ');
@@ -384,7 +385,7 @@ export class AngularDimension extends BaseDimension {
     // Add the entities to the dimension
     // calculate the radians to mm conversion
     // circumference = 2*PI*radius
-    const approxTextWidth = this.text.getApproximateWidth() * 1.25; // 1.25 is a factor to ensure the text is not too close to the arc
+    const approxTextWidth = text.getApproximateWidth() * 1.25; // 1.25 is a factor to ensure the text is not too close to the arc
     const circumference = 2 * Math.PI * distance;
     const circumferencePerRadian = (2 * Math.PI) / circumference;
     const arcAdjustment = (approxTextWidth / 2) * circumferencePerRadian;
@@ -476,7 +477,7 @@ export class AngularDimension extends BaseDimension {
    */
   dxf(file) {
     const Pt10 = this.getPointBySequence(this.points, 10);
-    const Pt11 = this.text.points[0];
+    const Pt11 = this.getPointBySequence(this.points, 11);
     const Pt13 = this.getPointBySequence(this.points, 13);
     const Pt14 = this.getPointBySequence(this.points, 14);
     const Pt15 = this.getPointBySequence(this.points, 15);
