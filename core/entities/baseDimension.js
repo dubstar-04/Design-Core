@@ -379,13 +379,15 @@ export class BaseDimension extends Entity {
       this.block.clearItems();
 
       entities.forEach((element) => {
+        // For colour BYBLOCK for dimensions
+        element.setColour('BYBLOCK');
         this.block.addItem(element);
       });
 
       this.block.addItem(this.text);
     }
 
-    this.block.draw(ctx, scale);
+    this.block.draw(ctx, scale, this);
   }
 
   /**
