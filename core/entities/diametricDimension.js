@@ -1,5 +1,6 @@
 import { Strings } from '../lib/strings.js';
 import { Line } from './line.js';
+import { Text } from './text.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
@@ -120,7 +121,7 @@ export class DiametricDimension extends BaseDimension {
     entities.push(text);
 
     // approximate text width based on height
-    const approxTextWidth = text.getApproximateWidth();
+    const approxTextWidth = Text.getApproximateWidth(text.string, text.height);
     let lineLength = Pt15.distance(Pt11) - approxTextWidth;
     const radius = dimension * 0.5;
 

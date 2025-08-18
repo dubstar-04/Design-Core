@@ -385,7 +385,8 @@ export class AngularDimension extends BaseDimension {
     // Add the entities to the dimension
     // calculate the radians to mm conversion
     // circumference = 2*PI*radius
-    const approxTextWidth = text.getApproximateWidth() * 1.25; // 1.25 is a factor to ensure the text is not too close to the arc
+    // approximate text width based on height
+    const approxTextWidth = Text.getApproximateWidth(text.string, text.height) * 1.25;// 1.25 is a factor to ensure the text is not too close to the arc
     const circumference = 2 * Math.PI * distance;
     const circumferencePerRadian = (2 * Math.PI) / circumference;
     const arcAdjustment = (approxTextWidth / 2) * circumferencePerRadian;

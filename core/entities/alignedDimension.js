@@ -1,5 +1,6 @@
 import { Strings } from '../lib/strings.js';
 import { Line } from './line.js';
+import { Text } from './text.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
@@ -166,6 +167,11 @@ export class AlignedDimension extends BaseDimension {
 
     // Get the dimension text using the value, position and rotation
     const text = this.getDimensionText(dimension, textPosition, textRotation);
+    // approximate text width based on height
+    const approxTextWidth = Text.getApproximateWidth(text.string, text.height);
+    const updatedTextPosition = this.getTextPosition(Pt13e, Pt14e, approxTextWidth);
+    text.points = [updatedTextPosition];
+
     entities.push(text);
 
     // approximate text width based on height
