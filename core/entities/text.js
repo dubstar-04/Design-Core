@@ -147,6 +147,20 @@ export class Text extends Entity {
   }
 
   /**
+   * Get the approximate width of the text
+   * @param {string} string - text string
+   * @param {number} textHeight - text height
+   * @return {number} - approximate width of the text
+   * This is a rough estimate based on the string length and height
+   * Actual width depends on the font and style used
+   */
+  static getApproximateWidth(string, textHeight) {
+    // Approximate width of the text based on the string length and height
+    // This is a rough estimate, as actual width depends on the font and style
+    return string.length * textHeight * 0.6; // 0.6 is an approximation factor for average character width
+  }
+
+  /**
    * Execute method
    * executes the workflow, requesting input required to create an entity
    */
@@ -349,18 +363,6 @@ export class Text extends Entity {
   getBoundingRect() {
     const rect = { width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y };
     return rect;
-  }
-
-  /**
-   * Get the approximate width of the text
-   * @return {number} - approximate width of the text
-   * This is a rough estimate based on the string length and height
-   * Actual width depends on the font and style used
-   */
-  getApproximateWidth() {
-    // Approximate width of the text based on the string length and height
-    // This is a rough estimate, as actual width depends on the font and style
-    return this.string.length * this.height * 0.6; // 0.6 is an approximation factor for average character width
   }
 
   /**
