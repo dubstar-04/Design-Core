@@ -98,17 +98,13 @@ export class Dimension extends BaseDimension {
 
         if (input1 instanceof Point) {
           inputValid = true;
-
           this.dimType = 1;
-
-          input1.sequence = 13;
-          this.points.push(input1);
-
           // select a second point to define the dimension
           const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
           const pt14 = await DesignCore.Scene.inputManager.requestInput(op1);
-          pt14.sequence = 14;
-          this.points.push(pt14);
+          // Create a temporary line using the selected points
+          const tempLine = new Line({ points: [input1, pt14] });
+          this.selectedItems.push(tempLine);
         }
 
         if (input1 instanceof SingleSelection) {
