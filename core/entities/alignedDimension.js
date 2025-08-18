@@ -91,39 +91,18 @@ export class AlignedDimension extends BaseDimension {
     const points = [];
     const item = items[0];
 
-    const pt13 = item.points[0];
-    pt13.sequence = 13;
-    points.push(pt13);
+    const Pt13 = item.points[0];
+    Pt13.sequence = 13;
+    points.push(Pt13);
 
-    const pt14 = item.points[1];
-    pt14.sequence = 14;
-    points.push(pt14);
+    const Pt14 = item.points[1];
+    Pt14.sequence = 14;
+    points.push(Pt14);
 
-    return points;
-  }
+    const Pt10 = new Point();
+    Pt10.sequence = 10;
 
-  /**
-   * Build the dimension
-   * @param {Object} style
-   * @return {Array} - Array of entities that compose the dimension
-   */
-  buildDimension(style) {
-    const Pt13 = this.getPointBySequence(this.points, 13);
-    const Pt14 = this.getPointBySequence(this.points, 14);
-    const Pt11 = this.getPointBySequence(this.points, 11);
-
-    let dimension = 0;
-    const entities = [];
-
-    // invalid points
-    if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
-      return null;
-    }
-
-    // extension points
-    let Pt13e = new Point();
-    let Pt14e = new Point();
-    // let P3e = new Point();
+    const Pt11 = DesignCore.Mouse.pointOnScene();
 
     // generate the x and y delta values
     const dx = Pt14.x - Pt13.x;
@@ -136,25 +115,80 @@ export class AlignedDimension extends BaseDimension {
       // Perpendicular to the selected line or line is vertical or horizontal
       const projectionAngle = pntPerp.angle(Pt11);
       const distance = Pt11.distance(pntPerp);
-      Pt13e = Pt13.project(projectionAngle, distance);
-      Pt14e = Pt14.project(projectionAngle, distance);
-      dimension = Pt13.distance(Pt14);
+
+      const projectedPoint = Pt14.project(projectionAngle, distance);
+      Pt10.x = projectedPoint.x;
+      Pt10.y = projectedPoint.y;
     } else {
       // Not perpendicular to the selected line: get the primary axis (x or y) and calculate the dimension
       const iX = ((Math.abs(Pt11.x - Pt13.x) + Math.abs(Pt14.x - Pt11.x)) - Math.abs(dx));
       const iY = ((Math.abs(Pt11.y - Pt13.y) + Math.abs(Pt14.y - Pt11.y)) - Math.abs(dy));
 
       if (iX >= iY && dy !== 0) {
-        Pt13e.x = Pt11.x;
+        Pt10.x = Pt11.x;
+        Pt10.y = Pt14.y;
+      } else if (iX < iY && dx !== 0) {
+        Pt10.x = Pt14.x;
+        Pt10.y = Pt11.y;
+      }
+    }
+
+    points.push(Pt10);
+    return points;
+  }
+
+  /**
+   * Build the dimension
+   * @param {Object} style
+   * @return {Array} - Array of entities that compose the dimension
+   */
+  buildDimension(style) {
+    const Pt10 = this.getPointBySequence(this.points, 10);
+    const Pt13 = this.getPointBySequence(this.points, 13);
+    const Pt14 = this.getPointBySequence(this.points, 14);
+    const Pt11 = this.getPointBySequence(this.points, 11);
+
+    let dimension = 0;
+    const entities = [];
+
+    // invalid points
+    if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
+      return null;
+    }
+
+    let Pt13e = new Point();
+    const Pt14e = Pt10;
+
+    // generate the x and y delta values
+    const dx = Pt14.x - Pt13.x;
+    const dy = Pt14.y - Pt13.y;
+
+    // check if Line Pt13 -> P14 is perpendicular to Line Pt14 -> Pt10
+    const m1 = (Pt14.y - Pt13.y) / (Pt14.x - Pt13.x);
+    const m2 = (Pt14.y - Pt10.y) / (Pt14.x - Pt10.x);
+    const perpendicular = Number((m1 * m2).toFixed(1));
+
+    let isAligned = true;
+
+    if (perpendicular !== -1.0) {
+      isAligned = false;
+    }
+
+    if (isAligned || Utils.round(dx) === 0 || Utils.round(dy) === 0) {
+      Pt13e = Pt13.project(Pt14.angle(Pt10), Pt14.distance(Pt10));
+      dimension = Pt13.distance(Pt14);
+    } else {
+      // Not perpendicular to the selected line: get the primary axis (x or y) and calculate the dimension
+      const iX = ((Math.abs(Pt10.x - Pt13.x) + Math.abs(Pt14.x - Pt10.x)) - Math.abs(dx));
+      const iY = ((Math.abs(Pt10.y - Pt13.y) + Math.abs(Pt14.y - Pt10.y)) - Math.abs(dy));
+
+      if (iX >= iY && dy !== 0) {
+        Pt13e.x = Pt10.x;
         Pt13e.y = Pt13.y;
-        Pt14e.x = Pt11.x;
-        Pt14e.y = Pt14.y;
         dimension = dy;
       } else if (iX < iY && dx !== 0) {
         Pt13e.x = Pt13.x;
-        Pt13e.y = Pt11.y;
-        Pt14e.x = Pt14.x;
-        Pt14e.y = Pt11.y;
+        Pt13e.y = Pt10.y;
         dimension = dx;
       }
     }
@@ -174,8 +208,6 @@ export class AlignedDimension extends BaseDimension {
 
     entities.push(text);
 
-    // approximate text width based on height
-    const approxTextWidth = text.getApproximateWidth();
 
     // generate extension line points
     // get style properties
@@ -229,23 +261,12 @@ export class AlignedDimension extends BaseDimension {
       entities.push(dimLine2, arrowHead2);
     }
 
-    /*
-    // Add Pt10 to the points array
-    const Pt10 = this.getPointBySequence(this.points, 10);
-    if (Pt10) {
-      // set the arrow point
-      Pt10.x = Pt13e.x;
-      Pt10.y = Pt13e.y;
-    } else {
-      // create the arrow point
-      const pt10 = new Point(Pt13e.x, Pt13e.y);
-      pt10.sequence = 10;
-      this.points.push(pt10);
     }
     */
 
     return entities;
   }
+
 
   /**
    * Write the entity to file in the dxf format
