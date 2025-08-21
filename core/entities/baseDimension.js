@@ -203,8 +203,45 @@ export class BaseDimension extends Entity {
    * @return {string} - the formatted dimension value
    */
   getDimensionValue(dimensionValue) {
-    let precision = 2; // Default precision
+    // Formatted value to return
     let formattedDimensionValue = '';
+
+    // Default precision from style
+    let precision = this.getDimensionStyle().getValue('DIMDEC');
+
+    // TODO: Implement Unit format - DIMLUNIT
+    // 1 = Scientific; 2 = Decimal; 3 = Engineering;
+    // 4 = Architectural; 5 = Fractional; 6 = Windows desktop
+    const DIMLUNIT = this.getDimensionStyle().getValue('DIMLUNIT');
+
+    // TODO: Implement decimal seperator - DIMDSEP
+    // Valid values are period (.) comma (,) or space ( )
+    const DIMDSEP = this.getDimensionStyle().getValue('DIMDSEP');
+
+    // TODO: Implement Rounding - DIMRND
+    const DIMRND = this.getDimensionStyle().getValue('DIMRND');
+
+    // TODO: Implement prefix and postsuffix - DIMPOST
+    // prefix and suffix included in DIMPOST value seperated by <>
+    // e.g. prefix<>suffix
+    const DIMPOST = this.getDimensionStyle().getValue('DIMPOST');
+    const DIMAPOST = this.getDimensionStyle().getValue('DIMAPOST');
+
+    // TODO: Implement Zero suppression
+    // Zero suppression
+    /*
+        Values 0-3 affect feet-and-inch dimensions only:
+        0 = Suppresses zero feet and precisely zero inches
+        1 = Includes zero feet and precisely zero inches
+        2 = Includes zero feet and suppresses zero inches
+        3 = Includes zero inches and suppresses zero feet
+        4 = Suppresses leading zeros in decimal dimensions (for example, 0.5000 becomes .5000)
+        8 = Suppresses trailing zeros in decimal dimensions (for example, 12.5000 becomes 12.5)
+        12 = Suppresses both leading and trailing zeros (for example, 0.5000 becomes .5)
+    */
+    const DIMZIN = this.getDimensionStyle().getValue('DIMZIN');
+    const DIMAZIN = this.getDimensionStyle().getValue('DIMAZIN');
+
 
     switch (this.getBaseDimType()) {
       case 0: // Rotated, horizontal, or vertical
