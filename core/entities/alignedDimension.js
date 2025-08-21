@@ -87,7 +87,7 @@ export class AlignedDimension extends BaseDimension {
    * @param {any} items
    * @return {Array} array of points
    */
-  static getPointsFromSelection(items) {
+  static getPointsFromSelection(items, textPos) {
     const points = [];
     const item = items[0];
 
@@ -143,18 +143,37 @@ export class AlignedDimension extends BaseDimension {
    * @return {Array} - Array of entities that compose the dimension
    */
   buildDimension(style) {
+    let dimension = 0;
+    const entities = [];
+
     const Pt10 = this.getPointBySequence(this.points, 10);
     const Pt13 = this.getPointBySequence(this.points, 13);
     const Pt14 = this.getPointBySequence(this.points, 14);
     const Pt11 = this.getPointBySequence(this.points, 11);
 
-    let dimension = 0;
-    const entities = [];
+    // DIMTIH inside text alignment
+    const DIMTIH = this.getDimensionStyle().getValue('DIMTIH');
+    // DIMTOH outside text alignment
+    const DIMTOH = this.getDimensionStyle().getValue('DIMTOH');
+    // Arrow size - use for extension line length
+    const DIMASZ = this.getDimensionStyle().getValue('DIMASZ');
+    // Text Size - use for extimated text width
+    const DIMTXT = this.getDimensionStyle().getValue('DIMTXT');
+    // Force Extension Line - If text outside extensions, force line extensions between extensions if nonzero
+    const DIMTOFL = this.getDimensionStyle().getValue('DIMTOFL');
+    // Text vertical position - 0 = Aligns text with the dimension line
+    const DIMTAD = this.getDimensionStyle().getValue('DIMTAD');
+    // Extend beyond dim line distance
+    const DIMEXE = this.getDimensionStyle().getValue('DIMEXE');
+    // Offset from origin distance
+    const DIMEXO = this.getDimensionStyle().getValue('DIMEXO');
+    // Justification of the dimension text
+    const DIMJUST = this.getDimensionStyle().getValue('DIMJUST');
 
     // invalid points
-    if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
-      return null;
-    }
+    // if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
+    //  return null;
+    // }
 
     let Pt13e = new Point();
     const Pt14e = Pt10;
@@ -194,31 +213,54 @@ export class AlignedDimension extends BaseDimension {
     }
 
     const projectAngle = Pt13.angle(Pt13e);
-    const midPoint = Pt13e.midPoint(Pt14e);
+    // const midPoint = Pt13e.midPoint(Pt14e);
 
-    const textPosition = midPoint;
-    const textRotation = Pt13e.angle(Pt14e);
+    const formattedDimensionValue = this.getDimensionValue(dimension);
+    // approximate text width based on height
+    const approxTextWidth = Text.getApproximateWidth(formattedDimensionValue, DIMTXT);
+
+    const midPoint = Pt13e.midPoint(Pt14e);
+    let textPosition = midPoint;
+    let textRotation = Pt13e.angle(Pt14e);
+
+    switch (DIMJUST) {
+      case 0:
+        // 0 = Center-justified between extension lines
+        break;
+      case 1:
+        // 1 = Next to first extension line
+        textPosition = Pt13e;
+        textPosition = Pt13e.project(Pt13e.angle(Pt14e), approxTextWidth * 0.75 + DIMASZ); // Offset text from the extension line
+        // textRotation = Pt13e.angle(Pt14e);
+        break;
+      case 2:
+        // 2 = Next to second extension line
+        textPosition = Pt14e;
+        textPosition = textPosition.project(Pt14e.angle(Pt13e), approxTextWidth * 0.75 + DIMASZ); // Offset text from the extension line
+        // textRotation = Pt13e.angle(Pt14e);
+        break;
+      case 3:
+        // 3 = Above first extension line
+        textPosition = Pt13e.project(projectAngle, approxTextWidth * 0.5 + DIMEXE + DIMTXT);
+        textRotation = textRotation + Math.PI / 2; // Rotate text 90 degrees
+        break;
+      case 4:
+        // 4 = Above second extension line
+        textPosition = Pt14e.project(projectAngle, approxTextWidth * 0.5 + DIMEXE + DIMASZ);
+        textRotation = textRotation + Math.PI / 2; // Rotate text 90 degrees
+        break;
+    }
 
     // Get the dimension text using the value, position and rotation
     const text = this.getDimensionText(dimension, textPosition, textRotation);
-    // approximate text width based on height
-    const approxTextWidth = Text.getApproximateWidth(text.string, text.height);
-    const updatedTextPosition = this.getTextPosition(Pt13e, Pt14e, approxTextWidth);
-    text.points = [updatedTextPosition];
 
     entities.push(text);
 
+    const extLineOneStart = Pt13.project(projectAngle, DIMEXO);
+    const extLineTwoStart = Pt14.project(projectAngle, DIMEXO);
 
-    // generate extension line points
-    // get style properties
-    const extension = style.getValue('DIMEXE');
-    const offset = style.getValue('DIMEXO');
-
-    const extLineOneStart = Pt13.project(projectAngle, offset);
-    const extLineTwoStart = Pt14.project(projectAngle, offset);
-
-    const extLineOneEnd = Pt13e.project(projectAngle, extension);
-    const extLineTwoEnd = Pt14e.project(projectAngle, extension);
+    const extLineOneEnd = Pt13e.project(projectAngle, DIMEXE);
+    const extLineTwoEnd = Pt14e.project(projectAngle, DIMEXE);
 
     // generate dimension line points
     const dimLineOneStart = Pt13e;
@@ -228,7 +270,7 @@ export class AlignedDimension extends BaseDimension {
     let dimLineTwoEnd = dimLineOneEnd;
 
     // split the dimension line when the text is centered vertically
-    if (style.getValue('DIMTAD') === 0) {
+    if (DIMTAD === 0 && DIMJUST <= 2) {
       dimLineOneEnd = dimLineOneEnd.project(Pt14e.angle(Pt13e), approxTextWidth * 0.75);
       dimLineTwoEnd = dimLineTwoEnd.project(Pt13e.angle(Pt14e), approxTextWidth * 0.75);
     }
@@ -261,12 +303,8 @@ export class AlignedDimension extends BaseDimension {
       entities.push(dimLine2, arrowHead2);
     }
 
-    }
-    */
-
     return entities;
   }
-
 
   /**
    * Write the entity to file in the dxf format
