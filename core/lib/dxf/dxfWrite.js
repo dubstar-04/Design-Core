@@ -18,6 +18,8 @@ export class DXFWriter {
     file.writeGroupCode('1', file.version);
     file.writeGroupCode('9', '$CLAYER');
     file.writeGroupCode('8', DesignCore.LayerManager.getCstyle());
+    file.writeGroupCode('9', '$DIMSTYLE');
+    file.writeGroupCode('2', DesignCore.DimStyleManager.getCstyle());
     file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
     file.writeGroupCode('5', file.formatHandle(DesignCore.Scene.items.length + 200), DXFFile.Version.R2000); // TODO: This needs to reflect the actual handle values
     file.writeGroupCode('0', 'ENDSEC');
