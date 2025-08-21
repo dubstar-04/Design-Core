@@ -365,7 +365,13 @@ export class AngularDimension extends BaseDimension {
 
     const arcMiddle = intersectPt.project(intersectPt.angle(arrow1pos.midPoint(arrow2pos)), distance);
     const textPosition = arcMiddle;
-    const textRotation = arrow1pos.angle(arrow2pos);
+
+    const textRotation = 0;
+    if (this.getDimensionStyle().getValue('DIMTOH') === 0) {
+    // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+    // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+      textRotation = arrow1pos.angle(arrow2pos);
+    }
 
     // Get the dimension text using the value, position and rotation
     const text = this.getDimensionText(Utils.radians2degrees(dimension), textPosition, textRotation);
