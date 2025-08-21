@@ -198,7 +198,7 @@ export class BaseDimension extends Entity {
   }
 
   /**
-   * Get the dimension value
+   * Get the dimension value formatted according to the dimension style
    * @param {number} dimensionValue - the value to format
    * @return {string} - the formatted dimension value
    */
@@ -245,21 +245,18 @@ export class BaseDimension extends Entity {
 
     switch (this.getBaseDimType()) {
       case 0: // Rotated, horizontal, or vertical
-        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}`;
-        break;
       case 1: // Aligned
-        precision = this.getDimensionStyle().getValue('DIMDEC');
-        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}`;
+        formattedDimensionValue = `${Math.abs(dimensionValue).toFixed(precision)}`;
         break;
       case 2: // Angular
-        precision = this.getDimensionStyle().getValue('DIMADEC');
-        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}${Strings.Symbol.DEGREE}`;
+        precision = this.getDimensionStyle().getValue('DIMADEC'); // Angular Precision
+        formattedDimensionValue = `${Math.abs(dimensionValue).toFixed(precision)}${Strings.Symbol.DEGREE}`;
         break;
       case 3: // Diameter
-        formattedDimensionValue = `${Strings.Symbol.DIAMETER}${Math.abs(dimensionValue.toFixed(precision))}`;
+        formattedDimensionValue = `${Strings.Symbol.DIAMETER}${Math.abs(dimensionValue).toFixed(precision)}`;
         break;
       case 4: // Radius
-        formattedDimensionValue = `${Strings.Symbol.RADIUS}${Math.abs(dimensionValue.toFixed(precision))}`;
+        formattedDimensionValue = `${Strings.Symbol.RADIUS}${Math.abs(dimensionValue).toFixed(precision)}`;
         break;
       case 5: // Angular 3 point
         precision = this.getDimensionStyle().getValue('DIMADEC');
@@ -267,10 +264,10 @@ export class BaseDimension extends Entity {
         break;
       case 6: // Ordinate
         // Ordinate dimensions are typically used to indicate the X or Y coordinate of a point
-        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))} ${Strings.Symbol.UNITS}`;
+        formattedDimensionValue = `${Math.abs(dimensionValue).toFixed(precision)} ${Strings.Symbol.UNITS}`;
         break;
       default:
-        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}`;
+        formattedDimensionValue = `${Math.abs(dimensionValue).toFixed(precision)}`;
     }
 
     // Handle textOverride
@@ -325,7 +322,6 @@ export class BaseDimension extends Entity {
   getDimensionStyle() {
     return DesignCore.DimStyleManager.getItemByName(this.dimensionStyle);
   }
-
 
   /**
    * Get the point for the sequence number
