@@ -118,6 +118,8 @@ export class RadialDimension extends BaseDimension {
     const DIMTXT = this.getDimensionStyle().getValue('DIMTXT');
     // Force Extension Line - If text outside extensions, force line extensions between extensions if nonzero
     const DIMTOFL = this.getDimensionStyle().getValue('DIMTOFL');
+    // Text vertical position - 0 = Aligns text with the dimension line
+    const DIMTAD = this.getDimensionStyle().getValue('DIMTAD');
 
     // Ensure points are aligned Pt10 > Pt15 > Pt11
     // This resets the points to a known state to allow application of the dimstyle
@@ -136,7 +138,6 @@ export class RadialDimension extends BaseDimension {
       Pt11 = Pt15.project(Pt10.angle(Pt11), DIMASZ + DIMTXT);
     }
 
-    const lineLength = Pt15.distance(Pt11);
     const formattedDimensionValue = this.getDimensionValue(dimension);
     // approximate text width based on height
     const approxTextWidth = Text.getApproximateWidth(formattedDimensionValue, DIMTXT);
@@ -165,6 +166,10 @@ export class RadialDimension extends BaseDimension {
     }
 
     // Add the dimension line and arrow head
+    let lineLength = Pt15.distance(Pt11);
+    if (DIMTAD !== 0) {
+      lineLength = lineLength + approxTextWidth + DIMTXT; // Add text offset to line length
+    }
     const startPoint = DIMTOFL ? Pt10 : Pt15;
     const endPoint = Pt15.project(Pt10.angle(Pt15), isInside ? -lineLength : lineLength);
     const line = new Line({ points: [startPoint, endPoint] });
