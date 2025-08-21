@@ -1,6 +1,8 @@
 import { Strings } from '../lib/strings.js';
 import { Line } from './line.js';
 import { Text } from './text.js';
+import { Point } from './point.js';
+import { Intersection } from '../lib/intersect.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
@@ -79,16 +81,16 @@ export class RadialDimension extends BaseDimension {
    * @param {any} items
    * @return {Array} array of points
    */
-  static getPointsFromSelection(items) {
+  static getPointsFromSelection(items, textPos) {
     const item = items[0];
-    const mousePoint = DesignCore.Mouse.pointOnScene();
-    const center = item.points[0];
-    center.sequence = 10;
-    const angle = center.angle(mousePoint);
-    const radPoint = center.project(angle, item.getRadius());
-    radPoint.sequence = 15;
+    const Pt11 = textPos;
+    Pt11.sequence = 11;
+    const Pt10 = item.points[0]; // Centre
+    Pt10.sequence = 10;
+    const Pt15 = Pt10.project(Pt10.angle(Pt11), item.getRadius());// Radius
+    Pt15.sequence = 15;
 
-    const points = [center, radPoint];
+    const points = [Pt10, Pt15, Pt11];
     return points;
   }
 
@@ -99,43 +101,86 @@ export class RadialDimension extends BaseDimension {
    */
   buildDimension() {
     // Radius
-
     let dimension = 0;
     const entities = [];
 
     const Pt15 = this.getPointBySequence(this.points, 15); // radius point
     const Pt10 = this.getPointBySequence(this.points, 10); // center point
-    const Pt11 = this.getPointBySequence(this.points, 11); // text position
+    let Pt11 = this.getPointBySequence(this.points, 11); // text position
 
-    const textPosition = Pt11;
-    const textRotation = Pt15.angle(Pt10);
+    // DIMTIH inside text alignment
+    const DIMTIH = this.getDimensionStyle().getValue('DIMTIH');
+    // DIMTOH outside text alignment
+    const DIMTOH = this.getDimensionStyle().getValue('DIMTOH');
+    // Arrow size - use for extension line length
+    const DIMASZ = this.getDimensionStyle().getValue('DIMASZ');
+    // Text Size - use for extimated text width
+    const DIMTXT = this.getDimensionStyle().getValue('DIMTXT');
+    // Force Extension Line - If text outside extensions, force line extensions between extensions if nonzero
+    const DIMTOFL = this.getDimensionStyle().getValue('DIMTOFL');
+
+    // Ensure points are aligned Pt10 > Pt15 > Pt11
+    // This resets the points to a known state to allow application of the dimstyle
+    if (Pt15.isOnLine(Pt10, Pt11) === false) {
+      // Find the intersection between Pt10 > Pt15 and a horizontal ray from Pt11
+      const line2 = { start: Pt10, end: Pt15 };
+      const line1 = { start: Pt11, end: new Point(Pt10.x, Pt11.y) };
+      const intersect = Intersection.intersectLineLine(line1, line2, true);
+      // Reset Pt11 - This should be the same as the originally selected Pt11
+      // Pt11 position can be changed depending on the dimstyle
+      Pt11 = intersect.points[0];
+    }
+
+    // set a minimum postion for the text
+    if (Pt15.distance(Pt11) < DIMASZ + DIMTXT) {
+      Pt11 = Pt15.project(Pt10.angle(Pt11), DIMASZ + DIMTXT);
+    }
+
+    const lineLength = Pt15.distance(Pt11);
+    const formattedDimensionValue = this.getDimensionValue(dimension);
+    // approximate text width based on height
+    const approxTextWidth = Text.getApproximateWidth(formattedDimensionValue, DIMTXT);
+
+    // let textPosition = Pt11;
+    let textPosition = Pt11.project(Pt15.angle(Pt11), approxTextWidth * 0.5 + DIMTXT);
+    let textRotation = Pt15.angle(Pt10);
     dimension = Pt15.distance(Pt10);
+
+    const isInside = Pt10.distance(Pt11) < Pt10.distance(Pt15);
+
+    // Check if the dimension text is aligned with the dimension line or horizontal
+    // This is determined by the DIMTIH and DIMTOH values
+    // 0 = Aligns text with the dimension line
+    // 1 = Draws text horizontally
+    if (isInside && DIMTIH === 1 || !isInside && DIMTOH === 1) {
+      // get a + or - to define the direction of the extension line - Reverse for internal radius dimension
+      const extLineDirection = isInside ? Math.sign(Pt10.x - Pt11.x) : Math.sign(Pt11.x - Pt10.x);
+      const extLineEnd = new Point(Pt11.x + DIMASZ * extLineDirection, Pt11.y);
+      const extLine = new Line({ points: [Pt11, extLineEnd] });
+      textRotation = 0;
+      if (Pt10.isSame(Pt11) === false) {
+        textPosition = extLineEnd.project(Pt11.angle(extLineEnd), approxTextWidth * 0.5 + DIMTXT);
+        entities.push(extLine);
+      }
+    }
+
+    // Add the dimension line and arrow head
+    const startPoint = DIMTOFL ? Pt10 : Pt15;
+    const endPoint = Pt15.project(Pt10.angle(Pt15), isInside ? -lineLength : lineLength);
+    const line = new Line({ points: [startPoint, endPoint] });
+    const arrowDirection = isInside ? Pt15.angle(Pt10) : Pt10.angle(Pt15);
+    const arrowHead = this.getArrowHead(Pt15, arrowDirection);
+    entities.push(line, arrowHead);
 
     // Get the dimension text using the value, position and rotation
     const text = this.getDimensionText(dimension, textPosition, textRotation);
     entities.push(text);
 
-    // approximate text width based on height
-    const approxTextWidth = Text.getApproximateWidth(text.string, text.height);
-    const lineLength = Pt15.distance(Pt11) - approxTextWidth;
-
-    // If the text is outside the radius
-    // Draw an extra line
-    if (dimension < Pt10.distance(Pt11)) {
-      // Text is outside the radius
-      const endPoint = Pt15.project(Pt10.angle(Pt15), lineLength);
-      const line1 = new Line({ points: [Pt15, endPoint] });
-      const arrowHead1 = this.getArrowHead(Pt15, Pt10.angle(Pt11));
-      entities.push(line1, arrowHead1);
-    } else {
-      // Text is inside the radius
-      const endPoint = Pt15.project(Pt10.angle(Pt15), -lineLength);
-      const line1 = new Line({ points: [Pt15, endPoint] });
-      const arrowHead1 = this.getArrowHead(Pt15, Pt11.angle(Pt10));
-      entities.push(line1, arrowHead1);
+    // If DIMTOFL is true, the centre mark is not drawn
+    if (!DIMTOFL) {
+    // Add the centre mark for radial dimensions
+      entities.push(...this.getCentreMark(Pt10));
     }
-
-    entities.push(...this.getCentreMark(Pt10));
 
     return entities;
   }
@@ -146,7 +191,7 @@ export class RadialDimension extends BaseDimension {
    */
   dxf(file) {
     const Pt10 = this.getPointBySequence(this.points, 10);
-    const Pt11 = this.getPointBySequence(this.points, 10);
+    const Pt11 = this.getPointBySequence(this.points, 11);
     const Pt15 = this.getPointBySequence(this.points, 15);
 
     file.writeGroupCode('0', 'DIMENSION');
@@ -162,7 +207,7 @@ export class RadialDimension extends BaseDimension {
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
     file.writeGroupCode('70', this.dimType); // DIMENSION TYPE
-    file.writeGroupCode('3', 'STANDARD'); // DIMENSION STYLE
+    file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbRadialDimension', DXFFile.Version.R2000);
     file.writeGroupCode('15', Pt15.x); // X - End of Dimension Line
     file.writeGroupCode('25', Pt15.y); // Y
