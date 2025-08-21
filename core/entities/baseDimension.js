@@ -301,17 +301,14 @@ export class BaseDimension extends Entity {
     text.points = [textPosition];
 
     // set the text rotation
-    if (this.getDimensionStyle().getValue('DIMTIH') === 0) {
-      // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
-      // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
-
-      // Ensure the text is orientated correctly
-      if (textRotation > Math.PI / 2 && textRotation <= Math.PI * 1.5) {
-        textRotation = textRotation + Math.PI;
-      }
-
-      text.setRotation(Utils.radians2degrees(textRotation));
+    // Ensure the text is orientated correctly
+    if (textRotation > Math.PI / 2 && textRotation <= Math.PI * 1.5) {
+      textRotation = textRotation + Math.PI;
     }
+
+    text.setRotation(Utils.radians2degrees(textRotation));
+
+
     return text;
   }
 
