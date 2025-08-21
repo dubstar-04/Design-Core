@@ -74,7 +74,7 @@ export class DimStyle {
       const err = 'DXF Groupcode 7 - obsolete';
       Logging.instance.warn(`${this.type} - ${err}`);
     }
-    this.DIMBLK2 = Property.loadValue([data.xx, data[7]], 'CloseFilled');
+    this.DIMBLK2 = Property.loadValue([data.DIMBLK2, data[7]], 'CloseFilled');
 
     // DXF Groupcode 40 - dimension scale
     /*
@@ -169,7 +169,7 @@ export class DimStyle {
     // 0 = Dimension limits are not generated as default text
     // 1 = Dimension limits are generated as default text
     // Setting DIMLIM to on (1) turns DIMTOL off (0)
-    this.DIMLIM = Property.loadValue([data.DIMLIM, data[72]], 1);
+    this.DIMLIM = Property.loadValue([data.DIMLIM, data[72]], 0);
 
     // DXF Groupcode 73 - Text inside horizontal if nonzero
     // 0 = Aligns text with the dimension line
@@ -205,7 +205,7 @@ export class DimStyle {
         4 = Suppresses leading zeros in decimal dimensions (for example, 0.5000 becomes .5000)
         8 = Suppresses trailing zeros in decimal dimensions (for example, 12.5000 becomes 12.5)
         12 = Suppresses both leading and trailing zeros (for example, 0.5000 becomes .5)
-        */
+    */
     this.DIMZIN = Property.loadValue([data.DIMZIN, data[78]], 0);
 
     // DXF Groupcode 170 - Alternate unit dimensioning performed if nonzero
@@ -213,16 +213,16 @@ export class DimStyle {
 
     // DXF Groupcode 171 - Alternate unit decimal places
     // If DIMALT is turned on, DIMALTD sets the number of digits displayed to the right of the decimal point in the alternate measurement.
-    this.DIMALTD = Property.loadValue([data.xx, data[171]], 2);
+    this.DIMALTD = Property.loadValue([data.DIMALTD, data[171]], 2);
 
     // DXF Groupcode 172 - If text outside extensions, force line extensions between extensions if nonzero
-    this.DIMTOFL = Property.loadValue([data.DIMALTD, data[172]], '');
+    this.DIMTOFL = Boolean(Property.loadValue([data.DIMTOFL, data[172]], 0));
 
     // DXF Groupcode 173 - Use separate arrow blocks if nonzero
     /*
         Off = Use arrowhead blocks set by DIMBLK
         On = Use arrowhead blocks set by DIMBLK1 and DIMBLK2
-        */
+    */
     this.DIMSAH = Property.loadValue([data.DIMSAH, data[173]], 0);
 
     // DXF Groupcode 174 - Force text inside extensions if nonzero
@@ -231,7 +231,7 @@ export class DimStyle {
         For linear and angular dimensions, text is placed inside the extension lines if there is sufficient room.
         For radius and diameter dimensions that don’t fit inside the circle or arc, DIMTIX has no effect and always forces the text outside the circle or arc.
         On = Draws dimension text between the extension lines even if it would ordinarily be placed outside those lines
-        */
+    */
     this.DIMTIX = Property.loadValue([data.DIMTIX, data[174]], 0);
 
     // DXF Groupcode 175 - Suppress outside-extensions dimension lines if nonzero
@@ -241,7 +241,7 @@ export class DimStyle {
 
         Off = Arrowheads are not suppressed
         On = Arrowheads are suppressed
-        */
+    */
     this.DIMSOXD = Property.loadValue([data.DIMSOXD, data[175]], 0);
 
     // DXF Groupcode 176 - Dimension line color, range is 0 = BYBLOCK, 256 = BYLAYER
@@ -254,8 +254,7 @@ export class DimStyle {
     this.DIMCLRT = Property.loadValue([data.DIMCLRT, data[178]], 0);
 
     // DXF Groupcode 179 - Number of precision places displayed in angular dimensions
-    this.DIMADEC = Property.loadValue([data.DIMADEC, data[179]], 1);
-
+    this.DIMADEC = Property.loadValue([data.DIMADEC, data[179]], 0);
 
     if (data.hasOwnProperty('DIMUNIT') || data.hasOwnProperty('270')) {
       // DXF Groupcode 270 - (obsolete, now use DIMLUNIT AND DIMFRAC)
@@ -325,7 +324,7 @@ export class DimStyle {
 
     // DXF Groupcode 283 - Vertical justification for tolerance values:
     // 0 = Top; 1 = Middle; 2 = Bottom
-    this.DIMTOLJ = Property.loadValue([data.DIMTOLJ, data[283]], '');
+    this.DIMTOLJ = Property.loadValue([data.DIMTOLJ, data[283]], 1);
 
     // DXF Groupcode 284 - Controls suppression of zeros for tolerance values:
     // 0 = Suppresses zero feet and precisely zero inches
@@ -544,7 +543,7 @@ export class DimStyle {
     file.writeGroupCode('78', this.DIMZIN);
     file.writeGroupCode('170', this.DIMALT);
     file.writeGroupCode('171', this.DIMALTD);
-    file.writeGroupCode('172', this.DIMTOFL);
+    file.writeGroupCode('172', this.DIMTOFL ? 1 : 0); // convert bool to int
     file.writeGroupCode('173', this.DIMSAH);
     file.writeGroupCode('174', this.DIMTIX);
     file.writeGroupCode('175', this.DIMSOXD);
