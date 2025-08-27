@@ -370,7 +370,7 @@ export class AngularDimension extends BaseDimension {
     const arcMiddle = intersectPt.project(intersectPt.angle(arrow1pos.midPoint(arrow2pos)), distance);
     const textPosition = arcMiddle;
 
-    const textRotation = 0;
+    let textRotation = 0;
     if (this.getDimensionStyle().getValue('DIMTOH') === 0) {
     // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
     // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
