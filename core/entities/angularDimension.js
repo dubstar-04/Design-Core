@@ -126,7 +126,7 @@ export class AngularDimension extends BaseDimension {
    * @param {any} items
    * @return {Array} array of points
    */
-  static getPointsFromSelection(items) {
+  static getPointsFromSelection(items, textPos) {
   // Transform the items into points
   // Do nothing more than transform the items into points
 
@@ -165,6 +165,10 @@ export class AngularDimension extends BaseDimension {
     const Pt14 = new Point(tempPt14.x, tempPt14.y);
     Pt14.sequence = 14;
     points.push(Pt14);
+
+    const Pt11 = new Point(textPos.x, textPos.y);
+    Pt11.sequence = 11;
+    points.push(Pt11);
 
     return points;
   }
