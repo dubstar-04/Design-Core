@@ -128,7 +128,7 @@ export class AngularDimension extends BaseDimension {
    */
   static getPointsFromSelection(items) {
   // Transform the items into points
-  // Do nothing more that transform the items into points
+  // Do nothing more than transform the items into points
 
     const points = [];
     const item1 = items[0];
