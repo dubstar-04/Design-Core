@@ -457,7 +457,7 @@ export class AngularDimension extends BaseDimension {
 
     // check if the dimension is beyond the limits of the selection
     // add extension line one
-    if (distance > intersectPt.distance(line1Extents) + offset * 2) {
+    if (distance > intersectPt.distance(line1Extents) + extension) {
       const extensionLineOneStart = intersectPt.project(intersectPt.angle(arrow1pos), intersectPt.distance(line1Extents) + offset);
       const extensionLineOneEnd = intersectPt.project(intersectPt.angle(arrow1pos), distance + extension);
       const extensionLineOne = new Line({ points: [extensionLineOneStart, extensionLineOneEnd] });
@@ -469,7 +469,7 @@ export class AngularDimension extends BaseDimension {
 
     // check if the dimension is beyond the limits of the selection
     // add extension line two
-    if (distance > intersectPt.distance(line2Extents) + offset * 2) {
+    if (distance > intersectPt.distance(line2Extents) + extension) {
       const extensionLineTwoStart = intersectPt.project(intersectPt.angle(arrow2pos), intersectPt.distance(line2Extents) + offset);
       const extensionLineTwoEnd = intersectPt.project(intersectPt.angle(arrow2pos), distance + extension);
       const extensionLineTwo = new Line({ points: [extensionLineTwoStart, extensionLineTwoEnd] });
