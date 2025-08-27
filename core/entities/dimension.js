@@ -17,6 +17,7 @@ import { Intersection } from '../lib/intersect.js';
 import { DesignCore } from '../designCore.js';
 import { SingleSelection } from '../lib/selectionManager.js';
 import { Utils } from '../lib/utils.js';
+import { Property } from '../properties/property.js';
 
 /**
  * Dimension Entity Class
@@ -44,7 +45,9 @@ export class Dimension extends BaseDimension {
     this.selectedItems = [];
 
     if (data) {
-      const dimType = (data[70] || data.dimType) % 32;
+      let dimType = Property.loadValue([data[70], data.dimType], 0);
+      // TODO: dimType needs to be a flag object
+      dimType = dimType % 32; // remove the flag values
 
       if (Number.isInteger(dimType) && dimType >= 0 && dimType <= 6) {
         const item = new this.dimensionMap[dimType](data);
@@ -54,14 +57,13 @@ export class Dimension extends BaseDimension {
 
         if (linkedBlockIndex.length) {
           // remove the block from the scene, dimensions manage their block internally
-          // const removed =
           DesignCore.Scene.removeItem(linkedBlockIndex[0]);
         }
 
         return item;
       } else {
         const msg = 'Invalid DimType';
-        const err = (`${this.type} - ${msg}`);
+        const err = (`${this.type} - ${msg}: ${dimType}`);
         throw Error(err);
       }
     }
