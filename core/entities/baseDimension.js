@@ -301,24 +301,23 @@ export class BaseDimension extends Entity {
     text.points = [textPosition];
 
     // set the text rotation
-    // Ensure the text is orientated correctly
-    if (textRotation > Math.PI / 2 && textRotation <= Math.PI * 1.5) {
-      textRotation = textRotation + Math.PI;
-    }
-
-    text.setRotation(Utils.radians2degrees(textRotation));
-
+    text.setRotation(Utils.radians2degrees(this.getTextDirection(textRotation)));
 
     return text;
   }
 
   /**
-   * Get the text position based on the dimension style
-   * @param {*} textPosition
-   * @param {*} textRotation
-   * @return {Point} - The adjusted text position
+   * Get the text direction ensuring it is always oriented correctly
+   * @param {number} textDirection - the direction of the text (radians)
+   * @return {number} - the adjusted text direction (radians)
    */
+  getTextDirection(textDirection) {
+    // Ensure the text is orientated correctly
+    if (textDirection > Math.PI / 2 && textDirection <= Math.PI * 1.5) {
+      textDirection = textDirection + Math.PI;
     }
+    return textDirection;
+  }
 
     return formattedTextPosition;
   }
