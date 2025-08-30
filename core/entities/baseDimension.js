@@ -319,7 +319,18 @@ export class BaseDimension extends Entity {
     return textDirection;
   }
 
-    return formattedTextPosition;
+  /**
+   * Check if two angles are aligned or opposite
+   * @param {number} angle1 in radians
+   * @param {number} angle2 in radians
+   * @return {boolean} true if aligned or opposite
+   */
+  alignedOrOpposite(angle1, angle2) {
+    const firstAngle = Utils.round(angle1 % (Math.PI * 2));
+    const secondAngle = Utils.round(angle2 % (Math.PI * 2));
+    const reversedSecondAngle = Utils.round((angle2 + Math.PI) % (Math.PI * 2));
+
+    return (firstAngle === secondAngle || firstAngle === reversedSecondAngle);
   }
 
   /**
