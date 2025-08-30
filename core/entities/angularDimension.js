@@ -307,7 +307,7 @@ export class AngularDimension extends BaseDimension {
     const intersect = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true);
     const intersectPt = intersect.points[0];
 
-    const distance = intersectPt.distance(Pt11);
+    const radius = intersectPt.distance(Pt16);
 
     const quadOneStart = Pt14;
     const quadOneEnd = Pt10;
@@ -329,7 +329,7 @@ export class AngularDimension extends BaseDimension {
     if (Pt16.isOnArc(quadOneStart, quadOneEnd, intersectPt, 1)) {
       arrow1pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
       line1Extents = Pt14;
-      arrow2pos = intersectPt.project(intersectPt.angle(quadOneEnd), distance);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
       line2Extents = Pt10;
     }
 
@@ -337,7 +337,7 @@ export class AngularDimension extends BaseDimension {
     if (Pt16.isOnArc(quadOneEnd, quadTwoStart, intersectPt, 1)) {
       arrow1pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
       line1Extents = Pt10;
-      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoStart), distance);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
       line2Extents = Pt13;
     }
 
@@ -345,7 +345,7 @@ export class AngularDimension extends BaseDimension {
     if (Pt16.isOnArc(quadTwoStart, quadTwoEnd, intersectPt, 1)) {
       arrow1pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
       line1Extents = Pt13;
-      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoEnd), distance);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
       line2Extents = Pt15;
     }
 
@@ -353,7 +353,7 @@ export class AngularDimension extends BaseDimension {
     if (Pt16.isOnArc(quadTwoEnd, quadOneStart, intersectPt, 1)) {
       arrow1pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
       line1Extents = Pt15;
-      arrow2pos = intersectPt.project(intersectPt.angle(quadOneStart), distance);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
       line2Extents = Pt14;
     }
 
@@ -367,7 +367,7 @@ export class AngularDimension extends BaseDimension {
       dimension = dimension + Math.PI * 2;
     }
 
-    const arcMiddle = intersectPt.project(intersectPt.angle(arrow1pos.midPoint(arrow2pos)), distance);
+    const arcMiddle = intersectPt.project(intersectPt.angle(arrow1pos.midPoint(arrow2pos)), radius);
     const textPosition = arcMiddle;
 
     let textRotation = 0;
@@ -397,7 +397,7 @@ export class AngularDimension extends BaseDimension {
     // circumference = 2*PI*radius
     // approximate text width based on height
     const approxTextWidth = Text.getApproximateWidth(text.string, text.height) * 1.25;// 1.25 is a factor to ensure the text is not too close to the arc
-    const circumference = 2 * Math.PI * distance;
+    const circumference = 2 * Math.PI * radius;
     const circumferencePerRadian = (2 * Math.PI) / circumference;
     const arcAdjustment = (approxTextWidth / 2) * circumferencePerRadian;
 
