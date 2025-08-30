@@ -298,7 +298,6 @@ export class BaseDimension extends Entity {
     text.string = this.getDimensionValue(textValue);
     // set the text position
     text.points = [textPosition];
-
     // set the text rotation
     text.setRotation(Utils.radians2degrees(this.getTextDirection(textRotation)));
 
