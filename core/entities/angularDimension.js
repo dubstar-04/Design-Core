@@ -289,7 +289,6 @@ export class AngularDimension extends BaseDimension {
     //  /        \
     //             14
 
-    // Type 2 - Angular dimension
     let dimension = 0;
     const entities = [];
 
@@ -302,6 +301,28 @@ export class AngularDimension extends BaseDimension {
     const Pt10 = this.getPointBySequence(sortedPoints, 10); // Pt10 is the second line end point
 
     const Pt16 = this.getPointBySequence(this.points, 16); // Pt16 is the arc position
+    // const Pt11 = this.getPointBySequence(this.points, 11); // Pt11 is the text position
+
+    // DIMTIH inside text alignment
+    const DIMTIH = this.getDimensionStyle().getValue('DIMTIH');
+    // DIMTOH outside text alignment
+    const DIMTOH = this.getDimensionStyle().getValue('DIMTOH');
+    // Arrow size - use for extension line length
+    const DIMASZ = this.getDimensionStyle().getValue('DIMASZ');
+    // Text Size - use for extimated text width
+    const DIMTXT = this.getDimensionStyle().getValue('DIMTXT');
+    // Force Extension Line - If text outside extensions, force line extensions between extensions if nonzero
+    const DIMTOFL = this.getDimensionStyle().getValue('DIMTOFL');
+    // Text vertical position - 0 = Aligns text with the dimension line
+    const DIMTAD = this.getDimensionStyle().getValue('DIMTAD');
+    // Extend beyond dim line distance
+    const DIMEXE = this.getDimensionStyle().getValue('DIMEXE');
+    // Offset from origin distance
+    const DIMEXO = this.getDimensionStyle().getValue('DIMEXO');
+    // Justification of the dimension text
+    const DIMJUST = this.getDimensionStyle().getValue('DIMJUST');
+    // Gap between dimension line and text
+    const DIMGAP = this.getDimensionStyle().getValue('DIMGAP');
 
     // Find the line intersection point
     const intersect = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true);
@@ -371,7 +392,7 @@ export class AngularDimension extends BaseDimension {
     const textPosition = arcMiddle;
 
     let textRotation = 0;
-    if (this.getDimensionStyle().getValue('DIMTOH') === 0) {
+    if (DIMTOH === 0) {
     // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
     // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
       textRotation = arrow1pos.angle(arrow2pos);
@@ -381,12 +402,14 @@ export class AngularDimension extends BaseDimension {
     const text = this.getDimensionText(Utils.radians2degrees(dimension), textPosition, textRotation);
     entities.push(text);
 
+    /*
     // Create the arrow heads
-    const arrowsize = this.getDimensionStyle().getValue('DIMASZ');
+    */
+
     // Arrow alignement - Calculate the distance from the arc tangent to the arc at <arrow size> along the tangent
-    const arcOffset = distance - Math.sqrt(distance * distance - arrowsize * arrowsize);
+    const arcOffset = radius - Math.sqrt(radius * radius - DIMASZ * DIMASZ);
     // Calculate the angle from the arc tangent (perpendicular to the extension line) to the arc at <arrow size> along the tangent
-    const arcRotationOffset = Math.asin(arcOffset / arrowsize);
+    const arcRotationOffset = Math.asin(arcOffset / DIMASZ);
     // Calculate the arrow head rotation to align with the arc
     const arrowRotation = Math.PI / 2 + arcRotationOffset;
     const arrowHead1 = this.getArrowHead(arrow1pos, intersectPt.angle(arrow1pos) + arrowRotation);
@@ -450,16 +473,15 @@ export class AngularDimension extends BaseDimension {
       entities.push(q2e);
     }
 
+    /*
     // generate extension line points
-    // get style properties
-    const extension = style.getValue('DIMEXE');
-    const offset = style.getValue('DIMEXO');
+    */
 
     // check if the dimension is beyond the limits of the selection
     // add extension line one
-    if (distance > intersectPt.distance(line1Extents) + extension) {
-      const extensionLineOneStart = intersectPt.project(intersectPt.angle(arrow1pos), intersectPt.distance(line1Extents) + offset);
-      const extensionLineOneEnd = intersectPt.project(intersectPt.angle(arrow1pos), distance + extension);
+    if (radius > intersectPt.distance(line1Extents) + DIMEXE) {
+      const extensionLineOneStart = intersectPt.project(intersectPt.angle(arrow1pos), intersectPt.distance(line1Extents) + DIMEXO);
+      const extensionLineOneEnd = intersectPt.project(intersectPt.angle(arrow1pos), radius + DIMEXE);
       const extensionLineOne = new Line({ points: [extensionLineOneStart, extensionLineOneEnd] });
       // Supress extension line 1 if DIMS1 is true
       if (!style.getValue('DIMSE1')) {
@@ -469,9 +491,9 @@ export class AngularDimension extends BaseDimension {
 
     // check if the dimension is beyond the limits of the selection
     // add extension line two
-    if (distance > intersectPt.distance(line2Extents) + extension) {
-      const extensionLineTwoStart = intersectPt.project(intersectPt.angle(arrow2pos), intersectPt.distance(line2Extents) + offset);
-      const extensionLineTwoEnd = intersectPt.project(intersectPt.angle(arrow2pos), distance + extension);
+    if (radius > intersectPt.distance(line2Extents) + DIMEXE) {
+      const extensionLineTwoStart = intersectPt.project(intersectPt.angle(arrow2pos), intersectPt.distance(line2Extents) + DIMEXO);
+      const extensionLineTwoEnd = intersectPt.project(intersectPt.angle(arrow2pos), radius + DIMEXE);
       const extensionLineTwo = new Line({ points: [extensionLineTwoStart, extensionLineTwoEnd] });
       // Supress extendsion line 2 if DIMSE2 is true
       if (!style.getValue('DIMSE2')) {
