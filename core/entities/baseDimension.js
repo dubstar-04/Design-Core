@@ -318,40 +318,6 @@ export class BaseDimension extends Entity {
    * @param {*} textRotation
    * @return {Point} - The adjusted text position
    */
-  getTextPosition(textPosition, textRotation) {
-    const DIMTXT = this.getDimensionStyle().getValue('DIMTXT');
-    const DIMTAD = this.getDimensionStyle().getValue('DIMTAD');
-    const DIMGAP = this.getDimensionStyle().getValue('DIMGAP');
-
-    let formattedTextPosition = textPosition;
-
-    // Get the direction for the dimension text offset
-    const textOffsetDirection = textRotation - Math.PI / 2; // Offset text perpendicular to dimension line
-
-    switch (DIMTAD) {
-      case 0:
-        // 0 = Centers the dimension text between the extension lines.
-        break;
-      case 1:
-      case 3:
-        // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1).
-        // The distance from the dimension line to the baseline of the lowest line of text is the current DIMGAP value.
-        formattedTextPosition = textPosition.project(textOffsetDirection, DIMTXT * 0.5 + DIMGAP); // Offset text from baseline
-        break;
-      case 2:
-        // 2 = Places the dimension text on the side of the dimension line farthest away from the defining points.
-        const outsideDirection = textOffsetDirection; // dimLineEndPos.angle(dimLineStartPos);
-        formattedTextPosition = textPosition.project(outsideDirection, DIMTXT * 0.5 + DIMGAP); // Offset text from baseline
-        break;
-        // case 3:
-        // 3 = Places the dimension text to conform to Japanese Industrial Standards (JIS).
-        // TODO: Implement JIS dimension text placement
-        // Not supported
-        // break;
-      case 4:
-        // 4 = Places the dimension text below the dimension line.
-        formattedTextPosition = textPosition.project(textOffsetDirection, -DIMTXT * 0.5 - DIMGAP); // Offset text from baseline
-        break;
     }
 
     return formattedTextPosition;
