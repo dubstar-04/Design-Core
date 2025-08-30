@@ -102,11 +102,22 @@ export class AlignedDimension extends BaseDimension {
     const Pt10 = new Point();
     Pt10.sequence = 10;
 
-    const Pt11 = DesignCore.Mouse.pointOnScene();
+    const Pt11 = textPos;
+    Pt11.sequence = 11;
+    points.push(Pt11);
 
     // generate the x and y delta values
     const dx = Pt14.x - Pt13.x;
     const dy = Pt14.y - Pt13.y;
+
+    /*
+    const isCoincident = Pt11.isOnLine(Pt13, Pt14);
+
+    if (isCoincident) {
+      // Text point is coincident with the line, move it off the line
+      Pt11 = Pt11.project(Pt13.angle(Pt14) + Math.PI / 2, 10);
+    }
+    */
 
     const pntPerp = Pt11.perpendicular(Pt13, Pt14);
     const isAligned = pntPerp.isOnLine(Pt13, Pt14);
@@ -169,6 +180,8 @@ export class AlignedDimension extends BaseDimension {
     const DIMEXO = this.getDimensionStyle().getValue('DIMEXO');
     // Justification of the dimension text
     const DIMJUST = this.getDimensionStyle().getValue('DIMJUST');
+    // Gap between dimension line and text
+    const DIMGAP = this.getDimensionStyle().getValue('DIMGAP');
 
     // invalid points
     // if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
@@ -187,11 +200,7 @@ export class AlignedDimension extends BaseDimension {
     const m2 = (Pt14.y - Pt10.y) / (Pt14.x - Pt10.x);
     const perpendicular = Number((m1 * m2).toFixed(1));
 
-    let isAligned = true;
-
-    if (perpendicular !== -1.0) {
-      isAligned = false;
-    }
+    const isAligned = perpendicular !== -1.0 ? false : true;
 
     if (isAligned || Utils.round(dx) === 0 || Utils.round(dy) === 0) {
       Pt13e = Pt13.project(Pt14.angle(Pt10), Pt14.distance(Pt10));
@@ -212,70 +221,196 @@ export class AlignedDimension extends BaseDimension {
       }
     }
 
-    const projectAngle = Pt13.angle(Pt13e);
-    // const midPoint = Pt13e.midPoint(Pt14e);
+    // ensure dimension is positive
+    dimension = Math.abs(dimension);
 
-    const formattedDimensionValue = this.getDimensionValue(dimension);
-    // approximate text width based on height
-    const approxTextWidth = Text.getApproximateWidth(formattedDimensionValue, DIMTXT);
-
+    const extensionLineAngle = Pt13.angle(Pt13e);
+    const reverseExtensionLineAngle = Pt13e.angle(Pt13);
+    const dimLineAngle = Pt13e.angle(Pt14e);
+    const reverseDimLineAngle = Pt14e.angle(Pt13e);
     const midPoint = Pt13e.midPoint(Pt14e);
+
+    // Approximate text width based on height using the formatted dimension value i.e with units, precision and symbols
+    const approxTextWidth = Text.getApproximateWidth(this.getDimensionValue(dimension), DIMTXT);
+    const approxTextHalfWidth = approxTextWidth * 0.5;
+
+    // Check if the text can fit inside extension lines
+    const textOutSide = (approxTextWidth * 1.5 + DIMASZ * 2) >= dimension;
+    // Check if the arrows fit inside the extension lines
+    const arrowsOutSide = (DIMASZ * 3) >= dimension;
+
+    // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+    // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
+    const horizontalText = (DIMTIH !== 0 && !textOutSide) || (DIMTOH !== 0 && textOutSide);
+
     let textPosition = midPoint;
-    let textRotation = Pt13e.angle(Pt14e);
+    let textRotation = this.getTextDirection(horizontalText ? 0 : dimLineAngle);
+
+    // Get the direction for the dimension text offset
+    let textAboveDirection = textRotation + Math.PI / 2;
+    let textAboveDistance = DIMTXT * 0.5 + DIMGAP;
+
+    // get the distance to offset outside the extension lines
+    let outsideOffsetDistance = 0;
+    if (textOutSide) {
+      outsideOffsetDistance = (dimension + approxTextWidth) * 0.5 + DIMASZ + DIMEXE;
+      if (arrowsOutSide) {
+        outsideOffsetDistance += DIMASZ; // Add extra offset if arrows are outside
+      }
+    }
+
+    // get the direction to offset outside the extension lines
+    const outsideOffsetDirection = Pt11.distance(Pt13e) < Pt11.distance(Pt14e) ? reverseDimLineAngle : dimLineAngle;
 
     switch (DIMJUST) {
-      case 0:
-        // 0 = Center-justified between extension lines
+      case 0: // 0 = Center-justified between extension lines
+        if (textOutSide) {
+          textPosition = midPoint.project(outsideOffsetDirection, outsideOffsetDistance);
+        }
         break;
-      case 1:
-        // 1 = Next to first extension line
-        textPosition = Pt13e;
-        textPosition = Pt13e.project(Pt13e.angle(Pt14e), approxTextWidth * 0.75 + DIMASZ); // Offset text from the extension line
-        // textRotation = Pt13e.angle(Pt14e);
+      case 1: // 1 = Next to first extension line
+        if (textOutSide) {
+          textPosition = midPoint.project(outsideOffsetDirection, outsideOffsetDistance);
+        } else {
+          textPosition = Pt13e.project(dimLineAngle, approxTextWidth * 0.75 + DIMASZ);
+        }
         break;
-      case 2:
-        // 2 = Next to second extension line
-        textPosition = Pt14e;
-        textPosition = textPosition.project(Pt14e.angle(Pt13e), approxTextWidth * 0.75 + DIMASZ); // Offset text from the extension line
-        // textRotation = Pt13e.angle(Pt14e);
+      case 2: // 2 = Next to second extension line
+        if (textOutSide) {
+          textPosition = midPoint.project(outsideOffsetDirection, outsideOffsetDistance);
+        } else {
+          textPosition = Pt14e.project(reverseDimLineAngle, approxTextWidth * 0.75 + DIMASZ);
+        }
         break;
-      case 3:
-        // 3 = Above first extension line
-        textPosition = Pt13e.project(projectAngle, approxTextWidth * 0.5 + DIMEXE + DIMTXT);
-        textRotation = textRotation + Math.PI / 2; // Rotate text 90 degrees
+      case 3: // 3 = Above first extension line
+        textPosition = Pt13e.project(extensionLineAngle, approxTextHalfWidth+ DIMEXE + DIMTXT);
+        textRotation = this.getTextDirection(extensionLineAngle);
+        textAboveDirection = textRotation + Math.PI / 2;
         break;
-      case 4:
-        // 4 = Above second extension line
-        textPosition = Pt14e.project(projectAngle, approxTextWidth * 0.5 + DIMEXE + DIMASZ);
-        textRotation = textRotation + Math.PI / 2; // Rotate text 90 degrees
+      case 4: // 4 = Above second extension line
+        textPosition = Pt14e.project(extensionLineAngle, approxTextHalfWidth+ DIMEXE + DIMASZ);
+        textRotation = this.getTextDirection(extensionLineAngle);
+        textAboveDirection = textRotation + Math.PI / 2;
         break;
     }
+
+    // Check if the text is aligned with the dimension line
+    const textAndDimlineAligned = this.alignedOrOpposite(textRotation, dimLineAngle);
+
+    // Check if the text is aligned with the extension line
+    const textAndExtlineAligned = this.alignedOrOpposite(textRotation, extensionLineAngle );
+
+    // Check if the text position is on an extension line
+    let textIsOnExtensionLine = textPosition.perpendicular(Pt13, Pt13e).isSame(textPosition) || textPosition.perpendicular(Pt14, Pt14e).isSame(textPosition);
+
+    // set the text offset to 0 for scenarios where the text offset should not be applied
+    if (!textAndDimlineAligned && !textIsOnExtensionLine) {
+      textAboveDistance = 0;
+    }
+
+    // DIMTAD - Text vertical position
+    switch (DIMTAD) {
+      case 0: // 0 = Centers the dimension text between the extension lines.
+        break;
+      case 1: // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1).
+        textPosition = textPosition.project(textAboveDirection, textAboveDistance);
+        break;
+      case 2: // 2 = Places the dimension text on the side of the dimension line farthest away from the defining points.
+        textPosition = textPosition.project(textAboveDirection, textAboveDistance);
+        break;
+      case 3: // 3 = Places the dimension text to conform to Japanese Industrial Standards (JIS).
+        textPosition = textPosition.project(textAboveDirection, textAboveDistance);
+        break;
+      case 4: // 4 = Places the dimension text below the dimension line.
+        textPosition = textPosition.project(textAboveDirection, -textAboveDistance);
+        break;
+    }
+
 
     // Get the dimension text using the value, position and rotation
     const text = this.getDimensionText(dimension, textPosition, textRotation);
-
     entities.push(text);
 
-    const extLineOneStart = Pt13.project(projectAngle, DIMEXO);
-    const extLineTwoStart = Pt14.project(projectAngle, DIMEXO);
+    /*
+    // Generate points for extension and dimension lines
+    */
 
-    const extLineOneEnd = Pt13e.project(projectAngle, DIMEXE);
-    const extLineTwoEnd = Pt14e.project(projectAngle, DIMEXE);
+    // Get the extension line start and end points
+    // TODO: If DIMTOFL is set force line extensions between extensions if text outside
+    const extLineOneStart = Pt13.project(extensionLineAngle, DIMEXO);
+    const extLineTwoStart = Pt14.project(extensionLineAngle, DIMEXO);
 
+    let extLineOneEnd = Pt13e.project(extensionLineAngle, DIMEXE);
+    let extLineTwoEnd = Pt14e.project(extensionLineAngle, DIMEXE);
+
+    /*
     // generate dimension line points
-    const dimLineOneStart = Pt13e;
-    const dimLineTwoStart = Pt14e;
+    */
 
-    let dimLineOneEnd = textPosition.perpendicular(Pt13e, Pt14e);
+    // get the perpendicular projection of the text position onto the dimension line
+    const textDimlineIntersection = textPosition.perpendicular(Pt13e, Pt14e);
+    // check if the perpendicular projection is on the dimension line
+    const textDimlineIntersectionIsOnDimline = textDimlineIntersection.isOnLine(Pt13e, Pt14e);
+    // Check if the text position is on the dimension line
+    const textIsOnInternalDimLine = textPosition.isOnLine(Pt13e, Pt14e);
+    // Check if the text position is on an extension line
+    textIsOnExtensionLine = textPosition.perpendicular(Pt13, Pt13e).isSame(textPosition) || textPosition.perpendicular(Pt14, Pt14e).isSame(textPosition);
+
+    let dimLineOneStart = Pt13e;
+    let dimLineOneEnd = textDimlineIntersectionIsOnDimline ? textDimlineIntersection : midPoint;
+
+    let dimLineTwoStart = Pt14e;
     let dimLineTwoEnd = dimLineOneEnd;
 
-    // split the dimension line when the text is centered vertically
-    if (DIMTAD === 0 && DIMJUST <= 2) {
-      dimLineOneEnd = dimLineOneEnd.project(Pt14e.angle(Pt13e), approxTextWidth * 0.75);
-      dimLineTwoEnd = dimLineTwoEnd.project(Pt13e.angle(Pt14e), approxTextWidth * 0.75);
+    // Extend dimension line when text is outside the extension lines
+    if (!textDimlineIntersectionIsOnDimline && textAndDimlineAligned) {
+      if (!arrowsOutSide) { // Arrows are inside the extension lines
+        dimLineOneEnd = midPoint;
+        dimLineTwoEnd = midPoint;
+      } else { // Arrows are outside the extension lines
+        dimLineOneEnd = Pt13e;
+        dimLineTwoEnd = Pt14e;
+      }
+      // get the distance to extend the dimension line
+      // when text is vertically centered trim the dimension line back from the text position
+      // when text is not vertically centered extend the dimension line beyond the text position by half the text width
+      const dimlineExtendDistance = textDimlineIntersection.isSame(textPosition) ? approxTextHalfWidth + DIMGAP : -approxTextHalfWidth;
+
+      if (Pt11.distance(Pt13e) < Pt11.distance(Pt14e)) {
+        // Text position is closer to extension line 1
+        dimLineOneStart = textDimlineIntersection.project(dimLineAngle, dimlineExtendDistance);
+      } else {
+        // Text position is closer to extension line 2
+        dimLineTwoStart = textDimlineIntersection.project(reverseDimLineAngle, dimlineExtendDistance);
+      }
     }
 
+    // split the dimension line when the text is centered vertically
+    if (textIsOnInternalDimLine) {
+      dimLineOneEnd = dimLineOneEnd.project(reverseDimLineAngle, approxTextWidth * 0.6);
+      dimLineTwoEnd = dimLineTwoEnd.project(dimLineAngle, approxTextWidth * 0.6);
+    }
+
+    /*
+    // generate extension line points
+    */
+
+    // Extend the extension line when text is alined with the extension line but not on the extension line
+    if (textAndExtlineAligned && !textIsOnExtensionLine && !textIsOnInternalDimLine) {
+      if (Pt11.distance(Pt13e) < Pt11.distance(Pt14e)) {
+        // Text position is closer to extension line 1
+        const dist = extLineOneEnd.distance(textPosition.perpendicular(Pt13, Pt13e)) + approxTextHalfWidth;
+        extLineOneEnd = extLineOneEnd.project(extensionLineAngle, dist);
+      } else {
+        // Text position is closer to extension line 2
+        const dist = extLineTwoEnd.distance(textPosition.perpendicular(Pt14, Pt14e)) + approxTextHalfWidth;
+        extLineTwoEnd = extLineTwoEnd.project(extensionLineAngle, dist);
+      }
+    }
+
+    /*
     // generate dimension geometry
+    */
     const extLine1 = new Line({ points: [extLineOneStart, extLineOneEnd] });
     // Supress extension line 1 if DIMS1 is true
     if (!style.getValue('DIMSE1')) {
@@ -288,8 +423,8 @@ export class AlignedDimension extends BaseDimension {
       entities.push(extLine2);
     }
 
-    const arrowHead1 = this.getArrowHead(Pt13e, Pt13e.angle(Pt14e));
-    const arrowHead2 = this.getArrowHead(Pt14e, Pt14e.angle(Pt13e));
+    const arrowHead1 = this.getArrowHead(Pt13e, arrowsOutSide ? reverseDimLineAngle : dimLineAngle);
+    const arrowHead2 = this.getArrowHead(Pt14e, arrowsOutSide ? dimLineAngle : reverseDimLineAngle);
 
     const dimLine1 = new Line({ points: [dimLineOneStart, dimLineOneEnd] });
     // Supress dimension line 1 if DIMSD1 is true
