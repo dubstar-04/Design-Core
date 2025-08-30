@@ -239,9 +239,8 @@ export class BaseDimension extends Entity {
         8 = Suppresses trailing zeros in decimal dimensions (for example, 12.5000 becomes 12.5)
         12 = Suppresses both leading and trailing zeros (for example, 0.5000 becomes .5)
     */
-    const DIMZIN = this.getDimensionStyle().getValue('DIMZIN');
-    const DIMAZIN = this.getDimensionStyle().getValue('DIMAZIN');
-
+    // const DIMZIN = this.getDimensionStyle().getValue('DIMZIN');
+    // const DIMAZIN = this.getDimensionStyle().getValue('DIMAZIN');
 
     switch (this.getBaseDimType()) {
       case 0: // Rotated, horizontal, or vertical
