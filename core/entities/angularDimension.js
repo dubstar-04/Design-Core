@@ -166,15 +166,16 @@ export class AngularDimension extends BaseDimension {
     Pt14.sequence = 14;
     points.push(Pt14);
 
-    // Add arc defining point
-    const Pt16 = new Point(textPos.x, textPos.y);
-    Pt16.sequence = 16;
-    points.push(Pt16);
-
     // Add text position
     const Pt11 = new Point(textPos.x, textPos.y);
     Pt11.sequence = 11;
     points.push(Pt11);
+
+    // Add arc defining point
+    // TODO: Pt16 should be 2/3 of the arc between pt10 and pt14
+    const Pt16 = new Point(textPos.x, textPos.y);
+    Pt16.sequence = 16;
+    points.push(Pt16);
 
     return points;
   }
@@ -461,6 +462,11 @@ export class AngularDimension extends BaseDimension {
       pt15Text.string = 'pt15';
       pt15Text.points = [Pt15];
       entities.push(pt15Text);
+
+      const pt16Text = new Text();
+      pt16Text.string = 'pt16';
+      pt16Text.points = [Pt16];
+      entities.push(pt16Text);
 
       const q2s = new Text();
       q2s.string = 'q2s';
