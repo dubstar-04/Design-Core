@@ -225,7 +225,7 @@ export class AlignedDimension extends BaseDimension {
     dimension = Math.abs(dimension);
 
     const extensionLineAngle = Pt13.angle(Pt13e);
-    const reverseExtensionLineAngle = Pt13e.angle(Pt13);
+    // const reverseExtensionLineAngle = Pt13e.angle(Pt13);
     const dimLineAngle = Pt13e.angle(Pt14e);
     const reverseDimLineAngle = Pt14e.angle(Pt13e);
     const midPoint = Pt13e.midPoint(Pt14e);

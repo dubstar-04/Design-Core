@@ -166,6 +166,12 @@ export class AngularDimension extends BaseDimension {
     Pt14.sequence = 14;
     points.push(Pt14);
 
+    // Add arc defining point
+    const Pt16 = new Point(textPos.x, textPos.y);
+    Pt16.sequence = 16;
+    points.push(Pt16);
+
+    // Add text position
     const Pt11 = new Point(textPos.x, textPos.y);
     Pt11.sequence = 11;
     points.push(Pt11);
@@ -295,9 +301,7 @@ export class AngularDimension extends BaseDimension {
     const Pt15 = this.getPointBySequence(sortedPoints, 15); // Pt15 is second line start point
     const Pt10 = this.getPointBySequence(sortedPoints, 10); // Pt10 is the second line end point
 
-    // Temp use 11, should be pt16
-    // const Pt16 = this.getPointBySequence(this.points, 11); // Pt16 is the arc position
-    const Pt11 = this.getPointBySequence(this.points, 11); // Pt11 is the text position
+    const Pt16 = this.getPointBySequence(this.points, 16); // Pt16 is the arc position
 
     // Find the line intersection point
     const intersect = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true);
@@ -320,38 +324,34 @@ export class AngularDimension extends BaseDimension {
     let line1Extents = Pt14;
     let line2Extents = Pt10;
 
-    // Check which quadrant the text is positioned in
+    // Check which quadrant Pt16 is positioned in
     // Quadrent One
-    if (Pt11.isOnArc(quadOneStart, quadOneEnd, intersectPt, 1)) {
-      // console.log('Pt11 is on arc quad One');
-      arrow1pos = intersectPt.project(intersectPt.angle(quadOneStart), distance);
+    if (Pt16.isOnArc(quadOneStart, quadOneEnd, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
       line1Extents = Pt14;
       arrow2pos = intersectPt.project(intersectPt.angle(quadOneEnd), distance);
       line2Extents = Pt10;
     }
 
     // Quadrent Two
-    if (Pt11.isOnArc(quadOneEnd, quadTwoStart, intersectPt, 1)) {
-      // console.log('Pt11 is on arc quad Two');
-      arrow1pos = intersectPt.project(intersectPt.angle(quadOneEnd), distance);
+    if (Pt16.isOnArc(quadOneEnd, quadTwoStart, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
       line1Extents = Pt10;
       arrow2pos = intersectPt.project(intersectPt.angle(quadTwoStart), distance);
       line2Extents = Pt13;
     }
 
     // Quadrent Three
-    if (Pt11.isOnArc(quadTwoStart, quadTwoEnd, intersectPt, 1)) {
-      // console.log("Pt11 is on arc quad Three");
-      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoStart), distance);
+    if (Pt16.isOnArc(quadTwoStart, quadTwoEnd, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
       line1Extents = Pt13;
       arrow2pos = intersectPt.project(intersectPt.angle(quadTwoEnd), distance);
       line2Extents = Pt15;
     }
 
     // Quadrent Four
-    if (Pt11.isOnArc(quadTwoEnd, quadOneStart, intersectPt, 1)) {
-      // console.log('Pt11 is on arc quad Four');
-      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoEnd), distance);
+    if (Pt16.isOnArc(quadTwoEnd, quadOneStart, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
       line1Extents = Pt15;
       arrow2pos = intersectPt.project(intersectPt.angle(quadOneStart), distance);
       line2Extents = Pt14;
