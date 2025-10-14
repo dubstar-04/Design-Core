@@ -245,7 +245,6 @@ export class AlignedDimension extends BaseDimension {
 
     let textPosition = midPoint;
     let textRotation = this.getTextDirection(horizontalText ? 0 : dimLineAngle);
-
     // Get the direction for the dimension text offset
     let textAboveDirection = textRotation + Math.PI / 2;
     let textAboveDistance = DIMTXT * 0.5 + DIMGAP;
@@ -327,6 +326,9 @@ export class AlignedDimension extends BaseDimension {
     }
 
 
+    /*
+    // generate the dimension text
+    */
     // Get the dimension text using the value, position and rotation
     const text = this.getDimensionText(dimension, textPosition, textRotation);
     entities.push(text);
@@ -334,7 +336,6 @@ export class AlignedDimension extends BaseDimension {
     /*
     // Generate points for extension and dimension lines
     */
-
     // Get the extension line start and end points
     // TODO: If DIMTOFL is set force line extensions between extensions if text outside
     const extLineOneStart = Pt13.project(extensionLineAngle, DIMEXO);
@@ -395,7 +396,7 @@ export class AlignedDimension extends BaseDimension {
     // generate extension line points
     */
 
-    // Extend the extension line when text is alined with the extension line but not on the extension line
+    // Extend the extension line when text is aligned with the extension line but not on the extension line
     if (textAndExtlineAligned && !textIsOnExtensionLine && !textIsOnInternalDimLine) {
       if (Pt11.distance(Pt13e) < Pt11.distance(Pt14e)) {
         // Text position is closer to extension line 1
