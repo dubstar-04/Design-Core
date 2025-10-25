@@ -338,7 +338,63 @@ export class Intersection {
     const b2 = line2.end;
     extend = extend || false;
 
+    // console.log('a:', a1.x, a1.y, a2.x, a2.y);
+    // console.log('b:', b1.x, b1.y, b2.x, b2.y);
+
     let result;
+
+    // TODO: fix this mess and add tests
+
+    // Check if lines have coincident points
+    if (a1.isSame(b1)) {
+      // console.log('a1:b1');
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(a1.x, a1.y));
+      return result;
+    }
+    if (a1.isSame(b2)) {
+      // console.log('a1:b2');
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(a1.x, a1.y));
+      return result;
+    }
+    if (a2.isSame(b1)) {
+      // console.log('a2:b1');
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(a2.x, a2.y));
+      return result;
+    }
+    if (a2.isSame(b2)) {
+      // console.log('a2:b2');
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(a2.x, a2.y));
+      return result;
+    }
+
+    // check if a line has a coincident start or end point. i.e is on the other line
+    if (a1.isOnLine(b1, b2)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(a1.x, a1.y));
+      return result;
+    }
+
+    if (a2.isOnLine(b1, b2)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(a2.x, a2.y));
+      return result;
+    }
+
+    if (b1.isOnLine(a1, a2)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(b1.x, b1.y));
+      return result;
+    }
+
+    if (b2.isOnLine(a1, a2)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(b2.x, b2.y));
+      return result;
+    }
 
     const uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x);
     const ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x);
@@ -347,6 +403,8 @@ export class Intersection {
     if (uB != 0) {
       const ua = uaT / uB;
       const ub = ubT / uB;
+
+      // TODO: this is sensitive to the order of the lines and points
 
       if ((0 <= ua && ua <= 1) && (0 <= ub && ub <= 1) || (0 <= ua && ua <= 1) && extend) {
         result = new Intersection('Intersection');
@@ -360,6 +418,7 @@ export class Intersection {
     } else {
       if (uaT == 0 || ubT == 0) {
         result = new Intersection('Coincident');
+        // console.log('coinsident unhandled');
       } else {
         result = new Intersection('Parallel');
       }
