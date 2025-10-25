@@ -85,6 +85,7 @@ export class AlignedDimension extends BaseDimension {
   /**
    * Get sequenced points from user selection
    * @param {any} items
+   * @param {Point} textPos
    * @return {Array} array of points
    */
   static getPointsFromSelection(items, textPos) {
@@ -169,7 +170,7 @@ export class AlignedDimension extends BaseDimension {
     const DIMTOH = getStyle('DIMTOH'); // Text outside horizontal alignment
     const DIMASZ = getStyle('DIMASZ'); // Arrow size (used for extension line length)
     const DIMTXT = getStyle('DIMTXT'); // Text size (used for estimated text width)
-    const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
+    // const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
     const DIMTAD = getStyle('DIMTAD'); // Text vertical position
     const DIMEXE = getStyle('DIMEXE'); // Extend beyond dimension line distance
     const DIMEXO = getStyle('DIMEXO'); // Offset from origin distance

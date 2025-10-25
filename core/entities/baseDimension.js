@@ -212,20 +212,20 @@ export class BaseDimension extends Entity {
     // TODO: Implement Unit format - DIMLUNIT
     // 1 = Scientific; 2 = Decimal; 3 = Engineering;
     // 4 = Architectural; 5 = Fractional; 6 = Windows desktop
-    const DIMLUNIT = this.getDimensionStyle().getValue('DIMLUNIT');
+    // const DIMLUNIT = this.getDimensionStyle().getValue('DIMLUNIT');
 
     // TODO: Implement decimal seperator - DIMDSEP
     // Valid values are period (.) comma (,) or space ( )
-    const DIMDSEP = this.getDimensionStyle().getValue('DIMDSEP');
+    // const DIMDSEP = this.getDimensionStyle().getValue('DIMDSEP');
 
     // TODO: Implement Rounding - DIMRND
-    const DIMRND = this.getDimensionStyle().getValue('DIMRND');
+    // const DIMRND = this.getDimensionStyle().getValue('DIMRND');
 
     // TODO: Implement prefix and postsuffix - DIMPOST
     // prefix and suffix included in DIMPOST value seperated by <>
     // e.g. prefix<>suffix
-    const DIMPOST = this.getDimensionStyle().getValue('DIMPOST');
-    const DIMAPOST = this.getDimensionStyle().getValue('DIMAPOST');
+    // const DIMPOST = this.getDimensionStyle().getValue('DIMPOST');
+    // const DIMAPOST = this.getDimensionStyle().getValue('DIMAPOST');
 
     // TODO: Implement Zero suppression
     // Zero suppression

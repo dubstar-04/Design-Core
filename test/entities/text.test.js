@@ -285,8 +285,12 @@ test('Text closestPoint returns correct distance', () => {
   const t = new Text({ points: [new Point(0, 0)] });
   t.boundingRect = { width: 10, height: 10 };
   const [mid, dist] = t.closestPoint(new Point(5, 5));
+  expect(mid.x).toBe(5);
+  expect(mid.y).toBe(5);
   expect(dist).toBe(0);
   const [mid2, dist2] = t.closestPoint(new Point(100, 100));
+  expect(mid2.x).toBe(5);
+  expect(mid2.y).toBe(5);
   expect(dist2).toBeGreaterThan(0);
 });
 
