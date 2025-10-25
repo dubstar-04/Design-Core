@@ -302,7 +302,7 @@ export class AngularDimension extends BaseDimension {
     const Pt10 = this.getPointBySequence(sortedPoints, 10); // Pt10 is the second line end point
 
     const Pt16 = this.getPointBySequence(this.points, 16); // Pt16 is the arc position
-    // const Pt11 = this.getPointBySequence(this.points, 11); // Pt11 is the text position
+    const Pt11 = this.getPointBySequence(this.points, 11); // Pt11 is the text position
 
     // DIMTIH inside text alignment
     const DIMTIH = this.getDimensionStyle().getValue('DIMTIH');
@@ -389,59 +389,228 @@ export class AngularDimension extends BaseDimension {
       dimension = dimension + Math.PI * 2;
     }
 
-    const arcMiddle = intersectPt.project(intersectPt.angle(arrow1pos.midPoint(arrow2pos)), radius);
-    const textPosition = arcMiddle;
+    // calculate the radians to mm conversion
+    // Approximate text width based on height using the formatted dimension value i.e with units, precision and symbols
+    const approxTextWidth = Text.getApproximateWidth(this.getDimensionValue(Utils.radians2degrees(dimension)), DIMTXT) * 1.25;// 1.25 is a factor to ensure the text is not too close to the arc
+    const approxTextHalfWidth = approxTextWidth * 0.5;
+    const circumference = 2 * Math.PI * radius;
+    // calculate the radians per length unit - this allows converting between liniear and angular values. e.g. 10mm * radiansPerLengthUnit = xx radians
+    const radiansPerLengthUnit = (2 * Math.PI) / circumference;
+    // get arc adjustment for text width to allow splitting the dimension line
+    const arcAdjustment = approxTextHalfWidth * radiansPerLengthUnit;
+    // get angle consumed by an arrow
+    const arrowRadians = DIMASZ * radiansPerLengthUnit;
+    // Check if the text can fit inside extension lines
+    const textOutSide = (approxTextWidth * 1.5) * radiansPerLengthUnit >= dimension;
+    // Check if the arrows fit inside the extension lines
+    const arrowsOutside = arrowRadians * 3 >= dimension;
 
-    let textRotation = 0;
-    if (DIMTOH === 0) {
     // DIMTIH - Text inside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
     // DIMTOH - Text outside horizontal if nonzero, 0 = Aligns text with the dimension line, 1 = Draws text horizontally
-      textRotation = arrow1pos.angle(arrow2pos);
+    const horizontalText = (DIMTIH !== 0 && !textOutSide) || (DIMTOH !== 0 && textOutSide);
+
+    const arcMiddle = intersectPt.project(intersectPt.angle(arrow1pos.midPoint(arrow2pos)), radius);
+    let textPosition = arcMiddle;
+    let textRotation = this.getTextDirection(horizontalText ? 0 : arrow1pos.angle(arrow2pos));
+    // Get the direction for the dimension text offset
+    let textAboveDirection = textRotation + Math.PI / 2;
+    let textAboveDistance = DIMTXT * 0.5 + DIMGAP;
+
+    // get the direction to offset outside the extension lines
+    const outsideOffsetDirection = Pt11.distance(arrow1pos) < Pt11.distance(arrow2pos) ? -1 : 1;
+
+    // Angle from arrow to rotate text position to place in next to an extension line inside
+    const textPositionOffsetAngle = arrowRadians * 3;
+    // Angle from arc middle to rotate text position to place in next to an extension line inside
+    const internalPositionAdjustmentAngle = dimension * 0.5 > textPositionOffsetAngle ? dimension * 0.5 - textPositionOffsetAngle : 0;
+    // Angle from arc middle to rotate text position to place in next to an extension line outside
+    const externalPositionAdjustmentAngle = dimension * 0.5 + textPositionOffsetAngle;
+
+
+    switch (DIMJUST) {
+      case 0: // 0 = Center-justified between extension lines
+        if (textOutSide) {
+          textPosition = arcMiddle.rotate(intersectPt, externalPositionAdjustmentAngle * outsideOffsetDirection);
+        }
+        break;
+      case 1: // 1 = Next to first extension line
+        if (textOutSide) {
+          textPosition = arcMiddle.rotate(intersectPt, externalPositionAdjustmentAngle * outsideOffsetDirection);
+        } else {
+          textPosition = arcMiddle.rotate(intersectPt, internalPositionAdjustmentAngle);
+          textRotation = this.getTextDirection(horizontalText ? 0 : (intersectPt.angle(textPosition) + Math.PI / 2));
+        }
+        break;
+      case 2: // 2 = Next to second extension line
+        if (textOutSide) {
+          textPosition = arcMiddle.rotate(intersectPt, (dimension * 0.5 + DIMASZ * 2* radiansPerLengthUnit) * outsideOffsetDirection);
+        } else {
+          textPosition = arcMiddle.rotate(intersectPt, -internalPositionAdjustmentAngle);
+          textRotation = this.getTextDirection(horizontalText ? 0 : (intersectPt.angle(textPosition) + Math.PI / 2));
+        }
+        break;
+      case 3: // 3 = Above first extension line
+        textPosition = arrow1pos.project(line1Angle, (approxTextHalfWidth+ DIMEXE + DIMTXT));
+        textRotation = this.getTextDirection(line1Angle);
+        textAboveDirection = textRotation + Math.PI / 2;
+        break;
+      case 4: // 4 = Above second extension line
+        textPosition = arrow2pos.project(line2Angle, (approxTextHalfWidth+ DIMEXE + DIMTXT));
+        textRotation = this.getTextDirection(line2Angle);
+        textAboveDirection = textRotation + Math.PI / 2;
+        break;
     }
+
+
+    // Check if the text is aligned with the dimension line
+    const textAndDimlineAligned = this.alignedOrOpposite(textRotation, (intersectPt.angle(textPosition) + Math.PI / 2));
+
+    // Check if the text position is on an extension line
+    const textIsOnExtensionLine = textPosition.perpendicular(intersectPt, arrow1pos).isSame(textPosition) || textPosition.perpendicular(intersectPt, arrow2pos).isSame(textPosition);
+
+    // set the text offset to 0 for scenarios where the text offset should not be applied
+    if (!textAndDimlineAligned && !textIsOnExtensionLine) {
+      textAboveDistance = 0;
+    }
+
+
+    // DIMTAD - Text vertical position
+    switch (DIMTAD) {
+      case 0: // 0 = Centers the dimension text between the extension lines.
+        break;
+      case 1: // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1).
+        textPosition = textPosition.project(textAboveDirection, textAboveDistance);
+        break;
+      case 2: // 2 = Places the dimension text on the side of the dimension line farthest away from the defining points.
+        textPosition = textPosition.project(textAboveDirection, textAboveDistance);
+        break;
+      case 3: // 3 = Places the dimension text to conform to Japanese Industrial Standards (JIS).
+        textPosition = textPosition.project(textAboveDirection, textAboveDistance);
+        break;
+      case 4: // 4 = Places the dimension text below the dimension line.
+        textPosition = textPosition.project(textAboveDirection, -textAboveDistance);
+        break;
+    }
+
 
     // Get the dimension text using the value, position and rotation
     const text = this.getDimensionText(Utils.radians2degrees(dimension), textPosition, textRotation);
     entities.push(text);
 
+    // get the projection of the text position onto the dimension line (arc)
+    const textDimlineIntersection = intersectPt.project(intersectPt.angle(textPosition), radius);
+
+    // check if the text position projection is on the dimension line (arc)
+    // const textDimlineIntersectionIsOnDimline = textDimlineIntersection.isOnArc(arrow1pos, arrow2pos, intersectPt, 1);
+
+    // check if the text position projection is on the dimension line (arc)
+    const textIsOnDimLine = Utils.round(intersectPt.distance(textPosition)) === Utils.round(radius);
+    // check if text is on extenstion line one
+    const textIsOnExtensionLineOne = textPosition.perpendicular(intersectPt, arrow1pos).isSame(textPosition);
+    // check if text is on extenstion line two
+    const textIsOnExtensionLineTwo = textPosition.perpendicular(intersectPt, arrow2pos).isSame(textPosition);
+    // check if text is aligned with extension line one
+    const textAndExtlineOneAligned = this.alignedOrOpposite(textRotation, intersectPt.angle(arrow1pos));
+    // check if text is aligned with extension line two
+    const textAndExtlineTwoAligned = this.alignedOrOpposite(textRotation, intersectPt.angle(arrow2pos));
+
+
+    /*
+    // generate dimension geometry
+    */
+
     /*
     // Create the arrow heads
     */
-
     // Arrow alignement - Calculate the distance from the arc tangent to the arc at <arrow size> along the tangent
     const arcOffset = radius - Math.sqrt(radius * radius - DIMASZ * DIMASZ);
     // Calculate the angle from the arc tangent (perpendicular to the extension line) to the arc at <arrow size> along the tangent
     const arcRotationOffset = Math.asin(arcOffset / DIMASZ);
-    // Calculate the arrow head rotation to align with the arc
-    const arrowRotation = Math.PI / 2 + arcRotationOffset;
+    // Calculate the arrow head rotation to align with the arc - Reversed when the arrows are outside the extension lines
+    const arrowRotation = arrowsOutside ? -Math.PI / 2 - arcRotationOffset : Math.PI / 2 + arcRotationOffset;
     const arrowHead1 = this.getArrowHead(arrow1pos, intersectPt.angle(arrow1pos) + arrowRotation);
     const arrowHead2 = this.getArrowHead(arrow2pos, intersectPt.angle(arrow2pos) - arrowRotation);
 
+    /*
     // Add the entities to the dimension
-    // calculate the radians to mm conversion
-    // circumference = 2*PI*radius
-    // approximate text width based on height
-    const approxTextWidth = Text.getApproximateWidth(text.string, text.height) * 1.25;// 1.25 is a factor to ensure the text is not too close to the arc
-    const circumference = 2 * Math.PI * radius;
-    const circumferencePerRadian = (2 * Math.PI) / circumference;
-    const arcAdjustment = (approxTextWidth / 2) * circumferencePerRadian;
+    */
+
+    // define where the the dim line arcs meet
+    const arcStart = textIsOnDimLine ? textDimlineIntersection : arcMiddle;
 
     // create the dimension line / arc
-    const arcOneEnd = arcMiddle.rotate(intersectPt, -arcAdjustment);
-    const arcOne = new Arc({ points: [intersectPt, arrow1pos, arcOneEnd] });
+    const arcOneBase = arrowsOutside ? arrow1pos : !textOutSide ? arcStart : arcMiddle;
+    const arcOneRotation = arrowsOutside ? (-arrowRadians * 2) : ((textIsOnDimLine && !textOutSide) ? -arcAdjustment : 0);
+    const arcOneEnd = arcOneBase.rotate(intersectPt, arcOneRotation);
+    const arcOne = new Arc({ points: [intersectPt, arrow1pos, arcOneEnd], direction: arrowsOutside ? -1 : 1 });
     // Supress dimension line 1 if DIMSD1 is true
     if (!style.getValue('DIMSD1')) {
-      entities.push(arrowHead1, arcOne);
+      entities.push(arrowHead1);
+      entities.push(arcOne);
     }
 
     // create the dimension line / arc
-    const arcTwoEnd = arcMiddle.rotate(intersectPt, arcAdjustment);
-    const arcTwo = new Arc({ points: [intersectPt, arcTwoEnd, arrow2pos] });
+    const arcTwoBase = arrowsOutside ? arrow2pos : !textOutSide ? arcStart : arcMiddle;
+    const arcTwoRotation = arrowsOutside ? (arrowRadians * 2) : ((textIsOnDimLine && !textOutSide) ? arcAdjustment : 0);
+    const arcTwoEnd = arcTwoBase.rotate(intersectPt, arcTwoRotation);
+    const arcTwo = new Arc({ points: [intersectPt, arrow2pos, arcTwoEnd], direction: arrowsOutside ? 1 : -1 });
     // Supress dimension line 2 if DIMSD2 is true
     if (!style.getValue('DIMSD2')) {
-      entities.push(arrowHead2, arcTwo);
+      entities.push(arrowHead2);
+      entities.push(arcTwo);
     }
 
+
+    /*
+    // generate extension line points
+    */
+
+    // create extension line one points
+    const extensionLineOneStart = intersectPt.project(intersectPt.angle(arrow1pos), intersectPt.distance(line1Extents) + DIMEXO);
+    let extensionLineOneEnd = intersectPt.project(intersectPt.angle(arrow1pos), radius + DIMEXE);
+    // create extension line two points
+    const extensionLineTwoStart = intersectPt.project(intersectPt.angle(arrow2pos), intersectPt.distance(line2Extents) + DIMEXO);
+    let extensionLineTwoEnd = intersectPt.project(intersectPt.angle(arrow2pos), radius + DIMEXE);
+
+
+    // Extend the extension line when text is aligned with the extension line but not on the extension line
+    if (textPosition.distance(arrow1pos) < textPosition.distance(arrow2pos)) {
+      // Text position is closer to extension line 1
+      if (!textIsOnExtensionLineOne && textAndExtlineOneAligned && !textIsOnDimLine) {
+        const dist = extensionLineOneEnd.distance(textPosition.perpendicular(extensionLineOneStart, extensionLineOneEnd)) + approxTextHalfWidth;
+        extensionLineOneEnd = extensionLineOneEnd.project(extensionLineOneStart.angle(extensionLineOneEnd), dist);
+      }
+    } else {
+      // Text position is closer to extension line 2
+      if (!textIsOnExtensionLineTwo && textAndExtlineTwoAligned && !textIsOnDimLine) {
+        const dist = extensionLineTwoEnd.distance(textPosition.perpendicular(extensionLineTwoStart, extensionLineTwoEnd)) + approxTextHalfWidth;
+        extensionLineTwoEnd = extensionLineTwoEnd.project(extensionLineTwoStart.angle(extensionLineTwoEnd), dist);
+      }
+    }
+
+    // check if the dimension is beyond the limits of the selection
+    // add extension line one
+    if (radius > intersectPt.distance(line1Extents) + DIMEXE) {
+      const extensionLineOne = new Line({ points: [extensionLineOneStart, extensionLineOneEnd] });
+      // Supress extension line 1 if DIMS1 is true
+      if (!style.getValue('DIMSE1')) {
+        entities.push(extensionLineOne);
+      }
+    }
+
+    // check if the dimension is beyond the limits of the selection
+    // add extension line two
+    if (radius > intersectPt.distance(line2Extents) + DIMEXE) {
+      const extensionLineTwo = new Line({ points: [extensionLineTwoStart, extensionLineTwoEnd] });
+      // Supress extendsion line 2 if DIMSE2 is true
+      if (!style.getValue('DIMSE2')) {
+        entities.push(extensionLineTwo);
+      }
+    }
+
+
     // debug
+    /*
     if (false) {
       const pt10Text = new Text();
       pt10Text.string = 'pt10';
@@ -478,34 +647,7 @@ export class AngularDimension extends BaseDimension {
       q2e.points = [quadTwoEnd];
       entities.push(q2e);
     }
-
-    /*
-    // generate extension line points
     */
-
-    // check if the dimension is beyond the limits of the selection
-    // add extension line one
-    if (radius > intersectPt.distance(line1Extents) + DIMEXE) {
-      const extensionLineOneStart = intersectPt.project(intersectPt.angle(arrow1pos), intersectPt.distance(line1Extents) + DIMEXO);
-      const extensionLineOneEnd = intersectPt.project(intersectPt.angle(arrow1pos), radius + DIMEXE);
-      const extensionLineOne = new Line({ points: [extensionLineOneStart, extensionLineOneEnd] });
-      // Supress extension line 1 if DIMS1 is true
-      if (!style.getValue('DIMSE1')) {
-        entities.push(extensionLineOne);
-      }
-    }
-
-    // check if the dimension is beyond the limits of the selection
-    // add extension line two
-    if (radius > intersectPt.distance(line2Extents) + DIMEXE) {
-      const extensionLineTwoStart = intersectPt.project(intersectPt.angle(arrow2pos), intersectPt.distance(line2Extents) + DIMEXO);
-      const extensionLineTwoEnd = intersectPt.project(intersectPt.angle(arrow2pos), radius + DIMEXE);
-      const extensionLineTwo = new Line({ points: [extensionLineTwoStart, extensionLineTwoEnd] });
-      // Supress extendsion line 2 if DIMSE2 is true
-      if (!style.getValue('DIMSE2')) {
-        entities.push(extensionLineTwo);
-      }
-    }
 
     return entities;
   }
