@@ -118,6 +118,7 @@ export class RadialDimension extends BaseDimension {
     const DIMTXT = getStyle('DIMTXT'); // Text size (used for estimated text width)
     const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
     const DIMTAD = getStyle('DIMTAD'); // Text vertical position
+    const DIMGAP = getStyle('DIMGAP'); // Gap between dimension line and text
 
     // Ensure points are aligned Pt10 > Pt15 > Pt11
     // This resets the points to a known state to allow application of the dimstyle
@@ -140,9 +141,13 @@ export class RadialDimension extends BaseDimension {
     // approximate text width based on height
     const approxTextWidth = Text.getApproximateWidth(formattedDimensionValue, DIMTXT);
 
+
     // let textPosition = Pt11;
-    let textPosition = Pt11.project(Pt15.angle(Pt11), approxTextWidth * 0.5 + DIMTXT);
+    let textPosition = Pt11.project(Pt15.angle(Pt11), approxTextWidth * 0.5);
     let textRotation = Pt15.angle(Pt10);
+    // Get the direction for the dimension text offset
+    const textAboveDirection = textRotation + Math.PI / 2;
+    const textAboveDistance = DIMTXT * 0.5 + DIMGAP;
     dimension = Pt15.distance(Pt10);
 
     const isInside = Pt10.distance(Pt11) < Pt10.distance(Pt15);
@@ -151,21 +156,55 @@ export class RadialDimension extends BaseDimension {
     // This is determined by the DIMTIH and DIMTOH values
     // 0 = Aligns text with the dimension line
     // 1 = Draws text horizontally
-    if (isInside && DIMTIH === 1 || !isInside && DIMTOH === 1) {
-      // get a + or - to define the direction of the extension line - Reverse for internal radius dimension
-      const extLineDirection = isInside ? Math.sign(Pt10.x - Pt11.x) : Math.sign(Pt11.x - Pt10.x);
-      const extLineEnd = new Point(Pt11.x + DIMASZ * extLineDirection, Pt11.y);
-      const extLine = new Line({ points: [Pt11, extLineEnd] });
+    // Determine if text should be horizontal, and handle extension line and text position
+    const shouldDrawTextHorizontal = (isInside && DIMTIH === 1) || (!isInside && DIMTOH === 1);
+
+    if (shouldDrawTextHorizontal) {
+      // Determine extension line direction (+1 or -1)
+      const extDir = isInside ? Math.sign(Pt10.x - Pt11.x) : Math.sign(Pt11.x - Pt10.x);
+
+      // Calculate distances for extension line and text offset
+      let textOffset = approxTextWidth * 0.5 + DIMTXT;
+      let extLineDist = DIMASZ * extDir;
+
+      if (DIMTAD > 0) {
+        extLineDist += approxTextWidth * extDir;
+        textOffset = -approxTextWidth;
+      }
+
+      const extLineEnd = new Point(Pt11.x + extLineDist, Pt11.y);
       textRotation = 0;
-      if (Pt10.isSame(Pt11) === false) {
-        textPosition = extLineEnd.project(Pt11.angle(extLineEnd), approxTextWidth * 0.5 + DIMTXT);
-        entities.push(extLine);
+
+      if (!Pt10.isSame(Pt11)) {
+        textPosition = extLineEnd.project(Pt11.angle(extLineEnd), textOffset);
+        entities.push(new Line({ points: [Pt11, extLineEnd] }));
       }
     }
 
+    // DIMTAD - Text vertical position
+    switch (DIMTAD) {
+      case 0: // 0 = Centers the dimension text between the extension lines.
+        break;
+      case 1: // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1).
+        textPosition = textPosition.project(textAboveDirection, textAboveDistance);
+        break;
+      case 2: // 2 = Places the dimension text on the side of the dimension line farthest away from the defining points.
+        textPosition = textPosition.project(textAboveDirection, textAboveDistance);
+        break;
+      case 3: // 3 = Places the dimension text to conform to Japanese Industrial Standards (JIS).
+        textPosition = textPosition.project(textAboveDirection, textAboveDistance);
+        break;
+      case 4: // 4 = Places the dimension text below the dimension line.
+        textPosition = textPosition.project(textAboveDirection, -textAboveDistance);
+        break;
+    }
+
+    // Check if the text is aligned with the dimension line
+    const textAndDimlineAligned = this.alignedOrOpposite(textRotation, Pt10.angle(Pt15));
+
     // Add the dimension line and arrow head
     let lineLength = Pt15.distance(Pt11);
-    if (DIMTAD !== 0) {
+    if (DIMTAD !== 0 && textAndDimlineAligned) {
       lineLength = lineLength + approxTextWidth + DIMTXT; // Add text offset to line length
     }
     const startPoint = DIMTOFL ? Pt10 : Pt15;
