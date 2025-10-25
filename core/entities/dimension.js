@@ -45,11 +45,21 @@ export class Dimension extends BaseDimension {
     this.selectedItems = [];
 
     if (data) {
-      let dimType = Property.loadValue([data[70], data.dimType], 0);
+      const dimensionTypes = new Set([1, 2, 3, 4, 5, 6, 32, 128]);
+
+      let dimType = Property.loadValue([data[70], data.dimType], -1);
       // TODO: dimType needs to be a flag object
+
+      if (!Number.isInteger(dimType) || !dimensionTypes.has(dimType)) {
+        // num is in the set
+        const msg = 'Invalid DimType';
+        const err = (`${this.type} - ${msg}: ${dimType}`);
+        throw Error(err);
+      }
+
       dimType = dimType % 32; // remove the flag values
 
-      if (Number.isInteger(dimType) && dimType >= 0 && dimType <= 6) {
+      if (dimType >= 0 && dimType <= 6) {
         const item = new this.dimensionMap[dimType](data);
 
         // find the block linked to this dimension
@@ -61,10 +71,6 @@ export class Dimension extends BaseDimension {
         }
 
         return item;
-      } else {
-        const msg = 'Invalid DimType';
-        const err = (`${this.type} - ${msg}: ${dimType}`);
-        throw Error(err);
       }
     }
   }
