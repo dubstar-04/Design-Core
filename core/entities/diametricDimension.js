@@ -119,12 +119,12 @@ export class DiametricDimension extends BaseDimension {
     // Helper to get style values
     const getStyle = (key) => this.getDimensionStyle().getValue(key);
     // Style values
-  const DIMTIH = getStyle('DIMTIH');   // Text inside horizontal alignment
-  const DIMTOH = getStyle('DIMTOH');   // Text outside horizontal alignment
-  const DIMASZ = getStyle('DIMASZ');   // Arrow size (used for extension line length)
-  const DIMTXT = getStyle('DIMTXT');   // Text size (used for estimated text width)
-  const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
-  const DIMTAD = getStyle('DIMTAD');   // Text vertical position
+    const DIMTIH = getStyle('DIMTIH'); // Text inside horizontal alignment
+    const DIMTOH = getStyle('DIMTOH'); // Text outside horizontal alignment
+    const DIMASZ = getStyle('DIMASZ'); // Arrow size (used for extension line length)
+    const DIMTXT = getStyle('DIMTXT'); // Text size (used for estimated text width)
+    const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
+    const DIMTAD = getStyle('DIMTAD'); // Text vertical position
 
     // Ensure points are aligned Pt10 > Pt15 > Pt11
     // This resets the points to a known state to allow application of the dimstyle

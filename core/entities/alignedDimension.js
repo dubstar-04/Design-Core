@@ -165,16 +165,16 @@ export class AlignedDimension extends BaseDimension {
     // Helper to get style values
     const getStyle = (key) => this.getDimensionStyle().getValue(key);
     // Style values
-  const DIMTIH = getStyle('DIMTIH');   // Text inside horizontal alignment
-  const DIMTOH = getStyle('DIMTOH');   // Text outside horizontal alignment
-  const DIMASZ = getStyle('DIMASZ');   // Arrow size (used for extension line length)
-  const DIMTXT = getStyle('DIMTXT');   // Text size (used for estimated text width)
-  const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
-  const DIMTAD = getStyle('DIMTAD');   // Text vertical position
-  const DIMEXE = getStyle('DIMEXE');   // Extend beyond dimension line distance
-  const DIMEXO = getStyle('DIMEXO');   // Offset from origin distance
-  const DIMJUST = getStyle('DIMJUST'); // Justification of the dimension text
-  const DIMGAP = getStyle('DIMGAP');   // Gap between dimension line and text
+    const DIMTIH = getStyle('DIMTIH'); // Text inside horizontal alignment
+    const DIMTOH = getStyle('DIMTOH'); // Text outside horizontal alignment
+    const DIMASZ = getStyle('DIMASZ'); // Arrow size (used for extension line length)
+    const DIMTXT = getStyle('DIMTXT'); // Text size (used for estimated text width)
+    const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
+    const DIMTAD = getStyle('DIMTAD'); // Text vertical position
+    const DIMEXE = getStyle('DIMEXE'); // Extend beyond dimension line distance
+    const DIMEXO = getStyle('DIMEXO'); // Offset from origin distance
+    const DIMJUST = getStyle('DIMJUST'); // Justification of the dimension text
+    const DIMGAP = getStyle('DIMGAP'); // Gap between dimension line and text
 
     // invalid points
     // if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
