@@ -237,7 +237,7 @@ export class Text extends Entity {
       return;
     }
 
-    if (this.height > 0 && angle !== 0) {
+    if (this.height > 0) {
       this.points[1] = this.points[0].project(Utils.degrees2radians(angle), this.height);
     }
   }
