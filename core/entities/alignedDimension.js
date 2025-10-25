@@ -162,26 +162,19 @@ export class AlignedDimension extends BaseDimension {
     const Pt14 = this.getPointBySequence(this.points, 14);
     const Pt11 = this.getPointBySequence(this.points, 11);
 
-    // DIMTIH inside text alignment
-    const DIMTIH = this.getDimensionStyle().getValue('DIMTIH');
-    // DIMTOH outside text alignment
-    const DIMTOH = this.getDimensionStyle().getValue('DIMTOH');
-    // Arrow size - use for extension line length
-    const DIMASZ = this.getDimensionStyle().getValue('DIMASZ');
-    // Text Size - use for extimated text width
-    const DIMTXT = this.getDimensionStyle().getValue('DIMTXT');
-    // Force Extension Line - If text outside extensions, force line extensions between extensions if nonzero
-    const DIMTOFL = this.getDimensionStyle().getValue('DIMTOFL');
-    // Text vertical position - 0 = Aligns text with the dimension line
-    const DIMTAD = this.getDimensionStyle().getValue('DIMTAD');
-    // Extend beyond dim line distance
-    const DIMEXE = this.getDimensionStyle().getValue('DIMEXE');
-    // Offset from origin distance
-    const DIMEXO = this.getDimensionStyle().getValue('DIMEXO');
-    // Justification of the dimension text
-    const DIMJUST = this.getDimensionStyle().getValue('DIMJUST');
-    // Gap between dimension line and text
-    const DIMGAP = this.getDimensionStyle().getValue('DIMGAP');
+    // Helper to get style values
+    const getStyle = (key) => this.getDimensionStyle().getValue(key);
+    // Style values
+  const DIMTIH = getStyle('DIMTIH');   // Text inside horizontal alignment
+  const DIMTOH = getStyle('DIMTOH');   // Text outside horizontal alignment
+  const DIMASZ = getStyle('DIMASZ');   // Arrow size (used for extension line length)
+  const DIMTXT = getStyle('DIMTXT');   // Text size (used for estimated text width)
+  const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
+  const DIMTAD = getStyle('DIMTAD');   // Text vertical position
+  const DIMEXE = getStyle('DIMEXE');   // Extend beyond dimension line distance
+  const DIMEXO = getStyle('DIMEXO');   // Offset from origin distance
+  const DIMJUST = getStyle('DIMJUST'); // Justification of the dimension text
+  const DIMGAP = getStyle('DIMGAP');   // Gap between dimension line and text
 
     // invalid points
     // if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
