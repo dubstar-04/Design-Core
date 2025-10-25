@@ -1,7 +1,41 @@
 import { Circle } from '../../core/entities/circle.js';
+import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
+import { DesignCore } from '../../core/designCore.js';
 
 import { File } from '../test-helpers/test-helpers.js';
+
+// initialise core
+new Core();
+
+test('Circle.execute creates points from user input', async () => {
+  // Mock DesignCore.Scene.inputManager.requestInput to return points
+  const origInputManager = DesignCore.Scene.inputManager;
+  const pt0 = new Point(0, 0);
+  const pt1 = new Point(10, 0);
+
+  let callCount = 0;
+  DesignCore.Scene.inputManager = {
+    requestInput: async () => {
+      callCount++;
+      if (callCount === 1) return pt0;
+      if (callCount === 2) return pt1;
+      return pt2;
+    },
+    executeCommand: () => {},
+  };
+
+  const circle = new Circle({});
+  await circle.execute();
+
+  expect(circle.points.length).toBe(2);
+  expect(circle.points[0]).toBe(pt0);
+  expect(circle.points[1]).toBe(pt1);
+  expect(circle.getRadius()).toBe(10);
+
+  // Restore original inputManager
+  DesignCore.Scene.inputManager = origInputManager;
+});
 
 test('Test Circle.getRadius', () => {
   const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });

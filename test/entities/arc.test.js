@@ -8,6 +8,41 @@ import { File } from '../test-helpers/test-helpers.js';
 const core = new Core();
 const commandline = core.commandLine;
 
+test('Arc.execute creates points from user input', async () => {
+  // Mock DesignCore.Scene.inputManager.requestInput to return points
+  const origInputManager = DesignCore.Scene.inputManager;
+  const pt0 = new Point(0, 0);
+  const pt1 = new Point(10, 0);
+  const pt2 = new Point(10, 10);
+
+  let callCount = 0;
+  DesignCore.Scene.inputManager = {
+    requestInput: async () => {
+      callCount++;
+      if (callCount === 1) return pt0;
+      if (callCount === 2) return pt1;
+      if (callCount === 3) return pt2;
+      return pt2;
+    },
+    executeCommand: () => {},
+  };
+
+  const arc = new Arc({});
+  await arc.execute();
+
+  expect(arc.points.length).toBe(3);
+  expect(arc.points[0]).toBe(pt0);
+  expect(arc.points[1]).toBe(pt1);
+  expect(arc.points[2]).toBe(pt2);
+
+  expect(arc.startAngle()).toBe(0);
+  expect(arc.endAngle()).toBeCloseTo(Math.PI / 4);
+  // expect(arc.getRadius()).toBeCloseTo(10 * Math.sqrt(2));
+
+  // Restore original inputManager
+  DesignCore.Scene.inputManager = origInputManager;
+});
+
 test('Test Arc.execute', async () => {
   expect(DesignCore.Scene.items.length).toBe(0);
 
@@ -229,5 +264,12 @@ test('Test Arc.decompose', () => {
   expect(decomposedArc[1].x).toBeCloseTo(170.71);
   expect(decomposedArc[1].y).toBeCloseTo(170.71);
   expect(decomposedArc[1].bulge).toBeCloseTo(0);
+});
+
+test('Arc constructor handles missing/invalid data', () => {
+  // No points
+  expect(() => new Arc({})).not.toThrow();
+  // Invalid points
+  expect(() => new Arc({ points: [null, undefined, {}] })).not.toThrow();
 });
 

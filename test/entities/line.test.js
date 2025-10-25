@@ -1,7 +1,45 @@
 import { Line } from '../../core/entities/line.js';
 import { Point } from '../../core/entities/point.js';
+import { Core } from '../../core/core/core.js';
+import { DesignCore } from '../../core/designCore.js';
 
 import { File } from '../test-helpers/test-helpers.js';
+
+// initialise core
+new Core();
+
+test('Line.execute creates points from user input', async () => {
+  // Mock DesignCore.Scene.inputManager.requestInput to return points
+  const origInputManager = DesignCore.Scene.inputManager;
+
+  const pt0 = new Point(0, 0);
+  const pt1 = new Point(10, 0);
+
+  let callCount = 0;
+  DesignCore.Scene.inputManager = {
+    requestInput: async () => {
+      callCount++;
+      if (callCount === 1) return pt0;
+      if (callCount === 2) return pt1;
+      return pt2;
+    },
+    executeCommand: () => {},
+  };
+
+  const line = new Line({});
+  await line.execute();
+
+  expect(line.points.length).toBe(2);
+  expect(line.points[0]).toBe(pt0);
+  expect(line.points[1]).toBe(pt1);
+
+  expect(line.length()).toBe(10);
+  expect(line.midPoint().x).toBe(5);
+  expect(line.midPoint().y).toBe(0);
+
+  // Restore original inputManager
+  DesignCore.Scene.inputManager = origInputManager;
+});
 
 test('Test Line.closestPoint', () => {
   const points = [new Point(100, 100), new Point(200, 100)];
