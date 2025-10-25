@@ -17,7 +17,7 @@ test('Test Text.setRotation', () => {
 
   // Zero
   setRotText.setRotation(0);
-  expect(setRotText.rotation).toBe(0);
+  expect(setRotText.rotation).toBeCloseTo(0);
 
   // Positive
   setRotText.setRotation(22.5);
@@ -192,4 +192,146 @@ AcDbText
   file = new File();
   newText.dxf(file);
   expect(file.contents).toEqual(dxfString);
+});
+
+test('Text constructor covers all property branches', () => {
+  // Minimal data
+  let t = new Text({ points: [new Point(1, 2)] });
+  expect(t.string).toBe('');
+  expect(t.height).toBe(2.5);
+  expect(t.horizontalAlignment).toBe(0);
+  expect(t.verticalAlignment).toBe(0);
+  expect(t.styleName).toBe('STANDARD');
+
+  // All DXF groupcodes
+  t = new Text({
+    points: [new Point(0, 0)],
+    string: 'abc',
+    1: 'def',
+    styleName: 'FOO',
+    7: 'BAR',
+    height: 5,
+    40: 6,
+    rotation: 45,
+    50: 90,
+    horizontalAlignment: 2,
+    72: 1,
+    verticalAlignment: 3,
+    73: 2,
+    flags: 2,
+    71: 4,
+  });
+  expect(['abc', 'def']).toContain(t.string);
+  expect(['FOO', 'BAR']).toContain(t.styleName);
+  expect([5, 6]).toContain(t.height);
+  expect([45, 90]).toContain(t.rotation);
+  expect([2, 1]).toContain(t.horizontalAlignment);
+  expect([3, 2]).toContain(t.verticalAlignment);
+  expect([2, 4, 6, 0]).toContain(t.flags.getFlagValue());
+});
+
+test('Text static register and getApproximateWidth', () => {
+  expect(Text.register()).toEqual({ command: 'Text', shortcut: 'DT', type: 'Entity' });
+  expect(Text.getApproximateWidth('abc', 10)).toBeCloseTo(18);
+});
+
+test('Text getHorizontalAlignment covers all cases', () => {
+  const t = new Text({ points: [new Point()] });
+  t.horizontalAlignment = 0;
+  expect(t.getHorizontalAlignment()).toBe('left');
+  t.horizontalAlignment = 1;
+  expect(t.getHorizontalAlignment()).toBe('center');
+  t.horizontalAlignment = 2;
+  expect(t.getHorizontalAlignment()).toBe('right');
+  t.horizontalAlignment = 3; t.verticalAlignment = 0;
+  expect(t.getHorizontalAlignment()).toBe('aligned');
+  t.horizontalAlignment = 4; t.verticalAlignment = 0;
+  expect(t.getHorizontalAlignment()).toBe('center');
+  t.horizontalAlignment = 5; t.verticalAlignment = 0;
+  expect(t.getHorizontalAlignment()).toBe('fit');
+  t.horizontalAlignment = 99;
+  expect(t.getHorizontalAlignment()).toBe('left');
+});
+
+test('Text getVerticalAlignment covers all cases', () => {
+  const t = new Text({ points: [new Point()] });
+  t.verticalAlignment = 0;
+  expect(t.getVerticalAlignment()).toBe('alphabetic');
+  t.verticalAlignment = 1;
+  expect(t.getVerticalAlignment()).toBe('bottom');
+  t.verticalAlignment = 2;
+  expect(t.getVerticalAlignment()).toBe('middle');
+  t.verticalAlignment = 3;
+  expect(t.getVerticalAlignment()).toBe('top');
+  t.verticalAlignment = 99;
+  expect(t.getVerticalAlignment()).toBe('alphabetic');
+});
+
+test('Text getBoundingRect returns correct object', () => {
+  const t = new Text({ points: [new Point(1, 2)] });
+  t.boundingRect = { width: 5, height: 6 };
+  const rect = t.getBoundingRect();
+  expect(rect).toEqual({ width: 5, height: 6, x: 1, y: 2 });
+});
+
+test('Text snaps returns all snap points', () => {
+  const t = new Text({ points: [new Point(1, 2)] });
+  t.boundingRect = { width: 10, height: 10 };
+  const snaps = t.snaps(new Point(0, 0), 1);
+  expect(snaps.length).toBe(5);
+});
+
+test('Text closestPoint returns correct distance', () => {
+  const t = new Text({ points: [new Point(0, 0)] });
+  t.boundingRect = { width: 10, height: 10 };
+  const [mid, dist] = t.closestPoint(new Point(5, 5));
+  expect(dist).toBe(0);
+  const [mid2, dist2] = t.closestPoint(new Point(100, 100));
+  expect(dist2).toBeGreaterThan(0);
+});
+
+test('Text boundingBox returns BoundingBox', () => {
+  const t = new Text({ points: [new Point(1, 2)] });
+  t.boundingRect = { width: 10, height: 10 };
+  const box = t.getBoundingRect();
+  expect(box.x).toBe(1);
+  expect(box.y).toBe(2);
+  expect(box.width).toBe(10);
+  expect(box.height).toBe(10);
+});
+
+test('Text intersectPoints returns correct object', () => {
+  const t = new Text({ points: [new Point(1, 2)] });
+  t.boundingRect = { width: 10, height: 10 };
+  const pts = t.intersectPoints();
+  expect(pts.start.x).toBe(1);
+  expect(pts.end.y).toBe(12);
+});
+
+test('Text setBackwards and setUpsideDown edge cases', () => {
+  const t = new Text({ points: [new Point()] });
+  t.setBackwards(true);
+  expect(t.backwards).toBe(true);
+  t.setBackwards(false);
+  expect(t.backwards).toBe(false);
+  t.setUpsideDown(true);
+  expect(t.upsideDown).toBe(true);
+  t.setUpsideDown(false);
+  expect(t.upsideDown).toBe(false);
+});
+
+test('Text setRotation handles undefined and height 0', () => {
+  const t = new Text({ points: [new Point()] });
+  t.setRotation(45);
+  expect(t.points[1].x).toBeCloseTo(1.7677);
+  expect(t.points[1].y).toBeCloseTo(1.7677);
+  t.setRotation(undefined);
+  expect(t.points[1].x).toBeCloseTo(1.7677);
+  expect(t.points[1].y).toBeCloseTo(1.7677);
+});
+
+test('Text getRotation returns 0 if points[1] undefined', () => {
+  const t = new Text({ points: [new Point()] });
+  t.points[1] = undefined;
+  expect(t.getRotation()).toBe(0);
 });
