@@ -157,15 +157,13 @@ export class Dimension extends BaseDimension {
         const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
 
         if (Input.getType(input2) === Input.Type.POINT) {
-          const pt11 = input2;
-          pt11.sequence = 11;
-          this.points.push(pt11);
+          const Pt11 = input2;
 
           // if selected items are available, get the points from the selected items
           // dimensions can be created from point selection only, therefore selected items may not be available
           if (this.selectedItems.length) {
             const dimensionType = this.dimensionMap[this.dimType]; // TODO: use this.dimensionMap.name?
-            this.points.push(...dimensionType.getPointsFromSelection(this.selectedItems));
+            this.points.push(...dimensionType.getPointsFromSelection(this.selectedItems, Pt11));
           }
         }
 
@@ -228,10 +226,8 @@ export class Dimension extends BaseDimension {
     const dimensionTypeString = dimensionType.register().command;
 
     if (this.selectedItems.length) {
-      const itemPoints = dimensionType.getPointsFromSelection(this.selectedItems);
-
       const mousePoint = DesignCore.Mouse.pointOnScene();
-      mousePoint.sequence = 11;
+      const itemPoints = dimensionType.getPointsFromSelection(this.selectedItems, mousePoint);
 
       const points = [...itemPoints, mousePoint];
       DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle, dimType: this.dimType });
