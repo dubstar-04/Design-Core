@@ -179,7 +179,7 @@ export class Arc extends Entity {
    * @param {number} scale
    */
   draw(ctx, scale) {
-    ctx.arc(this.points[0].x, this.points[0].y, this.radius, this.startAngle(), this.endAngle());
+    ctx.arc(this.points[0].x, this.points[0].y, this.radius, this.direction > 0 ? this.startAngle() : this.endAngle(), this.direction > 0 ? this.endAngle() : this.startAngle());
     ctx.stroke();
   }
 
