@@ -3,7 +3,8 @@ import { Point } from '../../core/entities/point';
 import { Core } from '../../core/core/core.js';
 import { Text } from '../../core/entities/text';
 
-const core = new Core();
+// initialise core
+new Core();
 
 describe('BaseDimension', () => {
   let baseDim;
