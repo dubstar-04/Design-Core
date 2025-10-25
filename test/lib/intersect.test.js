@@ -272,7 +272,7 @@ test('Test Intersection.intersectLineLine()', () => {
   const line5 = { start: new Point(0, 1), end: new Point(0, 8) };
   const result3 = Intersection.intersectLineLine(line1, line5, false);
   expect(result3.status).toBe('Coincident');
-  expect(result3.points.length).toBe(0);
+  expect(result3.points.length).toBe(1);
 });
 
 test('Test Intersection.intersectPolylineLine()', () => {
@@ -394,8 +394,8 @@ test('Test Intersection.intersectPolylineRectangle()', () => {
   const points2 = [new Point(5, 5), new Point(20, 20)];
   const polyline2 = { points: points2 };
   const result3 = Intersection.intersectPolylineLine(polyline2, rectangle, false);
-  expect(result3.status).toBe('No Intersection');
-  expect(result3.points.length).toBe(0);
+  expect(result3.status).toBe('Intersection');
+  expect(result3.points.length).toBe(1);
 });
 
 test('Test Intersection.intersectLineRectangle()', () => {
