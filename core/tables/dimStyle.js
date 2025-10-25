@@ -1,3 +1,4 @@
+
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { Logging } from '../lib/logging.js';
 import { Flags } from '../properties/flags.js';
@@ -429,14 +430,44 @@ export class DimStyle {
    */
   getValue(valueName) {
     if (this.hasOwnProperty(valueName)) {
-      // Ensure a number value is returned - Not 100% certain all values are numbers.
-      return Number(this[valueName]);
+      if (typeof this[valueName] === 'boolean') {
+        return this[valueName] ? 1 : 0;
+      }
+
+      // if a value cotainsly only digits, return it as a number
+      if (/^\d+$/.test(this[valueName])) {
+        // Ensure a number value is returned
+        return Number(this[valueName]);
+      } else {
+        return this[valueName];
+      }
     }
 
     const err = `Getting Value - ${valueName}`;
     Logging.instance.warn(`${this.type} - ${err}`);
     return;
   }
+
+  /**
+   * Set a property value by name
+   * @param {string} valueName
+   * @param {any} value
+   */
+  setValue(valueName, value) {
+    if (typeof valueName !== 'string' || valueName.length === 0) {
+      const err = `Setting Value - Invalid property name: ${valueName}`;
+      Logging.instance.warn(`${this.type} - ${err}`);
+      return;
+    }
+
+    if (this.hasOwnProperty(valueName)) {
+      this[valueName] = value;
+    } else {
+      const err = `Setting Value - Property does not exist: ${valueName}`;
+      Logging.instance.warn(`${this.type} - ${err}`);
+    }
+  }
+
 
   /**
    * Get the vertical value
