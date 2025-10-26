@@ -1,7 +1,72 @@
-import { Point } from '../../core/entities/point';
-import { Text } from '../../core/entities/text';
+import { Text } from '../../core/entities/text.js';
+import { Point } from '../../core/entities/point.js';
+import { DesignCore } from '../../core/designCore.js';
 
 import { File } from '../test-helpers/test-helpers.js';
+import { Core } from '../../core/core/core.js';
+
+// initialise core
+new Core();
+
+const textInputScenarios = [
+  {
+    desc: 'standard style, custom height and rotation',
+    pt0: new Point(1, 2),
+    styleName: 'STANDARD',
+    style: { textHeight: 2.5, backwards: false, upsideDown: false },
+    heightInput: 5,
+    rotationInput: 45,
+    stringInput: 'Hello',
+    expectedHeight: 5,
+    expectedRotation: 45,
+    expectedString: 'Hello',
+  },
+  {
+    desc: 'custom style, default height, rotation 90',
+    pt0: new Point(10, 20),
+    styleName: 'CUSTOM',
+    style: { textHeight: 3, backwards: true, upsideDown: true },
+    heightInput: undefined,
+    rotationInput: 90,
+    stringInput: 'World',
+    expectedHeight: 3,
+    expectedRotation: 90,
+    expectedString: 'World',
+  },
+];
+
+test.each(textInputScenarios)('Text.execute handles $desc', async (scenario) => {
+  const { pt0, styleName, style, heightInput, rotationInput, stringInput, expectedHeight, expectedRotation, expectedString } = scenario;
+  const origInputManager = DesignCore.Scene.inputManager;
+
+  let callCount = 0;
+  DesignCore.Scene.inputManager = {
+    requestInput: async (op) => {
+      callCount++;
+      if (callCount === 1) return pt0;
+      if (callCount === 2 && heightInput !== undefined) return heightInput;
+      if ((callCount === 2 && heightInput === undefined) || (callCount === 3 && heightInput !== undefined)) return rotationInput;
+      if ((callCount === 3 && heightInput === undefined) || (callCount === 4 && heightInput !== undefined)) return stringInput;
+    },
+    executeCommand: () => {},
+  };
+
+  const text = new Text({ points: [pt0] });
+  await text.execute();
+
+  expect(text.points.length).toBeGreaterThanOrEqual(1);
+  expect(text.points[0].x).toBe(pt0.x);
+  expect(text.points[0].y).toBe(pt0.y);
+  expect(text.height).toBe(expectedHeight);
+  expect(text.rotation).toBe(expectedRotation);
+  expect(text.string).toBe(expectedString);
+  expect(text.styleName).toBe(styleName);
+  expect(text.backwards).toBe(style.backwards);
+  expect(text.upsideDown).toBe(style.upsideDown);
+
+  // Restore original managers
+  DesignCore.Scene.inputManager = origInputManager;
+});
 
 test('Test Text.closestPoint', () => {
   const text = new Text({ points: [new Point(100, 100)] });
