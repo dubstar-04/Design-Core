@@ -5,24 +5,41 @@ import { DesignCore } from '../../core/designCore.js';
 
 import { File } from '../test-helpers/test-helpers.js';
 
-const core = new Core();
-const commandline = core.commandLine;
+// initialise core
+new Core();
 
-test('Arc.execute creates points from user input', async () => {
-  // Mock DesignCore.Scene.inputManager.requestInput to return points
+const arcInputScenarios = [
+  {
+    desc: 'two points and an angle',
+    input1: new Point(0, 0),
+    input2: new Point(10, 0),
+    input3: 90, // degrees
+    expectedPt2: (input1, input2) => input2.rotate(input1, Math.PI / 2),
+    expectedStart: 0,
+    expectedEnd: Math.PI / 2,
+  },
+  {
+    desc: 'three points',
+    input1: new Point(0, 0),
+    input2: new Point(10, 0),
+    input3: new Point(10, 10),
+    expectedPt2: (input1, input2, input3) => input3,
+    expectedStart: 0,
+    expectedEnd: Math.PI / 4,
+  },
+];
+
+test.each(arcInputScenarios)('Arc.execute handles $desc', async (scenario) => {
+  const { input1, input2, input3, expectedPt2, expectedStart, expectedEnd } = scenario;
   const origInputManager = DesignCore.Scene.inputManager;
-  const pt0 = new Point(0, 0);
-  const pt1 = new Point(10, 0);
-  const pt2 = new Point(10, 10);
-
   let callCount = 0;
   DesignCore.Scene.inputManager = {
     requestInput: async () => {
       callCount++;
-      if (callCount === 1) return pt0;
-      if (callCount === 2) return pt1;
-      if (callCount === 3) return pt2;
-      return pt2;
+      if (callCount === 1) return input1;
+      if (callCount === 2) return input2;
+      if (callCount === 3) return input3;
+      return input3;
     },
     executeCommand: () => {},
   };
@@ -31,43 +48,19 @@ test('Arc.execute creates points from user input', async () => {
   await arc.execute();
 
   expect(arc.points.length).toBe(3);
-  expect(arc.points[0]).toBe(pt0);
-  expect(arc.points[1]).toBe(pt1);
-  expect(arc.points[2]).toBe(pt2);
+  expect(arc.points[0]).toBe(input1);
+  expect(arc.points[1]).toBe(input2);
+  const expPt2 = expectedPt2(input1, input2, input3);
+  expect(arc.points[2].x).toBeCloseTo(expPt2.x);
+  expect(arc.points[2].y).toBeCloseTo(expPt2.y);
 
-  expect(arc.startAngle()).toBe(0);
-  expect(arc.endAngle()).toBeCloseTo(Math.PI / 4);
-  // expect(arc.getRadius()).toBeCloseTo(10 * Math.sqrt(2));
+  // if (checkAngles) {
+  expect(arc.startAngle()).toBe(expectedStart);
+  expect(arc.endAngle()).toBeCloseTo(expectedEnd);
+  // }
 
   // Restore original inputManager
   DesignCore.Scene.inputManager = origInputManager;
-});
-
-test('Test Arc.execute', async () => {
-  expect(DesignCore.Scene.items.length).toBe(0);
-
-  // Create arc - point, point, angle
-  commandline.handleKeys('A');
-  commandline.enterPressed();
-
-  commandline.command = '0,0';
-  commandline.update();
-  commandline.enterPressed();
-
-
-  commandline.command = '100,0';
-  commandline.update();
-  commandline.enterPressed();
-
-
-  commandline.command = '100,100';
-  commandline.update();
-  commandline.enterPressed();
-
-  // TODO: work out how to test user input for commands
-  // commented out because it fails. looks like the commands above run before the execute command because its async
-  // need to await enter pressed or similar without affecting user experience
-  // expect(DesignCore.Scene.items.length).toBe(1);
 });
 
 test('Test Arc.startAngle', () => {
