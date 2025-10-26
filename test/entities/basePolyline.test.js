@@ -1,8 +1,66 @@
 import { BasePolyline } from '../../core/entities/basePolyline';
 import { Point } from '../../core/entities/point';
 import { Polyline } from '../../core/entities/polyline.js';
+import { Core } from '../../core/core/core.js';
+import { DesignCore } from '../../core/designCore.js';
 
 import { File } from '../test-helpers/test-helpers.js';
+
+// initialise core
+new Core();
+
+const inputScenarios = [
+  {
+    desc: 'two points and an angle',
+    inputs: [new Point(0, 0), new Point(10, 0)],
+    expectedPoints: 2,
+  },
+  {
+    desc: 'three points with arc segment',
+    inputs: [new Point(0, 0), new Point(10, 0), 'Arc', new Point(10, 10)],
+    expectedPoints: 3,
+  },
+];
+
+test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => {
+  const { inputs, expectedPoints } = scenario;
+  const origInputManager = DesignCore.Scene.inputManager;
+  let callCount = 0;
+  DesignCore.Scene.inputManager = {
+
+    actionCommand: () => {},
+
+    executeCommand: () => {},
+
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        console.log('callCount =', callCount, 'input =', inputs[callCount], 'inputs.length =', inputs.length);
+        const input = inputs[callCount];
+        callCount++;
+        return input;
+      }
+    },
+  };
+
+  const polyline = new BasePolyline({});
+  await polyline.execute();
+
+  // console.log(polyline);
+  expect(polyline.points.length).toBe(expectedPoints);
+  expect(polyline.points[0]).toBe(inputs[0]);
+  expect(polyline.points[0].bulge).toBe(0);
+  expect(polyline.points[1]).toBe(inputs[1]);
+
+  // validate arc segment bulge and end point
+  if (inputs.length > 2) {
+    expect(polyline.points[1].bulge).toBeCloseTo(1);
+    expect(polyline.points[2]).toBe(inputs[3]);
+  }
+
+  // Restore original inputManager
+  DesignCore.Scene.inputManager = origInputManager;
+});
+
 
 test('Test BasePolyline.closestPoint', () => {
   const points = [new Point(100, 100), new Point(200, 100, -1), new Point(200, 50)];
