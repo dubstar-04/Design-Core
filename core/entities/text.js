@@ -104,7 +104,9 @@ export class Text extends Entity {
         this.setRotation(Property.loadValue([data.rotation, data[50]], 0));
       } else {
         // create points[1] used to determine the text rotation
-        this.points[1] = data.points[0].add(new Point(this.height, 0));
+        if (this.points.length && this.height !== undefined) {
+          this.points[1] = data.points[0].add(new Point(this.height, 0));
+        }
       }
 
       if (data.hasOwnProperty('horizontalAlignment') || data.hasOwnProperty('72')) {
