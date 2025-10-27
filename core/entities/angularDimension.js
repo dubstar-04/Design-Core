@@ -49,6 +49,8 @@ export class AngularDimension extends BaseDimension {
 
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
+      this.dimType = 2; // Angular dimension
+
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
 
@@ -87,14 +89,16 @@ export class AngularDimension extends BaseDimension {
       const op2 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const Pt11 = await DesignCore.Scene.inputManager.requestInput(op2);
       Pt11.sequence = 11;
-      this.points.push(Pt11);
 
-      const Pt15 = this.points.find((point) => point === 15);
+      const Pt15 = this.getPointBySequence(this.points, 15);
       const Pt10 = this.getPointBySequence(this.points, 10);
+      const Pt13 = this.getPointBySequence(this.points, 13);
+      const Pt14 = this.getPointBySequence(this.points, 14);
 
-      const Pt16 = Pt11.perpendicular(Pt15, Pt10);
-      Pt16.sequence = 16;
-      this.points.push(Pt16);
+      const tempLineOne = new Line({ points: [Pt15, Pt10] });
+      const tempLineTwo = new Line({ points: [Pt13, Pt14] });
+
+      this.points = AngularDimension.getPointsFromSelection([tempLineOne, tempLineTwo], Pt11);
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -107,17 +111,20 @@ export class AngularDimension extends BaseDimension {
    */
   preview() {
     if (this.points.length >= 4) {
-      const mousePoint = DesignCore.Mouse.pointOnScene();
-      mousePoint.sequence = 11;
+      const Pt11 = DesignCore.Mouse.pointOnScene();
+      Pt11.sequence = 11;
 
       const Pt15 = this.getPointBySequence(this.points, 15);
       const Pt10 = this.getPointBySequence(this.points, 10);
+      const Pt13 = this.getPointBySequence(this.points, 13);
+      const Pt14 = this.getPointBySequence(this.points, 14);
 
-      const Pt16 = mousePoint.perpendicular(Pt15, Pt10);
-      Pt16.sequence = 16;
+      const tempLineOne = new Line({ points: [Pt15, Pt10] });
+      const tempLineTwo = new Line({ points: [Pt13, Pt14] });
 
-      const points = [...this.points, mousePoint, Pt16];
-      DesignCore.Scene.createTempItem(this.type, { points: points });
+      const points = AngularDimension.getPointsFromSelection([tempLineOne, tempLineTwo], Pt11);
+
+      DesignCore.Scene.createTempItem(this.type, { points: points, dimensionStyle: this.dimensionStyle, dimType: this.dimType });
     }
   }
 

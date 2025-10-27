@@ -43,6 +43,8 @@ export class AlignedDimension extends BaseDimension {
     try {
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
+      this.dimType = 1; // Aligned dimension
+
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt13 = await DesignCore.Scene.inputManager.requestInput(op);
       pt13.sequence = 13;
@@ -53,10 +55,13 @@ export class AlignedDimension extends BaseDimension {
       pt14.sequence = 14;
       this.points.push(pt14);
 
-      const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
+      const op2 = new PromptOptions(Strings.Input.DIMENSION, [Input.Type.POINT]);
       const pt11 = await DesignCore.Scene.inputManager.requestInput(op2);
       pt11.sequence = 11;
       this.points.push(pt11);
+
+      const tempLine = new Line({ points: [pt13, pt14] });
+      this.points = AlignedDimension.getPointsFromSelection([tempLine], pt11);
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -75,10 +80,11 @@ export class AlignedDimension extends BaseDimension {
     }
 
     if (this.points.length > 1) {
-      const mousePoint = DesignCore.Mouse.pointOnScene();
-      mousePoint.sequence = 11;
-      const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(this.type, { points: points });
+      const pt11 = DesignCore.Mouse.pointOnScene();
+      pt11.sequence = 11;
+      const tempLine = new Line({ points: [...this.points] });
+      const points = AlignedDimension.getPointsFromSelection([tempLine], pt11);
+      DesignCore.Scene.createTempItem(this.type, { points: points, dimensionStyle: this.dimensionStyle, dimType: this.dimType });
     }
   }
 

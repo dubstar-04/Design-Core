@@ -1,6 +1,7 @@
 import { Strings } from '../lib/strings.js';
 import { Line } from './line.js';
 import { Text } from './text.js';
+import { Circle } from './circle.js';
 import { Point } from './point.js';
 import { Intersection } from '../lib/intersect.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
@@ -45,17 +46,31 @@ export class DiametricDimension extends BaseDimension {
 
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
+      this.dimType = 3; // Diametric
+
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-        // const selection =
-        await DesignCore.Scene.inputManager.requestInput(op);
+        const selection = await DesignCore.Scene.inputManager.requestInput(op);
+
+        const selectedItem = DesignCore.Scene.getItem(selection.selectedItemIndex);
+
+        const Pt15 = selectedItem.points[1];
+        Pt15.sequence = 15;
+        this.points.push(Pt15);
+
+        const Pt10 = selectedItem.points[0];
+        Pt10.sequence = 10;
+        this.points.push(Pt10);
       }
 
       const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
       const Pt11 = await DesignCore.Scene.inputManager.requestInput(op1);
-      Pt11.sequence = 11;
-      this.points.push(Pt11);
-      const selectionPoints = DiametricDimension.getPointsFromSelection();
-      this.points.push(...selectionPoints);
+      // Pt11.sequence = 11;
+
+      const Pt15 = this.getPointBySequence(this.points, 15);
+      const Pt10 = this.getPointBySequence(this.points, 10);
+
+      const tempCircle = new Circle({ points: [Pt10, Pt15] });
+      this.points = DiametricDimension.getPointsFromSelection([tempCircle], Pt11);
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -68,11 +83,15 @@ export class DiametricDimension extends BaseDimension {
    */
   preview() {
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-      const mousePoint = DesignCore.Mouse.pointOnScene();
-      mousePoint.sequence = 11;
+      const Pt11 = DesignCore.Mouse.pointOnScene();
+      Pt11.sequence = 11;
 
-      const selectionPoints = DiametricDimension.getPointsFromSelection();
-      const points = [...selectionPoints, mousePoint];
+      const Pt15 = this.getPointBySequence(this.points, 15);
+      const Pt10 = this.getPointBySequence(this.points, 10);
+
+      const tempCircle = new Circle({ points: [Pt10, Pt15] });
+      const points = DiametricDimension.getPointsFromSelection([tempCircle], Pt11);
+
       DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }

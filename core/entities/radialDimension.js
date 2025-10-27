@@ -1,4 +1,5 @@
 import { Strings } from '../lib/strings.js';
+import { Circle } from './circle.js';
 import { Line } from './line.js';
 import { Text } from './text.js';
 import { Point } from './point.js';
@@ -41,11 +42,23 @@ export class RadialDimension extends BaseDimension {
    */
   async execute() {
     try {
+      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
+      this.dimType = 4; // Radial dimension
+
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
 
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-        // const selection =
-        await DesignCore.Scene.inputManager.requestInput(op);
+        const selection = await DesignCore.Scene.inputManager.requestInput(op);
+
+        const selectedItem = DesignCore.Scene.getItem(selection.selectedItemIndex);
+
+        const Pt15 = selectedItem.points[1];
+        Pt15.sequence = 15;
+        this.points.push(Pt15);
+
+        const Pt10 = selectedItem.points[0];
+        Pt10.sequence = 10;
+        this.points.push(Pt10);
       }
 
       const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
@@ -53,8 +66,11 @@ export class RadialDimension extends BaseDimension {
       Pt11.sequence = 11;
       this.points.push(Pt11);
 
-      const selectionPoints = RadialDimension.getPointsFromSelection();
-      this.points.push(...selectionPoints);
+      const Pt15 = this.getPointBySequence(this.points, 15);
+      const Pt10 = this.getPointBySequence(this.points, 10);
+
+      const tempCircle = new Circle({ points: [Pt10, Pt15] });
+      this.points = RadialDimension.getPointsFromSelection([tempCircle], Pt11);
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -67,11 +83,15 @@ export class RadialDimension extends BaseDimension {
    */
   preview() {
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-      const mousePoint = DesignCore.Mouse.pointOnScene();
-      mousePoint.sequence = 11;
+      const Pt11 = DesignCore.Mouse.pointOnScene();
+      Pt11.sequence = 11;
 
-      const selectionPoints = this.getPointsFromSelection();
-      const points = [...selectionPoints, mousePoint];
+      const Pt15 = this.getPointBySequence(this.points, 15);
+      const Pt10 = this.getPointBySequence(this.points, 10);
+
+      const tempCircle = new Circle({ points: [Pt10, Pt15] });
+      const points = RadialDimension.getPointsFromSelection([tempCircle], Pt11);
+
       DesignCore.Scene.createTempItem(this.type, { points: points });
     }
   }
