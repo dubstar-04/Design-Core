@@ -45,9 +45,9 @@ export class Dimension extends BaseDimension {
     this.selectedItems = [];
 
     if (data) {
-      const dimensionTypes = new Set([1, 2, 3, 4, 5, 6, 32, 128]);
+      const dimensionTypes = new Set([0, 1, 2, 3, 4, 5, 6, 32, 128]);
 
-      let dimType = Property.loadValue([data[70], data.dimType], -1);
+      let dimType = Property.loadValue([data[70], data.dimType], 0);
       // TODO: dimType needs to be a flag object
 
       if (!Number.isInteger(dimType) || !dimensionTypes.has(dimType)) {
