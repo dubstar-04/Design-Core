@@ -31,7 +31,7 @@ export class RadialDimension extends BaseDimension {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = { command: 'RadialDimension', shortcut: 'DIMRADIUS' };
+    const command = { command: 'RadialDimension', shortcut: 'DIMRAD' };
     return command;
   }
 

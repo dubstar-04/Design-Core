@@ -31,7 +31,7 @@ export class AlignedDimension extends BaseDimension {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = { command: 'AlignedDimension', shortcut: 'DIMALIGNED' };
+    const command = { command: 'AlignedDimension', shortcut: 'DIMALI' };
     return command;
   }
 
