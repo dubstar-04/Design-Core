@@ -352,6 +352,15 @@ export class Text extends Entity {
   }
 
   /**
+   * Check if this text is currently being edited
+   * @return {boolean}
+   */
+  isBeingEdited() {
+    return DesignCore.Scene.inputManager.textEditing &&
+           DesignCore.Scene.inputManager.editingTextItem === this;
+  }
+
+  /**
    * Draw the entity
    * @param {Object} ctx - context
    * @param {number} scale

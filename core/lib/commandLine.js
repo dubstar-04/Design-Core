@@ -75,7 +75,10 @@ export class CommandLine {
       this.updateCallbackFunction(this.cmdLine);
     }
 
-    if (DesignCore.Scene.inputManager.activeCommand !== undefined) {
+    // Handle text editing mode
+    if (DesignCore.Scene.inputManager.textEditing) {
+      DesignCore.Scene.inputManager.handleTextEditInput(this.command);
+    } else if (DesignCore.Scene.inputManager.activeCommand !== undefined) {
       // TODO: This should call a common function that is currently called mouseMove in the scene class
       DesignCore.Scene.tempItems = [];
       DesignCore.Scene.inputManager.activeCommand.preview();
@@ -168,6 +171,13 @@ export class CommandLine {
    * Handles presses of the space key
    */
   spacePressed() {
+    // Handle text editing mode first
+    if (DesignCore.Scene.inputManager.textEditing) {
+      this.command = this.command + ' ';
+      this.update();
+      return;
+    }
+
     const activeCommand = DesignCore.Scene.inputManager.activeCommand;
     const promptOption = DesignCore.Scene.inputManager.promptOption;
 
@@ -186,8 +196,10 @@ export class CommandLine {
       this.command = '';
     } else {
       this.command = this.command.substring(0, this.command.length - 1);
-      this.update();
     }
+
+    // Always call update to keep command line in sync
+    this.update();
   }
 
   /**

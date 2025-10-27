@@ -172,6 +172,12 @@ export class InputManager {
     this.inputPoint = new Point();
 
     this.snapping = new Snapping();
+
+    // Text editing state
+    this.textEditing = false;
+    this.editingTextItem = undefined;
+    this.editingTextIndex = undefined;
+    this.originalTextString = '';
   }
 
   /**
@@ -184,6 +190,11 @@ export class InputManager {
     // this.promptOption.reject('reject');
     this.promptOption = undefined;
     DesignCore.Scene.reset();
+
+    // Exit text editing mode if active
+    if (this.textEditing) {
+      this.exitTextEdit();
+    }
   }
 
   /**
@@ -222,6 +233,14 @@ export class InputManager {
    * @param {any} input
    */
   onCommand(input) {
+    // Handle text editing mode first
+    if (this.textEditing) {
+      // For text editing, when onCommand is called, it means Enter was pressed
+      // So we should confirm the edit
+      this.confirmTextEdit();
+      return;
+    }
+
     if (this.activeCommand !== undefined) {
       this.promptOption.respond(input);
     } else if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
@@ -234,6 +253,12 @@ export class InputManager {
    * Handle enter / return presses
    */
   onEnterPressed() {
+    // Handle text editing mode first
+    if (this.textEditing) {
+      this.confirmTextEdit();
+      return;
+    }
+
     if (this.activeCommand !== undefined) {
       if (this.promptOption.types.includes(Input.Type.SELECTIONSET) && DesignCore.Scene.selectionManager.selectionSet.accepted !== true) {
         DesignCore.Scene.selectionManager.selectionSet.accepted = true;
@@ -255,6 +280,12 @@ export class InputManager {
    * Handle escape presses to reset
    */
   onEscapePressed() {
+    // Handle text editing mode first
+    if (this.textEditing) {
+      this.cancelTextEdit();
+      return;
+    }
+
     this.reset();
   }
 
@@ -316,7 +347,8 @@ export class InputManager {
     }
 
     // Determine if the mouse is over a scene item only if no snap point is available
-    if (snapped === undefined) {
+    // Skip selection/hover logic when in text editing mode
+    if (snapped === undefined && !this.textEditing) {
       if (this.activeCommand === undefined || this.activeCommand !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION) || this.promptOption.types.includes(Input.Type.SELECTIONSET))) {
         const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
         if (index !== undefined) {
@@ -460,5 +492,112 @@ export class InputManager {
       // return the item index
       return DesignCore.Scene.addItem(item.type, item, index);
     }
+  }
+
+  /**
+   * Start text editing mode
+   * @param {Object} textItem - the text item to edit
+   * @param {number} textIndex - index of the text item in scene.items
+   */
+  startTextEdit(textItem, textIndex) {
+    this.textEditing = true;
+    this.editingTextItem = textItem;
+    this.editingTextIndex = textIndex;
+    this.originalTextString = textItem.string;
+
+    // Set the command line content directly
+    DesignCore.CommandLine.command = textItem.string;
+    DesignCore.CommandLine.prompt = 'Edit text:';
+    DesignCore.CommandLine.update();
+
+    // Clear any existing selection and temp items
+    DesignCore.Scene.selectionManager.reset();
+    DesignCore.Scene.tempItems = [];
+
+    // Mark scene as requiring save since we're editing
+    DesignCore.Scene.saveRequired();
+
+    // Request a repaint to show editing state
+    DesignCore.Canvas.requestPaint();
+  }
+
+  /**
+   * Exit text editing mode
+   */
+  exitTextEdit() {
+    this.textEditing = false;
+    this.editingTextItem = undefined;
+    this.editingTextIndex = undefined;
+    this.originalTextString = '';
+
+    // Reset command line
+    DesignCore.CommandLine.resetPrompt();
+  }
+
+  /**
+   * Handle text editing input
+   * @param {string} input - the input text
+   */
+  handleTextEditInput(input) {
+    if (!this.textEditing || !this.editingTextItem || this.editingTextIndex === undefined) {
+      return;
+    }
+
+    // Get the current command line content
+    const currentText = DesignCore.CommandLine.command;
+
+    // Update the scene item
+    const textItem = DesignCore.Scene.items[this.editingTextIndex];
+    textItem.string = currentText;
+
+    // Also update the editing item reference to keep them in sync
+    this.editingTextItem.string = currentText;
+
+    // Update the command line display to ensure it's in sync
+    DesignCore.CommandLine.cmdLine = DesignCore.CommandLine.prompt + currentText;
+    if (DesignCore.CommandLine.updateCallbackFunction) {
+      DesignCore.CommandLine.updateCallbackFunction(DesignCore.CommandLine.cmdLine);
+    }
+
+    // Force a repaint
+    DesignCore.Canvas.requestPaint();
+  }
+
+  /**
+   * Confirm text editing changes
+   */
+  confirmTextEdit() {
+    if (!this.textEditing || !this.editingTextItem || this.editingTextIndex === undefined) {
+      return;
+    }
+
+    // The scene item is already updated during typing, so we just need to exit editing mode
+    // Mark scene as requiring save
+    DesignCore.Scene.saveRequired();
+
+    // Exit text editing mode
+    this.exitTextEdit();
+
+    // Request a repaint
+    DesignCore.Canvas.requestPaint();
+  }
+
+  /**
+   * Cancel text editing and restore original text
+   */
+  cancelTextEdit() {
+    if (!this.textEditing || !this.editingTextItem || this.editingTextIndex === undefined) {
+      return;
+    }
+
+    // Restore original text
+    this.editingTextItem.string = this.originalTextString;
+    DesignCore.Scene.items[this.editingTextIndex].string = this.originalTextString;
+
+    // Exit text editing mode
+    this.exitTextEdit();
+
+    // Request a repaint
+    DesignCore.Canvas.requestPaint();
   }
 }

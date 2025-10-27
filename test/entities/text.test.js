@@ -1,5 +1,6 @@
 import {Point} from '../../core/entities/point';
 import {Text} from '../../core/entities/text';
+import {DesignCore} from '../../core/designCore.js';
 
 import {File} from '../test-helpers/test-helpers.js';
 
@@ -192,4 +193,42 @@ AcDbText
   file = new File();
   newText.dxf(file);
   expect(file.contents).toEqual(dxfString);
+});
+
+test('Test Text.isBeingEdited', () => {
+  const text = new Text({points: [new Point(100, 100)], string: 'Test Text'});
+  
+  // Mock DesignCore.Scene.inputManager
+  const mockInputManager = {
+    textEditing: false,
+    editingTextItem: null
+  };
+  
+  // Mock DesignCore.Scene
+  const mockScene = {
+    inputManager: mockInputManager
+  };
+  
+  // Mock DesignCore with proper structure including Core
+  const originalCore = DesignCore._core;
+  DesignCore._core = {
+    scene: mockScene
+  };
+  
+  try {
+    // Test when not being edited
+    expect(text.isBeingEdited()).toBe(false);
+    
+    // Test when text editing is active but different item
+    mockInputManager.textEditing = true;
+    mockInputManager.editingTextItem = new Text({points: [new Point(200, 200)]});
+    expect(text.isBeingEdited()).toBe(false);
+    
+    // Test when this text is being edited
+    mockInputManager.editingTextItem = text;
+    expect(text.isBeingEdited()).toBe(true);
+  } finally {
+    // Restore original DesignCore
+    DesignCore._core = originalCore;
+  }
 });
