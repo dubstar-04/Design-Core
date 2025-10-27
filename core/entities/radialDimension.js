@@ -109,16 +109,14 @@ export class RadialDimension extends BaseDimension {
     const Pt10 = this.getPointBySequence(this.points, 10); // center point
     let Pt11 = this.getPointBySequence(this.points, 11); // text position
 
-    // Helper to get style values
-    const getStyle = (key) => this.getDimensionStyle().getValue(key);
     // Style values
-    const DIMTIH = getStyle('DIMTIH'); // Text inside horizontal alignment
-    const DIMTOH = getStyle('DIMTOH'); // Text outside horizontal alignment
-    const DIMASZ = getStyle('DIMASZ'); // Arrow size (used for extension line length)
-    const DIMTXT = getStyle('DIMTXT'); // Text size (used for estimated text width)
-    const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
-    const DIMTAD = getStyle('DIMTAD'); // Text vertical position
-    const DIMGAP = getStyle('DIMGAP'); // Gap between dimension line and text
+    const DIMTIH = this.getDimensionStyle().getValue('DIMTIH'); // Text inside horizontal alignment
+    const DIMTOH = this.getDimensionStyle().getValue('DIMTOH'); // Text outside horizontal alignment
+    const DIMASZ = this.getDimensionStyle().getValue('DIMASZ'); // Arrow size (used for extension line length)
+    const DIMTXT = this.getDimensionStyle().getValue('DIMTXT'); // Text size (used for estimated text width)
+    const DIMTOFL = this.getDimensionStyle().getValue('DIMTOFL'); // Force extension line if text outside
+    const DIMTAD = this.getDimensionStyle().getValue('DIMTAD'); // Text vertical position
+    const DIMGAP = this.getDimensionStyle().getValue('DIMGAP'); // Gap between dimension line and text
 
     // Ensure points are aligned Pt10 > Pt15 > Pt11
     // This resets the points to a known state to allow application of the dimstyle

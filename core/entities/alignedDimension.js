@@ -163,19 +163,21 @@ export class AlignedDimension extends BaseDimension {
     const Pt14 = this.getPointBySequence(this.points, 14);
     const Pt11 = this.getPointBySequence(this.points, 11);
 
-    // Helper to get style values
-    const getStyle = (key) => this.getDimensionStyle().getValue(key);
     // Style values
-    const DIMTIH = getStyle('DIMTIH'); // Text inside horizontal alignment
-    const DIMTOH = getStyle('DIMTOH'); // Text outside horizontal alignment
-    const DIMASZ = getStyle('DIMASZ'); // Arrow size (used for extension line length)
-    const DIMTXT = getStyle('DIMTXT'); // Text size (used for estimated text width)
-    // const DIMTOFL = getStyle('DIMTOFL'); // Force extension line if text outside
-    const DIMTAD = getStyle('DIMTAD'); // Text vertical position
-    const DIMEXE = getStyle('DIMEXE'); // Extend beyond dimension line distance
-    const DIMEXO = getStyle('DIMEXO'); // Offset from origin distance
-    const DIMJUST = getStyle('DIMJUST'); // Justification of the dimension text
-    const DIMGAP = getStyle('DIMGAP'); // Gap between dimension line and text
+    const DIMTIH = this.getDimensionStyle().getValue('DIMTIH'); // Text inside horizontal alignment
+    const DIMTOH = this.getDimensionStyle().getValue('DIMTOH'); // Text outside horizontal alignment
+    const DIMASZ = this.getDimensionStyle().getValue('DIMASZ'); // Arrow size (used for extension line length)
+    const DIMTXT = this.getDimensionStyle().getValue('DIMTXT'); // Text size (used for estimated text width)
+    // const DIMTOFL = this.getDimensionStyle().getValue('DIMTOFL'); // Force extension line if text outside
+    const DIMTAD = this.getDimensionStyle().getValue('DIMTAD'); // Text vertical position
+    const DIMEXE = this.getDimensionStyle().getValue('DIMEXE'); // Extend beyond dimension line distance
+    const DIMEXO = this.getDimensionStyle().getValue('DIMEXO'); // Offset from origin distance
+    const DIMJUST = this.getDimensionStyle().getValue('DIMJUST'); // Justification of the dimension text
+    const DIMGAP = this.getDimensionStyle().getValue('DIMGAP'); // Gap between dimension line and text
+    const DIMSE1 = this.getDimensionStyle().getValue('DIMSE1'); // Suppress first extension line
+    const DIMSE2 = this.getDimensionStyle().getValue('DIMSE2'); // Suppress second extension line
+    const DIMSD1 = this.getDimensionStyle().getValue('DIMSD1'); // Suppress first dimension line
+    const DIMSD2 = this.getDimensionStyle().getValue('DIMSD2'); // Suppress second dimension line
 
     // invalid points
     // if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
@@ -408,13 +410,13 @@ export class AlignedDimension extends BaseDimension {
     */
     const extLine1 = new Line({ points: [extLineOneStart, extLineOneEnd] });
     // Supress extension line 1 if DIMS1 is true
-    if (!style.getValue('DIMSE1')) {
+    if (!DIMSE1) {
       entities.push(extLine1);
     }
 
     const extLine2 = new Line({ points: [extLineTwoStart, extLineTwoEnd] });
     // Supress extendsion line 2 if DIMSE2 is true
-    if (!style.getValue('DIMSE2')) {
+    if (!DIMSE2) {
       entities.push(extLine2);
     }
 
@@ -423,13 +425,13 @@ export class AlignedDimension extends BaseDimension {
 
     const dimLine1 = new Line({ points: [dimLineOneStart, dimLineOneEnd] });
     // Supress dimension line 1 if DIMSD1 is true
-    if (!style.getValue('DIMSD1')) {
+    if (!DIMSD1) {
       entities.push(dimLine1, arrowHead1);
     }
 
     const dimLine2 = new Line({ points: [dimLineTwoStart, dimLineTwoEnd] });
     // Supress dimension line 2 if DIMSD2 is true
-    if (!style.getValue('DIMSD2')) {
+    if (!DIMSD2) {
       entities.push(dimLine2, arrowHead2);
     }
 

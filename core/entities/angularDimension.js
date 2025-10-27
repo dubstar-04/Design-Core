@@ -274,10 +274,7 @@ export class AngularDimension extends BaseDimension {
    * @return {Array} - Array of entities that compose the dimension
    */
   buildDimension(style) {
-    // Helper to get style values
-    const getStyle = (key) => this.getDimensionStyle().getValue(key);
-
-    // Get sorted and sequenced points
+  // Get sorted and sequenced points
     const sortedPoints = this.sortDimensionPoints();
     const Pt13 = this.getPointBySequence(sortedPoints, 13);
     const Pt14 = this.getPointBySequence(sortedPoints, 14);
@@ -287,15 +284,19 @@ export class AngularDimension extends BaseDimension {
     const Pt11 = this.getPointBySequence(this.points, 11);
 
     // Style values
-    const DIMTIH = getStyle('DIMTIH');
-    const DIMTOH = getStyle('DIMTOH');
-    const DIMASZ = getStyle('DIMASZ');
-    const DIMTXT = getStyle('DIMTXT');
-    const DIMTAD = getStyle('DIMTAD');
-    const DIMEXE = getStyle('DIMEXE');
-    const DIMEXO = getStyle('DIMEXO');
-    const DIMJUST = getStyle('DIMJUST');
-    const DIMGAP = getStyle('DIMGAP');
+    const DIMTIH = this.getDimensionStyle().getValue('DIMTIH'); // Text inside horizontal alignment
+    const DIMTOH = this.getDimensionStyle().getValue('DIMTOH'); // Text outside horizontal alignment
+    const DIMASZ = this.getDimensionStyle().getValue('DIMASZ'); // Arrow size (used for extension line length)
+    const DIMTXT = this.getDimensionStyle().getValue('DIMTXT'); // Text size (used for estimated text width)
+    const DIMTAD = this.getDimensionStyle().getValue('DIMTAD'); // Text vertical position
+    const DIMEXE = this.getDimensionStyle().getValue('DIMEXE'); // Extend beyond dimension line distance
+    const DIMEXO = this.getDimensionStyle().getValue('DIMEXO'); // Offset from origin distance
+    const DIMJUST = this.getDimensionStyle().getValue('DIMJUST'); // Justification of the dimension text
+    const DIMGAP = this.getDimensionStyle().getValue('DIMGAP'); // Gap between dimension line and text
+    const DIMSE1 = this.getDimensionStyle().getValue('DIMSE1'); // Suppress first extension line
+    const DIMSE2 = this.getDimensionStyle().getValue('DIMSE2'); // Suppress second extension line
+    const DIMSD1 = this.getDimensionStyle().getValue('DIMSD1'); // Suppress first dimension line
+    const DIMSD2 = this.getDimensionStyle().getValue('DIMSD2'); // Suppress second dimension line
 
     // Intersection and radius
     const intersectPt = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true).points[0];
@@ -441,7 +442,7 @@ export class AngularDimension extends BaseDimension {
     const arcOneRotation = arrowsOutside ? (-arrowRadians * 2) : ((textIsOnDimLine && !textOutSide) ? -arcAdjustment : 0);
     const arcOneEnd = arcOneBase.rotate(intersectPt, arcOneRotation);
     const arcOne = new Arc({ points: [intersectPt, arrow1pos, arcOneEnd], direction: arrowsOutside ? -1 : 1 });
-    if (!style.getValue('DIMSD1')) {
+    if (!DIMSD1) {
       entities.push(arrowHead1);
       entities.push(arcOne);
     }
@@ -449,7 +450,7 @@ export class AngularDimension extends BaseDimension {
     const arcTwoRotation = arrowsOutside ? (arrowRadians * 2) : ((textIsOnDimLine && !textOutSide) ? arcAdjustment : 0);
     const arcTwoEnd = arcTwoBase.rotate(intersectPt, arcTwoRotation);
     const arcTwo = new Arc({ points: [intersectPt, arrow2pos, arcTwoEnd], direction: arrowsOutside ? 1 : -1 });
-    if (!style.getValue('DIMSD2')) {
+    if (!DIMSD2) {
       entities.push(arrowHead2);
       entities.push(arcTwo);
     }
@@ -472,11 +473,11 @@ export class AngularDimension extends BaseDimension {
     }
     if (radius > intersectPt.distance(line1Extents) + DIMEXE) {
       const extensionLineOne = new Line({ points: [extensionLineOneStart, extensionLineOneEnd] });
-      if (!style.getValue('DIMSE1')) entities.push(extensionLineOne);
+      if (!DIMSE1) entities.push(extensionLineOne);
     }
     if (radius > intersectPt.distance(line2Extents) + DIMEXE) {
       const extensionLineTwo = new Line({ points: [extensionLineTwoStart, extensionLineTwoEnd] });
-      if (!style.getValue('DIMSE2')) entities.push(extensionLineTwo);
+      if (!DIMSE2) entities.push(extensionLineTwo);
     }
     return entities;
   }
