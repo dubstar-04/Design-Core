@@ -3,61 +3,97 @@ import { Dimension } from '../../core/entities/dimension';
 import { DiametricDimension } from '../../core/entities/diametricDimension';
 // import { AngularDimension } from '../../core/entities/angularDimension';
 // import { RadialDimension } from '../../core/entities/radialDimension';
-import { Property } from '../../core/properties/property';
+import { Circle } from '../../core/entities/circle';
+import { Point } from '../../core/entities/point';
+import { Line } from '../../core/entities/line.js';
+import { Arc } from '../../core/entities/arc';
 import { Core } from '../../core/core/core.js';
+import { DesignCore } from '../../core/designCore.js';
+import { SingleSelection } from '../../core/lib/selectionManager.js';
 
 // initialise core
 new Core();
 
-describe('Dimension', () => {
-  let origPropertyLoadValue;
-  let origDesignCore;
+// Test cases for user input
+const scenarios = [
 
-  beforeAll(() => {
-    // Save and mock Property.loadValue
-    origPropertyLoadValue = Property.loadValue;
-    Property.loadValue = (arr, def) => (arr && arr[0] !== undefined ? arr[0] : def);
-    // Minimal DesignCore mock
-    origDesignCore = global.DesignCore;
-    global.DesignCore = {
-      Scene: {
-        findItem: () => [],
-        removeItem: () => {},
-        inputManager: { requestInput: async () => ({}) },
-        getItem: () => ({}),
-        selectionManager: { reset: () => {}, removeLastSelection: () => {} },
-        createTempItem: () => {},
-      },
-      DimStyleManager: { getCstyle: () => 'STANDARD' },
-      Core: { notify: () => {} },
-      Mouse: { pointOnScene: () => ({}) },
-    };
-  });
+  { desc: 'Aligned dimension from line selection',
+    input: [new SingleSelection(0, new Point()), new Point(5, 5)],
+    selectedItems: [new Line({ points: [new Point(), new Point(10, 0)] })],
+    expectedDimType: 1,
+  },
+  { desc: 'Aligned dimension from point selection',
+    input: [new Point(), new Point(10, 0), new Point(5, 5)],
+    selectedItems: [],
+    expectedDimType: 1,
+  },
+  { desc: 'Diametric dimension from circle selection',
+    input: [new SingleSelection(0, new Point()), new Point(20, 10)],
+    selectedItems: [new Circle({ points: [new Point(), new Point(10, 0)] })],
+    expectedDimType: 3,
+  },
+  { desc: 'Radial dimension from arc selection',
+    input: [new SingleSelection(0, new Point()), new Point(20, 10)],
+    selectedItems: [new Arc({ points: [new Point(), new Point(10, 0), new Point(10, 10)] })],
+    expectedDimType: 4,
+  },
+  { desc: 'Angular dimension from line selection',
+    input: [new SingleSelection(0, new Point()), new SingleSelection(1, new Point()), new Point(5, 5)],
+    selectedItems: [new Line({ points: [new Point(), new Point(10, 0)] }), new Line({ points: [new Point(), new Point(10, 10)] })],
+    expectedDimType: 2,
+  },
+];
 
-  afterAll(() => {
-    Property.loadValue = origPropertyLoadValue;
-    global.DesignCore = origDesignCore;
-  });
+test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
+  const origInputManager = DesignCore.Scene.inputManager;
+  const origGetItem = DesignCore.Scene.getItem;
 
-  test('constructor instantiates correct dimension type', () => {
-    const data = { 70: 3, 2: 'blockName' };
-    const dim = new Dimension(data);
-    expect(dim instanceof DiametricDimension).toBe(true);
-  });
+  const { input, selectedItems, expectedDimType } = scenario;
+  let requestInputCallCount = 0;
+  let selectedItemsCallCount = 0;
 
-  test('constructor throws on invalid dimType', () => {
-    expect(() => new Dimension({ 70: 99 })).toThrow(/Invalid DimType/);
-  });
+  DesignCore.Scene.inputManager = {
+    requestInput: async () => {
+      requestInputCallCount++;
+      return input[requestInputCallCount - 1];
+    },
+    executeCommand: () => {},
+  };
 
-  test('register returns command object', () => {
-    expect(Dimension.register()).toEqual({ command: 'Dimension', shortcut: 'DIM' });
-  });
+  DesignCore.Scene.getItem = () => {
+    selectedItemsCallCount++;
+    return selectedItems[selectedItemsCallCount - 1];
+  };
 
-  test('preview calls createTempItem with correct args', () => {
-    const dim = new Dimension({ 70: 1 });
-    dim.selectedItems = [1];
-    dim.points = [{}, {}];
-    // Should not throw
-    expect(() => dim.preview()).not.toThrow();
-  });
+  const dim = new Dimension();
+  await dim.execute();
+
+  expect(dim.dimType).toBe(expectedDimType);
+
+  // Restore
+  DesignCore.Scene.inputManager = origInputManager;
+  DesignCore.Scene.getItem = origGetItem;
 });
+
+test('constructor instantiates correct dimension type', () => {
+  const data = { 70: 3, 2: 'blockName' };
+  const dim = new Dimension(data);
+  expect(dim instanceof DiametricDimension).toBe(true);
+});
+
+test('constructor throws on invalid dimType', () => {
+  expect(() => new Dimension({ 70: 99 })).toThrow(/Invalid DimType/);
+});
+
+test('register returns command object', () => {
+  expect(Dimension.register()).toEqual({ command: 'Dimension', shortcut: 'DIM' });
+});
+
+test('preview calls createTempItem with correct args', () => {
+  const dim = new Dimension({ 70: 1 });
+  dim.selectedItems = [1];
+  dim.points = [{}, {}];
+  // Should not throw
+  expect(() => dim.preview()).not.toThrow();
+});
+// });
