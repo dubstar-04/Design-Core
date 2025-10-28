@@ -434,7 +434,7 @@ export class DimStyle {
         return this[valueName] ? 1 : 0;
       }
 
-      // if a value cotainsly only digits, return it as a number
+      // if a value contains only digits, return it as a number
       if (/^\d+$/.test(this[valueName])) {
         // Ensure a number value is returned
         return Number(this[valueName]);
