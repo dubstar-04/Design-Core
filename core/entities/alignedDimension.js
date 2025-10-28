@@ -187,9 +187,10 @@ export class AlignedDimension extends BaseDimension {
     const DIMSD2 = this.getDimensionStyle().getValue('DIMSD2'); // Suppress second dimension line
 
     // invalid points
-    // if (Pt13.isSame(Pt14) || Pt13.isSame(Pt11) || Pt14.isSame(Pt11)) {
-    //  return null;
-    // }
+    if (Pt13.isSame(Pt14) || Pt11.closestPointOnLine(Pt13, Pt14).distance(Pt11) < DIMEXO) {
+      /* Pt13.distance(Pt11) < DIMEXO || Pt14.distance(Pt11) < DIMEXO ||*/
+      return;
+    }
 
     let Pt13e = new Point();
     const Pt14e = Pt10;
