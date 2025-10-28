@@ -402,7 +402,7 @@ export class AlignedDimension extends BaseDimension {
 
     // Extend the extension line when text is aligned with the extension line but not on the extension line
     if (textAndExtlineAligned && !textIsOnExtensionLine && !textIsOnInternalDimLine) {
-      if (Pt11.distance(Pt13e) < Pt11.distance(Pt14e)) {
+      if (textPosition.distance(Pt13e) < textPosition.distance(Pt14e)) {
         // Text position is closer to extension line 1
         const dist = extLineOneEnd.distance(textPosition.perpendicular(Pt13, Pt13e)) + approxTextHalfWidth;
         extLineOneEnd = extLineOneEnd.project(extensionLineAngle, dist);
