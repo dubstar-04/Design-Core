@@ -310,46 +310,37 @@ export class AngularDimension extends BaseDimension {
     const intersectPt = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true).points[0];
     const radius = intersectPt.distance(Pt16);
 
-    // Helper for quadrant/arrow/line logic
-    /**
-     * Get quadrant info for arrows and line extents
-     * @return {Object} arrow1pos, arrow2pos, line1Extents, line2Extents
-     */
-    function getQuadrantInfo() {
-      const quadOneStart = Pt14;
-      const quadOneEnd = Pt10;
-      const quadTwoStart = Pt14.rotate(intersectPt, Math.PI);
-      const quadTwoEnd = Pt10.rotate(intersectPt, Math.PI);
-      let arrow1pos = intersectPt;
-      let arrow2pos = intersectPt;
-      let line1Extents = Pt14;
-      let line2Extents = Pt10;
-      if (Pt16.isOnArc(quadOneStart, quadOneEnd, intersectPt, 1)) {
-        arrow1pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
-        arrow2pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
-        line1Extents = Pt14;
-        line2Extents = Pt10;
-      } else if (Pt16.isOnArc(quadOneEnd, quadTwoStart, intersectPt, 1)) {
-        arrow1pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
-        arrow2pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
-        line1Extents = Pt10;
-        line2Extents = Pt13;
-      } else if (Pt16.isOnArc(quadTwoStart, quadTwoEnd, intersectPt, 1)) {
-        arrow1pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
-        arrow2pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
-        line1Extents = Pt13;
-        line2Extents = Pt15;
-      } else if (Pt16.isOnArc(quadTwoEnd, quadOneStart, intersectPt, 1)) {
-        arrow1pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
-        arrow2pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
-        line1Extents = Pt15;
-        line2Extents = Pt14;
-      }
-      return { arrow1pos, arrow2pos, line1Extents, line2Extents };
+    // Inline quadrant/arrow/line logic
+    const quadOneStart = Pt14;
+    const quadOneEnd = Pt10;
+    const quadTwoStart = Pt14.rotate(intersectPt, Math.PI);
+    const quadTwoEnd = Pt10.rotate(intersectPt, Math.PI);
+    let arrow1pos = intersectPt;
+    let arrow2pos = intersectPt;
+    let line1Extents = Pt14;
+    let line2Extents = Pt10;
+    if (Pt16.isOnArc(quadOneStart, quadOneEnd, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
+      line1Extents = Pt14;
+      line2Extents = Pt10;
+    } else if (Pt16.isOnArc(quadOneEnd, quadTwoStart, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
+      line1Extents = Pt10;
+      line2Extents = Pt13;
+    } else if (Pt16.isOnArc(quadTwoStart, quadTwoEnd, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
+      line1Extents = Pt13;
+      line2Extents = Pt15;
+    } else if (Pt16.isOnArc(quadTwoEnd, quadOneStart, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
+      line1Extents = Pt15;
+      line2Extents = Pt14;
     }
 
-    // Get quadrant info
-    const { arrow1pos, arrow2pos, line1Extents, line2Extents } = getQuadrantInfo();
     const line1Angle = intersectPt.angle(arrow1pos);
     const line2Angle = intersectPt.angle(arrow2pos);
     let dimension = line2Angle - line1Angle;
