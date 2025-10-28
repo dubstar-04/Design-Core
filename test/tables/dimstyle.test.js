@@ -51,7 +51,7 @@ describe('DimStyle', () => {
 
     // Test boolean property
     style.setValue('DIMTIX', true);
-    expect(style.getValue('DIMTIX')).toBeTrue;
+    expect(style.getValue('DIMTIX')).toBe(true);
     style.setValue('DIMTIX', false);
     expect(style.getValue('DIMTIX')).toBe(false);
 
