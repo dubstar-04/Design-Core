@@ -286,7 +286,7 @@ export class AlignedDimension extends BaseDimension {
         }
         break;
       case 3: // 3 = Above first extension line
-        textPosition = Pt13e.project(extensionLineAngle, approxTextHalfWidth+ DIMEXE + DIMTXT);
+        textPosition = Pt13e.project(extensionLineAngle, approxTextHalfWidth + DIMEXE + DIMTXT);
         textRotation = this.getTextDirection(extensionLineAngle);
         textAboveDirection = textRotation + Math.PI / 2;
         break;
