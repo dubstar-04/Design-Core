@@ -310,6 +310,11 @@ export class AngularDimension extends BaseDimension {
     const intersectPt = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true).points[0];
     const radius = intersectPt.distance(Pt16);
 
+    // check dimension is valid
+    if (radius === 0) {
+      return;
+    }
+
     // Inline quadrant/arrow/line logic
     const quadOneStart = Pt14;
     const quadOneEnd = Pt10;
