@@ -9,7 +9,7 @@ describe('DimStyle', () => {
   });
 
   test('getValue returns correct default values', () => {
-    expect(style.getValue('DIMSE1')).toBe(false); // Suppress first extension line
+    expect(style.getValue('DIMSE1')).toBe(0); // Suppress first extension line
     expect(style.getValue('DIMASZ')).toBe(0.18); // Arrow size
   });
 
@@ -51,9 +51,9 @@ describe('DimStyle', () => {
 
     // Test boolean property
     style.setValue('DIMTIX', true);
-    expect(style.getValue('DIMTIX')).toBe(true);
+    expect(style.getValue('DIMTIX')).toBe(1);
     style.setValue('DIMTIX', false);
-    expect(style.getValue('DIMTIX')).toBe(false);
+    expect(style.getValue('DIMTIX')).toBe(0);
 
     // Test numeric property edge case
     style.setValue('DIMTAD', 99);
