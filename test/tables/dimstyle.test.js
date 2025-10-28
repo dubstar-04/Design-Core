@@ -65,7 +65,7 @@ describe('DimStyle', () => {
     expect(style.DIMTXT).toBe(42);
     expect(style.getValue('DIMTXT')).toBe(42);
     style.setValue('customProp', 'hello');
-    expect(style.customProp).toBeUndefined;
+    expect(style.customProp).toBeUndefined();
   });
 });
 
