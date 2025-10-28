@@ -9,7 +9,7 @@ describe('DimStyle', () => {
   });
 
   test('getValue returns correct default values', () => {
-    expect(style.getValue('DIMSE1')).toBeFalse; // Suppress first extension line
+    expect(style.getValue('DIMSE1')).toBe(false); // Suppress first extension line
     expect(style.getValue('DIMASZ')).toBe(0.18); // Arrow size
   });
 
