@@ -2,6 +2,7 @@ import { BaseDimension } from '../../core/entities/baseDimension';
 import { Point } from '../../core/entities/point';
 import { Core } from '../../core/core/core.js';
 import { Text } from '../../core/entities/text';
+// import { DimType } from '../../core/properties/dimType.js';
 
 // initialise core
 new Core();
@@ -22,22 +23,21 @@ describe('BaseDimension', () => {
     expect(baseDim.linearDimAngle).toBe(0);
   });
 
-  test('getBaseDimType returns correct type', () => {
-    baseDim.dimType = 34;
-    expect(baseDim.getBaseDimType()).toBe(2);
+  test('getDimensionValue formats values by type', () => {
+    baseDim.dimType.setDimType(0);
+    expect(baseDim.getDimensionValue(12.3456)).toBe('12.3456');
+    baseDim.dimType.setDimType(2);
+    expect(baseDim.getDimensionValue(45)).toContain('°');
+    baseDim.dimType.setDimType(3);
+    expect(baseDim.getDimensionValue(10)).toContain('Ø');
+    baseDim.dimType.setDimType(4);
+    expect(baseDim.getDimensionValue(5)).toContain('R');
+    baseDim.dimType.setDimType(6);
+    expect(baseDim.getDimensionValue(7)).toContain('7.00');
   });
 
-  test('getDimensionValue formats values by type', () => {
-    baseDim.dimType = 0;
-    expect(baseDim.getDimensionValue(12.3456)).toBe('12.3456');
-    baseDim.dimType = 2;
-    expect(baseDim.getDimensionValue(45)).toContain('°');
-    baseDim.dimType = 3;
-    expect(baseDim.getDimensionValue(10)).toContain('Ø');
-    baseDim.dimType = 4;
-    expect(baseDim.getDimensionValue(5)).toContain('R');
-    baseDim.dimType = 6;
-    expect(baseDim.getDimensionValue(7)).toContain('7.00');
+  test('constructor throws on invalid dimType', () => {
+    expect(() => new BaseDimension({ 70: 999 })).toThrow(/Invalid Dimension Type/);
   });
 
   test('getDimensionValue uses textOverride', () => {

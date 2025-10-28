@@ -43,7 +43,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
   const dim = new AlignedDimension();
   await dim.execute();
 
-  expect(dim.dimType).toBe(expectedDimType);
+  expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
   // get the text entities from the dimension block
   const dimensionBlockEntities = dim.buildDimension();
   expect(dimensionBlockEntities.length).toBe(7);

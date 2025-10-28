@@ -68,7 +68,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
   const dim = new Dimension();
   await dim.execute();
 
-  expect(dim.dimType).toBe(expectedDimType);
+  expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
 
   // Restore
   DesignCore.Scene.inputManager = origInputManager;
@@ -79,10 +79,6 @@ test('constructor instantiates correct dimension type', () => {
   const data = { 70: 3, 2: 'blockName' };
   const dim = new Dimension(data);
   expect(dim instanceof DiametricDimension).toBe(true);
-});
-
-test('constructor throws on invalid dimType', () => {
-  expect(() => new Dimension({ 70: 99 })).toThrow(/Invalid DimType/);
 });
 
 test('register returns command object', () => {

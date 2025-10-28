@@ -69,7 +69,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
   const dim = new AngularDimension();
   await dim.execute();
 
-  expect(dim.dimType).toBe(expectedDimType);
+  expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
   // get the text entities from the dimension block
   const dimensionBlockEntities = dim.buildDimension();
   expect(dimensionBlockEntities.length).toBe(dimensionEntities );
@@ -169,7 +169,7 @@ AcDbDimension
 31
 0.0
 70
-0
+2
 3
 STANDARD
 100

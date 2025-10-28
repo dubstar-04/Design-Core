@@ -22,6 +22,7 @@ export class RadialDimension extends BaseDimension {
    */
   constructor(data) {
     super(data);
+    this.dimType.setDimType(4); // Radial dimension
   }
 
   /**
@@ -43,7 +44,7 @@ export class RadialDimension extends BaseDimension {
   async execute() {
     try {
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
-      this.dimType = 4; // Radial dimension
+      this.dimType.setDimType(4); // Radial dimension
 
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
 
@@ -266,7 +267,7 @@ export class RadialDimension extends BaseDimension {
     file.writeGroupCode('11', Pt11.x); // X - Text Midpoint
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
-    file.writeGroupCode('70', this.dimType); // DIMENSION TYPE
+    file.writeGroupCode('70', this.dimType.getDimType()); // DIMENSION TYPE
     file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbRadialDimension', DXFFile.Version.R2000);
     file.writeGroupCode('15', Pt15.x); // X - End of Dimension Line

@@ -25,6 +25,7 @@ export class AngularDimension extends BaseDimension {
    */
   constructor(data) {
     super(data);
+    this.dimType.setDimType(2); // Angular dimension
   }
 
   /**
@@ -49,7 +50,7 @@ export class AngularDimension extends BaseDimension {
 
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
-      this.dimType = 2; // Angular dimension
+      this.dimType.setDimType(2); // Angular dimension
 
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
@@ -124,7 +125,7 @@ export class AngularDimension extends BaseDimension {
 
       const points = AngularDimension.getPointsFromSelection([tempLineOne, tempLineTwo], Pt11);
 
-      DesignCore.Scene.createTempItem(this.type, { points: points, dimensionStyle: this.dimensionStyle, dimType: this.dimType });
+      DesignCore.Scene.createTempItem(this.type, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 
@@ -513,7 +514,7 @@ export class AngularDimension extends BaseDimension {
     file.writeGroupCode('11', Pt11.x); // X - Text Midpoint
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
-    file.writeGroupCode('70', this.dimType); // DIMENSION TYPE
+    file.writeGroupCode('70', this.dimType.getDimType()); // DIMENSION TYPE
     file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDb2LineAngularDimension', DXFFile.Version.R2000);
     file.writeGroupCode('13', Pt13.x); // X

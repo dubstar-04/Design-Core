@@ -22,6 +22,7 @@ export class DiametricDimension extends BaseDimension {
    */
   constructor(data) {
     super(data);
+    this.dimType.setDimType(3); // Diametric dimension
   }
 
   /**
@@ -46,7 +47,7 @@ export class DiametricDimension extends BaseDimension {
 
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
-      this.dimType = 3; // Diametric
+      this.dimType.setDimType(3); // Diametric
 
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
@@ -278,7 +279,7 @@ export class DiametricDimension extends BaseDimension {
     file.writeGroupCode('11', Pt11.x); // X - Text Midpoint
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
-    file.writeGroupCode('70', this.dimType); // DIMENSION TYPE
+    file.writeGroupCode('70', this.dimType.getDimType()); // DIMENSION TYPE
     file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbDiametricDimension', DXFFile.Version.R2000);
     file.writeGroupCode('15', Pt15.x); // X - End of Dimension Line

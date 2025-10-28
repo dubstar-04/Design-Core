@@ -18,6 +18,7 @@ import { DesignCore } from '../designCore.js';
 import { SingleSelection } from '../lib/selectionManager.js';
 import { Utils } from '../lib/utils.js';
 import { Property } from '../properties/property.js';
+import { DimType } from '../properties/dimType.js';
 
 /**
  * Dimension Entity Class
@@ -45,33 +46,17 @@ export class Dimension extends BaseDimension {
     this.selectedItems = [];
 
     if (data) {
-      const dimensionTypes = new Set([0, 1, 2, 3, 4, 5, 6, 32, 128]);
+      const item = new this.dimensionMap[DimType.getBaseType(this.dimType.getBaseDimType())](data);
 
-      let dimType = Property.loadValue([data[70], data.dimType], 0);
-      // TODO: dimType needs to be a flag object
+      // find the block linked to this dimension
+      const linkedBlockIndex = DesignCore.Scene.findItem('BLOCK', 'name', data[2]);
 
-      if (!Number.isInteger(dimType) || !dimensionTypes.has(dimType)) {
-        // num is in the set
-        const msg = 'Invalid DimType';
-        const err = (`${this.type} - ${msg}: ${dimType}`);
-        throw Error(err);
+      if (linkedBlockIndex.length) {
+        // remove the block from the scene, dimensions manage their block internally
+        DesignCore.Scene.removeItem(linkedBlockIndex[0]);
       }
 
-      dimType = dimType % 32; // remove the flag values
-
-      if (dimType >= 0 && dimType <= 6) {
-        const item = new this.dimensionMap[dimType](data);
-
-        // find the block linked to this dimension
-        const linkedBlockIndex = DesignCore.Scene.findItem('BLOCK', 'name', data[2]);
-
-        if (linkedBlockIndex.length) {
-          // remove the block from the scene, dimensions manage their block internally
-          DesignCore.Scene.removeItem(linkedBlockIndex[0]);
-        }
-
-        return item;
-      }
+      return item;
     }
   }
 
@@ -97,16 +82,13 @@ export class Dimension extends BaseDimension {
 
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
-      // TODO: Type needs to be a flag object
-      // Type needs to have value 32 to indicate the dimensions block is owned by the dimension
-
       while (!inputValid) {
         const options = new PromptOptions(`${Strings.Input.START} or ${Strings.Input.SELECT}`, [Input.Type.POINT, Input.Type.SINGLESELECTION]);
         const input1 = await DesignCore.Scene.inputManager.requestInput(options);
 
         if (input1 instanceof Point) {
           inputValid = true;
-          this.dimType = 1;
+          this.dimType.setDimType(1);
           // select a second point to define the dimension
           const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
           const pt14 = await DesignCore.Scene.inputManager.requestInput(op1);
@@ -125,15 +107,15 @@ export class Dimension extends BaseDimension {
 
             // set the dimension type
             if (selectedItem instanceof Line) {
-              this.dimType = 1;
+              this.dimType.setDimType(1);
             }
 
             if (selectedItem instanceof Circle) {
-              this.dimType = 3;
+              this.dimType.setDimType(3);
             }
 
             if (selectedItem instanceof Arc) {
-              this.dimType = 4;
+              this.dimType.setDimType(4);
             }
           } else {
             const msg = `${this.type} - Unsupported Type: ${selectedItem.type}`;
@@ -156,7 +138,7 @@ export class Dimension extends BaseDimension {
 
         // diametric prompt: select radial or diametric type dimension or location for the the text position
         if (this.selectedItems[0] instanceof Circle) {
-          const options = this.dimType === 3 ? ['Radius'] : ['Diameter'];
+          const options = this.dimType.getBaseDimType() === 3 ? ['Radius'] : ['Diameter'];
           op2 = new PromptOptions(`${Strings.Input.DIMENSION} or ${Strings.Input.OPTION}`, [Input.Type.POINT], options);
         }
 
@@ -168,7 +150,7 @@ export class Dimension extends BaseDimension {
           // if selected items are available, get the points from the selected items
           // dimensions can be created from point selection only, therefore selected items may not be available
           if (this.selectedItems.length) {
-            const dimensionType = this.dimensionMap[this.dimType]; // TODO: use this.dimensionMap.name?
+            const dimensionType = this.dimensionMap[this.dimType.getBaseDimType()]; // TODO: use this.dimensionMap.name?
             this.points.push(...dimensionType.getPointsFromSelection(this.selectedItems, Pt11));
           }
         }
@@ -176,11 +158,11 @@ export class Dimension extends BaseDimension {
         if (Input.getType(input2) === Input.Type.STRING) {
           // options are converted to input in the prompt options class
           if (input2 === 'Diameter') {
-            this.dimType = 3;
+            this.dimType.setDimType(3);
           }
 
           if (input2 === 'Radius') {
-            this.dimType = 4;
+            this.dimType.setDimType(4);
           }
         }
 
@@ -201,7 +183,7 @@ export class Dimension extends BaseDimension {
               // add line to selection
                 this.selectedItems.push(selectedItem2);
                 // Two lines selected - switch to angular dimension
-                this.dimType = 2;
+                this.dimType.setDimType(2);
               }
             } else {
               const msg = `${this.type} - ${Strings.Error.SELECTION}: ${Strings.Error.PARALLELLINES}`;
@@ -227,7 +209,7 @@ export class Dimension extends BaseDimension {
    */
   preview() {
     // get the dimension class
-    const dimensionType = this.dimensionMap[this.dimType];
+    const dimensionType = this.dimensionMap[this.dimType.getBaseDimType()];
     // get the dimension type as a string
     const dimensionTypeString = dimensionType.register().command;
 
@@ -236,14 +218,14 @@ export class Dimension extends BaseDimension {
       const itemPoints = dimensionType.getPointsFromSelection(this.selectedItems, mousePoint);
 
       const points = [...itemPoints, mousePoint];
-      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle, dimType: this.dimType });
+      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
     }
 
     if (this.points.length > 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       mousePoint.sequence = 11;
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle, dimType: this.dimType });
+      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 }

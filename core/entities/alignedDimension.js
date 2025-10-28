@@ -21,6 +21,7 @@ export class AlignedDimension extends BaseDimension {
    */
   constructor(data) {
     super(data);
+    this.dimType.setDimType(1); // Aligned dimension
   }
 
   /**
@@ -43,7 +44,7 @@ export class AlignedDimension extends BaseDimension {
     try {
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
-      this.dimType = 1; // Aligned dimension
+      this.dimType.setDimType(1); // Aligned dimension
 
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt13 = await DesignCore.Scene.inputManager.requestInput(op);
@@ -84,7 +85,7 @@ export class AlignedDimension extends BaseDimension {
       pt11.sequence = 11;
       const tempLine = new Line({ points: [...this.points] });
       const points = AlignedDimension.getPointsFromSelection([tempLine], pt11);
-      DesignCore.Scene.createTempItem(this.type, { points: points, dimensionStyle: this.dimensionStyle, dimType: this.dimType });
+      DesignCore.Scene.createTempItem(this.type, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 
@@ -466,7 +467,7 @@ export class AlignedDimension extends BaseDimension {
     file.writeGroupCode('11', Pt11.x); // X - text midpoint
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
-    file.writeGroupCode('70', 1); // DIMENSION TYPE 0 = rotated, 1 = aligned
+    file.writeGroupCode('70', this.dimType.getDimType()); // DIMENSION TYPE
     file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbAlignedDimension', DXFFile.Version.R2000);
     file.writeGroupCode('13', Pt13.x); // X - start point of first extension line

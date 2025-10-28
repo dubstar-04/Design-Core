@@ -10,6 +10,7 @@ import { Strings } from '../lib/strings.js';
 import { Utils } from '../lib/utils.js';
 
 import { DesignCore } from '../designCore.js';
+import { DimType } from '../properties/dimType.js';
 
 /**
  * Base Dimension Entity Class
@@ -58,7 +59,7 @@ export class BaseDimension extends Entity {
     });
 
     Object.defineProperty(this, 'dimType', {
-      value: 0,
+      value: new DimType(),
       writable: true,
     });
 
@@ -162,7 +163,23 @@ export class BaseDimension extends Entity {
         // If set, ordinate is X-type; if not set, ordinate is Y-type
         // 128 = This is a bit value (bit 8) added to the other group 70 values if the dimension text
         // has been positioned at a user-defined location rather than at the default location
-        this.dimType = Property.loadValue([data.dimType, data[70]], 1);
+
+        let dimTypeValue = data.dimType;
+
+        if (data.dimType instanceof DimType) {
+          dimTypeValue = data.dimType.getBaseDimType();
+        }
+
+        const dimensionType = Property.loadValue([data[70], dimTypeValue], 0);
+
+        if (!DimType.isValidDimensionType(dimensionType)) {
+        // num is in the set
+          const msg = 'Invalid Dimension Type';
+          const err = (`${this.type} - ${msg}: ${dimensionType}`);
+          throw Error(err);
+        }
+
+        this.dimType.setDimType(dimensionType);
       }
 
       if (data.hasOwnProperty('71')) {
@@ -186,15 +203,6 @@ export class BaseDimension extends Entity {
         this.leaderLength = data.leaderLength;
       }
     }
-  }
-
-  /**
-   * Get the dimension type
-   * @return {number}
-   */
-  getBaseDimType() {
-    const type = this.dimType % 32;
-    return type;
   }
 
   /**
@@ -242,7 +250,7 @@ export class BaseDimension extends Entity {
     // const DIMZIN = this.getDimensionStyle().getValue('DIMZIN');
     // const DIMAZIN = this.getDimensionStyle().getValue('DIMAZIN');
 
-    switch (this.getBaseDimType()) {
+    switch (this.dimType.getBaseDimType()) {
       case 0: // Rotated, horizontal, or vertical
       case 1: // Aligned
         formattedDimensionValue = `${Math.abs(dimensionValue).toFixed(precision)}`;
