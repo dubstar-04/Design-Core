@@ -53,7 +53,7 @@ describe('DimStyle', () => {
     style.setValue('DIMTIX', true);
     expect(style.getValue('DIMTIX')).toBeTrue;
     style.setValue('DIMTIX', false);
-    expect(style.getValue('DIMTIX')).toBeFalse;
+    expect(style.getValue('DIMTIX')).toBe(false);
 
     // Test numeric property edge case
     style.setValue('DIMTAD', 99);
