@@ -1,8 +1,5 @@
 import { Dimension } from '../../core/entities/dimension';
-// import { AlignedDimension } from '../../core/entities/alignedDimension';
 import { DiametricDimension } from '../../core/entities/diametricDimension';
-// import { AngularDimension } from '../../core/entities/angularDimension';
-// import { RadialDimension } from '../../core/entities/radialDimension';
 import { Circle } from '../../core/entities/circle';
 import { Point } from '../../core/entities/point';
 import { Line } from '../../core/entities/line.js';
@@ -92,4 +89,3 @@ test('preview calls createTempItem with correct args', () => {
   // Should not throw
   expect(() => dim.preview()).not.toThrow();
 });
-// });

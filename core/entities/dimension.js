@@ -17,7 +17,6 @@ import { Intersection } from '../lib/intersect.js';
 import { DesignCore } from '../designCore.js';
 import { SingleSelection } from '../lib/selectionManager.js';
 import { Utils } from '../lib/utils.js';
-import { Property } from '../properties/property.js';
 import { DimType } from '../properties/dimType.js';
 
 /**
