@@ -77,7 +77,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
   // check if the text value matches the expected dimension value
   for (const entity of dimensionBlockEntities) {
     if (entity.type === 'Text') {
-      // remove all none numberic characters except . and -
+      // remove all non-numeric characters except . and -
       const numbersOnly = entity.string.replace(/[^0-9.-]+/g, '');
       expect(Number(numbersOnly)).toBeCloseTo(dimensionValue);
       expect(entity.string).toContain('°');
