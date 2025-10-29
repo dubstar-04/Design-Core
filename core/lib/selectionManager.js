@@ -205,4 +205,25 @@ export class SelectionManager {
 
     DesignCore.Core.canvas.requestPaint();
   }
+
+  /**
+   * Select all items on the canvas
+   */
+  selectAll() {
+    // Clear current selection
+    this.reset();
+
+    // Add all selectable items to the selection
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
+      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.items[i].layer);
+
+      // Only select items on selectable layers
+      if (layer.isSelectable) {
+        this.addToSelectionSet(i);
+      }
+    }
+
+    this.selectionSetChanged();
+    DesignCore.Core.canvas.requestPaint();
+  }
 }
