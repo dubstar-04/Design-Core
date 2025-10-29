@@ -25,6 +25,8 @@ export class FileIO {
     const dxf = new DXF();
     try {
       dxf.loadDxf(data);
+      // Mark scene as saved since we just loaded it
+      DesignCore.Scene.markSaved();
       DesignCore.Canvas.requestPaint();
       DesignCore.Core.notify(Strings.Message.FILEOPEN);
     } catch (error) {
