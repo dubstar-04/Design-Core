@@ -101,6 +101,52 @@ test('getPointsFromSelection returns correct sequenced points', () => {
   expect(result[2].sequence).toBe(11); // text position
 });
 
+test('RadialDimension.preview runs without error and calls createTempItem', () => {
+  const origCreateTempItem = DesignCore.Scene.createTempItem;
+  const origPointOnScene = DesignCore.Mouse.pointOnScene;
+  const origSeletionSet = DesignCore.Scene.selectionManager.selectionSet.selectionSet.length;
+
+  // Manual mock for createTempItem
+  const createTempItemCalls = [];
+  DesignCore.Scene.createTempItem = function(type, obj) {
+    createTempItemCalls.push([type, obj]);
+  };
+  // Manual mock for pointOnScene
+  DesignCore.Mouse.pointOnScene = function() {
+    return new Point(5, 5);
+  };
+  // Manual mock for selection set
+  DesignCore.Scene.selectionManager.selectionSet.selectionSet = [];
+
+  const points = [];
+
+  const Pt10 = new Point();
+  Pt10.sequence = 10;
+  points.push(Pt10);
+
+  const Pt15 = new Point(10, 0);
+  Pt15.sequence = 15;
+  points.push(Pt15);
+
+  // Test with no selection - no action
+  const dim1 = new RadialDimension();
+  dim1.points = points;
+  expect(() => dim1.preview()).not.toThrow();
+  expect(createTempItemCalls.length).toBe(0);
+
+  // Test with selection (should call createTempItem with this.type)
+  const dim2 = new RadialDimension();
+  dim2.points = points;
+  DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(1);
+  expect(() => dim2.preview()).not.toThrow();
+  expect(createTempItemCalls.some((call) => call[0] === dim2.type)).toBe(true);
+
+  // Restore
+  DesignCore.Scene.createTempItem = origCreateTempItem;
+  DesignCore.Mouse.pointOnScene = origPointOnScene;
+  DesignCore.Scene.selectionManager.selectionSet.selectionSet.length = origSeletionSet;
+});
+
 test('Test RadialDimension.dxf', () => {
   const points = [];
 

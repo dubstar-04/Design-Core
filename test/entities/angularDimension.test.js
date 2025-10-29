@@ -111,6 +111,49 @@ test('getPointsFromSelection returns correct sequenced points', () => {
   expect(result.length).toBeGreaterThanOrEqual(4);
 });
 
+test('AngularDimension.preview runs without error and calls createTempItem', () => {
+  const origCreateTempItem = DesignCore.Scene.createTempItem;
+  const origPointOnScene = DesignCore.Mouse.pointOnScene;
+  // Manual mock for createTempItem
+  const createTempItemCalls = [];
+  DesignCore.Scene.createTempItem = function(type, obj) {
+    createTempItemCalls.push([type, obj]);
+  };
+  // Manual mock for pointOnScene
+  DesignCore.Mouse.pointOnScene = function() {
+    return new Point(5, 5);
+  };
+
+
+  // Test with >4 point (should call createTempItem with this.type)
+  const dim2 = new AngularDimension();
+
+  dim2.points = [];
+
+  const Pt10 = new Point();
+  Pt10.sequence = 10;
+  dim2.points.push(Pt10);
+
+  const Pt13 = new Point();
+  Pt13.sequence = 13;
+  dim2.points.push(Pt13);
+
+  const Pt14 = new Point();
+  Pt14.sequence = 14;
+  dim2.points.push(Pt14);
+
+  const Pt15 = new Point();
+  Pt15.sequence = 15;
+  dim2.points.push(Pt15);
+
+  expect(() => dim2.preview()).not.toThrow();
+  expect(createTempItemCalls.some((call) => call[0] === dim2.type)).toBe(true);
+
+  // Restore
+  DesignCore.Scene.createTempItem = origCreateTempItem;
+  DesignCore.Mouse.pointOnScene = origPointOnScene;
+});
+
 test('Test AngularDimension.dxf', () => {
   const points = [];
 

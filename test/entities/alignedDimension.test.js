@@ -123,6 +123,35 @@ describe('AlignedDimension.getPointsFromSelection', () => {
   });
 });
 
+test('AlignedDimension.preview runs without error and calls createTempItem', () => {
+  const origCreateTempItem = DesignCore.Scene.createTempItem;
+  const origPointOnScene = DesignCore.Mouse.pointOnScene;
+  // Manual mock for createTempItem
+  const createTempItemCalls = [];
+  DesignCore.Scene.createTempItem = function(type, obj) {
+    createTempItemCalls.push([type, obj]);
+  };
+  // Manual mock for pointOnScene
+  DesignCore.Mouse.pointOnScene = function() {
+    return new Point(5, 5);
+  };
+
+  // Test with 1 point (should call createTempItem with 'Line')
+  const dim1 = new AlignedDimension();
+  dim1.points = [new Point(0, 0)];
+  expect(() => dim1.preview()).not.toThrow();
+  expect(createTempItemCalls.some((call) => call[0] === 'Line')).toBe(true);
+
+  // Test with >1 point (should call createTempItem with this.type)
+  const dim2 = new AlignedDimension();
+  dim2.points = [new Point(0, 0), new Point(10, 0), new Point(5, 5)];
+  expect(() => dim2.preview()).not.toThrow();
+  expect(createTempItemCalls.some((call) => call[0] === dim2.type)).toBe(true);
+
+  // Restore
+  DesignCore.Scene.createTempItem = origCreateTempItem;
+  DesignCore.Mouse.pointOnScene = origPointOnScene;
+});
 
 test('Test AlignedDimension.dxf', () => {
   const points = [];
