@@ -12,6 +12,7 @@ test('Test Solid.boundingBox', () => {
   expect(solid.boundingBox().yMax).toBeCloseTo(200);
 });
 
+
 test('Test Solid.dxf', () => {
   // test solid with 3 points
   const solid = new Solid({ points: [new Point(100, 100), new Point(200, 100), new Point(200, 200)] });
@@ -107,3 +108,22 @@ AcDbTrace
 
   expect(file2.contents).toEqual(dxfString2);
 });
+
+
+test('Solid.closestPoint returns input point and Infinity', () => {
+  const solid = new Solid({ points: [new Point(0, 0), new Point(1, 0), new Point(1, 1), new Point(0, 1)] });
+  const testPoint = new Point(5, 5);
+  const [closest, dist] = solid.closestPoint(testPoint);
+  expect(closest).toBe(testPoint);
+  expect(dist).toBe(Infinity);
+});
+
+test('Solid.intersectPoints returns correct points array', () => {
+  const pts = [new Point(0, 0), new Point(1, 0), new Point(1, 1), new Point(0, 1)];
+  const solid = new Solid({ points: pts });
+  const result = solid.intersectPoints();
+  expect(result).toHaveProperty('points');
+  expect(result.points).toEqual(pts);
+});
+
+
