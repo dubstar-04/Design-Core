@@ -155,6 +155,10 @@ export class CommandManager {
    * @return {boolean} boolean
    */
   isShortcut(shortcut) {
+    if (shortcut === undefined || shortcut === null || typeof shortcut !== 'string') {
+      return false;
+    }
+
     const found = this.commands.some((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === shortcut.toUpperCase());
     return found;
   }
@@ -165,7 +169,7 @@ export class CommandManager {
    * @return {boolean} boolean
    */
   isCommand(command) {
-    if (command === undefined || command === null) {
+    if (command === undefined || command === null || typeof command !== 'string') {
       return false;
     }
 
@@ -221,6 +225,10 @@ export class CommandManager {
    * @return {string} fuzzy matched command
    */
   getFuzzyMatch(input) {
+    if (input === undefined || input === null || typeof input !== 'string') {
+      return undefined;
+    }
+
     let score = Infinity;
     let fuzzyMatch;
     for (let i = 0; i < this.commands.length; i++) {

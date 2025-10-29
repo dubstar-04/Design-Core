@@ -223,7 +223,15 @@ export class InputManager {
    */
   onCommand(input) {
     if (this.activeCommand !== undefined) {
-      this.promptOption.respond(input);
+      // Check if the input is a valid command/shortcut - if so, switch to that command
+      if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
+        this.reset();
+        this.initialiseItem(DesignCore.CommandManager.getCommand(input));
+        this.activeCommand.execute();
+      } else {
+        // Otherwise, treat as input to the current command
+        this.promptOption.respond(input);
+      }
     } else if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
       this.initialiseItem(DesignCore.CommandManager.getCommand(input));
       this.activeCommand.execute();
