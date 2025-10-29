@@ -117,7 +117,10 @@ export class Core {
    * @return {string} The dxf file as a string.
    */
   saveFile(version) {
-    return FileIO.saveDxf(version);
+    const result = FileIO.saveDxf(version);
+    // Mark scene as saved since we just saved it
+    this.scene.markSaved();
+    return result;
   }
 
   /**
