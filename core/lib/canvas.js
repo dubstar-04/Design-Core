@@ -156,6 +156,36 @@ export class Canvas {
   }
 
   /**
+   * Zoom to a user-defined window
+   * @param {Point} pt1
+   * @param {Point} pt2
+   */
+  zoomToWindow(pt1, pt2) {
+    const xMin = Math.min(pt1.x, pt2.x);
+    const yMin = Math.min(pt1.y, pt2.y);
+    const xMax = Math.max(pt1.x, pt2.x);
+    const yMax = Math.max(pt1.y, pt2.y);
+
+    const width = xMax - xMin;
+    const height = yMax - yMin;
+
+    if (width === 0 || height === 0) {
+      return;
+    }
+
+    const selectionCenter = new Point(xMin + width / 2, yMin + height / 2);
+    const screenCenter = new Point(this.width / 2, this.height / 2);
+    const translateDelta = DesignCore.Mouse.transformToScene(screenCenter).subtract(selectionCenter);
+    const targetScale = Math.min((this.width / width), (this.height / height));
+    const scaleDelta = targetScale / this.getScale() * 0.9;
+
+    this.matrix.scale(scaleDelta, scaleDelta);
+    this.matrix.translate((selectionCenter.x / scaleDelta) - selectionCenter.x, (selectionCenter.y / scaleDelta) - selectionCenter.y);
+    this.matrix.translate(translateDelta.x / scaleDelta, translateDelta.y / scaleDelta);
+    this.requestPaint();
+  }
+
+  /**
    * Set the zoom to include all scene items
    */
   zoomExtents() {
