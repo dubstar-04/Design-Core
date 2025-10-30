@@ -59,3 +59,15 @@ test('Test SelectionManager.reset()', () => {
   expect(selectionManager.selectionSet.selectionSet.length).toBe(0);
 });
 
+test('Test SelectionManager.selectAll()', () => {
+  // Start with some selections
+  selectionManager.reset();
+  expect(selectionManager.selectionSet.selectionSet.length).toBe(0);
+
+  // Select all
+  selectionManager.selectAll();
+  expect(selectionManager.selectionSet.selectionSet.length).toBe(core.scene.items.length);
+  // The indices should match all scene items
+  expect(selectionManager.selectionSet.selectionSet).toEqual([0, 1, 2]);
+});
+
