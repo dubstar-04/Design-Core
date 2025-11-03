@@ -1,6 +1,8 @@
 import { BasePolyline } from '../../core/entities/basePolyline';
 import { Point } from '../../core/entities/point';
 import { Polyline } from '../../core/entities/polyline.js';
+import { Line } from '../../core/entities/line.js';
+import { Arc } from '../../core/entities/arc.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 
@@ -59,6 +61,23 @@ test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => 
 
   // Restore original inputManager
   DesignCore.Scene.inputManager = origInputManager;
+});
+
+test('Test BasePolyline.getClosestSegment', () => {
+  // Polyline with a line and an arc segment
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10)];
+  points[1].bulge = 1; // Arc from (10,0) to (10,10)
+  const polyline = new BasePolyline({ points });
+
+  // Closest to the line segment
+  const testPoint1 = new Point(5, 2);
+  const segment1 = polyline.getClosestSegment(testPoint1);
+  expect(segment1).toBeInstanceOf(Line);
+
+  // Closest to the arc segment
+  const testPoint2 = new Point(12, 5);
+  const segment2 = polyline.getClosestSegment(testPoint2);
+  expect(segment2).toBeInstanceOf(Arc);
 });
 
 

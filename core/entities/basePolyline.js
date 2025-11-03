@@ -6,6 +6,8 @@ import { Utils } from '../lib/utils.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
 import { Point } from './point.js';
+import { Line } from './line.js';
+import { Arc } from './arc.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
 
@@ -277,6 +279,43 @@ export class BasePolyline extends Entity {
     }
 
     return snaps;
+  }
+
+  /**
+   * Get the segment closest to point P
+   * @param {Point} P
+   * @return {Line|Arc|null} - closest segment
+   */
+  getClosestSegment(P) {
+    let closestSegment = null;
+    let minDistance = Infinity;
+
+    for (let i = 1; i < this.points.length; i++) {
+      const A = this.points[i - 1];
+      const B = this.points[i];
+
+      let candidateSegment;
+      let closestPoint;
+      if (A.bulge !== 0) {
+        const center = A.bulgeCentrePoint(B);
+        const direction = A.bulge > 0 ? 1 : -1;
+        closestPoint = P.closestPointOnArc(A, B, center, direction);
+        candidateSegment = new Arc({ points: [center, A, B], direction });
+      } else {
+        closestPoint = P.closestPointOnLine(A, B);
+        candidateSegment = new Line({ points: [A, B] });
+      }
+
+      if (closestPoint) {
+        const dist = P.distance(closestPoint);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestSegment = candidateSegment;
+        }
+      }
+    }
+
+    return closestSegment;
   }
 
   /**
