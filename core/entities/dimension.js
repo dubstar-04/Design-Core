@@ -79,10 +79,10 @@ export class Dimension extends BaseDimension {
   async execute() {
     try {
       let inputValid = false;
-
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
 
       while (!inputValid) {
+        DesignCore.Scene.selectionManager.reset();
         const options = new PromptOptions(`${Strings.Input.START} or ${Strings.Input.SELECT}`, [Input.Type.POINT, Input.Type.SINGLESELECTION]);
         const input1 = await DesignCore.Scene.inputManager.requestInput(options);
 

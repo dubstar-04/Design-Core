@@ -42,8 +42,8 @@ export class AlignedDimension extends BaseDimension {
    */
   async execute() {
     try {
+      DesignCore.Scene.selectionManager.reset();
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
-
       this.dimType.setDimType(1); // Aligned dimension
 
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
