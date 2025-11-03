@@ -1,6 +1,8 @@
 import { Strings } from '../lib/strings.js';
 import { Line } from './line.js';
 import { Text } from './text.js';
+import { Arc } from './arc.js';
+import { BasePolyline } from './basePolyline.js';
 import { Circle } from './circle.js';
 import { Point } from './point.js';
 import { Intersection } from '../lib/intersect.js';
@@ -43,32 +45,45 @@ export class DiametricDimension extends BaseDimension {
    */
   async execute() {
     try {
-      const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
-
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
+      this.dimType.setDimType(3); // Diametric dimension
 
-      this.dimType.setDimType(3); // Diametric
+      let Pt10;
+      let Pt15;
 
-      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+      while (!Pt10 && !Pt15) {
+        this.points = [];
+        DesignCore.Scene.selectionManager.reset();
+        const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
 
-        const selectedItem = DesignCore.Scene.getItem(selection.selectedItemIndex);
+        let selectedItem = DesignCore.Scene.getItem(selection.selectedItemIndex);
 
-        const Pt15 = selectedItem.points[1];
-        Pt15.sequence = 15;
-        this.points.push(Pt15);
+        if ([Circle, Arc, BasePolyline].some((entity) => selectedItem instanceof entity)) {
+          if (selectedItem instanceof BasePolyline) {
+            // get the segment closest to the mouse point
+            const segment = selectedItem.getClosestSegment(selection.selectedPoint);
 
-        const Pt10 = selectedItem.points[0];
-        Pt10.sequence = 10;
-        this.points.push(Pt10);
+            if (segment instanceof Arc) {
+              // update the selected item to be the polyline arc segment
+              selectedItem = segment;
+            }
+          }
+
+          if (selectedItem instanceof Circle || selectedItem instanceof Arc) {
+            Pt15 = selectedItem.points[1];
+            Pt15.sequence = 15;
+            this.points.push(Pt15);
+
+            Pt10 = selectedItem.points[0];
+            Pt10.sequence = 10;
+            this.points.push(Pt10);
+          }
+        }
       }
 
       const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
       const Pt11 = await DesignCore.Scene.inputManager.requestInput(op1);
-      // Pt11.sequence = 11;
-
-      const Pt15 = this.getPointBySequence(this.points, 15);
-      const Pt10 = this.getPointBySequence(this.points, 10);
 
       const tempCircle = new Circle({ points: [Pt10, Pt15] });
       this.points = DiametricDimension.getPointsFromSelection([tempCircle], Pt11);
@@ -134,6 +149,10 @@ export class DiametricDimension extends BaseDimension {
     const Pt15 = this.getPointBySequence(this.points, 15); // diameter point
     const Pt10 = this.getPointBySequence(this.points, 10); // diameter point
     let Pt11 = this.getPointBySequence(this.points, 11); // text position
+
+    if (!Pt10 || !Pt11 || !Pt15) {
+      return entities;
+    }
 
     const centre = Pt10.midPoint(Pt15);
 

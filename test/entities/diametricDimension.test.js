@@ -6,6 +6,7 @@ import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 import { Circle } from '../../core/entities/circle.js';
+import { Polyline } from '../../core/entities/polyline.js';
 
 
 // initialise core
@@ -33,6 +34,13 @@ const scenarios = [
     selectedItems: [new Arc({ points: [new Point(0, 0), new Point(20, 0), new Point(20, 20)] })],
     expectedDimType: 3,
     dimensionValue: 40,
+    dimensionEntities: 6,
+  },
+  { desc: 'Diametric dimension from polyline selection',
+    input: [new SingleSelection(0, new Point(30, 10)), new Point(30, 10)],
+    selectedItems: [new Polyline({ points: [new Point(0, 0), new Point(20, 0, 1), new Point(20, 20)] })],
+    expectedDimType: 3,
+    dimensionValue: 20,
     dimensionEntities: 6,
   },
 ];
