@@ -1,5 +1,7 @@
 import { Strings } from '../lib/strings.js';
 import { Circle } from './circle.js';
+import { Arc } from './arc.js';
+import { BasePolyline } from './basePolyline.js';
 import { Line } from './line.js';
 import { Text } from './text.js';
 import { Point } from './point.js';
@@ -46,29 +48,44 @@ export class RadialDimension extends BaseDimension {
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
       this.dimType.setDimType(4); // Radial dimension
 
-      const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
+      let Pt10;
+      let Pt15;
 
-      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+      while (!Pt10 && !Pt15) {
+        this.points = [];
+        DesignCore.Scene.selectionManager.reset();
+        const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
 
-        const selectedItem = DesignCore.Scene.getItem(selection.selectedItemIndex);
+        let selectedItem = DesignCore.Scene.getItem(selection.selectedItemIndex);
 
-        const Pt15 = selectedItem.points[1];
-        Pt15.sequence = 15;
-        this.points.push(Pt15);
+        if ([Circle, Arc, BasePolyline].some((entity) => selectedItem instanceof entity)) {
+          if (selectedItem instanceof BasePolyline) {
+            // get the segment closest to the mouse point
+            const segment = selectedItem.getClosestSegment(selection.selectedPoint);
 
-        const Pt10 = selectedItem.points[0];
-        Pt10.sequence = 10;
-        this.points.push(Pt10);
+            if (segment instanceof Arc) {
+              // update the selected item to be the polyline arc segment
+              selectedItem = segment;
+            }
+          }
+
+          if (selectedItem instanceof Circle || selectedItem instanceof Arc) {
+            Pt15 = selectedItem.points[1];
+            Pt15.sequence = 15;
+            this.points.push(Pt15);
+
+            Pt10 = selectedItem.points[0];
+            Pt10.sequence = 10;
+            this.points.push(Pt10);
+          }
+        }
       }
 
       const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
       const Pt11 = await DesignCore.Scene.inputManager.requestInput(op1);
       Pt11.sequence = 11;
       this.points.push(Pt11);
-
-      const Pt15 = this.getPointBySequence(this.points, 15);
-      const Pt10 = this.getPointBySequence(this.points, 10);
 
       const tempCircle = new Circle({ points: [Pt10, Pt15] });
       this.points = RadialDimension.getPointsFromSelection([tempCircle], Pt11);
@@ -138,6 +155,10 @@ export class RadialDimension extends BaseDimension {
     const DIMTOFL = this.getDimensionStyle().getValue('DIMTOFL'); // Force extension line if text outside
     const DIMTAD = this.getDimensionStyle().getValue('DIMTAD'); // Text vertical position
     const DIMGAP = this.getDimensionStyle().getValue('DIMGAP'); // Gap between dimension line and text
+
+    if (!Pt10 || !Pt11 || !Pt15) {
+      return entities;
+    }
 
     // Ensure points are aligned Pt10 > Pt15 > Pt11
     // This resets the points to a known state to allow application of the dimstyle
