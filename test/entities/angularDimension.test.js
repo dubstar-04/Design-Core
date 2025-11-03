@@ -2,6 +2,7 @@
 import { AngularDimension } from '../../core/entities/angularDimension';
 import { Point } from '../../core/entities/point';
 import { Line } from '../../core/entities/line';
+import { Polyline } from '../../core/entities/polyline.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
@@ -42,6 +43,13 @@ const scenarios = [
     expectedDimType: 2,
     dimensionValue: 135,
     dimensionEntities: 6,
+  },
+  { desc: 'Angular dimension from polyline selection - 45 degrees',
+    input: [new SingleSelection(0, new Point(5, 0)), new SingleSelection(1, new Point(5, 5)), new Point(5, 5)],
+    selectedItems: [new Polyline({ points: [new Point(0, 0), new Point(10, 0)] }), new Polyline({ points: [new Point(0, 0), new Point(10, 10)] })],
+    expectedDimType: 2,
+    dimensionValue: 45,
+    dimensionEntities: 5,
   },
 ];
 

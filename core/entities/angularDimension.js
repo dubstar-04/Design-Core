@@ -2,6 +2,7 @@
 import { Utils } from '../lib/utils.js';
 import { Strings } from '../lib/strings.js';
 import { Arc } from './arc.js';
+import { BasePolyline } from './basePolyline.js';
 import { Line } from './line.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
@@ -46,55 +47,75 @@ export class AngularDimension extends BaseDimension {
    */
   async execute() {
     try {
-      const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
-
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
-
       this.dimType.setDimType(2); // Angular dimension
 
-      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-        const selection = await DesignCore.Scene.inputManager.requestInput(op);
+      let Pt10;
+      let Pt15;
+      let Pt13;
+      let Pt14;
 
-        const line1 = DesignCore.Scene.getItem(selection.selectedItemIndex);
-
-        const Pt15 = line1.points[0];
-        Pt15.sequence = 15;
-        this.points.push(Pt15);
-
-        const Pt10 = line1.points[1];
-        Pt10.sequence = 10;
-        this.points.push(Pt10);
-
+      while (!Pt10 && !Pt15) {
+        this.points = [];
         DesignCore.Scene.selectionManager.reset();
+
+        const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
+        const selection = await DesignCore.Scene.inputManager.requestInput(op);
+        let selectedItem = DesignCore.Scene.getItem(selection.selectedItemIndex);
+
+        if ([Line, BasePolyline].some((entity) => selectedItem instanceof entity)) {
+          if (selectedItem instanceof BasePolyline) {
+            // get the segment closest to the mouse point
+            const segment = selectedItem.getClosestSegment(selection.selectedPoint);
+
+            if (segment instanceof Line) {
+              // update the selected item to be the polyline arc segment
+              selectedItem = segment;
+            }
+          }
+
+          if (selectedItem instanceof Line) {
+            Pt15 = selectedItem.points[0];
+            Pt15.sequence = 15;
+            this.points.push(Pt15);
+
+            Pt10 = selectedItem.points[1];
+            Pt10.sequence = 10;
+            this.points.push(Pt10);
+          }
+        }
       }
 
-      const op1 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
-
-
-      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-        const selection2 = await DesignCore.Scene.inputManager.requestInput(op1);
-
-        const line2 = DesignCore.Scene.getItem(selection2.selectedItemIndex);
-
-        const Pt13 = line2.points[0];
-        Pt13.sequence = 13;
-        this.points.push(Pt13);
-
-        const Pt14 = line2.points[1];
-        Pt14.sequence = 14;
-        this.points.push(Pt14);
-
+      while (!Pt13 && !Pt14) {
         DesignCore.Scene.selectionManager.reset();
+        const op1 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
+        const selection2 = await DesignCore.Scene.inputManager.requestInput(op1);
+        let selectedItem = DesignCore.Scene.getItem(selection2.selectedItemIndex);
+
+        if ([Line, BasePolyline].some((entity) => selectedItem instanceof entity)) {
+          if (selectedItem instanceof BasePolyline) {
+            // get the segment closest to the mouse point
+            const segment = selectedItem.getClosestSegment(selection2.selectedPoint);
+
+            if (segment instanceof Line) {
+              // update the selected item to be the polyline arc segment
+              selectedItem = segment;
+            }
+          }
+          if (selectedItem instanceof Line) {
+            Pt13 = selectedItem.points[0];
+            Pt13.sequence = 13;
+            this.points.push(Pt13);
+
+            Pt14 = selectedItem.points[1];
+            Pt14.sequence = 14;
+            this.points.push(Pt14);
+          }
+        }
       }
 
       const op2 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const Pt11 = await DesignCore.Scene.inputManager.requestInput(op2);
-      Pt11.sequence = 11;
-
-      const Pt15 = this.getPointBySequence(this.points, 15);
-      const Pt10 = this.getPointBySequence(this.points, 10);
-      const Pt13 = this.getPointBySequence(this.points, 13);
-      const Pt14 = this.getPointBySequence(this.points, 14);
 
       const tempLineOne = new Line({ points: [Pt15, Pt10] });
       const tempLineTwo = new Line({ points: [Pt13, Pt14] });
