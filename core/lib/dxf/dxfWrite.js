@@ -22,7 +22,7 @@ export class DXFWriter {
     file.writeGroupCode('2', DesignCore.DimStyleManager.getCstyle());
     file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
     // Horrible hack to generate a handseed value
-    //TODO: refactor core to track handle values properly and assigned them on creation
+    // TODO: refactor core to track handle values properly and assigned them on creation
     const handseed = (DesignCore.Scene.items.length +
       (DesignCore.LayerManager.items.length * 2)+
       DesignCore.LTypeManager.items.length +
