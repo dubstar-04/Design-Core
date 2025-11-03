@@ -4,6 +4,7 @@ import { Circle } from '../../core/entities/circle';
 import { Point } from '../../core/entities/point';
 import { Line } from '../../core/entities/line.js';
 import { Arc } from '../../core/entities/arc';
+import { Polyline } from '../../core/entities/polyline.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
@@ -39,6 +40,22 @@ const scenarios = [
     selectedItems: [new Line({ points: [new Point(), new Point(10, 0)] }), new Line({ points: [new Point(), new Point(10, 10)] })],
     expectedDimType: 2,
   },
+  { desc: 'Aligned dimension from polyline selection',
+    input: [new SingleSelection(0, new Point()), new SingleSelection(1, new Point()), new Point(5, 5)],
+    selectedItems: [new Polyline({ points: [new Point(), new Point(10, 0)] })],
+    expectedDimType: 1,
+  },
+  { desc: 'Radial dimension from polyline selection',
+    input: [new SingleSelection(0, new Point(16, 5)), new Point(20, 5)],
+    selectedItems: [new Polyline({ points: [new Point(), new Point(10, 0, 1), new Point(10, 10)] })],
+    expectedDimType: 4,
+  },
+  { desc: 'Angular dimension from polyline selection',
+    input: [new SingleSelection(0, new Point(5, 0)), new SingleSelection(1, new Point(5, 5)), new Point(5, 5)],
+    selectedItems: [new Polyline({ points: [new Point(), new Point(10, 0)] }), new Polyline({ points: [new Point(), new Point(10, 10)] })],
+    expectedDimType: 2,
+  },
+
 ];
 
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {

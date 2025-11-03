@@ -7,6 +7,7 @@ import { RadialDimension } from './radialDimension.js';
 import { Arc } from './arc.js';
 import { Circle } from './circle.js';
 import { Line } from './line.js';
+import { BasePolyline } from './basePolyline.js';
 import { Point } from './point.js';
 
 import { Strings } from '../lib/strings.js';
@@ -100,21 +101,41 @@ export class Dimension extends BaseDimension {
           const selectedItem = DesignCore.Scene.getItem(input1.selectedItemIndex);
 
           // check the selected entity is supported
-          if ([Line, Circle, Arc].some((entity) => selectedItem instanceof entity)) {
-            this.selectedItems.push(selectedItem);
-            inputValid = true;
-
+          if ([Line, Circle, Arc, BasePolyline].some((entity) => selectedItem instanceof entity)) {
             // set the dimension type
             if (selectedItem instanceof Line) {
               this.dimType.setDimType(1);
+              this.selectedItems.push(selectedItem);
+              inputValid = true;
             }
 
             if (selectedItem instanceof Circle) {
               this.dimType.setDimType(3);
+              this.selectedItems.push(selectedItem);
+              inputValid = true;
             }
 
             if (selectedItem instanceof Arc) {
               this.dimType.setDimType(4);
+              this.selectedItems.push(selectedItem);
+              inputValid = true;
+            }
+
+            if (selectedItem instanceof BasePolyline) {
+              // get the segment closest to the mouse point
+              const segment = selectedItem.getClosestSegment(input1.selectedPoint);
+
+              if (segment instanceof Line) {
+                this.dimType.setDimType(1);
+                this.selectedItems.push(segment);
+                inputValid = true;
+              }
+
+              if (segment instanceof Arc) {
+                this.dimType.setDimType(4);
+                this.selectedItems.push(segment);
+                inputValid = true;
+              }
             }
           } else {
             const msg = `${this.type} - Unsupported Type: ${selectedItem.type}`;
@@ -166,8 +187,17 @@ export class Dimension extends BaseDimension {
         }
 
         if (Input.getType(input2) === Input.Type.SINGLESELECTION) {
-          const selectedItem2 = DesignCore.Scene.getItem(input2.selectedItemIndex);
-          if ([Line].some((entity) => selectedItem2 instanceof entity)) {
+          let selectedItem2 = DesignCore.Scene.getItem(input2.selectedItemIndex);
+          if ([Line, BasePolyline].some((entity) => selectedItem2 instanceof entity)) {
+            // if a polyline is selected, get the segment closest to the mouse point
+            if (selectedItem2 instanceof BasePolyline) {
+              // get the segment closest to the mouse point
+              const segment = selectedItem2.getClosestSegment(input2.selectedPoint);
+
+              if (segment instanceof Line) {
+                selectedItem2 = segment;
+              }
+            }
             // Check lines intersect
             const line1 = { start: this.selectedItems[0].points[0], end: this.selectedItems[0].points[1] };
             const line2 = { start: selectedItem2.points[0], end: selectedItem2.points[1] };
