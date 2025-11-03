@@ -21,7 +21,15 @@ export class DXFWriter {
     file.writeGroupCode('9', '$DIMSTYLE');
     file.writeGroupCode('2', DesignCore.DimStyleManager.getCstyle());
     file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.formatHandle(DesignCore.Scene.items.length + 200), DXFFile.Version.R2000); // TODO: This needs to reflect the actual handle values
+    // Horrible hack to generate a handseed value
+    //TODO: refactor core to track handle values properly and assigned them on creation
+    const handseed = (DesignCore.Scene.items.length +
+      (DesignCore.LayerManager.items.length * 2)+
+      DesignCore.LTypeManager.items.length +
+      DesignCore.StyleManager.items.length +
+      DesignCore.DimStyleManager.items.length +
+      DesignCore.Scene.blockManager.items.length * 2) * 3;
+    file.writeGroupCode('5', file.formatHandle(parseInt(handseed)), DXFFile.Version.R2000); // TODO: This needs to reflect the actual handle values
     file.writeGroupCode('0', 'ENDSEC');
   }
 
