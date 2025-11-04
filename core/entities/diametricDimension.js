@@ -141,7 +141,7 @@ export class DiametricDimension extends BaseDimension {
    * @param {Object} style
    * @return {Array} - Array of entities that compose the dimension
    */
-  buildDimension(style) {
+  buildDimension() {
     // Diameter
     let dimension = 0;
     const entities = [];
