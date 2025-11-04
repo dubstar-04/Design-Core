@@ -20,7 +20,6 @@ import { DesignCore } from '../designCore.js';
 import { SingleSelection } from '../lib/selectionManager.js';
 import { Utils } from '../lib/utils.js';
 import { DimType } from '../properties/dimType.js';
-import { BaseLinearDimension } from './baseLinearDimension.js';
 
 /**
  * Dimension Entity Class
