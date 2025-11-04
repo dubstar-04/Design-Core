@@ -302,7 +302,7 @@ export class AngularDimension extends BaseDimension {
    * @param {Object} style
    * @return {Array} - Array of entities that compose the dimension
    */
-  buildDimension(style) {
+  buildDimension() {
   // Get sorted and sequenced points
     const sortedPoints = this.sortDimensionPoints();
     const Pt13 = this.getPointBySequence(sortedPoints, 13);
