@@ -10,6 +10,7 @@ import { Text } from '../entities/text.js';
 import { Dimension } from '../entities/dimension.js';
 import { AlignedDimension } from '../entities/alignedDimension.js';
 import { AngularDimension } from '../entities/angularDimension.js';
+import { LinearDimension } from '../entities/linearDimension.js';
 import { DiametricDimension } from '../entities/diametricDimension.js';
 import { RadialDimension } from '../entities/radialDimension.js';
 import { RotatedDimension } from '../entities/rotatedDimension.js';
@@ -36,6 +37,7 @@ import { Logging } from './logging.js';
 
 import { DesignCore } from '../designCore.js';
 
+
 const classes = {
   Line,
   Polyline,
@@ -50,6 +52,7 @@ const classes = {
   AngularDimension,
   AlignedDimension,
   DiametricDimension,
+  LinearDimension,
   RadialDimension,
   RotatedDimension,
   Block,
