@@ -15,15 +15,20 @@ new Core();
 // Test cases for user input
 const scenarios = [
 
-  { desc: 'Aligned dimension from line selection',
+  { desc: 'Rotated dimension from line selection',
     input: [new SingleSelection(0, new Point()), new Point(5, 5)],
     selectedItems: [new Line({ points: [new Point(), new Point(10, 0)] })],
+    expectedDimType: 0,
+  },
+  { desc: 'Aligned dimension from line selection',
+    input: [new SingleSelection(0, new Point()), new Point(6.5, 3.5)],
+    selectedItems: [new Line({ points: [new Point(), new Point(10, 10)] })],
     expectedDimType: 1,
   },
-  { desc: 'Aligned dimension from point selection',
+  { desc: 'Rotated dimension from point selection',
     input: [new Point(), new Point(10, 0), new Point(5, 5)],
     selectedItems: [],
-    expectedDimType: 1,
+    expectedDimType: 0,
   },
   { desc: 'Diametric dimension from circle selection',
     input: [new SingleSelection(0, new Point()), new Point(20, 10)],
@@ -98,6 +103,14 @@ test('constructor instantiates correct dimension type', () => {
 test('register returns command object', () => {
   expect(Dimension.register()).toEqual({ command: 'Dimension', shortcut: 'DIM' });
 });
+
+test('get linear dimension type', () => {
+  const dim = new Dimension();
+  expect(dim.getLinearDimensionType(new Point(0, 0), new Point(10, 0), new Point(5, 5))).toBe(0);
+  expect(dim.getLinearDimensionType(new Point(0, 0), new Point(10, 10), new Point(7.5, 2.5))).toBe(1);
+  expect(dim.getLinearDimensionType(new Point(0, 0), new Point(10, 10), new Point(12.5, 8.5))).toBe(0);
+});
+
 
 test('preview calls createTempItem with correct args', () => {
   const dim = new Dimension({ 70: 1 });
