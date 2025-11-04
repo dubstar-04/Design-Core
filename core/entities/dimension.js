@@ -20,6 +20,7 @@ import { DesignCore } from '../designCore.js';
 import { SingleSelection } from '../lib/selectionManager.js';
 import { Utils } from '../lib/utils.js';
 import { DimType } from '../properties/dimType.js';
+import { BaseLinearDimension } from './baseLinearDimension.js';
 
 /**
  * Dimension Entity Class
@@ -171,6 +172,14 @@ export class Dimension extends BaseDimension {
           // if selected items are available, get the points from the selected items
           // dimensions can be created from point selection only, therefore selected items may not be available
           if (this.selectedItems.length) {
+            // for linear dimensions, determine if aligned or rotated based on mouse position
+            if (this.dimType.getBaseDimType() === 0 || this.dimType.getBaseDimType() === 1) {
+              const Pt13 = this.selectedItems[0].points[0];
+              const Pt14 = this.selectedItems[0].points[1];
+              const linearDimTypeNumber = this.getLinearDimensionType(Pt13, Pt14, Pt11);
+              this.dimType.setDimType(linearDimTypeNumber);
+            }
+
             const dimensionType = this.dimensionMap[this.dimType.getBaseDimType()]; // TODO: use this.dimensionMap.name?
             this.points.push(...dimensionType.getPointsFromSelection(this.selectedItems, Pt11));
           }
@@ -235,19 +244,52 @@ export class Dimension extends BaseDimension {
   }
 
   /**
+   * Determine if linear dimension is aligned or rotated
+   * @param {Point} Pt13 - start point
+   * @param {Point} Pt14 - end point
+   * @param {Point} Pt11 - text position
+   * @return {number} 0 = rotated, 1 = aligned
+   */
+  getLinearDimensionType(Pt13, Pt14, Pt11) {
+    // generate the x and y delta values
+    const dx = Pt14.x - Pt13.x;
+    const dy = Pt14.y - Pt13.y;
+
+    const pntPerp = Pt11.perpendicular(Pt13, Pt14);
+    const isAligned = pntPerp.isOnLine(Pt13, Pt14);
+
+    if (!isAligned || Utils.round(dx) === 0 || Utils.round(dy) === 0) {
+      // Rotated dimension
+      return 0;
+    } else {
+      // Aligned dimension
+      return 1;
+    }
+  }
+
+  /**
    * Preview the entity during creation
    */
   preview() {
-    // get the dimension class
-    const dimensionType = this.dimensionMap[this.dimType.getBaseDimType()];
-    // get the dimension type as a string
-    const dimensionTypeString = dimensionType.register().command;
-
     if (this.selectedItems.length) {
-      const mousePoint = DesignCore.Mouse.pointOnScene();
-      const itemPoints = dimensionType.getPointsFromSelection(this.selectedItems, mousePoint);
+      let dimTypeNumber = this.dimType.getBaseDimType();
 
-      const points = [...itemPoints, mousePoint];
+      const Pt11 = DesignCore.Mouse.pointOnScene();
+      Pt11.sequence = 11;
+
+      if (dimTypeNumber === 0 || dimTypeNumber === 1) {
+        // for linear dimensions, determine if aligned or rotated based on mouse position
+        const Pt13 = this.selectedItems[0].points[0];
+        const Pt14 = this.selectedItems[0].points[1];
+        dimTypeNumber = this.getLinearDimensionType(Pt13, Pt14, Pt11);
+      }
+      // get the dimension class
+      const dimensionType = this.dimensionMap[dimTypeNumber];
+      // get the dimension type as a string
+      const dimensionTypeString = dimensionType.register().command;
+      // get the points for the dimension
+      const points = dimensionType.getPointsFromSelection(this.selectedItems, Pt11);
+      // create the temporary dimension
       DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
