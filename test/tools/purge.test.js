@@ -8,6 +8,7 @@ const purge = new Purge();
 const layerManager = DesignCore.LayerManager;
 const ltypeManager = DesignCore.LTypeManager;
 const blockManager = DesignCore.Scene.blockManager;
+const dimStyleManager = DesignCore.DimStyleManager;
 
 // Runc this before each test
 beforeEach(() => {
@@ -20,6 +21,8 @@ beforeEach(() => {
 
   ltypeManager.addItem({ 'name': 'ltypeWithoutItems' });
   ltypeManager.addItem({ 'name': 'ltypeWithItems' });
+
+  dimStyleManager.addItem({ 'name': 'dimstyleWithItems' });
 
   const point1 = new Point();
   const point2 = new Point(0, 100);
@@ -39,6 +42,11 @@ test('Test purge.action', () => {
   expect(blockManager.itemCount()).toBe(3);
   expect(blockManager.itemExists('blockWithoutItems')).toBe(false);
   expect(blockManager.itemExists('blockWithItems')).toBe(true);
+
+  expect(dimStyleManager.itemCount()).toBe(4);
+  purge.option = 'Dimstyles';
+  purge.action();
+  expect(dimStyleManager.itemCount()).toBe(1);
 
   expect(layerManager.itemCount()).toBe(4);
   purge.option = 'Layers';
