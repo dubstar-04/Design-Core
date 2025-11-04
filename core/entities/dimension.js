@@ -3,6 +3,7 @@ import { AlignedDimension } from './alignedDimension.js';
 import { DiametricDimension } from './diametricDimension.js';
 import { AngularDimension } from './angularDimension.js';
 import { RadialDimension } from './radialDimension.js';
+import { RotatedDimension } from './rotatedDimension.js';
 
 import { Arc } from './arc.js';
 import { Circle } from './circle.js';
@@ -34,7 +35,7 @@ export class Dimension extends BaseDimension {
 
     // map dimensions type to the class name
     this.dimensionMap = {
-      0: AlignedDimension,
+      0: RotatedDimension,
       1: AlignedDimension,
       2: AngularDimension,
       3: DiametricDimension,

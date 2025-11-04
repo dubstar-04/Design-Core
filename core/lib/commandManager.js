@@ -12,6 +12,7 @@ import { AlignedDimension } from '../entities/alignedDimension.js';
 import { AngularDimension } from '../entities/angularDimension.js';
 import { DiametricDimension } from '../entities/diametricDimension.js';
 import { RadialDimension } from '../entities/radialDimension.js';
+import { RotatedDimension } from '../entities/rotatedDimension.js';
 import { Block } from '../tables/block.js';
 import { Insert } from '../entities/insert.js';
 import { Hatch } from '../entities/hatch.js';
@@ -50,6 +51,7 @@ const classes = {
   AlignedDimension,
   DiametricDimension,
   RadialDimension,
+  RotatedDimension,
   Block,
   Insert,
   Hatch,
