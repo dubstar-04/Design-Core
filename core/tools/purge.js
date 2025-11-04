@@ -14,7 +14,7 @@ export class Purge extends Tool {
   constructor() {
     super();
     this.option = '';
-    this.options = ['Blocks', 'Layers', 'LTypes', 'All'];
+    this.options = ['Blocks', 'Dimstyles', 'Layers', 'LTypes', 'All'];
   }
 
   /**
@@ -61,6 +61,13 @@ export class Purge extends Tool {
       const intialitemCount = DesignCore.Scene.blockManager.itemCount();
       DesignCore.Scene.blockManager.purge();
       const finalitemCount = DesignCore.Scene.blockManager.itemCount();
+      purgedCount += (intialitemCount - finalitemCount);
+    }
+
+    if (this.option === 'Dimstyles' || this.option === 'All') {
+      const intialitemCount = DesignCore.DimStyleManager.itemCount();
+      DesignCore.DimStyleManager.purge();
+      const finalitemCount = DesignCore.DimStyleManager.itemCount();
       purgedCount += (intialitemCount - finalitemCount);
     }
 
