@@ -250,12 +250,5 @@ export class Dimension extends BaseDimension {
       const points = [...itemPoints, mousePoint];
       DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
     }
-
-    if (this.points.length > 1) {
-      const mousePoint = DesignCore.Mouse.pointOnScene();
-      mousePoint.sequence = 11;
-      const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
-    }
   }
 }
