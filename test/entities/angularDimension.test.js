@@ -244,9 +244,9 @@ AcDb2LineAngularDimension
 35
 0.0
 16
-7
+15
 26
-8
+16
 36
 0.0
 `;
