@@ -433,9 +433,7 @@ export class BaseDimension extends Entity {
    * @param {number} scale
    */
   draw(ctx, scale) {
-    const style = DesignCore.DimStyleManager.getItemByName(this.dimensionStyle);
-
-    const entities = this.buildDimension(style);
+    const entities = this.buildDimension();
 
     if (entities) {
       this.block.clearItems();
