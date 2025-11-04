@@ -517,7 +517,7 @@ export class AngularDimension extends BaseDimension {
     const Pt13 = this.getPointBySequence(this.points, 13);
     const Pt14 = this.getPointBySequence(this.points, 14);
     const Pt15 = this.getPointBySequence(this.points, 15);
-    const Pt16 = Pt11; // this.getPointBySequence(this.points, 16);
+    const Pt16 = this.getPointBySequence(this.points, 16);
 
     file.writeGroupCode('0', 'DIMENSION');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
