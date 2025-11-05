@@ -5,11 +5,11 @@ import { AngularDimension } from './angularDimension.js';
 import { RadialDimension } from './radialDimension.js';
 import { RotatedDimension } from './rotatedDimension.js';
 
-import { Arc } from './arc.js';
-import { Circle } from './circle.js';
-import { Line } from './line.js';
-import { BasePolyline } from './basePolyline.js';
-import { Point } from './point.js';
+import { Arc } from '../entities/arc.js';
+import { Circle } from '../entities/circle.js';
+import { Line } from '../entities/line.js';
+import { BasePolyline } from '../entities/basePolyline.js';
+import { Point } from '../entities/point.js';
 
 import { Strings } from '../lib/strings.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';

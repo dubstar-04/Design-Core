@@ -1,9 +1,9 @@
-import { Point } from './point.js';
+import { Point } from '../entities/point.js';
 import { Block } from '../tables/block.js';
-import { Text } from './text.js';
-import { Solid } from './solid.js';
-import { Line } from './line.js';
-import { Entity } from './entity.js';
+import { Text } from '../entities/text.js';
+import { Solid } from '../entities/solid.js';
+import { Line } from '../entities/line.js';
+import { Entity } from '../entities/entity.js';
 import { Logging } from '../lib/logging.js';
 import { Property } from '../properties/property.js';
 import { Strings } from '../lib/strings.js';

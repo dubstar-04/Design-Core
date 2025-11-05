@@ -1,10 +1,10 @@
 import { Strings } from '../lib/strings.js';
-import { Line } from './line.js';
-import { Text } from './text.js';
+import { Line } from '../entities/line.js';
+import { Text } from '../entities/text.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { BaseDimension } from './baseDimension.js';
-import { Point } from './point.js';
+import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 import { Utils } from '../lib/utils.js';

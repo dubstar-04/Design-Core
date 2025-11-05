@@ -1,17 +1,17 @@
 
 import { Utils } from '../lib/utils.js';
 import { Strings } from '../lib/strings.js';
-import { Arc } from './arc.js';
-import { BasePolyline } from './basePolyline.js';
-import { Line } from './line.js';
+import { Arc } from '../entities/arc.js';
+import { BasePolyline } from '../entities/basePolyline.js';
+import { Line } from '../entities/line.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BaseDimension } from './baseDimension.js';
 import { Intersection } from '../lib/intersect.js';
-import { Point } from './point.js';
+import { Point } from '../entities/point.js';
 
-import { Text } from './text.js'; // used to debug the dimension points
+import { Text } from '../entities/text.js'; // used to debug the dimension points
 
 import { DesignCore } from '../designCore.js';
 

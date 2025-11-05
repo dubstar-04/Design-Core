@@ -7,16 +7,17 @@ import { Rectangle } from '../entities/rectangle.js';
 // import {Ellipse} from '../entities/ellipse.js';
 // import {Spline} from '../entities/spline.js';
 import { Text } from '../entities/text.js';
-import { Dimension } from '../entities/dimension.js';
-import { AlignedDimension } from '../entities/alignedDimension.js';
-import { AngularDimension } from '../entities/angularDimension.js';
-import { LinearDimension } from '../entities/linearDimension.js';
-import { DiametricDimension } from '../entities/diametricDimension.js';
-import { RadialDimension } from '../entities/radialDimension.js';
-import { RotatedDimension } from '../entities/rotatedDimension.js';
 import { Block } from '../tables/block.js';
 import { Insert } from '../entities/insert.js';
 import { Hatch } from '../entities/hatch.js';
+
+import { Dimension } from '../dimensions/dimension.js';
+import { AlignedDimension } from '../dimensions/alignedDimension.js';
+import { AngularDimension } from '../dimensions/angularDimension.js';
+import { LinearDimension } from '../dimensions/linearDimension.js';
+import { DiametricDimension } from '../dimensions/diametricDimension.js';
+import { RadialDimension } from '../dimensions/radialDimension.js';
+import { RotatedDimension } from '../dimensions/rotatedDimension.js';
 
 // import { Point } from "../entities/point.js"
 

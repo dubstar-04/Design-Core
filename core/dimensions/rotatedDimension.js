@@ -1,26 +1,26 @@
 import { Strings } from '../lib/strings.js';
-import { Line } from './line.js';
+import { Line } from '../entities/line.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
-import { Point } from './point.js';
+import { Point } from '../entities/point.js';
 import { BaseLinearDimension } from './baseLinearDimension.js';
 
 import { DesignCore } from '../designCore.js';
 
 
 /**
- * Aligned Dimension Entity Class
- * @extends LinearDimension
+ * Rotated Dimension Entity Class
+ * @extends BaseLinearDimension
  */
-export class AlignedDimension extends BaseLinearDimension {
+export class RotatedDimension extends BaseLinearDimension {
   /**
-   * Create an Aligned Dimension
+   * Create an Rotated Dimension
    * @param {Array} data
    */
   constructor(data) {
     super(data);
-    this.dimType.setDimType(1); // Aligned dimension
+    this.dimType.setDimType(0); // Rotated dimension
   }
 
   /**
@@ -31,7 +31,7 @@ export class AlignedDimension extends BaseLinearDimension {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = { command: 'AlignedDimension', shortcut: 'DIMALI' };
+    const command = { command: 'RotatedDimension', shortcut: 'DIMROT' };
     return command;
   }
 
@@ -43,7 +43,7 @@ export class AlignedDimension extends BaseLinearDimension {
     try {
       DesignCore.Scene.selectionManager.reset();
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
-      this.dimType.setDimType(1); // Aligned dimension
+      this.dimType.setDimType(0); // Rotated dimension
 
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt13 = await DesignCore.Scene.inputManager.requestInput(op);
@@ -61,7 +61,7 @@ export class AlignedDimension extends BaseLinearDimension {
       this.points.push(pt11);
 
       const tempLine = new Line({ points: [pt13, pt14] });
-      this.points = AlignedDimension.getPointsFromSelection([tempLine], pt11);
+      this.points = RotatedDimension.getPointsFromSelection([tempLine], pt11);
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -94,14 +94,21 @@ export class AlignedDimension extends BaseLinearDimension {
     Pt11.sequence = 11;
     points.push(Pt11);
 
-    // Perpendicular to the selected line or line is vertical or horizontal
-    const pntPerp = Pt11.perpendicular(Pt13, Pt14);
-    const projectionAngle = pntPerp.angle(Pt11);
-    const distance = Pt11.distance(pntPerp);
-    const projectedPoint = Pt14.project(projectionAngle, distance);
+    // generate the x and y delta values
+    const dx = Pt14.x - Pt13.x;
+    const dy = Pt14.y - Pt13.y;
 
-    Pt10.x = projectedPoint.x;
-    Pt10.y = projectedPoint.y;
+    // Get the primary axis (x or y)
+    const iX = ((Math.abs(Pt11.x - Pt13.x) + Math.abs(Pt14.x - Pt11.x)) - Math.abs(dx));
+    const iY = ((Math.abs(Pt11.y - Pt13.y) + Math.abs(Pt14.y - Pt11.y)) - Math.abs(dy));
+
+    if (iX >= iY && dy !== 0) {
+      Pt10.x = Pt11.x;
+      Pt10.y = Pt14.y;
+    } else if (iX < iY && dx !== 0) {
+      Pt10.x = Pt14.x;
+      Pt10.y = Pt11.y;
+    }
 
     points.push(Pt10);
     return points;
@@ -138,5 +145,7 @@ export class AlignedDimension extends BaseLinearDimension {
     file.writeGroupCode('14', Pt14.x); // X - start point of second extension line
     file.writeGroupCode('24', Pt14.y); // Y
     file.writeGroupCode('34', '0.0'); // Z
+    file.writeGroupCode('50', this.linearDimAngle); // Utils.radians2degrees(Pt13.angle(Pt14))); // Rotation angle
+    file.writeGroupCode('100', 'AcDbRotatedDimension', DXFFile.Version.R2000);
   }
 }
