@@ -29,9 +29,6 @@ export class Circle extends Entity {
       enumerable: true,
     });
 
-    // ensure a radius is set
-    // this.setRadius(1);
-
     if (data) {
       if (data.hasOwnProperty('radius') || data.hasOwnProperty('40')) {
         // DXF Groupcode 40 - Radius
