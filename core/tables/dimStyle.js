@@ -106,7 +106,10 @@ export class DimStyle {
     this.DIMEXE = Property.loadValue([data.DIMEXE, data[44]], 0.18);
 
     // DXF Groupcode 45 - Rounding value for dimension distances
-    this.DIMRND = Property.loadValue([data.DIMRND, data[45]], 1);
+    // DIMRND set to 0.25, all distances round to the nearest 0.25.
+    // Note that the number of digits edited after the decimal point depends on the precision set by DIMDEC.
+    // DIMRND does not apply to angular dimensions.
+    this.DIMRND = Property.loadValue([data.DIMRND, data[45]], 0.0000);
 
     // DXF Groupcode 46 - Dimension line extension
     this.DIMDLE = Property.loadValue([data.DIMDLE, data[46]], 1);
@@ -264,7 +267,7 @@ export class DimStyle {
     }
     this.DIMUNIT = Property.loadValue([data.DIMUNIT, data[270]], 0);
 
-    // DXF Groupcode 271 - Number of decimal places for the tolerance values of a primary units dimension
+    // DXF Groupcode 271 - Number of decimal places displayed for the primary units of a dimension.
     // The precision is based on the units or angle format you have selected.
     // Specified value is applied to angular dimensions when DIMADEC is set to -1.
     this.DIMDEC = Property.loadValue([data.DIMDEC, data[271]], 4);
