@@ -1,5 +1,5 @@
-import { Dimension } from '../../core/entities/dimension';
-import { DiametricDimension } from '../../core/entities/diametricDimension';
+import { Dimension } from '../../core/dimensions/dimension';
+import { DiametricDimension } from '../../core/dimensions/diametricDimension';
 import { Circle } from '../../core/entities/circle';
 import { Point } from '../../core/entities/point';
 import { Line } from '../../core/entities/line.js';

@@ -1,4 +1,4 @@
-import { RadialDimension } from '../../core/entities/radialDimension';
+import { RadialDimension } from '../../core/dimensions/radialDimension';
 import { Point } from '../../core/entities/point';
 import { Arc } from '../../core/entities/arc';
 import { File } from '../test-helpers/test-helpers.js';

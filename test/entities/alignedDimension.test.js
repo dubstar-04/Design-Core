@@ -1,4 +1,4 @@
-import { AlignedDimension } from '../../core/entities/alignedDimension';
+import { AlignedDimension } from '../../core/dimensions/alignedDimension';
 import { Point } from '../../core/entities/point';
 import { DesignCore } from '../../core/designCore.js';
 import { Core } from '../../core/core/core.js';

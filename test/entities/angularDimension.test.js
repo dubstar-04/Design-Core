@@ -1,5 +1,5 @@
 
-import { AngularDimension } from '../../core/entities/angularDimension';
+import { AngularDimension } from '../../core/dimensions/angularDimension';
 import { Point } from '../../core/entities/point';
 import { Line } from '../../core/entities/line';
 import { Polyline } from '../../core/entities/polyline.js';

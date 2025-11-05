@@ -1,4 +1,4 @@
-import { RotatedDimension } from '../../core/entities/rotatedDimension.js';
+import { RotatedDimension } from '../../core/dimensions/rotatedDimension.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Core } from '../../core/core/core.js';

@@ -1,4 +1,4 @@
-import { DiametricDimension } from '../../core/entities/diametricDimension.js';
+import { DiametricDimension } from '../../core/dimensions/diametricDimension.js';
 import { Point } from '../../core/entities/point.js';
 import { Arc } from '../../core/entities/arc.js';
 import { File } from '../test-helpers/test-helpers.js';

@@ -1,4 +1,4 @@
-import { BaseDimension } from '../../core/entities/baseDimension';
+import { BaseDimension } from '../../core/dimensions/baseDimension';
 import { Point } from '../../core/entities/point';
 import { Core } from '../../core/core/core.js';
 import { Text } from '../../core/entities/text';
