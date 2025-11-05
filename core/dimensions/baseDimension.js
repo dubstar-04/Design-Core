@@ -114,14 +114,14 @@ export class BaseDimension extends Entity {
         // Percentage of default (3-on-5) line spacing to be applied.
         // Valid values range from 0.25 to 4.00
         const err = 'Groupcode 41 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
+        Logging.instance.debug(`${this.type} - ${err}`);
       }
 
       if (data.hasOwnProperty('42')) {
         // DXF Groupcode 42 - Actual Measurement
         // Read-only
         const err = 'Groupcode 42 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
+        Logging.instance.debug(`${this.type} - ${err}`);
       }
 
       if (data.hasOwnProperty('50')) {
@@ -173,7 +173,6 @@ export class BaseDimension extends Entity {
         const dimensionType = Property.loadValue([data[70], dimTypeValue], 0);
 
         if (!DimType.isValidDimensionType(dimensionType)) {
-        // num is in the set
           const msg = 'Invalid Dimension Type';
           const err = (`${this.type} - ${msg}: ${dimensionType}`);
           throw Error(err);
@@ -188,7 +187,7 @@ export class BaseDimension extends Entity {
         // 4 = Middle left; 5 = Middle center; 6 = Middle right
         // 7 = Bottom left; 8 = Bottom center; 9 = Bottom right
         const err = 'Groupcode 71 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
+        Logging.instance.debug(`${this.type} - ${err}`);
       }
 
       if (data.hasOwnProperty('72')) {
@@ -196,7 +195,7 @@ export class BaseDimension extends Entity {
         // 1 (or missing) = At least (taller characters will override)
         // 2 = Exact (taller characters will not override)
         const err = 'Groupcode 72 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
+        Logging.instance.debug(`${this.type} - ${err}`);
       }
 
       if (data.leaderLength) {
