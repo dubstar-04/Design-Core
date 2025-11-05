@@ -214,66 +214,69 @@ export class BaseDimension extends Entity {
     let formattedDimensionValue = '';
 
     // Default precision from style
-    let precision = this.getDimensionStyle().getValue('DIMDEC');
+    const precision = this.getDimensionStyle().getValue('DIMDEC');
+    const angularPrecision = this.getDimensionStyle().getValue('DIMADEC');
 
-    // TODO: Implement Unit format - DIMLUNIT
-    // 1 = Scientific; 2 = Decimal; 3 = Engineering;
-    // 4 = Architectural; 5 = Fractional; 6 = Windows desktop
-    // const DIMLUNIT = this.getDimensionStyle().getValue('DIMLUNIT');
+    // Dimension Rounding - DIMRND
+    // rounding is not applied to angular dimensions
+    const DIMRND = this.getDimensionStyle().getValue('DIMRND');
+    if (DIMRND !== 0 && this.dimType.getBaseDimType() !== 2) {
+      dimensionValue = Math.round(dimensionValue / DIMRND) * DIMRND;
+    }
 
-    // TODO: Implement decimal seperator - DIMDSEP
-    // Valid values are period (.) comma (,) or space ( )
-    // const DIMDSEP = this.getDimensionStyle().getValue('DIMDSEP');
+    let linearDimensionValue = Math.abs(dimensionValue).toFixed(precision);
+    let angularDimensionValue = Math.abs(dimensionValue).toFixed(angularPrecision);
 
-    // TODO: Implement Rounding - DIMRND
-    // const DIMRND = this.getDimensionStyle().getValue('DIMRND');
-
-    // TODO: Implement prefix and postsuffix - DIMPOST
-    // prefix and suffix included in DIMPOST value seperated by <>
-    // e.g. prefix<>suffix
-    // const DIMPOST = this.getDimensionStyle().getValue('DIMPOST');
-    // const DIMAPOST = this.getDimensionStyle().getValue('DIMAPOST');
-
-    // TODO: Implement Zero suppression
     // Zero suppression
-    /*
-        Values 0-3 affect feet-and-inch dimensions only:
-        0 = Suppresses zero feet and precisely zero inches
-        1 = Includes zero feet and precisely zero inches
-        2 = Includes zero feet and suppresses zero inches
-        3 = Includes zero inches and suppresses zero feet
-        4 = Suppresses leading zeros in decimal dimensions (for example, 0.5000 becomes .5000)
-        8 = Suppresses trailing zeros in decimal dimensions (for example, 12.5000 becomes 12.5)
-        12 = Suppresses both leading and trailing zeros (for example, 0.5000 becomes .5)
-    */
-    // const DIMZIN = this.getDimensionStyle().getValue('DIMZIN');
-    // const DIMAZIN = this.getDimensionStyle().getValue('DIMAZIN');
+    // Values 0-3 affect feet-and-inch dimensions only:
+    // 0 = Suppresses zero feet and precisely zero inches
+    // 1 = Includes zero feet and precisely zero inches
+    // 2 = Includes zero feet and suppresses zero inches
+    // 3 = Includes zero inches and suppresses zero feet
+    // 4 = Suppresses leading zeros in decimal dimensions (for example, 0.5000 becomes .5000)
+    // 8 = Suppresses trailing zeros in decimal dimensions (for example, 12.5000 becomes 12.5)
+    // 12 = Suppresses both leading and trailing zeros (for example, 0.5000 becomes .5)
+
+    const DIMZIN = this.getDimensionStyle().getValue('DIMZIN');
+    const suppressLeadingLinear = (DIMZIN === 4 || DIMZIN === 12);
+    const suppressTrailingLinear = (DIMZIN === 8 || DIMZIN === 12);
+    linearDimensionValue = this.suppressZeros(linearDimensionValue, suppressLeadingLinear, suppressTrailingLinear);
+
+    const DIMAZIN = this.getDimensionStyle().getValue('DIMAZIN');
+    const suppressLeadingAngular = (DIMAZIN === 4 || DIMAZIN === 12);
+    const suppressTrailingAngular = (DIMAZIN === 8 || DIMAZIN === 12);
+    angularDimensionValue = this.suppressZeros(angularDimensionValue, suppressLeadingAngular, suppressTrailingAngular);
 
     switch (this.dimType.getBaseDimType()) {
       case 0: // Rotated, horizontal, or vertical
       case 1: // Aligned
-        formattedDimensionValue = `${Math.abs(dimensionValue).toFixed(precision)}`;
+        formattedDimensionValue = `${linearDimensionValue}`;
         break;
       case 2: // Angular
-        precision = this.getDimensionStyle().getValue('DIMADEC'); // Angular Precision
-        formattedDimensionValue = `${Math.abs(dimensionValue).toFixed(precision)}${Strings.Symbol.DEGREE}`;
+        formattedDimensionValue = `${angularDimensionValue}${Strings.Symbol.DEGREE}`;
         break;
       case 3: // Diameter
-        formattedDimensionValue = `${Strings.Symbol.DIAMETER}${Math.abs(dimensionValue).toFixed(precision)}`;
+        formattedDimensionValue = `${Strings.Symbol.DIAMETER}${linearDimensionValue}`;
         break;
       case 4: // Radius
-        formattedDimensionValue = `${Strings.Symbol.RADIUS}${Math.abs(dimensionValue).toFixed(precision)}`;
+        formattedDimensionValue = `${Strings.Symbol.RADIUS}${linearDimensionValue}`;
         break;
       case 5: // Angular 3 point
-        precision = this.getDimensionStyle().getValue('DIMADEC');
-        formattedDimensionValue = `${Math.abs(dimensionValue.toFixed(precision))}${Strings.Symbol.DEGREE}`;
+        formattedDimensionValue = `${angularDimensionValue}${Strings.Symbol.DEGREE}`;
         break;
       case 6: // Ordinate
         // Ordinate dimensions are typically used to indicate the X or Y coordinate of a point
-        formattedDimensionValue = `${Math.abs(dimensionValue).toFixed(precision)} ${Strings.Symbol.UNITS}`;
+        formattedDimensionValue = `${linearDimensionValue} ${Strings.Symbol.UNITS}`;
         break;
       default:
-        formattedDimensionValue = `${Math.abs(dimensionValue).toFixed(precision)}`;
+        formattedDimensionValue = `${linearDimensionValue}`;
+    }
+
+    // Decimal seperator - DIMDSEP
+    const DIMDSEP = this.getDimensionStyle().getValue('DIMDSEP');
+    // Replace dot with specified seperator
+    if (DIMDSEP !== '.') {
+      formattedDimensionValue = formattedDimensionValue.replace('.', DIMDSEP);
     }
 
     // Handle textOverride
@@ -281,7 +284,46 @@ export class BaseDimension extends Entity {
       formattedDimensionValue = this.textOverride.replace(/<>/g, formattedDimensionValue);
     }
 
+    // TODO: Implement prefix and postsuffix - DIMPOST
+    // prefix and suffix included in DIMPOST value seperated by <>
+    // e.g. prefix<>suffix
+    // const DIMPOST = this.getDimensionStyle().getValue('DIMPOST');
+    // const DIMAPOST = this.getDimensionStyle().getValue('DIMAPOST');
+
+    // TODO: Implement Unit format - DIMLUNIT
+    // 1 = Scientific; 2 = Decimal; 3 = Engineering;
+    // 4 = Architectural; 5 = Fractional; 6 = Windows desktop
+    // const DIMLUNIT = this.getDimensionStyle().getValue('DIMLUNIT');
+
     return formattedDimensionValue;
+  }
+
+  /**
+   * Suppress leading and/or trailing zeros from a dimension value
+   * @param {number} dimensionValue
+   * @param {boolean} suppressLeading
+   * @param {boolean} suppressTrailing
+   * @return {string} - the dimension value as a string with suppressed zeros
+   */
+  suppressZeros(dimensionValue, suppressLeading, suppressTrailing) {
+    let numberString = dimensionValue.toString();
+
+    if (suppressLeading) {
+      // Suppress leading zeros
+      numberString = numberString.replace(/^0+/, '');
+    }
+
+    if (suppressTrailing) {
+      // Suppress trailing zeros
+      numberString = numberString.replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.0+$/, '');
+    }
+
+    if (numberString === '') {
+      // If the result is an empty string return '0'
+      numberString = '0';
+    }
+
+    return numberString;
   }
 
   /**
