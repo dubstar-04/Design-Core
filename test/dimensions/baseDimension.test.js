@@ -1,7 +1,7 @@
-import { BaseDimension } from '../../core/dimensions/baseDimension';
-import { Point } from '../../core/entities/point';
+import { BaseDimension } from '../../core/dimensions/baseDimension.js';
+import { Point } from '../../core/entities/point.js';
 import { Core } from '../../core/core/core.js';
-import { Text } from '../../core/entities/text';
+import { Text } from '../../core/entities/text.js';
 // import { DimType } from '../../core/properties/dimType.js';
 
 // initialise core

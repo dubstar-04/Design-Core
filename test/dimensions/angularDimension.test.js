@@ -1,7 +1,7 @@
 
-import { AngularDimension } from '../../core/dimensions/angularDimension';
-import { Point } from '../../core/entities/point';
-import { Line } from '../../core/entities/line';
+import { AngularDimension } from '../../core/dimensions/angularDimension.js';
+import { Point } from '../../core/entities/point.js';
+import { Line } from '../../core/entities/line.js';
 import { Polyline } from '../../core/entities/polyline.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';

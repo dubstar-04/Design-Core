@@ -1,9 +1,9 @@
-import { Dimension } from '../../core/dimensions/dimension';
-import { DiametricDimension } from '../../core/dimensions/diametricDimension';
-import { Circle } from '../../core/entities/circle';
-import { Point } from '../../core/entities/point';
+import { Dimension } from '../../core/dimensions/dimension.js';
+import { DiametricDimension } from '../../core/dimensions/diametricDimension.js';
+import { Circle } from '../../core/entities/circle.js';
+import { Point } from '../../core/entities/point.js';
 import { Line } from '../../core/entities/line.js';
-import { Arc } from '../../core/entities/arc';
+import { Arc } from '../../core/entities/arc.js';
 import { Polyline } from '../../core/entities/polyline.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';

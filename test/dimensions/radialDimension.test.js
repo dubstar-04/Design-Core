@@ -1,6 +1,6 @@
-import { RadialDimension } from '../../core/dimensions/radialDimension';
-import { Point } from '../../core/entities/point';
-import { Arc } from '../../core/entities/arc';
+import { RadialDimension } from '../../core/dimensions/radialDimension.js';
+import { Point } from '../../core/entities/point.js';
+import { Arc } from '../../core/entities/arc.js';
 import { File } from '../test-helpers/test-helpers.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
