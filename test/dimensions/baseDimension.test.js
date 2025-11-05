@@ -23,7 +23,7 @@ describe('BaseDimension', () => {
     expect(baseDim.linearDimAngle).toBe(0);
   });
 
-  test('getDimensionValue formats values by type', () => {
+  test('getDimensionValue formats values by dimension type', () => {
     baseDim.dimType.setDimType(0);
     expect(baseDim.getDimensionValue(12.3456)).toBe('12.3456');
     baseDim.dimType.setDimType(2);
@@ -34,6 +34,131 @@ describe('BaseDimension', () => {
     expect(baseDim.getDimensionValue(5)).toContain('R');
     baseDim.dimType.setDimType(6);
     expect(baseDim.getDimensionValue(7)).toContain('7.00');
+  });
+
+
+  describe('getDimensionValue formats to style', () => {
+    // Test cases for dimension value formatting
+    const scenarios = [
+
+      { desc: 'comma seperator, 2 decimal places',
+        dimType: 0,
+        inputValue: 12.34,
+        expectedValue: '12,34',
+        DIMDSEP: ',',
+        DIMDEC: 2,
+        DIMADEC: 2,
+        DIMRND: 0.0000,
+      },
+      { desc: 'comma seperator, 3 decimal places',
+        dimType: 0,
+        inputValue: 12.34,
+        expectedValue: '12,340',
+        DIMDSEP: ',',
+        DIMDEC: 3,
+        DIMADEC: 2,
+        DIMRND: 0.0000,
+      },
+      { desc: 'dot seperator, 3 decimal places',
+        dimType: 0,
+        inputValue: 12.34,
+        expectedValue: '12.340',
+        DIMDSEP: '.',
+        DIMDEC: 3,
+        DIMADEC: 2,
+        DIMRND: 0.0000,
+      },
+      { desc: 'hash seperator, 4 decimal places',
+        dimType: 0,
+        inputValue: 12.3456789,
+        expectedValue: '12#3457',
+        DIMDSEP: '#',
+        DIMDEC: 4,
+        DIMADEC: 2,
+        DIMRND: 0.0000,
+      },
+      { desc: 'hash seperator, 2 decimal places, rounded to nearest 1',
+        dimType: 0,
+        inputValue: 12.3456789,
+        expectedValue: '12#00',
+        DIMDSEP: '#',
+        DIMDEC: 2,
+        DIMADEC: 2,
+        DIMRND: 1,
+      },
+      { desc: 'comma seperator, 2 decimal places, rounded to nearest 1',
+        dimType: 0,
+        inputValue: 0.23456,
+        expectedValue: '0,00',
+        DIMDSEP: ',',
+        DIMDEC: 2,
+        DIMADEC: 2,
+        DIMRND: 1,
+      },
+      { desc: 'comma seperator, 2 decimal places, rounded to nearest 0.25',
+        dimType: 0,
+        inputValue: 0.23456,
+        expectedValue: '0,25',
+        DIMDSEP: ',',
+        DIMDEC: 2,
+        DIMADEC: 2,
+        DIMRND: 0.25,
+      },
+      { desc: 'Angular dimension, comma seperator, 2 decimal places, rounded to nearest 0.25',
+        dimType: 2,
+        inputValue: 0.23457,
+        expectedValue: '0,23°',
+        DIMDSEP: ',',
+        DIMDEC: 2,
+        DIMADEC: 2,
+        DIMRND: 0.25,
+      },
+      { desc: 'negative value, dot seperator, 4 decimal places, rounded to nearest 2',
+        dimType: 0,
+        inputValue: -123.45678,
+        expectedValue: '124.0000',
+        DIMDSEP: '.',
+        DIMDEC: 4,
+        DIMADEC: 2,
+        DIMRND: 2,
+      },
+      { desc: 'negative value, dot seperator, 4 decimal places, rounded to nearest 2, remove trailing zeros',
+        dimType: 0,
+        inputValue: -123.45678,
+        expectedValue: '124',
+        DIMDSEP: '.',
+        DIMDEC: 4,
+        DIMADEC: 2,
+        DIMRND: 2,
+        DIMZIN: 8,
+      },
+    ];
+
+    test.each(scenarios)('getDimensionValue formats to style - $desc', (scenario) => {
+      baseDim.dimType.setDimType(scenario.dimType);
+      // Mock getDimensionStyle to return specific rounding value
+      baseDim.getDimensionStyle = () => ({
+        getValue: (prop) => {
+          let returnValue = null;
+          if (prop === 'DIMDSEP') returnValue = scenario.DIMDSEP;
+          if (prop === 'DIMDEC') returnValue = scenario.DIMDEC;
+          if (prop === 'DIMRND') returnValue = scenario.DIMRND;
+          if (prop === 'DIMADEC') returnValue = scenario.DIMADEC;
+          if (prop === 'DIMZIN') returnValue = scenario.DIMZIN || 0;
+          return returnValue;
+        },
+      });
+      expect(baseDim.getDimensionValue(scenario.inputValue)).toBe(scenario.expectedValue);
+    });
+  });
+
+  test('suppressZeros', () => {
+    expect(baseDim.suppressZeros('012.3400', true, true)).toBe('12.34');
+    expect(baseDim.suppressZeros('012.3400', true, false)).toBe('12.3400');
+    expect(baseDim.suppressZeros('012.3400', false, true)).toBe('012.34');
+    expect(baseDim.suppressZeros('012.3400', false, false)).toBe('012.3400');
+    expect(baseDim.suppressZeros('0.050', true, true)).toBe('.05');
+    expect(baseDim.suppressZeros('0.0', true, true)).toBe('0');
   });
 
   test('constructor throws on invalid dimType', () => {
