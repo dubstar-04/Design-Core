@@ -141,11 +141,17 @@ export class CommandManager {
       return true;
     }
 
+    // no matching command found, try to get a fuzzy match
+    // get a fuzzy match and notify but only if the user is typing a new command (not mid-command)
+    if (DesignCore.Scene.inputManager.activeCommand === undefined) {
+      const command = this.getFuzzyMatch(input);
+      const shortcut = this.getShortcut(command);
+      if (command !== undefined) {
+        DesignCore.Core.notify(`${Strings.Message.RECOMMEND} ${command} (${shortcut})`);
+      }
+    }
+
     // no matching command found
-    // get a fuzzy match and notify
-    const command = this.getFuzzyMatch(input);
-    const shortcut = this.getShortcut(command);
-    DesignCore.Core.notify(`${Strings.Message.RECOMMEND} ${command} (${shortcut})`);
     return false;
   }
 

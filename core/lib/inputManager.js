@@ -230,7 +230,9 @@ export class InputManager {
         this.activeCommand.execute();
       } else {
         // Otherwise, treat as input to the current command
-        this.promptOption.respond(input);
+        if (this.promptOption) {
+          this.promptOption.respond(input);
+        }
       }
     } else if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
       this.initialiseItem(DesignCore.CommandManager.getCommand(input));
