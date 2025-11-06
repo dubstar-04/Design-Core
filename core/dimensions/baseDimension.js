@@ -243,8 +243,8 @@ export class BaseDimension extends Entity {
     linearDimensionValue = this.suppressZeros(linearDimensionValue, suppressLeadingLinear, suppressTrailingLinear);
 
     const DIMAZIN = this.getDimensionStyle().getValue('DIMAZIN');
-    const suppressLeadingAngular = (DIMAZIN === 4 || DIMAZIN === 12);
-    const suppressTrailingAngular = (DIMAZIN === 8 || DIMAZIN === 12);
+    const suppressLeadingAngular = (DIMAZIN === 1 || DIMAZIN === 3);
+    const suppressTrailingAngular = (DIMAZIN === 2 || DIMAZIN === 3);
     angularDimensionValue = this.suppressZeros(angularDimensionValue, suppressLeadingAngular, suppressTrailingAngular);
 
     switch (this.dimType.getBaseDimType()) {
