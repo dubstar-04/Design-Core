@@ -36,7 +36,6 @@ test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => 
 
     requestInput: async () => {
       if (callCount < inputs.length) {
-        console.log('callCount =', callCount, 'input =', inputs[callCount], 'inputs.length =', inputs.length);
         const input = inputs[callCount];
         callCount++;
         return input;
