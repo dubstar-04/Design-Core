@@ -33,7 +33,6 @@ export class DimStyle {
     DIMARCSYM - R2007
     DIMASSOC - 2002
     DIMASO - OBSOLETE
-    DIMAZIN - R2000
     DIMCONSTRAINTICON - R2010
     DIMFXL - R2007
     DIMFXLON - R2007
@@ -211,6 +210,14 @@ export class DimStyle {
         12 = Suppresses both leading and trailing zeros (for example, 0.5000 becomes .5)
     */
     this.DIMZIN = Property.loadValue([data.DIMZIN, data[78]], 0);
+
+
+    // DXF Groupcode 79 - Zero suppression for angular dimensions:
+    // 0 = Displays all leading and trailing zeros
+    // 1 = Suppresses leading zeros in decimal dimensions
+    // 2 = Suppresses trailing zeros in decimal dimensions
+    // 3 = Suppresses leading and trailing zeros
+    this.DIMAZIN = Property.loadValue([data.DIMAZIN, data[79]], 0);
 
     // DXF Groupcode 170 - Alternate unit dimensioning performed if nonzero
     this.DIMALT = Property.loadValue([data.DIMALT, data[170]], 0);
@@ -575,6 +582,7 @@ export class DimStyle {
     file.writeGroupCode('76', this.DIMSE2 ? 1 : 0); // convert bool to int
     file.writeGroupCode('77', this.DIMTAD);
     file.writeGroupCode('78', this.DIMZIN);
+    file.writeGroupCode('79', this.DIMAZIN);
     file.writeGroupCode('170', this.DIMALT);
     file.writeGroupCode('171', this.DIMALTD);
     file.writeGroupCode('172', this.DIMTOFL ? 1 : 0); // convert bool to int
