@@ -68,7 +68,7 @@ export class BaseCircularDimension extends BaseDimension {
         }
       }
 
-      const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
+      const op1 = new PromptOptions(Strings.Input.DIMENSION, [Input.Type.POINT]);
       const Pt11 = await DesignCore.Scene.inputManager.requestInput(op1);
       Pt11.sequence = 11;
       this.points.push(Pt11);
@@ -150,7 +150,7 @@ export class BaseCircularDimension extends BaseDimension {
 
     // let textPosition = Pt11;
     let textPosition = Pt11.project(Pt15.angle(Pt11), approxTextWidth * 0.5);
-    let textRotation = Pt15.angle(Pt10);
+    let textRotation = this.getTextDirection(Pt15.angle(Pt10));
     // Get the direction for the dimension text offset
     const textAboveDirection = textRotation + Math.PI / 2;
     const textAboveDistance = DIMTXT * 0.5 + DIMGAP;
