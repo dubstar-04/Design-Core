@@ -71,7 +71,7 @@ export class Strings {
     START: 'Specify start point',
     END: 'Specify end point',
     POINT: 'Specify a point',
-    DIMENSION: 'Specify dimension location',
+    DIMENSION: 'Specify dimension position',
     NEXTPOINT: 'Specify next point',
     RADIUS: 'Specify radius',
     POSITION: 'Specify position',
