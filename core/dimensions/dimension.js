@@ -84,7 +84,7 @@ export class Dimension extends BaseDimension {
 
       while (!inputValid) {
         DesignCore.Scene.selectionManager.reset();
-        const options = new PromptOptions(`${Strings.Input.START} or ${Strings.Input.SELECT}`, [Input.Type.POINT, Input.Type.SINGLESELECTION]);
+        const options = new PromptOptions(`${Strings.Input.START} ${Strings.Strings.OR} ${Strings.Input.SELECT}`, [Input.Type.POINT, Input.Type.SINGLESELECTION]);
         const input1 = await DesignCore.Scene.inputManager.requestInput(options);
 
         if (input1 instanceof Point) {
@@ -160,7 +160,7 @@ export class Dimension extends BaseDimension {
         // diametric prompt: select radial or diametric type dimension or location for the the text position
         if (this.selectedItems[0] instanceof Circle) {
           const options = this.dimType.getBaseDimType() === 3 ? ['Radius'] : ['Diameter'];
-          op2 = new PromptOptions(`${Strings.Input.DIMENSION} or ${Strings.Input.OPTION}`, [Input.Type.POINT], options);
+          op2 = new PromptOptions(`${Strings.Input.DIMENSION}`, [Input.Type.POINT], options);
         }
 
         const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
