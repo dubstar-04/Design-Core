@@ -199,7 +199,7 @@ export class DimStyle {
     // 4 = Places the dimension text below the dimension line.
     this.DIMTAD = Property.loadValue([data.DIMTAD, data[77]], 0);
 
-    // DXF Groupcode 78 - Zero suppression for “feet & inch” dimensions
+    // DXF Groupcode 78 - Zero suppression for linear dimensions
     /*
         Values 0-3 affect feet-and-inch dimensions only:
         0 = Suppresses zero feet and precisely zero inches
