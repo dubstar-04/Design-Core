@@ -38,24 +38,32 @@ export class Zoom extends Tool {
    */
   async execute() {
     try {
-      const op = new PromptOptions('Zoom', [], ['All', 'Extents', 'Window']);
-      const option = await DesignCore.Scene.inputManager.requestInput(op);
-      this.mode = option;
+      const op = new PromptOptions(Strings.Input.POINT,[Input.Type.POINT], [this.modes.ALL, this.modes.EXTENTS, this.modes.WINDOW, this.modes.OBJECT]);
+      const input = await DesignCore.Scene.inputManager.requestInput(op);
 
-      if (option === 'All' || option === 'Extents') {
-        DesignCore.Canvas.zoomExtents();
-        DesignCore.Scene.inputManager.executeCommand();
-        return;
-      }
+      // default window mode
+      if (this.mode === this.modes.WINDOW) {
+        if(Input.getType(input) === Input.Type.POINT){
+          this.points.push(input);
+        } else {
+          const p1op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);
+          const pt1 = await DesignCore.Scene.inputManager.requestInput(p1op);
+          this.points.push(pt1);
+        }
 
-      if (option === 'Window') {
-        const p1op = new PromptOptions(Strings.Input.FIRSTPOINT || 'First Point', [Input.Type.POINT]);
-        const pt1 = await DesignCore.Scene.inputManager.requestInput(p1op);
-        this.points.push(pt1);
-
-        const p2op = new PromptOptions(Strings.Input.SECONDPOINT || 'Second Point', [Input.Type.POINT]);
+        const p2op = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
         const pt2 = await DesignCore.Scene.inputManager.requestInput(p2op);
         this.points.push(pt2);
+
+        DesignCore.Scene.inputManager.executeCommand();
+      }
+
+      // Zoom or All extents
+      if (input === this.modes.ALL || input === this.modes.EXTENTS) {
+        this.mode = input;
+        DesignCore.Scene.inputManager.executeCommand();
+      }
+
 
         DesignCore.Scene.inputManager.executeCommand();
       }
@@ -68,7 +76,7 @@ export class Zoom extends Tool {
    * Preview the command during execution
    */
   preview() {
-    if (this.mode === 'Window' && this.points.length === 1) {
+    if (this.mode === this.modes.WINDOW && this.points.length === 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const p1 = this.points[0];
       const p2 = mousePoint;
@@ -89,7 +97,9 @@ export class Zoom extends Tool {
    * Perform the command
    */
   action() {
-    if (this.mode === 'Window' && this.points.length === 2) {
+
+    // Zoom to window
+    if (this.mode === this.modes.WINDOW  && this.points.length === 2) {
       DesignCore.Canvas.zoomToWindow(this.points[0], this.points[1]);
     }
   }
