@@ -15,7 +15,13 @@ export class Zoom extends Tool {
   /** Create a Zoom command */
   constructor() {
     super();
-    this.mode = undefined; // 'All' | 'Extents' | 'Window'
+    this.modes = {
+      ALL: 'All',
+      EXTENTS: 'Extents',
+      WINDOW: 'Window',
+      OBJECT: 'Object',
+    };
+    this.mode = this.modes.WINDOW; // default to window mode
   }
 
   /**
