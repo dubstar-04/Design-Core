@@ -41,6 +41,11 @@ export class Zoom extends Tool {
       const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT], [this.modes.ALL, this.modes.EXTENTS, this.modes.WINDOW, this.modes.OBJECT]);
       const input = await DesignCore.Scene.inputManager.requestInput(op);
 
+      if (Object.values(this.modes).includes(input)) {
+        // input matches one of the mode values
+        this.mode = input;
+      }
+
       // default window mode
       if (this.mode === this.modes.WINDOW) {
         if (Input.getType(input) === Input.Type.POINT) {
