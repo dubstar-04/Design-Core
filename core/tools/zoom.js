@@ -59,28 +59,18 @@ export class Zoom extends Tool {
         const p2op = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
         const pt2 = await DesignCore.Scene.inputManager.requestInput(p2op);
         this.points.push(pt2);
-
-        DesignCore.Scene.inputManager.executeCommand();
-      }
-
-      // Zoom or All extents
-      if (input === this.modes.ALL || input === this.modes.EXTENTS) {
-        this.mode = input;
-        DesignCore.Scene.inputManager.executeCommand();
       }
 
       // Zoom to objects in selection
-      if (input === this.modes.OBJECT) {
-        this.mode = input;
-
+      if (this.mode === this.modes.OBJECT) {
         const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
 
         if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
           await DesignCore.Scene.inputManager.requestInput(op);
         }
-
-        DesignCore.Scene.inputManager.executeCommand();
       }
+
+      DesignCore.Scene.inputManager.executeCommand();
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
@@ -128,6 +118,7 @@ export class Zoom extends Tool {
       let ymin = Infinity;
       let ymax = -Infinity;
 
+      // return if nothing selection
       if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length === 0) {
         return;
       }
