@@ -233,3 +233,28 @@ test('Test Canvas.zoomToWindow - same point (should not zoom)', () => {
   expect(finalScale).toBe(initialScale);
 });
 
+test('Test Zoom.action - Object mode', () => {
+  // Add an object to the scene
+  const obj = DesignCore.Scene.addItem('Circle', {points: [new Point(20, 20), new Point(40, 40)]});
+
+  core.canvas.width = 800;
+  core.canvas.height = 600;
+  core.canvas.matrix.scale(1, 1);
+
+  const initialScale = core.canvas.getScale();
+
+  const zoom = new Zoom();
+  zoom.mode = 'Object';
+
+  // Select the object for zoom
+  DesignCore.Scene.selectionManager.addToSelectionSet(obj);
+
+  // Perform zoom to object
+  zoom.action();
+
+  const finalScale = core.canvas.getScale();
+  expect(finalScale).not.toBe(initialScale);
+  expect(finalScale).toBeGreaterThan(0);
+});
+
+
