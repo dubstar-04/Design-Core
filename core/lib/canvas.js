@@ -156,7 +156,7 @@ export class Canvas {
   }
 
   /**
-   * Zoom to a user-defined window
+   * Zoom to a window
    * @param {Point} pt1
    * @param {Point} pt2
    */
@@ -192,24 +192,7 @@ export class Canvas {
     const extents = DesignCore.Scene.boundingBox();
 
     if (extents) {
-      // calculate the center of all items
-      const selectionCenter = new Point(extents.xMin + (extents.xLength / 2), extents.yMin + (extents.yLength / 2));
-      // get the center of the screen transformed to a scene position
-      const screenCenter = new Point(this.width / 2, this.height / 2);
-      // calculate the translation delta required to center on screen
-      const translateDelta = DesignCore.Mouse.transformToScene(screenCenter).subtract(selectionCenter);
-      // calculate the scale required to fill the screen
-      const targetScale = Math.min((this.width / extents.xLength), (this.height / extents.yLength));
-      // calculate the scale delta required to fill 90% of the screen
-      const scaleDelta = targetScale / this.getScale() * 0.9;
-      // apply scale
-      this.matrix.scale(scaleDelta, scaleDelta);
-      // translate to counteract the scale
-      this.matrix.translate((selectionCenter.x / scaleDelta) - selectionCenter.x, (selectionCenter.y / scaleDelta) - selectionCenter.y);
-      // translate to the center of the screen
-      this.matrix.translate(translateDelta.x / scaleDelta, translateDelta.y / scaleDelta);
-      // request paint to update
-      this.requestPaint();
+      this.zoomToWindow(new Point(extents.xMin, extents.yMin), new Point(extents.xMax, extents.yMax));
     }
   }
 
