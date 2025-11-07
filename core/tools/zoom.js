@@ -23,7 +23,7 @@ export class Zoom extends Tool {
    * @return {Object}
    */
   static register() {
-    const command = {command: 'Zoom', shortcut: 'Z', type: 'Tool'};
+    const command = {command: 'Zoom', shortcut: 'Z'};
     return command;
   }
 
