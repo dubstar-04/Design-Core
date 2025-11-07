@@ -9,7 +9,7 @@ test('Test Zoom.register', () => {
   const command = Zoom.register();
   expect(command.command).toBe('Zoom');
   expect(command.shortcut).toBe('Z');
-  expect(command.type).toBe('Tool');
+  expect(command.type).toBeUndefined();
 });
 
 test('Test Zoom.action - Window mode', () => {
