@@ -102,6 +102,13 @@ export class Zoom extends Tool {
     if (this.mode === this.modes.WINDOW  && this.points.length === 2) {
       DesignCore.Canvas.zoomToWindow(this.points[0], this.points[1]);
     }
+
+    // Zoom Extents
+    if (this.mode === this.modes.ALL || this.mode === this.modes.EXTENTS) {
+      DesignCore.Canvas.zoomExtents();
+    }
+
+    }
   }
 }
 
