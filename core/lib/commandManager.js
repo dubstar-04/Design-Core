@@ -29,6 +29,7 @@ import {Identify} from '../tools/identify.js';
 import {Extend} from '../tools/extend.js';
 import {Trim} from '../tools/trim.js';
 import {Purge} from '../tools/purge.js';
+import {Zoom} from '../tools/zoom.js';
 
 import {Utils} from './utils.js';
 import {Strings} from './strings.js';
@@ -64,6 +65,8 @@ const classes = {
   Extend,
   Trim,
   Purge,
+
+  Zoom,
 
 };
 
