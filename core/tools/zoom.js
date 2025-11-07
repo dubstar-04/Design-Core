@@ -38,12 +38,12 @@ export class Zoom extends Tool {
    */
   async execute() {
     try {
-      const op = new PromptOptions(Strings.Input.POINT,[Input.Type.POINT], [this.modes.ALL, this.modes.EXTENTS, this.modes.WINDOW, this.modes.OBJECT]);
+      const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT], [this.modes.ALL, this.modes.EXTENTS, this.modes.WINDOW, this.modes.OBJECT]);
       const input = await DesignCore.Scene.inputManager.requestInput(op);
 
       // default window mode
       if (this.mode === this.modes.WINDOW) {
-        if(Input.getType(input) === Input.Type.POINT){
+        if (Input.getType(input) === Input.Type.POINT) {
           this.points.push(input);
         } else {
           const p1op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);
@@ -68,16 +68,14 @@ export class Zoom extends Tool {
       if (input === this.modes.OBJECT) {
         this.mode = input;
 
-      const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
+        const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
 
-      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-        await DesignCore.Scene.inputManager.requestInput(op);
-      }
+        if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+          await DesignCore.Scene.inputManager.requestInput(op);
+        }
 
         DesignCore.Scene.inputManager.executeCommand();
       }
-
-
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
@@ -108,9 +106,8 @@ export class Zoom extends Tool {
    * Perform the command
    */
   action() {
-
     // Zoom to window
-    if (this.mode === this.modes.WINDOW  && this.points.length === 2) {
+    if (this.mode === this.modes.WINDOW && this.points.length === 2) {
       DesignCore.Canvas.zoomToWindow(this.points[0], this.points[1]);
     }
 
@@ -121,40 +118,33 @@ export class Zoom extends Tool {
 
     // Zoom to Object(s)
     if (this.mode === this.modes.OBJECT) {
+      let xmin = Infinity;
+      let xmax = -Infinity;
+      let ymin = Infinity;
+      let ymax = -Infinity;
 
-         let xmin = Infinity;
-          let xmax = -Infinity;
-          let ymin = Infinity;
-          let ymax = -Infinity;
+      if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length === 0) {
+        return;
+      }
 
-          if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length === 0) {
-            return;
-          }
+      for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        const itemBoundingBox = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].boundingBox();
 
-          for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-            const itemBoundingBox = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].boundingBox();
+        xmin = Math.min(xmin, itemBoundingBox.xMin);
+        xmax = Math.max(xmax, itemBoundingBox.xMax);
+        ymin = Math.min(ymin, itemBoundingBox.yMin);
+        ymax = Math.max(ymax, itemBoundingBox.yMax);
+      }
 
-            xmin = Math.min(xmin, itemBoundingBox.xMin);
-            xmax = Math.max(xmax, itemBoundingBox.xMax);
-            ymin = Math.min(ymin, itemBoundingBox.yMin);
-            ymax = Math.max(ymax, itemBoundingBox.yMax);
-          }
+      // if all values are zero return undefined
+      if (xmin === 0 && xmax === 0, ymin === 0, ymax === 0) {
+        return;
+      }
 
-          // if all values are zero return undefined
-          if (xmin === 0 && xmax === 0, ymin === 0, ymax === 0) {
-            return;
-          }
-
-
-
-      const Pt1 = new Point(xmin, ymin)
-      const Pt2 = new Point(xmax, ymax)
+      const Pt1 = new Point(xmin, ymin);
+      const Pt2 = new Point(xmax, ymax);
 
       DesignCore.Canvas.zoomToWindow(Pt1, Pt2);
-
-
-
-
     }
   }
 }
