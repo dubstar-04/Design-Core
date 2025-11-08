@@ -141,11 +141,17 @@ export class CommandManager {
       return true;
     }
 
+    // no matching command found, try to get a fuzzy match
+    // get a fuzzy match and notify but only if the user is typing a new command (not mid-command)
+    if (DesignCore.Scene.inputManager.activeCommand === undefined) {
+      const command = this.getFuzzyMatch(input);
+      const shortcut = this.getShortcut(command);
+      if (command !== undefined) {
+        DesignCore.Core.notify(`${Strings.Message.RECOMMEND} ${command} (${shortcut})`);
+      }
+    }
+
     // no matching command found
-    // get a fuzzy match and notify
-    const command = this.getFuzzyMatch(input);
-    const shortcut = this.getShortcut(command);
-    DesignCore.Core.notify(`${Strings.Message.RECOMMEND} ${command} (${shortcut})`);
     return false;
   }
 
@@ -155,6 +161,10 @@ export class CommandManager {
    * @return {boolean} boolean
    */
   isShortcut(shortcut) {
+    if (shortcut === undefined || shortcut === null || typeof shortcut !== 'string') {
+      return false;
+    }
+
     const found = this.commands.some((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === shortcut.toUpperCase());
     return found;
   }
@@ -165,7 +175,7 @@ export class CommandManager {
    * @return {boolean} boolean
    */
   isCommand(command) {
-    if (command === undefined || command === null) {
+    if (command === undefined || command === null || typeof command !== 'string') {
       return false;
     }
 
@@ -221,6 +231,10 @@ export class CommandManager {
    * @return {string} fuzzy matched command
    */
   getFuzzyMatch(input) {
+    if (input === undefined || input === null || typeof input !== 'string') {
+      return undefined;
+    }
+
     let score = Infinity;
     let fuzzyMatch;
     for (let i = 0; i < this.commands.length; i++) {
