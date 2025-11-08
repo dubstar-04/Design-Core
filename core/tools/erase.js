@@ -40,7 +40,7 @@ export class Erase extends Tool {
       }
 
       DesignCore.Scene.inputManager.executeCommand();
-    } catch (error) {
+    } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }

@@ -49,7 +49,7 @@ export class Copy extends Tool {
       this.points.push(pt2);
 
       DesignCore.Scene.inputManager.executeCommand();
-    } catch (error) {
+    } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }
