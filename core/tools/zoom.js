@@ -1,10 +1,10 @@
-import {Tool} from './tool.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Strings} from '../lib/strings.js';
-import {Logging} from '../lib/logging.js';
-import {Point} from '../entities/point.js';
+import { Tool } from './tool.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Strings } from '../lib/strings.js';
+import { Logging } from '../lib/logging.js';
+import { Point } from '../entities/point.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Zoom Command Class
@@ -29,7 +29,7 @@ export class Zoom extends Tool {
    * @return {Object}
    */
   static register() {
-    const command = {command: 'Zoom', shortcut: 'Z'};
+    const command = { command: 'Zoom', shortcut: 'Z' };
     return command;
   }
 
@@ -93,7 +93,7 @@ export class Zoom extends Tool {
         new Point(p1.x, p1.y),
       ];
 
-      DesignCore.Scene.createTempItem('Polyline', {points: points});
+      DesignCore.Scene.createTempItem('Polyline', { points: points });
     }
   }
 
