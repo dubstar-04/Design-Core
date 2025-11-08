@@ -47,7 +47,7 @@ export class Trim extends Tool {
         this.selectedIndex = selection.selectedItemIndex;
         DesignCore.Scene.inputManager.actionCommand();
       }
-    } catch (error) {
+    } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
   }

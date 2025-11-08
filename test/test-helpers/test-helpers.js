@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc */
+
 // mock file for dxf test
 export class File {
   constructor() {
