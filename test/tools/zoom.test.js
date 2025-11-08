@@ -1,7 +1,7 @@
-import {Core} from '../../core/core/core.js';
-import {DesignCore} from '../../core/designCore.js';
-import {Point} from '../../core/entities/point.js';
-import {Zoom} from '../../core/tools/zoom.js';
+import { Core } from '../../core/core/core.js';
+import { DesignCore } from '../../core/designCore.js';
+import { Point } from '../../core/entities/point.js';
+import { Zoom } from '../../core/tools/zoom.js';
 
 const core = new Core();
 
@@ -82,8 +82,8 @@ test('Test Zoom.action - Window mode with single point (should not zoom)', () =>
 
 test('Test Zoom.action - All mode (calls zoomExtents)', () => {
   // Add items to scene so extents exist
-  DesignCore.Scene.addItem('Line', {points: [new Point(10, 10), new Point(100, 100)]});
-  DesignCore.Scene.addItem('Circle', {points: [new Point(50, 50), new Point(60, 60)]});
+  DesignCore.Scene.addItem('Line', { points: [new Point(10, 10), new Point(100, 100)] });
+  DesignCore.Scene.addItem('Circle', { points: [new Point(50, 50), new Point(60, 60)] });
 
   core.canvas.width = 800;
   core.canvas.height = 600;
@@ -235,7 +235,7 @@ test('Test Canvas.zoomToWindow - same point (should not zoom)', () => {
 
 test('Test Zoom.action - Object mode', () => {
   // Add an object to the scene
-  const obj = DesignCore.Scene.addItem('Circle', {points: [new Point(20, 20), new Point(40, 40)]});
+  const obj = DesignCore.Scene.addItem('Circle', { points: [new Point(20, 20), new Point(40, 40)] });
 
   core.canvas.width = 800;
   core.canvas.height = 600;

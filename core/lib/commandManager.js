@@ -1,15 +1,15 @@
-import {Line} from '../entities/line.js';
-import {Polyline} from '../entities/polyline.js';
-import {Lwpolyline} from '../entities/lwpolyline.js';
-import {Circle} from '../entities/circle.js';
-import {Arc} from '../entities/arc.js';
-import {Rectangle} from '../entities/rectangle.js';
+import { Line } from '../entities/line.js';
+import { Polyline } from '../entities/polyline.js';
+import { Lwpolyline } from '../entities/lwpolyline.js';
+import { Circle } from '../entities/circle.js';
+import { Arc } from '../entities/arc.js';
+import { Rectangle } from '../entities/rectangle.js';
 // import {Ellipse} from '../entities/ellipse.js';
 // import {Spline} from '../entities/spline.js';
-import {Text} from '../entities/text.js';
-import {Block} from '../tables/block.js';
-import {Insert} from '../entities/insert.js';
-import {Hatch} from '../entities/hatch.js';
+import { Text } from '../entities/text.js';
+import { Block } from '../tables/block.js';
+import { Insert } from '../entities/insert.js';
+import { Hatch } from '../entities/hatch.js';
 /*
 import { Dimension } from '../dimensions/dimension.js';
 import { AlignedDimension } from '../dimensions/alignedDimension.js';
@@ -22,23 +22,23 @@ import { RotatedDimension } from '../dimensions/rotatedDimension.js';
 
 // import { Point } from "../entities/point.js"
 
-import {Move} from '../tools/move.js';
-import {Copy} from '../tools/copy.js';
-import {Rotate} from '../tools/rotate.js';
-import {Erase} from '../tools/erase.js';
-import {Explode} from '../tools/explode.js';
-import {Distance} from '../tools/distance.js';
-import {Identify} from '../tools/identify.js';
-import {Extend} from '../tools/extend.js';
-import {Trim} from '../tools/trim.js';
-import {Purge} from '../tools/purge.js';
-import {Zoom} from '../tools/zoom.js';
+import { Move } from '../tools/move.js';
+import { Copy } from '../tools/copy.js';
+import { Rotate } from '../tools/rotate.js';
+import { Erase } from '../tools/erase.js';
+import { Explode } from '../tools/explode.js';
+import { Distance } from '../tools/distance.js';
+import { Identify } from '../tools/identify.js';
+import { Extend } from '../tools/extend.js';
+import { Trim } from '../tools/trim.js';
+import { Purge } from '../tools/purge.js';
+import { Zoom } from '../tools/zoom.js';
 
-import {Utils} from './utils.js';
-import {Strings} from './strings.js';
-import {Logging} from './logging.js';
+import { Utils } from './utils.js';
+import { Strings } from './strings.js';
+import { Logging } from './logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 
 const classes = {
