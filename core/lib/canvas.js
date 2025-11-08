@@ -109,12 +109,33 @@ export class Canvas {
   doubleClick(button) {
     switch (button) {
       case 0: // left button
+        this.handleTextEditDoubleClick();
         break;
       case 1: // middle button
         this.zoomExtents();
         break;
       case 2: // right button
         break;
+    }
+  };
+
+  /**
+   * Handle double click for text editing
+   */
+  handleTextEditDoubleClick() {
+    // Find the closest text entity to the mouse position
+    const mousePoint = DesignCore.Mouse.pointOnScene();
+    const closestItemIndex = DesignCore.Scene.selectionManager.findClosestItem(mousePoint);
+
+    if (closestItemIndex !== undefined) {
+      const item = DesignCore.Scene.items[closestItemIndex];
+
+      // Check if the item is a text entity
+      if (item.type === 'Text') {
+        // Start text editing mode
+        DesignCore.Scene.inputManager.startTextEdit(item, closestItemIndex);
+        return;
+      }
     }
   };
 
