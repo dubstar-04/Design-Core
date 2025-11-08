@@ -12,7 +12,7 @@ export class File {
 
   /**
    * Mock function to return next handle
-   * @returns number
+   * @return number
    */
   nextHandle() {
     return 1;
