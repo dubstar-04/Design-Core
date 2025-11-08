@@ -1,9 +1,9 @@
-import {PatternLine, Patterns} from '../../core/lib/patterns.js';
+import { PatternLine, Patterns } from '../../core/lib/patterns.js';
 
 test('Test Patterns.getPattern', () => {
   const pattern = Patterns.getPattern('HONEY');
   expect(pattern.length).toBe(3);
-  pattern.forEach((patternLine) =>{
+  pattern.forEach((patternLine) => {
     expect(patternLine instanceof PatternLine).toBe(true);
   });
 });

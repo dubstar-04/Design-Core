@@ -1,10 +1,10 @@
-import {Tool} from '../tools/tool.js';
-import {Snapping} from './snapping.js';
-import {Utils} from './utils.js';
-import {Strings} from './strings.js';
+import { Tool } from '../tools/tool.js';
+import { Snapping } from './snapping.js';
+import { Utils } from './utils.js';
+import { Strings } from './strings.js';
 
-import {DesignCore} from '../designCore.js';
-import {Point} from '../entities/point.js';
+import { DesignCore } from '../designCore.js';
+import { Point } from '../entities/point.js';
 
 /** PromptOption Class */
 export class PromptOptions {
@@ -290,7 +290,7 @@ export class InputManager {
     // Select entity only mouse is close to an entity and no snap point is available
     // Do allow selection when there is no command active
     // Don't allow selection of there is an active command that does't require a selection i.e. prompt option includes SINGLESELECTION
-    if (index !== undefined && !snap && (this.activeCommand === undefined || this.promptOption !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION)|| this.promptOption.types.includes(Input.Type.SELECTIONSET)))) {
+    if (index !== undefined && !snap && (this.activeCommand === undefined || this.promptOption !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION) || this.promptOption.types.includes(Input.Type.SELECTIONSET)))) {
       const selection = DesignCore.Scene.selectionManager.singleSelect(DesignCore.Mouse.pointOnScene());
       this.onSelection(selection);
     } else if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {

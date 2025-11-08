@@ -1,5 +1,5 @@
-import {Logging} from '../logging.js';
-import {Strings} from '../strings.js';
+import { Logging } from '../logging.js';
+import { Strings } from '../strings.js';
 
 /** DXF File Class */
 export class DXFFile {
@@ -7,7 +7,7 @@ export class DXFFile {
    * Create DXFFile
    * @param {string} version
    */
-  constructor(version='R2018') {
+  constructor(version = 'R2018') {
     this.contents = '';
 
     // Validate version
@@ -114,7 +114,7 @@ export class DXFFile {
    * @param {string} groupValue
    * @param {string} version - DXFFile.Version
    */
-  writeGroupCode(groupCode, groupValue, version=DXFFile.Version.R12) {
+  writeGroupCode(groupCode, groupValue, version = DXFFile.Version.R12) {
     // return if the groupcode is required for a later version
     if (version > this.version) {
       return;

@@ -1,20 +1,20 @@
-import {Scene} from '../lib/scene.js';
-import {CommandManager} from '../lib/commandManager.js';
-import {Mouse} from '../lib/mouse.js';
-import {Canvas} from '../lib/canvas.js';
-import {CommandLine} from '../lib/commandLine.js';
-import {LayerManager} from '../tables/layerManager.js';
-import {LTypeManager} from '../tables/ltypeManager.js';
-import {StyleManager} from '../tables/styleManager.js';
-import {DimStyleManager} from '../tables/dimStyleManager.js';
-import {PropertyManager} from '../properties/propertyManager.js';
+import { Scene } from '../lib/scene.js';
+import { CommandManager } from '../lib/commandManager.js';
+import { Mouse } from '../lib/mouse.js';
+import { Canvas } from '../lib/canvas.js';
+import { CommandLine } from '../lib/commandLine.js';
+import { LayerManager } from '../tables/layerManager.js';
+import { LTypeManager } from '../tables/ltypeManager.js';
+import { StyleManager } from '../tables/styleManager.js';
+import { DimStyleManager } from '../tables/dimStyleManager.js';
+import { PropertyManager } from '../properties/propertyManager.js';
 
-import {FileIO} from '../lib/fileio.js';
-import {Settings} from '../lib/settings.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {Logging} from '../lib/logging.js';
+import { FileIO } from '../lib/fileio.js';
+import { Settings } from '../lib/settings.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /** Class representing design core. This is the primary entry point */
 export class Core {

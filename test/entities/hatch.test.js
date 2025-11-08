@@ -1,48 +1,109 @@
-import {BasePolyline} from '../../core/entities/basePolyline.js';
-import {Circle} from '../../core/entities/circle.js';
-import {Hatch} from '../../core/entities/hatch.js';
-import {Line} from '../../core/entities/line.js';
-import {Point} from '../../core/entities/point.js';
+import { Hatch } from '../../core/entities/hatch.js';
+import { Point } from '../../core/entities/point.js';
+import { DesignCore } from '../../core/designCore.js';
 
-import {File} from '../test-helpers/test-helpers.js';
-import {Polyline} from '../../core/entities/polyline.js';
-import {Arc} from '../../core/entities/arc.js';
-import {Text} from '../../core/entities/text.js';
+import { BasePolyline } from '../../core/entities/basePolyline.js';
+import { Circle } from '../../core/entities/circle.js';
+import { Line } from '../../core/entities/line.js';
+import { Polyline } from '../../core/entities/polyline.js';
+import { Arc } from '../../core/entities/arc.js';
+import { Text } from '../../core/entities/text.js';
+
+import { File } from '../test-helpers/test-helpers.js';
+
+import { Core } from '../../core/core/core.js';
+
+// initialise core
+new Core();
 
 const points = [new Point(100, 100, 1), new Point(200, 100, 1)];
-const boundaryShape = new BasePolyline({points: points});
+const boundaryShape = new BasePolyline({ points: points });
 
 const hatch = new Hatch();
 hatch.boundaryShapes = [boundaryShape];
 
+const hatchInputScenarios = [
+  {
+    desc: 'simple rectangle',
+    points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)],
+    pattern: 'ANSI31',
+    scale: 1,
+    angle: 0,
+    // expectedPoints: 4,
+    expectedPattern: 'ANSI31',
+    expectedScale: 1,
+    expectedAngle: 0,
+  },
+  {
+    desc: 'triangle, custom pattern and scale',
+    points: [new Point(0, 0), new Point(5, 10), new Point(10, 0)],
+    pattern: 'SOLID',
+    scale: 2,
+    angle: 45,
+    // expectedPoints: 3,
+    expectedPattern: 'SOLID',
+    expectedScale: 2,
+    expectedAngle: 45,
+  },
+];
+
+test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) => {
+  const { points, pattern, scale, angle, expectedPattern, expectedScale, expectedAngle } = scenario;
+  const origInputManager = DesignCore.Scene.inputManager;
+  let callCount = 0;
+  DesignCore.Scene.inputManager = {
+    requestInput: async () => {
+      callCount++;
+      if (callCount <= points.length) return points[callCount - 1];
+      if (callCount === points.length + 1) return pattern;
+      if (callCount === points.length + 2) return scale;
+      if (callCount === points.length + 3) return angle;
+    },
+    executeCommand: () => {},
+  };
+
+  const hatch = new Hatch({ patternName: pattern, scale: scale, angle: angle });
+  await hatch.execute();
+
+  expect(hatch.points.length).toBe(1);
+  expect(hatch.pattern).toBe(expectedPattern);
+  expect(hatch.scale).toBe(expectedScale);
+  expect(hatch.angle).toBe(expectedAngle);
+  expect(hatch.solid).toBe(expectedPattern === 'SOLID');
+
+  // Restore original inputManager
+  DesignCore.Scene.inputManager = origInputManager;
+});
+
 test('Test Hatch', () => {
   const data =
-{'0': 'HATCH',
-  '2': 'HONEY', // hatch name
-  // '8': '0', // layer name
-  '41': 2, // Pattern scale
-  // '43': 0, // Pattern line base X
-  // '44': 0, // Pattern line base Y
-  // '45': -2.245064030267288, // Pattern line offset x
-  // '46': 2.245064030267288, // Pattern line offset y
-  // '47': 0.5126851563522042, // pixel size
-  '52': 45, // pattern angle
-  // '53': 45, // Pattern line angle
-  '70': 0, // Solid fill flag
-  // '71': 1, // Associativity flag
-  // '72': [0, 1], // Edge type
-  // '73': [1, 1], // Boundary annotation flag
-  // '75': 1, // Hatch style
-  // '76': 1, // Hatch pattern type
-  // '77': 0, // Hatch pattern double flag
-  // '78': 1, // Number of pattern definition lines
-  // '79': 0, // Number of dash length items
-  // '91': 2, // Number of boundary path loops
-  // '92': [7, 7], // Boundary path type flag
-  // '93': [4, 2], // Number of edges in this boundary path / number of points in polyline
-  // '97': [1, 1], // Number of source boundary objects
-  // '98': 2, // Number of seed points
-};
+  {
+    '0': 'HATCH',
+    '2': 'HONEY', // hatch name
+    // '8': '0', // layer name
+    '41': 2, // Pattern scale
+    // '43': 0, // Pattern line base X
+    // '44': 0, // Pattern line base Y
+    // '45': -2.245064030267288, // Pattern line offset x
+    // '46': 2.245064030267288, // Pattern line offset y
+    // '47': 0.5126851563522042, // pixel size
+    '52': 45, // pattern angle
+    // '53': 45, // Pattern line angle
+    '70': 0, // Solid fill flag
+    // '71': 1, // Associativity flag
+    // '72': [0, 1], // Edge type
+    // '73': [1, 1], // Boundary annotation flag
+    // '75': 1, // Hatch style
+    // '76': 1, // Hatch pattern type
+    // '77': 0, // Hatch pattern double flag
+    // '78': 1, // Number of pattern definition lines
+    // '79': 0, // Number of dash length items
+    // '91': 2, // Number of boundary path loops
+    // '92': [7, 7], // Boundary path type flag
+    // '93': [4, 2], // Number of edges in this boundary path / number of points in polyline
+    // '97': [1, 1], // Number of source boundary objects
+    // '98': 2, // Number of seed points
+  };
 
   const newHatch = new Hatch(data);
 
@@ -305,35 +366,36 @@ ANSI31
 test('Test Hatch.processBoundaryData', () => {
   // create data defining a square and a circle
   const data =
-{'0': 'HATCH',
-  // '2': 'ANSI31', // hatch name
-  // '8': '0', // layer name
-  // '41': 1, // Pattern scale
-  // '43': 0, // Pattern line base X
-  // '44': 0, // Pattern line base Y
-  // '45': -2.245064030267288, // Pattern line offset x
-  // '46': 2.245064030267288, // Pattern line offset y
-  // '47': 0.5126851563522042, // pixel size
-  // '52': 0, // pattern angle
-  // '53': 45, // Pattern line angle
-  // '70': 0, // Solid fill flag
-  // '71': 1, // Associativity flag
-  '72': [0, 1], // Edge type
-  // '73': [1, 1], // Boundary annotation flag
-  // '75': 1, // Hatch style
-  // '76': 1, // Hatch pattern type
-  // '77': 0, // Hatch pattern double flag
-  '78': 1, // Number of pattern definition lines
-  // '79': 0, // Number of dash length items
-  '91': 2, // Number of boundary path loops
-  '92': [7, 7], // Boundary path type flag
-  '93': [4, 2], // Number of edges in this boundary path / number of points in polyline
-  // '97': [1, 1], // Number of source boundary objects
-  // '98': 2, // Number of seed points
-  // Points 0 and -1 are stripped before processing
-  'points': [new Point(), new Point(200, 200), new Point(100, 200), new Point(100, 100), new Point(200, 100), new Point(350, 300, 1),
-    new Point(250, 300, 1), new Point(350, 300, 1)],
-};
+  {
+    '0': 'HATCH',
+    // '2': 'ANSI31', // hatch name
+    // '8': '0', // layer name
+    // '41': 1, // Pattern scale
+    // '43': 0, // Pattern line base X
+    // '44': 0, // Pattern line base Y
+    // '45': -2.245064030267288, // Pattern line offset x
+    // '46': 2.245064030267288, // Pattern line offset y
+    // '47': 0.5126851563522042, // pixel size
+    // '52': 0, // pattern angle
+    // '53': 45, // Pattern line angle
+    // '70': 0, // Solid fill flag
+    // '71': 1, // Associativity flag
+    '72': [0, 1], // Edge type
+    // '73': [1, 1], // Boundary annotation flag
+    // '75': 1, // Hatch style
+    // '76': 1, // Hatch pattern type
+    // '77': 0, // Hatch pattern double flag
+    '78': 1, // Number of pattern definition lines
+    // '79': 0, // Number of dash length items
+    '91': 2, // Number of boundary path loops
+    '92': [7, 7], // Boundary path type flag
+    '93': [4, 2], // Number of edges in this boundary path / number of points in polyline
+    // '97': [1, 1], // Number of source boundary objects
+    // '98': 2, // Number of seed points
+    // Points 0 and -1 are stripped before processing
+    'points': [new Point(), new Point(200, 200), new Point(100, 200), new Point(100, 100), new Point(200, 100), new Point(350, 300, 1),
+      new Point(250, 300, 1), new Point(350, 300, 1)],
+  };
 
   const hatch = new Hatch();
 
@@ -348,10 +410,10 @@ test('Test Hatch.processBoundaryData', () => {
 test('Test Hatch.processSelection', () => {
   // create selected items defining a square
   let selectedItems = [];
-  selectedItems.push(new Line({points: [new Point(100, 100), new Point(200, 100)]}));
-  selectedItems.push(new Line({points: [new Point(200, 100), new Point(200, 200)]}));
-  selectedItems.push(new Line({points: [new Point(200, 200), new Point(100, 200)]}));
-  selectedItems.push(new Line({points: [new Point(100, 200), new Point(100, 100)]}));
+  selectedItems.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedItems.push(new Line({ points: [new Point(200, 100), new Point(200, 200)] }));
+  selectedItems.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
+  selectedItems.push(new Line({ points: [new Point(100, 200), new Point(100, 100)] }));
 
   let hatch = new Hatch();
   let boundaryData = hatch.processSelection(selectedItems);
@@ -361,7 +423,7 @@ test('Test Hatch.processSelection', () => {
 
   // create selected items defining a circle
   selectedItems = [];
-  selectedItems.push(new Circle({points: [new Point(100, 100), new Point(200, 100)]}));
+  selectedItems.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
 
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);
@@ -370,8 +432,10 @@ test('Test Hatch.processSelection', () => {
 
   // create selected items defining a square (polyline)
   selectedItems = [];
-  selectedItems.push( new Polyline({points: [new Point(100, 100), new Point(200, 100), new Point(200, 200),
-    new Point(100, 200), new Point(100, 100)]}));
+  selectedItems.push(new Polyline({
+    points: [new Point(100, 100), new Point(200, 100), new Point(200, 200),
+      new Point(100, 200), new Point(100, 100)],
+  }));
 
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);
@@ -380,10 +444,10 @@ test('Test Hatch.processSelection', () => {
 
   // create selected items defining a pill shape
   selectedItems = [];
-  selectedItems.push(new Line({points: [new Point(100, 100), new Point(200, 100)]}));
-  selectedItems.push(new Arc({points: [new Point(200, 150), new Point(200, 100), new Point(200, 200)]}));
-  selectedItems.push(new Line({points: [new Point(200, 200), new Point(100, 200)]}));
-  selectedItems.push(new Arc({points: [new Point(100, 150), new Point(100, 200), new Point(100, 100)]}));
+  selectedItems.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedItems.push(new Arc({ points: [new Point(200, 150), new Point(200, 100), new Point(200, 200)] }));
+  selectedItems.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
+  selectedItems.push(new Arc({ points: [new Point(100, 150), new Point(100, 200), new Point(100, 100)] }));
 
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);
@@ -392,8 +456,8 @@ test('Test Hatch.processSelection', () => {
 
   // Test a selection with invalid items
   selectedItems = [];
-  selectedItems.push(new Text({points: [new Point(100, 100), new Point(200, 100)]}));
-  selectedItems.push(new Circle({points: [new Point(100, 100), new Point(200, 100)]}));
+  selectedItems.push(new Text({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedItems.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
 
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);

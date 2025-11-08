@@ -1,16 +1,16 @@
-import {Strings} from '../lib/strings.js';
-import {Tool} from './tool.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
+import { Strings } from '../lib/strings.js';
+import { Tool } from './tool.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Distance Command Class
  * @extends Tool
  */
 export class Distance extends Tool {
-/** Create a Distance command */
+  /** Create a Distance command */
   constructor() {
     super();
   }
@@ -23,7 +23,7 @@ export class Distance extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Distance', shortcut: 'DI'}; // , type: 'Tool'};
+    const command = { command: 'Distance', shortcut: 'DI' }; // , type: 'Tool'};
     return command;
   }
 

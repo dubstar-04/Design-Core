@@ -1,4 +1,4 @@
-import {Logging} from '../../core/lib/logging';
+import { Logging } from '../../core/lib/logging';
 
 // mock console.log for tests
 const msg = 'testMessage';

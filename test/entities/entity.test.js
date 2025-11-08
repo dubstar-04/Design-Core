@@ -1,16 +1,16 @@
 
 
-import {Core} from '../../core/core/core.js';
-import {Entity} from '../../core/entities/entity.js';
-import {Line} from '../../core/entities/line.js';
-import {Point} from '../../core/entities/point.js';
+import { Core } from '../../core/core/core.js';
+import { Entity } from '../../core/entities/entity.js';
+import { Line } from '../../core/entities/line.js';
+import { Point } from '../../core/entities/point.js';
 
 // initialise core
 new Core();
 
 test('Test Entity.colour', () => {
   const entity = new Entity();
-  expect(entity.colour).toEqual({'r': 1, 'g': 1, 'b': 1});
+  expect(entity.colour).toEqual({ 'r': 1, 'g': 1, 'b': 1 });
 });
 
 test('Test Entity.getLineType', () => {
@@ -19,7 +19,7 @@ test('Test Entity.getLineType', () => {
 });
 
 test('Test Entity.Within', () => {
-  const entity = new Line({points: [new Point(100, 100), new Point(200, 200)]});
+  const entity = new Line({ points: [new Point(100, 100), new Point(200, 200)] });
   const selectionExtremesFalse = [101, 199, 101, 199];
   const selectionExtremesTrue = [99, 201, 99, 201];
 
@@ -28,7 +28,7 @@ test('Test Entity.Within', () => {
 });
 
 test('Test Entity.touched', () => {
-  const entity = new Line({points: [new Point(100, 100), new Point(200, 200)]});
+  const entity = new Line({ points: [new Point(100, 100), new Point(200, 200)] });
   const selectionExtremesTrue = [101, 199, 101, 199];
   const selectionExtremesFalse = [99, 201, 99, 201];
 

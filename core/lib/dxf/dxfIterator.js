@@ -1,4 +1,4 @@
-import {Strings} from '../strings.js';
+import { Strings } from '../strings.js';
 
 /**
 This class is designed to iterate though an internal array of DXF groupcode and value pairs
@@ -153,7 +153,7 @@ export class DxfIterator {
    * @return {Array}
    */
   currentPair() {
-    return {code: this.current().trim(), value: this.nextValue()};
+    return { code: this.current().trim(), value: this.nextValue() };
   }
 
   /**

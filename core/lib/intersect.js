@@ -1,4 +1,4 @@
-import {Point} from '../entities/point.js';
+import { Point } from '../entities/point.js';
 
 /** Intersection Class */
 export class Intersection {
@@ -34,7 +34,7 @@ export class Intersection {
    */
   appendPoints(points) {
     // Forward all points through appendPoint
-    points.forEach((point)=>{
+    points.forEach((point) => {
       this.appendPoint(point);
     });
   };
@@ -56,11 +56,11 @@ export class Intersection {
 
     let result;
     const a = (a2.x - a1.x) * (a2.x - a1.x) +
-            (a2.y - a1.y) * (a2.y - a1.y);
+      (a2.y - a1.y) * (a2.y - a1.y);
     const b = 2 * ((a2.x - a1.x) * (a1.x - c.x) +
-            (a2.y - a1.y) * (a1.y - c.y));
+      (a2.y - a1.y) * (a1.y - c.y));
     const cc = c.x * c.x + c.y * c.y + a1.x * a1.x + a1.y * a1.y -
-            2 * (c.x * a1.x + c.y * a1.y) - r * r;
+      2 * (c.x * a1.x + c.y * a1.y) - r * r;
     const deter = b * b - 4 * a * cc;
 
     if (deter < 0) {
@@ -177,16 +177,16 @@ export class Intersection {
     const bottomLeft = new Point(min.x, max.y);
 
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectArcLine(arc, rectPoints, extend);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectArcLine(arc, rectPoints, extend);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectArcLine(arc, rectPoints, extend);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectArcLine(arc, rectPoints, extend);
 
     const result = new Intersection('No Intersection');
@@ -296,16 +296,16 @@ export class Intersection {
     const topRight = new Point(max.x, min.y);
     const bottomLeft = new Point(min.x, max.y);
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectCircleLine(circle, rectPoints);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectCircleLine(circle, rectPoints);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectCircleLine(circle, rectPoints);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectCircleLine(circle, rectPoints);
 
     const result = new Intersection('No Intersection');
@@ -329,38 +329,97 @@ export class Intersection {
    * @param {Line} line1
    * @param {Line} line2
    * @param {boolean} extend
-   * @return {Intersect}
+   * @return {Intersection}
    */
   static intersectLineLine(line1, line2, extend) {
-    const a1 = line1.start;
-    const a2 = line1.end;
-    const b1 = line2.start;
-    const b2 = line2.end;
+    const aStart = line1.start;
+    const aEnd = line1.end;
+    const bStart = line2.start;
+    const bEnd = line2.end;
     extend = extend || false;
 
     let result;
 
-    const uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x);
-    const ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x);
-    const uB = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
+    // Check if any endpoints are coincident
+    if (aStart.isSame(bStart)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(aStart.x, aStart.y));
+      return result;
+    }
+    if (aStart.isSame(bEnd)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(aStart.x, aStart.y));
+      return result;
+    }
+    if (aEnd.isSame(bStart)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(aEnd.x, aEnd.y));
+      return result;
+    }
+    if (aEnd.isSame(bEnd)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(aEnd.x, aEnd.y));
+      return result;
+    }
 
-    if (uB != 0) {
-      const ua = uaT / uB;
-      const ub = ubT / uB;
+    // Check if any endpoints of one line are on the other line
+    if (aStart.isOnLine(bStart, bEnd)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(aStart.x, aStart.y));
+      return result;
+    }
+    if (aEnd.isOnLine(bStart, bEnd)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(aEnd.x, aEnd.y));
+      return result;
+    }
+    if (bStart.isOnLine(aStart, aEnd)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(bStart.x, bStart.y));
+      return result;
+    }
+    if (bEnd.isOnLine(aStart, aEnd)) {
+      result = new Intersection('Coincident');
+      result.appendPoint(new Point(bEnd.x, bEnd.y));
+      return result;
+    }
 
-      if ((0 <= ua && ua <= 1) && (0 <= ub && ub <= 1) || (0 <= ua && ua <= 1) && extend) {
+    // Calculate the denominator of the intersection formula
+    const denominator = (bEnd.y - bStart.y) * (aEnd.x - aStart.x) - (bEnd.x - bStart.x) * (aEnd.y - aStart.y);
+
+    // Calculate numerators for ua and ub
+    const numeratorA = (bEnd.x - bStart.x) * (aStart.y - bStart.y) - (bEnd.y - bStart.y) * (aStart.x - bStart.x);
+    const numeratorB = (aEnd.x - aStart.x) * (aStart.y - bStart.y) - (aEnd.y - aStart.y) * (aStart.x - bStart.x);
+
+    if (denominator !== 0) {
+      // Lines are not parallel
+      const ua = numeratorA / denominator;
+      const ub = numeratorB / denominator;
+
+      // If ua and ub are between 0 and 1, the intersection is within the line segments
+      // If 'extend' is true, allow intersection outside the segments
+      const isWithinSegments = (0 <= ua && ua <= 1) && (0 <= ub && ub <= 1);
+      const isExtended = (0 <= ua && ua <= 1) && extend;
+
+      if (isWithinSegments || isExtended) {
         result = new Intersection('Intersection');
-        result.appendPoint(new Point(
-            a1.x + ua * (a2.x - a1.x),
-            a1.y + ua * (a2.y - a1.y),
-        ));
+        // Calculate intersection point
+        const intersectionPoint = new Point(
+            aStart.x + ua * (aEnd.x - aStart.x),
+            aStart.y + ua * (aEnd.y - aStart.y),
+        );
+        result.appendPoint(intersectionPoint);
       } else {
         result = new Intersection('No Intersection');
       }
     } else {
-      if (uaT == 0 || ubT == 0) {
+      // Lines are parallel or coincident
+      if (numeratorA === 0 || numeratorB === 0) {
+        // Lines are coincident (overlap)
         result = new Intersection('Coincident');
+        // No specific intersection point added here
       } else {
+        // Lines are parallel but not coincident
         result = new Intersection('Parallel');
       }
     }
@@ -396,7 +455,7 @@ export class Intersection {
 
 
       if (b1.bulge === 0) {
-        const line2 = {start: b1, end: b2};
+        const line2 = { start: b1, end: b2 };
         const inter = this.intersectLineLine(line2, line, extend);
         result.appendPoints(inter.points);
       } else {
@@ -463,16 +522,16 @@ export class Intersection {
     const topRight = new Point(max.x, min.y);
     const bottomLeft = new Point(min.x, max.y);
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectPolylineLine(polyline, rectPoints, extend);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectPolylineLine(polyline, rectPoints, extend);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectPolylineLine(polyline, rectPoints, extend);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectPolylineLine(polyline, rectPoints, extend);
 
     const result = new Intersection('No Intersection');
@@ -507,16 +566,16 @@ export class Intersection {
     const topRight = new Point(max.x, min.y);
     const bottomLeft = new Point(min.x, max.y);
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectLineLine(rectPoints, line, extend);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectLineLine(rectPoints, line, extend);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectLineLine(rectPoints, line, extend);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectLineLine(rectPoints, line, extend);
 
     const result = new Intersection('No Intersection');
@@ -576,16 +635,16 @@ export class Intersection {
     const topRight = new Point(max.x, min.y);
     const bottomLeft = new Point(min.x, max.y);
 
-    let rectPoints = {start: min, end: topRight};
+    let rectPoints = { start: min, end: topRight };
     const inter1 = this.intersectLineRectangle(rectPoints, rectangle2);
 
-    rectPoints = {start: topRight, end: max};
+    rectPoints = { start: topRight, end: max };
     const inter2 = this.intersectLineRectangle(rectPoints, rectangle2);
 
-    rectPoints = {start: max, end: bottomLeft};
+    rectPoints = { start: max, end: bottomLeft };
     const inter3 = this.intersectLineRectangle(rectPoints, rectangle2);
 
-    rectPoints = {start: bottomLeft, end: min};
+    rectPoints = { start: bottomLeft, end: min };
     const inter4 = this.intersectLineRectangle(rectPoints, rectangle2);
 
     const result = new Intersection('No Intersection');
@@ -600,6 +659,18 @@ export class Intersection {
     }
 
     return result;
+  };
+
+
+  /**
+   * Find intersections between solid and rectangle
+   * @param {Solid} solid
+   * @param {Rectangle} rectangle
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectSolidRectangle(solid, rectangle, extend) {
+    return this.intersectPolylineRectangle(solid, rectangle, extend);
   };
 }
 

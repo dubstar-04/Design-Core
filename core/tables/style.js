@@ -1,6 +1,6 @@
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {Flags} from '../properties/flags.js';
-import {Property} from '../properties/property.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Flags } from '../properties/flags.js';
+import { Property } from '../properties/property.js';
 
 /** Style Class */
 export class Style {
@@ -21,42 +21,42 @@ export class Style {
     this.standardFlags = new Flags();
 
     if (data) {
-      if (data.hasOwnProperty('name') || data.hasOwnProperty('2') ) {
+      if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - ltype name
         this.name = data.name || data[2];
       }
 
-      if (data.hasOwnProperty('font') || data.hasOwnProperty('3') ) {
+      if (data.hasOwnProperty('font') || data.hasOwnProperty('3')) {
         // DXF Groupcode 3 - style font
         this.font = data.font || data[3];
       }
 
-      if (data.hasOwnProperty('bigFont') || data.hasOwnProperty('4') ) {
+      if (data.hasOwnProperty('bigFont') || data.hasOwnProperty('4')) {
         // DXF Groupcode 4 - big font
         this.bigFont = data.bigFont || data[4];
       }
 
-      if (data.hasOwnProperty('textHeight') || data.hasOwnProperty('40') ) {
+      if (data.hasOwnProperty('textHeight') || data.hasOwnProperty('40')) {
         // DXF Groupcode 40 - Text height
         this.textHeight = data.textHeight || data[40];
       }
 
-      if (data.hasOwnProperty('widthFactor') || data.hasOwnProperty('41') ) {
+      if (data.hasOwnProperty('widthFactor') || data.hasOwnProperty('41')) {
         // DXF Groupcode 41 - width factor
         this.widthFactor = data.widthFactor || data[41];
       }
 
-      if (data.hasOwnProperty('lastTextHeight') || data.hasOwnProperty('42') ) {
+      if (data.hasOwnProperty('lastTextHeight') || data.hasOwnProperty('42')) {
         // DXF Groupcode 42 - Last text height
         this.lastTextHeight = data.lastTextHeight || data[42];
       }
 
-      if (data.hasOwnProperty('obliqueAngle') || data.hasOwnProperty('50') ) {
+      if (data.hasOwnProperty('obliqueAngle') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - test height
         this.obliqueAngle = data.obliqueAngle || data[50];
       }
 
-      if (data.hasOwnProperty('standardFlags') || data.hasOwnProperty('70') ) {
+      if (data.hasOwnProperty('standardFlags') || data.hasOwnProperty('70')) {
         // DXF Groupcode 70 - standard flags
         /*
         1 = If set, this entry describes a shape
@@ -70,7 +70,7 @@ export class Style {
         this.standardFlags.setFlagValue(Property.loadValue([data.standardFlags, data[70]], 0));
       }
 
-      if (data.hasOwnProperty('flags') || data.hasOwnProperty('71') ) {
+      if (data.hasOwnProperty('flags') || data.hasOwnProperty('71')) {
         // DXF Groupcode 71 - flags (bit-coded values):
         // 2 = Text is backward (mirrored in X).
         // 4 = Text is upside down (mirrored in Y).

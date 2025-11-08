@@ -1,32 +1,35 @@
-import {Core} from '../../core/core/core.js';
-import {Point} from '../../core/entities/point.js';
-import {Purge} from '../../core/tools/purge.js';
-import {DesignCore} from '../../core/designCore.js';
+import { Core } from '../../core/core/core.js';
+import { Point } from '../../core/entities/point.js';
+import { Purge } from '../../core/tools/purge.js';
+import { DesignCore } from '../../core/designCore.js';
 
 new Core();
 const purge = new Purge();
 const layerManager = DesignCore.LayerManager;
 const ltypeManager = DesignCore.LTypeManager;
 const blockManager = DesignCore.Scene.blockManager;
+const dimStyleManager = DesignCore.DimStyleManager;
 
 // Runc this before each test
 beforeEach(() => {
-// insert needed for block?
-  blockManager.addItem({name: 'blockWithoutItems'});
-  blockManager.addItem({name: 'blockWithItems'});
+  // insert needed for block?
+  blockManager.addItem({ name: 'blockWithoutItems' });
+  blockManager.addItem({ name: 'blockWithItems' });
 
-  layerManager.addItem({'name': 'layerWithoutItems'});
-  layerManager.addItem({'name': 'layerWithItems'});
+  layerManager.addItem({ 'name': 'layerWithoutItems' });
+  layerManager.addItem({ 'name': 'layerWithItems' });
 
-  ltypeManager.addItem({'name': 'ltypeWithoutItems'});
-  ltypeManager.addItem({'name': 'ltypeWithItems'});
+  ltypeManager.addItem({ 'name': 'ltypeWithoutItems' });
+  ltypeManager.addItem({ 'name': 'ltypeWithItems' });
+
+  dimStyleManager.addItem({ 'name': 'dimstyleWithItems' });
 
   const point1 = new Point();
   const point2 = new Point(0, 100);
 
-  const data = {points: [point1, point2], layer: 'layerWithItems', lineType: 'ltypeWithItems'};
+  const data = { points: [point1, point2], layer: 'layerWithItems', lineType: 'ltypeWithItems' };
 
-  DesignCore.Scene.addItem('Insert', {blockName: 'blockWithItems'});
+  DesignCore.Scene.addItem('Insert', { blockName: 'blockWithItems' });
   DesignCore.Scene.addItem('Line', data);
   DesignCore.Scene.addItem('Circle', data);
   DesignCore.Scene.addItem('Text', data);
@@ -39,6 +42,11 @@ test('Test purge.action', () => {
   expect(blockManager.itemCount()).toBe(3);
   expect(blockManager.itemExists('blockWithoutItems')).toBe(false);
   expect(blockManager.itemExists('blockWithItems')).toBe(true);
+
+  expect(dimStyleManager.itemCount()).toBe(4);
+  purge.option = 'Dimstyles';
+  purge.action();
+  expect(dimStyleManager.itemCount()).toBe(1);
 
   expect(layerManager.itemCount()).toBe(4);
   purge.option = 'Layers';

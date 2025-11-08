@@ -1,6 +1,6 @@
-import {Section} from './section.js';
-import {DxfIterator} from '../dxfIterator.js';
-import {Strings} from '../../strings.js';
+import { Section } from './section.js';
+import { DxfIterator } from '../dxfIterator.js';
+import { Strings } from '../../strings.js';
 
 /**
  * Entities Class

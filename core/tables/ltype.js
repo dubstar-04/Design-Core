@@ -1,6 +1,6 @@
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {Flags} from '../properties/flags.js';
-import {Property} from '../properties/property.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Flags } from '../properties/flags.js';
+import { Property } from '../properties/property.js';
 
 /** LineType Class */
 export class LType {
@@ -20,29 +20,29 @@ export class LType {
     });
 
     if (data) {
-      if (data.hasOwnProperty('name') || data.hasOwnProperty('2') ) {
+      if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - ltype name
         this.name = data.name || data[2];
       }
 
-      if (data.hasOwnProperty('description') || data.hasOwnProperty('3') ) {
+      if (data.hasOwnProperty('description') || data.hasOwnProperty('3')) {
         // DXF Groupcode 3 - description text
         this.description = data.description || data[3];
       }
 
-      if (data.hasOwnProperty('pattern') || data.hasOwnProperty('49') ) {
+      if (data.hasOwnProperty('pattern') || data.hasOwnProperty('49')) {
         // DXF Groupcode 49 - line type pattern
         this.pattern = data.pattern || data[49];
       }
 
-      if (data.hasOwnProperty('73') ) {
+      if (data.hasOwnProperty('73')) {
         // DXF Groupcode 73 - number of line type elements in data[49]
         if (data[73] !== this.pattern.length) {
           throw Error('invalid line type pattern');
         }
       }
 
-      if (data.hasOwnProperty('flags') || data.hasOwnProperty('70') ) {
+      if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
         // DXF Groupcode 70 - Polyline flag (bit-coded; default = 0):
         // 16 = If set, table entry is externally dependent on an xref
         // 32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved

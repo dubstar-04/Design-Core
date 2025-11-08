@@ -1,8 +1,8 @@
-import {Tables} from '../../../../core/lib/dxf/sections/tables.js';
-import {DxfIterator} from '../../../../core/lib/dxf/dxfIterator.js';
+import { Tables } from '../../../../core/lib/dxf/sections/tables.js';
+import { DxfIterator } from '../../../../core/lib/dxf/dxfIterator.js';
 
 const tableData =
-`0
+  `0
 TABLES
 0
 TABLE

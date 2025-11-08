@@ -1,13 +1,13 @@
 
-import {DxfIterator} from '../dxfIterator.js';
-import {Strings} from '../../strings.js';
+import { DxfIterator } from '../dxfIterator.js';
+import { Strings } from '../../strings.js';
 
 /**
  * Section Class
  */
 export class Section {
   /** Create Section */
-  constructor() {}
+  constructor() { }
 
   /**
    * Parse value

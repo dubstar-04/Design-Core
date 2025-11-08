@@ -1,6 +1,6 @@
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 // import {Strings} from '../lib/strings.js';
-import {TableManagerBase} from './tableManagerBase.js';
+import { TableManagerBase } from './tableManagerBase.js';
 
 /**
  * StyleManagerBase Class
@@ -20,12 +20,12 @@ export class StyleManagerBase extends TableManagerBase {
    * @param {number} itemIndex
    * @param {boolean} showWarning
    */
-  deleteStyle(itemIndex, showWarning=true) {
+  deleteStyle(itemIndex, showWarning = true) {
     // call the super class delete
     const deletedItem = this.deleteItem(itemIndex, showWarning);
 
     if (deletedItem) {
-    // delete all item using the selected style
+      // delete all item using the selected style
       this.deleteStyleFromScene(deletedItem.name);
     }
   }
@@ -37,14 +37,14 @@ export class StyleManagerBase extends TableManagerBase {
   deleteStyleFromScene(style) {
     const selectionSet = [];
 
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
       if (DesignCore.Scene.items[i][this.itemProperty] === style) {
         selectionSet.push(i);
       }
     }
 
     // sort the selection in descending order
-    selectionSet.sort((a, b)=>b-a);
+    selectionSet.sort((a, b) => b - a);
 
     for (let j = 0; j < selectionSet.length; j++) {
       DesignCore.Scene.items.splice((selectionSet[j]), 1);

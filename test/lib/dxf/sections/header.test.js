@@ -1,8 +1,8 @@
-import {Header} from '../../../../core/lib/dxf/sections/header.js';
-import {DxfIterator} from '../../../../core/lib/dxf/dxfIterator.js';
+import { Header } from '../../../../core/lib/dxf/sections/header.js';
+import { DxfIterator } from '../../../../core/lib/dxf/dxfIterator.js';
 
 const headerData =
-`2
+  `2
 HEADER
   9
 $ACADVER

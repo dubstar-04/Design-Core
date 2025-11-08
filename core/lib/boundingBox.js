@@ -1,4 +1,4 @@
-import {Point} from '../entities/point.js';
+import { Point } from '../entities/point.js';
 
 /** BoundingBox Class */
 export class BoundingBox {
@@ -99,7 +99,7 @@ export class BoundingBox {
    * @param {Point} endPoint
    * @return {BoundingBox}
    */
-  static lineBoundingBox( startPoint, endPoint) {
+  static lineBoundingBox(startPoint, endPoint) {
     return new BoundingBox(startPoint, endPoint);
   }
 
@@ -111,7 +111,7 @@ export class BoundingBox {
    * @param {number} direction - ccw > 0, cw < 0
    * @return {BoundingBox}
    */
-  static arcBoundingBox(centerPoint, startPoint, endPoint, direction=1) {
+  static arcBoundingBox(centerPoint, startPoint, endPoint, direction = 1) {
     const startAngle = centerPoint.angle(startPoint);
     const endAngle = centerPoint.angle(endPoint);
     const radius = centerPoint.distance(startPoint);
@@ -153,10 +153,10 @@ export class BoundingBox {
    * @param {number} direction - ccw > 0, cw < 0
    * @return {boolean}
    */
-  static crossesAxis(startAngle, endAngle, axisAngle, direction=1) {
+  static crossesAxis(startAngle, endAngle, axisAngle, direction = 1) {
     const circle = Math.PI * 2;
     const referenceStartAngle = (startAngle - axisAngle + circle) % circle;
-    const referenceEndAngle = (endAngle - axisAngle + circle ) % circle;
+    const referenceEndAngle = (endAngle - axisAngle + circle) % circle;
 
     // if refStartAngle > refEndAngle then the arc crosses the axis
     let crosses = referenceStartAngle >= referenceEndAngle;

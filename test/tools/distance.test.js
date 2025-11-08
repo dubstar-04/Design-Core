@@ -1,7 +1,7 @@
-import {Core} from '../../core/core/core.js';
-import {DesignCore} from '../../core/designCore.js';
-import {Point} from '../../core/entities/point.js';
-import {Distance} from '../../core/tools/distance.js';
+import { Core } from '../../core/core/core.js';
+import { DesignCore } from '../../core/designCore.js';
+import { Point } from '../../core/entities/point.js';
+import { Distance } from '../../core/tools/distance.js';
 
 const core = new Core();
 let output;
@@ -12,7 +12,7 @@ core.notify = (notification) => {
 
 test('Test distance.action', () => {
   // Add items to scene
-  DesignCore.Scene.addItem('Line', {points: [new Point(), new Point(0, 10)]});
+  DesignCore.Scene.addItem('Line', { points: [new Point(), new Point(0, 10)] });
 
   const distance = new Distance();
 

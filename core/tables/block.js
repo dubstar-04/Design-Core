@@ -1,13 +1,13 @@
-import {Point} from '../entities/point.js';
-import {Entity} from '../entities/entity.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
-import {Strings} from '../lib/strings.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Flags} from '../properties/flags.js';
-import {Property} from '../properties/property.js';
+import { Point } from '../entities/point.js';
+import { Entity } from '../entities/entity.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
+import { Strings } from '../lib/strings.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Flags } from '../properties/flags.js';
+import { Property } from '../properties/property.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Block Entity Class
@@ -67,7 +67,7 @@ export class Block extends Entity {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Block', shortcut: 'B'};
+    const command = { command: 'Block', shortcut: 'B' };
     return command;
   }
 
@@ -138,7 +138,7 @@ export class Block extends Entity {
   /**
    * Preview the entity during creation
    */
-  preview() {}
+  preview() { }
 
   /**
    * Write the entity to file in the dxf format
@@ -158,7 +158,7 @@ export class Block extends Entity {
     file.writeGroupCode('3', this.name); // Name again
     file.writeGroupCode('1', '');
 
-    for (let i = 0; i <this.items.length; i++) {
+    for (let i = 0; i < this.items.length; i++) {
       this.items[i].dxf(file);
     }
 

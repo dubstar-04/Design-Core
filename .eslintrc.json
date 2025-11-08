@@ -4,16 +4,19 @@
         "es2021": true
     },
     "extends": "google",
-    "overrides": [
-    ],
+    "overrides": [],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
     "rules": {
-        "require-jsdoc" : 2,
-        "valid-jsdoc" : 2,
-        "max-len" : 0,
-        "function-paren-newline":"warn"
+        "require-jsdoc": 2,
+        "valid-jsdoc": 2,
+        "max-len": 0,
+        "function-paren-newline": "warn",
+        "object-curly-spacing": [
+            "error",
+            "always"
+        ]
     }
 }

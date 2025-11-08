@@ -1,5 +1,5 @@
-import {Section} from '../../../../core/lib/dxf/sections/section.js';
-import {DxfIterator} from '../../../../core/lib/dxf/dxfIterator.js';
+import { Section } from '../../../../core/lib/dxf/sections/section.js';
+import { DxfIterator } from '../../../../core/lib/dxf/dxfIterator.js';
 
 const section = new Section();
 
@@ -29,7 +29,7 @@ test('Test Section.parseValue', () => {
 
 test('Test Section.parseChild', () => {
   const string =
-`0
+    `0
 CIRCLE
   8
 0
@@ -69,7 +69,7 @@ EOF`;
 
 test('Test Section.parsePoint', () => {
   const string =
-`10
+    `10
   500.0
 20
   500.0
@@ -125,69 +125,69 @@ test('Test Section.parseBoolean', () => {
 
 test('Test Section.getGroupValue', () => {
   // 0-9: String
-  expect(section.getGroupValue({'code': '1', 'value': '1'})).toBe('1');
+  expect(section.getGroupValue({ 'code': '1', 'value': '1' })).toBe('1');
   // 10-39: Double precision 3D point value
   // 40-59: Double precision floating-point value
-  expect(section.getGroupValue({'code': '10', 'value': ' 100.0'})).toBe(100.0);
+  expect(section.getGroupValue({ 'code': '10', 'value': ' 100.0' })).toBe(100.0);
   // 60-79: 16-bit integer value
   // 90-99: 32-bit integer value
-  expect(section.getGroupValue({'code': '60', 'value': ' 100.0'})).toBe(100);
+  expect(section.getGroupValue({ 'code': '60', 'value': ' 100.0' })).toBe(100);
   // 100: String (255-character maximum; less for Unicode strings)
   // 102: String (255-character maximum; less for Unicode strings)
   // 105: String representing hexadecimal (hex) handle value
-  expect(section.getGroupValue({'code': '100', 'value': 'aabbccdd'})).toBe('aabbccdd');
+  expect(section.getGroupValue({ 'code': '100', 'value': 'aabbccdd' })).toBe('aabbccdd');
   // 110-119: Double precision floating-point value
   // 120-129: Double precision floating-point value
   // 130-139: Double precision floating-point value
   // 140-149: Double precision scalar floating-point value
-  expect(section.getGroupValue({'code': '110', 'value': ' 100.0'})).toBe(100.0);
+  expect(section.getGroupValue({ 'code': '110', 'value': ' 100.0' })).toBe(100.0);
   // 160-169: 64-bit integer value
   // 170-179: 16-bit integer value
-  expect(section.getGroupValue({'code': '160', 'value': ' 100.0'})).toBe(100);
+  expect(section.getGroupValue({ 'code': '160', 'value': ' 100.0' })).toBe(100);
   // 210-239: Double-precision floating-point value
-  expect(section.getGroupValue({'code': '210', 'value': ' 100.0'})).toBe(100.0);
+  expect(section.getGroupValue({ 'code': '210', 'value': ' 100.0' })).toBe(100.0);
   // 270-279: 16-bit integer value
   // 280-289: 16-bit integer value
-  expect(section.getGroupValue({'code': '270', 'value': ' 100.0'})).toBe(100);
+  expect(section.getGroupValue({ 'code': '270', 'value': ' 100.0' })).toBe(100);
   // 290-299: Boolean flag value
-  expect(section.getGroupValue({'code': '290', 'value': ' 0'})).toBe(false);
-  expect(section.getGroupValue({'code': '299', 'value': ' 1'})).toBe(true);
+  expect(section.getGroupValue({ 'code': '290', 'value': ' 0' })).toBe(false);
+  expect(section.getGroupValue({ 'code': '299', 'value': ' 1' })).toBe(true);
   // 300-309: Arbitrary text string
   // 330-369: String representing hex object IDs
-  expect(section.getGroupValue({'code': '300', 'value': 'aabbccdd'})).toBe('aabbccdd');
+  expect(section.getGroupValue({ 'code': '300', 'value': 'aabbccdd' })).toBe('aabbccdd');
   // 370-379: 16-bit integer value
   // 380-389: 16-bit integer value
-  expect(section.getGroupValue({'code': '370', 'value': ' 100.0'})).toBe(100);
+  expect(section.getGroupValue({ 'code': '370', 'value': ' 100.0' })).toBe(100);
   // 390-399: String representing hex handle value
-  expect(section.getGroupValue({'code': '390', 'value': 'aabbccdd'})).toBe('aabbccdd');
+  expect(section.getGroupValue({ 'code': '390', 'value': 'aabbccdd' })).toBe('aabbccdd');
   // 400-409: 16-bit integer value
-  expect(section.getGroupValue({'code': '400', 'value': ' 100.0'})).toBe(100);
+  expect(section.getGroupValue({ 'code': '400', 'value': ' 100.0' })).toBe(100);
   // 410-419: String
-  expect(section.getGroupValue({'code': '410', 'value': 'aabbccdd'})).toBe('aabbccdd');
+  expect(section.getGroupValue({ 'code': '410', 'value': 'aabbccdd' })).toBe('aabbccdd');
   // 420-429: 32-bit integer value
-  expect(section.getGroupValue({'code': '420', 'value': ' 100.0'})).toBe(100);
+  expect(section.getGroupValue({ 'code': '420', 'value': ' 100.0' })).toBe(100);
   // 430-439: String
-  expect(section.getGroupValue({'code': '340', 'value': 'aabbccdd'})).toBe('aabbccdd');
+  expect(section.getGroupValue({ 'code': '340', 'value': 'aabbccdd' })).toBe('aabbccdd');
   // 440-449: 32-bit integer value
   // 450-459: Long
-  expect(section.getGroupValue({'code': '440', 'value': ' 100.0'})).toBe(100);
+  expect(section.getGroupValue({ 'code': '440', 'value': ' 100.0' })).toBe(100);
   // 460-469: Double-precision floating-point value
-  expect(section.getGroupValue({'code': '460', 'value': ' 100.0'})).toBe(100.0);
+  expect(section.getGroupValue({ 'code': '460', 'value': ' 100.0' })).toBe(100.0);
   // 470-479: String
   // 480-481: String representing hex handle value
-  expect(section.getGroupValue({'code': '470', 'value': 'aabbccdd'})).toBe('aabbccdd');
+  expect(section.getGroupValue({ 'code': '470', 'value': 'aabbccdd' })).toBe('aabbccdd');
   // 999: Comment (string)
-  expect(section.getGroupValue({'code': '999', 'value': 'comment'})).toBe('comment');
+  expect(section.getGroupValue({ 'code': '999', 'value': 'comment' })).toBe('comment');
   // 1000-1009: String (same limits as indicated with 0-9 code range)
-  expect(section.getGroupValue({'code': '1000', 'value': 'aabbccdd'})).toBe('aabbccdd');
+  expect(section.getGroupValue({ 'code': '1000', 'value': 'aabbccdd' })).toBe('aabbccdd');
   // 1010-1059: Double-precision floating-point value
-  expect(section.getGroupValue({'code': '1010', 'value': ' 100.0'})).toBe(100.0);
+  expect(section.getGroupValue({ 'code': '1010', 'value': ' 100.0' })).toBe(100.0);
   // 1060-1070: 16-bit integer value
   // 1071: 32-bit: integer value
-  expect(section.getGroupValue({'code': '1060', 'value': ' 100.0'})).toBe(100);
+  expect(section.getGroupValue({ 'code': '1060', 'value': ' 100.0' })).toBe(100);
 
   // test for throw on invalid group code
   expect(() => {
-    section.getGroupValue({'code': 'error', 'value': 'error'}); ;
+    section.getGroupValue({ 'code': 'error', 'value': 'error' }); ;
   }).toThrow();
 });

@@ -1,6 +1,6 @@
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {StyleManagerBase} from './styleManagerBase.js';
-import {Style} from './style.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { StyleManagerBase } from './styleManagerBase.js';
+import { Style } from './style.js';
 
 /**
  * StyleManager Class

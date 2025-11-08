@@ -1,6 +1,6 @@
-import {DesignCore} from '../designCore.js';
-import {Point} from '../entities/point.js';
-import {Colours} from './colours.js';
+import { DesignCore } from '../designCore.js';
+import { Point } from '../entities/point.js';
+import { Colours } from './colours.js';
 
 /** SelectionWindow Class */
 export class SelectionWindow {

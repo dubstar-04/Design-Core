@@ -1,7 +1,7 @@
 
-import {Core} from '../../core/core/core.js';
-import {PromptOptions} from '../../core/lib/inputManager.js';
-import {Input} from '../../core/lib/inputManager.js';
+import { Core } from '../../core/core/core.js';
+import { PromptOptions } from '../../core/lib/inputManager.js';
+import { Input } from '../../core/lib/inputManager.js';
 
 const core = new Core();
 const inputManager = core.scene.inputManager;

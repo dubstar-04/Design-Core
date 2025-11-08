@@ -1,11 +1,11 @@
-import {Point} from './point.js';
-import {Strings} from '../lib/strings.js';
-import {Entity} from './entity.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {Polyline} from './polyline.js';
+import { Point } from './point.js';
+import { Strings } from '../lib/strings.js';
+import { Entity } from './entity.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { Polyline } from './polyline.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Rectangle Entity Class
@@ -30,7 +30,7 @@ export class Rectangle extends Entity {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Rectangle', shortcut: 'REC', type: 'Entity'};
+    const command = { command: 'Rectangle', shortcut: 'REC', type: 'Entity' };
     return command;
   }
 
@@ -49,7 +49,7 @@ export class Rectangle extends Entity {
       this.points.push(pt2);
 
       const points = this.rectPoints(this.points[0], this.points[1]);
-      const polyline = new Polyline({points: points});
+      const polyline = new Polyline({ points: points });
 
       DesignCore.Scene.inputManager.executeCommand(polyline);
     } catch (err) {
@@ -64,7 +64,7 @@ export class Rectangle extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = this.rectPoints(this.points.at(-1), mousePoint);
-      DesignCore.Scene.createTempItem('Polyline', {points: points});
+      DesignCore.Scene.createTempItem('Polyline', { points: points });
     }
   }
 
@@ -76,10 +76,10 @@ export class Rectangle extends Entity {
    */
   rectPoints(pt1, pt2) {
     const points = [];
-    points.push( new Point(pt1.x, pt1.y));
+    points.push(new Point(pt1.x, pt1.y));
     points.push(new Point(pt2.x, pt1.y));
-    points.push( new Point(pt2.x, pt2.y));
-    points.push( new Point(pt1.x, pt2.y));
+    points.push(new Point(pt2.x, pt2.y));
+    points.push(new Point(pt1.x, pt2.y));
     points.push(new Point(pt1.x, pt1.y));
     return points;
   }

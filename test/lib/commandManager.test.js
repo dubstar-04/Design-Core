@@ -1,6 +1,6 @@
 
-import {Core} from '../../core/core/core.js';
-import {Point} from '../../core/entities/point.js';
+import { Core } from '../../core/core/core.js';
+import { Point } from '../../core/entities/point.js';
 
 const core = new Core();
 const commandManager = core.commandManager;
@@ -10,10 +10,10 @@ test('Test CommandManager.createNew', () => {
   const endPoint = new Point(10, 10);
   const points = [startPoint, endPoint];
 
-  const line = commandManager.createNew('Line', {points: points});
+  const line = commandManager.createNew('Line', { points: points });
   expect(typeof line).toBe('object');
 
-  const test = commandManager.createNew('test', {points: points});
+  const test = commandManager.createNew('test', { points: points });
   expect(typeof test).toBe('undefined');
 });
 

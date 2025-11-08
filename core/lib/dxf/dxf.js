@@ -1,11 +1,11 @@
-import {DXFReader} from './dxfRead.js';
-import {DXFWriter} from './dxfWrite.js';
-import {DXFFile} from './dxfFile.js';
-import {Point} from '../../entities/point.js';
-import {Strings} from '../strings.js';
-import {Logging} from '../logging.js';
+import { DXFReader } from './dxfRead.js';
+import { DXFWriter } from './dxfWrite.js';
+import { DXFFile } from './dxfFile.js';
+import { Point } from '../../entities/point.js';
+import { Strings } from '../strings.js';
+import { Logging } from '../logging.js';
 
-import {DesignCore} from '../../designCore.js';
+import { DesignCore } from '../../designCore.js';
 
 /** DXF Class */
 export class DXF {
@@ -69,6 +69,14 @@ export class DXF {
       if (clayer.hasOwnProperty('8')) {
         const layerName = clayer['8'];
         DesignCore.LayerManager.setCstyle(layerName);
+      }
+    }
+
+    if (header.hasOwnProperty('$DIMSTYLE')) {
+      const dimstyle = header['$DIMSTYLE'];
+      if (dimstyle.hasOwnProperty('2')) {
+        const styleName = dimstyle['2'];
+        DesignCore.DimStyleManager.setCstyle(styleName);
       }
     }
 

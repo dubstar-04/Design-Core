@@ -24,7 +24,7 @@ export class Utils {
    * @return {number} rounded number
    */
   static round(number) {
-    return Number(number.toFixed(5));
+    return Number(Number(number).toFixed(5));
   }
 
   /**
@@ -69,9 +69,9 @@ export class Utils {
         m[0][j] = j;
         if (j === 0) continue;
         m[i][j] = b.charAt(i - 1) == a.charAt(j - 1) ? m[i - 1][j - 1] : Math.min(
-            m[i-1][j-1] + 1,
-            m[i][j-1] + 1,
-            m[i-1][j] + 1,
+            m[i - 1][j - 1] + 1,
+            m[i][j - 1] + 1,
+            m[i - 1][j] + 1,
         );
       }
     }

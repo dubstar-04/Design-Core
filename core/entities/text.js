@@ -1,15 +1,15 @@
-import {Point} from './point.js';
-import {Utils} from '../lib/utils.js';
-import {Strings} from '../lib/strings.js';
-import {Entity} from './entity.js';
-import {Input, PromptOptions} from '../lib/inputManager.js';
-import {Logging} from '../lib/logging.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
-import {Flags} from '../properties/flags.js';
-import {Property} from '../properties/property.js';
+import { Point } from './point.js';
+import { Utils } from '../lib/utils.js';
+import { Strings } from '../lib/strings.js';
+import { Entity } from './entity.js';
+import { Input, PromptOptions } from '../lib/inputManager.js';
+import { Logging } from '../lib/logging.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
+import { Flags } from '../properties/flags.js';
+import { Property } from '../properties/property.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * Text Entity Class
@@ -49,7 +49,7 @@ export class Text extends Entity {
 
     // needs to be non-enumerable as to not appear in the object props
     Object.defineProperty(this, 'boundingRect', {
-      value: {width: 10, height: 10},
+      value: { width: 10, height: 10 },
       writable: true,
     });
 
@@ -104,7 +104,9 @@ export class Text extends Entity {
         this.setRotation(Property.loadValue([data.rotation, data[50]], 0));
       } else {
         // create points[1] used to determine the text rotation
-        this.points[1] = data.points[0].add(new Point(this.height, 0));
+        if (this.points.length && this.height !== undefined) {
+          this.points[1] = data.points[0].add(new Point(this.height, 0));
+        }
       }
 
       if (data.hasOwnProperty('horizontalAlignment') || data.hasOwnProperty('72')) {
@@ -142,8 +144,22 @@ export class Text extends Entity {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Text', shortcut: 'DT', type: 'Entity'};
+    const command = { command: 'Text', shortcut: 'DT', type: 'Entity' };
     return command;
+  }
+
+  /**
+   * Get the approximate width of the text
+   * @param {string} string - text string
+   * @param {number} textHeight - text height
+   * @return {number} - approximate width of the text
+   * This is a rough estimate based on the string length and height
+   * Actual width depends on the font and style used
+   */
+  static getApproximateWidth(string, textHeight) {
+    // Approximate width of the text based on the string length and height
+    // This is a rough estimate, as actual width depends on the font and style
+    return string.length * textHeight * 0.6; // 0.6 is an approximation factor for average character width
   }
 
   /**
@@ -207,7 +223,7 @@ export class Text extends Entity {
       } else {
         const mousePoint = DesignCore.Mouse.pointOnScene();
         const points = [this.points.at(-1), mousePoint];
-        DesignCore.Scene.createTempItem('Line', {points: points});
+        DesignCore.Scene.createTempItem('Line', { points: points });
       }
     }
   }
@@ -223,7 +239,7 @@ export class Text extends Entity {
       return;
     }
 
-    if (this.height > 0 && angle !== 0) {
+    if (this.height > 0) {
       this.points[1] = this.points[0].project(Utils.degrees2radians(angle), this.height);
     }
   }
@@ -347,7 +363,7 @@ export class Text extends Entity {
    * @return {Object}
    */
   getBoundingRect() {
-    const rect = {width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y};
+    const rect = { width: Number(this.boundingRect.width), height: Number(this.boundingRect.height), x: this.points[0].x, y: this.points[0].y };
     return rect;
   }
 
@@ -383,7 +399,7 @@ export class Text extends Entity {
     try { // HTML
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt Arial'; // +DesignCore.StyleManager.getItemByName(this.styleName).font.toString();
+      ctx.font = this.height + 'pt Arial'; // TODO: use style.font
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
@@ -400,10 +416,10 @@ export class Text extends Entity {
           x = -this.boundingRect.xBearing;
           break;
         case 1: // 1= Center;
-          x = -this.boundingRect.xBearing-this.boundingRect.width / 2;
+          x = -this.boundingRect.xBearing - this.boundingRect.width / 2;
           break;
         case 2: // 2 = Right
-          x = -this.boundingRect.xBearing-this.boundingRect.width;
+          x = -this.boundingRect.xBearing - this.boundingRect.width;
           break;
       }
 
@@ -502,9 +518,9 @@ export class Text extends Entity {
 
     // if P is inside the bounding box return distance 0
     if (P.x > botLeft.x &&
-            P.x < topRight.x &&
-            P.y > botLeft.y &&
-            P.y < topRight.y
+      P.x < topRight.x &&
+      P.y > botLeft.y &&
+      P.y < topRight.y
     ) {
       distance = 0;
     }

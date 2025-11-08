@@ -1,5 +1,5 @@
-import {DesignCore} from '../designCore.js';
-import {Strings} from '../lib/strings.js';
+import { DesignCore } from '../designCore.js';
+import { Strings } from '../lib/strings.js';
 
 /**
  * Table Manager Base Class
@@ -66,7 +66,7 @@ export class TableManagerBase {
    * @param {boolean} overwrite
    * @return {Objects}
    */
-  addItem(item, overwrite=false) {
+  addItem(item, overwrite = false) {
     // Call the subclass to create a new typed item object
     const newItem = this.createItem(item);
     const newItemName = newItem.name;
@@ -88,7 +88,7 @@ export class TableManagerBase {
    * @param {boolean} showWarning
    * @return {Array} array containing deleted item or undefined
    */
-  deleteItem(itemIndex, showWarning=true) {
+  deleteItem(itemIndex, showWarning = true) {
     if (this.items[itemIndex] === undefined) {
       return;
     }
@@ -276,7 +276,7 @@ export class TableManagerBase {
     });
 
     // sort the selection in descending order
-    itemsToPurge.sort((a, b)=>b-a);
+    itemsToPurge.sort((a, b) => b - a);
     itemsToPurge.forEach((itemIndex) => this.deleteItem(itemIndex, false));
   }
 }

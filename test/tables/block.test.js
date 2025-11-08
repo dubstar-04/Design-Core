@@ -1,26 +1,26 @@
-import {Core} from '../../core/core/core.js';
-import {Block} from '../../core/tables/block.js';
-import {Line} from '../../core/entities/line.js';
-import {Point} from '../../core/entities/point.js';
+import { Core } from '../../core/core/core.js';
+import { Block } from '../../core/tables/block.js';
+import { Line } from '../../core/entities/line.js';
+import { Point } from '../../core/entities/point.js';
 
-import {File} from '../test-helpers/test-helpers.js';
-import {Flags} from '../../core/properties/flags.js';
+import { File } from '../test-helpers/test-helpers.js';
+import { Flags } from '../../core/properties/flags.js';
 
 new Core();
 
 test('Test Block', () => {
-  const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
+  const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
   const flags = new Flags();
   flags.addValue(1);
-  const block = new Block({items: [line], flags: flags});
+  const block = new Block({ items: [line], flags: flags });
 
   expect(block.items.length).toBe(1);
   expect(block.flags.getFlagValue()).toBe(1);
 });
 
 test('Test Block.clearItems', () => {
-  const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
-  const block = new Block({items: [line]});
+  const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
+  const block = new Block({ items: [line] });
   expect(block.items.length).toBe(1);
 
   block.clearItems();
@@ -32,17 +32,17 @@ test('Test Block.snaps', () => {
   expect(block.snaps()).toBeInstanceOf(Array);
   expect(block.snaps()).toHaveLength(0);
 
-  const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
+  const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
   block.addItem(line);
   expect(block.snaps()).toBeInstanceOf(Array);
   expect(block.snaps()).not.toHaveLength(0);
 });
 
 test('Test Block', () => {
-  const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
+  const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
   const flags = new Flags();
   flags.addValue(1);
-  const block = new Block({items: [line], flags: flags});
+  const block = new Block({ items: [line], flags: flags });
 
   expect(block.items.length).toBe(1);
   expect(block.flags.getFlagValue()).toBe(1);
@@ -59,7 +59,7 @@ test('Test Block.closestPoint', () => {
   expect(block.closestPoint(point)[0].y).toBe(0);
   expect(block.closestPoint(point)[1]).toBe(Infinity);
 
-  const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
+  const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
   block.addItem(line);
   expect(block.closestPoint(point)).toBeInstanceOf(Array);
   expect(block.closestPoint(point)).toHaveLength(2);
@@ -71,7 +71,7 @@ test('Test Block.closestPoint', () => {
 
 test('Test Block.dxf', () => {
   const block = new Block();
-  const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
+  const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
   block.addItem(line);
 
   const file = new File();
@@ -146,7 +146,7 @@ test('Test Block.touched', () => {
 
   expect(block.touched(selectionExtremesTrue)).toBe(false);
 
-  const line = new Line({points: [new Point(101, 102), new Point(201, 202)]});
+  const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
   block.addItem(line);
   expect(block.touched(selectionExtremesTrue)).toBe(true);
   expect(block.touched(selectionExtremesFalse)).toBe(false);

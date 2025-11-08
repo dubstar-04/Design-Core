@@ -1,6 +1,6 @@
-import {Utils} from './utils.js';
-import {SelectionWindow} from './selectionWindow.js';
-import {DesignCore} from '../designCore.js';
+import { Utils } from './utils.js';
+import { SelectionWindow } from './selectionWindow.js';
+import { DesignCore } from '../designCore.js';
 
 /** SingleSelection Class */
 export class SingleSelection {
@@ -22,6 +22,13 @@ export class SelectionSet {
     this.accepted = false;
     this.selectionSet = [];
   }
+
+  /**
+   * Remove the last selection from the selectionSet
+   */
+  removeLastSelection() {
+    this.selectionSet.pop();
+  }
 }
 
 // TODO: Refactor class.
@@ -39,6 +46,15 @@ export class SelectionManager {
   reset() {
     this.selectedItems = [];
     this.selectionSet = new SelectionSet();
+    this.selectionSetChanged();
+  }
+
+  /**
+   * Remove the last selection from the selected items
+   */
+  removeLastSelection() {
+    this.selectedItems.pop();
+    this.selectionSet.removeLastSelection();
     this.selectionSetChanged();
   }
 
@@ -70,18 +86,18 @@ export class SelectionManager {
    */
   windowSelect() {
     const selectionRect = this.getSelectionRect();
-    const crossingSelect = DesignCore.Mouse.pointOnScene().y >DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint).y;
+    const crossingSelect = DesignCore.Mouse.pointOnScene().y > DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint).y;
 
     if (selectionRect !== undefined) {
-    // Loop through all the entities and see if it should be selected
-      for (let i = 0; i <DesignCore.Scene.items.length; i++) {
-      // check if the item is within the selection rect
+      // Loop through all the entities and see if it should be selected
+      for (let i = 0; i < DesignCore.Scene.items.length; i++) {
+        // check if the item is within the selection rect
         if (DesignCore.Scene.items[i].within(selectionRect)) {
           this.addToSelectionSet(i);
         }
 
         if (crossingSelect) {
-        // check if the item is touched / crossed by the selection rect
+          // check if the item is touched / crossed by the selection rect
           if (DesignCore.Scene.items[i].touched(selectionRect)) {
             this.addToSelectionSet(i);
           }
@@ -134,10 +150,10 @@ export class SelectionManager {
    * @return {number} - return index of closest item or undefined
    */
   findClosestItem(point) {
-    let delta = 1.65 /DesignCore.Core.canvas.getScale(); // find a more suitable starting value
+    let delta = 1.65 / DesignCore.Core.canvas.getScale(); // find a more suitable starting value
     let closestItemIndex;
 
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
       // check the items layer is selectable - i.e. on, thawed, etc...
       const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.items[i].layer);
 

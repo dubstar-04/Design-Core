@@ -1,5 +1,5 @@
-import {BlockManager} from '../../core/tables/blockManager.js';
-import {Core} from '../../core/core/core.js';
+import { BlockManager } from '../../core/tables/blockManager.js';
+import { Core } from '../../core/core/core.js';
 
 // initialise core
 new Core();
@@ -7,7 +7,7 @@ new Core();
 const blockManager = new BlockManager();
 
 // mock block data
-blockManager.items = [{name: 'blockOne'}, {name: 'blockTwo'}];
+blockManager.items = [{ name: 'blockOne' }, { name: 'blockTwo' }];
 
 test('Test blockManager.getItems', () => {
   const blocks = blockManager.getItems();
@@ -24,7 +24,7 @@ test('Test blockManager.itemCount', () => {
 
 test('Test blockManager.addItem', () => {
   const count = blockManager.itemCount();
-  blockManager.addItem({name: 'blockThree'});
+  blockManager.addItem({ name: 'blockThree' });
   expect(blockManager.itemCount()).toBe(count + 1);
 });
 
@@ -44,7 +44,7 @@ test('Test blockManager.getItemIndex', () => {
 
 test('Test blockManager.getItemByName', () => {
   // add a new block to blocks
-  blockManager.items.push({'name': 'test'});
+  blockManager.items.push({ 'name': 'test' });
   const block = blockManager.getItemByName('test');
   expect(block.name).toBe('test');
   // get a block that doesn't exist

@@ -1,16 +1,50 @@
-import {Circle} from '../../core/entities/circle.js';
-import {Point} from '../../core/entities/point.js';
+import { Circle } from '../../core/entities/circle.js';
+import { Core } from '../../core/core/core.js';
+import { Point } from '../../core/entities/point.js';
+import { DesignCore } from '../../core/designCore.js';
 
-import {File} from '../test-helpers/test-helpers.js';
+import { File } from '../test-helpers/test-helpers.js';
+
+// initialise core
+new Core();
+
+test('Circle.execute creates points from user input', async () => {
+  // Mock DesignCore.Scene.inputManager.requestInput to return points
+  const origInputManager = DesignCore.Scene.inputManager;
+  const pt0 = new Point(0, 0);
+  const pt1 = new Point(10, 0);
+
+  let callCount = 0;
+  DesignCore.Scene.inputManager = {
+    requestInput: async () => {
+      callCount++;
+      if (callCount === 1) return pt0;
+      if (callCount === 2) return pt1;
+      return pt2;
+    },
+    executeCommand: () => {},
+  };
+
+  const circle = new Circle({});
+  await circle.execute();
+
+  expect(circle.points.length).toBe(2);
+  expect(circle.points[0]).toBe(pt0);
+  expect(circle.points[1]).toBe(pt1);
+  expect(circle.getRadius()).toBe(10);
+
+  // Restore original inputManager
+  DesignCore.Scene.inputManager = origInputManager;
+});
 
 test('Test Circle.getRadius', () => {
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   expect(circle.getRadius()).toBe(100);
 });
 
 test('Test Circle.setRadius', () => {
   // create a circle with radius 100
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   // set radius to 200
   circle.setRadius(200);
   expect(circle.getRadius()).toBe(200);
@@ -19,7 +53,7 @@ test('Test Circle.setRadius', () => {
 
 test('Test Circle.closestPoint', () => {
   // create a circle with radius 100
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   // inside
   const point1 = new Point(150, 100);
   const closest1 = circle.closestPoint(point1);
@@ -36,13 +70,13 @@ test('Test Circle.closestPoint', () => {
 });
 
 test('Test Circle.boundingBox', () => {
-  let circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  let circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   expect(circle.boundingBox().xMin).toBeCloseTo(0);
   expect(circle.boundingBox().xMax).toBeCloseTo(200);
   expect(circle.boundingBox().yMin).toBeCloseTo(0);
   expect(circle.boundingBox().yMax).toBeCloseTo(200);
 
-  circle = new Circle({points: [new Point(0, 0)], radius: 100});
+  circle = new Circle({ points: [new Point(0, 0)], radius: 100 });
   expect(circle.boundingBox().xMin).toBeCloseTo(-100);
   expect(circle.boundingBox().xMax).toBeCloseTo(100);
   expect(circle.boundingBox().yMin).toBeCloseTo(-100);
@@ -50,7 +84,7 @@ test('Test Circle.boundingBox', () => {
 });
 
 test('Test Circle.dxf', () => {
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   let file = new File();
   circle.dxf(file);
   // console.log(file.contents);
@@ -86,7 +120,7 @@ AcDbCircle
 });
 
 test('Test Circle.decompose', () => {
-  const circle = new Circle({points: [new Point(100, 100), new Point(200, 100)]});
+  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
   const decomposedCircle = circle.decompose();
   expect(decomposedCircle[0].x).toBe(200);
   expect(decomposedCircle[0].y).toBe(100);

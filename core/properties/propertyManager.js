@@ -1,5 +1,5 @@
-import {Strings} from '../lib/strings.js';
-import {DesignCore} from '../designCore.js';
+import { Strings } from '../lib/strings.js';
+import { DesignCore } from '../designCore.js';
 
 /** Property Manager Class */
 export class PropertyManager {
@@ -38,7 +38,7 @@ export class PropertyManager {
         continue;
       }
 
-      if (typeof(DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]][property]) !== typeof(newPropertyValue)) {
+      if (typeof (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]][property]) !== typeof (newPropertyValue)) {
         DesignCore.Core.notify(Strings.Error.INPUT);
       } else {
         DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]][property] = newPropertyValue;
@@ -56,7 +56,7 @@ export class PropertyManager {
     const itemTypes = [];
 
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
-      for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         const itemType = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].type;
 
         if (itemTypes.indexOf(itemType, 0) === -1) {
@@ -82,7 +82,7 @@ export class PropertyManager {
     // Loop through the items and get a list of common properties.
 
     // check for valid itemType and selectionSet
-    if (itemType === undefined || itemType === null ||DesignCore.Scene.selectionManager.selectionSet.selectionSet.length <= 0) {
+    if (itemType === undefined || itemType === null || DesignCore.Scene.selectionManager.selectionSet.selectionSet.length <= 0) {
       return;
     }
 
@@ -102,10 +102,10 @@ export class PropertyManager {
 
     subset.forEach((el) => {
       // get list of keys
-      Object.keys(el).forEach( (key) => {
+      Object.keys(el).forEach((key) => {
         // check if the key is already in the propertiesList
         if (propertiesList.includes(key) === false) {
-        // check if all subset items contain the key
+          // check if all subset items contain the key
           if (subset.every((el) => el.hasOwnProperty(key))) {
             propertiesList.push(key);
           }

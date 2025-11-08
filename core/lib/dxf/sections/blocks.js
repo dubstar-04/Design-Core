@@ -1,4 +1,4 @@
-import {Section} from './section.js';
+import { Section } from './section.js';
 
 /**
  * Blocks Class
@@ -36,7 +36,7 @@ export class Blocks extends Section {
 
           if (['BLOCK'].includes(currentPair.value)) {
             this.addBlock(currentBlock);
-            currentBlock = {children: []};
+            currentBlock = { children: [] };
             this.parseValue(iterator, currentBlock);
             break;
           } else {

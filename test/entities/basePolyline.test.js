@@ -1,12 +1,88 @@
-import {BasePolyline} from '../../core/entities/basePolyline';
-import {Point} from '../../core/entities/point';
-import {Polyline} from '../../core/entities/polyline.js';
+import { BasePolyline } from '../../core/entities/basePolyline';
+import { Point } from '../../core/entities/point';
+import { Polyline } from '../../core/entities/polyline.js';
+import { Line } from '../../core/entities/line.js';
+import { Arc } from '../../core/entities/arc.js';
+import { Core } from '../../core/core/core.js';
+import { DesignCore } from '../../core/designCore.js';
 
-import {File} from '../test-helpers/test-helpers.js';
+import { File } from '../test-helpers/test-helpers.js';
+
+// initialise core
+new Core();
+
+const inputScenarios = [
+  {
+    desc: 'two points and an angle',
+    inputs: [new Point(0, 0), new Point(10, 0)],
+    expectedPoints: 2,
+  },
+  {
+    desc: 'three points with arc segment',
+    inputs: [new Point(0, 0), new Point(10, 0), 'Arc', new Point(10, 10)],
+    expectedPoints: 3,
+  },
+];
+
+test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => {
+  const { inputs, expectedPoints } = scenario;
+  const origInputManager = DesignCore.Scene.inputManager;
+  let callCount = 0;
+  DesignCore.Scene.inputManager = {
+
+    actionCommand: () => {},
+
+    executeCommand: () => {},
+
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        const input = inputs[callCount];
+        callCount++;
+        return input;
+      }
+    },
+  };
+
+  const polyline = new BasePolyline({});
+  await polyline.execute();
+
+  // console.log(polyline);
+  expect(polyline.points.length).toBe(expectedPoints);
+  expect(polyline.points[0]).toBe(inputs[0]);
+  expect(polyline.points[0].bulge).toBe(0);
+  expect(polyline.points[1]).toBe(inputs[1]);
+
+  // validate arc segment bulge and end point
+  if (inputs.length > 2) {
+    expect(polyline.points[1].bulge).toBeCloseTo(1);
+    expect(polyline.points[2]).toBe(inputs[3]);
+  }
+
+  // Restore original inputManager
+  DesignCore.Scene.inputManager = origInputManager;
+});
+
+test('Test BasePolyline.getClosestSegment', () => {
+  // Polyline with a line and an arc segment
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10)];
+  points[1].bulge = 1; // Arc from (10,0) to (10,10)
+  const polyline = new BasePolyline({ points });
+
+  // Closest to the line segment
+  const testPoint1 = new Point(5, 2);
+  const segment1 = polyline.getClosestSegment(testPoint1);
+  expect(segment1).toBeInstanceOf(Line);
+
+  // Closest to the arc segment
+  const testPoint2 = new Point(12, 5);
+  const segment2 = polyline.getClosestSegment(testPoint2);
+  expect(segment2).toBeInstanceOf(Arc);
+});
+
 
 test('Test BasePolyline.closestPoint', () => {
   const points = [new Point(100, 100), new Point(200, 100, -1), new Point(200, 50)];
-  const polyline = new BasePolyline({points: points});
+  const polyline = new BasePolyline({ points: points });
   // line segment
   const point1 = new Point(150, 85);
   const closest1 = polyline.closestPoint(point1);
@@ -23,13 +99,13 @@ test('Test BasePolyline.closestPoint', () => {
 });
 
 test('Test BasePolyline.boundingBox', () => {
-  let polyline = new BasePolyline({points: [new Point(101, 102), new Point(201, 202)]});
+  let polyline = new BasePolyline({ points: [new Point(101, 102), new Point(201, 202)] });
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
   expect(polyline.boundingBox().xMax).toBeCloseTo(201);
   expect(polyline.boundingBox().yMin).toBeCloseTo(102);
   expect(polyline.boundingBox().yMax).toBeCloseTo(202);
 
-  polyline = new BasePolyline({points: [new Point(101, 102), new Point(-201, 202)]});
+  polyline = new BasePolyline({ points: [new Point(101, 102), new Point(-201, 202)] });
   expect(polyline.boundingBox().xMin).toBeCloseTo(-201);
   expect(polyline.boundingBox().xMax).toBeCloseTo(101);
   expect(polyline.boundingBox().yMin).toBeCloseTo(102);
@@ -39,7 +115,7 @@ test('Test BasePolyline.boundingBox', () => {
   let points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
   // set the bulge
   points[1].bulge = -1;
-  polyline = new BasePolyline({points: points});
+  polyline = new BasePolyline({ points: points });
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
   expect(polyline.boundingBox().xMax).toBeCloseTo(251);
   expect(polyline.boundingBox().yMin).toBeCloseTo(0);
@@ -48,7 +124,7 @@ test('Test BasePolyline.boundingBox', () => {
   points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
   // set the bulge
   points[1].bulge = -1;
-  polyline = new BasePolyline({points: points});
+  polyline = new BasePolyline({ points: points });
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
   expect(polyline.boundingBox().xMax).toBeCloseTo(251);
   expect(polyline.boundingBox().yMin).toBeCloseTo(0);
@@ -60,7 +136,7 @@ test('Test BasePolyline.getBulgeFromSegment', () => {
   // center: 100,50
   // radius: 50
   const points = [new Point(), new Point(100, 0)];
-  const polyline = new BasePolyline({points: points});
+  const polyline = new BasePolyline({ points: points });
 
   // zero delta angle:
   // bulge: 0
@@ -182,7 +258,7 @@ test('Test BasePolyline.getBulgeFromSegment', () => {
 test('Test BasePolyline.dxf', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
-  const polyline = new BasePolyline({points: points});
+  const polyline = new BasePolyline({ points: points });
   let file = new File();
   polyline.dxf(file);
   // console.log(file.contents);
@@ -291,7 +367,7 @@ AcDbEntity
 test('Test BasePolyline.decompose', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
-  const polyline = new BasePolyline({points: points});
+  const polyline = new BasePolyline({ points: points });
 
   const decomposedPolyline = polyline.decompose();
   expect(decomposedPolyline[0].x).toBe(100);

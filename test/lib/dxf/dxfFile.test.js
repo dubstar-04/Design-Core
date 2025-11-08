@@ -1,4 +1,4 @@
-import {DXFFile} from '../../../core/lib/dxf/dxfFile.js';
+import { DXFFile } from '../../../core/lib/dxf/dxfFile.js';
 
 const file = new DXFFile();
 

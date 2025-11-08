@@ -1,8 +1,8 @@
-import {Matrix} from './matrix.js';
-import {Colours} from './colours.js';
-import {Point} from '../entities/point.js';
+import { Matrix } from './matrix.js';
+import { Colours } from './colours.js';
+import { Point } from '../entities/point.js';
 
-import {DesignCore} from '../designCore.js';
+import { DesignCore } from '../designCore.js';
 
 /** Canvas Class */
 export class Canvas {
@@ -235,7 +235,7 @@ export class Canvas {
     try {
       context.setTransform(this.matrix);
     } catch {
-    // context.setMatrix(this.matrix)
+      // context.setMatrix(this.matrix)
       context.translate(this.matrix.e, this.matrix.f);
       context.scale(this.matrix.a, this.matrix.d);
     }
@@ -306,7 +306,7 @@ export class Canvas {
    * Set the scene context
    * @param {entity} item
    * @param {Object} context - scene painting context from ui
-   * @param {Object} block - insert element for the current block, required for colour ByBlock
+   * @param {Object} block - insert or dimension element for the current block, required for colour ByBlock
    */
   setContext(item, context, block = undefined) {
     let colour = item.getDrawColour();

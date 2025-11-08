@@ -1,10 +1,10 @@
-import {DXFFile} from './dxfFile.js';
-import {DesignCore} from '../../designCore.js';
+import { DXFFile } from './dxfFile.js';
+import { DesignCore } from '../../designCore.js';
 
 /** DXF Writer Class */
 export class DXFWriter {
   /** Create DXF Writer */
-  constructor() {}
+  constructor() { }
 
   /**
    * Write DXF header section
@@ -18,8 +18,18 @@ export class DXFWriter {
     file.writeGroupCode('1', file.version);
     file.writeGroupCode('9', '$CLAYER');
     file.writeGroupCode('8', DesignCore.LayerManager.getCstyle());
+    file.writeGroupCode('9', '$DIMSTYLE');
+    file.writeGroupCode('2', DesignCore.DimStyleManager.getCstyle());
     file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.formatHandle(DesignCore.Scene.items.length + 200), DXFFile.Version.R2000); // TODO: This needs to reflect the actual handle values
+    // Horrible hack to generate a handseed value
+    // TODO: refactor core to track handle values properly and assigned them on creation
+    const handseed = (DesignCore.Scene.items.length +
+      (DesignCore.LayerManager.items.length * 2)+
+      DesignCore.LTypeManager.items.length +
+      DesignCore.StyleManager.items.length +
+      DesignCore.DimStyleManager.items.length +
+      DesignCore.Scene.blockManager.items.length * 2) * 3;
+    file.writeGroupCode('5', file.formatHandle(parseInt(handseed)), DXFFile.Version.R2000); // TODO: This needs to reflect the actual handle values
     file.writeGroupCode('0', 'ENDSEC');
   }
 
@@ -117,7 +127,7 @@ export class DXFWriter {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'ENTITIES');
 
-    for (let i = 0; i <DesignCore.Scene.items.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
       DesignCore.Scene.items[i].dxf(file);
     }
 

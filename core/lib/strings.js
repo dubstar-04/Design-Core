@@ -4,11 +4,11 @@
  * Holds common strings for consistency and translation
  */
 export class Strings {
-// Error Strings
+  // Error Strings
   static Error = {
     ERROR: 'Error',
-    FILEOPEN: 'Error opening file',
-    INPUT: 'Invalid input',
+    FILEOPEN: 'Error Opening File',
+    INPUT: 'Invalid Input',
     INVALIDFILE: 'Invalid File',
     INVALIDDXFFORMAT: 'Invalid DXF Format',
     INVALIDPOINT: 'Invalid Point Data',
@@ -16,6 +16,8 @@ export class Strings {
     INVALIDNUMBER: 'Invalid Number',
     INVALIDTYPE: 'Invalid Type',
     INVALIDINTERSECTTYPE: 'Invalid Intersect Type',
+    SELECTION: 'Invalid Selection',
+    PARALLELLINES: 'Parallel Lines',
   };
 
   // Warning Strings
@@ -56,8 +58,9 @@ export class Strings {
 
   // Unicode Symbols
   static Symbol = {
-    DIAMETER: '\u2300',
+    DIAMETER: '\u00D8',
     DEGREE: '\u00B0',
+    RADIUS: 'R',
   };
 
   // Input Strings
@@ -68,7 +71,7 @@ export class Strings {
     START: 'Specify start point',
     END: 'Specify end point',
     POINT: 'Specify a point',
-    DIMENSION: 'Specify dimension location',
+    DIMENSION: 'Specify dimension position',
     NEXTPOINT: 'Specify next point',
     RADIUS: 'Specify radius',
     POSITION: 'Specify position',

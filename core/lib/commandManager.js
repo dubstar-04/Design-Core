@@ -7,15 +7,18 @@ import {Rectangle} from '../entities/rectangle.js';
 // import {Ellipse} from '../entities/ellipse.js';
 // import {Spline} from '../entities/spline.js';
 import {Text} from '../entities/text.js';
-// import {Dimension} from '../entities/dimension.js';
-// import {AlignedDimension} from '../entities/alignedDimension.js';
-// import {AngularDimension} from '../entities/angularDimension.js';
-// import {DiametricDimension} from '../entities/diametricDimension.js';
-// import {RadialDimension} from '../entities/radialDimension.js';
-// import {BaseDimension} from '../entities/basedimension.js';
 import {Block} from '../tables/block.js';
 import {Insert} from '../entities/insert.js';
 import {Hatch} from '../entities/hatch.js';
+/*
+import { Dimension } from '../dimensions/dimension.js';
+import { AlignedDimension } from '../dimensions/alignedDimension.js';
+import { AngularDimension } from '../dimensions/angularDimension.js';
+import { LinearDimension } from '../dimensions/linearDimension.js';
+import { DiametricDimension } from '../dimensions/diametricDimension.js';
+import { RadialDimension } from '../dimensions/radialDimension.js';
+import { RotatedDimension } from '../dimensions/rotatedDimension.js';
+*/
 
 // import { Point } from "../entities/point.js"
 
@@ -37,6 +40,7 @@ import {Logging} from './logging.js';
 
 import {DesignCore} from '../designCore.js';
 
+
 const classes = {
   Line,
   Polyline,
@@ -47,11 +51,15 @@ const classes = {
   // Ellipse,
   // Spline,
   Text,
-  // Dimension,
-  // AngularDimension,
-  // AlignedDimension,
-  // DiametricDimension,
-  // RadialDimension,
+  /*
+  Dimension,
+  AngularDimension,
+  AlignedDimension,
+  DiametricDimension,
+  LinearDimension,
+  RadialDimension,
+  RotatedDimension,
+  */
   Block,
   Insert,
   Hatch,
@@ -76,7 +84,7 @@ const classes = {
  * Creates new commands
  */
 export class CommandManager {
-/** Create CommandManager */
+  /** Create CommandManager */
   constructor() {
     // store a list of the available commands
     this.commands = [];
@@ -179,7 +187,7 @@ export class CommandManager {
       return false;
     }
 
-    const found = this.commands.some((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
+    const found = this.commands.some((el) => typeof (el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
     return found;
   }
 
@@ -193,10 +201,10 @@ export class CommandManager {
     let command;
 
     if (this.isCommand(input)) {
-      const found = this.commands.find((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === input.toUpperCase());
+      const found = this.commands.find((el) => typeof (el.command) !== 'undefined' && el.command.toUpperCase() === input.toUpperCase());
       command = found.command;
     } else if (this.isShortcut(input)) {
-      const found = this.commands.find((el) => typeof(el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === input.toUpperCase());
+      const found = this.commands.find((el) => typeof (el.shortcut) !== 'undefined' && el.shortcut.toUpperCase() === input.toUpperCase());
       command = found.command;
     }
 
@@ -217,7 +225,7 @@ export class CommandManager {
     let shortcut;
 
     if (this.isCommand(command)) {
-      const found = this.commands.find((el) => typeof(el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
+      const found = this.commands.find((el) => typeof (el.command) !== 'undefined' && el.command.toUpperCase() === command.toUpperCase());
       shortcut = found.shortcut;
     }
 

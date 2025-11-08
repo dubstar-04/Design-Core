@@ -1,4 +1,4 @@
-import {Utils} from '../lib/utils.js';
+import { Utils } from '../lib/utils.js';
 
 /** Point Entity Class */
 export class Point {
@@ -8,7 +8,7 @@ export class Point {
    * @param  {number} y
    * @param  {number} bulge
    */
-  constructor(x, y, bulge=0) {
+  constructor(x, y, bulge = 0) {
     this.type = this.constructor.name;
     this.x = 0;
     this.y = 0;
@@ -52,7 +52,7 @@ export class Point {
    */
   angle(that) {
     const angle = Math.atan2((this.y - that.y), (this.x - that.x)) + Math.PI;
-    return angle % (Math.PI*2);
+    return angle % (Math.PI * 2);
   }
 
 
@@ -226,7 +226,7 @@ export class Point {
    * @param {number} direction - CCW if > 0
    * @return {Point} the closest point on the arc or null
    */
-  closestPointOnArc(startPoint, endPoint, centerPoint, direction=0) {
+  closestPointOnArc(startPoint, endPoint, centerPoint, direction = 0) {
     const length = this.distance(centerPoint);
     const radius = centerPoint.distance(startPoint);
 
@@ -255,7 +255,7 @@ export class Point {
    * @param {number} direction - CCW if > 0
    * @return {Point} true or false
    */
-  isOnArc(startPoint, endPoint, centerPoint, direction=0) {
+  isOnArc(startPoint, endPoint, centerPoint, direction = 0) {
     // direction: ccw arc > 0, clockwise arc <= 0
     const snapAngle = centerPoint.angle(this);
     const startAngle = centerPoint.angle(startPoint);
@@ -301,7 +301,7 @@ export class Point {
    */
   isOnLine(startPoint, endPoint) {
     // check start -> point + point -> end equals start -> end
-    if (startPoint.distance(this) + this.distance(endPoint) === startPoint.distance(endPoint)) {
+    if (Utils.round(startPoint.distance(this) + this.distance(endPoint)) === Utils.round(startPoint.distance(endPoint))) {
       return true;
     }
     return false;

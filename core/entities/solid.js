@@ -1,6 +1,6 @@
-import {Entity} from './entity.js';
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {BoundingBox} from '../lib/boundingBox.js';
+import { Entity } from './entity.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { BoundingBox } from '../lib/boundingBox.js';
 
 /**
  * Solid Entity Class
@@ -68,6 +68,16 @@ export class Solid extends Entity {
    */
   closestPoint(P) {
     return [P, Infinity];
+  }
+
+  /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
+  intersectPoints() {
+    return {
+      points: this.points,
+    };
   }
 
   /**

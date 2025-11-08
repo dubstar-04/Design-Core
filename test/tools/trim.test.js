@@ -1,6 +1,6 @@
-import {Core} from '../../core/core/core.js';
-import {Point} from '../../core/entities/point.js';
-import {Trim} from '../../core/tools/trim.js';
+import { Core } from '../../core/core/core.js';
+import { Point } from '../../core/entities/point.js';
+import { Trim } from '../../core/tools/trim.js';
 
 const core = new Core();
 
@@ -22,8 +22,8 @@ test('Test Trim.action', () => {
    * trim end from horizontal line
    */
   // Add items to scene
-  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
   core.scene.selectionManager.addToSelectionSet(0);
   // select item to trim
@@ -53,8 +53,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.items = [];
   // Add items to scene
-  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
   core.scene.selectionManager.addToSelectionSet(0);
   // select item to trim
@@ -84,8 +84,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.items = [];
   // Add items to scene
-  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
   core.scene.selectionManager.addToSelectionSet(1);
   // select item to trim
@@ -115,8 +115,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.items = [];
   // Add items to scene
-  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addItem('Line', {points: [lineTwoStart, lineTwoEnd]});
+  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
   core.scene.selectionManager.addToSelectionSet(1);
   // select item to trim
@@ -147,8 +147,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.items = [];
   // Add items to scene
-  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addItem('Line', {points: [crossingLineStart, crossingLineEnd]});
+  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
   // Select boundary item
   core.scene.selectionManager.addToSelectionSet(0);
   // select item to trim
@@ -178,8 +178,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.items = [];
   // Add items to scene
-  core.scene.addItem('Line', {points: [lineOneStart, lineOneEnd]});
-  core.scene.addItem('Line', {points: [crossingLineStart, crossingLineEnd]});
+  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
   // Select boundary item
   core.scene.selectionManager.addToSelectionSet(0);
   // select item to trim

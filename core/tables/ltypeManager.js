@@ -1,6 +1,6 @@
-import {DXFFile} from '../lib/dxf/dxfFile.js';
-import {StyleManagerBase} from './styleManagerBase.js';
-import {LType} from './ltype.js';
+import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { StyleManagerBase } from './styleManagerBase.js';
+import { LType } from './ltype.js';
 
 /**
  * Line Type Manager Class
@@ -26,9 +26,9 @@ export class LTypeManager extends StyleManagerBase {
 
   /** Add standard line types */
   addStandardItems() {
-    this.addItem({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
-    this.addItem({'name': 'ByLayer'});
-    this.addItem({'name': 'ByBlock'});
+    this.addItem({ 'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________' });
+    this.addItem({ 'name': 'ByLayer' });
+    this.addItem({ 'name': 'ByBlock' });
   }
 
   /**
@@ -37,12 +37,12 @@ export class LTypeManager extends StyleManagerBase {
    */
   getOptionalStyles() {
     const styles = [];
-    styles.push({'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________'});
-    styles.push({'name': 'CENTER', 'pattern': [31.75, -6.35, 6.35, -6.35], 'description': 'Center ____ _ ____ _ ____ _ ____ _ ____ _ ____'});
-    styles.push({'name': 'DASHDOT', 'pattern': [12.7, -6.345, 0, -6.345], 'description': 'Dash dot __ . __ . __ . __ . __ . __ . __ . __'});
-    styles.push({'name': 'DOT', 'pattern': [0, -6.35], 'description': 'Dot . . . . . . . . . . . . . . . . . . . . . .'});
-    styles.push({'name': 'DASHED', 'pattern': [12.7, -6.35], 'description': 'Dashed __ __ __ __ __ __ __ __ __ __ __ __ __ _'});
-    styles.push({'name': 'HIDDEN', 'pattern': [6.35, -3.175], 'description': 'Hidden __ __ __ __ __ __ __ __ __ __ __ __ __ _'});
+    styles.push({ 'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________' });
+    styles.push({ 'name': 'CENTER', 'pattern': [31.75, -6.35, 6.35, -6.35], 'description': 'Center ____ _ ____ _ ____ _ ____ _ ____ _ ____' });
+    styles.push({ 'name': 'DASHDOT', 'pattern': [12.7, -6.345, 0, -6.345], 'description': 'Dash dot __ . __ . __ . __ . __ . __ . __ . __' });
+    styles.push({ 'name': 'DOT', 'pattern': [0, -6.35], 'description': 'Dot . . . . . . . . . . . . . . . . . . . . . .' });
+    styles.push({ 'name': 'DASHED', 'pattern': [12.7, -6.35], 'description': 'Dashed __ __ __ __ __ __ __ __ __ __ __ __ __ _' });
+    styles.push({ 'name': 'HIDDEN', 'pattern': [6.35, -3.175], 'description': 'Hidden __ __ __ __ __ __ __ __ __ __ __ __ __ _' });
     return styles;
   }
 

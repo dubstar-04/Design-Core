@@ -1,5 +1,5 @@
-import {Logging} from '../lib/logging.js';
-import {BasePolyline} from './basePolyline.js';
+import { Logging } from '../lib/logging.js';
+import { BasePolyline } from './basePolyline.js';
 
 /**
  * LWPolyline Entity Class
@@ -31,7 +31,7 @@ export class Lwpolyline extends BasePolyline {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = {command: 'Lwpolyline'};
+    const command = { command: 'Lwpolyline' };
     return command;
   }
 }
