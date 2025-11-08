@@ -1,6 +1,6 @@
 
 /**
- *
+ *  Mock File class for testing
  */
 export class File {
   /**
