@@ -223,14 +223,31 @@ export class InputManager {
    */
   onCommand(input) {
     if (this.activeCommand !== undefined) {
-      // Check if the input is a valid command/shortcut - if so, switch to that command
-      if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
-        this.reset();
-        this.initialiseItem(DesignCore.CommandManager.getCommand(input));
-        this.activeCommand.execute();
-      } else {
-        // Otherwise, treat as input to the current command
-        if (this.promptOption) {
+      let handledByPrompt = false;
+
+      if (this.promptOption) {
+        let inputType;
+        try {
+          inputType = Input.getType(input);
+        } catch (error) {
+          inputType = undefined;
+        }
+
+        const matchesType = inputType !== undefined && this.promptOption.types.includes(inputType);
+        const matchesOption = this.promptOption.parseInputToOption(input) !== undefined;
+
+        if (matchesType || matchesOption) {
+          this.promptOption.respond(input);
+          handledByPrompt = true;
+        }
+      }
+
+      if (!handledByPrompt) {
+        if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
+          this.reset();
+          this.initialiseItem(DesignCore.CommandManager.getCommand(input));
+          this.activeCommand.execute();
+        } else if (this.promptOption) {
           this.promptOption.respond(input);
         }
       }
