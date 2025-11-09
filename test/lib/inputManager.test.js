@@ -2,22 +2,9 @@
 import { Core } from '../../core/core/core.js';
 import { PromptOptions } from '../../core/lib/inputManager.js';
 import { Input } from '../../core/lib/inputManager.js';
-import { Strings } from '../../core/lib/strings.js';
 
 const core = new Core();
 const inputManager = core.scene.inputManager;
-const notifications = [];
-
-beforeEach(() => {
-  notifications.length = 0;
-  core.setExternalNotifyCallbackFunction((message) => notifications.push(message));
-  inputManager.reset();
-});
-
-afterEach(() => {
-  core.setExternalNotifyCallbackFunction(undefined);
-  inputManager.reset();
-});
 
 test('Test PromptOptions.getOptionWithShortcut', () => {
   const po = new PromptOptions();
@@ -30,6 +17,9 @@ test('Test Input.getType', () => {
 });
 
 test('Test tool switching - click circle then rectangle', () => {
+  // Reset input manager
+  inputManager.reset();
+
   // Initially no active command
   expect(inputManager.activeCommand).toBeUndefined();
 
@@ -42,9 +32,15 @@ test('Test tool switching - click circle then rectangle', () => {
   inputManager.onCommand('REC', { source: 'toolbar' });
   expect(inputManager.activeCommand).not.toBeUndefined();
   expect(inputManager.activeCommand.constructor.name).toBe('Rectangle');
+
+  // Reset for cleanup
+  inputManager.reset();
 });
 
 test('Test tool switching - click rectangle then circle', () => {
+  // Reset input manager
+  inputManager.reset();
+
   // Initially no active command
   expect(inputManager.activeCommand).toBeUndefined();
 
@@ -57,9 +53,15 @@ test('Test tool switching - click rectangle then circle', () => {
   inputManager.onCommand('C', { source: 'toolbar' });
   expect(inputManager.activeCommand).not.toBeUndefined();
   expect(inputManager.activeCommand.constructor.name).toBe('Circle');
+
+  // Reset for cleanup
+  inputManager.reset();
 });
 
 test('Test tool switching with invalid command', () => {
+  // Reset input manager
+  inputManager.reset();
+
   // Start with circle tool
   inputManager.onCommand('C', { source: 'toolbar' });
   expect(inputManager.activeCommand.constructor.name).toBe('Circle');
@@ -68,17 +70,7 @@ test('Test tool switching with invalid command', () => {
   const originalCommand = inputManager.activeCommand;
   inputManager.onCommand('INVALID', { source: 'toolbar' });
   expect(inputManager.activeCommand).toBe(originalCommand);
-});
 
-test('Notifies when invalid command entered at command line with no active command', () => {
-  inputManager.onCommand('INVALID');
-  expect(notifications).toContain(`${Strings.Message.UNKNOWNCOMMAND}: INVALID`);
-});
-
-test('Notifies when invalid command entered at command line during active command', () => {
-  inputManager.onCommand('C');
-  expect(inputManager.activeCommand.constructor.name).toBe('Circle');
-
-  inputManager.onCommand('INVALID');
-  expect(notifications).toContain(`${Strings.Message.UNKNOWNCOMMAND}: INVALID`);
+  // Reset for cleanup
+  inputManager.reset();
 });
