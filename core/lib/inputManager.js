@@ -23,6 +23,27 @@ export class PromptOptions {
   }
 
   /**
+   * Check if the prompt option can respond to the input
+   * @param {any} input
+   * @return {boolean}
+   */
+  canRespond(input) {
+    if (input === undefined) {
+      return false;
+    }
+
+    try {
+      if (this.types.includes(Input.getType(input))) {
+        return true;
+      }
+    } catch (err) {
+      return false;
+    }
+
+    return this.parseInputToOption(input) !== undefined;
+  }
+
+  /**
    * Return data to the input request
    * @param {any} input
    */
@@ -46,12 +67,15 @@ export class PromptOptions {
 
       // expected type input, pass to active command
       this.resolve(input);
-    } else if (this.parseInputToOption(input) !== undefined) {
-      // input matches command option, pass to active command
-      this.resolve(this.parseInputToOption(input));
     } else {
-      // Invalid input receieved. notify the user.
-      DesignCore.Core.notify(`${Strings.Error.INPUT}: ${this.promptMessage}`);
+      const matchedOption = this.parseInputToOption(input);
+      if (matchedOption !== undefined) {
+        // input matches command option, pass to active command
+        this.resolve(matchedOption);
+      } else {
+        // Invalid input receieved. notify the user.
+        DesignCore.Core.notify(`${Strings.Error.INPUT}: ${this.promptMessage}`);
+      }
     }
   }
 
@@ -65,11 +89,17 @@ export class PromptOptions {
       return;
     }
 
+    if (input === undefined || input === null) {
+      return;
+    }
+
+    const normalisedInput = String(input);
+
     for (let i = 0; i < this.options.length; i++) {
       const option = this.options[i];
       // convert the option to uppercase and substring to the input length for comparison
-      const optionSubstring = option.toUpperCase().substring(0, input.length);
-      if (optionSubstring === input.toUpperCase()) {
+      const optionSubstring = option.toUpperCase().substring(0, normalisedInput.length);
+      if (optionSubstring === normalisedInput.toUpperCase()) {
         return option;
       }
     }
@@ -221,22 +251,33 @@ export class InputManager {
    * Handle command input
    * @param {any} input
    */
-  onCommand(input) {
-    if (this.activeCommand !== undefined) {
-      // Check if the input is a valid command/shortcut - if so, switch to that command
-      if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
-        this.reset();
-        this.initialiseItem(DesignCore.CommandManager.getCommand(input));
-        this.activeCommand.execute();
-      } else {
-        // Otherwise, treat as input to the current command
-        if (this.promptOption) {
-          this.promptOption.respond(input);
-        }
+  onCommand(input, { source = 'commandline' } = {}) {
+    const hasActiveCommand = this.activeCommand !== undefined;
+
+    if (hasActiveCommand) {
+      if (this.promptOption && this.promptOption.canRespond(input)) {
+        this.promptOption.respond(input);
+        return;
       }
-    } else if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
+
+      if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
+        if (source === 'toolbar' || this.promptOption === undefined) {
+          this.reset();
+          this.initialiseItem(DesignCore.CommandManager.getCommand(input));
+          this.activeCommand.execute();
+        }
+      } else if (source === 'commandline') {
+        this.notifyUnknownCommand(input);
+      }
+
+      return;
+    }
+
+    if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
       this.initialiseItem(DesignCore.CommandManager.getCommand(input));
       this.activeCommand.execute();
+    } else if (source === 'commandline') {
+      this.notifyUnknownCommand(input);
     }
   }
 
@@ -471,4 +512,22 @@ export class InputManager {
       return DesignCore.Scene.addItem(item.type, item, index);
     }
   }
+
+  /**
+   * Notify user of an unknown command entered at the command line
+   * @param {any} input
+   */
+  notifyUnknownCommand(input) {
+    if (typeof input !== 'string') {
+      return;
+    }
+
+    const trimmedInput = input.trim();
+    if (trimmedInput.length === 0) {
+      return;
+    }
+
+    DesignCore.Core.notify(`${Strings.Message.UNKNOWNCOMMAND}: ${trimmedInput}`);
+  }
 }
+
