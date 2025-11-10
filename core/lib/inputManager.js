@@ -6,7 +6,11 @@ import { Strings } from './strings.js';
 import { DesignCore } from '../designCore.js';
 import { Point } from '../entities/point.js';
 
+/** MouseStateChange Class */
 export class MouseStateChange {
+  /** Create MouseStateChange
+   * @param {Point} point
+   */
   constructor(point) {
     this.point = point;
   }
