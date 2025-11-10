@@ -32,6 +32,7 @@ import { Identify } from '../tools/identify.js';
 import { Extend } from '../tools/extend.js';
 import { Trim } from '../tools/trim.js';
 import { Purge } from '../tools/purge.js';
+import { Pan } from '../tools/pan.js';
 import { Zoom } from '../tools/zoom.js';
 
 import { Utils } from './utils.js';
@@ -75,6 +76,7 @@ const classes = {
   Purge,
 
   Zoom,
+  Pan,
 
 };
 

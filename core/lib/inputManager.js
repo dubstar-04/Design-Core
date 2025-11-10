@@ -6,6 +6,16 @@ import { Strings } from './strings.js';
 import { DesignCore } from '../designCore.js';
 import { Point } from '../entities/point.js';
 
+/** MouseStateChange Class */
+export class MouseStateChange {
+  /** Create MouseStateChange
+   * @param {Point} point
+   */
+  constructor(point) {
+    this.point = point;
+  }
+}
+
 /** PromptOption Class */
 export class PromptOptions {
   /**
@@ -134,6 +144,7 @@ export class Input {
     NUMBER: 'Number',
     STRING: 'String',
     DYNAMIC: 'Dynamic', // convert numerical input to point data
+    MOUSESTATECHANGE: 'MouseStateChange', // special type to handle mouse state input - returns point on scene when mouse events occur
   };
 
   /**
@@ -323,16 +334,13 @@ export class InputManager {
     DesignCore.Scene.tempItems = [];
     DesignCore.Scene.auxiliaryItems = [];
 
-    // selection window active
-    if (DesignCore.Mouse.buttonOneDown) {
-      if (this.promptOption !== undefined) {
-        // check if the active command requires a selection set
-        if (!this.promptOption.types.includes(Input.Type.SELECTIONSET)) {
-          return;
-        }
-      }
 
-      DesignCore.Scene.selectionManager.drawSelectionWindow();
+    if (DesignCore.Mouse.buttonOneDown) {
+      const windowSelect = !this.promptOption || this.promptOption.types.includes(Input.Type.SELECTIONSET);
+
+      if (windowSelect) {
+        DesignCore.Scene.selectionManager.drawSelectionWindow();
+      }
     }
 
     // store the snapped point
@@ -394,6 +402,14 @@ export class InputManager {
       case 2: // right button
         break;
     }
+
+    if (this.promptOption !== undefined) {
+      if (this.promptOption.types.includes(Input.Type.MOUSESTATECHANGE)) {
+        const point = DesignCore.Mouse.pointOnScene();
+        const mouseStateChange = new MouseStateChange(point);
+        this.promptOption.respond(mouseStateChange);
+      }
+    }
   };
 
   /**
@@ -406,7 +422,13 @@ export class InputManager {
         // Clear tempItems - This is here to remove the crossing window
         DesignCore.Scene.auxiliaryItems = [];
 
+
         if (this.promptOption !== undefined) {
+          if (this.promptOption.types.includes(Input.Type.MOUSESTATECHANGE)) {
+            const point = DesignCore.Mouse.pointOnScene();
+            const mouseStateChange = new MouseStateChange(point);
+            this.promptOption.respond(mouseStateChange);
+          }
           // check if the active command requires a selection set
           if (!this.promptOption.types.includes(Input.Type.SELECTIONSET)) {
             return;
@@ -459,7 +481,7 @@ export class InputManager {
    */
   setPrompt(prompt) {
     // TODO: single line method required?
-    DesignCore.CommandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
+    DesignCore.CommandLine.setPrompt(`${this.activeCommand.type}${prompt ? '- ':''}${prompt}`);
   }
 
   /**

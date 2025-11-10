@@ -1,10 +1,31 @@
 
 import { Core } from '../../core/core/core.js';
+import { Point } from '../../core/entities/point.js';
 import { PromptOptions } from '../../core/lib/inputManager.js';
 import { Input } from '../../core/lib/inputManager.js';
+import { MouseStateChange } from '../../core/lib/inputManager.js';
 
 const core = new Core();
 const inputManager = core.scene.inputManager;
+
+test('Test MouseStateChange class is available and integrable with PromptOptions', () => {
+  // create mouse state change instance
+  const point = new Point(10, 20);
+  const mouseStateChange = new MouseStateChange(point);
+  expect(mouseStateChange.point.x).toBe(10);
+  expect(mouseStateChange.point.y).toBe(20);
+
+  // Class should be exported
+  expect(MouseStateChange).toBeDefined();
+
+  // Input type constant should exist
+  expect(Input.Type.MOUSESTATECHANGE).toBeDefined();
+
+  // PromptOptions should accept the MouseStateChange input type
+  const po = new PromptOptions('', [Input.Type.MOUSESTATECHANGE]);
+  expect(po.types).toContain(Input.Type.MOUSESTATECHANGE);
+});
+
 
 test('Test PromptOptions.getOptionWithShortcut', () => {
   const po = new PromptOptions();
