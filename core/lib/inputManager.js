@@ -459,7 +459,7 @@ export class InputManager {
    */
   setPrompt(prompt) {
     // TODO: single line method required?
-    DesignCore.CommandLine.setPrompt(`${this.activeCommand.type} - ${prompt}`);
+    DesignCore.CommandLine.setPrompt(`${this.activeCommand.type}${prompt ? '- ':''}${prompt}`);
   }
 
   /**
