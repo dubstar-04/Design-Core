@@ -6,6 +6,12 @@ import { Strings } from './strings.js';
 import { DesignCore } from '../designCore.js';
 import { Point } from '../entities/point.js';
 
+export class MouseStateChange {
+  constructor(point) {
+    this.point = point;
+  }
+}
+
 /** PromptOption Class */
 export class PromptOptions {
   /**
