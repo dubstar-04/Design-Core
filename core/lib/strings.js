@@ -84,5 +84,7 @@ export class Strings {
     DESTINATION: 'Specify destination',
     SELECT: 'Select object',
     SELECTIONSET: 'Select Items',
+    SOURCE: 'Select source object',
+    DESTINATIONSET: 'Select destination object(s)',
   };
 };
