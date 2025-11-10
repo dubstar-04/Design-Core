@@ -22,6 +22,7 @@ import { RotatedDimension } from '../dimensions/rotatedDimension.js';
 
 // import { Point } from "../entities/point.js"
 
+import { MatchProp } from '../tools/matchProp.js';
 import { Move } from '../tools/move.js';
 import { Copy } from '../tools/copy.js';
 import { Rotate } from '../tools/rotate.js';
@@ -64,6 +65,7 @@ const classes = {
   Block,
   Insert,
   Hatch,
+  MatchProp,
   Move,
   Copy,
   Rotate,
