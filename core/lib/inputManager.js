@@ -331,7 +331,7 @@ export class InputManager {
    * Handle mouse position changes
    */
   mouseMoved() {
-    DesignCore.Scene.tempItems = [];
+    DesignCore.Scene.clearTempItems();
     DesignCore.Scene.auxiliaryItems = [];
 
 

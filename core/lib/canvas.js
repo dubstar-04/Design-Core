@@ -279,9 +279,9 @@ export class Canvas {
 
     // Paint the temporary scene items
     this.paintState = this.paintStates.TEMPORARY;
-    for (let j = 0; j < DesignCore.Scene.tempItems.length; j++) {
-      this.setContext(DesignCore.Scene.tempItems[j], context);
-      DesignCore.Scene.tempItems[j].draw(context, this.getScale());
+    for (let j = 0; j < DesignCore.Scene.sceneTempItemCount(); j++) {
+      this.setContext(DesignCore.Scene.getTempItem(j), context);
+      DesignCore.Scene.getTempItem(j).draw(context, this.getScale());
     }
 
     // Paint the selected scene items

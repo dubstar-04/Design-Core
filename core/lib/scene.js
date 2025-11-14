@@ -16,12 +16,12 @@ import { BlockManager } from '../tables/blockManager.js';
 export class Scene {
   /** Create a scene */
   #items = []; // Main array that stores all the geometry
+  #tempItems = []; // Temporary Array to store items while input is being gathered
 
   constructor() {
     // initialise the scene variables
     this.saved = false;
 
-    this.tempItems = []; // Temporary Array to store items while input is being gathered
     this.auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
     this.selectionManager = new SelectionManager();
@@ -35,15 +35,19 @@ export class Scene {
   /** Clear the scene of all items */
   clear() {
     this.#items = [];
-    this.tempItems = [];
+    this.#tempItems = [];
     this.auxiliaryItems = [];
+  }
+
+  clearTempItems() {
+    this.#tempItems = [];
   }
 
   /**
    * Reset the scene
    */
   reset() {
-    this.tempItems = [];
+    this.#tempItems = [];
     this.auxiliaryItems = [];
     this.selectionManager.reset();
     DesignCore.Canvas.requestPaint();
@@ -89,6 +93,10 @@ export class Scene {
 
   sceneEntitityCount() {
     return this.#items.length;
+  }
+
+  sceneTempItemCount() {
+    return this.#tempItems.length;
   }
 
   /**
@@ -182,6 +190,11 @@ export class Scene {
     return this.#items[index];
   }
 
+
+  getTempItem(index) {
+    return this.#tempItems[index];
+  }
+
   /**
    * Remove Item
    * @param {number} index - items index
@@ -203,7 +216,7 @@ export class Scene {
    * @param {Object} item
    */
   addToTempItems(item) {
-    this.tempItems.push(item); // Add it to the tempItems Array
+    this.#tempItems.push(item); // Add it to the tempItems Array
   }
 
   /**
