@@ -33,15 +33,18 @@ export class PropertyManager {
    */
   setItemProperties(property, newPropertyValue) {
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
       // check if the item has the selected property
-      if (!DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).hasOwnProperty(property)) {
+      if (!DesignCore.Scene.getItem(index).hasOwnProperty(property)) {
         continue;
       }
 
-      if (typeof (DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i])[property]) !== typeof (newPropertyValue)) {
+      if (typeof (DesignCore.Scene.getItem(index)[property]) !== typeof (newPropertyValue)) {
         DesignCore.Core.notify(Strings.Error.INPUT);
       } else {
-        DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i])[property] = newPropertyValue;
+        const update = {};
+        update[property] = newPropertyValue;
+        DesignCore.Scene.updateItem(index, update);
         DesignCore.Scene.selectionManager.reloadSelectedItems();
       }
     }
