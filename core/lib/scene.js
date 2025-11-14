@@ -31,14 +31,26 @@ export class Scene {
     this.dxfVersion = 'R2018';
   }
 
+  /**
+   * Get the number of items in the scene
+   * @returns {number}
+   */
   sceneEntitityCount() {
     return this.#items.length;
   }
 
+  /**
+   * Get the number of temp items in the scene
+   * @returns {number}
+   */
   sceneTempItemCount() {
     return this.#tempItems.length;
   }
 
+  /**
+   * Get the number of auxiliary items in the scene
+   * @returns {number}
+   */
   sceneAuxItemCount() {
     return this.#auxiliaryItems.length;
   }
@@ -50,17 +62,17 @@ export class Scene {
     this.#auxiliaryItems = [];
   }
 
+  /** Clear the scene temp items */
   clearTempItems() {
     this.#tempItems = [];
   }
 
+  /** Clear the scene aux items */
   clearAuxiliaryItems() {
     this.#auxiliaryItems = [];
   }
 
-  /**
-   * Reset the scene
-   */
+  /** Reset the scene */
   reset() {
     this.#tempItems = [];
     this.#auxiliaryItems = [];
@@ -198,10 +210,20 @@ export class Scene {
   }
 
 
+  /**
+   * Get Temp Item
+   * @param {number} index - items index
+   * @return {Object} - item
+   */
   getTempItem(index) {
     return this.#tempItems[index];
   }
 
+  /**
+   * Get Aux Item
+   * @param {number} index - items index
+   * @return {Object} - item
+   */
   getAuxiliaryItem(index) {
     return this.#auxiliaryItems[index];
   }
