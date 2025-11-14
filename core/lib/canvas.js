@@ -266,15 +266,15 @@ export class Canvas {
 
     // Paint the primary scene items
     this.paintState = this.paintStates.ENTITIES;
-    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
-      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.items[i].layer);
+    for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
+      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.getItem(i).layer);
 
       if (!layer.isVisible) {
         continue;
       }
 
-      this.setContext(DesignCore.Scene.items[i], context);
-      DesignCore.Scene.items[i].draw(context, this.getScale());
+      this.setContext(DesignCore.Scene.getItem(i), context);
+      DesignCore.Scene.getItem(i).draw(context, this.getScale());
     }
 
     // Paint the temporary scene items

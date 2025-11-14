@@ -23,7 +23,7 @@ export class DXFWriter {
     file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
     // Horrible hack to generate a handseed value
     // TODO: refactor core to track handle values properly and assigned them on creation
-    const handseed = (DesignCore.Scene.items.length +
+    const handseed = (DesignCore.Scene.sceneEntitityCount() +
       (DesignCore.LayerManager.items.length * 2)+
       DesignCore.LTypeManager.items.length +
       DesignCore.StyleManager.items.length +
@@ -127,8 +127,8 @@ export class DXFWriter {
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'ENTITIES');
 
-    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
-      DesignCore.Scene.items[i].dxf(file);
+    for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
+      DesignCore.Scene.getItem(i).dxf(file);
     }
 
     file.writeGroupCode('0', 'ENDSEC');

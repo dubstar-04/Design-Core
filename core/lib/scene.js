@@ -15,11 +15,12 @@ import { BlockManager } from '../tables/blockManager.js';
  */
 export class Scene {
   /** Create a scene */
+  #items = []; // Main array that stores all the geometry
+
   constructor() {
     // initialise the scene variables
     this.saved = false;
 
-    this.items = []; // Main array that stores all the geometry
     this.tempItems = []; // Temporary Array to store items while input is being gathered
     this.auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
@@ -29,6 +30,13 @@ export class Scene {
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
+  }
+
+  /** Clear the scene of all items */
+  clear() {
+    this.#items = [];
+    this.tempItems = [];
+    this.auxiliaryItems = [];
   }
 
   /**
@@ -51,12 +59,12 @@ export class Scene {
     let ymin = Infinity;
     let ymax = -Infinity;
 
-    if (this.items.length === 0) {
+    if (this.#items.length === 0) {
       return;
     }
 
-    for (let i = 0; i < this.items.length; i++) {
-      const itemBoundingBox = this.items[i].boundingBox();
+    for (let i = 0; i < this.#items.length; i++) {
+      const itemBoundingBox = this.#items[i].boundingBox();
 
       xmin = Math.min(xmin, itemBoundingBox.xMin);
       xmax = Math.max(xmax, itemBoundingBox.xMax);
@@ -77,6 +85,10 @@ export class Scene {
    */
   saveRequired() {
     this.saved = false; // Changes have occured. A save may be required.
+  }
+
+  sceneEntitityCount() {
+    return this.#items.length;
   }
 
   /**
@@ -103,11 +115,11 @@ export class Scene {
 
     if (typeof index === 'undefined') {
       // add to end of array
-      this.items.push(item); // add item to the scene
-      index = this.items.length - 1;
+      this.#items.push(item); // add item to the scene
+      index = this.#items.length - 1;
     } else {
       // replace item at index
-      this.items.splice(index, 1, item);
+      this.#items.splice(index, 1, item);
     }
 
     // return the index of the added item
@@ -124,7 +136,7 @@ export class Scene {
   findItem(type, prop, value) {
     const filteredItems = [];
 
-    this.items.forEach((item, index) => {
+    this.#items.forEach((item, index) => {
       if ((type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) && item.hasOwnProperty(prop) && item[prop] === value) {
         filteredItems.push(index);
       }
@@ -134,12 +146,40 @@ export class Scene {
   }
 
   /**
+   * Find closest item to point
+   * @param  {Point} point
+   * @return {number} - return index of closest item or undefined
+   */
+  findClosestItem(point) {
+    let delta = 1.65 / DesignCore.Core.canvas.getScale(); // find a more suitable starting value
+    let closestItemIndex;
+
+    for (let i = 0; i < this.#items.length; i++) {
+      // check the items layer is selectable - i.e. on, thawed, etc...
+      const layer = DesignCore.LayerManager.getItemByName(this.#items[i].layer);
+
+      if (!layer.isSelectable) {
+        continue;
+      }
+
+      const distance = this.#items[i].closestPoint(point)[1]; // ClosestPoint()[1] returns a distance to the closest point
+
+      if (distance < delta) {
+        delta = distance;
+        closestItemIndex = i;
+      }
+    }
+
+    return closestItemIndex;
+  }
+
+  /**
    * Get Item
    * @param {number} index - items index
    * @return {Object} - item
    */
   getItem(index) {
-    return this.items[index];
+    return this.#items[index];
   }
 
   /**
@@ -148,10 +188,10 @@ export class Scene {
    * @return {boolean} - success status
    */
   removeItem(index) {
-    const count = this.items.length;
-    this.items.splice(index, 1);
+    const count = this.#items.length;
+    this.#items.splice(index, 1);
 
-    if (this.items.length < count) {
+    if (this.#items.length < count) {
       return true;
     }
 

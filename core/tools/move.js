@@ -83,7 +83,7 @@ export class Move extends Tool {
     const yDelta = this.points[1].y - this.points[0].y;
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].move(xDelta, yDelta);
+      DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).move(xDelta, yDelta);
     }
   }
 }

@@ -15,10 +15,10 @@ test('Test Explode.action', () => {
     insert.block.addItem(line);
   }
 
-  expect(core.scene.items.length).toBe(1);
+  expect(core.scene.sceneEntitityCount()).toBe(1);
 
   // Add items to selection set
-  for (let i = 0; i < core.scene.items.length; i++) {
+  for (let i = 0; i < core.scene.sceneEntitityCount(); i++) {
     core.scene.selectionManager.addToSelectionSet(i);
   }
 
@@ -26,11 +26,11 @@ test('Test Explode.action', () => {
   const explode = new Explode();
   explode.action();
 
-  expect(core.scene.items.length).toBe(5);
+  expect(core.scene.sceneEntitityCount()).toBe(5);
 
   // loop through all exploded items, check the type and
   // check the points have be modified when exploded
-  for (let i = 0; i < core.scene.items.length; i++) {
+  for (let i = 0; i < core.scene.sceneEntitityCount(); i++) {
     const item = core.scene.getItem(i);
     expect(item instanceof Line).toBe(true);
     expect(item.points[0].x).toBe(0 + insertPoint.x);

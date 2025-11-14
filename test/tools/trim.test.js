@@ -34,16 +34,16 @@ test('Test Trim.action', () => {
   trim.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.getItem(0).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.getItem(0).points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(0);
-  expect(core.scene.items[1].points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.getItem(1).points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.getItem(1).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.getItem(1).points[1].x).toBe(0);
+  expect(core.scene.getItem(1).points[1].y).toBe(lineTwoEnd.y);
 
   /**
    * Trim test two
@@ -51,7 +51,7 @@ test('Test Trim.action', () => {
    * trim start from horizontal line
    */
   // clear scene items
-  core.scene.items = [];
+  core.scene.clear();
   // Add items to scene
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
@@ -65,16 +65,16 @@ test('Test Trim.action', () => {
   trim.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.getItem(0).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.getItem(0).points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(0);
-  expect(core.scene.items[1].points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(lineTwoEnd.x);
-  expect(core.scene.items[1].points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.getItem(1).points[0].x).toBe(0);
+  expect(core.scene.getItem(1).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.getItem(1).points[1].x).toBe(lineTwoEnd.x);
+  expect(core.scene.getItem(1).points[1].y).toBe(lineTwoEnd.y);
 
   /**
    * Trim test three
@@ -82,7 +82,7 @@ test('Test Trim.action', () => {
    * trim end from vertical line
    */
   // clear scene items
-  core.scene.items = [];
+  core.scene.clear();
   // Add items to scene
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
@@ -96,16 +96,16 @@ test('Test Trim.action', () => {
   trim.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(50);
+  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.getItem(0).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.getItem(0).points[1].y).toBe(50);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(lineTwoEnd.x);
-  expect(core.scene.items[1].points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.getItem(1).points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.getItem(1).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.getItem(1).points[1].x).toBe(lineTwoEnd.x);
+  expect(core.scene.getItem(1).points[1].y).toBe(lineTwoEnd.y);
 
   /**
    * Trim test four
@@ -113,7 +113,7 @@ test('Test Trim.action', () => {
    * trim start from vertical line
    */
   // clear scene items
-  core.scene.items = [];
+  core.scene.clear();
   // Add items to scene
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
@@ -127,16 +127,16 @@ test('Test Trim.action', () => {
   trim.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(50);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.getItem(0).points[0].y).toBe(50);
+  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.getItem(0).points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(lineTwoEnd.x);
-  expect(core.scene.items[1].points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.getItem(1).points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.getItem(1).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.getItem(1).points[1].x).toBe(lineTwoEnd.x);
+  expect(core.scene.getItem(1).points[1].y).toBe(lineTwoEnd.y);
 
 
   /**
@@ -145,7 +145,7 @@ test('Test Trim.action', () => {
    * trim end from crossing line
    */
   // clear scene items
-  core.scene.items = [];
+  core.scene.clear();
   // Add items to scene
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
@@ -159,16 +159,16 @@ test('Test Trim.action', () => {
   trim.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.getItem(0).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.getItem(0).points[1].y).toBe(lineOneEnd.y);
 
   // crossing line
-  expect(core.scene.items[1].points[0].x).toBe(crossingLineStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(crossingLineStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(0);
-  expect(core.scene.items[1].points[1].y).toBe(50);
+  expect(core.scene.getItem(1).points[0].x).toBe(crossingLineStart.x);
+  expect(core.scene.getItem(1).points[0].y).toBe(crossingLineStart.y);
+  expect(core.scene.getItem(1).points[1].x).toBe(0);
+  expect(core.scene.getItem(1).points[1].y).toBe(50);
 
   /**
    * Trim test six
@@ -176,7 +176,7 @@ test('Test Trim.action', () => {
    * trim start from crossing line
    */
   // clear scene items
-  core.scene.items = [];
+  core.scene.clear();
   // Add items to scene
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
@@ -190,14 +190,14 @@ test('Test Trim.action', () => {
   trim.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.getItem(0).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.getItem(0).points[1].y).toBe(lineOneEnd.y);
 
   // crossing line
-  expect(core.scene.items[1].points[0].x).toBe(0);
-  expect(core.scene.items[1].points[0].y).toBe(50);
-  expect(core.scene.items[1].points[1].x).toBe(crossingLineEnd.x);
-  expect(core.scene.items[1].points[1].y).toBe(crossingLineEnd.y);
+  expect(core.scene.getItem(1).points[0].x).toBe(0);
+  expect(core.scene.getItem(1).points[0].y).toBe(50);
+  expect(core.scene.getItem(1).points[1].x).toBe(crossingLineEnd.x);
+  expect(core.scene.getItem(1).points[1].y).toBe(crossingLineEnd.y);
 });

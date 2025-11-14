@@ -37,16 +37,16 @@ test('Test Extend.action', () => {
   extend.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.getItem(0).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.getItem(0).points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(100);
-  expect(core.scene.items[1].points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.getItem(1).points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.getItem(1).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.getItem(1).points[1].x).toBe(100);
+  expect(core.scene.getItem(1).points[1].y).toBe(lineTwoEnd.y);
 
   /**
    * Extend test two
@@ -55,7 +55,7 @@ test('Test Extend.action', () => {
    */
 
   // clear scene items
-  core.scene.items = [];
+  core.scene.clear();
   // Add items to scene
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   core.scene.addItem('Line', { points: [lineThreeStart, lineThreeEnd] });
@@ -69,16 +69,16 @@ test('Test Extend.action', () => {
   extend.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineTwoEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.getItem(0).points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.getItem(0).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.getItem(0).points[1].x).toBe(lineTwoEnd.x);
+  expect(core.scene.getItem(0).points[1].y).toBe(lineTwoEnd.y);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(lineThreeStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(lineThreeStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(lineThreeEnd.x);
-  expect(core.scene.items[1].points[1].y).toBe(50);
+  expect(core.scene.getItem(1).points[0].x).toBe(lineThreeStart.x);
+  expect(core.scene.getItem(1).points[0].y).toBe(lineThreeStart.y);
+  expect(core.scene.getItem(1).points[1].x).toBe(lineThreeEnd.x);
+  expect(core.scene.getItem(1).points[1].y).toBe(50);
 
   /**
    * Extend test three
@@ -86,7 +86,7 @@ test('Test Extend.action', () => {
    * trim end from crossing line
    */
   // clear scene items
-  core.scene.items = [];
+  core.scene.clear();
   // Add items to scene
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
@@ -100,14 +100,14 @@ test('Test Extend.action', () => {
   extend.action();
 
   // line one
-  expect(core.scene.items[0].points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.items[0].points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.items[0].points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.items[0].points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.getItem(0).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.getItem(0).points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(core.scene.items[1].points[0].x).toBe(crossingLineStart.x);
-  expect(core.scene.items[1].points[0].y).toBe(crossingLineStart.y);
-  expect(core.scene.items[1].points[1].x).toBe(100);
-  expect(core.scene.items[1].points[1].y).toBe(100);
+  expect(core.scene.getItem(1).points[0].x).toBe(crossingLineStart.x);
+  expect(core.scene.getItem(1).points[0].y).toBe(crossingLineStart.y);
+  expect(core.scene.getItem(1).points[1].x).toBe(100);
+  expect(core.scene.getItem(1).points[1].y).toBe(100);
 });

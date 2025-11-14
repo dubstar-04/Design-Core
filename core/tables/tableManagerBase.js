@@ -126,7 +126,7 @@ export class TableManagerBase {
       this.addStandardItems();
     }
 
-    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
       const item = (DesignCore.Scene.getItem(i)[this.itemProperty]);
       this.addItem({
         'name': item,
@@ -230,9 +230,9 @@ export class TableManagerBase {
    * @param {string} newItemName
    */
   updateSceneItem(oldItemName, newItemName) {
-    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
-      if (DesignCore.Scene.items[i][this.itemProperty] === oldItemName) {
-        DesignCore.Scene.items[i][this.itemProperty] = newItemName;
+    for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
+      if (DesignCore.Scene.getItem(i)[this.itemProperty] === oldItemName) {
+        DesignCore.Scene.getItem(i)[this.itemProperty] = newItemName;
       }
     }
   }

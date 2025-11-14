@@ -355,7 +355,7 @@ export class InputManager {
       if (this.activeCommand === undefined || this.activeCommand !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION) || this.promptOption.types.includes(Input.Type.SELECTIONSET))) {
         const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
         if (index !== undefined) {
-          const copyofitem = Utils.cloneObject(DesignCore.Scene.items[index]);
+          const copyofitem = Utils.cloneObject(DesignCore.Scene.getItem(index));
           DesignCore.Scene.addToTempItems(copyofitem);
           selecting = true;
         }

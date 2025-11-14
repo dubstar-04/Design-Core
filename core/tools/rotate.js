@@ -108,7 +108,7 @@ export class Rotate extends Tool {
     const theta = ang - this.baseAngle;
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].rotate(this.points[0], theta);
+      DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).rotate(this.points[0], theta);
     }
   };
 }

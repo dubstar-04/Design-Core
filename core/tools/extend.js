@@ -71,8 +71,8 @@ export class Extend extends Tool {
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         if (DesignCore.Scene.selectionManager.selectionSet.selectionSet[i] !== item) {
-          const boundaryItem = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]];
-          extendItem = DesignCore.Scene.items[item];
+          const boundaryItem = DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
+          extendItem = DesignCore.Scene.getItem(item);
 
           const functionName = 'intersect' + boundaryItem.type + extendItem.type;
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), extendItem.intersectPoints(), true);

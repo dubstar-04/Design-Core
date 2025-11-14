@@ -37,8 +37,8 @@ export class StyleManagerBase extends TableManagerBase {
   deleteStyleFromScene(style) {
     const selectionSet = [];
 
-    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
-      if (DesignCore.Scene.items[i][this.itemProperty] === style) {
+    for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
+      if (DesignCore.Scene.getItem(i)[this.itemProperty] === style) {
         selectionSet.push(i);
       }
     }
@@ -47,7 +47,7 @@ export class StyleManagerBase extends TableManagerBase {
     selectionSet.sort((a, b) => b - a);
 
     for (let j = 0; j < selectionSet.length; j++) {
-      DesignCore.Scene.items.splice((selectionSet[j]), 1);
+      DesignCore.Scene.removeItem((selectionSet[j]));
     }
   }
 
@@ -78,7 +78,7 @@ export class StyleManagerBase extends TableManagerBase {
       this.addStandardItems();
     }
 
-    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
+    for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
       const style = (DesignCore.Scene.getItem(i)[this.itemProperty]);
       this.addItem({
         'name': style,
