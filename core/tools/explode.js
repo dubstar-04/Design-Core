@@ -4,6 +4,7 @@ import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Insert } from '../entities/insert.js';
+import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -87,7 +88,7 @@ export class Explode extends Tool {
 
       blockItems.forEach((blockItem) => {
         const copyofitem = Utils.cloneObject(blockItem);
-        copyofitem.move(insertPoint.x, insertPoint.y);
+        copyofitem.points = copyofitem.points.map((p) => new Point(p.x, p.y).add(insertPoint));
         DesignCore.Scene.addItem(copyofitem.type, copyofitem);
       });
 

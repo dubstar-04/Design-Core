@@ -2,6 +2,7 @@ import { Strings } from '../lib/strings.js';
 import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -70,7 +71,9 @@ export class Move extends Tool {
       this.lastMousePoint = mousePoint;
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        DesignCore.Scene.selectionManager.selectedItems[i].move(delta.x, delta.y);
+        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+        const points = item.points.map((p) => new Point(p.x + delta.x, p.y + delta.y));
+        item.points = points;
       }
     }
   }
@@ -82,8 +85,13 @@ export class Move extends Tool {
     const xDelta = this.points[1].x - this.points[0].x;
     const yDelta = this.points[1].y - this.points[0].y;
 
+    const delta = new Point(xDelta, yDelta);
+
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).move(xDelta, yDelta);
+      const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
+      const item = DesignCore.Scene.getItem(index);
+      const points = item.points.map((p) => new Point(p.x, p.y).add(delta));
+      DesignCore.Scene.updateItem(index, { points: points });
     }
   }
 }

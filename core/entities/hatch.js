@@ -322,7 +322,7 @@ export class Hatch extends Entity {
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
     const shapes = this.processSelection(selectedItems);
     if (shapes.length) {
-      DesignCore.Scene.createTempItem(this.type, { boundaryShapes: shapes });
+      DesignCore.Scene.createTempItem(this.type, { points: this.points, boundaryShapes: shapes });
     }
   }
 
@@ -402,6 +402,8 @@ export class Hatch extends Entity {
     if (this.scale < 0.01) {
       this.scale = 1;
     }
+    ctx.save();
+    ctx.translate(this.points[0].x, this.points[0].y);
 
     for (let i = 0; i < this.boundaryShapes.length; i++) {
       const shape = this.boundaryShapes[i];
@@ -431,6 +433,7 @@ export class Hatch extends Entity {
       this.createPattern(ctx, scale, shape);
       ctx.restore();
     }
+    ctx.restore();
   }
 
   /**
@@ -620,6 +623,7 @@ export class Hatch extends Entity {
    * @return {boolean} - true if inside
    */
   isInside(P) {
+    P = P.subtract(this.points[0]);
     for (let i = 0; i < this.boundaryShapes.length; i++) {
       const shape = this.boundaryShapes[i];
 
@@ -671,8 +675,8 @@ export class Hatch extends Entity {
       ymax = Math.max(ymax, boundingBox.yMax);
     }
 
-    const topLeft = new Point(xmin, ymax);
-    const bottomRight = new Point(xmax, ymin);
+    const topLeft = new Point(xmin, ymax).add(this.points[0]);
+    const bottomRight = new Point(xmax, ymin).add(this.points[0]);
 
     return new BoundingBox(topLeft, bottomRight);
   }
@@ -692,25 +696,19 @@ export class Hatch extends Entity {
    * @return {boolean} true if touched
    */
   touched(selectionExtremes) {
+    const se = [
+      selectionExtremes[0] - this.points[0].x,
+      selectionExtremes[1]- this.points[0].y,
+      selectionExtremes[2]- this.points[0].x,
+      selectionExtremes[3]- this.points[0].y,
+    ];
     for (let i = 0; i < this.boundaryShapes.length; i++) {
-      if (this.boundaryShapes[i].touched(selectionExtremes)) {
+      if (this.boundaryShapes[i].touched(se)) {
         return true;
       }
     }
 
     return false;
-  }
-
-  /**
-   * Move the boundary items
-   * @param {number} xDelta
-   * @param {number} yDelta
-   */
-  move(xDelta, yDelta) {
-    for (let i = 0; i < this.boundaryShapes.length; i++) {
-      const shape = this.boundaryShapes[i];
-      shape.move(xDelta, yDelta);
-    }
   }
 
   /**

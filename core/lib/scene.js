@@ -154,6 +154,20 @@ export class Scene {
     return index;
   }
 
+  updateItem(index, data) {
+    const item = this.getItem(index);
+
+    if (!item) {
+      throw Error('Item not found in scene');
+    }
+
+    for (const property in data) {
+      if (item.hasOwnProperty(property)) {
+        item[property] = data[property];
+      }
+    }
+  }
+
   /**
    * Find items in scene
    * @param {string} type - entity type or "ANY"

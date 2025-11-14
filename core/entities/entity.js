@@ -231,18 +231,6 @@ export class Entity {
   }
 
   /**
-   * Move this entity
-   * @param {number} xDelta
-   * @param {number} yDelta
-   */
-  move(xDelta, yDelta) {
-    const delta = new Point(xDelta, yDelta);
-    for (let i = 0; i < this.points.length; i++) {
-      this.points[i] = this.points[i].add(delta);
-    }
-  }
-
-  /**
    * Rotate this entity
    * @param  {Point} center - center of rotation
    * @param {number} angle - in radians

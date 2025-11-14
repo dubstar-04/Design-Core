@@ -115,8 +115,9 @@ export class Block extends Entity {
       selections.forEach((index) => {
         const item = DesignCore.Scene.removeItem(index);
         // adjust the items points to reflect the insert point
+        const delta = new Point(-insertPoint.x, -insertPoint.y);
         if (item.hasOwnProperty('points')) {
-          item.move(-insertPoint.x, -insertPoint.y);
+          item.points = item.points.map((p) => new Point(p.x, p.y).add(delta));
         }
         block.items.push(item);
       });
