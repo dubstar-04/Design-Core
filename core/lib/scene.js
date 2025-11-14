@@ -19,6 +19,7 @@ export class Scene {
   #tempItems = []; // Temporary Array to store items while input is being gathered
   #auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
+  /** Create a Scene */
   constructor() {
     // initialise the scene variables
     this.saved = false;
@@ -33,7 +34,7 @@ export class Scene {
 
   /**
    * Get the number of items in the scene
-   * @returns {number}
+   * @return {number}
    */
   sceneEntitityCount() {
     return this.#items.length;
@@ -41,7 +42,7 @@ export class Scene {
 
   /**
    * Get the number of temp items in the scene
-   * @returns {number}
+   * @return {number}
    */
   sceneTempItemCount() {
     return this.#tempItems.length;
@@ -49,7 +50,7 @@ export class Scene {
 
   /**
    * Get the number of auxiliary items in the scene
-   * @returns {number}
+   * @return {number}
    */
   sceneAuxItemCount() {
     return this.#auxiliaryItems.length;
