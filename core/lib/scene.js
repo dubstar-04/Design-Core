@@ -17,12 +17,11 @@ export class Scene {
   /** Create a scene */
   #items = []; // Main array that stores all the geometry
   #tempItems = []; // Temporary Array to store items while input is being gathered
+  #auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
   constructor() {
     // initialise the scene variables
     this.saved = false;
-
-    this.auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
     this.selectionManager = new SelectionManager();
     this.inputManager = new InputManager();
@@ -32,15 +31,31 @@ export class Scene {
     this.dxfVersion = 'R2018';
   }
 
+  sceneEntitityCount() {
+    return this.#items.length;
+  }
+
+  sceneTempItemCount() {
+    return this.#tempItems.length;
+  }
+
+  sceneAuxItemCount() {
+    return this.#auxiliaryItems.length;
+  }
+
   /** Clear the scene of all items */
   clear() {
     this.#items = [];
     this.#tempItems = [];
-    this.auxiliaryItems = [];
+    this.#auxiliaryItems = [];
   }
 
   clearTempItems() {
     this.#tempItems = [];
+  }
+
+  clearAuxiliaryItems() {
+    this.#auxiliaryItems = [];
   }
 
   /**
@@ -48,7 +63,7 @@ export class Scene {
    */
   reset() {
     this.#tempItems = [];
-    this.auxiliaryItems = [];
+    this.#auxiliaryItems = [];
     this.selectionManager.reset();
     DesignCore.Canvas.requestPaint();
   }
@@ -89,14 +104,6 @@ export class Scene {
    */
   saveRequired() {
     this.saved = false; // Changes have occured. A save may be required.
-  }
-
-  sceneEntitityCount() {
-    return this.#items.length;
-  }
-
-  sceneTempItemCount() {
-    return this.#tempItems.length;
   }
 
   /**
@@ -195,6 +202,10 @@ export class Scene {
     return this.#tempItems[index];
   }
 
+  getAuxiliaryItem(index) {
+    return this.#auxiliaryItems[index];
+  }
+
   /**
    * Remove Item
    * @param {number} index - items index
@@ -224,7 +235,7 @@ export class Scene {
    * @param {Object} item
    */
   addToAuxiliaryItems(item) {
-    this.auxiliaryItems.push(item); // Add it to the auxiliary Array
+    this.#auxiliaryItems.push(item); // Add it to the auxiliary Array
   }
 
   /**

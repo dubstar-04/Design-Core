@@ -332,8 +332,7 @@ export class InputManager {
    */
   mouseMoved() {
     DesignCore.Scene.clearTempItems();
-    DesignCore.Scene.auxiliaryItems = [];
-
+    DesignCore.Scene.clearAuxiliaryItems();
 
     if (DesignCore.Mouse.buttonOneDown) {
       const windowSelect = !this.promptOption || this.promptOption.types.includes(Input.Type.SELECTIONSET);
@@ -420,7 +419,7 @@ export class InputManager {
     switch (button) {
       case 0: // left button
         // Clear tempItems - This is here to remove the crossing window
-        DesignCore.Scene.auxiliaryItems = [];
+        DesignCore.Scene.clearAuxiliaryItems();
 
 
         if (this.promptOption !== undefined) {

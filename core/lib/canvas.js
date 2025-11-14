@@ -295,8 +295,8 @@ export class Canvas {
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
     this.paintState = this.paintStates.AUXILLARY;
-    for (let l = 0; l < DesignCore.Scene.auxiliaryItems.length; l++) {
-      DesignCore.Scene.auxiliaryItems[l].draw(context, this.getScale());
+    for (let l = 0; l < DesignCore.Scene.sceneAuxItemCount(); l++) {
+      DesignCore.Scene.getAuxiliaryItem(l).draw(context, this.getScale());
     }
 
     this.paintState = undefined;
