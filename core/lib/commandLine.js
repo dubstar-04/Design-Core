@@ -98,7 +98,7 @@ export class CommandLine {
         this.enterPressed();
         break;
       case 'Escape':
-        DesignCore.Scene.inputManager.onEscapePressed();
+        this.escapePressed();
         break;
       case 'Space': // space
         this.spacePressed();
@@ -155,6 +155,13 @@ export class CommandLine {
           this.update();
         }
     }
+  }
+
+  /**
+   * Handles presses of the delete key
+   */
+  escapePressed() {
+    DesignCore.Scene.inputManager.onEscapePressed();
   }
 
   /**
