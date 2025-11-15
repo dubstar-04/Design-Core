@@ -42,6 +42,7 @@ export class PropertyManager {
       if (typeof (DesignCore.Scene.getItem(index)[property]) !== typeof (newPropertyValue)) {
         DesignCore.Core.notify(Strings.Error.INPUT);
       } else {
+        // update the item property
         const update = {};
         update[property] = newPropertyValue;
         DesignCore.Scene.updateItem(index, update);
