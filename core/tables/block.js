@@ -119,7 +119,8 @@ export class Block extends Entity {
         // adjust the items points to reflect the insert point
         const delta = new Point(-insertPoint.x, -insertPoint.y);
         if (item.hasOwnProperty('points')) {
-          item.points = item.points.map((p) => new Point(p.x, p.y).add(delta));
+          const points = item.points.map((p) => new Point(p.x, p.y).add(delta));
+          item.setProperty('points', points);
         }
         block.items.push(item);
       });
