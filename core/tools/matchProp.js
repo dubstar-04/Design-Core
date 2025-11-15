@@ -70,17 +70,15 @@ export class MatchProp extends Tool {
 
     // loop through destination set
     for (let i = 0; i < this.destinationSetIndices.length; i++) {
-      // get destination item
-      const destinationItem = DesignCore.Scene.getItem(this.destinationSetIndices[i]);
       // loop through properties and match
       for (let p = 0; p < this.properties.length; p++) {
         // check property exists on both items
-        if (sourceItem.hasOwnProperty(this.properties[p])) {
-          if (destinationItem.hasOwnProperty(this.properties[p])) {
-            // match property
-            const prop = this.properties[p];
-            destinationItem[prop] = sourceItem[prop];
-          }
+        const prop = this.properties[p];
+        if (sourceItem.hasOwnProperty(prop)) {
+          const update = {};
+          update[prop] = sourceItem[prop];
+          // try and update the item
+          DesignCore.Scene.updateItem(this.destinationSetIndices[i], update);
         }
       }
     }
