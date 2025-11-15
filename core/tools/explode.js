@@ -4,6 +4,7 @@ import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Insert } from '../entities/insert.js';
+import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -66,31 +67,34 @@ export class Explode extends Tool {
     selections.sort((a, b) => b - a);
 
     for (let i = 0; i < selections.length; i++) {
-      const item = DesignCore.Scene.items[selections[i]];
+      const insert = DesignCore.Scene.entities.get(selections[i]);
 
       // check the selected item in an insert
-      if (!(item instanceof Insert)) {
+      if (!(insert instanceof Insert)) {
         counter++;
         continue;
       }
 
       // check the insert has a block and
       // check the block has items
-      if (item.block === undefined || item.block.items.length == 0) {
+      if (insert.block === undefined || insert.block.items.length == 0) {
         counter++;
         continue;
       }
 
-      const insert = DesignCore.Scene.items.splice(selections[i], 1)[0];
       const insertPoint = insert.points[0];
       const block = insert.block;
       const blockItems = block.items;
 
       blockItems.forEach((blockItem) => {
         const copyofitem = Utils.cloneObject(blockItem);
-        copyofitem.move(insertPoint.x, insertPoint.y);
-        DesignCore.Scene.items.push(copyofitem);
+        const points = copyofitem.points.map((p) => new Point(p.x, p.y).add(insertPoint));
+        copyofitem.setProperty('points', points);
+        DesignCore.Scene.addItem(copyofitem.type, copyofitem);
       });
+
+      // remove the insert from the scene
+      DesignCore.Scene.entities.remove(selections[i]);
     }
 
     if (counter) {

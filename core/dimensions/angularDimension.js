@@ -61,7 +61,7 @@ export class AngularDimension extends BaseDimension {
 
         const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
-        let selectedItem = DesignCore.Scene.getItem(selection.selectedItemIndex);
+        let selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
 
         if ([Line, BasePolyline].some((entity) => selectedItem instanceof entity)) {
           if (selectedItem instanceof BasePolyline) {
@@ -90,7 +90,7 @@ export class AngularDimension extends BaseDimension {
         DesignCore.Scene.selectionManager.reset();
         const op1 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         const selection2 = await DesignCore.Scene.inputManager.requestInput(op1);
-        let selectedItem = DesignCore.Scene.getItem(selection2.selectedItemIndex);
+        let selectedItem = DesignCore.Scene.entities.get(selection2.selectedItemIndex);
 
         if ([Line, BasePolyline].some((entity) => selectedItem instanceof entity)) {
           if (selectedItem instanceof BasePolyline) {
@@ -146,7 +146,7 @@ export class AngularDimension extends BaseDimension {
 
       const points = AngularDimension.getPointsFromSelection([tempLineOne, tempLineTwo], Pt11);
 
-      DesignCore.Scene.createTempItem(this.type, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.tempEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 

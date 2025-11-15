@@ -127,14 +127,14 @@ export class BasePolyline extends Entity {
 
     if (this.points.length >= 1) {
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.createTempItem(this.type, { points: points });
+      DesignCore.Scene.tempEntities.create(this.type, { points: points });
     }
 
     if (this.inputMode === this.modes.ARC) {
       const arcpoints = Utils.cloneObject(this.points);
       arcpoints.at(-1).bulge = this.getBulgeFromSegment(mousePoint);
       const points = [...arcpoints, mousePoint];
-      DesignCore.Scene.createTempItem(this.type, { points: points });
+      DesignCore.Scene.tempEntities.create(this.type, { points: points });
     }
   }
 

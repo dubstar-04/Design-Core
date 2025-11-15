@@ -43,7 +43,7 @@ export class BaseCircularDimension extends BaseDimension {
         const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
 
-        let selectedItem = DesignCore.Scene.getItem(selection.selectedItemIndex);
+        let selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
 
         if ([Circle, Arc, BasePolyline].some((entity) => selectedItem instanceof entity)) {
           if (selectedItem instanceof BasePolyline) {
@@ -96,7 +96,7 @@ export class BaseCircularDimension extends BaseDimension {
       const tempCircle = new Circle({ points: [Pt10, Pt15] });
       const points = this.constructor.getPointsFromSelection([tempCircle], Pt11);
 
-      DesignCore.Scene.createTempItem(this.type, { points: points });
+      DesignCore.Scene.tempEntities.create(this.type, { points: points });
     }
   }
 

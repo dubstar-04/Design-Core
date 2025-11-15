@@ -7,15 +7,16 @@ export class Point {
    * @param  {number} x
    * @param  {number} y
    * @param  {number} bulge
+   * @param  {number} sequence - dxf group code sequence reference
    */
-  constructor(x, y, bulge = 0) {
+  constructor(x, y, bulge = 0, sequence) {
     this.type = this.constructor.name;
     this.x = 0;
     this.y = 0;
     // sequence holds a reference to the dxf group code sequence the point represents
     // 10, 20, 30;
     // 11, 21, 31;
-    this.sequence;
+    this.sequence = sequence;
 
     // bulge value used for defining arcs in polylines
     // arc is ccw if positive
@@ -33,7 +34,7 @@ export class Point {
    * @return {Point}
    */
   add(that) {
-    return new Point(this.x + that.x, this.y + that.y, this.bulge);
+    return new Point(this.x + that.x, this.y + that.y, this.bulge, this.sequence);
   }
 
   /**
@@ -42,7 +43,7 @@ export class Point {
    * @return {Point}
    */
   subtract(that) {
-    return new Point(this.x - that.x, this.y - that.y, this.bulge);
+    return new Point(this.x - that.x, this.y - that.y, this.bulge, this.sequence);
   };
 
   /**
@@ -61,7 +62,7 @@ export class Point {
    * @return {Point}
    */
   clone() {
-    return new Point(this.x, this.y);
+    return new Point(this.x, this.y, this.bulge, this.sequence);
   };
 
   /**
@@ -92,7 +93,7 @@ export class Point {
   rotate(centre, angle) {
     const x = centre.x + (this.x - centre.x) * Math.cos(angle) - (this.y - centre.y) * Math.sin(angle);
     const y = centre.y + (this.x - centre.x) * Math.sin(angle) + (this.y - centre.y) * Math.cos(angle);
-    return new Point(x, y, this.bulge);
+    return new Point(x, y, this.bulge, this.sequence);
   }
 
   /**

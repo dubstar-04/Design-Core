@@ -266,22 +266,22 @@ export class Canvas {
 
     // Paint the primary scene items
     this.paintState = this.paintStates.ENTITIES;
-    for (let i = 0; i < DesignCore.Scene.items.length; i++) {
-      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.items[i].layer);
+    for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
+      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).layer);
 
       if (!layer.isVisible) {
         continue;
       }
 
-      this.setContext(DesignCore.Scene.items[i], context);
-      DesignCore.Scene.items[i].draw(context, this.getScale());
+      this.setContext(DesignCore.Scene.entities.get(i), context);
+      DesignCore.Scene.entities.get(i).draw(context, this.getScale());
     }
 
     // Paint the temporary scene items
     this.paintState = this.paintStates.TEMPORARY;
-    for (let j = 0; j < DesignCore.Scene.tempItems.length; j++) {
-      this.setContext(DesignCore.Scene.tempItems[j], context);
-      DesignCore.Scene.tempItems[j].draw(context, this.getScale());
+    for (let j = 0; j < DesignCore.Scene.tempEntities.count(); j++) {
+      this.setContext(DesignCore.Scene.tempEntities.get(j), context);
+      DesignCore.Scene.tempEntities.get(j).draw(context, this.getScale());
     }
 
     // Paint the selected scene items
@@ -295,8 +295,8 @@ export class Canvas {
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
     this.paintState = this.paintStates.AUXILLARY;
-    for (let l = 0; l < DesignCore.Scene.auxiliaryItems.length; l++) {
-      DesignCore.Scene.auxiliaryItems[l].draw(context, this.getScale());
+    for (let l = 0; l < DesignCore.Scene.auxiliaryEntities.count(); l++) {
+      DesignCore.Scene.auxiliaryEntities.get(l).draw(context, this.getScale());
     }
 
     this.paintState = undefined;

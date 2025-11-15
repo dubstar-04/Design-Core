@@ -113,10 +113,14 @@ export class Block extends Entity {
 
       // move selected items from scene to block
       selections.forEach((index) => {
-        const item = DesignCore.Scene.items.splice(index, 1)[0];
+        const item = DesignCore.Scene.entities.get(index);
+        // remove item from scene
+        DesignCore.Scene.entities.remove(index);
         // adjust the items points to reflect the insert point
+        const delta = new Point(-insertPoint.x, -insertPoint.y);
         if (item.hasOwnProperty('points')) {
-          item.move(-insertPoint.x, -insertPoint.y);
+          const points = item.points.map((p) => new Point(p.x, p.y).add(delta));
+          item.setProperty('points', points);
         }
         block.items.push(item);
       });

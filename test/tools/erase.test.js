@@ -14,15 +14,15 @@ test('Test Erase.action', () => {
   core.scene.addItem('Text', { points: [new Point(10, 0), new Point(0, 10)], height: 10, rotation: 0, string: 'text test' });
 
   // Add items to selection set
-  for (let i = 0; i < core.scene.items.length; i++) {
+  for (let i = 0; i < core.scene.entities.count(); i++) {
     core.scene.selectionManager.addToSelectionSet(i);
   }
 
-  expect(core.scene.items.length).toBe(6);
+  expect(core.scene.entities.count()).toBe(6);
 
   // Perform Erase
   const erase = new Erase();
   erase.action();
 
-  expect(core.scene.items.length).toBe(0);
+  expect(core.scene.entities.count()).toBe(0);
 });

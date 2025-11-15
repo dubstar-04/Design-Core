@@ -3,6 +3,7 @@ import { Tool } from './tool.js';
 import { Utils } from '../lib/utils.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -86,16 +87,25 @@ export class Rotate extends Tool {
       // Draw a line
       const points = [this.points.at(0), mousePoint];
 
-      DesignCore.Scene.createTempItem('Line', { points: points });
+      DesignCore.Scene.tempEntities.create('Line', { points: points });
     }
 
     if (this.points.length >= 1) {
       const ang = this.points[0].angle(mousePoint);
       const theta = this.baseAngle === null ? 0 : ang - this.baseAngle - this.lastAngle;
       this.lastAngle = ang;
+      const center = this.points[0];
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        DesignCore.Scene.selectionManager.selectedItems[i].rotate(this.points[0], theta);
+        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+
+        if (item.hasOwnProperty('childEntities')) {
+          item.childEntities.forEach((child) => {
+            child.setProperty('points', this.getRotatedPoints(child.points, center, theta));
+          });
+        } else {
+          item.setProperty('points', this.getRotatedPoints(item.points, center, theta));
+        }
       }
     }
   };
@@ -106,9 +116,31 @@ export class Rotate extends Tool {
   action() {
     const ang = this.points[0].angle(this.points[1]);
     const theta = ang - this.baseAngle;
+    const center = this.points[0];
 
-    for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].rotate(this.points[0], theta);
+    for (let index = 0; index < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; index++) {
+      const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
+      if (item.hasOwnProperty('childEntities')) {
+        item.childEntities.forEach((child) => {
+          child.setProperty('points', this.getRotatedPoints(child.points, center, theta));
+        });
+        // set the angle of the main item if it has one
+        // item.setProperty('angle', item.angle+= Utils.radians2degrees(theta));
+      } else {
+        DesignCore.Scene.entities.update(index, { points: this.getRotatedPoints(item.points, center, theta) });
+      }
     }
   };
+
+  /**
+ * Get rotated points
+ * @param {Array} points
+ * @param {Point} center
+ * @param {Point} theta
+ * @return {Array} rotatedPoints
+ */
+  getRotatedPoints(points, center, theta) {
+    const rotatedPoints = points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
+    return rotatedPoints;
+  }
 }

@@ -107,15 +107,15 @@ test('Test Zoom.preview - Window mode with one point', () => {
   // Mock mouse position
   core.mouse.mouseMoved(50, 50);
 
-  const initialTempItemsCount = DesignCore.Scene.tempItems.length;
+  const initialTempItemsCount = DesignCore.Scene.tempEntities.count();
 
   zoom.preview();
 
   // Should have added a polyline (rectangle preview)
-  expect(DesignCore.Scene.tempItems.length).toBe(initialTempItemsCount + 1);
+  expect(DesignCore.Scene.tempEntities.count()).toBe(initialTempItemsCount + 1);
 
   // Verify it's a polyline
-  const tempItem = DesignCore.Scene.tempItems[DesignCore.Scene.tempItems.length - 1];
+  const tempItem = DesignCore.Scene.tempEntities.get(DesignCore.Scene.tempEntities.count() - 1);
   expect(tempItem.type).toBe('Polyline');
   expect(tempItem.points.length).toBe(5); // Rectangle has 5 points (closed)
 });
@@ -124,12 +124,12 @@ test('Test Zoom.preview - Window mode with no points (should not preview)', () =
   const zoom = new Zoom();
   zoom.mode = 'Window';
 
-  const initialTempItemsCount = DesignCore.Scene.tempItems.length;
+  const initialTempItemsCount = DesignCore.Scene.tempEntities.count();
 
   zoom.preview();
 
   // Should not add anything
-  expect(DesignCore.Scene.tempItems.length).toBe(initialTempItemsCount);
+  expect(DesignCore.Scene.tempEntities.count()).toBe(initialTempItemsCount);
 });
 
 test('Test Zoom.preview - All mode (should not preview)', () => {
@@ -137,12 +137,12 @@ test('Test Zoom.preview - All mode (should not preview)', () => {
   zoom.mode = 'All';
   zoom.points.push(new Point(10, 10));
 
-  const initialTempItemsCount = DesignCore.Scene.tempItems.length;
+  const initialTempItemsCount = DesignCore.Scene.tempEntities.count();
 
   zoom.preview();
 
   // Should not add anything for All/Extents modes
-  expect(DesignCore.Scene.tempItems.length).toBe(initialTempItemsCount);
+  expect(DesignCore.Scene.tempEntities.count()).toBe(initialTempItemsCount);
 });
 
 test('Test Canvas.zoomToWindow - valid window', () => {
