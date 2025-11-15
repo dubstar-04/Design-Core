@@ -229,15 +229,4 @@ export class Entity {
   trim(points) {
     // trim function to be overidden by implementation
   }
-
-  /**
-   * Rotate this entity
-   * @param  {Point} center - center of rotation
-   * @param {number} angle - in radians
-   */
-  rotate(center, angle) {
-    for (let i = 0; i < this.points.length; i++) {
-      this.points[i] = this.points[i].rotate(center, angle);
-    }
-  }
 }

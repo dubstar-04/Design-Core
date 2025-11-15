@@ -3,6 +3,7 @@ import { Tool } from './tool.js';
 import { Utils } from '../lib/utils.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -95,7 +96,10 @@ export class Rotate extends Tool {
       this.lastAngle = ang;
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        DesignCore.Scene.selectionManager.selectedItems[i].rotate(this.points[0], theta);
+        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+        const center = this.points[0];
+        const points = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
+        item.points = points;
       }
     }
   };
@@ -107,8 +111,11 @@ export class Rotate extends Tool {
     const ang = this.points[0].angle(this.points[1]);
     const theta = ang - this.baseAngle;
 
-    for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).rotate(this.points[0], theta);
+    for (let index = 0; index < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; index++) {
+      const item = DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
+      const center = this.points[0];
+      const points = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
+      DesignCore.Scene.updateItem(index, { points: points });
     }
   };
 }
