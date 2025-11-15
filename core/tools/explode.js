@@ -88,7 +88,8 @@ export class Explode extends Tool {
 
       blockItems.forEach((blockItem) => {
         const copyofitem = Utils.cloneObject(blockItem);
-        copyofitem.points = copyofitem.points.map((p) => new Point(p.x, p.y).add(insertPoint));
+        const points = copyofitem.points.map((p) => new Point(p.x, p.y).add(insertPoint));
+        copyofitem.setProperty('points', points);
         DesignCore.Scene.addItem(copyofitem.type, copyofitem);
       });
 
