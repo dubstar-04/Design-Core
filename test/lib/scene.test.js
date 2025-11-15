@@ -6,6 +6,46 @@ import { Point } from '../../core/entities/point';
 const core = new Core();
 const scene = core.scene;
 
+test('Test Scene.sceneEntitityCount', () => {
+  const baseCount = scene.sceneEntitityCount();
+
+  const idx1 = scene.addItem('Line', { points: [new Point(0, 0), new Point(1, 1)] });
+  const idx2 = scene.addItem('Circle', { points: [new Point(5, 5)], radius: 2 });
+
+  expect(scene.sceneEntitityCount()).toBe(baseCount + 2);
+
+  // Remove in descending index order to avoid reindexing issues
+  [idx1, idx2].sort((a, b) => b - a).forEach((i) => {
+    expect(scene.removeItem(i)).toBe(true);
+  });
+
+  expect(scene.sceneEntitityCount()).toBe(baseCount);
+});
+
+test('Test Scene.sceneTempItemCount', () => {
+  const baseCount = scene.sceneTempItemCount();
+
+  scene.addToTempItems('Line', { points: [new Point(0, 0), new Point(1, 1)] });
+  expect(scene.sceneTempItemCount()).toBe(1 + baseCount);
+  scene.addToTempItems('Circle', { points: [new Point(5, 5)], radius: 2 });
+  expect(scene.sceneTempItemCount()).toBe(2 + baseCount);
+
+  scene.clearTempItems();
+  expect(scene.sceneTempItemCount()).toBe(0);
+});
+
+test('Test Scene.sceneAuxItemCount', () => {
+  const baseCount = scene.sceneTempItemCount();
+
+  scene.addToAuxiliaryItems('Line', { points: [new Point(0, 0), new Point(1, 1)] });
+  expect(scene.sceneAuxItemCount()).toBe(1 + baseCount);
+  scene.addToAuxiliaryItems('Circle', { points: [new Point(5, 5)], radius: 2 });
+  expect(scene.sceneAuxItemCount()).toBe(2 + baseCount);
+
+  scene.clearAuxiliaryItems();
+  expect(scene.sceneAuxItemCount()).toBe(0);
+});
+
 
 test('Test Scene.boundingBox', () => {
   // empty scene

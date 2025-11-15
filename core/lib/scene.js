@@ -229,7 +229,6 @@ export class Scene {
     return this.#items[index];
   }
 
-
   /**
    * Get Temp Item
    * @param {number} index - items index
