@@ -35,17 +35,17 @@ export class PropertyManager {
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
       // check if the item has the selected property
-      if (!DesignCore.Scene.getItem(index).hasOwnProperty(property)) {
+      if (!DesignCore.Scene.entities.get(index).hasOwnProperty(property)) {
         continue;
       }
 
-      if (typeof (DesignCore.Scene.getItem(index)[property]) !== typeof (newPropertyValue)) {
+      if (typeof (DesignCore.Scene.entities.get(index)[property]) !== typeof (newPropertyValue)) {
         DesignCore.Core.notify(Strings.Error.INPUT);
       } else {
         // update the item property
         const update = {};
         update[property] = newPropertyValue;
-        DesignCore.Scene.updateItem(index, update);
+        DesignCore.Scene.entities.update(index, update);
         DesignCore.Scene.selectionManager.reloadSelectedItems();
       }
     }
@@ -61,7 +61,7 @@ export class PropertyManager {
 
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        const itemType = DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).type;
+        const itemType = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).type;
 
         if (itemTypes.indexOf(itemType, 0) === -1) {
           itemTypes.push(itemType);
@@ -94,7 +94,7 @@ export class PropertyManager {
 
     // create subset array of selectionSet
     DesignCore.Scene.selectionManager.selectionSet.selectionSet.forEach((index) => {
-      subset.push(DesignCore.Scene.getItem(index));
+      subset.push(DesignCore.Scene.entities.get(index));
     });
 
     // get a subset of the selectionSet
@@ -132,8 +132,8 @@ export class PropertyManager {
     const propertiesValueList = [];
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        if (DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).type === itemType || itemType === 'All') {
-          const prop = DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i])[property];
+        if (DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).type === itemType || itemType === 'All') {
+          const prop = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i])[property];
           propertiesValueList.push(prop);
         }
       }

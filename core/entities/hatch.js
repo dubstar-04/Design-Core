@@ -322,7 +322,7 @@ export class Hatch extends Entity {
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
     const shapes = this.processSelection(selectedItems);
     if (shapes.length) {
-      DesignCore.Scene.createTempItem(this.type, { points: this.points, childEntities: shapes });
+      DesignCore.Scene.tempEntities.create(this.type, { points: this.points, childEntities: shapes });
     }
   }
 

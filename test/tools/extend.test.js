@@ -37,16 +37,16 @@ test('Test Extend.action', () => {
   extend.action();
 
   // line one
-  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.getItem(0).points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.getItem(0).points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.entities.get(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.entities.get(0).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.entities.get(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.entities.get(0).points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(core.scene.getItem(1).points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.getItem(1).points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.getItem(1).points[1].x).toBe(100);
-  expect(core.scene.getItem(1).points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.entities.get(1).points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.entities.get(1).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.entities.get(1).points[1].x).toBe(100);
+  expect(core.scene.entities.get(1).points[1].y).toBe(lineTwoEnd.y);
 
   /**
    * Extend test two
@@ -69,16 +69,16 @@ test('Test Extend.action', () => {
   extend.action();
 
   // line one
-  expect(core.scene.getItem(0).points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.getItem(0).points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.getItem(0).points[1].x).toBe(lineTwoEnd.x);
-  expect(core.scene.getItem(0).points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.entities.get(0).points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.entities.get(0).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.entities.get(0).points[1].x).toBe(lineTwoEnd.x);
+  expect(core.scene.entities.get(0).points[1].y).toBe(lineTwoEnd.y);
 
   // line two
-  expect(core.scene.getItem(1).points[0].x).toBe(lineThreeStart.x);
-  expect(core.scene.getItem(1).points[0].y).toBe(lineThreeStart.y);
-  expect(core.scene.getItem(1).points[1].x).toBe(lineThreeEnd.x);
-  expect(core.scene.getItem(1).points[1].y).toBe(50);
+  expect(core.scene.entities.get(1).points[0].x).toBe(lineThreeStart.x);
+  expect(core.scene.entities.get(1).points[0].y).toBe(lineThreeStart.y);
+  expect(core.scene.entities.get(1).points[1].x).toBe(lineThreeEnd.x);
+  expect(core.scene.entities.get(1).points[1].y).toBe(50);
 
   /**
    * Extend test three
@@ -100,14 +100,14 @@ test('Test Extend.action', () => {
   extend.action();
 
   // line one
-  expect(core.scene.getItem(0).points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.getItem(0).points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.getItem(0).points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.getItem(0).points[1].y).toBe(lineOneEnd.y);
+  expect(core.scene.entities.get(0).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.entities.get(0).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.entities.get(0).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.entities.get(0).points[1].y).toBe(lineOneEnd.y);
 
   // line two
-  expect(core.scene.getItem(1).points[0].x).toBe(crossingLineStart.x);
-  expect(core.scene.getItem(1).points[0].y).toBe(crossingLineStart.y);
-  expect(core.scene.getItem(1).points[1].x).toBe(100);
-  expect(core.scene.getItem(1).points[1].y).toBe(100);
+  expect(core.scene.entities.get(1).points[0].x).toBe(crossingLineStart.x);
+  expect(core.scene.entities.get(1).points[0].y).toBe(crossingLineStart.y);
+  expect(core.scene.entities.get(1).points[1].x).toBe(100);
+  expect(core.scene.entities.get(1).points[1].y).toBe(100);
 });

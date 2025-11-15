@@ -83,6 +83,11 @@ export class Entity {
         this.lineType = data.lineType || data[6];
       }
 
+      if (data.hasOwnProperty('lineWidth') || data.hasOwnProperty('39')) {
+        // DXF Groupcode 39 - Thickness (lineWidth)
+        this.lineWidth = Property.loadValue([data.lineWidth, data[39]], 2);
+      }
+
       if (data.hasOwnProperty('layer') || data.hasOwnProperty('8')) {
         // DXF Groupcode 8 - layername
         this.layer = Property.loadValue([data.layer, data[8]], 0);

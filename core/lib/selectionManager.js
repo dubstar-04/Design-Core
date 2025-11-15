@@ -78,7 +78,7 @@ export class SelectionManager {
       points: selectionPoints,
     };
 
-    DesignCore.Scene.addToAuxiliaryItems(new SelectionWindow(data));
+    DesignCore.Scene.auxiliaryEntities.add(new SelectionWindow(data));
   }
 
   /**
@@ -90,15 +90,15 @@ export class SelectionManager {
 
     if (selectionRect !== undefined) {
       // Loop through all the entities and see if it should be selected
-      for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
+      for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
         // check if the item is within the selection rect
-        if (DesignCore.Scene.getItem(i).within(selectionRect)) {
+        if (DesignCore.Scene.entities.get(i).within(selectionRect)) {
           this.addToSelectionSet(i);
         }
 
         if (crossingSelect) {
           // check if the item is touched / crossed by the selection rect
-          if (DesignCore.Scene.getItem(i).touched(selectionRect)) {
+          if (DesignCore.Scene.entities.get(i).touched(selectionRect)) {
             this.addToSelectionSet(i);
           }
         }
@@ -150,7 +150,7 @@ export class SelectionManager {
    * @return {number} - return index of closest item or undefined
    */
   findClosestItem(point) {
-    return DesignCore.Scene.findClosestItem(point);
+    return DesignCore.Scene.entities.findClosest(point);
   }
 
   /**
@@ -185,7 +185,7 @@ export class SelectionManager {
    * @param  {number} index
    */
   addToSelectedItems(index) {
-    const copyofitem = Utils.cloneObject(DesignCore.Scene.getItem(index));
+    const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(index));
     this.selectedItems.push(copyofitem);
   }
 
@@ -211,8 +211,8 @@ export class SelectionManager {
     this.reset();
 
     // Add all selectable items to the selection
-    for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
-      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.getItem(i).layer);
+    for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
+      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).layer);
 
       // Only select items on selectable layers
       if (layer.isSelectable) {

@@ -47,13 +47,13 @@ test('Test propertyManager.setItemProperties', () => {
   const string = 'test text';
   propertiesManager.setItemProperties('string', string);
 
-  let text = DesignCore.Scene.getItem(2);
+  let text = DesignCore.Scene.entities.get(2);
   expect(text.type).toBe('Text');
   expect(text.string).toBe(string);
 
   // try and set a non-existent property
   propertiesManager.setItemProperties('faux-prop', string);
-  text = DesignCore.Scene.getItem(2);
+  text = DesignCore.Scene.entities.get(2);
   expect(text['faux-prop']).toBeUndefined();
 
   // clear the selection set
@@ -61,10 +61,10 @@ test('Test propertyManager.setItemProperties', () => {
   // Select the circle element
   DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(1);
   // get the current radius
-  const radius = DesignCore.Scene.getItem(1).radius;
+  const radius = DesignCore.Scene.entities.get(1).radius;
   // try and set an incorrect value
   propertiesManager.setItemProperties('radius', string);
-  const circle = DesignCore.Scene.getItem(1);
+  const circle = DesignCore.Scene.entities.get(1);
   expect(circle.radius).toBe(radius);
 });
 

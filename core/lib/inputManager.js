@@ -331,8 +331,8 @@ export class InputManager {
    * Handle mouse position changes
    */
   mouseMoved() {
-    DesignCore.Scene.clearTempItems();
-    DesignCore.Scene.clearAuxiliaryItems();
+    DesignCore.Scene.tempEntities.clear();
+    DesignCore.Scene.auxiliaryEntities.clear();;
 
     if (DesignCore.Mouse.buttonOneDown) {
       const windowSelect = !this.promptOption || this.promptOption.types.includes(Input.Type.SELECTIONSET);
@@ -354,8 +354,8 @@ export class InputManager {
       if (this.activeCommand === undefined || this.activeCommand !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION) || this.promptOption.types.includes(Input.Type.SELECTIONSET))) {
         const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
         if (index !== undefined) {
-          const copyofitem = Utils.cloneObject(DesignCore.Scene.getItem(index));
-          DesignCore.Scene.addToTempItems(copyofitem);
+          const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(index));
+          DesignCore.Scene.tempEntities.add(copyofitem);
           selecting = true;
         }
       }
@@ -419,7 +419,7 @@ export class InputManager {
     switch (button) {
       case 0: // left button
         // Clear tempItems - This is here to remove the crossing window
-        DesignCore.Scene.clearAuxiliaryItems();
+        DesignCore.Scene.auxiliaryEntities.clear();;
 
 
         if (this.promptOption !== undefined) {

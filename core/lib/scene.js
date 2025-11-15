@@ -5,6 +5,7 @@ import { InputManager } from './inputManager.js';
 import { DXFFile } from './dxf/dxfFile.js';
 import { BoundingBox } from './boundingBox.js';
 import { Point } from '../entities/point.js';
+import { EntityManager } from './entityManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { BlockManager } from '../tables/blockManager.js';
@@ -15,9 +16,9 @@ import { BlockManager } from '../tables/blockManager.js';
  */
 export class Scene {
   /** Create a scene */
-  #items = []; // Main array that stores all the geometry
-  #tempItems = []; // Temporary Array to store items while input is being gathered
-  #auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
+  // #items = []; // Main array that stores all the geometry
+  // #tempItems = []; // Temporary Array to store items while input is being gathered
+  // #auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
   /** Create a Scene */
   constructor() {
@@ -28,55 +29,26 @@ export class Scene {
     this.inputManager = new InputManager();
     this.blockManager = new BlockManager();
 
+    this.entities = new EntityManager();
+    this.tempEntities = new EntityManager();
+    this.auxiliaryEntities = new EntityManager();
+
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
   }
 
-  /**
-   * Get the number of items in the scene
-   * @return {number}
-   */
-  sceneEntitityCount() {
-    return this.#items.length;
-  }
-
-  /**
-   * Get the number of temp items in the scene
-   * @return {number}
-   */
-  sceneTempItemCount() {
-    return this.#tempItems.length;
-  }
-
-  /**
-   * Get the number of auxiliary items in the scene
-   * @return {number}
-   */
-  sceneAuxItemCount() {
-    return this.#auxiliaryItems.length;
-  }
 
   /** Clear the scene of all items */
   clear() {
-    this.#items = [];
-    this.#tempItems = [];
-    this.#auxiliaryItems = [];
-  }
-
-  /** Clear the scene temp items */
-  clearTempItems() {
-    this.#tempItems = [];
-  }
-
-  /** Clear the scene aux items */
-  clearAuxiliaryItems() {
-    this.#auxiliaryItems = [];
+    this.entities.clear();
+    this.tempEntities.clear();
+    this.auxiliaryEntities.clear();
   }
 
   /** Reset the scene */
   reset() {
-    this.#tempItems = [];
-    this.#auxiliaryItems = [];
+    this.tempEntities.clear();
+    this.auxiliaryEntities.clear();
     this.selectionManager.reset();
     DesignCore.Canvas.requestPaint();
   }
@@ -91,12 +63,12 @@ export class Scene {
     let ymin = Infinity;
     let ymax = -Infinity;
 
-    if (this.#items.length === 0) {
+    if (this.entities.count() === 0) {
       return;
     }
 
-    for (let i = 0; i < this.#items.length; i++) {
-      const itemBoundingBox = this.#items[i].boundingBox();
+    for (let i = 0; i < this.entities.count(); i++) {
+      const itemBoundingBox = this.entities.get(i).boundingBox();
 
       xmin = Math.min(xmin, itemBoundingBox.xMin);
       xmax = Math.max(xmax, itemBoundingBox.xMax);
@@ -143,151 +115,15 @@ export class Scene {
 
     if (typeof index === 'undefined') {
       // add to end of array
-      this.#items.push(item); // add item to the scene
-      index = this.#items.length - 1;
+      this.entities.add(item); // add item to the scene
+      index = this.entities.count() - 1;
     } else {
       // replace item at index
-      this.#items.splice(index, 1, item);
+      this.entities.replace(index, item);
     }
 
     // return the index of the added item
     return index;
-  }
-
-  /**
-   * Update and item
-   * @param {number} index
-   * @param {Object} data
-   */
-  updateItem(index, data) {
-    const item = this.getItem(index);
-
-    if (!item) {
-      throw Error('Item not found in scene');
-    }
-
-    for (const property in data) {
-      if (item.hasOwnProperty(property)) {
-        item.setProperty(property, data[property]);
-      }
-    }
-  }
-
-  /**
-   * Find items in scene
-   * @param {string} type - entity type or "ANY"
-   * @param {string} prop - object of entity parameters
-   * @param {any} value - value of the property
-   * @return {number} - index of items
-   */
-  findItem(type, prop, value) {
-    const filteredItems = [];
-
-    this.#items.forEach((item, index) => {
-      if ((type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) && item.hasOwnProperty(prop) && item[prop] === value) {
-        filteredItems.push(index);
-      }
-    });
-
-    return filteredItems;
-  }
-
-  /**
-   * Find closest item to point
-   * @param  {Point} point
-   * @return {number} - return index of closest item or undefined
-   */
-  findClosestItem(point) {
-    let delta = 1.65 / DesignCore.Core.canvas.getScale(); // find a more suitable starting value
-    let closestItemIndex;
-
-    for (let i = 0; i < this.#items.length; i++) {
-      // check the items layer is selectable - i.e. on, thawed, etc...
-      const layer = DesignCore.LayerManager.getItemByName(this.#items[i].layer);
-
-      if (!layer.isSelectable) {
-        continue;
-      }
-
-      const distance = this.#items[i].closestPoint(point)[1]; // ClosestPoint()[1] returns a distance to the closest point
-
-      if (distance < delta) {
-        delta = distance;
-        closestItemIndex = i;
-      }
-    }
-
-    return closestItemIndex;
-  }
-
-  /**
-   * Get Item
-   * @param {number} index - items index
-   * @return {Object} - item
-   */
-  getItem(index) {
-    return this.#items[index];
-  }
-
-  /**
-   * Get Temp Item
-   * @param {number} index - items index
-   * @return {Object} - item
-   */
-  getTempItem(index) {
-    return this.#tempItems[index];
-  }
-
-  /**
-   * Get Aux Item
-   * @param {number} index - items index
-   * @return {Object} - item
-   */
-  getAuxiliaryItem(index) {
-    return this.#auxiliaryItems[index];
-  }
-
-  /**
-   * Remove Item
-   * @param {number} index - items index
-   * @return {boolean} - success status
-   */
-  removeItem(index) {
-    const count = this.#items.length;
-    this.#items.splice(index, 1);
-
-    if (this.#items.length < count) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Add items to the scenes tempItems
-   * @param {Object} item
-   */
-  addToTempItems(item) {
-    this.#tempItems.push(item); // Add it to the tempItems Array
-  }
-
-  /**
-   * Add items to the scenes auxiliary items
-   * @param {Object} item
-   */
-  addToAuxiliaryItems(item) {
-    this.#auxiliaryItems.push(item); // Add it to the auxiliary Array
-  }
-
-  /**
-   * Create a new temp item and add to scenes tempItems
-   * @param {string} type - entity type
-   * @param {Object} data - object of entity parameters
-   */
-  createTempItem(type, data) {
-    data.layer = DesignCore.LayerManager.getCstyle();
-    const helper = DesignCore.CommandManager.createNew(type, data);
-    this.addToTempItems(helper);
   }
 
   /**

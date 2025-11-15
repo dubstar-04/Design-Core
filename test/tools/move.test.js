@@ -14,7 +14,7 @@ test('Test Move.action', () => {
   core.scene.addItem('Text', { points: [new Point(), new Point(0, 10)], height: 10, rotation: 0, string: 'text test' });
 
   // Add items to selection set
-  for (let i = 0; i < core.scene.sceneEntitityCount(); i++) {
+  for (let i = 0; i < core.scene.entities.count(); i++) {
     core.scene.selectionManager.addToSelectionSet(i);
   }
 
@@ -33,9 +33,9 @@ test('Test Move.action', () => {
   // Perform move
   move.action();
 
-  for (let i = 0; i < core.scene.sceneEntitityCount(); i++) {
-    expect(core.scene.getItem(i).points[0].x).toBe(10);
-    expect(core.scene.getItem(i).points[0].y).toBe(0);
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    expect(core.scene.entities.get(i).points[0].x).toBe(10);
+    expect(core.scene.entities.get(i).points[0].y).toBe(0);
   }
 
 
@@ -54,9 +54,9 @@ test('Test Move.action', () => {
   // Perform move
   move.action();
 
-  for (let i = 0; i < core.scene.sceneEntitityCount(); i++) {
-    expect(core.scene.getItem(i).points[0].x).toBe(10);
-    expect(core.scene.getItem(i).points[0].y).toBe(10);
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    expect(core.scene.entities.get(i).points[0].x).toBe(10);
+    expect(core.scene.entities.get(i).points[0].y).toBe(10);
   }
 
   /**
@@ -74,8 +74,8 @@ test('Test Move.action', () => {
   // Perform move
   move.action();
 
-  for (let i = 0; i < core.scene.sceneEntitityCount(); i++) {
-    expect(core.scene.getItem(i).points[0].x).toBe(0);
-    expect(core.scene.getItem(i).points[0].y).toBe(0);
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    expect(core.scene.entities.get(i).points[0].x).toBe(0);
+    expect(core.scene.entities.get(i).points[0].y).toBe(0);
   }
 });

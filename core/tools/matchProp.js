@@ -66,7 +66,7 @@ export class MatchProp extends Tool {
     }
 
     // get source item
-    const sourceItem = DesignCore.Scene.getItem(this.sourceIndex);
+    const sourceItem = DesignCore.Scene.entities.get(this.sourceIndex);
 
     // loop through destination set
     for (let i = 0; i < this.destinationSetIndices.length; i++) {
@@ -78,7 +78,7 @@ export class MatchProp extends Tool {
           const update = {};
           update[prop] = sourceItem[prop];
           // try and update the item
-          DesignCore.Scene.updateItem(this.destinationSetIndices[i], update);
+          DesignCore.Scene.entities.update(this.destinationSetIndices[i], update);
         }
       }
     }

@@ -64,7 +64,7 @@ export class Move extends Tool {
 
       // Draw a line
       const points = [this.points.at(-1), mousePoint];
-      DesignCore.Scene.createTempItem('Line', { points: points });
+      DesignCore.Scene.tempEntities.create('Line', { points: points });
 
       // Get the delta from the last mouse point
       const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);
@@ -94,14 +94,14 @@ export class Move extends Tool {
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
-      const item = DesignCore.Scene.getItem(index);
+      const item = DesignCore.Scene.entities.get(index);
 
       if (item.hasOwnProperty('childEntities')) {
         item.childEntities.forEach((child) => {
           child.setProperty('points', this.getOffsetPoints(child.points, delta));
         });
       } else {
-        DesignCore.Scene.updateItem(index, { points: this.getOffsetPoints(item.points, delta) });
+        DesignCore.Scene.entities.update(index, { points: this.getOffsetPoints(item.points, delta) });
       }
     }
   }

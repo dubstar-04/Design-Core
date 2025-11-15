@@ -64,15 +64,15 @@ export class Copy extends Tool {
       // Draw a line
       const points = [this.points.at(-1), mousePoint];
 
-      DesignCore.Scene.createTempItem('Line', { points: points });
+      DesignCore.Scene.tempEntities.create('Line', { points: points });
 
       const xDelta = mousePoint.x - this.points[0].x;
       const yDelta = mousePoint.y - this.points[0].y;
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         for (let j = 0; j < DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
-          DesignCore.Scene.selectionManager.selectedItems[i].points[j].x = DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].x + xDelta;
-          DesignCore.Scene.selectionManager.selectedItems[i].points[j].y = DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].y + yDelta;
+          DesignCore.Scene.selectionManager.selectedItems[i].points[j].x = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].x + xDelta;
+          DesignCore.Scene.selectionManager.selectedItems[i].points[j].y = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].y + yDelta;
         }
       }
     }
@@ -86,11 +86,11 @@ export class Copy extends Tool {
     const yDelta = this.points[1].y - this.points[0].y;
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      const copyofitem = Utils.cloneObject(DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]));
+      const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]));
 
       for (let j = 0; j < copyofitem.points.length; j++) {
-        copyofitem.points[j].x = DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].x + xDelta;
-        copyofitem.points[j].y = DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].y + yDelta;
+        copyofitem.points[j].x = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].x + xDelta;
+        copyofitem.points[j].y = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].y + yDelta;
       }
 
       DesignCore.Scene.addItem(copyofitem.type, copyofitem);

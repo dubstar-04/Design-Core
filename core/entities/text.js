@@ -219,11 +219,11 @@ export class Text extends Entity {
           string: DesignCore.CommandLine.command,
         };
 
-        DesignCore.Scene.createTempItem(this.type, data);
+        DesignCore.Scene.tempEntities.create(this.type, data);
       } else {
         const mousePoint = DesignCore.Mouse.pointOnScene();
         const points = [this.points.at(-1), mousePoint];
-        DesignCore.Scene.createTempItem('Line', { points: points });
+        DesignCore.Scene.tempEntities.create('Line', { points: points });
       }
     }
   }

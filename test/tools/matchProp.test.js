@@ -19,9 +19,9 @@ test('Test MatchProp.execute requests source and targets and completes', async (
   const match = new MatchProp();
 
   // Use existing items added at top of file
-  const src = core.scene.getItem(0);
-  const tgt1 = core.scene.getItem(1);
-  const tgt2 = core.scene.getItem(2);
+  const src = core.scene.entities.get(0);
+  const tgt1 = core.scene.entities.get(1);
+  const tgt2 = core.scene.entities.get(2);
 
   const im = core.scene.inputManager;
 
@@ -68,17 +68,17 @@ test('Test MatchProp.action matches properties from source to targets', () => {
 
   // Validate that layer property was matched to targets
   for (let i = 0; i < match.destinationSetIndices.length; i++) {
-    const tgt = core.scene.getItem(match.destinationSetIndices[i]);
+    const tgt = core.scene.entities.get(match.destinationSetIndices[i]);
     expect(tgt.layer).toBe('test');
   }
 
-  const circle = core.scene.getItem(1);
+  const circle = core.scene.entities.get(1);
   expect(circle.radius).toBe(10); // original radius
 
-  const arc = core.scene.getItem(3);
+  const arc = core.scene.entities.get(3);
   expect(arc.radius).toBe(10); // original radius
 
-  const text = core.scene.getItem(5);
+  const text = core.scene.entities.get(5);
   expect(text.height).toBe(10); // original height
   expect(text.string).toBe('text test'); // original string
 });

@@ -67,7 +67,7 @@ export class Explode extends Tool {
     selections.sort((a, b) => b - a);
 
     for (let i = 0; i < selections.length; i++) {
-      const insert = DesignCore.Scene.getItem(selections[i]);
+      const insert = DesignCore.Scene.entities.get(selections[i]);
 
       // check the selected item in an insert
       if (!(insert instanceof Insert)) {
@@ -94,7 +94,7 @@ export class Explode extends Tool {
       });
 
       // remove the insert from the scene
-      DesignCore.Scene.removeItem(selections[i]);
+      DesignCore.Scene.entities.remove(selections[i]);
     }
 
     if (counter) {

@@ -126,8 +126,8 @@ export class TableManagerBase {
       this.addStandardItems();
     }
 
-    for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
-      const item = (DesignCore.Scene.getItem(i)[this.itemProperty]);
+    for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
+      const item = (DesignCore.Scene.entities.get(i)[this.itemProperty]);
       this.addItem({
         'name': item,
       });
@@ -230,9 +230,9 @@ export class TableManagerBase {
    * @param {string} newItemName
    */
   updateSceneItem(oldItemName, newItemName) {
-    for (let i = 0; i < DesignCore.Scene.sceneEntitityCount(); i++) {
-      if (DesignCore.Scene.getItem(i)[this.itemProperty] === oldItemName) {
-        DesignCore.Scene.getItem(i)[this.itemProperty] = newItemName;
+    for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
+      if (DesignCore.Scene.entities.get(i)[this.itemProperty] === oldItemName) {
+        DesignCore.Scene.entities.get(i)[this.itemProperty] = newItemName;
       }
     }
   }
@@ -269,7 +269,7 @@ export class TableManagerBase {
     const itemsToPurge = [];
     this.items.forEach((item, index) => {
       const searchTerm = this.itemProperty === 'block' ? item : item.name;
-      const items = DesignCore.Scene.findItem('ANY', this.itemProperty, searchTerm);
+      const items = DesignCore.Scene.entities.find('ANY', this.itemProperty, searchTerm);
       if (items.length === 0) {
         itemsToPurge.push(index);
       }

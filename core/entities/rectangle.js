@@ -64,7 +64,7 @@ export class Rectangle extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = this.rectPoints(this.points.at(-1), mousePoint);
-      DesignCore.Scene.createTempItem('Polyline', { points: points });
+      DesignCore.Scene.tempEntities.create('Polyline', { points: points });
     }
   }
 
