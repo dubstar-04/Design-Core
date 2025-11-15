@@ -44,7 +44,7 @@ export class EntityManager {
   /**
    * Get entity at index
    * @param {number} index
-   * @returns
+   * @return {object} entity
    */
   get(index) {
     return this.#entities[index];
@@ -129,7 +129,7 @@ export class EntityManager {
 
   /**
    * Get count of entities
-   * @returns {number}
+   * @return {number}
    */
   count() {
     return this.#entities.length;
