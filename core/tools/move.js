@@ -72,7 +72,7 @@ export class Move extends Tool {
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
         const item = DesignCore.Scene.selectionManager.selectedItems[i];
-        const points = item.points.map((p) => new Point(p.x + delta.x, p.y + delta.y));
+        const points = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
         item.points = points;
       }
     }
@@ -90,7 +90,7 @@ export class Move extends Tool {
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
       const item = DesignCore.Scene.getItem(index);
-      const points = item.points.map((p) => new Point(p.x, p.y).add(delta));
+      const points = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
       DesignCore.Scene.updateItem(index, { points: points });
     }
   }
