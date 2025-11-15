@@ -229,4 +229,15 @@ export class Entity {
   trim(points) {
     // trim function to be overidden by implementation
   }
+
+  /**
+   * Set a property if it exists
+   * @param {string} property
+   * @param {any} value
+   */
+  setProperty(property, value) {
+    if (this.hasOwnProperty(property)) {
+      this[property] = value;
+    }
+  }
 }
