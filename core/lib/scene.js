@@ -163,7 +163,7 @@ export class Scene {
 
     for (const property in data) {
       if (item.hasOwnProperty(property)) {
-        item[property] = data[property];
+        item.setProperty(property, data[property]);
       }
     }
   }
