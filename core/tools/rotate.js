@@ -135,7 +135,8 @@ export class Rotate extends Tool {
   /**
  * Get rotated points
  * @param {Array} points
- * @param {Point} delta
+ * @param {Point} center
+ * @param {Point} theta
  * @return {Array} rotatedPoints
  */
   getRotatedPoints(points, center, theta) {

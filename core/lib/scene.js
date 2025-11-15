@@ -154,6 +154,11 @@ export class Scene {
     return index;
   }
 
+  /**
+   * Update and item
+   * @param {number} index
+   * @param {Object} data
+   */
   updateItem(index, data) {
     const item = this.getItem(index);
 
