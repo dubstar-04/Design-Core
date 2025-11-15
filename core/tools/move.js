@@ -72,8 +72,13 @@ export class Move extends Tool {
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
         const item = DesignCore.Scene.selectionManager.selectedItems[i];
-        const points = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-        item.points = points;
+        if (item.hasOwnProperty('childEntities')) {
+          item.childEntities.forEach((child) => {
+            child.setProperty('points', this.getOffsetPoints(child.points, delta));
+          });
+        } else {
+          item.setProperty('points', this.getOffsetPoints(item.points, delta));
+        }
       }
     }
   }
@@ -90,8 +95,25 @@ export class Move extends Tool {
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
       const item = DesignCore.Scene.getItem(index);
-      const points = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-      DesignCore.Scene.updateItem(index, { points: points });
+
+      if (item.hasOwnProperty('childEntities')) {
+        item.childEntities.forEach((child) => {
+          child.setProperty('points', this.getOffsetPoints(child.points, delta));
+        });
+      } else {
+        DesignCore.Scene.updateItem(index, { points: this.getOffsetPoints(item.points, delta) });
+      }
     }
+  }
+
+  /**
+ * Get offset points
+ * @param {Array} points
+ * @param {Point} delta
+ * @return {Array} offsetPoints
+ */
+  getOffsetPoints(points, delta) {
+    const offsetPoints = points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+    return offsetPoints;
   }
 }

@@ -20,7 +20,7 @@ const points = [new Point(100, 100, 1), new Point(200, 100, 1)];
 const boundaryShape = new BasePolyline({ points: points });
 
 const hatch = new Hatch();
-hatch.boundaryShapes = [boundaryShape];
+hatch.childEntities = [boundaryShape];
 
 const hatchInputScenarios = [
   {

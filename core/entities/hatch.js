@@ -33,7 +33,7 @@ export class Hatch extends Entity {
     super(data);
 
     // store the boundary shapes
-    Object.defineProperty(this, 'boundaryShapes', {
+    Object.defineProperty(this, 'childEntities', {
       value: [],
       writable: true,
     });
@@ -104,14 +104,14 @@ export class Hatch extends Entity {
         this.solid = Boolean(Property.loadValue([data.solid, data[70]], 0));
       }
 
-      if (data.hasOwnProperty('boundaryShapes')) {
-        if (Array.isArray(data.boundaryShapes)) {
-          this.boundaryShapes = data.boundaryShapes;
+      if (data.hasOwnProperty('childEntities')) {
+        if (Array.isArray(data.childEntities)) {
+          this.childEntities = data.childEntities;
         }
       } else {
         const shapes = this.processBoundaryData(data);
         if (shapes.length) {
-          this.boundaryShapes = shapes;
+          this.childEntities = shapes;
         }
       }
     }
@@ -144,7 +144,7 @@ export class Hatch extends Entity {
       return [];
     }
 
-    const boundaryShapes = [];
+    const childEntities = [];
 
     // copy this.points and remove first point
     // First and last points define the hatch, not the hatch boundary
@@ -257,12 +257,12 @@ export class Hatch extends Entity {
             }
           }
 
-          boundaryShapes.push(shape);
+          childEntities.push(shape);
         }
       }
     }
 
-    return boundaryShapes;
+    return childEntities;
   }
 
 
@@ -307,7 +307,7 @@ export class Hatch extends Entity {
         await DesignCore.Scene.inputManager.requestInput(op);
       }
       const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
-      this.boundaryShapes = this.processSelection(selectedItems);
+      this.childEntities = this.processSelection(selectedItems);
       // TODO: Check if there are boundary shapes
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -322,7 +322,7 @@ export class Hatch extends Entity {
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
     const shapes = this.processSelection(selectedItems);
     if (shapes.length) {
-      DesignCore.Scene.createTempItem(this.type, { points: this.points, boundaryShapes: shapes });
+      DesignCore.Scene.createTempItem(this.type, { points: this.points, childEntities: shapes });
     }
   }
 
@@ -332,7 +332,7 @@ export class Hatch extends Entity {
    * @return {Array} - Array of boundary items
    */
   processSelection(selectedItems) {
-    const selectedBoundaryShapes = [];
+    const selectedchildEntities = [];
 
     let iterationPoints = [];
 
@@ -381,7 +381,7 @@ export class Hatch extends Entity {
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1))) {
             const shape = new Polyline();
             shape.points.push(...iterationPoints);
-            selectedBoundaryShapes.push(shape);
+            selectedchildEntities.push(shape);
             iterationPoints = [];
             break;
           }
@@ -389,7 +389,7 @@ export class Hatch extends Entity {
       }
     }
 
-    return selectedBoundaryShapes;
+    return selectedchildEntities;
   }
 
   /**
@@ -402,11 +402,9 @@ export class Hatch extends Entity {
     if (this.scale < 0.01) {
       this.scale = 1;
     }
-    ctx.save();
-    ctx.translate(this.points[0].x, this.points[0].y);
 
-    for (let i = 0; i < this.boundaryShapes.length; i++) {
-      const shape = this.boundaryShapes[i];
+    for (let i = 0; i < this.childEntities.length; i++) {
+      const shape = this.childEntities[i];
       ctx.save();
       shape.draw(ctx, scale, false);
       // ctx.stroke();
@@ -433,7 +431,6 @@ export class Hatch extends Entity {
       this.createPattern(ctx, scale, shape);
       ctx.restore();
     }
-    ctx.restore();
   }
 
   /**
@@ -542,10 +539,10 @@ export class Hatch extends Entity {
     file.writeGroupCode('71', '0'); // Associativity flag (associative = 1; non-associative = 0); for MPolygon, solid-fill flag (has solidfill = 1; lacks solid fill = 0)
 
 
-    file.writeGroupCode('91', this.boundaryShapes.length); // Number of boundary path loops
+    file.writeGroupCode('91', this.childEntities.length); // Number of boundary path loops
 
-    for (let i = 0; i < this.boundaryShapes.length; i++) {
-      const shape = this.boundaryShapes[i];
+    for (let i = 0; i < this.childEntities.length; i++) {
+      const shape = this.childEntities[i];
       file.writeGroupCode('92', '7'); // Boundary path type flag (bit coded): 0 = Default; 1 = External; 2 = Polyline 4 = Derived; 8 = Textbox; 16 = Outermost
       file.writeGroupCode('72', '1'); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
       file.writeGroupCode('73', '1'); // For MPolygon, boundary annotation flag (boundary is an annotated boundary = 1; boundary is not an annotated boundary = 0)
@@ -623,9 +620,9 @@ export class Hatch extends Entity {
    * @return {boolean} - true if inside
    */
   isInside(P) {
-    P = P.subtract(this.points[0]);
-    for (let i = 0; i < this.boundaryShapes.length; i++) {
-      const shape = this.boundaryShapes[i];
+    // P = P.subtract(this.points[0]);
+    for (let i = 0; i < this.childEntities.length; i++) {
+      const shape = this.childEntities[i];
 
       if (shape.boundingBox().isInside(P)) {
         const polyline = { points: [...shape.points] };
@@ -655,7 +652,7 @@ export class Hatch extends Entity {
    * @return {BoundingBox}
    */
   boundingBox() {
-    if (this.boundaryShapes.length === 0) {
+    if (this.childEntities.length === 0) {
       return new BoundingBox();
     }
 
@@ -664,8 +661,8 @@ export class Hatch extends Entity {
     let ymin = Infinity;
     let ymax = -Infinity;
 
-    for (let i = 0; i < this.boundaryShapes.length; i++) {
-      const shape = this.boundaryShapes[i];
+    for (let i = 0; i < this.childEntities.length; i++) {
+      const shape = this.childEntities[i];
 
       const boundingBox = shape.boundingBox();
 
@@ -687,7 +684,7 @@ export class Hatch extends Entity {
    */
   intersectPoints() {
     // return all the polyline boundary shapes
-    return this.boundaryShapes;
+    return this.childEntities;
   }
 
   /**
@@ -696,14 +693,14 @@ export class Hatch extends Entity {
    * @return {boolean} true if touched
    */
   touched(selectionExtremes) {
-    const se = [
-      selectionExtremes[0] - this.points[0].x,
-      selectionExtremes[1]- this.points[0].y,
-      selectionExtremes[2]- this.points[0].x,
-      selectionExtremes[3]- this.points[0].y,
-    ];
-    for (let i = 0; i < this.boundaryShapes.length; i++) {
-      if (this.boundaryShapes[i].touched(se)) {
+    // const se = [
+    //  selectionExtremes[0] - this.points[0].x,
+    //  selectionExtremes[1]- this.points[0].y,
+    //  selectionExtremes[2]- this.points[0].x,
+    //  selectionExtremes[3]- this.points[0].y,
+    // ];
+    for (let i = 0; i < this.childEntities.length; i++) {
+      if (this.childEntities[i].touched(selectionExtremes)) {
         return true;
       }
     }
@@ -712,15 +709,17 @@ export class Hatch extends Entity {
   }
 
   /**
-   * Rotate the boundary items
-   * @param  {Point} center
-   * @param {number} angle
+   * Set a property if it exists
+   * @param {string} property
+   * @param {any} value
    */
-  rotate(center, angle) {
-    for (let i = 0; i < this.boundaryShapes.length; i++) {
-      const shape = this.boundaryShapes[i];
-      shape.rotate(center, angle);
-      this.angle += Utils.radians2degrees(angle);
+  setProperty(property, value) {
+    if (this.hasOwnProperty(property)) {
+      if (property === 'points') {
+        console.log('update hatch points');
+      }
+
+      this[property] = value;
     }
   }
 }

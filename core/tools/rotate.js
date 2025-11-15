@@ -94,12 +94,18 @@ export class Rotate extends Tool {
       const ang = this.points[0].angle(mousePoint);
       const theta = this.baseAngle === null ? 0 : ang - this.baseAngle - this.lastAngle;
       this.lastAngle = ang;
+      const center = this.points[0];
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
         const item = DesignCore.Scene.selectionManager.selectedItems[i];
-        const center = this.points[0];
-        const points = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
-        item.points = points;
+
+        if (item.hasOwnProperty('childEntities')) {
+          item.childEntities.forEach((child) => {
+            child.setProperty('points', this.getRotatedPoints(child.points, center, theta));
+          });
+        } else {
+          item.setProperty('points', this.getRotatedPoints(item.points, center, theta));
+        }
       }
     }
   };
@@ -110,12 +116,30 @@ export class Rotate extends Tool {
   action() {
     const ang = this.points[0].angle(this.points[1]);
     const theta = ang - this.baseAngle;
+    const center = this.points[0];
 
     for (let index = 0; index < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; index++) {
       const item = DesignCore.Scene.getItem(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
-      const center = this.points[0];
-      const points = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
-      DesignCore.Scene.updateItem(index, { points: points });
+      if (item.hasOwnProperty('childEntities')) {
+        item.childEntities.forEach((child) => {
+          child.setProperty('points', this.getRotatedPoints(child.points, center, theta));
+        });
+        // set the angle of the main item if it has one
+        // item.setProperty('angle', item.angle+= Utils.radians2degrees(theta));
+      } else {
+        DesignCore.Scene.updateItem(index, { points: this.getRotatedPoints(item.points, center, theta) });
+      }
     }
   };
+
+  /**
+ * Get rotated points
+ * @param {Array} points
+ * @param {Point} delta
+ * @return {Array} rotatedPoints
+ */
+  getRotatedPoints(points, center, theta) {
+    const rotatedPoints = points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
+    return rotatedPoints;
+  }
 }
