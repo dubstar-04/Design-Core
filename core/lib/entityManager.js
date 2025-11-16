@@ -2,7 +2,8 @@
 import { DesignCore } from '../designCore.js';
 
 /**
- *
+ * Entity Manager Class
+ * Holds all entity instances and manages all changes to them
  */
 export class EntityManager {
   #entities = [];
