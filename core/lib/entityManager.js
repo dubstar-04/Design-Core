@@ -128,7 +128,7 @@ export class EntityManager {
       throw Error('Item not found in scene');
     }
 
-    for (const property in data) {
+    for (const property of Object.getOwnPropertyNames(data)) {
       if (item.hasOwnProperty(property)) {
         item.setProperty(property, data[property]);
       }
