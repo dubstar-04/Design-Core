@@ -131,7 +131,7 @@ export class Scene {
 
   /**
    * Add entity to scene with state management
-   * @param {object} entity
+   * @param {Array} entityArray
    */
   add(entityArray) {
     const stateChanges = [];
@@ -145,7 +145,7 @@ export class Scene {
 
   /**
    * Remove entity from scene with state management
-   * @param {number} index
+   * @param {Array} entityIndices
    */
   remove(entityIndices) {
     const stateChanges = [];
@@ -160,7 +160,7 @@ export class Scene {
   /**
    * Update entity in scene with state management
    * @param {number} index
-   * @param {object} entity
+   * @param {Array} StateChanges
    */
   update(StateChanges) {
     this.stateManager.update(this.entities, StateChanges);
