@@ -19,7 +19,11 @@ export class StateManager {
    */
   constructor() { }
 
-  /** Add a new state to the history */
+  /**
+   * Add a new state to the history
+   * state: instance of State (AddState, RemoveState, UpdateState)
+   * @param {State} state
+   * */
   addState(state) {
     // Remove all future states
     if (this.#historyIndex < this.#history.length && this.#historyIndex !== -1) {
@@ -41,16 +45,26 @@ export class StateManager {
     }
   }
 
-  /** Get the previous state */
+  /**
+   * Get the previous state
+   * @return {State}
+   * */
   getPreviousState() {
     return this.#history[this.#historyIndex - 1];
   }
 
-  /** Get the current state */
+  /**
+   * Get the current state
+   * @return {State}
+   * */
   getCurrentState() {
     return this.#history[this.#historyIndex];
   }
-  /** Get the next state */
+
+  /**
+   * Get the next state
+   * @return {State}
+   * */
   getNextState() {
     return this.#history[this.#historyIndex + 1];
   }
@@ -61,26 +75,41 @@ export class StateManager {
     this.#historyIndex = 0;
   }
 
-  /** Get the length of the history */
+  /**
+   * Get the length of the history
+   * @returns {number}
+   * */
   getHistoryLength() {
     return this.#history.length;
   }
 
-  /** Add entities to the entity manager */
+  /**
+   * Add entities to the entity manager
+   * @param {object} entityManager
+   * @param {Array} stateChanges
+   * */
   add(entityManager, stateChanges) {
     const state = new AddState(entityManager, stateChanges);
     this.addState(state);
     state.do();
   }
 
-  /** Remove entities from the entity manager */
+  /**
+   * Remove entities from the entity manager
+   * @param {object} entityManager
+   * @param {Array} stateChanges
+   * */
   remove(entityManager, stateChanges) {
     const state = new RemoveState(entityManager, stateChanges);
     this.addState(state);
     state.do();
   }
 
-  /** Update entities in the entity manager */
+  /**
+   * Update entities in the entity manager
+   * @param {object} entityManager
+   * @param {Array} stateChanges
+   * */
   update(entityManager, StateChanges) {
     const state = new UpdateState(entityManager, StateChanges);
     this.addState(state);
@@ -114,6 +143,11 @@ export class StateManager {
 
 /** Base State Class */
 export class State {
+  /**
+   * Create State
+   * @param {object} entityManager
+   * @param {Array} stateChanges
+   * */
   constructor(entityManager, stateChanges) {
     this.entityManager = entityManager;
     this.stateChanges = stateChanges;
@@ -123,6 +157,11 @@ export class State {
 
 /** Add State Class */
 export class AddState extends State {
+  /**
+   * Create Add State
+   * @param {object} entityManager
+   * @param {Array} stateChanges
+   * */
   constructor(entityManager, stateChanges) {
     super(entityManager, stateChanges);
   }
@@ -149,6 +188,11 @@ export class AddState extends State {
 
 /** Remove State Class */
 export class RemoveState extends State {
+  /**
+   * Create  Remove State
+   * @param {object} entityManager
+   * @param {Array} stateChanges
+   * */
   constructor(entityManager, stateChanges) {
     super(entityManager, stateChanges);
   }
@@ -175,6 +219,11 @@ export class RemoveState extends State {
 
 /** Update State Class */
 export class UpdateState extends State {
+  /**
+   * Create Update State
+   * @param {object} entityManager
+   * @param {Array} stateChanges
+   * */
   constructor(entityManager, StateChanges) {
     super(entityManager, StateChanges);
     this.previousStateChanges = [];
@@ -183,7 +232,6 @@ export class UpdateState extends State {
   /** Perform the update */
   do() {
     console.log('do update');
-
     this.previousStateChanges = [];
     for (const stateChange of this.stateChanges) {
       // get the entity and its current properties
