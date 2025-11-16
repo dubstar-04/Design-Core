@@ -8,7 +8,6 @@ import { Utils } from './utils.js';
  * The commands consist of Add, Remove and Update.
  * Each command has a do() and undo() method to perform and revert the action respectively.
  */
-
 export class StateManager {
   #history = [];
   #historyIndex = 0;
@@ -77,7 +76,7 @@ export class StateManager {
 
   /**
    * Get the length of the history
-   * @returns {number}
+   * @return {number}
    * */
   getHistoryLength() {
     return this.#history.length;
@@ -110,8 +109,8 @@ export class StateManager {
    * @param {object} entityManager
    * @param {Array} stateChanges
    * */
-  update(entityManager, StateChanges) {
-    const state = new UpdateState(entityManager, StateChanges);
+  update(entityManager, stateChanges) {
+    const state = new UpdateState(entityManager, stateChanges);
     this.addState(state);
     state.do();
   }
@@ -224,8 +223,8 @@ export class UpdateState extends State {
    * @param {object} entityManager
    * @param {Array} stateChanges
    * */
-  constructor(entityManager, StateChanges) {
-    super(entityManager, StateChanges);
+  constructor(entityManager, stateChanges) {
+    super(entityManager, stateChanges);
     this.previousStateChanges = [];
   }
 
