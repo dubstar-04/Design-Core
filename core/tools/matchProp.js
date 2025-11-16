@@ -2,6 +2,7 @@ import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Strings } from '../lib/strings.js';
 import { Logging } from '../lib/logging.js';
+import { StateChange } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -68,19 +69,30 @@ export class MatchProp extends Tool {
     // get source item
     const sourceItem = DesignCore.Scene.entities.get(this.sourceIndex);
 
+    const stateChanges = [];
+
     // loop through destination set
     for (let i = 0; i < this.destinationSetIndices.length; i++) {
+      const targetItem = DesignCore.Scene.entities.get(this.destinationSetIndices[i]);
+      const propertySet = {};
       // loop through properties and match
       for (let p = 0; p < this.properties.length; p++) {
         // check property exists on both items
         const prop = this.properties[p];
         if (sourceItem.hasOwnProperty(prop)) {
-          const update = {};
-          update[prop] = sourceItem[prop];
-          // try and update the item
-          DesignCore.Scene.entities.update(this.destinationSetIndices[i], update);
+          propertySet[prop] = sourceItem[prop];
         }
       }
+
+      // only add state change if there are properties to change
+      if (Object.keys(propertySet).length > 0) {
+        const stateChange = new StateChange(targetItem, propertySet);
+        stateChanges.push(stateChange);
+      }
+    }
+    // apply the updates
+    if (stateChanges.length > 0) {
+      DesignCore.Scene.update(stateChanges);
     }
   }
 }
