@@ -716,7 +716,7 @@ export class Hatch extends Entity {
   setProperty(property, value) {
     if (this.hasOwnProperty(property)) {
       if (property === 'points') {
-        console.log('update hatch points');
+
       }
 
       this[property] = value;

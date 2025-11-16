@@ -70,7 +70,6 @@ export class EntityManager {
     const filteredItems = [];
 
     this.#entities.forEach((item, index) => {
-      console.log(item, index, prop, value);
       if ((type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) && item.hasOwnProperty(prop) && item[prop] === value) {
         filteredItems.push(index);
       }

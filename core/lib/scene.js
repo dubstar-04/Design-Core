@@ -16,9 +16,6 @@ import { BlockManager } from '../tables/blockManager.js';
  */
 export class Scene {
   /** Create a scene */
-  // #items = []; // Main array that stores all the geometry
-  // #tempItems = []; // Temporary Array to store items while input is being gathered
-  // #auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
 
   /** Create a Scene */
   constructor() {
@@ -35,6 +32,13 @@ export class Scene {
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
+  }
+
+  /**
+   * Sets the save state following scene changes
+   */
+  saveRequired() {
+    this.saved = false; // Changes have occured. A save may be required.
   }
 
 
@@ -82,13 +86,6 @@ export class Scene {
     }
 
     return new BoundingBox(new Point(xmin, ymin), new Point(xmax, ymax));
-  }
-
-  /**
-   * Sets the save state following scene changes
-   */
-  saveRequired() {
-    this.saved = false; // Changes have occured. A save may be required.
   }
 
   /**
