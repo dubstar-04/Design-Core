@@ -9,6 +9,8 @@ import { EntityManager } from './entityManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { BlockManager } from '../tables/blockManager.js';
+import { StateManager } from './stateManager.js';
+import { StateChange } from './stateManager.js';
 
 /**
  * Scene Class
@@ -29,6 +31,8 @@ export class Scene {
     this.entities = new EntityManager();
     this.tempEntities = new EntityManager();
     this.auxiliaryEntities = new EntityManager();
+
+    this.stateManager = new StateManager();
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
@@ -111,16 +115,71 @@ export class Scene {
     const item = DesignCore.CommandManager.createNew(type, data);
 
     if (typeof index === 'undefined') {
-      // add to end of array
-      this.entities.add(item); // add item to the scene
+      // add item to the scene
+      this.add([item]);
       index = this.entities.count() - 1;
     } else {
       // replace item at index
-      this.entities.replace(index, item);
+      const existingItem = this.entities.get(index);
+      const stateChange = new StateChange(existingItem, data);
+      this.update([stateChange]);
     }
 
     // return the index of the added item
     return index;
+  }
+
+  /**
+   * Add entity to scene with state management
+   * @param {object} entity
+   */
+  add(entityArray) {
+    const stateChanges = [];
+    for (const entity of entityArray) {
+      const stateChange = new StateChange(entity, {});
+      stateChanges.push(stateChange);
+    }
+
+    this.stateManager.add(this.entities, stateChanges);
+  }
+
+  /**
+   * Remove entity from scene with state management
+   * @param {number} index
+   */
+  remove(entityIndices) {
+    const stateChanges = [];
+    for (const index of entityIndices) {
+      const stateChange = new StateChange(this.entities.get(index), {});
+      stateChanges.push(stateChange);
+    }
+
+    this.stateManager.remove(this.entities, stateChanges);
+  }
+
+  /**
+   * Update entity in scene with state management
+   * @param {number} index
+   * @param {object} entity
+   */
+  update(StateChanges) {
+    this.stateManager.update(this.entities, StateChanges);
+  }
+
+  /**
+   * Undo the last action
+   */
+  undo() {
+    this.stateManager.undo();
+    DesignCore.Canvas.requestPaint();
+  }
+
+  /**
+   * Redo the last undone action
+   */
+  redo() {
+    this.stateManager.redo();
+    DesignCore.Canvas.requestPaint();
   }
 
   /**
