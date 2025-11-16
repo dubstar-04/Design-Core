@@ -62,9 +62,6 @@ export class Erase extends Tool {
     selections.sort((a, b) => b - a);
 
     // delete each of the selections from the scene items
-    // This is done in descending order to preserve the indices i.e if index 1 is deleted, index 2 becomes index 1
-    for (let i = 0; i < selections.length; i++) {
-      DesignCore.Scene.entities.remove((selections[i]));
-    }
+    DesignCore.Scene.remove(selections);
   }
 }
