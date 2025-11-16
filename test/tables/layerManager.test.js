@@ -91,7 +91,7 @@ test('Test LayerManager.checkStyles', () => {
     layer: newItemName,
   };
 
-  core.scene.addItem('Line', data, false);
+  core.scene.addItem('Line', data);
 
   layerManager.checkStyles();
   const layers = layerManager.getItems();
