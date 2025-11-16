@@ -29,6 +29,9 @@ export class Scene {
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
+
+    // callback function for when saved state changes
+    this.savedStateChangedCallback = null;
   }
 
   /**
@@ -77,6 +80,32 @@ export class Scene {
    */
   saveRequired() {
     this.saved = false; // Changes have occured. A save may be required.
+    this.notifySavedStateChanged();
+  }
+
+  /**
+   * Set callback for when saved state changes
+   * @param {Function} callback - function to call when saved state changes
+   */
+  setSavedStateChangedCallback(callback) {
+    this.savedStateChangedCallback = callback;
+  }
+
+  /**
+   * Notify that saved state has changed
+   */
+  notifySavedStateChanged() {
+    if (this.savedStateChangedCallback) {
+      this.savedStateChangedCallback(this.saved);
+    }
+  }
+
+  /**
+   * Mark scene as saved
+   */
+  markSaved() {
+    this.saved = true;
+    this.notifySavedStateChanged();
   }
 
   /**
@@ -109,6 +138,9 @@ export class Scene {
       // replace item at index
       this.items.splice(index, 1, item);
     }
+
+    // Mark that changes have been made
+    this.saveRequired();
 
     // return the index of the added item
     return index;
@@ -152,6 +184,8 @@ export class Scene {
     this.items.splice(index, 1);
 
     if (this.items.length < count) {
+      // Mark that changes have been made
+      this.saveRequired();
       return true;
     }
 
