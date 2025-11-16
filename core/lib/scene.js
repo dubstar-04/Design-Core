@@ -159,7 +159,6 @@ export class Scene {
 
   /**
    * Update entity in scene with state management
-   * @param {number} index
    * @param {Array} StateChanges
    */
   update(StateChanges) {
