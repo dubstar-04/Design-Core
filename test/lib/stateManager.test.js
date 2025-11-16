@@ -67,6 +67,33 @@ describe('StateManager', () => {
 
   test('update() creates UpdateState and undo restores previous properties', () => {
     const em = new EntityManager();
+    // Add 10 items
+    for (let i = 0; i < 10; i++) {
+      const stateChange = new StateChange({ id: `e${i}` }, {});
+      sm.add(em, [stateChange]);
+      expect(sm.getHistoryLength()).toBeLessThanOrEqual(10);
+      expect(em.count()).toBe(i + 1);
+    }
+
+    // undo should restore previous values
+    const itemCount = em.count();
+    for (let i = 0; i < 5; i++) {
+      sm.undo();
+      expect(em.get(em.count() - 1).id).toBe(`e${itemCount - i - 2}`);
+      expect(em.count()).toBe(itemCount - i - 1);
+      expect(sm.getHistoryLength()).toBe(10);
+    };
+
+    // adding a new state should remove future states
+    const entity = { id: 'extraItem' };
+    const stateChange = new StateChange(entity, {});
+    sm.add(em, [stateChange]);
+    expect(sm.getHistoryLength()).toBe(6);
+  });
+
+
+  test('addState removed future states', () => {
+    const em = new EntityManager();
     const entity = new Line( { layer: 'testLayer', points: [new Point(), new Point(10, 11)] });
     const stateChange = new StateChange(entity, {});
     sm.add(em, [stateChange]);
