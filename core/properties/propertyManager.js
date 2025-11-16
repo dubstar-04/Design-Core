@@ -1,5 +1,6 @@
 import { Strings } from '../lib/strings.js';
 import { DesignCore } from '../designCore.js';
+import { StateChange } from '../lib/stateManager.js';
 
 /** Property Manager Class */
 export class PropertyManager {
@@ -32,6 +33,7 @@ export class PropertyManager {
    * @param {any} newPropertyValue
    */
   setItemProperties(property, newPropertyValue) {
+    const stateChanges = [];
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
       // check if the item has the selected property
@@ -45,10 +47,12 @@ export class PropertyManager {
         // update the item property
         const update = {};
         update[property] = newPropertyValue;
-        DesignCore.Scene.entities.update(index, update);
-        DesignCore.Scene.selectionManager.reloadSelectedItems();
+        const stateChange = new StateChange(DesignCore.Scene.entities.get(index), update);
+        stateChanges.push(stateChange);
       }
     }
+    DesignCore.Scene.update(stateChanges);
+    DesignCore.Scene.selectionManager.reloadSelectedItems();
   }
 
   /**
@@ -61,7 +65,8 @@ export class PropertyManager {
 
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        const itemType = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).type;
+        const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
+        const itemType = item.type;
 
         if (itemTypes.indexOf(itemType, 0) === -1) {
           itemTypes.push(itemType);
