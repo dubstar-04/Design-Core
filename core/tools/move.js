@@ -5,6 +5,7 @@ import { Logging } from '../lib/logging.js';
 import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
+import { StateChange } from '../lib/stateManager.js';
 
 /**
  * Move Command Class
@@ -92,6 +93,8 @@ export class Move extends Tool {
 
     const delta = new Point(xDelta, yDelta);
 
+    const stateChanges = [];
+
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
       const item = DesignCore.Scene.entities.get(index);
@@ -101,9 +104,12 @@ export class Move extends Tool {
           child.setProperty('points', this.getOffsetPoints(child.points, delta));
         });
       } else {
-        DesignCore.Scene.entities.update(index, { points: this.getOffsetPoints(item.points, delta) });
+        const stateChange = new StateChange(item, { points: this.getOffsetPoints(item.points, delta) });
+        stateChanges.push(stateChange);
       }
     }
+
+    DesignCore.Scene.update(stateChanges);
   }
 
   /**
