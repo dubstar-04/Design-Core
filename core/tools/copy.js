@@ -85,6 +85,8 @@ export class Copy extends Tool {
     const xDelta = this.points[1].x - this.points[0].x;
     const yDelta = this.points[1].y - this.points[0].y;
 
+    const copiedEntities = [];
+
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]));
 
@@ -93,7 +95,9 @@ export class Copy extends Tool {
         copyofitem.points[j].y = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].y + yDelta;
       }
 
-      DesignCore.Scene.addItem(copyofitem.type, copyofitem);
+      copiedEntities.push(copyofitem);
     }
+
+    DesignCore.Scene.add(copiedEntities);
   };
 }

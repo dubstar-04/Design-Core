@@ -4,6 +4,7 @@ import { Utils } from '../lib/utils.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Point } from '../entities/point.js';
+import { StateChange } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -118,6 +119,8 @@ export class Rotate extends Tool {
     const theta = ang - this.baseAngle;
     const center = this.points[0];
 
+    const stateChanges = [];
+
     for (let index = 0; index < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; index++) {
       const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
       if (item.hasOwnProperty('childEntities')) {
@@ -127,9 +130,12 @@ export class Rotate extends Tool {
         // set the angle of the main item if it has one
         // item.setProperty('angle', item.angle+= Utils.radians2degrees(theta));
       } else {
-        DesignCore.Scene.entities.update(index, { points: this.getRotatedPoints(item.points, center, theta) });
+        const stateChange = new StateChange(item, { points: this.getRotatedPoints(item.points, center, theta) });
+        stateChanges.push(stateChange);
       }
     }
+
+    DesignCore.Scene.update(stateChanges);
   };
 
   /**
