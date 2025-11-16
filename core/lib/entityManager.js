@@ -78,6 +78,14 @@ export class EntityManager {
     return filteredItems;
   }
 
+  /** Get index of entity
+   * @param {object} entity
+   * @return {number} index
+   */
+  indexOf(entity) {
+    return this.#entities.indexOf(entity);
+  }
+
 
   /**
    * Find closest item to point
