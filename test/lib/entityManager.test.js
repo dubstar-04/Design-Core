@@ -58,6 +58,19 @@ describe('EntityManager', () => {
     expect(mgr.get(0)).toBe(l2);
   });
 
+
+  test('indexOf - test correct index is returned', () => {
+    const mgr = DesignCore.Scene.entities;
+    // Add two lines with the same data
+    const l1 = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+    const l2 = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+    mgr.add(l1);
+    mgr.add(l2);
+    expect(mgr.count()).toBe(2);
+    expect(mgr.indexOf(l1)).toBe(0);
+    expect(mgr.indexOf(l2)).toBe(1);
+  });
+
   test('find returns indices matching type and property', () => {
     const mgr = DesignCore.Scene.entities;
     const l1 = new Line({ points: [new Point(0, 0), new Point(1, 0)], lineWidth: 5 });
