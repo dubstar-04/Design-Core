@@ -3,6 +3,7 @@ import { Strings } from '../lib/strings.js';
 import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -63,17 +64,15 @@ export class Copy extends Tool {
 
       // Draw a line
       const points = [this.points.at(-1), mousePoint];
-
       DesignCore.Scene.tempEntities.create('Line', { points: points });
 
-      const xDelta = mousePoint.x - this.points[0].x;
-      const yDelta = mousePoint.y - this.points[0].y;
+      const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);
+      this.lastMousePoint = mousePoint;
 
-      for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        for (let j = 0; j < DesignCore.Scene.selectionManager.selectedItems[i].points.length; j++) {
-          DesignCore.Scene.selectionManager.selectedItems[i].points[j].x = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].x + xDelta;
-          DesignCore.Scene.selectionManager.selectedItems[i].points[j].y = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].y + yDelta;
-        }
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
+        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+        const offsetPoints = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+        item.setProperty('points', offsetPoints);
       }
     }
   }
@@ -82,19 +81,13 @@ export class Copy extends Tool {
    * Perform the command
    */
   action() {
-    const xDelta = this.points[1].x - this.points[0].x;
-    const yDelta = this.points[1].y - this.points[0].y;
-
+    const delta = this.points[1].subtract(this.points[0]);
     const copiedEntities = [];
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]));
-
-      for (let j = 0; j < copyofitem.points.length; j++) {
-        copyofitem.points[j].x = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].x + xDelta;
-        copyofitem.points[j].y = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).points[j].y + yDelta;
-      }
-
+      const offsetPoints = copyofitem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+      copyofitem.setProperty('points', offsetPoints);
       copiedEntities.push(copyofitem);
     }
 
