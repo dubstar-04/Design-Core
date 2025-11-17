@@ -1,6 +1,6 @@
 import { Strings } from '../lib/strings.js';
 import { DesignCore } from '../designCore.js';
-import { StateChange } from '../lib/stateManager.js';
+import { UpdateState } from '../lib/stateManager.js';
 
 /** Property Manager Class */
 export class PropertyManager {
@@ -47,11 +47,11 @@ export class PropertyManager {
         // update the item property
         const update = {};
         update[property] = newPropertyValue;
-        const stateChange = new StateChange(DesignCore.Scene.entities.get(index), update);
+        const stateChange = new UpdateState(DesignCore.Scene.entities.get(index), update);
         stateChanges.push(stateChange);
       }
     }
-    DesignCore.Scene.update(stateChanges);
+    DesignCore.Scene.commit(stateChanges);
     DesignCore.Scene.selectionManager.reloadSelectedItems();
   }
 
