@@ -17,7 +17,7 @@ describe('StateManager', () => {
     const em = new EntityManager();
     // Add 20 items
     for (let i = 0; i < 20; i++) {
-      const stateChange = new AddState({ id: `e${i}` }, {});
+      const stateChange = new AddState({ id: `e${i}` });
       sm.commit(em, [stateChange]);
       expect(sm.getHistoryLength()).toBeLessThanOrEqual(10);
     }
@@ -28,7 +28,7 @@ describe('StateManager', () => {
     const em = new EntityManager();
     const entity = { id: 'e1' };
 
-    const stateChange = new AddState(entity, {});
+    const stateChange = new AddState(entity);
     sm.commit(em, [stateChange]);
     expect(em.count()).toBe(1);
     expect(sm.getHistoryLength()).toBe(1);
@@ -46,11 +46,11 @@ describe('StateManager', () => {
   test('remove() creates a RemoveState, performs do, undo and redo', () => {
     const em = new EntityManager();
     const entity = { id: 'e2' };
-    const stateChange = new AddState(entity, {});
+    const stateChange = new AddState(entity);
     sm.commit(em, [stateChange]);
     expect(em.count()).toBe(1);
 
-    const stateChangeRem = new RemoveState(entity, {});
+    const stateChangeRem = new RemoveState(entity);
     sm.commit(em, [stateChangeRem]);
     // remove.do should have removed entity
     expect(em.count()).toBe(0);
@@ -69,7 +69,7 @@ describe('StateManager', () => {
     const em = new EntityManager();
     // Add 10 items
     for (let i = 0; i < 10; i++) {
-      const stateChange = new AddState({ id: `e${i}` }, {});
+      const stateChange = new AddState({ id: `e${i}` });
       sm.commit(em, [stateChange]);
       expect(sm.getHistoryLength()).toBeLessThanOrEqual(10);
       expect(em.count()).toBe(i + 1);
@@ -86,7 +86,7 @@ describe('StateManager', () => {
 
     // adding a new state should remove future states
     const entity = { id: 'extraItem' };
-    const stateChange = new AddState(entity, {});
+    const stateChange = new AddState(entity);
     sm.commit(em, [stateChange]);
     expect(sm.getHistoryLength()).toBe(6);
   });
@@ -95,7 +95,7 @@ describe('StateManager', () => {
   test('addState removed future states', () => {
     const em = new EntityManager();
     const entity = new Line( { layer: 'testLayer', points: [new Point(), new Point(10, 11)] });
-    const stateChange = new AddState(entity, {});
+    const stateChange = new AddState(entity);
     sm.commit(em, [stateChange]);
     expect(em.get(0).layer).toBe('testLayer');
     expect(em.get(0).points[0].x).toBe(0);
@@ -132,7 +132,7 @@ describe('StateManager', () => {
   test('clearHistory resets history and indices', () => {
     const em = new EntityManager();
     const entity = new Line( { layer: 'testLayer', points: [new Point(), new Point(10, 11)] });
-    const stateChange = new AddState(entity, {});
+    const stateChange = new AddState(entity);
     sm.commit(em, [stateChange]);
     expect(sm.getHistoryLength()).toBeGreaterThan(0);
     sm.clearHistory();

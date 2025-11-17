@@ -93,11 +93,11 @@ export class Explode extends Tool {
         const copyofitem = Utils.cloneObject(blockItem);
         const points = copyofitem.points.map((p) => new Point(p.x, p.y).add(insertPoint));
         copyofitem.setProperty('points', points);
-        const stateChange = new AddState(copyofitem, {});
+        const stateChange = new AddState(copyofitem);
         stateChanges.push(stateChange);
       });
 
-      const stateChangeRemove = new RemoveState(insert, {});
+      const stateChangeRemove = new RemoveState(insert);
       stateChanges.push(stateChangeRemove);
     }
 

@@ -122,7 +122,7 @@ export class Block extends Entity {
           copyofitem.setProperty('points', points);
         }
         block.items.push(copyofitem);
-        const stateChangeRemove = new RemoveState(item, {});
+        const stateChangeRemove = new RemoveState(item);
         stateChanges.push(stateChangeRemove);
       });
 
@@ -134,7 +134,7 @@ export class Block extends Entity {
       };
 
       const insert = DesignCore.CommandManager.createNew(insertData.type, insertData);
-      const stateChangeAdd = new AddState(insert, {});
+      const stateChangeAdd = new AddState(insert);
       stateChanges.push(stateChangeAdd);
 
       // commit the changes to the scene

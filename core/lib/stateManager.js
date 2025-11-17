@@ -215,7 +215,7 @@ export class AddState extends StateChange {
    * @param {object} entity
    * @param {object} properties
    */
-  constructor(entity, properties) {
+  constructor(entity, properties={}) {
     super(entity, properties);
   }
 }
@@ -226,7 +226,7 @@ export class RemoveState extends StateChange {
    * @param {object} entity
    * @param {object} properties
    */
-  constructor(entity, properties) {
+  constructor(entity, properties={}) {
     super(entity, properties);
   }
 }

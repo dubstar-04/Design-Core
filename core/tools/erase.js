@@ -63,7 +63,7 @@ export class Erase extends Tool {
     const stateChanges = [];
 
     for (let i = 0; i < selections.length; i++) {
-      const stateChange = new RemoveState(DesignCore.Scene.entities.get(selections[i]), {});
+      const stateChange = new RemoveState(DesignCore.Scene.entities.get(selections[i]));
       stateChanges.push(stateChange);
     }
 

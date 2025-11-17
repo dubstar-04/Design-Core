@@ -115,7 +115,7 @@ export class Scene {
 
     if (typeof index === 'undefined') {
       // add item to the scene
-      const stateChange = new AddState(item, {});
+      const stateChange = new AddState(item);
       this.commit([stateChange]);
       index = this.entities.count() - 1;
     } else {
