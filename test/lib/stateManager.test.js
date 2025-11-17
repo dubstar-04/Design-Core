@@ -1,6 +1,6 @@
 import { StateManager } from '../../core/lib/stateManager.js';
 import { EntityManager } from '../../core/lib/entityManager.js';
-import { StateChange } from '../../core/lib/stateManager.js';
+import { AddState, RemoveState, UpdateState } from '../../core/lib/stateManager.js';
 
 import { Line } from '../../core/entities/line.js';
 import { Point } from '../../core/entities/point.js';
@@ -17,8 +17,8 @@ describe('StateManager', () => {
     const em = new EntityManager();
     // Add 20 items
     for (let i = 0; i < 20; i++) {
-      const stateChange = new StateChange({ id: `e${i}` }, {});
-      sm.add(em, [stateChange]);
+      const stateChange = new AddState({ id: `e${i}` }, {});
+      sm.commit(em, [stateChange]);
       expect(sm.getHistoryLength()).toBeLessThanOrEqual(10);
     }
   });
@@ -28,8 +28,8 @@ describe('StateManager', () => {
     const em = new EntityManager();
     const entity = { id: 'e1' };
 
-    const stateChange = new StateChange(entity, {});
-    sm.add(em, [stateChange]);
+    const stateChange = new AddState(entity, {});
+    sm.commit(em, [stateChange]);
     expect(em.count()).toBe(1);
     expect(sm.getHistoryLength()).toBe(1);
 
@@ -46,12 +46,12 @@ describe('StateManager', () => {
   test('remove() creates a RemoveState, performs do, undo and redo', () => {
     const em = new EntityManager();
     const entity = { id: 'e2' };
-    const stateChange = new StateChange(entity, {});
-    sm.add(em, [stateChange]);
+    const stateChange = new AddState(entity, {});
+    sm.commit(em, [stateChange]);
     expect(em.count()).toBe(1);
 
-    const stateChangeRem = new StateChange(entity, {});
-    sm.remove(em, [stateChangeRem]);
+    const stateChangeRem = new RemoveState(entity, {});
+    sm.commit(em, [stateChangeRem]);
     // remove.do should have removed entity
     expect(em.count()).toBe(0);
 
@@ -69,8 +69,8 @@ describe('StateManager', () => {
     const em = new EntityManager();
     // Add 10 items
     for (let i = 0; i < 10; i++) {
-      const stateChange = new StateChange({ id: `e${i}` }, {});
-      sm.add(em, [stateChange]);
+      const stateChange = new AddState({ id: `e${i}` }, {});
+      sm.commit(em, [stateChange]);
       expect(sm.getHistoryLength()).toBeLessThanOrEqual(10);
       expect(em.count()).toBe(i + 1);
     }
@@ -86,8 +86,8 @@ describe('StateManager', () => {
 
     // adding a new state should remove future states
     const entity = { id: 'extraItem' };
-    const stateChange = new StateChange(entity, {});
-    sm.add(em, [stateChange]);
+    const stateChange = new AddState(entity, {});
+    sm.commit(em, [stateChange]);
     expect(sm.getHistoryLength()).toBe(6);
   });
 
@@ -95,8 +95,8 @@ describe('StateManager', () => {
   test('addState removed future states', () => {
     const em = new EntityManager();
     const entity = new Line( { layer: 'testLayer', points: [new Point(), new Point(10, 11)] });
-    const stateChange = new StateChange(entity, {});
-    sm.add(em, [stateChange]);
+    const stateChange = new AddState(entity, {});
+    sm.commit(em, [stateChange]);
     expect(em.get(0).layer).toBe('testLayer');
     expect(em.get(0).points[0].x).toBe(0);
     expect(em.get(0).points[0].y).toBe(0);
@@ -104,8 +104,8 @@ describe('StateManager', () => {
     expect(em.get(0).points[1].y).toBe(11);
 
     // perform update
-    const stateChangeUpdate = new StateChange(entity, { layer: 'differentLayer', points: [new Point(1, 2), new Point(101, 110)] });
-    sm.update(em, [stateChangeUpdate]);
+    const stateChangeUpdate = new UpdateState(entity, { layer: 'differentLayer', points: [new Point(1, 2), new Point(101, 110)] });
+    sm.commit(em, [stateChangeUpdate]);
     expect(em.get(0).layer).toBe('differentLayer');
     expect(em.get(0).points[0].x).toBe(1);
     expect(em.get(0).points[0].y).toBe(2);
@@ -132,8 +132,8 @@ describe('StateManager', () => {
   test('clearHistory resets history and indices', () => {
     const em = new EntityManager();
     const entity = new Line( { layer: 'testLayer', points: [new Point(), new Point(10, 11)] });
-    const stateChange = new StateChange(entity, {});
-    sm.add(em, [stateChange]);
+    const stateChange = new AddState(entity, {});
+    sm.commit(em, [stateChange]);
     expect(sm.getHistoryLength()).toBeGreaterThan(0);
     sm.clearHistory();
     expect(sm.getHistoryLength()).toBe(0);
