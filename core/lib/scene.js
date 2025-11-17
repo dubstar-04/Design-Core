@@ -9,8 +9,7 @@ import { EntityManager } from './entityManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { BlockManager } from '../tables/blockManager.js';
-import { StateManager } from './stateManager.js';
-import { StateChange } from './stateManager.js';
+import { AddState, StateManager, UpdateState } from './stateManager.js';
 
 /**
  * Scene Class
@@ -32,7 +31,7 @@ export class Scene {
     this.tempEntities = new EntityManager();
     this.auxiliaryEntities = new EntityManager();
 
-    this.stateManager = new StateManager();
+    this.stateManager = new StateManager(this.entities);
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
@@ -116,13 +115,14 @@ export class Scene {
 
     if (typeof index === 'undefined') {
       // add item to the scene
-      this.add([item]);
+      const stateChange = new AddState(item, {});
+      this.commit([stateChange]);
       index = this.entities.count() - 1;
     } else {
       // replace item at index
       const existingItem = this.entities.get(index);
-      const stateChange = new StateChange(existingItem, data);
-      this.update([stateChange]);
+      const stateChange = new UpdateState(existingItem, data);
+      this.commit([stateChange]);
     }
 
     // return the index of the added item
@@ -130,39 +130,11 @@ export class Scene {
   }
 
   /**
-   * Add entity to scene with state management
-   * @param {Array} entityArray
+   * Commit state changes to the scene
+   * @param {Array} stateChanges
    */
-  add(entityArray) {
-    const stateChanges = [];
-    for (const entity of entityArray) {
-      const stateChange = new StateChange(entity, {});
-      stateChanges.push(stateChange);
-    }
-
-    this.stateManager.add(this.entities, stateChanges);
-  }
-
-  /**
-   * Remove entity from scene with state management
-   * @param {Array} entityIndices
-   */
-  remove(entityIndices) {
-    const stateChanges = [];
-    for (const index of entityIndices) {
-      const stateChange = new StateChange(this.entities.get(index), {});
-      stateChanges.push(stateChange);
-    }
-
-    this.stateManager.remove(this.entities, stateChanges);
-  }
-
-  /**
-   * Update entity in scene with state management
-   * @param {Array} StateChanges
-   */
-  update(StateChanges) {
-    this.stateManager.update(this.entities, StateChanges);
+  commit(stateChanges) {
+    this.stateManager.commit(this.entities, stateChanges);
   }
 
   /**
