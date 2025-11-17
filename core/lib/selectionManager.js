@@ -155,7 +155,7 @@ export class SelectionManager {
 
   /**
   * Remove the item at index from the selectionSet and selectedItems
-  * @param  {number} index - index of the item in scene.items
+  * @param  {number} index - index of the item
   */
   removeFromSelectionSet(index) {
     const itemIndex = this.selectionSet.selectionSet.indexOf(index);

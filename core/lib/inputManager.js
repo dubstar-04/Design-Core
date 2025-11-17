@@ -486,7 +486,7 @@ export class InputManager {
   /**
    * Execute the currently active command then reset
    * @param {Object} item - item to create
-   * @param {number} index - index of item in scene.items
+   * @param {number} index - index of item
    */
   executeCommand(item, index = undefined) {
     this.actionCommand(item, index);
