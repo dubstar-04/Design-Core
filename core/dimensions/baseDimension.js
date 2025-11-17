@@ -535,6 +535,9 @@ export class BaseDimension extends Entity {
     return this.block.touched(selectionExtremes);
   }
 
+  /**
+   * Refesh the dimension geometry
+   */
   refesh() {
     const entities = this.buildDimension();
 
