@@ -115,6 +115,15 @@ export class Hatch extends Entity {
         }
       }
     }
+
+    // ensure first point is 0,0 and last point is 1,1
+    if ( this.points.at(0).x !== 0 || this.points.at(0).y !== 0 ) {
+      this.point[0] = new Point(0, 0);
+    }
+
+    if (this.points.length < 2 || (this.points.at(-1).x === 1 && this.points.at(-1).y === 1)) {
+      this.points.push(new Point(1, 1));
+    }
   }
 
   /**
