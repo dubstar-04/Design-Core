@@ -16,6 +16,7 @@ export class StateManager {
 
   /**
    * Create StateManager
+   * @param {EntityManager} entityManager
    */
   constructor(entityManager) {
     this.#entityManager = entityManager;
@@ -125,7 +126,8 @@ export class StateManager {
 class State {
   /**
    * Create State
-   * @param {Array}stateChanges
+   * @param {EntityManager} entityManager
+   * @param {Array} stateChanges
    * */
   constructor(entityManager, stateChanges) {
     this.entityManager = entityManager;
