@@ -496,7 +496,7 @@ export class InputManager {
   /**
    * Execute the currently active command without reset
    * @param {Object} item - item to create
-   * @param {number} index - index of item in scene.items
+   * @param {number} index - index of item
    * @return {number}
    */
   actionCommand(item, index = undefined) {
