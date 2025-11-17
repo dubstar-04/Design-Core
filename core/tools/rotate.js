@@ -87,7 +87,6 @@ export class Rotate extends Tool {
     if (this.points.length >= 1 && this.baseAngle !== null) {
       // Draw a line
       const points = [this.points.at(0), mousePoint];
-
       DesignCore.Scene.tempEntities.create('Line', { points: points });
     }
 
@@ -99,14 +98,7 @@ export class Rotate extends Tool {
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
         const item = DesignCore.Scene.selectionManager.selectedItems[i];
-
-        if (item.hasOwnProperty('childEntities')) {
-          item.childEntities.forEach((child) => {
-            child.setProperty('points', this.getRotatedPoints(child.points, center, theta));
-          });
-        } else {
-          item.setProperty('points', this.getRotatedPoints(item.points, center, theta));
-        }
+        item.setProperty('points', this.getRotatedPoints(item.points, center, theta));
       }
     }
   };
@@ -123,16 +115,8 @@ export class Rotate extends Tool {
 
     for (let index = 0; index < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; index++) {
       const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
-      if (item.hasOwnProperty('childEntities')) {
-        item.childEntities.forEach((child) => {
-          child.setProperty('points', this.getRotatedPoints(child.points, center, theta));
-        });
-        // set the angle of the main item if it has one
-        // item.setProperty('angle', item.angle+= Utils.radians2degrees(theta));
-      } else {
-        const stateChange = new StateChange(item, { points: this.getRotatedPoints(item.points, center, theta) });
-        stateChanges.push(stateChange);
-      }
+      const stateChange = new StateChange(item, { points: this.getRotatedPoints(item.points, center, theta) });
+      stateChanges.push(stateChange);
     }
 
     DesignCore.Scene.update(stateChanges);

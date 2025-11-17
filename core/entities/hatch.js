@@ -715,10 +715,41 @@ export class Hatch extends Entity {
    */
   setProperty(property, value) {
     if (this.hasOwnProperty(property)) {
-      if (property === 'points') {
+      // Special handling for hatch points to move child entities
+      // First hatch point is always 0,0
+      // Last hatch point is always 1,1
 
+      // Consider the changes from the hatch points to be an offset and rotation
+      if (property === 'points') {
+        const ang = value[0].angle(value.at(-1));
+        const theta = ang - this.points[0].angle(this.points.at(-1));
+
+        if (theta !== 0) {
+          // set rotation center
+          const center = this.points[0];
+          // apply rotation to child entities points
+          this.childEntities.forEach((child) => {
+            const rotatedPoints = child.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
+            child.setProperty('points', rotatedPoints);
+          });
+
+          this.angle+= Utils.radians2degrees(theta);
+        }
+
+        const delta = value[0].subtract(this.points[0]);
+        if ( delta.x !== 0 || delta.y !== 0 ) {
+        // apply translation to child entities points
+          this.childEntities.forEach((child) => {
+            const offsetPoints = child.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+            child.setProperty('points', offsetPoints);
+          });
+        }
+
+        // do not change hatch points
+        return;
       }
 
+      // other properties as normal
       this[property] = value;
     }
   }
