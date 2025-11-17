@@ -12,15 +12,12 @@ export class StateManager {
   #history = [];
   #historyIndex = 0;
   #maxHistoryStates = 10;
-  #entityManager = null;
 
   /**
    * Create StateManager
    * @param {EntityManager} entityManager
    */
-  constructor(entityManager) {
-    this.#entityManager = entityManager;
-  }
+  constructor() {}
 
   /**
    * Add a new state to the history
