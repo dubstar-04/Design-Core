@@ -474,16 +474,8 @@ export class BaseDimension extends Entity {
    * @param {number} scale
    */
   draw(ctx, scale) {
-    const entities = this.buildDimension();
-
-    if (entities) {
-      this.block.clearItems();
-
-      entities.forEach((element) => {
-        // For colour BYBLOCK for dimensions
-        element.setColour('BYBLOCK');
-        this.block.addItem(element);
-      });
+    if (this.block.items.length === 0) {
+      this.refesh();
     }
 
     this.block.draw(ctx, scale, this);
@@ -541,5 +533,31 @@ export class BaseDimension extends Entity {
    */
   touched(selectionExtremes) {
     return this.block.touched(selectionExtremes);
+  }
+
+  refesh() {
+    const entities = this.buildDimension();
+
+    if (entities) {
+      this.block.clearItems();
+
+      entities.forEach((element) => {
+        // For colour BYBLOCK for dimensions
+        element.setColour('BYBLOCK');
+        this.block.addItem(element);
+      });
+    }
+  }
+
+  /**
+   * Set a property if it exists
+   * @param {string} property
+   * @param {any} value
+   */
+  setProperty(property, value) {
+    if (this.hasOwnProperty(property)) {
+      this[property] = value;
+      this.refesh();
+    }
   }
 }
