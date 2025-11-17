@@ -503,10 +503,12 @@ export class InputManager {
     if (this.activeCommand instanceof Tool) {
       this.activeCommand.action();
     } else {
+      if (item !== undefined) {
       // set the items layer to the current layer
-      item.layer = DesignCore.LayerManager.getCstyle();
-      // return the item index
-      return DesignCore.Scene.addItem(item.type, item, index);
+        item.layer = DesignCore.LayerManager.getCstyle();
+        // return the item index
+        return DesignCore.Scene.addItem(item.type, item, index);
+      }
     }
   }
 }
