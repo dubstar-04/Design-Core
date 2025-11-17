@@ -2,6 +2,7 @@ import { Strings } from '../lib/strings.js';
 import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { RemoveState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -58,10 +59,15 @@ export class Erase extends Tool {
   action() {
     // get a copy of the selection set
     const selections = DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice();
-    // sort the selection in descending order
-    selections.sort((a, b) => b - a);
+
+    const stateChanges = [];
+
+    for (let i = 0; i < selections.length; i++) {
+      const stateChange = new RemoveState(DesignCore.Scene.entities.get(selections[i]), {});
+      stateChanges.push(stateChange);
+    }
 
     // delete each of the selections from the scene items
-    DesignCore.Scene.remove(selections);
+    DesignCore.Scene.commit(stateChanges);
   }
 }

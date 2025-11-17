@@ -2,7 +2,7 @@ import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Strings } from '../lib/strings.js';
 import { Logging } from '../lib/logging.js';
-import { StateChange } from '../lib/stateManager.js';
+import { UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -86,13 +86,13 @@ export class MatchProp extends Tool {
 
       // only add state change if there are properties to change
       if (Object.keys(propertySet).length > 0) {
-        const stateChange = new StateChange(targetItem, propertySet);
+        const stateChange = new UpdateState(targetItem, propertySet);
         stateChanges.push(stateChange);
       }
     }
     // apply the updates
     if (stateChanges.length > 0) {
-      DesignCore.Scene.update(stateChanges);
+      DesignCore.Scene.commit(stateChanges);
     }
   }
 }

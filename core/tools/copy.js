@@ -4,6 +4,7 @@ import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Point } from '../entities/point.js';
+import { AddState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -82,15 +83,16 @@ export class Copy extends Tool {
    */
   action() {
     const delta = this.points[1].subtract(this.points[0]);
-    const copiedEntities = [];
+    const stateChanges = [];
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]));
       const offsetPoints = copyofitem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
       copyofitem.setProperty('points', offsetPoints);
-      copiedEntities.push(copyofitem);
+      const stateChange = new AddState(copyofitem, {});
+      stateChanges.push(stateChange);
     }
 
-    DesignCore.Scene.add(copiedEntities);
+    DesignCore.Scene.commit(stateChanges);
   };
 }

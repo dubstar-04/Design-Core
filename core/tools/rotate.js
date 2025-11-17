@@ -4,7 +4,7 @@ import { Utils } from '../lib/utils.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Point } from '../entities/point.js';
-import { StateChange } from '../lib/stateManager.js';
+import { UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -115,11 +115,11 @@ export class Rotate extends Tool {
 
     for (let index = 0; index < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; index++) {
       const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
-      const stateChange = new StateChange(item, { points: this.getRotatedPoints(item.points, center, theta) });
+      const stateChange = new UpdateState(item, { points: this.getRotatedPoints(item.points, center, theta) });
       stateChanges.push(stateChange);
     }
 
-    DesignCore.Scene.update(stateChanges);
+    DesignCore.Scene.commit(stateChanges);
   };
 
   /**

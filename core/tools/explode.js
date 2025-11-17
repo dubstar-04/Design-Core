@@ -5,6 +5,7 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Insert } from '../entities/insert.js';
 import { Point } from '../entities/point.js';
+import { AddState, RemoveState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -66,6 +67,8 @@ export class Explode extends Tool {
     // sort the selection in descending order
     selections.sort((a, b) => b - a);
 
+    const stateChanges = [];
+
     for (let i = 0; i < selections.length; i++) {
       const insert = DesignCore.Scene.entities.get(selections[i]);
 
@@ -90,12 +93,18 @@ export class Explode extends Tool {
         const copyofitem = Utils.cloneObject(blockItem);
         const points = copyofitem.points.map((p) => new Point(p.x, p.y).add(insertPoint));
         copyofitem.setProperty('points', points);
-        DesignCore.Scene.addItem(copyofitem.type, copyofitem);
+        const stateChange = new AddState(copyofitem, {});
+        stateChanges.push(stateChange);
       });
 
-      // remove the insert from the scene
-      DesignCore.Scene.entities.remove(selections[i]);
+      const stateChangeRemove = new RemoveState(insert, {});
+      stateChanges.push(stateChangeRemove);
     }
+
+
+    // add the exploded items to the scene
+    DesignCore.Scene.commit(stateChanges);
+
 
     if (counter) {
       DesignCore.Core.notify(`${this.type} - ${counter} ${Strings.Strings.ITEMS} ${Strings.Message.CANNOTBEACTIONED}`);
