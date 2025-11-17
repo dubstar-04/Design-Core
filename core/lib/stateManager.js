@@ -12,11 +12,14 @@ export class StateManager {
   #history = [];
   #historyIndex = 0;
   #maxHistoryStates = 10;
+  #entityManager = null;
 
   /**
    * Create StateManager
    */
-  constructor() { }
+  constructor(entityManager) {
+    this.#entityManager = entityManager;
+  }
 
   /**
    * Add a new state to the history
@@ -83,34 +86,12 @@ export class StateManager {
   }
 
   /**
-   * Add entities to the entity manager
-   * @param {object} entityManager
+   * Commit a set of state changes
+   * @param {EntityManager} entityManger
    * @param {Array} stateChanges
-   * */
-  add(entityManager, stateChanges) {
-    const state = new AddState(entityManager, stateChanges);
-    this.addState(state);
-    state.do();
-  }
-
-  /**
-   * Remove entities from the entity manager
-   * @param {object} entityManager
-   * @param {Array} stateChanges
-   * */
-  remove(entityManager, stateChanges) {
-    const state = new RemoveState(entityManager, stateChanges);
-    this.addState(state);
-    state.do();
-  }
-
-  /**
-   * Update entities in the entity manager
-   * @param {object} entityManager
-   * @param {Array} stateChanges
-   * */
-  update(entityManager, stateChanges) {
-    const state = new UpdateState(entityManager, stateChanges);
+   */
+  commit(entityManger, stateChanges) {
+    const state = new State(entityManger, stateChanges);
     this.addState(state);
     state.do();
   }
@@ -141,132 +122,82 @@ export class StateManager {
 }
 
 /** Base State Class */
-export class State {
+class State {
   /**
    * Create State
-   * @param {object} entityManager
-   * @param {Array} stateChanges
+   * @param {Array}stateChanges
    * */
   constructor(entityManager, stateChanges) {
     this.entityManager = entityManager;
     this.stateChanges = stateChanges;
-  }
-}
-
-
-/** Add State Class */
-export class AddState extends State {
-  /**
-   * Create Add State
-   * @param {object} entityManager
-   * @param {Array} stateChanges
-   * */
-  constructor(entityManager, stateChanges) {
-    super(entityManager, stateChanges);
+    this.undoStateChanges = [];
   }
 
-  /** Perform the add */
+  /** Perform the state changes */
   do() {
-    console.log('do add');
+    this.undoStateChanges = [];
+    // console.log('Base State do');
+    // console.trace();
     for (const stateChange of this.stateChanges) {
-      this.entityManager.add(stateChange.entity);
+      if (stateChange instanceof AddState) {
+        this.entityManager.add(stateChange.entity);
+        const undoStateChange = new RemoveState(stateChange.entity, {});
+        this.undoStateChanges.push(undoStateChange);
+      }
+
+      if (stateChange instanceof RemoveState) {
+        const index = this.entityManager.indexOf(stateChange.entity);
+        if (index !== -1) {
+          this.entityManager.remove(index);
+          const undoStateChange = new AddState(stateChange.entity, {});
+          this.undoStateChanges.push(undoStateChange);
+        }
+      }
+
+      if (stateChange instanceof UpdateState) {
+        const index = this.entityManager.indexOf(stateChange.entity);
+        if (index !== -1) {
+          const previousProperties = Utils.cloneObject(stateChange.entity);
+          const undoStateChange = new UpdateState(stateChange.entity, previousProperties);
+          this.undoStateChanges.push(undoStateChange);
+
+          this.entityManager.update(index, stateChange.properties);
+        }
+      }
     }
   }
 
-  /** Undo the add */
+  /** Undo the state changes */
   undo() {
-    console.log('undo add');
-    for (const stateChange of this.stateChanges) {
-      const index = this.entityManager.indexOf(stateChange.entity);
-      if (index !== -1) {
-        this.entityManager.remove(index);
+    // console.log('Base State undo');
+    for (const stateChange of this.undoStateChanges) {
+      if (stateChange instanceof AddState) {
+        this.entityManager.add(stateChange.entity);
+      }
+
+      if (stateChange instanceof RemoveState) {
+        const index = this.entityManager.indexOf(stateChange.entity);
+        if (index !== -1) {
+          this.entityManager.remove(index);
+        }
+      }
+
+      if (stateChange instanceof UpdateState) {
+        const index = this.entityManager.indexOf(stateChange.entity);
+        if (index !== -1) {
+          this.entityManager.update(index, stateChange.properties);
+        }
       }
     }
   }
 }
 
-/** Remove State Class */
-export class RemoveState extends State {
-  /**
-   * Create  Remove State
-   * @param {object} entityManager
-   * @param {Array} stateChanges
-   * */
-  constructor(entityManager, stateChanges) {
-    super(entityManager, stateChanges);
-  }
-
-  /** Perform the remove  */
-  do() {
-    console.log('do remove');
-    for (const stateChange of this.stateChanges) {
-      const index = this.entityManager.indexOf(stateChange.entity);
-      if (index !== -1) {
-        this.entityManager.remove(index);
-      }
-    }
-  }
-
-  /** Undo the remove */
-  undo() {
-    console.log('undo remove');
-    for (const stateChange of this.stateChanges) {
-      this.entityManager.add(stateChange.entity);
-    }
-  }
-}
-
-/** Update State Class */
-export class UpdateState extends State {
-  /**
-   * Create Update State
-   * @param {object} entityManager
-   * @param {Array} stateChanges
-   * */
-  constructor(entityManager, stateChanges) {
-    super(entityManager, stateChanges);
-    this.previousStateChanges = [];
-  }
-
-  /** Perform the update */
-  do() {
-    console.log('do update');
-    this.previousStateChanges = [];
-    for (const stateChange of this.stateChanges) {
-      // get the entity and its current properties
-      const entity = stateChange.entity;
-      const properties = stateChange.properties;
-      // store the previous properties for undo
-      const previousProperties = Utils.cloneObject(entity);
-      const previousStateChange = new StateChange(entity, previousProperties);
-      this.previousStateChanges.push(previousStateChange);
-      // perform the update
-      const index = this.entityManager.indexOf(entity);
-      this.entityManager.update(index, properties);
-    }
-  }
-
-  /**
-   * Undo the update
-   */
-  undo() {
-    console.log('undo update');
-    for (const stateChange of this.previousStateChanges) {
-      // get the entity and its previous properties
-      const entity = stateChange.entity;
-      const properties = stateChange.properties;
-      // perform the update to restore previous properties
-      const index = this.entityManager.indexOf(entity);
-      this.entityManager.update(index, properties);
-    }
-  }
-}
 
 /**
- * State Change Class
+ * State Change Base Class
  * Holds an entity and the properties to be changed
  */
-export class StateChange {
+class StateChange {
   /**
    * Create a state change
    * @param {object} entity
@@ -278,3 +209,37 @@ export class StateChange {
   }
 }
 
+/** Add State Class */
+export class AddState extends StateChange {
+  /**
+   * Create Add State
+   * @param {object} entity
+   * @param {object} properties
+   */
+  constructor(entity, properties) {
+    super(entity, properties);
+  }
+}
+
+/** Remove State Class */
+export class RemoveState extends StateChange {
+  /** Create Remove State
+   * @param {object} entity
+   * @param {object} properties
+   */
+  constructor(entity, properties) {
+    super(entity, properties);
+  }
+}
+
+/** Update State Class */
+export class UpdateState extends StateChange {
+  /**
+   * Create Update State
+   * @param {object} entity
+   * @param {object} properties
+   */
+  constructor(entity, properties) {
+    super(entity, properties);
+  }
+}
