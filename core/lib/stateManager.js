@@ -117,6 +117,16 @@ export class StateManager {
       }
     }
   }
+
+  /** Check if undo is possible */
+  canUndo() {
+    return this.#historyIndex > 0;
+  }
+
+  /** Check if redo is possible */
+  canRedo() {
+    return this.#historyIndex < this.#history.length;
+  }
 }
 
 /** Base State Class */
