@@ -145,6 +145,7 @@ export class Circle extends Entity {
   /**
    * Trim the entity
    * @param {Array} points
+   * @return {Array} - array of state changes
    */
   trim(points) {
     if (points.length > 1) {

@@ -185,6 +185,7 @@ export class Line extends Entity {
   /**
    * Extend the entity
    * @param {Array} intersections
+   * @return {Array} - array of state changes
    */
   extend(intersections) {
     // array to hold state changes
