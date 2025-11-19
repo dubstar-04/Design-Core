@@ -8,6 +8,7 @@ import { BoundingBox } from '../lib/boundingBox.js';
 import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
+import { AddState, RemoveState } from '../lib/stateManager.js';
 
 /**
  * Circle Entity Class
@@ -168,7 +169,17 @@ export class Circle extends Entity {
         lineWidth: this.lineWidth,
       };
 
-      DesignCore.Scene.addItem('Arc', data, DesignCore.Scene.items.indexOf(this));
+      // DesignCore.Scene.addItem('Arc', data, DesignCore.Scene.items.indexOf(this));
+
+      // create a new arc entity
+      const arc = DesignCore.CommandManager.createNew('Arc', data);
+
+      const stateChanges = [];
+      // Remove the circle and add the new arc
+      const removeState = new RemoveState(this);
+      const addState = new AddState(arc);
+      stateChanges.push(removeState, addState);
+      return stateChanges;
     }
   }
 

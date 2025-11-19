@@ -5,8 +5,11 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
+import { AddState, RemoveState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
+import { Utils } from '../lib/utils.js';
+
 
 /**
  * Line Entity Class
@@ -117,158 +120,70 @@ export class Line extends Entity {
 
   /**
    * Trim the entity
-   * @param {Array} points
+   * @param {Array} intersections
+   * @return {Array} - array of state changes
    */
-  trim(points) {
-    /**
-     * Trim one end
-     * @param {Array} intersectPnts
-     * @param {Line} line
-     */
-    function trimOneEnd(intersectPnts, line) {
-      let originPoint;
-      let destinationPoint;
-      const validPoints = [];
+  trim(intersections) {
+    // array to hold state changes
+    const stateChanges = [];
 
-      for (let i = 0; i < line.points.length; i++) {
-        for (let j = 0; j < intersectPnts.length; j++) {
-          if (betweenPoints(DesignCore.Mouse.pointOnScene(), [intersectPnts[j], line.points[i]], false)) {
-            if (Math.round(intersectPnts[j].distance(line.points[i]) * 100) / 100 < Math.round(line.points[0].distance(line.points[1]) * 100) / 100) {
-              originPoint = i;
-              validPoints.push(j);
+    // get the mouse position
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+    // get the point on the line closest to the mouse
+    const pointOnLine = mousePosition.closestPointOnLine(this.points[0], this.points[1]);
+
+    // remove any intersections that are at the end points of the line
+    intersections = intersections.filter((p) => !p.isSame(this.points[0]) || !p.isSame(this.points[1]));
+
+    Utils.sortPointsByDistance(intersections, this.points[0]);
+
+    // Add line points to the start and the end of the point array
+    const testPoints = [this.points[0], ...intersections, this.points[1]];
+
+    // Test if mouse position is between two intersection points
+    if (testPoints.length > 1) {
+      for (let i = 0; i < testPoints.length - 1; i++) {
+        const startPoint = testPoints[i];
+        const endPoint = testPoints[i + 1];
+
+        // check if the mouse is between startPoint and endPoint
+        if (pointOnLine.isOnLine(startPoint, endPoint)) {
+          const newPoints = [];
+
+          for (const p of testPoints) {
+            const inOriginalLine = this.points.indexOf(p) !== -1;
+            const inIntersections = intersections.indexOf(p) !== -1;
+
+            // Keep points which:
+            // - The mouse is between are intersections
+            // - The mouse is not between and in this line
+            const isBetween = p.isSame(startPoint) || p.isSame(endPoint);
+            if ((isBetween && inIntersections) || (!isBetween && inOriginalLine)) {
+              newPoints.push(p);
             }
           }
-        }
-      }
 
-      if (typeof validPoints !== 'undefined') {
-        let dist = Number.POSITIVE_INFINITY;
-
-        for (let j = 0; j < validPoints.length; j++) {
-          if (line.points[originPoint].distance(intersectPnts[validPoints[j]]) < dist) {
-            dist = line.points[originPoint].distance(intersectPnts[validPoints[j]]);
-            destinationPoint = validPoints[j];
+          if (newPoints.length % 2 === 0) {
+            // Add lines for each point pair
+            for (let j = 0; j < newPoints.length; j += 2) {
+              const line = DesignCore.CommandManager.createNew('Line', {
+                points: [newPoints[j], newPoints[j + 1]],
+                colour: this.colour,
+                layer: this.layer,
+                lineWidth: this.lineWidth,
+              });
+              const addState = new AddState(line);
+              stateChanges.push(addState);
+            }
           }
-        }
-      }
-
-      if (typeof destinationPoint !== 'undefined') {
-        line.points[originPoint] = intersectPnts[destinationPoint];
-      }
-    }
-
-    /**
-     * Trim between points
-     * @param {Array} pnts
-     * @param {Line} line
-     */
-    function trimBetween(pnts, line) {
-      const a = Math.round(line.points[0].distance(pnts[0]));
-      const b = Math.round(line.points[0].distance(pnts[1]));
-      const c = Math.round(line.points[1].distance(pnts[0]));
-      const d = Math.round(line.points[1].distance(pnts[1]));
-
-      if (a === 0 && d === 0 || b === 0 && c === 0) {
-      } else {
-        const data = {
-          points: [pnts[a < b ? 1 : 0], line.points[1]],
-          colour: line.colour,
-          layer: line.layer,
-          lineWidth: line.lineWidth,
-        };
-
-        DesignCore.Scene.addItem('Line', data);
-
-        if (a < b) {
-          line.points[1] = pnts[0];
-        } else {
-          line.points[1] = pnts[1];
+          // Remove the existing line
+          const removeState = new RemoveState(this);
+          stateChanges.push(removeState);
         }
       }
     }
 
-    /**
-     * Check if the trim is between two points
-     * @param {Point} mousePnt
-     * @param {Array} pntsArray
-     * @param {Array} returnPoints
-     * @return {boolean}
-     */
-    function betweenPoints(mousePnt, pntsArray, returnPoints) {
-      for (let i = 0; i < pntsArray.length - 1; i++) {
-        const a = pntsArray[i].distance(mousePnt);
-        const b = pntsArray[i + 1].distance(mousePnt);
-        const c = pntsArray[i].distance(pntsArray[i + 1]);
-
-        if (Math.round(a + b) === Math.round(c)) {
-          if (returnPoints) {
-            return [pntsArray[i], pntsArray[i + 1]];
-          }
-
-          return true;
-        }
-      }
-    }
-
-    if (points.length > 1) {
-      // is the mouse between two points
-      const pnts = betweenPoints(DesignCore.Mouse.pointOnScene(), points, true);
-
-      if (typeof pnts !== 'undefined') {
-        trimBetween(pnts, this);
-      } else {
-        trimOneEnd(points, this);
-      }
-    } else {
-      trimOneEnd(points, this);
-    }
-  }
-
-  /**
-   * Extend the entity
-   * @param {Array} points
-   */
-  extend(points) {
-    let originPoint;
-    let destinationPoint;
-
-    // Find which end is closer to the mouse
-    // ToDo: Pass the mouse location in rather than needing a ref to core.
-    if (this.points[0].distance(DesignCore.Mouse.pointOnScene()) < this.points[1].distance(DesignCore.Mouse.pointOnScene())) {
-      originPoint = 0;
-    } else {
-      originPoint = 1;
-    }
-
-    // check if any of the points are valid
-    const validPoints = [];
-
-    for (let i = 0; i < points.length; i++) {
-      if (Math.round(this.points[originPoint].angle(points[i])) === Math.round(this.points[originPoint ? 0 : 1].angle(this.points[originPoint]))) {
-        // if the destination point is different than the origin add it to the array of valid points
-        if (Math.round(this.points[originPoint].distance(points[i])) !== 0) {
-          validPoints.push(i);
-        }
-      }
-    }
-
-    if (validPoints.length > 1) {
-      let dist = Number.POSITIVE_INFINITY;
-
-      for (let j = 0; j < validPoints.length; j++) {
-        if (this.points[originPoint].distance(points[validPoints[j]]) < dist) {
-          dist = this.points[originPoint].distance(points[validPoints[j]]);
-          destinationPoint = validPoints[j];
-        }
-      }
-    } else if (validPoints.length === 1) {
-      // only one valid point
-      destinationPoint = validPoints[0];
-    }
-
-    if (destinationPoint !== undefined) {
-      this.points[originPoint] = points[destinationPoint];
-    }
+    return stateChanges;
   }
 
   /**

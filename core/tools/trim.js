@@ -86,7 +86,10 @@ export class Trim extends Tool {
       }
 
       if (intersectPoints) {
-        TrimItem.trim(intersectPoints);
+        const stateChanges = TrimItem.trim(intersectPoints);
+        if (stateChanges.length) {
+          DesignCore.Scene.commit(stateChanges);
+        }
       }
 
       // remove item from selection set and reset the selectedIndex
