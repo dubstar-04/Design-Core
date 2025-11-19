@@ -5,7 +5,7 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
-import { AddState, RemoveState } from '../lib/stateManager.js';
+import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { Utils } from '../lib/utils.js';
@@ -166,12 +166,8 @@ export class Line extends Entity {
           if (newPoints.length % 2 === 0) {
             // Add lines for each point pair
             for (let j = 0; j < newPoints.length; j += 2) {
-              const line = DesignCore.CommandManager.createNew('Line', {
-                points: [newPoints[j], newPoints[j + 1]],
-                colour: this.colour,
-                layer: this.layer,
-                lineWidth: this.lineWidth,
-              });
+              const line = Utils.cloneObject(this);
+              line.points = [newPoints[j], newPoints[j + 1]];
               const addState = new AddState(line);
               stateChanges.push(addState);
             }
@@ -182,6 +178,50 @@ export class Line extends Entity {
         }
       }
     }
+
+    return stateChanges;
+  }
+
+  /**
+   * Extend the entity
+   * @param {Array} intersections
+   */
+  extend(intersections) {
+    // array to hold state changes
+    const stateChanges = [];
+    let originPoint;
+
+    // Find which end is closer to the mouse
+    if (this.points[0].distance(DesignCore.Mouse.pointOnScene()) < this.points[1].distance(DesignCore.Mouse.pointOnScene())) {
+      originPoint = 0;
+    } else {
+      originPoint = 1;
+    }
+
+    Utils.sortPointsByDistance(intersections, this.points[originPoint]);
+    // closest point is the extension point
+    const newEndPoint = intersections.at(0);
+
+    if (newEndPoint.distance(this.points[originPoint]) > newEndPoint.distance(this.points[1 - originPoint])) {
+      // end of the line selected is further away than the opposite end - no extension
+      return stateChanges;
+    }
+
+    const newPoints = [];
+    if (originPoint === 0) {
+      newPoints.push(newEndPoint, this.points[1]);
+    } else {
+      newPoints.push(this.points[0], newEndPoint);
+    }
+
+    if (newPoints[0].isSame(this.points[0]) && newPoints[1].isSame(this.points[1])) {
+      // No change
+      return stateChanges;
+    }
+
+    // update the line
+    const addState = new UpdateState(this, { points: newPoints });
+    stateChanges.push(addState);
 
     return stateChanges;
   }

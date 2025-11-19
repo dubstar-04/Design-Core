@@ -86,7 +86,10 @@ export class Extend extends Tool {
       }
 
       if (intersectPoints) {
-        extendItem.extend(intersectPoints);
+        const stateChanges = extendItem.extend(intersectPoints);
+        if (stateChanges.length) {
+          DesignCore.Scene.commit(stateChanges);
+        }
       }
 
       // remove item from selection set and reset the selectedIndex
