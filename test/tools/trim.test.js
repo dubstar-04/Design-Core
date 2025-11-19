@@ -95,17 +95,19 @@ test('Test Trim.action', () => {
   // Perform trim
   trim.action();
 
-  // line one
-  expect(core.scene.entities.get(0).points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.entities.get(0).points[0].y).toBe(lineOneStart.y);
-  expect(core.scene.entities.get(0).points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.entities.get(0).points[1].y).toBe(50);
+  // index 0 is now line two
+  // line Two
+  expect(core.scene.entities.get(0).points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.entities.get(0).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.entities.get(0).points[1].x).toBe(lineTwoEnd.x);
+  expect(core.scene.entities.get(0).points[1].y).toBe(lineTwoEnd.y);
 
-  // line two
-  expect(core.scene.entities.get(1).points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.entities.get(1).points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.entities.get(1).points[1].x).toBe(lineTwoEnd.x);
-  expect(core.scene.entities.get(1).points[1].y).toBe(lineTwoEnd.y);
+  // index 1 is now line one
+  // line One
+  expect(core.scene.entities.get(1).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.entities.get(1).points[0].y).toBe(lineOneStart.y);
+  expect(core.scene.entities.get(1).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.entities.get(1).points[1].y).toBe(50);
 
   /**
    * Trim test four
@@ -126,17 +128,19 @@ test('Test Trim.action', () => {
   // Perform trim
   trim.action();
 
-  // line one
-  expect(core.scene.entities.get(0).points[0].x).toBe(lineOneStart.x);
-  expect(core.scene.entities.get(0).points[0].y).toBe(50);
-  expect(core.scene.entities.get(0).points[1].x).toBe(lineOneEnd.x);
-  expect(core.scene.entities.get(0).points[1].y).toBe(lineOneEnd.y);
-
+  // index 0 is now line two
   // line two
-  expect(core.scene.entities.get(1).points[0].x).toBe(lineTwoStart.x);
-  expect(core.scene.entities.get(1).points[0].y).toBe(lineTwoStart.y);
-  expect(core.scene.entities.get(1).points[1].x).toBe(lineTwoEnd.x);
-  expect(core.scene.entities.get(1).points[1].y).toBe(lineTwoEnd.y);
+  expect(core.scene.entities.get(1).points[0].x).toBe(lineOneStart.x);
+  expect(core.scene.entities.get(1).points[0].y).toBe(50);
+  expect(core.scene.entities.get(1).points[1].x).toBe(lineOneEnd.x);
+  expect(core.scene.entities.get(1).points[1].y).toBe(lineOneEnd.y);
+
+  // index 1 is now line two
+  // line one
+  expect(core.scene.entities.get(0).points[0].x).toBe(lineTwoStart.x);
+  expect(core.scene.entities.get(0).points[0].y).toBe(lineTwoStart.y);
+  expect(core.scene.entities.get(0).points[1].x).toBe(lineTwoEnd.x);
+  expect(core.scene.entities.get(0).points[1].y).toBe(lineTwoEnd.y);
 
 
   /**
