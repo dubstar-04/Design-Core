@@ -141,16 +141,24 @@ export class Scene {
    * Undo the last action
    */
   undo() {
-    this.stateManager.undo();
-    DesignCore.Canvas.requestPaint();
+    if (this.stateManager.canUndo()) {
+      this.stateManager.undo();
+      DesignCore.Canvas.requestPaint();
+    } else {
+      DesignCore.Core.notify(Strings.Message.NOUNDO);
+    }
   }
 
   /**
    * Redo the last undone action
    */
   redo() {
-    this.stateManager.redo();
-    DesignCore.Canvas.requestPaint();
+    if (this.stateManager.canRedo()) {
+      this.stateManager.redo();
+      DesignCore.Canvas.requestPaint();
+    } else {
+      DesignCore.Core.notify(Strings.Message.NOREDO);
+    }
   }
 
   /**
