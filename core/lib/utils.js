@@ -31,6 +31,20 @@ export class Utils {
   }
 
   /**
+   * Sort points by distance to reference point
+   * note this mutates the points array
+   * @param {Array} points
+   * @param {Point} refPoint
+   */
+  static sortPointsByDistance(points, refPoint) {
+    points.sort((a, b) => {
+      const da = (a.x - refPoint.x) ** 2 + (a.y - refPoint.y) ** 2;
+      const db = (b.x - refPoint.x) ** 2 + (b.y - refPoint.y) ** 2;
+      return da - db; // nearest first
+    });
+  }
+
+  /**
    * Deep clone object
    * @param {Object} obj - object to clone
    * @return {Object} - new cloned object
