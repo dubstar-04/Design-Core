@@ -746,7 +746,7 @@ export class Hatch extends Entity {
         }
 
         const delta = value[0].subtract(this.points[0]);
-        if ( delta.x !== 0 || delta.y !== 0 ) {
+        if (delta.x !== 0 || delta.y !== 0) {
         // apply translation to child entities points
           this.childEntities.forEach((child) => {
             const offsetPoints = child.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
