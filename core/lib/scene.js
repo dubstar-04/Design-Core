@@ -31,7 +31,7 @@ export class Scene {
     this.tempEntities = new EntityManager();
     this.auxiliaryEntities = new EntityManager();
 
-    this.stateManager = new StateManager(this.entities);
+    this.stateManager = new StateManager();
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
