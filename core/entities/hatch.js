@@ -121,7 +121,7 @@ export class Hatch extends Entity {
       this.points[0] = new Point(0, 0);
     }
 
-    if (this.points.length < 2 || (this.points.at(-1).x === 1 && this.points.at(-1).y === 1)) {
+    if (this.points.length < 2 || (this.points.at(-1).x !== 1 || this.points.at(-1).y !== 1)) {
       this.points.push(new Point(1, 1));
     }
   }
