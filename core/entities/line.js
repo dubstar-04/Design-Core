@@ -133,7 +133,7 @@ export class Line extends Entity {
     const pointOnLine = mousePosition.closestPointOnLine(this.points[0], this.points[1]);
 
     // remove any intersections that are at the end points of the line
-    intersections = intersections.filter((p) => !p.isSame(this.points[0]) || !p.isSame(this.points[1]));
+    intersections = intersections.filter((p) => !p.isSame(this.points[0]) && !p.isSame(this.points[1]));
 
     Utils.sortPointsByDistance(intersections, this.points[0]);
 
