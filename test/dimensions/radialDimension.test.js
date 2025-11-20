@@ -116,7 +116,7 @@ test('RadialDimension.preview runs without error and calls createTempItem', () =
 
   // Manual mock for createTempItem
   const createTempItemCalls = [];
-  DesignCore.Scene.tempEntities.create= function(type, obj) {
+  DesignCore.Scene.tempEntities.create = function(type, obj) {
     createTempItemCalls.push([type, obj]);
   };
   // Manual mock for pointOnScene

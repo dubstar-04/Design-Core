@@ -128,7 +128,7 @@ test('RotatedDimension.preview runs without error and calls createTempItem', () 
   const origPointOnScene = DesignCore.Mouse.pointOnScene;
   // Manual mock for createTempItem
   const createTempItemCalls = [];
-  DesignCore.Scene.tempEntities.create= function(type, obj) {
+  DesignCore.Scene.tempEntities.create = function(type, obj) {
     createTempItemCalls.push([type, obj]);
   };
   // Manual mock for pointOnScene
