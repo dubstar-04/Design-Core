@@ -179,6 +179,7 @@ export class Circle extends Entity {
       stateChanges.push(removeState, addState);
       return stateChanges;
     }
+    return [];
   }
 
   /**
