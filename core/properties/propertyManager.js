@@ -1,5 +1,6 @@
 import { Strings } from '../lib/strings.js';
 import { DesignCore } from '../designCore.js';
+import { UpdateState } from '../lib/stateManager.js';
 
 /** Property Manager Class */
 export class PropertyManager {
@@ -32,19 +33,26 @@ export class PropertyManager {
    * @param {any} newPropertyValue
    */
   setItemProperties(property, newPropertyValue) {
+    const stateChanges = [];
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+      const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
       // check if the item has the selected property
-      if (!DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].hasOwnProperty(property)) {
+      if (!DesignCore.Scene.entities.get(index).hasOwnProperty(property)) {
         continue;
       }
 
-      if (typeof (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]][property]) !== typeof (newPropertyValue)) {
+      if (typeof (DesignCore.Scene.entities.get(index)[property]) !== typeof (newPropertyValue)) {
         DesignCore.Core.notify(Strings.Error.INPUT);
       } else {
-        DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]][property] = newPropertyValue;
-        DesignCore.Scene.selectionManager.reloadSelectedItems();
+        // update the item property
+        const update = {};
+        update[property] = newPropertyValue;
+        const stateChange = new UpdateState(DesignCore.Scene.entities.get(index), update);
+        stateChanges.push(stateChange);
       }
     }
+    DesignCore.Scene.commit(stateChanges);
+    DesignCore.Scene.selectionManager.reloadSelectedItems();
   }
 
   /**
@@ -57,7 +65,8 @@ export class PropertyManager {
 
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        const itemType = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].type;
+        const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
+        const itemType = item.type;
 
         if (itemTypes.indexOf(itemType, 0) === -1) {
           itemTypes.push(itemType);
@@ -90,7 +99,7 @@ export class PropertyManager {
 
     // create subset array of selectionSet
     DesignCore.Scene.selectionManager.selectionSet.selectionSet.forEach((index) => {
-      subset.push(DesignCore.Scene.items[index]);
+      subset.push(DesignCore.Scene.entities.get(index));
     });
 
     // get a subset of the selectionSet
@@ -128,8 +137,8 @@ export class PropertyManager {
     const propertiesValueList = [];
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        if (DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].type === itemType || itemType === 'All') {
-          const prop = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]][property];
+        if (DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).type === itemType || itemType === 'All') {
+          const prop = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i])[property];
           propertiesValueList.push(prop);
         }
       }

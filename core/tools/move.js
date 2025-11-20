@@ -2,8 +2,10 @@ import { Strings } from '../lib/strings.js';
 import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
+import { UpdateState } from '../lib/stateManager.js';
 
 /**
  * Move Command Class
@@ -63,14 +65,15 @@ export class Move extends Tool {
 
       // Draw a line
       const points = [this.points.at(-1), mousePoint];
-      DesignCore.Scene.createTempItem('Line', { points: points });
+      DesignCore.Scene.tempEntities.create('Line', { points: points });
 
       // Get the delta from the last mouse point
       const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);
       this.lastMousePoint = mousePoint;
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        DesignCore.Scene.selectionManager.selectedItems[i].move(delta.x, delta.y);
+        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+        item.setProperty('points', this.getOffsetPoints(item.points, delta));
       }
     }
   }
@@ -82,8 +85,28 @@ export class Move extends Tool {
     const xDelta = this.points[1].x - this.points[0].x;
     const yDelta = this.points[1].y - this.points[0].y;
 
+    const delta = new Point(xDelta, yDelta);
+
+    const stateChanges = [];
+
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].move(xDelta, yDelta);
+      const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
+      const item = DesignCore.Scene.entities.get(index);
+      const stateChange = new UpdateState(item, { points: this.getOffsetPoints(item.points, delta) });
+      stateChanges.push(stateChange);
     }
+
+    DesignCore.Scene.commit(stateChanges);
+  }
+
+  /**
+ * Get offset points
+ * @param {Array} points
+ * @param {Point} delta
+ * @return {Array} offsetPoints
+ */
+  getOffsetPoints(points, delta) {
+    const offsetPoints = points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+    return offsetPoints;
   }
 }

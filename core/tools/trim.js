@@ -71,8 +71,8 @@ export class Trim extends Tool {
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         if (DesignCore.Scene.selectionManager.selectionSet.selectionSet[i] !== item) {
-          const boundaryItem = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]];
-          TrimItem = DesignCore.Scene.items[item];
+          const boundaryItem = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
+          TrimItem = DesignCore.Scene.entities.get(item);
 
           const functionName = 'intersect' + boundaryItem.type + TrimItem.type;
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), TrimItem.intersectPoints());
@@ -86,7 +86,10 @@ export class Trim extends Tool {
       }
 
       if (intersectPoints) {
-        TrimItem.trim(intersectPoints);
+        const stateChanges = TrimItem.trim(intersectPoints);
+        if (stateChanges.length) {
+          DesignCore.Scene.commit(stateChanges);
+        }
       }
 
       // remove item from selection set and reset the selectedIndex

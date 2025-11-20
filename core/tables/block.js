@@ -6,8 +6,10 @@ import { Strings } from '../lib/strings.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
+import { AddState, RemoveState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
+import { Utils } from '../lib/utils.js';
 
 /**
  * Block Entity Class
@@ -82,8 +84,7 @@ export class Block extends Entity {
       const nameOp = new PromptOptions(`${Strings.Input.NAME} <${name}>`, [
         Input.Type.STRING,
       ]);
-      const selectedName =
-        await DesignCore.Scene.inputManager.requestInput(nameOp);
+      const selectedName = await DesignCore.Scene.inputManager.requestInput(nameOp);
 
       // get the insertion point
       const op2 = new PromptOptions(Strings.Input.BASEPOINT, [
@@ -101,24 +102,28 @@ export class Block extends Entity {
       }
 
       // create block
-      const block = DesignCore.Scene.blockManager.addItem({
-        name: selectedName,
-      });
-
+      const block = DesignCore.Scene.blockManager.addItem({ name: selectedName });
       // get a copy of the selection set
-      const selections =
-        DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice();
+      const selections = DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice();
       // sort the selection in descending order
       selections.sort((a, b) => b - a);
+      // array to hold state changes
+      const stateChanges = [];
 
       // move selected items from scene to block
       selections.forEach((index) => {
-        const item = DesignCore.Scene.items.splice(index, 1)[0];
+        const item = DesignCore.Scene.entities.get(index);
+        // remove item from scene
+        const copyofitem = Utils.cloneObject(item);
         // adjust the items points to reflect the insert point
+        const delta = new Point(-insertPoint.x, -insertPoint.y);
         if (item.hasOwnProperty('points')) {
-          item.move(-insertPoint.x, -insertPoint.y);
+          const points = copyofitem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+          copyofitem.setProperty('points', points);
         }
-        block.items.push(item);
+        block.items.push(copyofitem);
+        const stateChangeRemove = new RemoveState(item);
+        stateChanges.push(stateChangeRemove);
       });
 
       // define insert data
@@ -128,8 +133,14 @@ export class Block extends Entity {
         blockName: selectedName,
       };
 
-      // create the insert
-      DesignCore.Scene.inputManager.executeCommand(insertData);
+      const insert = DesignCore.CommandManager.createNew(insertData.type, insertData);
+      const stateChangeAdd = new AddState(insert);
+      stateChanges.push(stateChangeAdd);
+
+      // commit the changes to the scene
+      DesignCore.Scene.commit(stateChanges);
+
+      DesignCore.Scene.inputManager.executeCommand();
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }

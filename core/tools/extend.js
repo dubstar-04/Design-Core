@@ -71,8 +71,8 @@ export class Extend extends Tool {
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         if (DesignCore.Scene.selectionManager.selectionSet.selectionSet[i] !== item) {
-          const boundaryItem = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]];
-          extendItem = DesignCore.Scene.items[item];
+          const boundaryItem = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
+          extendItem = DesignCore.Scene.entities.get(item);
 
           const functionName = 'intersect' + boundaryItem.type + extendItem.type;
           const intersect = Intersection[functionName](boundaryItem.intersectPoints(), extendItem.intersectPoints(), true);
@@ -86,7 +86,10 @@ export class Extend extends Tool {
       }
 
       if (intersectPoints) {
-        extendItem.extend(intersectPoints);
+        const stateChanges = extendItem.extend(intersectPoints);
+        if (stateChanges.length) {
+          DesignCore.Scene.commit(stateChanges);
+        }
       }
 
       // remove item from selection set and reset the selectedIndex

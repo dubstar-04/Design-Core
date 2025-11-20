@@ -50,11 +50,11 @@ export class Dimension extends BaseDimension {
       const item = new this.dimensionMap[DimType.getBaseType(this.dimType.getBaseDimType())](data);
 
       // find the block linked to this dimension
-      const linkedBlockIndex = DesignCore.Scene.findItem('BLOCK', 'name', data[2]);
+      const linkedBlockIndex = DesignCore.Scene.entities.find('BLOCK', 'name', data[2]);
 
       if (linkedBlockIndex.length) {
         // remove the block from the scene, dimensions manage their block internally
-        DesignCore.Scene.removeItem(linkedBlockIndex[0]);
+        DesignCore.Scene.entities.remove(linkedBlockIndex[0]);
       }
 
       return item;
@@ -99,7 +99,7 @@ export class Dimension extends BaseDimension {
         }
 
         if (input1 instanceof SingleSelection) {
-          const selectedItem = DesignCore.Scene.getItem(input1.selectedItemIndex);
+          const selectedItem = DesignCore.Scene.entities.get(input1.selectedItemIndex);
 
           // check the selected entity is supported
           if ([Line, Circle, Arc, BasePolyline].some((entity) => selectedItem instanceof entity)) {
@@ -196,7 +196,7 @@ export class Dimension extends BaseDimension {
         }
 
         if (Input.getType(input2) === Input.Type.SINGLESELECTION) {
-          let selectedItem2 = DesignCore.Scene.getItem(input2.selectedItemIndex);
+          let selectedItem2 = DesignCore.Scene.entities.get(input2.selectedItemIndex);
           if ([Line, BasePolyline].some((entity) => selectedItem2 instanceof entity)) {
             // if a polyline is selected, get the segment closest to the mouse point
             if (selectedItem2 instanceof BasePolyline) {
@@ -289,7 +289,7 @@ export class Dimension extends BaseDimension {
       // get the points for the dimension
       const points = dimensionType.getPointsFromSelection(this.selectedItems, Pt11);
       // create the temporary dimension
-      DesignCore.Scene.createTempItem(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.tempEntities.create(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 }

@@ -331,9 +331,8 @@ export class InputManager {
    * Handle mouse position changes
    */
   mouseMoved() {
-    DesignCore.Scene.tempItems = [];
-    DesignCore.Scene.auxiliaryItems = [];
-
+    DesignCore.Scene.tempEntities.clear();
+    DesignCore.Scene.auxiliaryEntities.clear();
 
     if (DesignCore.Mouse.buttonOneDown) {
       const windowSelect = !this.promptOption || this.promptOption.types.includes(Input.Type.SELECTIONSET);
@@ -355,8 +354,8 @@ export class InputManager {
       if (this.activeCommand === undefined || this.activeCommand !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION) || this.promptOption.types.includes(Input.Type.SELECTIONSET))) {
         const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
         if (index !== undefined) {
-          const copyofitem = Utils.cloneObject(DesignCore.Scene.items[index]);
-          DesignCore.Scene.addToTempItems(copyofitem);
+          const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(index));
+          DesignCore.Scene.tempEntities.add(copyofitem);
           selecting = true;
         }
       }
@@ -420,7 +419,7 @@ export class InputManager {
     switch (button) {
       case 0: // left button
         // Clear tempItems - This is here to remove the crossing window
-        DesignCore.Scene.auxiliaryItems = [];
+        DesignCore.Scene.auxiliaryEntities.clear();
 
 
         if (this.promptOption !== undefined) {
@@ -487,7 +486,7 @@ export class InputManager {
   /**
    * Execute the currently active command then reset
    * @param {Object} item - item to create
-   * @param {number} index - index of item in scene.items
+   * @param {number} index - index of item
    */
   executeCommand(item, index = undefined) {
     this.actionCommand(item, index);
@@ -497,17 +496,19 @@ export class InputManager {
   /**
    * Execute the currently active command without reset
    * @param {Object} item - item to create
-   * @param {number} index - index of item in scene.items
+   * @param {number} index - index of item
    * @return {number}
    */
   actionCommand(item, index = undefined) {
     if (this.activeCommand instanceof Tool) {
       this.activeCommand.action();
     } else {
+      if (item !== undefined) {
       // set the items layer to the current layer
-      item.layer = DesignCore.LayerManager.getCstyle();
-      // return the item index
-      return DesignCore.Scene.addItem(item.type, item, index);
+        item.layer = DesignCore.LayerManager.getCstyle();
+        // return the item index
+        return DesignCore.Scene.addItem(item.type, item, index);
+      }
     }
   }
 }

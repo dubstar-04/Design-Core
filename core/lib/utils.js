@@ -1,3 +1,6 @@
+
+import { Logging } from './logging.js';
+
 /** Utils Class */
 export class Utils {
   /**
@@ -28,6 +31,20 @@ export class Utils {
   }
 
   /**
+   * Sort points by distance to reference point
+   * note this mutates the points array
+   * @param {Array} points
+   * @param {Point} refPoint
+   */
+  static sortPointsByDistance(points, refPoint) {
+    points.sort((a, b) => {
+      const da = (a.x - refPoint.x) ** 2 + (a.y - refPoint.y) ** 2;
+      const db = (b.x - refPoint.x) ** 2 + (b.y - refPoint.y) ** 2;
+      return da - db; // nearest first
+    });
+  }
+
+  /**
    * Deep clone object
    * @param {Object} obj - object to clone
    * @return {Object} - new cloned object
@@ -44,7 +61,12 @@ export class Utils {
 
     for (const key of Reflect.ownKeys(obj)) {
       const value = obj[key];
-      clone[key] = value instanceof Object && typeof value !== 'function' ? this.cloneObject(value) : value;
+      try {
+        clone[key] = value instanceof Object && typeof value !== 'function' ? this.cloneObject(value) : value;
+      } catch (e) {
+        const err = 'Utils.cloneObject - Could not clone property';
+        Logging.instance.warn(`${err}:${key} - ${e}`);
+      }
     }
 
     return clone;

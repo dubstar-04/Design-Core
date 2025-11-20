@@ -21,7 +21,7 @@ const scenarios = [
 
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
   const origInputManager = DesignCore.Scene.inputManager;
-  const origGetItem = DesignCore.Scene.getItem;
+  const origGetItem = DesignCore.Scene.entities.get;
 
   const { input, selectedItems, expectedDimType, dimensionValue } = scenario;
   let requestInputCallCount = 0;
@@ -35,7 +35,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
     executeCommand: () => {},
   };
 
-  DesignCore.Scene.getItem = () => {
+  DesignCore.Scene.entities.get = () => {
     selectedItemsCallCount++;
     return selectedItems[selectedItemsCallCount - 1];
   };
@@ -57,7 +57,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
 
   // Restore
   DesignCore.Scene.inputManager = origInputManager;
-  DesignCore.Scene.getItem = origGetItem;
+  DesignCore.Scene.entities.get = origGetItem;
 });
 
 test('constructor sets default properties', () => {
@@ -124,11 +124,11 @@ describe('AlignedDimension.getPointsFromSelection', () => {
 });
 
 test('AlignedDimension.preview runs without error and calls createTempItem', () => {
-  const origCreateTempItem = DesignCore.Scene.createTempItem;
+  const origCreateTempItem = DesignCore.Scene.tempEntities.create;
   const origPointOnScene = DesignCore.Mouse.pointOnScene;
   // Manual mock for createTempItem
   const createTempItemCalls = [];
-  DesignCore.Scene.createTempItem = function(type, obj) {
+  DesignCore.Scene.tempEntities.create = function(type, obj) {
     createTempItemCalls.push([type, obj]);
   };
   // Manual mock for pointOnScene
@@ -149,7 +149,7 @@ test('AlignedDimension.preview runs without error and calls createTempItem', () 
   expect(createTempItemCalls.some((call) => call[0] === dim2.type)).toBe(true);
 
   // Restore
-  DesignCore.Scene.createTempItem = origCreateTempItem;
+  DesignCore.Scene.tempEntities.create = origCreateTempItem;
   DesignCore.Mouse.pointOnScene = origPointOnScene;
 });
 

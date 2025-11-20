@@ -36,6 +36,8 @@ export class Strings {
     CANNOTBERENAMED: 'cannot be renamed',
     CANNOTBEACTIONED: 'cannot be actioned',
     COMPLETED: 'completed',
+    NOUNDO: 'No actions to undo',
+    NOREDO: 'No actions to redo',
   };
 
   // Strings

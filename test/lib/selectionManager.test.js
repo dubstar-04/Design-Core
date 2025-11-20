@@ -66,7 +66,7 @@ test('Test SelectionManager.selectAll()', () => {
 
   // Select all
   selectionManager.selectAll();
-  expect(selectionManager.selectionSet.selectionSet.length).toBe(core.scene.items.length);
+  expect(selectionManager.selectionSet.selectionSet.length).toBe(core.scene.entities.count());
   // The indices should match all scene items
   expect(selectionManager.selectionSet.selectionSet).toEqual([0, 1, 2]);
 });

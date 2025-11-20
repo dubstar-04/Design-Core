@@ -5,9 +5,11 @@ import { InputManager } from './inputManager.js';
 import { DXFFile } from './dxf/dxfFile.js';
 import { BoundingBox } from './boundingBox.js';
 import { Point } from '../entities/point.js';
+import { EntityManager } from './entityManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { BlockManager } from '../tables/blockManager.js';
+import { AddState, StateManager, UpdateState } from './stateManager.js';
 
 /**
  * Scene Class
@@ -15,28 +17,45 @@ import { BlockManager } from '../tables/blockManager.js';
  */
 export class Scene {
   /** Create a scene */
+
+  /** Create a Scene */
   constructor() {
     // initialise the scene variables
     this.saved = false;
 
-    this.items = []; // Main array that stores all the geometry
-    this.tempItems = []; // Temporary Array to store items while input is being gathered
-    this.auxiliaryItems = []; // Auxiliary items such as the selection window and snap points
-
     this.selectionManager = new SelectionManager();
     this.inputManager = new InputManager();
     this.blockManager = new BlockManager();
+
+    this.entities = new EntityManager();
+    this.tempEntities = new EntityManager();
+    this.auxiliaryEntities = new EntityManager();
+
+    this.stateManager = new StateManager();
 
     // store the version of dxf that is currently being used
     this.dxfVersion = 'R2018';
   }
 
   /**
-   * Reset the scene
+   * Sets the save state following scene changes
    */
+  saveRequired() {
+    this.saved = false; // Changes have occured. A save may be required.
+  }
+
+
+  /** Clear the scene of all items */
+  clear() {
+    this.entities.clear();
+    this.tempEntities.clear();
+    this.auxiliaryEntities.clear();
+  }
+
+  /** Reset the scene */
   reset() {
-    this.tempItems = [];
-    this.auxiliaryItems = [];
+    this.tempEntities.clear();
+    this.auxiliaryEntities.clear();
     this.selectionManager.reset();
     DesignCore.Canvas.requestPaint();
   }
@@ -51,12 +70,12 @@ export class Scene {
     let ymin = Infinity;
     let ymax = -Infinity;
 
-    if (this.items.length === 0) {
+    if (this.entities.count() === 0) {
       return;
     }
 
-    for (let i = 0; i < this.items.length; i++) {
-      const itemBoundingBox = this.items[i].boundingBox();
+    for (let i = 0; i < this.entities.count(); i++) {
+      const itemBoundingBox = this.entities.get(i).boundingBox();
 
       xmin = Math.min(xmin, itemBoundingBox.xMin);
       xmax = Math.max(xmax, itemBoundingBox.xMax);
@@ -70,13 +89,6 @@ export class Scene {
     }
 
     return new BoundingBox(new Point(xmin, ymin), new Point(xmax, ymax));
-  }
-
-  /**
-   * Sets the save state following scene changes
-   */
-  saveRequired() {
-    this.saved = false; // Changes have occured. A save may be required.
   }
 
   /**
@@ -102,12 +114,15 @@ export class Scene {
     const item = DesignCore.CommandManager.createNew(type, data);
 
     if (typeof index === 'undefined') {
-      // add to end of array
-      this.items.push(item); // add item to the scene
-      index = this.items.length - 1;
+      // add item to the scene
+      const stateChange = new AddState(item);
+      this.commit([stateChange]);
+      index = this.entities.count() - 1;
     } else {
       // replace item at index
-      this.items.splice(index, 1, item);
+      const existingItem = this.entities.get(index);
+      const stateChange = new UpdateState(existingItem, data);
+      this.commit([stateChange]);
     }
 
     // return the index of the added item
@@ -115,74 +130,35 @@ export class Scene {
   }
 
   /**
-   * Find items in scene
-   * @param {string} type - entity type or "ANY"
-   * @param {string} prop - object of entity parameters
-   * @param {any} value - value of the property
-   * @return {number} - index of items
+   * Commit state changes to the scene
+   * @param {Array} stateChanges
    */
-  findItem(type, prop, value) {
-    const filteredItems = [];
-
-    this.items.forEach((item, index) => {
-      if ((type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) && item.hasOwnProperty(prop) && item[prop] === value) {
-        filteredItems.push(index);
-      }
-    });
-
-    return filteredItems;
+  commit(stateChanges) {
+    this.stateManager.commit(this.entities, stateChanges);
   }
 
   /**
-   * Get Item
-   * @param {number} index - items index
-   * @return {Object} - item
+   * Undo the last action
    */
-  getItem(index) {
-    return this.items[index];
-  }
-
-  /**
-   * Remove Item
-   * @param {number} index - items index
-   * @return {boolean} - success status
-   */
-  removeItem(index) {
-    const count = this.items.length;
-    this.items.splice(index, 1);
-
-    if (this.items.length < count) {
-      return true;
+  undo() {
+    if (this.stateManager.canUndo()) {
+      this.stateManager.undo();
+      DesignCore.Canvas.requestPaint();
+    } else {
+      DesignCore.Core.notify(Strings.Message.NOUNDO);
     }
-
-    return false;
   }
 
   /**
-   * Add items to the scenes tempItems
-   * @param {Object} item
+   * Redo the last undone action
    */
-  addToTempItems(item) {
-    this.tempItems.push(item); // Add it to the tempItems Array
-  }
-
-  /**
-   * Add items to the scenes auxiliary items
-   * @param {Object} item
-   */
-  addToAuxiliaryItems(item) {
-    this.auxiliaryItems.push(item); // Add it to the auxiliary Array
-  }
-
-  /**
-   * Create a new temp item and add to scenes tempItems
-   * @param {string} type - entity type
-   * @param {Object} data - object of entity parameters
-   */
-  createTempItem(type, data) {
-    data.layer = DesignCore.LayerManager.getCstyle();
-    const helper = DesignCore.CommandManager.createNew(type, data);
-    this.addToTempItems(helper);
+  redo() {
+    if (this.stateManager.canRedo()) {
+      this.stateManager.redo();
+      DesignCore.Canvas.requestPaint();
+    } else {
+      DesignCore.Core.notify(Strings.Message.NOREDO);
+    }
   }
 
   /**

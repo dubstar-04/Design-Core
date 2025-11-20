@@ -20,7 +20,7 @@ const points = [new Point(100, 100, 1), new Point(200, 100, 1)];
 const boundaryShape = new BasePolyline({ points: points });
 
 const hatch = new Hatch();
-hatch.boundaryShapes = [boundaryShape];
+hatch.childEntities = [boundaryShape];
 
 const hatchInputScenarios = [
   {
@@ -65,7 +65,13 @@ test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) =
   const hatch = new Hatch({ patternName: pattern, scale: scale, angle: angle });
   await hatch.execute();
 
-  expect(hatch.points.length).toBe(1);
+  expect(hatch.points.length).toBe(2);
+  // hatch first point should be at 0,0
+  expect(hatch.points.at(0).x).toBe(0);
+  expect(hatch.points.at(0).y).toBe(0);
+  // hatch last point should be at 1,1
+  expect(hatch.points.at(-1).x).toBe(1);
+  expect(hatch.points.at(-1).y).toBe(1);
   expect(hatch.pattern).toBe(expectedPattern);
   expect(hatch.scale).toBe(expectedScale);
   expect(hatch.angle).toBe(expectedAngle);

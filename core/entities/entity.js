@@ -83,6 +83,11 @@ export class Entity {
         this.lineType = data.lineType || data[6];
       }
 
+      if (data.hasOwnProperty('lineWidth') || data.hasOwnProperty('39')) {
+        // DXF Groupcode 39 - Thickness (lineWidth)
+        this.lineWidth = Property.loadValue([data.lineWidth, data[39]], 2);
+      }
+
       if (data.hasOwnProperty('layer') || data.hasOwnProperty('8')) {
         // DXF Groupcode 8 - layername
         this.layer = Property.loadValue([data.layer, data[8]], 0);
@@ -231,25 +236,13 @@ export class Entity {
   }
 
   /**
-   * Move this entity
-   * @param {number} xDelta
-   * @param {number} yDelta
+   * Set a property if it exists
+   * @param {string} property
+   * @param {any} value
    */
-  move(xDelta, yDelta) {
-    const delta = new Point(xDelta, yDelta);
-    for (let i = 0; i < this.points.length; i++) {
-      this.points[i] = this.points[i].add(delta);
-    }
-  }
-
-  /**
-   * Rotate this entity
-   * @param  {Point} center - center of rotation
-   * @param {number} angle - in radians
-   */
-  rotate(center, angle) {
-    for (let i = 0; i < this.points.length; i++) {
-      this.points[i] = this.points[i].rotate(center, angle);
+  setProperty(property, value) {
+    if (this.hasOwnProperty(property)) {
+      this[property] = value;
     }
   }
 }

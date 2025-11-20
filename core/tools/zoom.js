@@ -93,7 +93,7 @@ export class Zoom extends Tool {
         new Point(p1.x, p1.y),
       ];
 
-      DesignCore.Scene.createTempItem('Polyline', { points: points });
+      DesignCore.Scene.tempEntities.create('Polyline', { points: points });
     }
   }
 
@@ -124,7 +124,7 @@ export class Zoom extends Tool {
       }
 
       for (let i = 0; i <DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        const itemBoundingBox = DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].boundingBox();
+        const itemBoundingBox = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).boundingBox();
 
         xmin = Math.min(xmin, itemBoundingBox.xMin);
         xmax = Math.max(xmax, itemBoundingBox.xMax);

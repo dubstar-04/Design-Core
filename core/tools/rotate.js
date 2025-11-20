@@ -3,6 +3,8 @@ import { Tool } from './tool.js';
 import { Utils } from '../lib/utils.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Point } from '../entities/point.js';
+import { UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -85,17 +87,18 @@ export class Rotate extends Tool {
     if (this.points.length >= 1 && this.baseAngle !== null) {
       // Draw a line
       const points = [this.points.at(0), mousePoint];
-
-      DesignCore.Scene.createTempItem('Line', { points: points });
+      DesignCore.Scene.tempEntities.create('Line', { points: points });
     }
 
     if (this.points.length >= 1) {
       const ang = this.points[0].angle(mousePoint);
       const theta = this.baseAngle === null ? 0 : ang - this.baseAngle - this.lastAngle;
       this.lastAngle = ang;
+      const center = this.points[0];
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        DesignCore.Scene.selectionManager.selectedItems[i].rotate(this.points[0], theta);
+        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+        item.setProperty('points', this.getRotatedPoints(item.points, center, theta));
       }
     }
   };
@@ -106,9 +109,28 @@ export class Rotate extends Tool {
   action() {
     const ang = this.points[0].angle(this.points[1]);
     const theta = ang - this.baseAngle;
+    const center = this.points[0];
 
-    for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      DesignCore.Scene.items[DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]].rotate(this.points[0], theta);
+    const stateChanges = [];
+
+    for (let index = 0; index < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; index++) {
+      const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
+      const stateChange = new UpdateState(item, { points: this.getRotatedPoints(item.points, center, theta) });
+      stateChanges.push(stateChange);
     }
+
+    DesignCore.Scene.commit(stateChanges);
   };
+
+  /**
+ * Get rotated points
+ * @param {Array} points
+ * @param {Point} center
+ * @param {Point} theta
+ * @return {Array} rotatedPoints
+ */
+  getRotatedPoints(points, center, theta) {
+    const rotatedPoints = points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
+    return rotatedPoints;
+  }
 }

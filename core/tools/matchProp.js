@@ -2,6 +2,7 @@ import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Strings } from '../lib/strings.js';
 import { Logging } from '../lib/logging.js';
+import { UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -66,23 +67,32 @@ export class MatchProp extends Tool {
     }
 
     // get source item
-    const sourceItem = DesignCore.Scene.getItem(this.sourceIndex);
+    const sourceItem = DesignCore.Scene.entities.get(this.sourceIndex);
+
+    const stateChanges = [];
 
     // loop through destination set
     for (let i = 0; i < this.destinationSetIndices.length; i++) {
-      // get destination item
-      const destinationItem = DesignCore.Scene.items[this.destinationSetIndices[i]];
+      const targetItem = DesignCore.Scene.entities.get(this.destinationSetIndices[i]);
+      const propertySet = {};
       // loop through properties and match
       for (let p = 0; p < this.properties.length; p++) {
         // check property exists on both items
-        if (sourceItem.hasOwnProperty(this.properties[p])) {
-          if (destinationItem.hasOwnProperty(this.properties[p])) {
-            // match property
-            const prop = this.properties[p];
-            destinationItem[prop] = sourceItem[prop];
-          }
+        const prop = this.properties[p];
+        if (sourceItem.hasOwnProperty(prop)) {
+          propertySet[prop] = sourceItem[prop];
         }
       }
+
+      // only add state change if there are properties to change
+      if (Object.keys(propertySet).length > 0) {
+        const stateChange = new UpdateState(targetItem, propertySet);
+        stateChanges.push(stateChange);
+      }
+    }
+    // apply the updates
+    if (stateChanges.length > 0) {
+      DesignCore.Scene.commit(stateChanges);
     }
   }
 }
