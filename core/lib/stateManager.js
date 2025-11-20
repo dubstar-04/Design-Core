@@ -172,7 +172,11 @@ class State {
       if (stateChange instanceof UpdateState) {
         const index = this.entityManager.indexOf(stateChange.entity);
         if (index !== -1) {
-          const previousProperties = Utils.cloneObject(stateChange.entity);
+          // capture previous properties for undo
+          const previousProperties = {};
+          for (const prop of Object.getOwnPropertyNames(stateChange.properties)) {
+            previousProperties[prop] = stateChange.entity[prop];
+          }
           const undoStateChange = new UpdateState(stateChange.entity, previousProperties);
           this.undoStateChanges.push(undoStateChange);
 
