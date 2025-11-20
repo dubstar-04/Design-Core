@@ -162,15 +162,12 @@ export class Circle extends Entity {
         arcPoints.push(points[1], points[0]);
       }
 
-
       const data = {
         points: arcPoints,
         colour: this.colour,
         layer: this.layer,
         lineWidth: this.lineWidth,
       };
-
-      // DesignCore.Scene.addItem('Arc', data, DesignCore.Scene.items.indexOf(this));
 
       // create a new arc entity
       const arc = DesignCore.CommandManager.createNew('Arc', data);
