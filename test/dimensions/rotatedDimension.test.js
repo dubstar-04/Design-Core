@@ -149,7 +149,7 @@ test('RotatedDimension.preview runs without error and calls createTempItem', () 
   expect(createTempItemCalls.some((call) => call[0] === dim2.type)).toBe(true);
 
   // Restore
-  DesignCore.Scene.tempEntities.create= origCreateTempItem;
+  DesignCore.Scene.tempEntities.create = origCreateTempItem;
   DesignCore.Mouse.pointOnScene = origPointOnScene;
 });
 
