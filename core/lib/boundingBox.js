@@ -95,7 +95,7 @@ export class BoundingBox {
 
   static fromEntities(entities) {
     if (!entities.length) {
-      throw Error('BoundingBox from entities - entity array empty');
+      return;
     }
 
     let xmin = Infinity;
