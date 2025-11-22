@@ -88,7 +88,7 @@ export class Clipboard {
 
       this.#basePoint = new Point(JsonBasePoint.x, JsonBasePoint.y);
       this.#Entities = entities;
-    } catch (e) {
+    } catch {
       Logging.instance.error(`${this.constructor.name} - ${Strings.Error.INVALIDCLIPBOARD}`);
     }
   }
