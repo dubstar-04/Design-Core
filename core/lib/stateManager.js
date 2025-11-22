@@ -94,7 +94,6 @@ export class StateManager {
 
   /** Undo the last action */
   undo() {
-    console.log('StateManager undo');
     const lastState = this.getPreviousState();
 
     if (lastState) {
@@ -106,7 +105,6 @@ export class StateManager {
   /** Redo the last undone action */
   redo() {
     if (this.#historyIndex < this.#history.length) {
-      console.log('StateManager redo');
       const currentState = this.getCurrentState();
 
       if (currentState) {
@@ -149,8 +147,6 @@ class State {
   /** Perform the state changes */
   do() {
     this.undoStateChanges = [];
-    // console.log('Base State do');
-    // console.trace();
     for (const stateChange of this.stateChanges) {
       if (stateChange instanceof AddState) {
         this.entityManager.add(stateChange.entity);
@@ -186,7 +182,6 @@ class State {
 
   /** Undo the state changes */
   undo() {
-    // console.log('Base State undo');
     for (const stateChange of this.undoStateChanges) {
       if (stateChange instanceof AddState) {
         this.entityManager.add(stateChange.entity);
