@@ -62,6 +62,13 @@ export class DesignCore {
   }
 
   /**
+   * Get the Clipboard
+   */
+  static get Clipboard() {
+    return DesignCore.Core.clipboard;
+  }
+
+  /**
    * Get the CommandManager
    */
   static get CommandManager() {

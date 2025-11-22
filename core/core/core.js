@@ -8,6 +8,7 @@ import { LTypeManager } from '../tables/ltypeManager.js';
 import { StyleManager } from '../tables/styleManager.js';
 import { DimStyleManager } from '../tables/dimStyleManager.js';
 import { PropertyManager } from '../properties/propertyManager.js';
+import { Clipboard } from '../lib/clipboard.js';
 
 import { FileIO } from '../lib/fileio.js';
 import { Settings } from '../lib/settings.js';
@@ -32,6 +33,7 @@ export class Core {
     this.styleManager = new StyleManager();
     this.dimStyleManager = new DimStyleManager();
     this.propertyManager = new PropertyManager();
+    this.clipboard = new Clipboard();
 
     this.settings = new Settings();
 

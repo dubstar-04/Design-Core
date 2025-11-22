@@ -240,7 +240,7 @@ export class InputManager {
         let inputType;
         try {
           inputType = Input.getType(input);
-        } catch (error) {
+        } catch {
           inputType = undefined;
         }
 
@@ -479,7 +479,11 @@ export class InputManager {
    * @param {string} prompt
    */
   setPrompt(prompt) {
-    // TODO: single line method required?
+    // return if there is no active command
+    if (this.activeCommand === undefined) {
+      return;
+    }
+
     DesignCore.CommandLine.setPrompt(`${this.activeCommand.type}${prompt ? '- ':''}${prompt}`);
   }
 
