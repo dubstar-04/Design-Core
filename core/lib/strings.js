@@ -18,6 +18,7 @@ export class Strings {
     INVALIDINTERSECTTYPE: 'Invalid Intersect Type',
     SELECTION: 'Invalid Selection',
     PARALLELLINES: 'Parallel Lines',
+    INVALIDCLIPBOARD: 'Invalid Clipboard Data',
   };
 
   // Warning Strings
