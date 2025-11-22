@@ -4,7 +4,6 @@ import { Strings } from './strings.js';
 import { InputManager } from './inputManager.js';
 import { DXFFile } from './dxf/dxfFile.js';
 import { BoundingBox } from './boundingBox.js';
-import { Point } from '../entities/point.js';
 import { EntityManager } from './entityManager.js';
 
 import { DesignCore } from '../designCore.js';
