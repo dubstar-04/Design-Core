@@ -39,6 +39,7 @@ import { Zoom } from '../tools/zoom.js';
 // Clipboard tools
 import { Copybase } from '../tools/copybase.js';
 import { Copyclip } from '../tools/copyclip.js';
+import { Cutclip } from '../tools/cutclip.js';
 import { Pasteclip } from '../tools/pasteclip.js';
 
 import { Utils } from './utils.js';
@@ -87,6 +88,7 @@ const classes = {
 
   Copybase,
   Copyclip,
+  Cutclip,
   Pasteclip,
 
 };
