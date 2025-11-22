@@ -65,30 +65,8 @@ export class Scene {
    * @return {BoundingBox} scene bounding box
    */
   boundingBox() {
-    let xmin = Infinity;
-    let xmax = -Infinity;
-    let ymin = Infinity;
-    let ymax = -Infinity;
-
-    if (this.entities.count() === 0) {
-      return;
-    }
-
-    for (let i = 0; i < this.entities.count(); i++) {
-      const itemBoundingBox = this.entities.get(i).boundingBox();
-
-      xmin = Math.min(xmin, itemBoundingBox.xMin);
-      xmax = Math.max(xmax, itemBoundingBox.xMax);
-      ymin = Math.min(ymin, itemBoundingBox.yMin);
-      ymax = Math.max(ymax, itemBoundingBox.yMax);
-    }
-
-    // if all values are zero return undefined
-    if (xmin === 0 && xmax === 0, ymin === 0, ymax === 0) {
-      return;
-    }
-
-    return new BoundingBox(new Point(xmin, ymin), new Point(xmax, ymax));
+    const boundingBox = BoundingBox.fromEntities(this.entities.getAll());
+    return boundingBox;
   }
 
   /**
