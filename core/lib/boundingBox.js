@@ -93,6 +93,32 @@ export class BoundingBox {
     return new BoundingBox(new Point(xMin, yMin), new Point(xMax, yMax));
   }
 
+  static fromEntities(entities) {
+    if (!entities.length) {
+      throw Error('BoundingBox from entities - entity array empty');
+    }
+
+    let xmin = Infinity;
+    let xmax = -Infinity;
+    let ymin = Infinity;
+    let ymax = -Infinity;
+
+    for (const ent of entities) {
+      const bbox = ent.boundingBox();
+
+      if (!bbox) {
+        continue;
+      }
+
+      xmin = Math.min(xmin, bbox.xMin);
+      xmax = Math.max(xmax, bbox.xMax);
+      ymin = Math.min(ymin, bbox.yMin);
+      ymax = Math.max(ymax, bbox.yMax);
+    }
+
+    return new BoundingBox(new Point(xmin, ymin), new Point(xmax, ymax));
+  }
+
   /**
    * Calculate the boundingbox for a line
    * @param {Point} startPoint
