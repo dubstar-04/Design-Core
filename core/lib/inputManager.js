@@ -240,7 +240,7 @@ export class InputManager {
         let inputType;
         try {
           inputType = Input.getType(input);
-        } catch (error) {
+        } catch {
           inputType = undefined;
         }
 
