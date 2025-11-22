@@ -93,6 +93,11 @@ export class BoundingBox {
     return new BoundingBox(new Point(xMin, yMin), new Point(xMax, yMax));
   }
 
+  /**
+   * Genetate bounding box from entities
+   * @param {Array} entities
+   * @return {BoundingBox}
+   */
   static fromEntities(entities) {
     if (!entities.length) {
       return;
