@@ -50,8 +50,6 @@ export class Copyclip extends Tool {
    * Perform the command
    */
   action() {
-    console.log('Copyclip action performed');
-
     // generate clipboard data from selected items
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
 
