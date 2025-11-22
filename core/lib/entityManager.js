@@ -52,6 +52,14 @@ export class EntityManager {
   }
 
   /**
+   * Return all entities
+   * @return {Array} all entities
+   */
+  getAll() {
+    return this.#entities;
+  }
+
+  /**
    * Replace entity at index
    * @param {number} index
    * @param {object} entity
