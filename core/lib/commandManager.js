@@ -36,6 +36,11 @@ import { Purge } from '../tools/purge.js';
 import { Pan } from '../tools/pan.js';
 import { Zoom } from '../tools/zoom.js';
 
+// Clipboard tools
+import { Copybase } from '../tools/copybase.js';
+import { Copyclip } from '../tools/copyclip.js';
+import { Pasteclip } from '../tools/pasteclip.js';
+
 import { Utils } from './utils.js';
 import { Strings } from './strings.js';
 import { Logging } from './logging.js';
@@ -79,6 +84,10 @@ const classes = {
 
   Zoom,
   Pan,
+
+  Copybase,
+  Copyclip,
+  Pasteclip,
 
 };
 
