@@ -3,7 +3,7 @@ import { Point } from '../../core/entities/point.js';
 import { Pasteclip } from '../../core/tools/pasteclip.js';
 import { Copyclip } from '../../core/tools/copyclip.js';
 import { DesignCore } from '../../core/designCore.js';
-import { jest } from '@jest/globals';
+import { expect, jest } from '@jest/globals';
 
 // Init core context
 new Core();
@@ -66,22 +66,31 @@ describe('Pasteclip Tool', () => {
   });
 
   test('action pastes entities with correct offset', () => {
-    const line = DesignCore.CommandManager.createNew('Line', { layer: '0', points: [new Point(5, 5), new Point(15, 5)] });
+    const line = DesignCore.CommandManager.createNew('Circle', { layer: '0', points: [new Point(), new Point(5, 0)] });
     DesignCore.Scene.entities.add(line);
     DesignCore.Scene.selectionManager.addToSelectionSet(0);
     new Copyclip().action();
-    const basePoint = DesignCore.Clipboard.BasePoint;
 
+    const basePoint = DesignCore.Clipboard.BasePoint;
+    expect(basePoint.x).toBe(-5);
+    expect(basePoint.y).toBe(-5);
+
+    const entityCount = DesignCore.Scene.entities.count();
     const tool = new Pasteclip();
-    const insertion = new Point(100, 200);
+    const insertion = new Point(10, 10);
     tool.points.push(insertion); // simulate execute collected base point
     tool.action();
 
-    // The entity in clipboard was mutated to new offset (since action adjusts in place before AddState)
+    expect(DesignCore.Scene.entities.count()).toBe(entityCount + 1);
+
+
+    const newEntity = DesignCore.Scene.entities.get(-1);
+    expect(newEntity.points[0].x).toBe(15);
+    expect(newEntity.points[0].y).toBe(15);
+
+    // Ensure the in clipboard was not mutated
     const pasted = DesignCore.Clipboard.Entities[0];
-    const deltaX = insertion.x - basePoint.x;
-    const deltaY = insertion.y - basePoint.y;
-    expect(pasted.points[0].x).toBe(5 + deltaX);
-    expect(pasted.points[0].y).toBe(5 + deltaY);
+    expect(pasted.points[0].x).toBe(0);
+    expect(pasted.points[0].y).toBe(0);
   });
 });
