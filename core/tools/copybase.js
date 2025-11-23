@@ -61,5 +61,5 @@ export class Copybase extends Tool {
     DesignCore.Clipboard.Entities = selectedItems;
     // set base point
     DesignCore.Clipboard.BasePoint = this.points[0];
-  };
+  }
 }
