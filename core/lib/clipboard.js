@@ -59,6 +59,16 @@ export class Clipboard {
    * @param {Array} entities - new entities array
    */
   set Entities(entities) {
+    if (!Array.isArray(entities)) {
+      return;
+    }
+
+    if (entities.length === 0) {
+      this.#Entities = [];
+      this.#basePoint = new Point();
+      return;
+    }
+
     this.#Entities = entities;
     // set basepoint to bottom left of selection bounding box
     const bbox = BoundingBox.fromEntities(entities);
