@@ -17,7 +17,7 @@ describe('Copybase Tool', () => {
     DesignCore.Clipboard.Entities = [];
   });
 
-  test('action copies selected entities and sets base point to bounding box bottom-left', () => {
+  test('action copies selected entities and sets base point to user-provided point', () => {
     // Create two line entities and add to scene
     const line1 = DesignCore.CommandManager.createNew('Line', { layer: '0', points: [new Point(10, 20), new Point(30, 40)] });
     const line2 = DesignCore.CommandManager.createNew('Line', { layer: '0', points: [new Point(-5, 100), new Point(0, 80)] });
