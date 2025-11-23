@@ -86,6 +86,9 @@ export class Clipboard {
    * @param {string} json
    */
   parse(json) {
+    // clear clipboard - temp debugging?
+    this.#basePoint = new Point();
+    this.#Entities = [];
     try {
       const clipBoardData = JSON.parse(json);
       const JsonBasePoint = clipBoardData.basePoint;
@@ -109,14 +112,35 @@ export class Clipboard {
    * @return {Array} - array of entities
    */
   #parseEntities(jsonEntities) {
-    const entities = [];
-    for (const jsonEntity of jsonEntities) {
-      const points = Object.values(jsonEntity.points).map((p) => new Point(p.x, p.y));
-      jsonEntity.points = points;
-      const entity = DesignCore.CommandManager.createNew(jsonEntity.type, jsonEntity);
-      entities.push(entity);
+    try {
+      const entities = [];
+      for (const jsonEntity of jsonEntities) {
+        // create point object for points
+        if (jsonEntity.type === 'Point') {
+          const point = new Point(jsonEntity.x, jsonEntity.y, jsonEntity.bulge, jsonEntity.sequence);
+          entities.push(point);
+          continue;
+        }
+
+        // loop through properties to parse arrays of child objects
+        for (const [key, value] of Object.entries(jsonEntity)) {
+          if (Array.isArray(value)) {
+            const values = this.#parseEntities(jsonEntity[key]);
+            jsonEntity[key] = values;
+          }
+        }
+
+        // check if the type is a valid entity
+        if (DesignCore.CommandManager.isCommand(jsonEntity.type)) {
+          const entity = DesignCore.CommandManager.createNew(jsonEntity.type, jsonEntity);
+          entities.push(entity);
+        }
+      }
+      return entities;
+    } catch (err) {
+      Logging.instance.error(`${this.constructor.name} - ${Strings.Error.INVALIDCLIPBOARD}: ${err}`);
+      return [];
     }
-    return entities;
   }
 
   /**
@@ -125,23 +149,35 @@ export class Clipboard {
    */
   stringify() {
     const clipboardData = { basePoint: undefined, Entities: undefined };
-
     const jsonEntities = [];
 
     // convert each entity to a simple object - this allows non-enumberable properties (like points) to be copied
     for (const ent of this.#Entities) {
-      const jsonEntity = Object.getOwnPropertyNames(ent).reduce((acc, key) => {
-        acc[key] = ent[key]; return acc;
-      }, {});
-
+      const jsonEntity = this.#simplify(ent);
       jsonEntities.push(jsonEntity);
     }
 
     clipboardData.basePoint = this.#basePoint;
     clipboardData.Entities = jsonEntities;
-    const clipboardJson = JSON.stringify(clipboardData);
 
+    const clipboardJson = JSON.stringify(clipboardData);
     return clipboardJson;
+  }
+
+  /**
+   * Simplify an object by copying only its own properties
+   * @param {Object} original
+   * @return {Object} - simplified object
+   */
+  #simplify(original) {
+    return Object.getOwnPropertyNames(original).reduce((simplified, property) => {
+      const value = original[property];
+      if (Array.isArray(value)) {
+        simplified[property] = original[property].map((item) => this.#simplify(item));
+        return simplified;
+      }
+      simplified[property] = original[property]; return simplified;
+    }, {});
   }
 
   /**
