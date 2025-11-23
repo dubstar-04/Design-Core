@@ -55,5 +55,5 @@ export class Copyclip extends Tool {
 
     // create clipboard data
     DesignCore.Clipboard.Entities = selectedItems;
-  };
+  }
 }
