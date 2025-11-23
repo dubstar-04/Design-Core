@@ -1,6 +1,6 @@
 import { BoundingBox } from './boundingBox.js';
 import { Point } from '../entities/point.js';
-
+import { Utils } from './utils.js';
 import { DesignCore } from '../designCore.js';
 import { Logging } from './logging.js';
 import { Strings } from './strings.js';
@@ -69,7 +69,8 @@ export class Clipboard {
       return;
     }
 
-    this.#Entities = entities;
+    // copy the item to avoid mutation of originals
+    this.#Entities = entities.map((entity) => Utils.cloneObject(entity));
     // set basepoint to bottom left of selection bounding box
     const bbox = BoundingBox.fromEntities(entities);
     const basePoint = new Point(bbox.xMin, bbox.yMin);
