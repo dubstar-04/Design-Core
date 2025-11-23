@@ -68,5 +68,5 @@ export class Cutclip extends Tool {
 
     // delete each of the selections from the scene items
     DesignCore.Scene.commit(stateChanges);
-  };
+  }
 }
