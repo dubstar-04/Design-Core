@@ -89,5 +89,5 @@ export class Pasteclip extends Tool {
     }
 
     DesignCore.Scene.commit(stateChanges);
-  };
+  }
 }
