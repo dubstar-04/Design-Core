@@ -1,6 +1,5 @@
 
 import { Logging } from './logging.js';
-import { DesignCore } from '../designCore.js';
 
 /** Utils Class */
 export class Utils {
