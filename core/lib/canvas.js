@@ -348,15 +348,17 @@ export class Canvas {
    * @param {object} context
    */
   paintGrid(context) {
+    const scale = this.getScale();
+
     // TODO: Move grid linewidth to settings?
     let lineWidth = 0.75;
 
     try { // HTML Canvas
       context.strokeStyle = Colours.rgbToString(DesignCore.Settings.gridcolour);
-      context.lineWidth = lineWidth / this.getScale();
+      context.lineWidth = lineWidth / scale;
       context.beginPath();
     } catch { // Cairo
-      context.setLineWidth(lineWidth / this.getScale());
+      context.setLineWidth(lineWidth / scale);
       const rgbColour = Colours.rgbToScaledRGB(DesignCore.Settings.gridcolour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
     }
@@ -377,26 +379,31 @@ export class Canvas {
     context.lineTo(0, ygridmin);
     context.stroke();
 
+    // only draw the grid if within scale limits
+    if (scale < this.minScaleFactor || scale > this.maxScaleFactor ) {
+      return;
+    }
+
     if (DesignCore.Settings['drawgrid']) {
       // set a feint linewidth for the grid
       lineWidth = lineWidth * 0.25;
 
       try { // HTML Canvas
-        context.lineWidth = lineWidth / this.getScale();
+        context.lineWidth = lineWidth / scale;
         context.beginPath();
       } catch { // Cairo
-        context.setLineWidth(lineWidth / this.getScale());
+        context.setLineWidth(lineWidth / scale);
       }
 
       // TODO: add setting for grid spacing
       let gridInterval = 100;
 
       // define the grid spacing based on zoom level
-      if (this.getScale() > 50) {
+      if (scale > 50) {
         gridInterval = 1;
-      } else if (this.getScale() > 5) {
+      } else if (scale > 5) {
         gridInterval = 10;
-      } else if (this.getScale() < 0.6) {
+      } else if (scale < 0.6) {
         gridInterval = 1000;
       } else {
         gridInterval = 100;
