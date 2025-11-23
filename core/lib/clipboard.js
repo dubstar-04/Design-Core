@@ -176,7 +176,8 @@ export class Clipboard {
         simplified[property] = original[property].map((item) => this.#simplify(item));
         return simplified;
       }
-      simplified[property] = original[property]; return simplified;
+      simplified[property] = original[property];
+      return simplified;
     }, {});
   }
 
