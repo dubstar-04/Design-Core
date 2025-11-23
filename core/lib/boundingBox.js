@@ -94,7 +94,7 @@ export class BoundingBox {
   }
 
   /**
-   * Genetate bounding box from entities
+   * Generate bounding box from entities
    * @param {Array} entities
    * @return {BoundingBox}
    */
