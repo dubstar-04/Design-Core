@@ -62,7 +62,13 @@ export class Utils {
     for (const key of Reflect.ownKeys(obj)) {
       const value = obj[key];
       try {
-        clone[key] = value instanceof Object && typeof value !== 'function' ? this.cloneObject(value) : value;
+        if (Array.isArray(value)) {
+          clone[key] = value.map((v) => this.cloneObject(v));
+        } else if (value && typeof value === 'object' && typeof value !== 'function') {
+          clone[key] = this.cloneObject(value);
+        } else {
+          clone[key] = value;
+        }
       } catch (e) {
         const err = 'Utils.cloneObject - Could not clone property';
         Logging.instance.warn(`${err}:${key} - ${e}`);

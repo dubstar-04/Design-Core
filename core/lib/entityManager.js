@@ -48,7 +48,15 @@ export class EntityManager {
    * @return {object} entity
    */
   get(index) {
-    return this.#entities[index];
+    return this.#entities.at(index);
+  }
+
+  /**
+   * Return all entities
+   * @return {Array} all entities
+   */
+  getAll() {
+    return this.#entities;
   }
 
   /**
