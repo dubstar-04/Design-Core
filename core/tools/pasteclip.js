@@ -80,10 +80,11 @@ export class Pasteclip extends Tool {
     const delta = mousePosition.subtract(basePoint);
 
     for (const entity of DesignCore.Clipboard.Entities) {
-      const offsetPoints = entity.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-      entity.setProperty('points', offsetPoints);
+      const pastedEntity = Utils.cloneObject(entity);
+      const offsetPoints = pastedEntity.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+      pastedEntity.setProperty('points', offsetPoints);
 
-      const stateChange = new AddState(entity);
+      const stateChange = new AddState(pastedEntity);
       stateChanges.push(stateChange);
     }
 
