@@ -9,7 +9,7 @@ import { Strings } from './strings.js';
 export class Clipboard {
   // store the base point for pasting
   #basePoint = new Point();
-  // store the entities being copies
+  // store the entities being copied
   #Entities = [];
   /** Create Clipboard */
   constructor() {
