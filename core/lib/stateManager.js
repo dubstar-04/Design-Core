@@ -142,10 +142,9 @@ export class StateManager {
   }
 
   /**
-   * Set the modified state
-   * @param {boolean} isModified
-   * */
-
+   * Set the state changed callback function
+   * @param {function} callback
+   */
   setStateCallbackFunction(callback) {
     this.stateCallbackFunction = callback;
   }
