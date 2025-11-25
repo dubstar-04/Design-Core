@@ -39,8 +39,8 @@ export class Scene {
   /**
    * Sets the save state following scene changes
    */
-  saveRequired() {
-    this.saved = false; // Changes have occured. A save may be required.
+  get isModified() {
+    return this.stateManager.isModified;
   }
 
 
