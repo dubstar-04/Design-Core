@@ -10,12 +10,15 @@ export class StateManager {
   #history = [];
   #historyIndex = 0;
   #maxHistoryStates = 10;
+  #isModified = false;
 
   /**
    * Create StateManager
    * @param {EntityManager} entityManager
    */
-  constructor() {}
+  constructor() {
+    this.stateCallbackFunction;
+  }
 
   /**
    * Add a new state to the history
@@ -90,6 +93,7 @@ export class StateManager {
     const state = new State(entityManger, stateChanges);
     this.addState(state);
     state.do();
+    this.stateChanged();
   }
 
   /** Undo the last action */
@@ -99,6 +103,7 @@ export class StateManager {
     if (lastState) {
       lastState.undo();
       this.#historyIndex--;
+      this.stateChanged();
     }
   }
 
@@ -110,6 +115,7 @@ export class StateManager {
       if (currentState) {
         currentState.do();
         this.#historyIndex++;
+        this.stateChanged();
       }
     }
   }
@@ -128,6 +134,31 @@ export class StateManager {
    * */
   canRedo() {
     return this.#historyIndex < this.#history.length;
+  }
+
+  /** Get the modified state */
+  get isModified() {
+    return this.#isModified;
+  }
+
+  /**
+   * Set the state changed callback function
+   * @param {function} callback
+   */
+  setStateCallbackFunction(callback) {
+    this.stateCallbackFunction = callback;
+  }
+
+  /**
+   * Set the modified state
+   * @param {boolean} isModified
+   */
+  stateChanged(isModified=true) {
+    this.#isModified = isModified;
+
+    if (this.stateCallbackFunction) {
+      this.stateCallbackFunction();
+    }
   }
 }
 

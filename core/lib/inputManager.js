@@ -469,7 +469,6 @@ export class InputManager {
  * @param {string} command
  */
   initialiseItem(command) {
-    DesignCore.Scene.saveRequired();
     DesignCore.CommandLine.addToCommandHistory(command);
     this.activeCommand = DesignCore.CommandManager.createNew(command);
   };
