@@ -3,6 +3,7 @@ import { EntityManager } from '../../core/lib/entityManager.js';
 import { AddState, RemoveState, UpdateState } from '../../core/lib/stateManager.js';
 import { Line } from '../../core/entities/line.js';
 import { Point } from '../../core/entities/point.js';
+import { jest } from '@jest/globals';
 
 describe('StateManager', () => {
   let sm;
@@ -109,6 +110,43 @@ describe('StateManager', () => {
     expect(sm.canRedo()).toBe(true);
     sm.commit(em, [new AddState({ id: 'C' })]);
     expect(sm.canRedo()).toBe(false);
+  });
+
+  test('isModified getter reflects internal flag and stateChanged invokes callback and respects parameter', () => {
+    // initial state should be not modified
+    expect(sm.isModified).toBe(false);
+
+    const cb = jest.fn();
+    sm.setStateCallbackFunction(cb);
+
+    // calling stateChanged with default should set modified to true and call callback
+    sm.stateChanged();
+    expect(sm.isModified).toBe(true);
+    expect(cb).toHaveBeenCalledTimes(1);
+
+    // calling stateChanged(false) should clear modified flag and call callback
+    sm.stateChanged(false);
+    expect(sm.isModified).toBe(false);
+    expect(cb).toHaveBeenCalledTimes(2);
+  });
+
+  test('stateChanged is invoked after commit/undo/redo', () => {
+    const em = new EntityManager();
+    const cb = jest.fn();
+    sm.setStateCallbackFunction(cb);
+
+    // commit should call stateChanged once
+    sm.commit(em, [new AddState({ id: 'x' })]);
+    expect(cb).toHaveBeenCalledTimes(1);
+    expect(sm.isModified).toBe(true);
+
+    // undo should call stateChanged again
+    sm.undo();
+    expect(cb).toHaveBeenCalledTimes(2);
+
+    // redo should call stateChanged again
+    sm.redo();
+    expect(cb).toHaveBeenCalledTimes(3);
   });
 });
 
