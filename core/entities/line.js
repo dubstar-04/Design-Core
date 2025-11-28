@@ -131,7 +131,6 @@ export class Line extends Entity {
     const mousePosition = DesignCore.Mouse.pointOnScene();
     // get the point on the line closest to the mouse
     const pointOnLine = mousePosition.closestPointOnLine(this.points[0], this.points[1]);
-
     // remove any intersections that are at the end points of the line
     intersections = intersections.filter((p) => !p.isSame(this.points[0]) && !p.isSame(this.points[1]));
 
