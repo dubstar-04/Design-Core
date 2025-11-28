@@ -238,6 +238,11 @@ export class Arc extends Entity {
   trim(intersections) {
     // array to hold state changes
     const stateChanges = [];
+
+    if (intersections.length === 0) {
+      return stateChanges;
+    }
+
     // get the mouse position
     const mousePosition = DesignCore.Mouse.pointOnScene();
     // get the point on the arc closest to the mouse
