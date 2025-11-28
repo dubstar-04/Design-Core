@@ -103,7 +103,8 @@ export class Rotate extends Tool {
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
         const item = DesignCore.Scene.selectionManager.selectedItems[i];
         // get the original points from the scene entities
-        const originalItem = DesignCore.Scene.entities.get(i);
+        const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
+        const originalItem = DesignCore.Scene.entities.get(entityIndex);
         item.setProperty('points', this.getRotatedPoints(originalItem.points, center, theta));
       }
     }
