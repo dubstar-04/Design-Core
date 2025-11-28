@@ -139,10 +139,10 @@ test('test onCommand with no activeCommand or promptOption', async () => {
 
   const po = new PromptOptions('Point or Number', [Input.Type.POINT, Input.Type.NUMBER], ['One', 'Two', 'Three']);
 
-  const numbericalInput = core.scene.inputManager.requestInput(po);
+  const numericalInput = core.scene.inputManager.requestInput(po);
   expect(inputManager.promptOption).toBe(po);
   inputManager.onCommand(42); // numerical input
-  await expect(numbericalInput).resolves.toBe(42);
+  await expect(numericalInput).resolves.toBe(42);
 
   const pointInput = core.scene.inputManager.requestInput(po);
   const point = new Point(5, 10);
