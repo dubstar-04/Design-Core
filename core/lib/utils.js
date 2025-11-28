@@ -1,5 +1,6 @@
 
 import { Logging } from './logging.js';
+import { Arc } from '../entities/arc.js';
 
 /** Utils Class */
 export class Utils {
@@ -42,6 +43,46 @@ export class Utils {
       const db = (b.x - refPoint.x) ** 2 + (b.y - refPoint.y) ** 2;
       return da - db; // nearest first
     });
+  }
+
+  /**
+   * Sort points around an arc center by angular position.
+   * Mutates the points array.
+   *
+   * @param {Array} points - array of points
+   * @param {Arc} arc - arc
+   *
+   */
+  static sortPointsOnArc(points, arc) {
+    if (!Array.isArray(points)) return;
+
+    if (!(arc instanceof Arc)) {
+      Logging.instance.warn('Utils.sortPointsOnArc - arc parameter is not an Arc instance');
+      return;
+    }
+
+    const center = arc.points[0];
+    const startAngle = arc.direction > 0 ? arc.startAngle() : arc.endAngle();
+    const twoPi = Math.PI * 2;
+    const normalize = (ang) => ((ang % twoPi) + twoPi) % twoPi;
+
+    // map points to angles
+    const mapped = points.map((point) => {
+      const angle = Math.atan2(point.y - center.y, point.x - center.x);
+      const normalizedAngle = normalize(angle - startAngle);
+      return { point, normalizedAngle };
+    });
+
+    // sort by angle
+    mapped.sort((u, v) => u.normalizedAngle - v.normalizedAngle);
+
+    // direction: - ccw > 0, cw <= 0
+    if (arc.direction <= 0) mapped.reverse();
+
+    // write back into original array (preserve Point instances)
+    for (let i = 0; i < mapped.length; i++) {
+      points[i] = mapped[i].point;
+    }
   }
 
   /**
