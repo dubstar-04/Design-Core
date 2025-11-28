@@ -71,10 +71,21 @@ export class PromptOptions {
    * @return {string} undefined or the matched option
    */
   parseInputToOption(input) {
+    // no options to match
     if (this.options.length === 0) {
       return;
     }
 
+    // can't match numbers options
+    if (typeof(input) === 'number') {
+      return;
+    }
+
+    // can't match points to options
+    if ( input instanceof Point) {
+      return;
+    }
+    // loop through options to find a match
     for (let i = 0; i < this.options.length; i++) {
       const option = this.options[i];
       // convert the option to uppercase and substring to the input length for comparison
@@ -259,7 +270,9 @@ export class InputManager {
           this.initialiseItem(DesignCore.CommandManager.getCommand(input));
           this.activeCommand.execute();
         } else if (this.promptOption) {
-          this.promptOption.respond(input);
+          // unknown input for the active command prompt
+          // this.promptOption.respond(input);
+          return;
         }
       }
     } else if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
