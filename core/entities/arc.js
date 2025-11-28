@@ -6,6 +6,7 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
+import { AddState, RemoveState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
@@ -226,6 +227,71 @@ export class Arc extends Entity {
     startPoint.bulge = bulge;
     const endPoint = this.points[0].project(this.endAngle(), this.radius);
     return [startPoint, endPoint];
+  }
+
+
+  /**
+   * Trim the entity
+   * @param {Array} intersections
+   * @return {Array} - array of state changes
+   */
+  trim(intersections) {
+    // array to hold state changes
+    const stateChanges = [];
+    // get the mouse position
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+    // get the point on the arc closest to the mouse
+    const pointOnArc = mousePosition.closestPointOnArc(this.points[1], this.points[2], this.points[0], this.direction);
+    // remove any intersections that are at the end points of the arc
+    intersections = intersections.filter((p) => !p.isSame(this.points[0]) && !p.isSame(this.points[1]));
+    // sort intersection points by distance to start point
+    Utils.sortPointsOnArc(intersections, this);
+    // Add arc points to the start and the end of the point array
+    const testPoints = [this.points[1], ...intersections, this.points[2]];
+
+    // Test if mouse position is between two intersection points
+    if (testPoints.length > 1) {
+      // Test if mouse position is between two intersection points
+      if (testPoints.length > 1) {
+        for (let i = 0; i < testPoints.length - 1; i++) {
+          const startPoint = testPoints[i];
+          const endPoint = testPoints[i + 1];
+
+          // check if the mouse is between startPoint and endPoint
+          if (pointOnArc.isOnArc(startPoint, endPoint, this.points[0], this.direction)) {
+            const newPoints = [];
+
+            for (const p of testPoints) {
+              const inOriginalLine = this.points.indexOf(p) !== -1;
+              const inIntersections = intersections.indexOf(p) !== -1;
+
+              // Keep points which:
+              // - The mouse is between are intersections
+              // - The mouse is not between and in this line
+              const isBetween = p.isSame(startPoint) || p.isSame(endPoint);
+              if ((isBetween && inIntersections) || (!isBetween && inOriginalLine)) {
+                newPoints.push(p);
+              }
+            }
+
+            if (newPoints.length % 2 === 0) {
+            // Add lines for each point pair
+              for (let j = 0; j < newPoints.length; j += 2) {
+                const arc = Utils.cloneObject(this);
+                arc.points = [this.points[0], newPoints[j], newPoints[j + 1]];
+                const addState = new AddState(arc);
+                stateChanges.push(addState);
+              }
+            }
+            // Remove the existing arc
+            const removeState = new RemoveState(this);
+            stateChanges.push(removeState);
+          }
+        }
+      }
+    }
+
+    return stateChanges;
   }
 
   /**
