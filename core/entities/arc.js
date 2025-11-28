@@ -256,42 +256,41 @@ export class Arc extends Entity {
 
     // Test if mouse position is between two intersection points
     if (testPoints.length > 1) {
-      // Test if mouse position is between two intersection points
-      if (testPoints.length > 1) {
-        for (let i = 0; i < testPoints.length - 1; i++) {
-          const startPoint = testPoints[i];
-          const endPoint = testPoints[i + 1];
+      for (let i = 0; i < testPoints.length - 1; i++) {
+        const startPoint = testPoints[i];
+        const endPoint = testPoints[i + 1];
 
-          // check if the mouse is between startPoint and endPoint
-          if (pointOnArc.isOnArc(startPoint, endPoint, this.points[0], this.direction)) {
-            const newPoints = [];
+        // check if the mouse is between startPoint and endPoint
+        if (pointOnArc.isOnArc(startPoint, endPoint, this.points[0], this.direction)) {
+          console.log('Trimming arc between points', startPoint, endPoint);
 
-            for (const p of testPoints) {
-              const inOriginalLine = this.points.indexOf(p) !== -1;
-              const inIntersections = intersections.indexOf(p) !== -1;
+          const newPoints = [];
 
-              // Keep points which:
-              // - The mouse is between are intersections
-              // - The mouse is not between and in this line
-              const isBetween = p.isSame(startPoint) || p.isSame(endPoint);
-              if ((isBetween && inIntersections) || (!isBetween && inOriginalLine)) {
-                newPoints.push(p);
-              }
+          for (const p of testPoints) {
+            const inOriginalLine = this.points.indexOf(p) !== -1;
+            const inIntersections = intersections.indexOf(p) !== -1;
+
+            // Keep points which:
+            // - The mouse is between are intersections
+            // - The mouse is not between and in this line
+            const isBetween = p.isSame(startPoint) || p.isSame(endPoint);
+            if ((isBetween && inIntersections) || (!isBetween && inOriginalLine)) {
+              newPoints.push(p);
             }
-
-            if (newPoints.length % 2 === 0) {
-            // Add lines for each point pair
-              for (let j = 0; j < newPoints.length; j += 2) {
-                const arc = Utils.cloneObject(this);
-                arc.points = [this.points[0], newPoints[j], newPoints[j + 1]];
-                const addState = new AddState(arc);
-                stateChanges.push(addState);
-              }
-            }
-            // Remove the existing arc
-            const removeState = new RemoveState(this);
-            stateChanges.push(removeState);
           }
+
+          if (newPoints.length % 2 === 0) {
+            // Add lines for each point pair
+            for (let j = 0; j < newPoints.length; j += 2) {
+              const arc = Utils.cloneObject(this);
+              arc.points = [this.points[0], newPoints[j], newPoints[j + 1]];
+              const addState = new AddState(arc);
+              stateChanges.push(addState);
+            }
+          }
+          // Remove the existing arc
+          const removeState = new RemoveState(this);
+          stateChanges.push(removeState);
         }
       }
     }
