@@ -17,7 +17,7 @@ export class Rotate extends Tool {
   constructor() {
     super();
     this.baseAngle = 0;
-    this.lastAngle = 0;
+    this.basePoint = null;
   }
 
   /**
@@ -57,11 +57,15 @@ export class Rotate extends Tool {
           this.baseAngle = null;
           const op4 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
           const refBase = await DesignCore.Scene.inputManager.requestInput(op4);
+          // set the base point to the reference start point
+          this.basePoint = refBase;
 
           const op5 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
           const refEnd = await DesignCore.Scene.inputManager.requestInput(op5);
           // set the base angle to the reference
           this.baseAngle = refBase.angle(refEnd);
+          // set the base point to null
+          this.basePoint = null;
         } else if (Input.getType(input2) === Input.Type.NUMBER) {
           const basePoint = this.points.at(0);
           const angle = Utils.degrees2radians(input2);
@@ -84,21 +88,23 @@ export class Rotate extends Tool {
   preview() {
     const mousePoint = DesignCore.Mouse.pointOnScene();
 
-    if (this.points.length >= 1 && this.baseAngle !== null) {
+    if (this.points.length >= 1 && this.baseAngle !== null || this.basePoint !== null) {
       // Draw a line
-      const points = [this.points.at(0), mousePoint];
+      const center = this.basePoint === null ? this.points.at(0) : this.basePoint;
+      const points = [center, mousePoint];
       DesignCore.Scene.tempEntities.create('Line', { points: points });
     }
 
     if (this.points.length >= 1) {
       const ang = this.points[0].angle(mousePoint);
-      const theta = this.baseAngle === null ? 0 : ang - this.baseAngle - this.lastAngle;
-      this.lastAngle = ang;
+      const theta = this.baseAngle === null ? 0 : ang - this.baseAngle;
       const center = this.points[0];
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
         const item = DesignCore.Scene.selectionManager.selectedItems[i];
-        item.setProperty('points', this.getRotatedPoints(item.points, center, theta));
+        // get the original points from the scene entities
+        const originalItem = DesignCore.Scene.entities.get(i);
+        item.setProperty('points', this.getRotatedPoints(originalItem.points, center, theta));
       }
     }
   };
