@@ -4,8 +4,64 @@ import { Move } from '../../core/tools/move.js';
 
 const core = new Core();
 
+const inputScenarios = [
+  {
+    desc: 'Move by point',
+    inputs: [new Point(10, 0), new Point(30, 20)],
+    result: new Point(40, 20),
+
+  },
+  {
+    desc: 'move by negative distance',
+    inputs: [new Point(10, 0), new Point(-30, -20)],
+    result: new Point(-20, -20),
+  },
+
+];
+
+test.each(inputScenarios)('Move.execute handles $desc', async (scenario) => {
+  const { inputs, result } = scenario;
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        const input = inputs[callCount];
+        callCount++;
+        return input;
+      }
+    },
+
+    executeCommand: async () => { },
+  };
+
+  // clear all scene entities
+  core.scene.clear();
+  // create line
+  const pointOne = new Point(10, 0);
+  const pointTwo = new Point(20, 0);
+  core.scene.addItem('Line', { points: [pointOne, pointTwo] });
+
+  // select line
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const move = new Move();
+  await move.execute();
+
+  move.action();
+
+  const line = core.scene.entities.get(0);
+
+  expect(line.points[1].x).toBeCloseTo(result.x);
+  expect(line.points[1].y).toBeCloseTo(result.y);
+
+  // Restore original inputManager
+  core.scene.inputManager = origInputManager;
+});
+
 test('Test Move.action', () => {
   // Add items to scene
+  core.scene.clear();
   core.scene.addItem('Line', { points: [new Point(), new Point(0, 10)] });
   core.scene.addItem('Circle', { points: [new Point(), new Point(0, 10)] });
   core.scene.addItem('Polyline', { points: [new Point(), new Point(0, 10)] });
