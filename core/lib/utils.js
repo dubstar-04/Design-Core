@@ -1,6 +1,5 @@
 
 import { Logging } from './logging.js';
-import { Point } from '../entities/point.js';
 
 /** Utils Class */
 export class Utils {
@@ -55,10 +54,6 @@ export class Utils {
    */
   static sortPointsOnArc(points, startPoint, endPoint, centerPoint, direction = 0) {
     if (!Array.isArray(points)) return;
-
-    if ( startPoint instanceof Point === false || endPoint instanceof Point === false || centerPoint instanceof Point === false ) {
-      throw new Error('Utils.sortPointsOnArc - startPoint, endPoint and centerPoint must be Point instances');
-    }
 
     const refAngle = direction > 0 ? centerPoint.angle(startPoint) : centerPoint.angle(endPoint);
     const twoPi = Math.PI * 2;
