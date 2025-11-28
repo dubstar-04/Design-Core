@@ -1,6 +1,6 @@
 
 import { Logging } from './logging.js';
-import { Arc } from '../entities/arc.js';
+import { Point } from '../entities/point.js';
 
 /** Utils Class */
 export class Utils {
@@ -53,23 +53,21 @@ export class Utils {
    * @param {Arc} arc - arc
    *
    */
-  static sortPointsOnArc(points, arc) {
+  static sortPointsOnArc(points, startPoint, endPoint, centerPoint, direction = 0) {
     if (!Array.isArray(points)) return;
 
-    if (!(arc instanceof Arc)) {
-      Logging.instance.warn('Utils.sortPointsOnArc - arc parameter is not an Arc instance');
-      return;
+    if ( startPoint instanceof Point === false || endPoint instanceof Point === false || centerPoint instanceof Point === false ) {
+      throw new Error('Utils.sortPointsOnArc - startPoint, endPoint and centerPoint must be Point instances');
     }
 
-    const center = arc.points[0];
-    const startAngle = arc.direction > 0 ? arc.startAngle() : arc.endAngle();
+    const refAngle = direction > 0 ? centerPoint.angle(startPoint) : centerPoint.angle(endPoint);
     const twoPi = Math.PI * 2;
     const normalize = (ang) => ((ang % twoPi) + twoPi) % twoPi;
 
     // map points to angles
     const mapped = points.map((point) => {
-      const angle = Math.atan2(point.y - center.y, point.x - center.x);
-      const normalizedAngle = normalize(angle - startAngle);
+      const angle = Math.atan2(point.y - centerPoint.y, point.x - centerPoint.x);
+      const normalizedAngle = normalize(angle - refAngle);
       return { point, normalizedAngle };
     });
 
@@ -77,7 +75,7 @@ export class Utils {
     mapped.sort((u, v) => u.normalizedAngle - v.normalizedAngle);
 
     // direction: - ccw > 0, cw <= 0
-    if (arc.direction <= 0) mapped.reverse();
+    if (direction <= 0) mapped.reverse();
 
     // write back into original array (preserve Point instances)
     for (let i = 0; i < mapped.length; i++) {
