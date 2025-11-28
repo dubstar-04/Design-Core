@@ -57,7 +57,7 @@ test.each(inputScenarios)('Rotate.execute handles $desc', async (scenario) => {
   const rotate = new Rotate();
   await rotate.execute();
 
-  expect(core.scene.tempEntities.count()).toBe(0); // preview should create temp entity
+  expect(core.scene.tempEntities.count()).toBe(0); // no temp entities before preview
   rotate.preview(); // to set up any preview state if needed
   expect(core.scene.tempEntities.count()).toBe(1); // preview should create temp entity
 

@@ -103,7 +103,7 @@ test('mouseMoved draws selection window when mouse button one is down and no pro
   core.mouse.buttonOneDown = false;
 });
 
-test( 'Test PromptOptions creation with various parameters', () => {
+test('Test PromptOptions creation with various parameters', () => {
   const promptMessage = 'Select a point';
   const types = [Input.Type.POINT, Input.Type.NUMBER];
   const options = ['One', 'Two', 'Three'];
@@ -139,10 +139,10 @@ test('test onCommand with no activeCommand or promptOption', async () => {
 
   const po = new PromptOptions('Point or Number', [Input.Type.POINT, Input.Type.NUMBER], ['One', 'Two', 'Three']);
 
-  const numbericalInput = core.scene.inputManager.requestInput(po);
+  const numericalInput = core.scene.inputManager.requestInput(po);
   expect(inputManager.promptOption).toBe(po);
   inputManager.onCommand(42); // numerical input
-  await expect(numbericalInput).resolves.toBe(42);
+  await expect(numericalInput).resolves.toBe(42);
 
   const pointInput = core.scene.inputManager.requestInput(po);
   const point = new Point(5, 10);
