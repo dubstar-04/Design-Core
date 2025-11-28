@@ -103,7 +103,7 @@ test('mouseMoved draws selection window when mouse button one is down and no pro
   core.mouse.buttonOneDown = false;
 });
 
-test( 'Test PromptOptions creation with various parameters', () => {
+test('Test PromptOptions creation with various parameters', () => {
   const promptMessage = 'Select a point';
   const types = [Input.Type.POINT, Input.Type.NUMBER];
   const options = ['One', 'Two', 'Three'];
