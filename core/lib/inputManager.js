@@ -82,7 +82,7 @@ export class PromptOptions {
     }
 
     // can't match points to options
-    if ( input instanceof Point) {
+    if (input instanceof Point) {
       return;
     }
     // loop through options to find a match
