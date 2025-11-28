@@ -236,3 +236,19 @@ test('Test tool switching with invalid command', () => {
   // Reset for cleanup
   inputManager.reset();
 });
+
+test('parse input to option with shortcut', () => {
+  let po = new PromptOptions('Select option', [Input.Type.STRING], ['Apple', 'Banana', 'Cherry']);
+  expect(po.parseInputToOption('A')).toBe('Apple');
+  expect(po.parseInputToOption('B')).toBe('Banana');
+  expect(po.parseInputToOption('C')).toBe('Cherry');
+  expect(po.parseInputToOption('X')).toBeUndefined();
+  expect(po.parseInputToOption(42)).toBeUndefined();
+  expect(po.parseInputToOption(new Point())).toBeUndefined();
+
+  po = new PromptOptions('Select without options', [Input.Type.STRING]);
+  expect(po.parseInputToOption('A')).toBeUndefined();
+  expect(po.parseInputToOption('X')).toBeUndefined();
+  expect(po.parseInputToOption(42)).toBeUndefined();
+  expect(po.parseInputToOption(new Point())).toBeUndefined();
+});
