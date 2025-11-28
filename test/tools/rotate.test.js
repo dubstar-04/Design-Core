@@ -38,7 +38,6 @@ test.each(inputScenarios)('Rotate.execute handles $desc', async (scenario) => {
     requestInput: async () => {
       if (callCount < inputs.length) {
         const input = inputs[callCount];
-        console.log(`Providing input: ${input}`);
         callCount++;
         return input;
       }
