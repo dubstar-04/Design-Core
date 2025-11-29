@@ -55,7 +55,7 @@ export class Utils {
    * @param {number} direction - arc direction (ccw >0, cw <=0)
    *
    */
-  static sortPointsOnArc(points, startPoint, endPoint, centerPoint, direction = 0) {
+  static sortPointsOnArc(points, startPoint, endPoint, centerPoint, direction = 1) {
     if (!Array.isArray(points)) return;
 
     const refAngle = direction > 0 ? centerPoint.angle(startPoint) : centerPoint.angle(endPoint);
