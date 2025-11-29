@@ -266,14 +266,14 @@ export class Arc extends Entity {
           const newPoints = [];
 
           for (const p of testPoints) {
-            const inOriginalLine = this.points.indexOf(p) !== -1;
+            const inOriginalArc = this.points.indexOf(p) !== -1;
             const inIntersections = intersections.indexOf(p) !== -1;
 
             // Keep points which:
             // - The mouse is between are intersections
-            // - The mouse is not between and in this line
+            // - The mouse is not between and in this arc
             const isBetween = p.isSame(startPoint) || p.isSame(endPoint);
-            if ((isBetween && inIntersections) || (!isBetween && inOriginalLine)) {
+            if ((isBetween && inIntersections) || (!isBetween && inOriginalArc)) {
               newPoints.push(p);
             }
           }
