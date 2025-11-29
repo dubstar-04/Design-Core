@@ -248,7 +248,7 @@ export class Arc extends Entity {
     // get the point on the arc closest to the mouse
     const pointOnArc = mousePosition.closestPointOnArc(this.points[1], this.points[2], this.points[0], this.direction);
     // remove any intersections that are at the end points of the arc
-    intersections = intersections.filter((p) => !p.isSame(this.points[0]) && !p.isSame(this.points[1]));
+    intersections = intersections.filter((p) => !p.isSame(this.points[1]) && !p.isSame(this.points[2]));
     // sort intersection points by distance to start point
     Utils.sortPointsOnArc(intersections, this.points[1], this.points[2], this.points[0], this.direction);
     // Add arc points to the start and the end of the point array
