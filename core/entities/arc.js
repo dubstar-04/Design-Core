@@ -279,7 +279,7 @@ export class Arc extends Entity {
           }
 
           if (newPoints.length % 2 === 0) {
-            // Add lines for each point pair
+            // Add arcs for each point pair
             for (let j = 0; j < newPoints.length; j += 2) {
               const arc = Utils.cloneObject(this);
               arc.points = [this.points[0], newPoints[j], newPoints[j + 1]];
