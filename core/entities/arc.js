@@ -262,8 +262,7 @@ export class Arc extends Entity {
 
         // check if the mouse is between startPoint and endPoint
         if (pointOnArc.isOnArc(startPoint, endPoint, this.points[0], this.direction)) {
-          console.log('Trimming arc between points', startPoint, endPoint);
-
+          // Store new entity points
           const newPoints = [];
 
           for (const p of testPoints) {
