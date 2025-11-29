@@ -25,9 +25,9 @@ test('Test Trim.action', () => {
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to trim
-  trim.selectedIndex = 1;
+  trim.selectedItem = core.scene.entities.get(1);
   // set mouse location - required for trim
   core.mouse.setPosFromScenePoint(new Point(10, 50));
   // Perform trim
@@ -56,9 +56,9 @@ test('Test Trim.action', () => {
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to trim
-  trim.selectedIndex = 1;
+  trim.selectedItem = core.scene.entities.get(1);
   // set mouse location - required for trim
   core.mouse.setPosFromScenePoint(new Point(-10, 50));
   // Perform trim
@@ -87,9 +87,9 @@ test('Test Trim.action', () => {
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(1);
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   // select item to trim
-  trim.selectedIndex = 0;
+  trim.selectedItem = core.scene.entities.get(0);
   // set mouse location - required for trim
   core.mouse.setPosFromScenePoint(new Point(0, 60));
   // Perform trim
@@ -120,9 +120,9 @@ test('Test Trim.action', () => {
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(1);
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   // select item to trim
-  trim.selectedIndex = 0;
+  trim.selectedItem = core.scene.entities.get(0);
   // set mouse location - required for trim
   core.mouse.setPosFromScenePoint(new Point(0, 30));
   // Perform trim
@@ -154,9 +154,9 @@ test('Test Trim.action', () => {
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to trim
-  trim.selectedIndex = 1;
+  trim.selectedItem = core.scene.entities.get(1);
   // set mouse location - required for trim
   core.mouse.setPosFromScenePoint(new Point(25, 75));
   // Perform trim
@@ -185,9 +185,9 @@ test('Test Trim.action', () => {
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to trim
-  trim.selectedIndex = 1;
+  trim.selectedItem = core.scene.entities.get(1);
   // set mouse location - required for trim
   core.mouse.setPosFromScenePoint(new Point(-25, 25));
   // Perform trim
