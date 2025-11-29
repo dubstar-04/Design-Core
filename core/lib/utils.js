@@ -52,7 +52,7 @@ export class Utils {
    * @param {Point} startPoint - arc start point
    * @param {Point} endPoint - arc end point
    * @param {Point} centerPoint - arc center point
-   * @param {number} direction - arc direction (-ccw >0, cw <=0)
+   * @param {number} direction - arc direction (ccw >0, cw <=0)
    *
    */
   static sortPointsOnArc(points, startPoint, endPoint, centerPoint, direction = 0) {
