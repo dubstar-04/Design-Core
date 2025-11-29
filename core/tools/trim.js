@@ -14,7 +14,8 @@ export class Trim extends Tool {
   /** Create a Trim command */
   constructor() {
     super();
-    this.selectedIndex;
+    this.selectedItem = null;
+    this.selectedBoundaryItems = [];
   }
 
   /**
@@ -41,10 +42,18 @@ export class Trim extends Tool {
         await DesignCore.Scene.inputManager.requestInput(op);
       }
 
+
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        const boundaryItem = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
+        this.selectedBoundaryItems.push(boundaryItem);
+      }
+
       const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       while (true) {
         const selection = await DesignCore.Scene.inputManager.requestInput(op2);
-        this.selectedIndex = selection.selectedItemIndex;
+        // this.selectedIndex = selection.selectedItemIndex;
+        this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+        DesignCore.Scene.selectionManager.removeLastSelection();
         DesignCore.Scene.inputManager.actionCommand();
       }
     } catch (err) {
@@ -63,20 +72,16 @@ export class Trim extends Tool {
    * Perform the command
    */
   action() {
-    const item = this.selectedIndex;
-
-    if (item !== undefined) {
+    if (this.selectedItem && this.selectedBoundaryItems.length) {
       const intersectPoints = [];
-      let TrimItem;
 
-      for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        if (DesignCore.Scene.selectionManager.selectionSet.selectionSet[i] !== item) {
-          const boundaryItem = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
-          TrimItem = DesignCore.Scene.entities.get(item);
 
-          const functionName = 'intersect' + boundaryItem.type + TrimItem.type;
-          const intersect = Intersection[functionName](boundaryItem.intersectPoints(), TrimItem.intersectPoints());
-
+      for (const boundaryItem of this.selectedBoundaryItems) {
+        if (boundaryItem !== this.selectedItem) {
+          const functionName = 'intersect' + boundaryItem.type + this.selectedItem.type;
+          console.log('Using intersection function:', functionName);
+          const intersect = Intersection[functionName](boundaryItem.intersectPoints(), this.selectedItem.intersectPoints());
+          // console.log('Found intersection points:', intersect.points);
           if (intersect.points.length) {
             for (let point = 0; point < intersect.points.length; point++) {
               intersectPoints.push(intersect.points[point]);
@@ -85,16 +90,16 @@ export class Trim extends Tool {
         }
       }
 
+
       if (intersectPoints) {
-        const stateChanges = TrimItem.trim(intersectPoints);
+        const stateChanges = this.selectedItem.trim(intersectPoints);
         if (stateChanges.length) {
           DesignCore.Scene.commit(stateChanges);
         }
       }
 
-      // remove item from selection set and reset the selectedIndex
-      DesignCore.Scene.selectionManager.removeFromSelectionSet(this.selectedIndex);
-      this.selectedIndex = undefined;
+      // reset selected item
+      this.selectedItem = null;
     }
   }
 }
