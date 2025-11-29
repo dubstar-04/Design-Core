@@ -287,9 +287,12 @@ export class Arc extends Entity {
               stateChanges.push(addState);
             }
           }
+
+          if (stateChanges.length > 0) {
           // Remove the existing arc
-          const removeState = new RemoveState(this);
-          stateChanges.push(removeState);
+            const removeState = new RemoveState(this);
+            stateChanges.push(removeState);
+          }
         }
       }
     }
