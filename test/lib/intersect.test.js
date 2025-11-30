@@ -542,7 +542,7 @@ test('Test Intersection.intersectArcPolyline()', () => {
 
 test('Test Intersection.intersectPolylineCircle()', () => {
   // Intersection
-  const circle = { centre: new Point(10, 10), radius: 5 };
+  const circle = { centre: new Point(0, 0), radius: 5 };
   const polyline = { points: [new Point(), new Point(0, 25)] };
   const result = Intersection.intersectPolylineCircle(polyline, circle, false);
   expect(result.status).toBe('Intersection');
@@ -570,7 +570,7 @@ test('Test Intersection.intersectPolylineCircle()', () => {
 
 test('Test Intersection.intersectCirclePolyline()', () => {
   // Intersection
-  const circle = { centre: new Point(10, 10), radius: 5 };
+  const circle = { centre: new Point(0, 0), radius: 5 };
   const polyline = { points: [new Point(), new Point(0, 25)] };
   const result = Intersection.intersectCirclePolyline(circle, polyline, false);
   expect(result.status).toBe('Intersection');
