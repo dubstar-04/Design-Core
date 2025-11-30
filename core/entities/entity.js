@@ -225,6 +225,8 @@ export class Entity {
    */
   extend(points) {
     // extend function to be overidden by implementation
+    DesignCore.Core.notify(`${this.type} ${Strings.Message.NOEXTEND}`);
+    return [];
   }
 
   /**
@@ -233,6 +235,8 @@ export class Entity {
    */
   trim(points) {
     // trim function to be overidden by implementation
+    DesignCore.Core.notify(`${this.type} ${Strings.Message.NOTRIM}`);
+    return [];
   }
 
   /**
