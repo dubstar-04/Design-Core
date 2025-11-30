@@ -335,17 +335,20 @@ export class Intersection {
     const inter1 = this.intersectPolylineCircle(polyline, arc, extend);
     const result = new Intersection('No Intersection');
 
-    if (!extend) {
+    if (extend) {
+      result.appendPoint(inter1.points[i]);
+    } else {
       for (let i = 0; i < inter1.points.length; i++) {
         if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
           result.appendPoint(inter1.points[i]);
         }
       }
-
-      if (result.points.length > 0) {
-        result.status = 'Intersection';
-      }
     }
+
+    if (result.points.length > 0) {
+      result.status = 'Intersection';
+    }
+
 
     return result;
   }
