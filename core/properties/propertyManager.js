@@ -115,7 +115,7 @@ export class PropertyManager {
         // check if the key is already in the propertiesList
         if (propertiesList.includes(key) === false) {
           // check if all subset items contain the key
-          if (subset.every((el) => el.hasOwnProperty(key))) {
+          if (subset.every((el) => el.hasOwnProperty(key) && Object.getOwnPropertyDescriptor(el, key).enumerable)) {
             propertiesList.push(key);
           }
         }
