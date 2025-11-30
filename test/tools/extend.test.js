@@ -114,7 +114,7 @@ test('Test Extend.action', () => {
   core.scene.addItem('Line', { points: [lineThreeStart, lineThreeEnd] });
   // Select boundary item
   extend.selectedBoundaryItems = [core.scene.entities.get(0)];
-  // select item to trim
+  // select item to extend
   extend.selectedItem = core.scene.entities.get(1);
   // set mouse location - required for Extend
   core.mouse.setPosFromScenePoint(new Point(0, 20));
