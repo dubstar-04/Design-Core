@@ -91,7 +91,7 @@ export class Trim extends Tool {
         }
       }
 
-      if (intersectPoints) {
+      if (intersectPoints.length) {
         const stateChanges = this.selectedItem.trim(intersectPoints);
         if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);

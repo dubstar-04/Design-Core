@@ -91,7 +91,7 @@ export class Extend extends Tool {
         }
       }
 
-      if (intersectPoints) {
+      if (intersectPoints.length) {
         const stateChanges = this.selectedItem.extend(intersectPoints);
         if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
