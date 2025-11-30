@@ -222,6 +222,7 @@ export class Entity {
   /**
    * Extend the entity
    * @param {Array} points
+   * @return {Array} - array of state changes
    */
   extend(points) {
     // extend function to be overidden by implementation
@@ -232,6 +233,7 @@ export class Entity {
   /**
    * Trim the entity
    * @param {Array} points
+   * @return {Array} - array of state changes
    */
   trim(points) {
     // trim function to be overidden by implementation
