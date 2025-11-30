@@ -4,6 +4,7 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 
 import { File } from '../test-helpers/test-helpers.js';
+import { AddState } from '../../core/lib/stateManager.js';
 
 // initialise core
 new Core();
@@ -140,4 +141,62 @@ test('Test Circle.trim returns empty array when provided with empty intersection
 
   expect(circle.trim([])).toEqual([]);
   expect(circle.trim()).toEqual([]);
+});
+
+test('Test Circle.trim does not modify circle', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+
+  DesignCore.Mouse.pointOnScene = () => new Point(7.71, 7.71);
+
+  // test a single intersection - not valid
+  const intersections = [new Point(10, 0)];
+  expect(circle.trim(intersections)).toEqual([]);
+
+  // test two intersections - should return an arc
+  intersections.push(new Point(-10, 0));
+  let trimWithTwoPoints = circle.trim(intersections);
+  let trimResult = trimWithTwoPoints[0].entity;
+  expect(trimResult.type).toEqual('Arc');
+  expect(trimResult.points[0].x).toEqual(0);
+  expect(trimResult.points[0].y).toEqual(0);
+
+  expect(trimResult.points[1].x).toEqual(10);
+  expect(trimResult.points[1].y).toEqual(0);
+
+  expect(trimResult.points[2].x).toEqual(-10);
+  expect(trimResult.points[2].y).toEqual(0);
+
+  expect(trimWithTwoPoints[1].entity).toEqual(circle);
+
+  // test three intersections - should return an arc from first two points found
+  intersections.push(new Point(0, 10));
+  trimWithTwoPoints = circle.trim(intersections);
+  trimResult = trimWithTwoPoints[0].entity;
+  expect(trimResult.type).toEqual('Arc');
+  expect(trimResult.points[0].x).toEqual(0);
+  expect(trimResult.points[0].y).toEqual(0);
+
+  expect(trimResult.points[1].x).toEqual(10);
+  expect(trimResult.points[1].y).toEqual(0);
+
+  expect(trimResult.points[2].x).toEqual(0);
+  expect(trimResult.points[2].y).toEqual(10);
+
+  expect(trimWithTwoPoints[1].entity).toEqual(circle);
+
+  // test four intersections - should return an arc from first two points found
+  intersections.push(new Point(0, -10));
+  trimWithTwoPoints = circle.trim(intersections);
+  trimResult = trimWithTwoPoints[0].entity;
+  expect(trimResult.type).toEqual('Arc');
+  expect(trimResult.points[0].x).toEqual(0);
+  expect(trimResult.points[0].y).toEqual(0);
+
+  expect(trimResult.points[1].x).toEqual(10);
+  expect(trimResult.points[1].y).toEqual(0);
+
+  expect(trimResult.points[2].x).toEqual(0);
+  expect(trimResult.points[2].y).toEqual(10);
+
+  expect(trimWithTwoPoints[1].entity).toEqual(circle);
 });
