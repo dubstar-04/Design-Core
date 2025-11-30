@@ -35,3 +35,13 @@ test('Test Entity.touched', () => {
   expect(entity.touched(selectionExtremesFalse)).toBe(false);
   expect(entity.touched(selectionExtremesTrue)).toBe(true);
 });
+
+test('Test Entity.trim', () => {
+  const entity = new Entity();
+  expect(entity.trim()).toEqual([]);
+});
+
+test('Test Entity.extend', () => {
+  const entity = new Entity();
+  expect(entity.extend()).toEqual([]);
+});
