@@ -2,6 +2,7 @@ import { Core } from '../../core/core/core.js';
 import { Arc } from '../../core/entities/arc.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
+import { AddState, RemoveState } from '../../core/lib/stateManager.js';
 
 import { File } from '../test-helpers/test-helpers.js';
 
