@@ -189,8 +189,12 @@ export class Line extends Entity {
   extend(intersections) {
     // array to hold state changes
     const stateChanges = [];
-    let originPoint;
 
+    if (intersections.length === 0) {
+      return stateChanges;
+    }
+
+    let originPoint;
     // Find which end is closer to the mouse
     if (this.points[0].distance(DesignCore.Mouse.pointOnScene()) < this.points[1].distance(DesignCore.Mouse.pointOnScene())) {
       originPoint = 0;
