@@ -279,19 +279,24 @@ export class Intersection {
     const inter1 = this.intersectCircleCircle(arc1, arc2, extend);
     const result = new Intersection('No Intersection');
 
-    if (!extend) {
-      for (let i = 0; i < inter1.points.length; i++) {
+
+    for (let i = 0; i < inter1.points.length; i++) {
+      if (extend) {
+        result.appendPoint(inter1.points[i]);
+      } else {
+        // check the point in on the arcs
         if (inter1.points[i].isOnArc(arc1.startPoint, arc1.endPoint, arc1.centre, arc1.direction)) {
           if (inter1.points[i].isOnArc(arc2.startPoint, arc2.endPoint, arc2.centre, arc2.direction)) {
             result.appendPoint(inter1.points[i]);
           }
         }
       }
-
-      if (result.points.length > 0) {
-        result.status = 'Intersection';
-      }
     }
+
+    if (result.points.length > 0) {
+      result.status = 'Intersection';
+    }
+
 
     return result;
   }
