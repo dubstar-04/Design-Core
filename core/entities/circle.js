@@ -152,7 +152,7 @@ export class Circle extends Entity {
     // array to hold state changes
     const stateChanges = [];
 
-    if (intersections.length === 0) {
+    if (intersections?.length === 0 || !intersections) {
       return stateChanges;
     }
 

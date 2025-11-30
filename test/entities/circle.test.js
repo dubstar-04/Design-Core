@@ -134,3 +134,10 @@ test('Test Circle.decompose', () => {
   expect(decomposedCircle[2].y).toBe(100);
   expect(decomposedCircle[2].bulge).toBe(0);
 });
+
+test('Test Circle.trim returns empty array when provided with empty intersection list', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(100, 0)] });
+
+  expect(circle.trim([])).toEqual([]);
+  expect(circle.trim()).toEqual([]);
+});

@@ -269,9 +269,8 @@ test('Arc constructor handles missing/invalid data', () => {
 
 test('Arc.trim returns empty for no intersections', () => {
   const arc = new Arc({ points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)] });
-  const changes = arc.trim([]);
-  expect(Array.isArray(changes)).toBe(true);
-  expect(changes).toHaveLength(0);
+  expect(arc.trim([])).toEqual([]);
+  expect(arc.trim()).toEqual([]);
 });
 
 

@@ -127,6 +127,10 @@ export class Line extends Entity {
     // array to hold state changes
     const stateChanges = [];
 
+    if (intersections?.length === 0 || !intersections) {
+      return stateChanges;
+    }
+
     // get the mouse position
     const mousePosition = DesignCore.Mouse.pointOnScene();
     // get the point on the line closest to the mouse
