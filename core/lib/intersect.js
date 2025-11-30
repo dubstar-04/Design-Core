@@ -541,6 +541,18 @@ export class Intersection {
     return result;
   };
 
+
+  /**
+   * Find intersections between circle and polyline segments
+   * @param {Circle} circle
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectCirclePolyline(circle, polyline, extend) {
+    return this.intersectPolylineCircle(polyline, circle, extend);
+  }
+
   /**
    * Find intersections between polyline and circle segments
    * @param {Polyline} polyline
