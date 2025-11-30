@@ -31,7 +31,7 @@ test.each(inputScenarios)('Trim.execute handles $desc', async (scenario) => {
         return input;
       }
     },
-    // mock the ation command
+    // mock the action command
     actionCommand: () => actionSpy(),
   };
 

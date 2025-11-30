@@ -289,7 +289,7 @@ export class Arc extends Entity {
           }
 
           if (stateChanges.length > 0) {
-          // Remove the existing arc
+            // Remove the existing arc
             const removeState = new RemoveState(this);
             stateChanges.push(removeState);
           }
