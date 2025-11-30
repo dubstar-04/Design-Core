@@ -171,3 +171,11 @@ test('Test Line.trim returns empty array when provided with empty intersection l
   expect(line.trim([])).toEqual([]);
   expect(line.trim()).toEqual([]);
 });
+
+
+test('Test Line.extend returns empty array when provided with empty intersection list', () => {
+  const line = new Line({ points: [new Point(0, 0), new Point(100, 0)] });
+
+  expect(line.extend([])).toEqual([]);
+  expect(line.extend()).toEqual([]);
+});
