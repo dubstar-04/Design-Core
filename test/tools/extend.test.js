@@ -1,8 +1,59 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { Extend } from '../../core/tools/extend.js';
+import { SingleSelection } from '../../core/lib/selectionManager.js';
+import { expect, jest } from '@jest/globals';
 
 const core = new Core();
+
+// Test cases for user input
+const inputScenarios = [
+
+  { desc: 'Trim selection',
+    inputs: [new SingleSelection(1, new Point())],
+  },
+];
+
+test.each(inputScenarios)('Trim.execute handles $desc', async (scenario) => {
+  const { inputs } = scenario;
+  const origInputManager = core.scene.inputManager;
+
+  // mock action function
+  const actionSpy = jest.fn();
+
+  let callCount = 0;
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        const input = inputs[callCount];
+        console.log('input:', input);
+        callCount++;
+        return input;
+      }
+    },
+    // mock the ation command
+    actionCommand: () => actionSpy(),
+  };
+
+  // clear all scene entities
+  core.scene.clear();
+  // create line
+  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  // create circle
+  core.scene.addItem('Circle', { points: [new Point(), new Point(10, 0)] });
+  // select line
+  core.scene.selectionManager.selectionSet.selectionSet.push(0);
+
+  const extend = new Extend();
+  await extend.execute();
+
+  expect(extend.selectedBoundaryItems[0]).toEqual(core.scene.entities.get(0));
+  expect(extend.selectedItem).toBe(core.scene.entities.get(1));
+  expect(actionSpy).toHaveBeenCalled();
+
+  // Restore original inputManager
+  core.scene.inputManager = origInputManager;
+});
 
 test('Test Extend.action', () => {
   const lineOneStart = new Point(100, 0);
@@ -24,6 +75,8 @@ test('Test Extend.action', () => {
    * perpendicular lines
    * Extend end from horizontal line
    */
+  // clear all scene entities
+  core.scene.clear();
   // Add items to scene
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
