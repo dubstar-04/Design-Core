@@ -39,6 +39,8 @@ export class Strings {
     COMPLETED: 'completed',
     NOUNDO: 'No actions to undo',
     NOREDO: 'No actions to redo',
+    NOTRIM: 'cannot be trimmed',
+    NOEXTEND: 'cannot be extended',
   };
 
   // Strings
