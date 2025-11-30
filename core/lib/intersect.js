@@ -269,7 +269,40 @@ export class Intersection {
   }
 
   /**
-   * Find intersections between
+   * Find intersections between two segments
+   * @param {Arc} arc1
+   * @param {Arc} arc2
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectArcArc(arc1, arc2, extend) {
+    const inter1 = this.intersectCircleCircle(arc1, arc2, extend);
+    const result = new Intersection('No Intersection');
+
+
+    for (let i = 0; i < inter1.points.length; i++) {
+      if (extend) {
+        result.appendPoint(inter1.points[i]);
+      } else {
+        // check the point in on the arcs
+        if (inter1.points[i].isOnArc(arc1.startPoint, arc1.endPoint, arc1.centre, arc1.direction)) {
+          if (inter1.points[i].isOnArc(arc2.startPoint, arc2.endPoint, arc2.centre, arc2.direction)) {
+            result.appendPoint(inter1.points[i]);
+          }
+        }
+      }
+    }
+
+    if (result.points.length > 0) {
+      result.status = 'Intersection';
+    }
+
+
+    return result;
+  }
+
+  /**
+   * Find intersections between arc and circle segments
    * @param {Arc} arc
    * @param {Circle} circle
    * @param {boolean} extend
@@ -277,6 +310,47 @@ export class Intersection {
    */
   static intersectArcCircle(arc, circle, extend) {
     return this.intersectCircleArc(circle, arc, extend);
+  }
+
+
+  /**
+   * Find intersections between arc and polyline segments
+   * @param {Arc} arc
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectArcPolyline(arc, polyline, extend) {
+    return this.intersectPolylineArc(polyline, arc, extend);
+  }
+
+  /**
+   * Find intersections between polyline and arc segments
+   * @param {Polyline} polyline
+   * @param {Arc} arc
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectPolylineArc(polyline, arc, extend) {
+    const inter1 = this.intersectPolylineCircle(polyline, arc, extend);
+    const result = new Intersection('No Intersection');
+
+    if (extend) {
+      result.appendPoint(inter1.points[i]);
+    } else {
+      for (let i = 0; i < inter1.points.length; i++) {
+        if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
+          result.appendPoint(inter1.points[i]);
+        }
+      }
+    }
+
+    if (result.points.length > 0) {
+      result.status = 'Intersection';
+    }
+
+
+    return result;
   }
 
   /**
@@ -474,6 +548,56 @@ export class Intersection {
     if (result.points.length > 0) result.status = 'Intersection';
     return result;
   };
+
+
+  /**
+   * Find intersections between circle and polyline segments
+   * @param {Circle} circle
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectCirclePolyline(circle, polyline, extend) {
+    return this.intersectPolylineCircle(polyline, circle, extend);
+  }
+
+  /**
+   * Find intersections between polyline and circle segments
+   * @param {Polyline} polyline
+   * @param {Circle} circle
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectPolylineCircle(polyline, circle, extend) {
+    const result = new Intersection('No Intersection');
+    const length = polyline.points.length;
+
+    for (let i = 0; i < length - 1; i++) {
+      const b1 = polyline.points[i];
+      const b2 = polyline.points[(i + 1) % length];
+
+
+      if (b1.bulge === 0) {
+        const line2 = { start: b1, end: b2 };
+        const inter = this.intersectLineCircle(line2, circle, extend);
+        result.appendPoints(inter.points);
+      } else {
+        const arc = {};
+        arc.centre = b1.bulgeCentrePoint(b2);
+        arc.startPoint = b1;
+        arc.endPoint = b2;
+        arc.radius = arc.centre.distance(b1);
+        arc.direction = b1.bulge;
+
+        const interArc = this.intersectArcCircle(arc, circle, extend);
+        result.appendPoints(interArc.points);
+      }
+    }
+
+    if (result.points.length > 0) result.status = 'Intersection';
+    return result;
+  };
+
 
   /**
    * Find intersections between hatch and rectangle

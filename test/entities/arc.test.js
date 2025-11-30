@@ -2,6 +2,7 @@ import { Core } from '../../core/core/core.js';
 import { Arc } from '../../core/entities/arc.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
+import { AddState, RemoveState } from '../../core/lib/stateManager.js';
 
 import { File } from '../test-helpers/test-helpers.js';
 
@@ -264,5 +265,45 @@ test('Arc constructor handles missing/invalid data', () => {
   expect(() => new Arc({})).not.toThrow();
   // Invalid points
   expect(() => new Arc({ points: [null, undefined, {}] })).not.toThrow();
+});
+
+test('Arc.trim returns empty for no intersections', () => {
+  const arc = new Arc({ points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)] });
+  expect(arc.trim([])).toEqual([]);
+  expect(arc.trim()).toEqual([]);
+});
+
+
+test('Arc.trim returns remove + add states when trimming between two intersections', () => {
+  const arc = new Arc({ points: [new Point(), new Point(10, 0), new Point(-10, 0)] });
+  // Intersection points on the arc.
+  const i1 = new Point(7.71, 7.71);
+  const i2 = new Point(-7.71, 7.71);
+  const intersections = [i1, i2];
+
+  // set the mouse position to mid point of the arc
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 10);
+
+  const changes = arc.trim(intersections);
+
+  expect(Array.isArray(changes)).toBe(true);
+  expect(changes.length).toBeGreaterThanOrEqual(2);
+
+  expect(changes[0]).toBeInstanceOf(AddState);
+  expect(changes[1]).toBeInstanceOf(AddState);
+  expect(changes[2]).toBeInstanceOf(RemoveState);
+
+  expect(changes[0].entity.points[0].x).toBe(0);
+  expect(changes[0].entity.points[0].y).toBe(0);
+
+  expect(changes[0].entity.points[1].x).toBeCloseTo(10);
+  expect(changes[0].entity.points[1].y).toBeCloseTo(0);
+  expect(changes[0].entity.points[2].x).toBeCloseTo(7.71);
+  expect(changes[0].entity.points[2].y).toBeCloseTo(7.71);
+
+  expect(changes[1].entity.points[1].x).toBeCloseTo(-7.71);
+  expect(changes[1].entity.points[1].y).toBeCloseTo(7.71);
+  expect(changes[1].entity.points[2].x).toBe(-10);
+  expect(changes[1].entity.points[2].y).toBe(0);
 });
 

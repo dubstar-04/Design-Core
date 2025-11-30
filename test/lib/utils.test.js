@@ -1,4 +1,6 @@
+import { Arc } from '../../core/entities/arc.js';
 import { Utils } from '../../core/lib/utils.js';
+import { Point } from '../../core/entities/point.js';
 
 test('Test Utils.degrees2radians', () => {
   // Positive
@@ -60,6 +62,52 @@ test('Test Utils.sortPointsByDistance with empty array does nothing', () => {
   const pts = [];
   Utils.sortPointsByDistance(pts, ref);
   expect(pts).toEqual([]);
+});
+
+test('Test Utils.sortPointsOnArc mutates array ordered by angular position', () => {
+  const pts = [
+    new Point(7.1, 7.1 ), // 45 degree
+    new Point( 10, 0 ), // end
+    new Point( -10, 0 ), // start
+    new Point(-7.1, 7.1 ), // 45 degree
+    new Point(10, 10 ), // mid
+  ];
+
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)], direction: 1 });
+  Utils.sortPointsOnArc(pts, arc.points[1], arc.points[2], arc.points[0], arc.direction);
+  // Expect order: (10,0), (7.1, 7.1), (10,10), (-7.1, 7.1), (-10,0)
+  expect(pts[0].x).toBe(10);
+  expect(pts[0].y).toBe(0);
+
+  expect(pts[1].x).toBe(7.1);
+  expect(pts[1].y).toBe(7.1);
+
+  expect(pts[2].x).toBe(10);
+  expect(pts[2].y).toBe(10);
+
+  expect(pts[3].x).toBe(-7.1);
+  expect(pts[3].y).toBe(7.1);
+
+  expect(pts[4].x).toBe(-10);
+  expect(pts[4].y).toBe(0);
+
+  const cwArc = new Arc({ points: [new Point(0, 0), new Point(-10, 0), new Point(10, 0)], direction: -1 });
+  Utils.sortPointsOnArc(pts, cwArc.points[1], cwArc.points[2], cwArc.points[0], cwArc.direction);
+  // Expect order: (-10,0), (-7.1, 7.1), (10,10), (7.1, 7.1), (10,0)
+  expect(pts[0].x).toBe(-10);
+  expect(pts[0].y).toBe(0);
+
+  expect(pts[1].x).toBe(-7.1);
+  expect(pts[1].y).toBe(7.1);
+
+  expect(pts[2].x).toBe(10);
+  expect(pts[2].y).toBe(10);
+
+  expect(pts[3].x).toBe(7.1);
+  expect(pts[3].y).toBe(7.1);
+
+  expect(pts[4].x).toBe(10);
+  expect(pts[4].y).toBe(0);
 });
 
 

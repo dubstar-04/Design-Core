@@ -14,7 +14,8 @@ export class Extend extends Tool {
   /** Create an Extend command */
   constructor() {
     super();
-    this.selectedIndex;
+    this.selectedItem = null;
+    this.selectedBoundaryItems = [];
   }
 
   /**
@@ -41,10 +42,17 @@ export class Extend extends Tool {
         await DesignCore.Scene.inputManager.requestInput(op);
       }
 
+      // add all selected items to boundary items
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
+        const boundaryItem = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
+        this.selectedBoundaryItems.push(boundaryItem);
+      }
+
       const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       while (true) {
         const selection = await DesignCore.Scene.inputManager.requestInput(op2);
-        this.selectedIndex = selection.selectedItemIndex;
+        this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+        DesignCore.Scene.selectionManager.removeLastSelection();
         DesignCore.Scene.inputManager.actionCommand();
       }
     } catch (err) {
@@ -63,39 +71,36 @@ export class Extend extends Tool {
    * Perform the command
    */
   action() {
-    const item = this.selectedIndex;
-
-    if (item !== undefined) {
+    if (this.selectedItem && this.selectedBoundaryItems.length) {
       const intersectPoints = [];
-      let extendItem;
 
-      for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-        if (DesignCore.Scene.selectionManager.selectionSet.selectionSet[i] !== item) {
-          const boundaryItem = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
-          extendItem = DesignCore.Scene.entities.get(item);
-
-          const functionName = 'intersect' + boundaryItem.type + extendItem.type;
-          const intersect = Intersection[functionName](boundaryItem.intersectPoints(), extendItem.intersectPoints(), true);
-
-          if (intersect.points.length) {
-            for (let point = 0; point < intersect.points.length; point++) {
-              intersectPoints.push(intersect.points[point]);
+      for (const boundaryItem of this.selectedBoundaryItems) {
+        if (boundaryItem !== this.selectedItem) {
+          const functionName = 'intersect' + boundaryItem.type + this.selectedItem.type;
+          try {
+            const intersect = Intersection[functionName](boundaryItem.intersectPoints(), this.selectedItem.intersectPoints(), true);
+            if (intersect.points.length) {
+              for (let point = 0; point < intersect.points.length; point++) {
+                intersectPoints.push(intersect.points[point]);
+              }
             }
+          } catch {
+            Logging.instance.warn(`${this.constructor.name}: Error intersecting between ${boundaryItem.type} and ${this.selectedItem.type}`);
+            continue;
           }
         }
       }
 
-      if (intersectPoints) {
-        const stateChanges = extendItem.extend(intersectPoints);
-        if (stateChanges.length) {
+      if (intersectPoints.length) {
+        const stateChanges = this.selectedItem.extend(intersectPoints);
+        if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
         }
       }
-
-      // remove item from selection set and reset the selectedIndex
-      DesignCore.Scene.selectionManager.removeFromSelectionSet(this.selectedIndex);
-      this.selectedIndex = undefined;
     }
+
+    // reset selected item
+    this.selectedItem = null;
   }
 }
 

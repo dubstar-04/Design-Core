@@ -6,6 +6,7 @@ import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
 import { Property } from '../properties/property.js';
+import { Utils } from '../lib/utils.js';
 
 import { DesignCore } from '../designCore.js';
 import { AddState, RemoveState } from '../lib/stateManager.js';
@@ -144,42 +145,55 @@ export class Circle extends Entity {
 
   /**
    * Trim the entity
-   * @param {Array} points
+   * @param {Array} intersections
    * @return {Array} - array of state changes
    */
-  trim(points) {
-    if (points.length > 1) {
-      const start = points[0];
-      const cen = DesignCore.Mouse.pointOnScene();
-      const end = points[1];
+  trim(intersections) {
+    // array to hold state changes
+    const stateChanges = [];
 
-      const arcPoints = [this.points[0]];
-
-      const dir = (start.x - cen.x) * (end.y - cen.y) - (start.y - cen.y) * (end.x - cen.x);
-      if (dir > 0) {
-        arcPoints.push(points[0], points[1]);
-      } else if (dir < 0) {
-        arcPoints.push(points[1], points[0]);
-      }
-
-      const data = {
-        points: arcPoints,
-        colour: this.colour,
-        layer: this.layer,
-        lineWidth: this.lineWidth,
-      };
-
-      // create a new arc entity
-      const arc = DesignCore.CommandManager.createNew('Arc', data);
-
-      const stateChanges = [];
-      // Remove the circle and add the new arc
-      const removeState = new RemoveState(this);
-      const addState = new AddState(arc);
-      stateChanges.push(removeState, addState);
+    if (intersections?.length === 0 || !intersections) {
       return stateChanges;
     }
-    return [];
+
+    const direction = 1; // Circle is always CCW for trimming purposes
+
+    // get the mouse position
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+    // get the point on the arc closest to the mouse
+    const pointOnCircle = mousePosition.closestPointOnArc(this.points[1], this.points[1], this.points[0]);
+    // sort intersection points
+    Utils.sortPointsOnArc(intersections, this.points[0], this.points[0], this.points[0], direction);
+    // Repeat the first point to close the circle
+    const testPoints = [...intersections, intersections.at(0)]; // Closing the circle
+
+    // Test if mouse position is between two intersection points
+    if (testPoints.length > 1) {
+      for (let i = 0; i < testPoints.length - 1; i++) {
+        const startPoint = testPoints[i];
+        const endPoint = testPoints[i + 1];
+
+        // check if the mouse is between startPoint and endPoint
+        if (pointOnCircle.isOnArc(startPoint, endPoint, this.points[0], direction)) {
+          // create a new arc entity
+          const arc = DesignCore.CommandManager.createNew('Arc', this);
+          // flip direction
+          arc.direction = direction * -1;
+          arc.points = [this.points[0], startPoint, endPoint];
+          const addState = new AddState(arc);
+          stateChanges.push(addState);
+
+          // Remove the existing arc
+          if (stateChanges.length > 0) {
+            const removeState = new RemoveState(this);
+            stateChanges.push(removeState);
+            return stateChanges;
+          }
+        }
+      }
+    }
+
+    return stateChanges;
   }
 
   /**
