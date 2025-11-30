@@ -42,7 +42,7 @@ export class Trim extends Tool {
         await DesignCore.Scene.inputManager.requestInput(op);
       }
 
-
+      // add all selected items to boundary items
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         const boundaryItem = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
         this.selectedBoundaryItems.push(boundaryItem);
@@ -51,7 +51,6 @@ export class Trim extends Tool {
       const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       while (true) {
         const selection = await DesignCore.Scene.inputManager.requestInput(op2);
-        // this.selectedIndex = selection.selectedItemIndex;
         this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
         DesignCore.Scene.inputManager.actionCommand();
@@ -75,32 +74,33 @@ export class Trim extends Tool {
     if (this.selectedItem && this.selectedBoundaryItems.length) {
       const intersectPoints = [];
 
-
       for (const boundaryItem of this.selectedBoundaryItems) {
         if (boundaryItem !== this.selectedItem) {
           const functionName = 'intersect' + boundaryItem.type + this.selectedItem.type;
-          console.log('Using intersection function:', functionName);
-          const intersect = Intersection[functionName](boundaryItem.intersectPoints(), this.selectedItem.intersectPoints());
-          // console.log('Found intersection points:', intersect.points);
-          if (intersect.points.length) {
-            for (let point = 0; point < intersect.points.length; point++) {
-              intersectPoints.push(intersect.points[point]);
+          try {
+            const intersect = Intersection[functionName](boundaryItem.intersectPoints(), this.selectedItem.intersectPoints());
+            if (intersect.points.length) {
+              for (let point = 0; point < intersect.points.length; point++) {
+                intersectPoints.push(intersect.points[point]);
+              }
             }
+          } catch {
+            Logging.instance.warn(`${this.constructor.name}: Error intersecting between ${boundaryItem.type} and ${this.selectedItem.type}`);
+            continue;
           }
         }
       }
 
-
       if (intersectPoints) {
         const stateChanges = this.selectedItem.trim(intersectPoints);
-        if (stateChanges.length) {
+        if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
         }
       }
-
-      // reset selected item
-      this.selectedItem = null;
     }
+
+    // reset selected item
+    this.selectedItem = null;
   }
 }
 
