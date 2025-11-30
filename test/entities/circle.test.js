@@ -4,7 +4,6 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 
 import { File } from '../test-helpers/test-helpers.js';
-import { AddState } from '../../core/lib/stateManager.js';
 
 // initialise core
 new Core();
