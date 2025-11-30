@@ -28,9 +28,9 @@ test('Test Extend.action', () => {
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
-  // select item to Extend
-  extend.selectedIndex = 1;
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+  // select item to trim
+  extend.selectedItem = core.scene.entities.get(1);
   // set mouse location - required for Extend
   core.mouse.setPosFromScenePoint(new Point(40, 50));
   // Perform Extend
@@ -60,9 +60,9 @@ test('Test Extend.action', () => {
   core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
   core.scene.addItem('Line', { points: [lineThreeStart, lineThreeEnd] });
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
-  // select item to Extend
-  extend.selectedIndex = 1;
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+  // select item to trim
+  extend.selectedItem = core.scene.entities.get(1);
   // set mouse location - required for Extend
   core.mouse.setPosFromScenePoint(new Point(0, 20));
   // Perform Extend
@@ -91,9 +91,9 @@ test('Test Extend.action', () => {
   core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
   core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
   // Select boundary item
-  core.scene.selectionManager.addToSelectionSet(0);
-  // select item to Extend
-  extend.selectedIndex = 1;
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+  // select item to trim
+  extend.selectedItem = core.scene.entities.get(1);
   // set mouse location - required for Extend
   core.mouse.setPosFromScenePoint(new Point(35, 35));
   // Perform Extend
