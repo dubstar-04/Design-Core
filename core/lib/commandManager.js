@@ -6,6 +6,7 @@ import { Arc } from '../entities/arc.js';
 import { Rectangle } from '../entities/rectangle.js';
 // import {Ellipse} from '../entities/ellipse.js';
 // import {Spline} from '../entities/spline.js';
+import { ArcAlignedText } from '../entities/arctext.js';
 import { Text } from '../entities/text.js';
 import { Block } from '../tables/block.js';
 import { Insert } from '../entities/insert.js';
@@ -58,6 +59,7 @@ const classes = {
   Rectangle,
   // Ellipse,
   // Spline,
+  ArcAlignedText,
   Text,
   /*
   Dimension,
