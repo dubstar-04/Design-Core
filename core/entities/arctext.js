@@ -16,8 +16,8 @@ export class ArcAlignedCharacter {
   #position;
   #angle;
   #height;
+
   /**
-   *
    * @param {string} character - text character
    * @param {Point} position - center mid point of character
    * @param {number} angle - in radians
@@ -29,27 +29,51 @@ export class ArcAlignedCharacter {
     this.#height = height;
   }
 
+  /**
+   * Get character
+   * @return {string}
+   */
   get character() {
     return this.#character;
   }
 
+  /**
+   * Get position
+   * @return {Point}
+   */
   get position() {
     return this.#position;
   }
 
+  /**
+   * Get angle
+   * @return {number}
+   */
   get angle() {
     return this.#angle;
   }
 
+  /**
+   * Get height
+   * @return {number}
+   */
   get height() {
     return this.#height;
   }
 
+  /**
+   * Get baseline point
+   * @return {Point}
+   */
   get baseline() {
     const baselinePoint = new Point(this.#position.x - this.boundingBox.xLength*0.5, this.#position.y - this.boundingBox.yLength*0.5).rotate(this.#position, this.#angle);
     return baselinePoint;
   }
 
+  /**
+   * Get bounding box
+   * @return {BoundingBox}
+   */
   get boundingBox() {
     const halfHeight = this.#height / 2;
     const halfWidth = halfHeight * 0.6; // approximate width as half height
@@ -223,11 +247,21 @@ export class ArcAlignedText extends Entity {
     }
   }
 
+  /**
+   * Convert linear length to angular length on arc
+   * @param {number} length - linear length
+   * @param {number} radius - radius of arc
+   * @return {number} angle in radians
+   */
   linearToAnglular(length, radius) {
     // angle in radians
     return 2 * Math.atan((length)/radius);
   }
 
+  /**
+   * Get mid angle of arc
+   * @return {number} mid angle in degrees
+   */
   arcMidAngle() {
     let startAng = this.startAngle % 360;
     let endAng = this.endAngle % 360;
@@ -250,7 +284,6 @@ export class ArcAlignedText extends Entity {
    * Get characters aligned on arc
    * @return {Array} - array of ArcAlignedCharacter
    */
-
   getArcAlignedCharacters() {
     // character positions on arc
     const arcAlignedCharacters = [];
