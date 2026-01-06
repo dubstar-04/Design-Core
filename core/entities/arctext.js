@@ -21,6 +21,7 @@ export class ArcAlignedCharacter {
    * @param {string} character - text character
    * @param {Point} position - center mid point of character
    * @param {number} angle - in radians
+   * @param {number} height - character height
    */
   constructor(character, position, angle, height = 1) {
     this.#character = character;
