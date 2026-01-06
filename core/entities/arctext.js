@@ -6,7 +6,6 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
-import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
