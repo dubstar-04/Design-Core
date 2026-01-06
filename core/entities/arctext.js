@@ -11,6 +11,9 @@ import { Property } from '../properties/property.js';
 import { DesignCore } from '../designCore.js';
 import { Text } from './text.js';
 
+/**
+ * Arc Aligned Charater Class
+ */
 export class ArcAlignedCharacter {
   #character;
   #position;
