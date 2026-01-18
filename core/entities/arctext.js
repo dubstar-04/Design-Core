@@ -264,19 +264,21 @@ export class ArcAlignedText extends Entity {
 
   /**
    * Get mid angle of arc
-   * @return {number} mid angle in degrees
+   * @param {number} startAngle - in radians
+   * @param {number} endAngle - in radians
+   * @return {number} mid angle in radians
    */
-  arcMidAngle() {
-    let startAng = this.startAngle % 360;
-    let endAng = this.endAngle % 360;
+  arcMidAngle(startAngle, endAngle) {
+    let startAng = startAngle % (Math.PI*2);
+    let endAng = endAngle % (Math.PI*2);
 
-    if (startAng < 0) startAng += 360;
-    if (endAng < 0) endAng += 360;
+    if (startAng < 0) startAng += Math.PI*2;
+    if (endAng < 0) endAng += Math.PI*2;
 
     let midAngle;
     if (endAng < startAng) {
-      midAngle = ((endAng + 360) + startAng) / 2;
-      if (midAngle >= 360) midAngle -= 360;
+      midAngle = ((endAng + Math.PI*2) + startAng) / 2;
+      if (midAngle >= Math.PI*2) midAngle -= Math.PI*2; ;
     } else {
       midAngle = (startAng + endAng) / 2;
     }
