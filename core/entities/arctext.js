@@ -310,8 +310,8 @@ export class ArcAlignedText extends Entity {
     let totalCharWidthAsAngle = this.linearToAnglular(totalCharWidth*0.5, radialDistance);
 
     // calculate start and end offsets
-    const startOffsetAngle = this.linearToAnglular(this.offsetFromRight, radialDistance);
-    const endOffsetAngle = this.linearToAnglular(this.offsetFromLeft, radialDistance);
+    const startOffsetAngle = this.linearToAnglular(this.offsetFromRight, radialDistance) + charWidthAsAngle * 0.5;
+    const endOffsetAngle = this.linearToAnglular(this.offsetFromLeft, radialDistance) + charWidthAsAngle * 0.5;
 
     // total arc angle
     const totalArcAngle = Utils.degrees2radians(Math.abs(this.endAngle - this.startAngle)) - startOffsetAngle - endOffsetAngle;
