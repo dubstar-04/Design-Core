@@ -130,7 +130,7 @@ export class ArcAlignedText extends Entity {
     // DXF Groupcode 30 - Z Arc center point
 
     // DXF Groupcode 40 -
-    this.radius = Property.loadValue([data?.radius, data?.[40]], 0);
+    this.radius = Property.loadValue([data?.radius, data?.[40]], 10);
     // DXF Groupcode 41 - Width Factor
     this.widthFactor = Property.loadValue([data?.widthFactor, data?.[41]], 1);
     // DXF Groupcode 42 - Text Height
@@ -146,7 +146,7 @@ export class ArcAlignedText extends Entity {
     // DXF Groupcode 50 - Start Angle in degrees
     this.startAngle = Property.loadValue([data?.startAngle, data?.[50]], 0);
     // DXF Groupcode 51 - End Angle in degrees
-    this.endAngle = Property.loadValue([data?.endAngle, data?.[51]], 0);
+    this.endAngle = Property.loadValue([data?.endAngle, data?.[51]], 180);
     // DXF Groupcode 70 - Text Direction 0 = forward, 1 = reversed
     this.textReversed = Property.loadValue([data?.textReversed, Boolean(parseInt(data?.[70]))], false);
     // DXF Groupcode 71 - 1 = outward, 2 = inward
