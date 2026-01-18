@@ -315,8 +315,6 @@ export class ArcAlignedText extends Entity {
 
     // total arc angle
     const totalArcAngle = Utils.degrees2radians(Math.abs(this.endAngle - this.startAngle)) - startOffsetAngle - endOffsetAngle;
-    // calculate total angular width of the text on the arc
-    const stringWidthAsAngle = totalCharWidthAsAngle * this.string.length;
 
     // defined positions - Start and end angles +/- half char width
     const startPosition = this.points[0].project(Utils.degrees2radians(this.startAngle) + startOffsetAngle, radialDistance);
