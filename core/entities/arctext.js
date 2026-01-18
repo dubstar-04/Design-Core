@@ -299,7 +299,7 @@ export class ArcAlignedText extends Entity {
     }
 
     // calculate the radial distance - Arc Side: convex = 1, concave = 2
-    const radialDistance = this.arcSide === 2 ? this.radius - this.offsetFromArc : this.radius + this.offsetFromArc;
+    const radialDistance = this.arcSide === 2 ? this.radius - this.offsetFromArc - this.height * 0.5: this.radius + this.offsetFromArc + this.height * 0.5;
     // calculate character width
     const charWidth = Text.getApproximateWidth(this.string[0], this.height);
     // calculate total char width including additional spacing
