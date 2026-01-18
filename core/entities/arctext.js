@@ -258,8 +258,11 @@ export class ArcAlignedText extends Entity {
    * @return {number} angle in radians
    */
   linearToAnglular(length, radius) {
-    // angle in radians
-    return 2 * Math.atan((length)/radius);
+    if (radius === 0) {
+      return 0;
+    }
+
+    return 2 * Math.atan((length)/Math.abs(radius));
   }
 
   /**
