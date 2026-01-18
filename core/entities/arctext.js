@@ -343,8 +343,8 @@ export class ArcAlignedText extends Entity {
       string = string.split('').reverse().join('');
     }
     if (this.textAlignment === 4) { // center
-      stringStartPoint = arcMidPoint.rotate(this.points[0], stringWidthAsAngle*0.5);
       const arcMidPoint = this.points[0].project(this.arcMidAngle(Utils.degrees2radians(this.startAngle), Utils.degrees2radians(this.endAngle)), radialDistance);
+      stringStartPoint = arcMidPoint.rotate(this.points[0], 0.5 * totalCharWidthAsAngle * (string.length - 1));
     }
 
     // calculate the text rotation angle: 1 = outward, 2 = inward
