@@ -596,3 +596,16 @@ test('Test Intersection.intersectCirclePolyline()', () => {
   expect(result2.points.length).toBe(0);
 });
 
+test('Test Intersection.intersectArcAlignedTextRectangle', () => {
+  const polyline = { points: [new Point(0, -50), new Point(0, 50)] };
+  const rectangle = { start: new Point(-25, -25), end: new Point(25, 25) };
+
+  // Test rectangle with single intersection
+  const result = Intersection.intersectArcAlignedTextRectangle(polyline, rectangle, false);
+  expect(result.status).toBe('Intersection');
+  expect(result.points.length).toBe(2);
+  expect(result.points[0].x).toBeCloseTo(0);
+  expect(result.points[0].y).toBeCloseTo(-25);
+  expect(result.points[1].x).toBeCloseTo(0);
+  expect(result.points[1].y).toBeCloseTo(25);
+});
