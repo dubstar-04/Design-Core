@@ -1,13 +1,59 @@
 import { ArcAlignedText } from '../../core/entities/arctext.js';
 import { ArcAlignedCharacter } from '../../core/entities/arctext.js';
+import { Arc } from '../../core/entities/arc.js';
 import { Point } from '../../core/entities/point.js';
 import { BoundingBox } from '../../core/lib/boundingBox.js';
+import { DesignCore } from '../../core/designCore.js';
+import { SingleSelection } from '../../core/lib/selectionManager.js';
 
 import { File } from '../test-helpers/test-helpers.js';
 import { Core } from '../../core/core/core.js';
 
 // initialise core
 new Core();
+
+const arcInputScenarios = [
+  {
+    desc: 'two points and an angle',
+    input: [new SingleSelection(0, new Point(5, 0)), 2.5, 'Test Arc'],
+    selectedItems: [new Arc({ points: [new Point(), new Point(100, 0), new Point(-100, 0)] })],
+    expectedTextHeight: 2.5,
+    expectedText: 'Test Arc',
+  },
+];
+
+test.each(arcInputScenarios)('ArcText.execute handles $desc', async (scenario) => {
+  const { input, selectedItems, expectedTextHeight, expectedText } = scenario;
+  const origInputManager = DesignCore.Scene.inputManager;
+  let requestInputCallCount = 0;
+
+  DesignCore.Scene.inputManager = {
+    requestInput: async () => {
+      requestInputCallCount++;
+      return input[requestInputCallCount - 1];
+    },
+    executeCommand: () => {},
+  };
+
+  DesignCore.Scene.entities.get = () => {
+    return selectedItems[0];
+  };
+
+  const arcText = new ArcAlignedText();
+  await arcText.execute();
+
+  expect(arcText.styleName).toBe('STANDARD');
+  expect(arcText.height).toBe(expectedTextHeight);
+  expect(arcText.string).toBe(expectedText);
+
+  // arc props
+  expect(arcText.radius).toBe(100);
+  expect(arcText.startAngle).toBe(0);
+  expect(arcText.endAngle).toBeCloseTo(180);
+
+  // Restore original inputManager
+  DesignCore.Scene.inputManager = origInputManager;
+});
 
 test('ArcAlignedCharacter', () => {
   const point = new Point(10, 20);
