@@ -114,25 +114,29 @@ export class ArcAlignedText extends Entity {
     this.string = (Property.loadValue([data?.string, data?.[1]], ''));
 
     // DXF Groupcode 2 - Font name
-    // Object.defineProperty(this, 'fontName', {
-    //  value: Property.loadValue([data?.fontName, data?.[2]], 'Arial'),
-    // enumerable: false,
-    // });
+    // not implemented - enumerable=false to not appear in the object props
+    // get font from selected style: this.styleName.font
+    Object.defineProperty(this, 'fontName', {
+      value: Property.loadValue([data?.fontName, data?.[2]], 'Arial'),
+      enumerable: false,
+    });
 
-    // DXF Groupcode 3 -
+    // DXF Groupcode 3
+    // not implemented - always empty in acad output
 
     // DXF Groupcode 7 - Text style name
     this.styleName = (Property.loadValue([data?.styleName, data?.[7]], 'STANDARD'));
 
-    // points loaded by super class
-    // DXF Groupcode 10 - X Arc center point
-    // DXF Groupcode 20 - Y Arc center point
-    // DXF Groupcode 30 - Z Arc center point
-
-    // DXF Groupcode 40 -
+    // DXF Groupcode 40 - Radius
     this.radius = Property.loadValue([data?.radius, data?.[40]], 10);
+
     // DXF Groupcode 41 - Width Factor
-    this.widthFactor = Property.loadValue([data?.widthFactor, data?.[41]], 1);
+    // not implemented - enumerable=false to not appear in the object props
+    Object.defineProperty(this, 'widthFactor', {
+      value: Property.loadValue([data?.widthFactor, data?.[41]], 1),
+      enumerable: false,
+    });
+
     // DXF Groupcode 42 - Text Height
     this.height = Property.loadValue([data?.height, data?.[42]], 2.5);
     // DXF Groupcode 43 - Character Spacing
@@ -144,23 +148,46 @@ export class ArcAlignedText extends Entity {
     // DXF Groupcode 46 - Offset from left
     this.offsetFromLeft = Property.loadValue([data?.offsetFromLeft, data?.[46]], 0);
     // DXF Groupcode 50 - Start Angle in degrees
-    this.startAngle = Property.loadValue([data?.startAngle, data?.[50]], 0);
+    this.startAngle = Utils.round(Property.loadValue([data?.startAngle, data?.[50]], 0));
     // DXF Groupcode 51 - End Angle in degrees
-    this.endAngle = Property.loadValue([data?.endAngle, data?.[51]], 180);
+    this.endAngle = Utils.round(Property.loadValue([data?.endAngle, data?.[51]], 180));
+
     // DXF Groupcode 70 - Text Direction 0 = forward, 1 = reversed
-    this.textReversed = Property.loadValue([data?.textReversed, Boolean(parseInt(data?.[70]))], false);
+    // not implemented - enumerable=false to not appear in the object props
+    Object.defineProperty(this, 'textReversed', {
+      value: Property.loadValue([data?.textReversed, Boolean(parseInt(data?.[70]))], false),
+      enumerable: false,
+    });
+
     // DXF Groupcode 71 - 1 = outward, 2 = inward
     this.textOrientation = Property.loadValue([data?.textOrientation, data?.[71]], 1);
     // DXF Groupcode 72 - 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
     this.textAlignment = Property.loadValue([data?.textAlignment, data?.[72]], 4);
     // DXF Groupcode 73 - Arc Side: convex = 1, concave = 2
     this.arcSide = Property.loadValue([data?.arcSide, data?.[73]], 1);
+
     // DXF Groupcode 74 - Bold 0 = off, 1 = on
-    this.bold = Property.loadValue([data?.bold, Boolean(parseInt(data?.[74]))], false);
+    // not implemented - enumerable=false to not appear in the object props
+    Object.defineProperty(this, 'bold', {
+      value: Property.loadValue([data?.bold, Boolean(parseInt(data?.[74]))], false),
+      enumerable: false,
+    });
+
     // DXF Groupcode 75 - Italic 0 = off, 1 = on
-    this.italic = Property.loadValue([data?.italic, Boolean(parseInt(data?.[75]))], false);
+    // not implemented - enumerable=false to not appear in the object props
+    Object.defineProperty(this, 'italic', {
+      value: Property.loadValue([data?.italic, Boolean(parseInt(data?.[75]))], false),
+      enumerable: false,
+    });
+
     // DXF Groupcode 76 - Underline 0 = off, 1 = on
-    this.underline = Property.loadValue([data?.underline, Boolean(parseInt(data?.[76]))], false);
+    // not implemented - enumerable=false to not appear in the object props
+    Object.defineProperty(this, 'underline', {
+      value: Property.loadValue([data?.underline, Boolean(parseInt(data?.[76]))], false),
+      enumerable: false,
+    });
+
+    // Not Implemented:
     // DXF Groupcode 77 -
     // DXF Groupcode 78 -
     // DXF Groupcode 79 -
