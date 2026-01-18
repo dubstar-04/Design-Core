@@ -450,7 +450,7 @@ export class ArcAlignedText extends Entity {
     file.writeGroupCode('46', this.offsetFromLeft);
     file.writeGroupCode('50', this.startAngle);
     file.writeGroupCode('51', this.endAngle);
-    file.writeGroupCode('70', this.textReversed); // Text direction
+    file.writeGroupCode('70', this.textReversed ? 1 : 0); // Text direction
     file.writeGroupCode('71', this.textOrientation); // Text orientation
     file.writeGroupCode('72', this.textAlignment); // Text alignment
     file.writeGroupCode('73', this.arcSide); // Arc side
