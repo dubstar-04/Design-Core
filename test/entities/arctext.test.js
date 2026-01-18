@@ -1,7 +1,6 @@
 import { ArcAlignedText } from '../../core/entities/arctext.js';
 import { ArcAlignedCharacter } from '../../core/entities/arctext.js';
 import { Point } from '../../core/entities/point.js';
-import { DesignCore } from '../../core/designCore.js';
 
 import { File } from '../test-helpers/test-helpers.js';
 import { Core } from '../../core/core/core.js';
