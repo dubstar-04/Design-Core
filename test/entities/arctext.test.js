@@ -1,13 +1,13 @@
 import { ArcAlignedText } from '../../core/entities/arctext.js';
 import { ArcAlignedCharacter } from '../../core/entities/arctext.js';
 import { Point } from '../../core/entities/point.js';
+import { BoundingBox } from '../../core/lib/boundingBox.js';
 
 import { File } from '../test-helpers/test-helpers.js';
 import { Core } from '../../core/core/core.js';
 
 // initialise core
 new Core();
-
 
 test('ArcAlignedCharacter', () => {
   const point = new Point(10, 20);
@@ -20,9 +20,9 @@ test('ArcAlignedCharacter', () => {
   expect(ac.position.x).toBe(point.x);
   expect(ac.position.y).toBe(point.y);
   expect(ac.angle).toBeCloseTo(angle);
-  // expect(ac.baseline.x).toBe(1);
-  // expect(ac.baseline.y).toBe(1);
-  // expect(ac.boundingBox).toBe(1);
+  expect(ac.baseline.x).toBe(10.5);
+  expect(ac.baseline.y).toBe(19.7);
+  expect(ac.boundingBox).toBeInstanceOf(BoundingBox);
 });
 
 
@@ -242,10 +242,41 @@ STANDARD
 
   expect(file.contents).toEqual(dxfString);
 
-
   // create new entity from entity data to ensure all props are loaded
   const newArcAlignedText = new ArcAlignedText(arctext);
   file = new File();
   newArcAlignedText.dxf(file);
   expect(file.contents).toEqual(dxfString);
+});
+
+test('Test ArcText.snaps', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
+  const point = new Point(100, 100);
+  const snaps = arcText.snaps(point, 1);
+  expect(snaps[0].x).toBeCloseTo(-2.39222);
+  expect(snaps[0].y).toBeCloseTo(101.22173);
+});
+
+test('Test ArcText.closestPoint', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
+  const point = new Point(100, 100);
+  const closest = arcText.closestPoint(point);
+  expect(closest[0].x).toBeCloseTo(2.39222);
+  expect(closest[0].y).toBeCloseTo(101.22173);
+});
+
+test('Test ArcText.boundingBox', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
+  expect(arcText.boundingBox().xMin).toBeCloseTo(-2.39222);
+  expect(arcText.boundingBox().xMax).toBeCloseTo(2.39222);
+  expect(arcText.boundingBox().yMin).toBeCloseTo(101.22173);
+  expect(arcText.boundingBox().yMax).toBeCloseTo(101.24685);
+});
+
+test('Test ArcText.intersectPoints - returns correct points array', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
+  const result = arcText.intersectPoints();
+  expect(result).toHaveProperty('points');
+  expect(result.points[0].x).toBeCloseTo(-2.39222);
+  expect(result.points[0].y).toBeCloseTo(101.22173);
 });
