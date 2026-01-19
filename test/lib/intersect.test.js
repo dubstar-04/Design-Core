@@ -600,7 +600,6 @@ test('Test Intersection.intersectArcAlignedTextRectangle', () => {
   const polyline = { points: [new Point(0, -50), new Point(0, 50)] };
   const rectangle = { start: new Point(-25, -25), end: new Point(25, 25) };
 
-  // Test rectangle with single intersection
   const result = Intersection.intersectArcAlignedTextRectangle(polyline, rectangle, false);
   expect(result.status).toBe('Intersection');
   expect(result.points.length).toBe(2);
