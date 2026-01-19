@@ -445,6 +445,17 @@ export class ArcAlignedText extends Entity {
       ctx.lineTo(posOne.x, -posOne.y);
       ctx.stroke();
       */
+
+      /*
+      // debug draw the arcText bounding box
+      const bb = this.boundingBox();
+      ctx.moveTo(bb.xMin, -bb.yMin);
+      ctx.lineTo(bb.xMax, -bb.yMin);
+      ctx.lineTo(bb.xMax, -bb.yMax);
+      ctx.lineTo(bb.xMin, -bb.yMax);
+      ctx.lineTo(bb.xMin, -bb.yMin);
+      ctx.stroke();
+      */
     }
 
     ctx.stroke();
