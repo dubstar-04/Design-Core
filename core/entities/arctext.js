@@ -587,7 +587,6 @@ export class ArcAlignedText extends Entity {
    * @return {Object} - object defining data required by intersect methods
    */
   intersectPoints() {
-    // TODO: improve intersection calculation
     const ArcAlignedCharacters = this.getArcAlignedCharacters();
 
     if (ArcAlignedCharacters.length > 0) {
