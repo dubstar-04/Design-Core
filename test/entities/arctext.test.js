@@ -87,7 +87,7 @@ test('ArcText linearToAngular', () => {
 
 test('ArcText arcMidAngle', () => {
   const arcText = new ArcAlignedText();
-  // arcMidAngle(startAngle, endAngle) - returns angle in degrees
+  // arcMidAngle(startAngle, endAngle) - returns angle in radians
   expect(arcText.arcMidAngle(0, Math.PI / 2)).toBeCloseTo(Math.PI / 4);
   expect(arcText.arcMidAngle(Math.PI / 2, Math.PI)).toBeCloseTo((3 * Math.PI) / 4);
   expect(arcText.arcMidAngle(Math.PI, (3 * Math.PI) / 2)).toBeCloseTo((5 * Math.PI) / 4);
