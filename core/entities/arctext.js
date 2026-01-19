@@ -70,7 +70,8 @@ export class ArcAlignedCharacter {
    * @return {Point}
    */
   get baseline() {
-    const baselinePoint = new Point(this.#position.x - this.boundingBox.xLength*0.5, this.#position.y - this.boundingBox.yLength*0.5).rotate(this.#position, this.#angle);
+    const bb = this.boundingBox;
+    const baselinePoint = new Point(this.#position.x - bb.xLength*0.5, this.#position.y - bb.yLength*0.5).rotate(this.#position, this.#angle);
     return baselinePoint;
   }
 
