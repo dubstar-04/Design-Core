@@ -562,10 +562,19 @@ export class ArcAlignedText extends Entity {
    * @return {BoundingBox}
    */
   boundingBox() {
-    // TODO: improve bounding box calculation
     const ArcAlignedCharacters = this.getArcAlignedCharacters();
-    const points = ArcAlignedCharacters.map((char) => char.position);
+    const points = [];
 
+    // get all corner points from each character bounding box
+    ArcAlignedCharacters.forEach((char) => {
+      const bb = char.boundingBox;
+      points.push(new Point(bb.xMin, bb.yMin));
+      points.push(new Point(bb.xMax, bb.yMin));
+      points.push(new Point(bb.xMin, bb.yMax));
+      points.push(new Point(bb.xMax, bb.yMax));
+    });
+
+    // create bounding box from points
     if (points.length > 0) {
       return BoundingBox.fromPoints(points);
     }
