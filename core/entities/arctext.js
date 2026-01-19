@@ -536,15 +536,17 @@ export class ArcAlignedText extends Entity {
    * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
-    // TODO: improve closest point calculation
     let distance = Infinity;
     let minPnt = P;
 
     const ArcAlignedCharacters = this.getArcAlignedCharacters();
 
     for (const arcAlignedChar of ArcAlignedCharacters) {
-      const pntDist = P.distance(arcAlignedChar.position);
+      let pntDist = P.distance(arcAlignedChar.position);
 
+      if (pntDist < arcAlignedChar.height * 0.35) {
+        pntDist = 0.1; // this is a hack to make selecting easier
+      }
 
       if (pntDist < distance) {
         distance = pntDist;
