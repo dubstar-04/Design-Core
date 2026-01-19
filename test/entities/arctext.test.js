@@ -72,17 +72,17 @@ test('ArcAlignedCharacter', () => {
 });
 
 
-test('ArcText linearToAnglular', () => {
+test('ArcText linearToAngular', () => {
   const arcText = new ArcAlignedText();
 
-  // linearToAnglular(length, radius) - returns angle in radians
-  expect(arcText.linearToAnglular(0, 100)).toBeCloseTo(0);
-  expect(arcText.linearToAnglular(10, 100)).toBeCloseTo(0.199337);
-  expect(arcText.linearToAnglular(-10, 100)).toBeCloseTo(-0.199337);
+  // linearToAngular(length, radius) - returns angle in radians
+  expect(arcText.linearToAngular(0, 100)).toBeCloseTo(0);
+  expect(arcText.linearToAngular(10, 100)).toBeCloseTo(0.199337);
+  expect(arcText.linearToAngular(-10, 100)).toBeCloseTo(-0.199337);
 
-  expect(arcText.linearToAnglular(0, 0)).toBeCloseTo(0);
-  expect(arcText.linearToAnglular(10, -101.247222)).toBeCloseTo(0.199337);
-  expect(arcText.linearToAnglular(-10, -101.247222)).toBeCloseTo(-0.199337);
+  expect(arcText.linearToAngular(0, 0)).toBeCloseTo(0);
+  expect(arcText.linearToAngular(10, -101.247222)).toBeCloseTo(0.199337);
+  expect(arcText.linearToAngular(-10, -101.247222)).toBeCloseTo(-0.199337);
 });
 
 test('ArcText arcMidAngle', () => {
