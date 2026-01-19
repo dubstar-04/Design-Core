@@ -363,6 +363,7 @@ export class ArcAlignedText extends Entity {
       totalCharWidthAsAngle = totalArcAngle / (this.string.length - 1);
     }
     if (this.textAlignment === 2) { // left align
+      // default
     }
     if (this.textAlignment === 3) { // right align
       // start at the arc start position and create the text cw around the arc
