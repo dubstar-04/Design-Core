@@ -334,7 +334,7 @@ export class ArcAlignedText extends Entity {
     const charWidth = Text.getApproximateWidth(this.string[0], this.height);
     // calculate total char width including additional spacing
     const totalCharWidth = charWidth + this.characterSpacing;
-    // convert the linear with of a character as an angle on the arc
+    // convert the linear width of a character as an angle on the arc
     const charWidthAsAngle = this.linearToAnglular(charWidth*0.5, radialDistance);
     // get total charwidth as angle
     let totalCharWidthAsAngle = this.linearToAnglular(totalCharWidth*0.5, radialDistance);
