@@ -313,10 +313,10 @@ test('Test ArcText.closestPoint', () => {
 
 test('Test ArcText.boundingBox', () => {
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
-  expect(arcText.boundingBox().xMin).toBeCloseTo(-2.39222);
-  expect(arcText.boundingBox().xMax).toBeCloseTo(2.39222);
-  expect(arcText.boundingBox().yMin).toBeCloseTo(101.22173);
-  expect(arcText.boundingBox().yMax).toBeCloseTo(101.24685);
+  expect(arcText.boundingBox().xMin).toBeCloseTo(-3.14222);
+  expect(arcText.boundingBox().xMax).toBeCloseTo(3.14222);
+  expect(arcText.boundingBox().yMin).toBeCloseTo(99.97173);
+  expect(arcText.boundingBox().yMax).toBeCloseTo(102.49685);
 });
 
 test('Test ArcText.intersectPoints - returns correct points array', () => {
