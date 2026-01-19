@@ -118,7 +118,7 @@ export class ArcAlignedText extends Entity {
     // get font from selected style: this.styleName.font
     Object.defineProperty(this, 'fontName', {
       value: Property.loadValue([data?.fontName, data?.[2]], 'Arial'),
-      enumerable: false,
+      writable: true,
     });
 
     // DXF Groupcode 3
@@ -134,7 +134,7 @@ export class ArcAlignedText extends Entity {
     // not implemented - enumerable=false to not appear in the object props
     Object.defineProperty(this, 'widthFactor', {
       value: Property.loadValue([data?.widthFactor, data?.[41]], 1),
-      enumerable: false,
+      writable: true,
     });
 
     // DXF Groupcode 42 - Text Height
@@ -156,7 +156,7 @@ export class ArcAlignedText extends Entity {
     // not implemented - enumerable=false to not appear in the object props
     Object.defineProperty(this, 'textReversed', {
       value: Property.loadValue([data?.textReversed, Boolean(parseInt(data?.[70]))], false),
-      enumerable: false,
+      writable: true,
     });
 
     // DXF Groupcode 71 - 1 = outward, 2 = inward
@@ -170,21 +170,21 @@ export class ArcAlignedText extends Entity {
     // not implemented - enumerable=false to not appear in the object props
     Object.defineProperty(this, 'bold', {
       value: Property.loadValue([data?.bold, Boolean(parseInt(data?.[74]))], false),
-      enumerable: false,
+      writable: true,
     });
 
     // DXF Groupcode 75 - Italic 0 = off, 1 = on
     // not implemented - enumerable=false to not appear in the object props
     Object.defineProperty(this, 'italic', {
       value: Property.loadValue([data?.italic, Boolean(parseInt(data?.[75]))], false),
-      enumerable: false,
+      writable: true,
     });
 
     // DXF Groupcode 76 - Underline 0 = off, 1 = on
     // not implemented - enumerable=false to not appear in the object props
     Object.defineProperty(this, 'underline', {
       value: Property.loadValue([data?.underline, Boolean(parseInt(data?.[76]))], false),
-      enumerable: false,
+      writable: true,
     });
 
     // Not Implemented:
