@@ -12,7 +12,7 @@ import { DesignCore } from '../designCore.js';
 import { Text } from './text.js';
 
 /**
- * Arc Aligned Charater Class
+ * Arc Aligned Character Class
  */
 export class ArcAlignedCharacter {
   #character;
@@ -285,7 +285,7 @@ export class ArcAlignedText extends Entity {
    * @param {number} radius - radius of arc
    * @return {number} angle in radians
    */
-  linearToAnglular(length, radius) {
+  linearToAngular(length, radius) {
     if (radius === 0) {
       return 0;
     }
@@ -336,13 +336,13 @@ export class ArcAlignedText extends Entity {
     // calculate total char width including additional spacing
     const totalCharWidth = charWidth + this.characterSpacing;
     // convert the linear width of a character as an angle on the arc
-    const charWidthAsAngle = this.linearToAnglular(charWidth*0.5, radialDistance);
+    const charWidthAsAngle = this.linearToAngular(charWidth*0.5, radialDistance);
     // get total charwidth as angle
-    let totalCharWidthAsAngle = this.linearToAnglular(totalCharWidth*0.5, radialDistance);
+    let totalCharWidthAsAngle = this.linearToAngular(totalCharWidth*0.5, radialDistance);
 
     // calculate start and end offsets
-    const startOffsetAngle = this.linearToAnglular(this.offsetFromRight, radialDistance) + charWidthAsAngle * 0.5;
-    const endOffsetAngle = this.linearToAnglular(this.offsetFromLeft, radialDistance) + charWidthAsAngle * 0.5;
+    const startOffsetAngle = this.linearToAngular(this.offsetFromRight, radialDistance) + charWidthAsAngle * 0.5;
+    const endOffsetAngle = this.linearToAngular(this.offsetFromLeft, radialDistance) + charWidthAsAngle * 0.5;
 
     // total arc angle
     const totalArcAngle = Utils.degrees2radians(Math.abs(this.endAngle - this.startAngle)) - startOffsetAngle - endOffsetAngle;
