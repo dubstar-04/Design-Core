@@ -309,7 +309,7 @@ export class ArcAlignedText extends Entity {
     let midAngle;
     if (endAng < startAng) {
       midAngle = ((endAng + Math.PI*2) + startAng) / 2;
-      if (midAngle >= Math.PI*2) midAngle -= Math.PI*2; ;
+      if (midAngle >= Math.PI*2) midAngle -= Math.PI*2;
     } else {
       midAngle = (startAng + endAng) / 2;
     }
