@@ -174,8 +174,6 @@ export class TableManagerBase {
     const msg = 'Invalid Item Name';
     const err = (`${this.constructor.name} - ${msg}: ${itemName}`);
     throw Error(err);
-
-    // return;
   }
 
   /**
