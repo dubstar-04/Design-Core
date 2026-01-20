@@ -48,8 +48,8 @@ test.each(arcInputScenarios)('ArcText.execute handles $desc', async (scenario) =
 
   // arc props
   expect(arcText.radius).toBe(100);
-  expect(arcText.startAngle).toBe(0);
-  expect(arcText.endAngle).toBeCloseTo(180);
+  expect(arcText.startAngle()).toBe(0);
+  expect(arcText.endAngle()).toBeCloseTo(3.14159);
 
   // Restore original inputManager
   DesignCore.Scene.inputManager = origInputManager;
@@ -71,6 +71,22 @@ test('ArcAlignedCharacter', () => {
   expect(ac.boundingBox).toBeInstanceOf(BoundingBox);
 });
 
+
+test('ArcText startAngle', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)] });
+  expect(arcText.startAngle()).toBeCloseTo(0);
+
+  const arcText90 = new ArcAlignedText({ points: [new Point(0, 0)], startAngle: 90 });
+  expect(arcText90.startAngle()).toBeCloseTo(Math.PI / 2);
+});
+
+test('ArcText endAngle', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)] });
+  expect(arcText.endAngle()).toBeCloseTo(Math.PI);
+
+  const arcText90 = new ArcAlignedText({ points: [new Point(0, 0)], endAngle: 90 });
+  expect(arcText90.endAngle()).toBeCloseTo(Math.PI / 2);
+});
 
 test('ArcText linearToAngular', () => {
   const arcText = new ArcAlignedText();
