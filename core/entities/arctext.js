@@ -8,9 +8,9 @@ import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
 import { Property } from '../properties/property.js';
+import { Text } from './text.js';
 
 import { DesignCore } from '../designCore.js';
-import { Text } from './text.js';
 
 /**
  * Arc Aligned Character Class
@@ -149,10 +149,24 @@ export class ArcAlignedText extends Entity {
     this.offsetFromRight = Property.loadValue([data?.offsetFromRight, data?.[45]], 0);
     // DXF Groupcode 46 - Offset from left
     this.offsetFromLeft = Property.loadValue([data?.offsetFromLeft, data?.[46]], 0);
+
+    // ensure points array has at least one point - the arc center
+    if (!this.points.length) {
+      this.points = [];
+      this.points.push(new Point(0, 0)); // center point
+    }
+
     // DXF Groupcode 50 - Start Angle in degrees
-    this.startAngle = Utils.round(Property.loadValue([data?.startAngle, data?.[50]], 0));
+    const startAngle = Utils.round(Property.loadValue([data?.startAngle, data?.[50]], 0));
+    if (this.points[1] === undefined) {
+      this.points[1] = this.points[0].project(Utils.degrees2radians(startAngle), this.radius);
+    }
+
     // DXF Groupcode 51 - End Angle in degrees
-    this.endAngle = Utils.round(Property.loadValue([data?.endAngle, data?.[51]], 180));
+    const endAngle = Utils.round(Property.loadValue([data?.endAngle, data?.[51]], 180));
+    if (this.points[2] === undefined) {
+      this.points[2] = this.points[0].project(Utils.degrees2radians(endAngle), this.radius);
+    }
 
     // DXF Groupcode 70 - Text Direction 0 = forward, 1 = reversed
     // not implemented - enumerable=false to not appear in the object props
@@ -219,7 +233,6 @@ export class ArcAlignedText extends Entity {
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
-      const selection = await DesignCore.Scene.inputManager.requestInput(op);
 
       let selectedArc = null;
       while (selectedArc instanceof Arc !== true) {
@@ -235,14 +248,16 @@ export class ArcAlignedText extends Entity {
         }
       }
 
-      // set the arc properties
+      // Get the arc properties
       // direction: - ccw > 0, cw <= 0
-      this.startAngle = Utils.radians2degrees(selectedArc.direction > 0 ? selectedArc.startAngle() : selectedArc.endAngle());
-      this.endAngle = Utils.radians2degrees(selectedArc.direction > 0 ? selectedArc.endAngle(): selectedArc.startAngle());
       this.radius = selectedArc.radius;
+      const startPoint = selectedArc.direction > 0 ? selectedArc.points[1] : selectedArc.points[2];
+      const endPoint = selectedArc.direction > 0 ? selectedArc.points[2] : selectedArc.points[1];
 
-      //  set the center point
-      this.points.push(new Point(selectedArc.points[0].x, selectedArc.points[0].y));
+      //  set the points
+      this.points[0] = new Point(selectedArc.points[0].x, selectedArc.points[0].y);
+      this.points[1] = new Point(startPoint.x, startPoint.y);
+      this.points[2] = new Point(endPoint.x, endPoint.y);
 
       // set the text style to the current style
       const currentStyle = DesignCore.StyleManager.getCstyle();
@@ -281,8 +296,8 @@ export class ArcAlignedText extends Entity {
           points: this.points,
           height: this.height,
           rotation: this.rotation,
-          startAngle: this.startAngle,
-          endAngle: this.endAngle,
+          startAngle: Utils.radians2degrees(this.startAngle()),
+          endAngle: Utils.radians2degrees(this.endAngle()),
           radius: this.radius,
           string: DesignCore.CommandLine.command,
         };
@@ -290,6 +305,22 @@ export class ArcAlignedText extends Entity {
         DesignCore.Scene.tempEntities.create(this.type, data);
       }
     }
+  }
+
+  /**
+   * Get start angle in radians
+   * @return {number}
+   */
+  startAngle() {
+    return this.points[0].angle(this.points[1]);
+  }
+
+  /**
+   * Get end angle in radians
+   * @return {number}
+   */
+  endAngle() {
+    return this.points[0].angle(this.points[2]);
   }
 
   /**
@@ -358,11 +389,11 @@ export class ArcAlignedText extends Entity {
     const endOffsetAngle = this.linearToAngular(this.offsetFromLeft, radialDistance) + charWidthAsAngle * 0.5;
 
     // total arc angle
-    const totalArcAngle = Utils.degrees2radians(Math.abs(this.endAngle - this.startAngle)) - startOffsetAngle - endOffsetAngle;
+    const totalArcAngle = Math.abs(this.endAngle() - this.startAngle()) - startOffsetAngle - endOffsetAngle;
 
     // defined positions - Start and end angles +/- half char width
-    const startPosition = this.points[0].project(Utils.degrees2radians(this.startAngle) + startOffsetAngle, radialDistance);
-    const endPosition = this.points[0].project(Utils.degrees2radians(this.endAngle) - endOffsetAngle, radialDistance);
+    const startPosition = this.points[0].project(this.startAngle() + startOffsetAngle, radialDistance);
+    const endPosition = this.points[0].project(this.endAngle() - endOffsetAngle, radialDistance);
 
     // default to the arc end position as the string start
     let stringStartPoint = endPosition;
@@ -385,7 +416,7 @@ export class ArcAlignedText extends Entity {
       string = string.split('').reverse().join('');
     }
     if (this.textAlignment === 4) { // center
-      const arcMidPoint = this.points[0].project(this.arcMidAngle(Utils.degrees2radians(this.startAngle), Utils.degrees2radians(this.endAngle)), radialDistance);
+      const arcMidPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
       stringStartPoint = arcMidPoint.rotate(this.points[0], 0.5 * totalCharWidthAsAngle * (string.length - 1));
     }
 
@@ -503,8 +534,8 @@ export class ArcAlignedText extends Entity {
     file.writeGroupCode('44', this.offsetFromArc);
     file.writeGroupCode('45', this.offsetFromRight);
     file.writeGroupCode('46', this.offsetFromLeft);
-    file.writeGroupCode('50', this.startAngle);
-    file.writeGroupCode('51', this.endAngle);
+    file.writeGroupCode('50', Utils.radians2degrees(this.startAngle()));
+    file.writeGroupCode('51', Utils.radians2degrees(this.endAngle()));
     file.writeGroupCode('70', this.textReversed ? 1 : 0); // Text direction
     file.writeGroupCode('71', this.textOrientation); // Text orientation
     file.writeGroupCode('72', this.textAlignment); // Text alignment
