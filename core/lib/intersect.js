@@ -796,5 +796,17 @@ export class Intersection {
   static intersectSolidRectangle(solid, rectangle, extend) {
     return this.intersectPolylineRectangle(solid, rectangle, extend);
   };
+
+  /**
+   * Find intersections between arc aligned text and rectangle
+   * ArcAlignedText is treated as a polyline for intersection purposes
+   * @param {Polyline} polyline
+   * @param {Rectangle} rectangle
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectArcAlignedTextRectangle(polyline, rectangle, extend) {
+    return this.intersectPolylineRectangle(polyline, rectangle, extend);
+  };
 }
 
