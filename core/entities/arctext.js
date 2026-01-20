@@ -1,3 +1,4 @@
+import { Arc } from './arc.js';
 import { Point } from './point.js';
 import { Utils } from '../lib/utils.js';
 import { Strings } from '../lib/strings.js';
@@ -220,7 +221,19 @@ export class ArcAlignedText extends Entity {
       const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       const selection = await DesignCore.Scene.inputManager.requestInput(op);
 
-      const selectedArc = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+      let selectedArc = null;
+      while (selectedArc instanceof Arc !== true) {
+        // reset selection
+        DesignCore.Scene.selectionManager.reset();
+
+        const selection = await DesignCore.Scene.inputManager.requestInput(op);
+        selectedArc = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+
+        if (selectedArc instanceof Arc === false) {
+          const msg = `${this.type} - ${Strings.Error.INVALIDTYPE}: ${selectedArc.type}`;
+          DesignCore.Core.notify(msg);
+        }
+      }
 
       // set the arc properties
       // direction: - ccw > 0, cw <= 0
