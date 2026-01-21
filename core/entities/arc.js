@@ -197,6 +197,7 @@ export class Arc extends Entity {
     file.writeGroupCode('10', this.points[0].x); // X
     file.writeGroupCode('20', this.points[0].y); // Y
     file.writeGroupCode('30', '0.0'); // Z
+    file.writeGroupCode('39', this.lineWidth); // Line Width
     file.writeGroupCode('40', this.radius); // Radius
     file.writeGroupCode('100', 'AcDbArc', DXFFile.Version.R2000);
     file.writeGroupCode('50', Utils.radians2degrees(this.direction > 0 ? this.startAngle() : this.endAngle())); // Start Angle

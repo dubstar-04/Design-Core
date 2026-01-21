@@ -108,6 +108,7 @@ export class Line extends Entity {
     file.writeGroupCode('11', this.points[1].x);
     file.writeGroupCode('21', this.points[1].y);
     file.writeGroupCode('31', '0.0');
+    file.writeGroupCode('39', this.lineWidth);
   }
 
   /**

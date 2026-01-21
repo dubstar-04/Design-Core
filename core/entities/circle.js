@@ -127,6 +127,7 @@ export class Circle extends Entity {
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
+    file.writeGroupCode('39', this.lineWidth);
     file.writeGroupCode('40', this.radius);
   }
 
