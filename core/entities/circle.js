@@ -123,10 +123,12 @@ export class Circle extends Entity {
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbCircle', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('6', this.lineType);
     this.writeDxfColour(file);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
+    file.writeGroupCode('39', this.lineWidth);
     file.writeGroupCode('40', this.radius);
   }
 

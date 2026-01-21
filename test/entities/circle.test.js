@@ -99,12 +99,16 @@ AcDbEntity
 AcDbCircle
 8
 0
+6
+ByLayer
 10
 100
 20
 100
 30
 0.0
+39
+2
 40
 100
 `;

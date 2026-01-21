@@ -273,6 +273,8 @@ AcDbEntity
 AcDb2dPolyline
 8
 0
+6
+ByLayer
 10
 0
 20
