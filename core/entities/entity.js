@@ -39,7 +39,7 @@ export class Entity {
     });
 
     this.lineWidth = 2;
-    this.lineType = 'BYLAYER';
+    this.lineType = 'ByLayer';
     this.layer = '0';
 
 
@@ -134,7 +134,7 @@ export class Entity {
   getLineType() {
     let lineTypeName = this.lineType;
 
-    if (lineTypeName === 'BYLAYER') {
+    if (lineTypeName.toUpperCase() === 'BYLAYER') {
       const layer = DesignCore.LayerManager.getItemByName(this.layer);
       lineTypeName = layer.lineType;
     }
