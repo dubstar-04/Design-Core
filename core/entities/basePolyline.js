@@ -187,6 +187,7 @@ export class BasePolyline extends Entity {
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDb2dPolyline', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer); // LAYERNAME
+    file.writeGroupCode('6', this.lineType);
     file.writeGroupCode('10', '0');
     file.writeGroupCode('20', '0');
     file.writeGroupCode('30', '0');

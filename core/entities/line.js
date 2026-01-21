@@ -102,6 +102,7 @@ export class Line extends Entity {
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbLine', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('6', this.lineType);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
