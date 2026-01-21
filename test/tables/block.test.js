@@ -112,6 +112,8 @@ AcDbEntity
 AcDbLine
 8
 0
+6
+ByLayer
 10
 101
 20
@@ -124,6 +126,8 @@ AcDbLine
 202
 31
 0.0
+39
+2
 0
 ENDBLK
 5
