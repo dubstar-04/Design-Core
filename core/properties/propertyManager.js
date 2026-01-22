@@ -33,7 +33,7 @@ export class PropertyManager {
    * @param {any} newPropertyValue
    * @param {string} itemType
    */
-  setItemProperties(property, newPropertyValue, type='All') {
+  setItemProperties(property, newPropertyValue, itemType='All') {
     const stateChanges = [];
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
@@ -41,7 +41,7 @@ export class PropertyManager {
       const item = DesignCore.Scene.entities.get(index);
 
       // check if the item is of the selected type
-      if (type !== 'All' && item.type !== type) {
+      if (itemType !== 'All' && item.type !== itemType) {
         continue;
       }
 
