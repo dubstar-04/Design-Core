@@ -31,6 +31,7 @@ export class PropertyManager {
    * Set item properties
    * @param {string} property
    * @param {any} newPropertyValue
+   * @param {string} itemType
    */
   setItemProperties(property, newPropertyValue, type='All') {
     const stateChanges = [];
