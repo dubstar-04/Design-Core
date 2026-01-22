@@ -36,18 +36,19 @@ export class PropertyManager {
     const stateChanges = [];
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
+      const item = DesignCore.Scene.entities.get(index);
       // check if the item has the selected property
-      if (!DesignCore.Scene.entities.get(index).hasOwnProperty(property)) {
+      if (!item.hasOwnProperty(property)) {
         continue;
       }
 
-      if (typeof (DesignCore.Scene.entities.get(index)[property]) !== typeof (newPropertyValue)) {
+      if (typeof (item[property]) !== typeof (newPropertyValue)) {
         DesignCore.Core.notify(Strings.Error.INPUT);
       } else {
         // update the item property
         const update = {};
         update[property] = newPropertyValue;
-        const stateChange = new UpdateState(DesignCore.Scene.entities.get(index), update);
+        const stateChange = new UpdateState(item, update);
         stateChanges.push(stateChange);
       }
     }
