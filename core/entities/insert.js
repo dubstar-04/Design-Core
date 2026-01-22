@@ -183,9 +183,7 @@ export class Insert extends Entity {
       return;
     }
 
-    if (angle !== 0) {
-      this.points[1] = this.points[0].project(Utils.degrees2radians(angle), 10);
-    }
+    this.points[1] = this.points[0].project(Utils.degrees2radians(angle), 10);
   }
 
   /**

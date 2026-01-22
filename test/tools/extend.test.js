@@ -26,7 +26,6 @@ test.each(inputScenarios)('Trim.execute handles $desc', async (scenario) => {
     requestInput: async () => {
       if (callCount < inputs.length) {
         const input = inputs[callCount];
-        console.log('input:', input);
         callCount++;
         return input;
       }
