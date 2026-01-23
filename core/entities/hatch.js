@@ -311,13 +311,25 @@ export class Hatch extends Entity {
   async execute() {
     try {
       const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
+      let validBoundary = false;
 
-      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+      while (!validBoundary) {
         await DesignCore.Scene.inputManager.requestInput(op);
+
+        const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
+        const boundary = this.processSelection(selectedItems);
+
+        if (boundary.length) {
+          this.childEntities = boundary;
+          validBoundary = true;
+        } else {
+        // reset selection
+          DesignCore.Scene.selectionManager.reset();
+          const msg = `${this.type} - ${Strings.Error.SELECTION}`;
+          DesignCore.Core.notify(msg);
+        }
       }
-      const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
-      this.childEntities = this.processSelection(selectedItems);
-      // TODO: Check if there are boundary shapes
+
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
@@ -350,8 +362,6 @@ export class Hatch extends Entity {
 
     while (selectedItems.length) {
       if (selectedItems.length === lastIndexCount) {
-        const msg = `${this.type} - Invalid boundary`;
-        DesignCore.Core.notify(msg);
         return [];
       }
 
@@ -389,7 +399,9 @@ export class Hatch extends Entity {
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1))) {
             const shape = new Polyline();
-            shape.points.push(...iterationPoints);
+            // deduplicate points
+            const uniquePoints = iterationPoints.filter((point, index, self) => index === self.findIndex((p) => (p.x === point.x && p.y === point.y)));
+            shape.points.push(...uniquePoints);
             selectedchildEntities.push(shape);
             iterationPoints = [];
             break;
