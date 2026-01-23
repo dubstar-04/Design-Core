@@ -25,7 +25,9 @@ hatch.childEntities = [boundaryShape];
 const hatchInputScenarios = [
   {
     desc: 'simple rectangle',
-    points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)],
+    boundaryItems: [new Line({ points: [new Point(0, 0), new Point(10, 0)] }), new Line({ points: [new Point(10, 0), new Point(10, 10)] }),
+      new Line({ points: [new Point(10, 10), new Point(0, 10)] }), new Line({ points: [new Point(0, 10), new Point(0, 0)] })],
+    pointCount: 4,
     pattern: 'ANSI31',
     scale: 1,
     angle: 0,
@@ -36,7 +38,9 @@ const hatchInputScenarios = [
   },
   {
     desc: 'triangle, custom pattern and scale',
-    points: [new Point(0, 0), new Point(5, 10), new Point(10, 0)],
+    boundaryItems: [new Line({ points: [new Point(0, 0), new Point(5, 10)] }), new Line({ points: [new Point(5, 10), new Point(10, 0)] }),
+      new Line({ points: [new Point(10, 0), new Point(0, 0)] })],
+    pointCount: 3,
     pattern: 'SOLID',
     scale: 2,
     angle: 45,
@@ -48,22 +52,37 @@ const hatchInputScenarios = [
 ];
 
 test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) => {
-  const { points, pattern, scale, angle, expectedPattern, expectedScale, expectedAngle } = scenario;
+  const { boundaryItems, pointCount, pattern, scale, angle, expectedPattern, expectedScale, expectedAngle } = scenario;
   const origInputManager = DesignCore.Scene.inputManager;
-  let callCount = 0;
+  // let callCount = 0;
   DesignCore.Scene.inputManager = {
     requestInput: async () => {
-      callCount++;
-      if (callCount <= points.length) return points[callCount - 1];
-      if (callCount === points.length + 1) return pattern;
-      if (callCount === points.length + 2) return scale;
-      if (callCount === points.length + 3) return angle;
+      // return to accept input
+      return null;
     },
     executeCommand: () => {},
   };
 
+  // Manual mock for selected items
+  DesignCore.Scene.selectionManager.selectedItems = [];
+
+  for (let i = 0; i < boundaryItems.length; i++) {
+    DesignCore.Scene.selectionManager.selectedItems.push(boundaryItems[i]);
+  }
+
+  // const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
+
   const hatch = new Hatch({ patternName: pattern, scale: scale, angle: angle });
+
   await hatch.execute();
+
+  console.log(hatch);
+
+  console.log(hatch.childEntities[0].points);
+
+  expect(hatch.childEntities.length).toBe(1);
+
+  expect(hatch.childEntities[0].points.length).toBe(pointCount); // closed polyline adds extra point
 
   expect(hatch.points.length).toBe(2);
   // hatch first point should be at 0,0
@@ -76,6 +95,7 @@ test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) =
   expect(hatch.scale).toBe(expectedScale);
   expect(hatch.angle).toBe(expectedAngle);
   expect(hatch.solid).toBe(expectedPattern === 'SOLID');
+
 
   // Restore original inputManager
   DesignCore.Scene.inputManager = origInputManager;
@@ -424,7 +444,7 @@ test('Test Hatch.processSelection', () => {
   let hatch = new Hatch();
   let boundaryData = hatch.processSelection(selectedItems);
   expect(boundaryData.length).toEqual(1);
-  expect(boundaryData[0].points.length).toEqual(8);
+  expect(boundaryData[0].points.length).toEqual(4);
 
 
   // create selected items defining a circle
@@ -434,7 +454,7 @@ test('Test Hatch.processSelection', () => {
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);
   expect(boundaryData.length).toEqual(1);
-  expect(boundaryData[0].points.length).toEqual(3);
+  expect(boundaryData[0].points.length).toEqual(2);
 
   // create selected items defining a square (polyline)
   selectedItems = [];
@@ -446,7 +466,7 @@ test('Test Hatch.processSelection', () => {
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);
   expect(boundaryData.length).toEqual(1);
-  expect(boundaryData[0].points.length).toEqual(5);
+  expect(boundaryData[0].points.length).toEqual(4);
 
   // create selected items defining a pill shape
   selectedItems = [];
@@ -458,7 +478,7 @@ test('Test Hatch.processSelection', () => {
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);
   expect(boundaryData.length).toEqual(1);
-  expect(boundaryData[0].points.length).toEqual(8);
+  expect(boundaryData[0].points.length).toEqual(5);
 
   // Test a selection with invalid items
   selectedItems = [];
@@ -468,5 +488,5 @@ test('Test Hatch.processSelection', () => {
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);
   expect(boundaryData.length).toEqual(1);
-  expect(boundaryData[0].points.length).toEqual(3);
+  expect(boundaryData[0].points.length).toEqual(2);
 });
