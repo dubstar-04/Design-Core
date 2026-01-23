@@ -399,7 +399,9 @@ export class Hatch extends Entity {
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1))) {
             const shape = new Polyline();
-            shape.points.push(...iterationPoints);
+            // deduplicate points
+            const uniquePoints = iterationPoints.filter((point, index, self) => index === self.findIndex((p) => (p.x === point.x && p.y === point.y)));
+            shape.points.push(...uniquePoints);
             selectedchildEntities.push(shape);
             iterationPoints = [];
             break;
