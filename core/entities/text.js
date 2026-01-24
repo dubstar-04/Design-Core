@@ -445,18 +445,15 @@ export class Text extends Entity {
     ctx.stroke();
     ctx.restore(); // restore context before scale and translate
 
-    // Draw Bounding Box to test the getBoundingRect()
-    /*
-        ctx.strokeStyle = Colours.rgbToString(colour);
-        ctx.lineWidth = 1 / scale;
-        ctx.beginPath()
-        ctx.moveTo(rect.x, rect.y);
-        ctx.lineTo(rect.x + rect.width, rect.y);
-        ctx.lineTo(rect.x + rect.width, rect.y + rect.height);
-        ctx.lineTo(rect.x, rect.y + rect.height);
-        ctx.lineTo(rect.x, rect.y);
-        ctx.stroke()
-        */
+
+    // debug draw the arcText bounding box
+    const bb = this.boundingBox();
+    ctx.moveTo(bb.xMin, bb.yMin);
+    ctx.lineTo(bb.xMax, bb.yMin);
+    ctx.lineTo(bb.xMax, bb.yMax);
+    ctx.lineTo(bb.xMin, bb.yMax);
+    ctx.lineTo(bb.xMin, bb.yMin);
+    ctx.stroke();
   }
 
   /**
