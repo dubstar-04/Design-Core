@@ -533,9 +533,9 @@ export class Text extends Entity {
     const rect = this.getBoundingRect();
 
     const xmin = rect.x;
-    const xmax = rect.x + rect.width;
+    const xmax = this.backwards ? rect.x - rect.width : rect.x + rect.width;
     const ymin = rect.y;
-    const ymax = rect.y + rect.height;
+    const ymax = this.upsideDown ? rect.y - rect.height : rect.y + rect.height;
 
     const topLeft = new Point(xmin, ymax);
     const bottomRight = new Point(xmax, ymin);
