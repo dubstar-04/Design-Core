@@ -526,8 +526,8 @@ export class Text extends Entity {
   }
 
   /**
-   * Return boundingbox for entity
-   * @return {BoundingBox}
+   * Get the corner points of a frame around the text (Tight bounding box)
+   * @return {Array} - array of 4 Points defining the text frame corners
    */
   getTextFrameCorners() {
     const rect = this.getBoundingRect();
