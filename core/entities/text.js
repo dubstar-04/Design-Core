@@ -553,7 +553,13 @@ export class Text extends Entity {
     return [bottomLeft, bottomRight, topRight, topLeft];
   }
 
-    return new BoundingBox(topLeft, bottomRight);
+  /**
+   * Return boundingbox for entity
+   * @return {BoundingBox}
+   */
+  boundingBox() {
+    const bb = BoundingBox.fromPoints(this.getTextFrameCorners());
+    return bb;
   }
 
   /**
