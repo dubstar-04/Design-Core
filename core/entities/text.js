@@ -445,7 +445,7 @@ export class Text extends Entity {
     ctx.stroke();
     ctx.restore(); // restore context before scale and translate
 
-
+    /*
     // debug draw the arcText bounding box
     const bb = this.boundingBox();
     ctx.moveTo(bb.xMin, bb.yMin);
@@ -454,6 +454,16 @@ export class Text extends Entity {
     ctx.lineTo(bb.xMin, bb.yMax);
     ctx.lineTo(bb.xMin, bb.yMin);
     ctx.stroke();
+
+    // debug draw the text frame
+    const frameCorners = this.getTextFrameCorners();
+    ctx.moveTo(frameCorners[0].x, frameCorners[0].y);
+    ctx.lineTo(frameCorners[1].x, frameCorners[1].y);
+    ctx.lineTo(frameCorners[2].x, frameCorners[2].y);
+    ctx.lineTo(frameCorners[3].x, frameCorners[3].y);
+    ctx.lineTo(frameCorners[0].x, frameCorners[0].y);
+    ctx.stroke();
+    */
   }
 
   /**
