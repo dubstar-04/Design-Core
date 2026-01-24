@@ -529,16 +529,29 @@ export class Text extends Entity {
    * Return boundingbox for entity
    * @return {BoundingBox}
    */
-  boundingBox() {
+  getTextFrameCorners() {
     const rect = this.getBoundingRect();
+    // calculate corners before rotation accounting for backwards and upsideDown text
+    const xmin = Math.min(rect.x, this.backwards ? rect.x - rect.width : rect.x + rect.width);
+    const xmax = Math.max(rect.x, this.backwards ? rect.x - rect.width : rect.x + rect.width);
+    const ymin = Math.min(rect.y, this.upsideDown ? rect.y - rect.height : rect.y + rect.height);
+    const ymax = Math.max(rect.y, this.upsideDown ? rect.y - rect.height : rect.y + rect.height);
 
-    const xmin = rect.x;
-    const xmax = this.backwards ? rect.x - rect.width : rect.x + rect.width;
-    const ymin = rect.y;
-    const ymax = this.upsideDown ? rect.y - rect.height : rect.y + rect.height;
+    let bottomLeft = new Point(xmin, ymin);
+    let bottomRight = new Point(xmax, ymin);
+    let topLeft = new Point(xmin, ymax);
+    let topRight = new Point(xmax, ymax);
 
-    const topLeft = new Point(xmin, ymax);
-    const bottomRight = new Point(xmax, ymin);
+    if (this.rotation !== 0) {
+      const angle = Utils.degrees2radians(this.rotation);
+      bottomLeft = bottomLeft.rotate(this.points[0], angle);
+      bottomRight = bottomRight.rotate(this.points[0], angle);
+      topLeft = topLeft.rotate(this.points[0], angle);
+      topRight = topRight.rotate(this.points[0], angle);
+    }
+
+    return [bottomLeft, bottomRight, topRight, topLeft];
+  }
 
     return new BoundingBox(topLeft, bottomRight);
   }
