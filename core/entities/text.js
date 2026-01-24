@@ -496,15 +496,9 @@ export class Text extends Entity {
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
-    const rect = this.getBoundingRect();
-
-    const botLeft = new Point(rect.x, rect.y);
-    const botRight = new Point(rect.x + rect.width, rect.y);
-    const topLeft = new Point(rect.x, rect.y + rect.height);
-    const topRight = new Point(rect.x + rect.width, rect.y + rect.height);
-    const mid = new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
-
-    const snaps = [botLeft, botRight, topLeft, topRight, mid];
+    const frameCorners = this.getTextFrameCorners();
+    const mid = frameCorners[0].midPoint(frameCorners[2]);
+    const snaps = [...frameCorners, mid];
 
     return snaps;
   }
