@@ -505,20 +505,15 @@ export class Text extends Entity {
    * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
-    // TODO: Support rotation
-    const rect = this.getBoundingRect();
-    const botLeft = new Point(rect.x, rect.y);
-    const topRight = new Point(rect.x + rect.width, rect.y + rect.height);
-    const mid = new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
+    const frameCorners = this.getTextFrameCorners();
+    const A = frameCorners[0];
+    const B = frameCorners[1];
+    const C = frameCorners[2];
+    const D = frameCorners[3];
 
     let distance = P.distance(mid);
 
-    // if P is inside the bounding box return distance 0
-    if (P.x > botLeft.x &&
-      P.x < topRight.x &&
-      P.y > botLeft.y &&
-      P.y < topRight.y
-    ) {
+    if ( P.isInRectangle(A, B, C, D)) {
       distance = 0;
     }
 
