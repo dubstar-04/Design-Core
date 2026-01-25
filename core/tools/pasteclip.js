@@ -26,7 +26,7 @@ export class Pasteclip extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = { command: 'Pasteclip', shortcut: 'Pasteclip' };
+    const command = { command: 'Pasteclip', shortcut: 'PASTECLIP' };
     return command;
   }
 
