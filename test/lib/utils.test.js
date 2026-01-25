@@ -66,11 +66,11 @@ test('Test Utils.sortPointsByDistance with empty array does nothing', () => {
 
 test('Test Utils.sortPointsOnArc mutates array ordered by angular position', () => {
   const pts = [
-    new Point(7.1, 7.1 ), // 45 degree
-    new Point( 10, 0 ), // end
-    new Point( -10, 0 ), // start
-    new Point(-7.1, 7.1 ), // 45 degree
-    new Point(10, 10 ), // mid
+    new Point(7.1, 7.1), // 45 degree
+    new Point(10, 0), // end
+    new Point(-10, 0), // start
+    new Point(-7.1, 7.1), // 45 degree
+    new Point(10, 10), // mid
   ];
 
   const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)], direction: 1 });
@@ -110,7 +110,7 @@ test('Test Utils.sortPointsOnArc mutates array ordered by angular position', () 
   expect(pts[4].y).toBe(0);
 });
 
-test( 'Test Utils.areaOfTriangle', () => {
-  expect( Utils.areaOfTriangle( new Point( 0, 0 ), new Point( 10, 0 ), new Point( 0, 10 ) ) ).toBe( 50 );
-  expect( Utils.areaOfTriangle( new Point( -5, -5 ), new Point( 5, -5 ), new Point( 0, 5 ) ) ).toBe( 50 );
+test('Test Utils.areaOfTriangle', () => {
+  expect(Utils.areaOfTriangle(new Point(0, 0), new Point(10, 0), new Point(0, 10))).toBe(50);
+  expect(Utils.areaOfTriangle(new Point(-5, -5), new Point(5, -5), new Point(0, 5))).toBe(50);
 });
