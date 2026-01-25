@@ -515,7 +515,7 @@ export class Text extends Entity {
     const C = frameCorners[2];
     const D = frameCorners[3];
 
-    const mid = A.midPoint(D);
+    const mid = A.midPoint(C);
     let distance = P.distance(mid);
 
     if ( P.isInRectangle(A, B, C, D)) {
