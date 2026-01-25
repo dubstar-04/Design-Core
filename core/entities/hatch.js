@@ -765,9 +765,6 @@ export class Hatch extends Entity {
             child.setProperty('points', offsetPoints);
           });
         }
-
-        // do not change hatch points
-        return;
       }
 
       // other properties as normal
