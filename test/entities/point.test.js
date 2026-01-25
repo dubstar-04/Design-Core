@@ -479,6 +479,38 @@ test('Test Point.isOnLine', () => {
   expect(isOnLine4).toBe(false);
 });
 
+
+test('Test Point.isInRectangle', () => {
+  let pt = new Point(5, 5);
+  const bl = new Point(0, 0);
+  const br = new Point(10, 0);
+  const tr = new Point(10, 10);
+  const tl = new Point(0, 10);
+
+  const isInRect = pt.isInRectangle(bl, br, tr, tl);
+  expect(isInRect).toBe(true);
+
+  // not in rectangle
+  pt = new Point(-5, 5);
+  const notInRect = pt.isInRectangle(bl, br, tr, tl);
+  expect(notInRect).toBe(false);
+
+  // on edge of rectangle
+  pt = new Point(0, 0);
+  const onEdgeRect = pt.isInRectangle(bl, br, tr, tl);
+  expect(onEdgeRect).toBe(true);
+
+  // rotated rectangle
+  pt = new Point(0, 5);
+  const bl2 = new Point(0, 0);
+  const br2 = new Point(7, 7);
+  const tr2 = new Point(0, 10);
+  const tl2 = new Point(-7, 7);
+  const isInRotatedRect = pt.isInRectangle(bl2, br2, tr2, tl2);
+  expect(isInRotatedRect).toBe(true);
+});
+
+
 test('Test Point.bulgeAngle', () => {
   const angle = Math.PI;
   const bulge = Math.tan(angle / 4);
