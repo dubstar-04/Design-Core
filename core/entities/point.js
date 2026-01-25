@@ -314,7 +314,7 @@ export class Point {
    * @param {Point} B - Bottom right rectangle corner
    * @param {Point} C - Top right rectangle corner
    * @param {Point} D - Top left rectangle corner
-   * @returns {boolean} - true if point is inside rectangle
+   * @return {boolean} - true if point is inside rectangle
    */
   isInRectangle(A, B, C, D) {
     /* Calculate area of rectangle ABCD */
