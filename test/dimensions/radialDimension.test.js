@@ -72,7 +72,7 @@ test.each(scenarios)('RadialDimension.execute handles $desc', async (scenario) =
   expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
   // get the text entities from the dimension block
   const dimensionBlockEntities = dim.buildDimension();
-  expect(dimensionBlockEntities.length).toBe(dimensionEntities );
+  expect(dimensionBlockEntities.length).toBe(dimensionEntities);
 
   // check if the text value matches the expected dimension value
   for (const entity of dimensionBlockEntities) {

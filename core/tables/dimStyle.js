@@ -530,7 +530,7 @@ export class DimStyle {
    * @param {String} value
    */
   setDimcen(value) {
-    if ( value === 0) {
+    if (value === 0) {
       this.DIMCENSTYL = 0;
     } else if (value > 0) {
       this.DIMCENSTYL = 1;
