@@ -17,6 +17,10 @@
         "object-curly-spacing": [
             "error",
             "always"
+        ],
+        "space-in-parens": [
+            "error",
+            "never"
         ]
     }
 }
