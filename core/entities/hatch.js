@@ -547,8 +547,8 @@ export class Hatch extends Entity {
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbHatch', DXFFile.Version.R2000);
-    file.writeGroupCode('10', this.points[0].x);
-    file.writeGroupCode('20', this.points[0].y);
+    file.writeGroupCode('10', '0.0');
+    file.writeGroupCode('20', '0.0');
     file.writeGroupCode('30', '0.0');
 
     file.writeGroupCode('210', '0.0'); // Extrusion Direction X
@@ -693,8 +693,8 @@ export class Hatch extends Entity {
       ymax = Math.max(ymax, boundingBox.yMax);
     }
 
-    const topLeft = new Point(xmin, ymax).add(this.points[0]);
-    const bottomRight = new Point(xmax, ymin).add(this.points[0]);
+    const topLeft = new Point(xmin, ymax);
+    const bottomRight = new Point(xmax, ymin);
 
     return new BoundingBox(topLeft, bottomRight);
   }
@@ -736,12 +736,9 @@ export class Hatch extends Entity {
    */
   setProperty(property, value) {
     if (this.hasOwnProperty(property)) {
-      // Special handling for hatch points to move child entities
-      // First hatch point is always 0,0
-      // Last hatch point is always 1,1
-
-      // Consider the changes from the hatch points to be an offset and rotation
       if (property === 'points') {
+        // Special handling for hatch points to move child entities
+        // Consider the changes from the hatch points to be an offset and rotation
         const ang = value[0].angle(value.at(-1));
         const theta = ang - this.points[0].angle(this.points.at(-1));
 
@@ -765,9 +762,6 @@ export class Hatch extends Entity {
             child.setProperty('points', offsetPoints);
           });
         }
-
-        // do not change hatch points
-        return;
       }
 
       // other properties as normal
