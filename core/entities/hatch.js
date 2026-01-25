@@ -736,11 +736,6 @@ export class Hatch extends Entity {
    */
   setProperty(property, value) {
     if (this.hasOwnProperty(property)) {
-      // Special handling for hatch points to move child entities
-      // First hatch point is always 0,0
-      // Last hatch point is always 1,1
-
-      // Consider the changes from the hatch points to be an offset and rotation
       if (property === 'points') {
         // Special handling for hatch points to move child entities
         // Consider the changes from the hatch points to be an offset and rotation
