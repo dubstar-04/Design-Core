@@ -230,9 +230,9 @@ AcDbEntity
 100
 AcDbHatch
 10
-0
+0.0
 20
-0
+0.0
 30
 0.0
 210
@@ -332,9 +332,9 @@ AcDbEntity
 100
 AcDbHatch
 10
-0
+0.0
 20
-0
+0.0
 30
 0.0
 210
