@@ -693,8 +693,8 @@ export class Hatch extends Entity {
       ymax = Math.max(ymax, boundingBox.yMax);
     }
 
-    const topLeft = new Point(xmin, ymax).add(this.points[0]);
-    const bottomRight = new Point(xmax, ymin).add(this.points[0]);
+    const topLeft = new Point(xmin, ymax);
+    const bottomRight = new Point(xmax, ymin);
 
     return new BoundingBox(topLeft, bottomRight);
   }
