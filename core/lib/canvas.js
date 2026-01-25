@@ -380,7 +380,7 @@ export class Canvas {
     context.stroke();
 
     // only draw the grid if within scale limits
-    if (scale < this.minScaleFactor || scale > this.maxScaleFactor ) {
+    if (scale < this.minScaleFactor || scale > this.maxScaleFactor) {
       return;
     }
 

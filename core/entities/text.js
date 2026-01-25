@@ -445,18 +445,25 @@ export class Text extends Entity {
     ctx.stroke();
     ctx.restore(); // restore context before scale and translate
 
-    // Draw Bounding Box to test the getBoundingRect()
     /*
-        ctx.strokeStyle = Colours.rgbToString(colour);
-        ctx.lineWidth = 1 / scale;
-        ctx.beginPath()
-        ctx.moveTo(rect.x, rect.y);
-        ctx.lineTo(rect.x + rect.width, rect.y);
-        ctx.lineTo(rect.x + rect.width, rect.y + rect.height);
-        ctx.lineTo(rect.x, rect.y + rect.height);
-        ctx.lineTo(rect.x, rect.y);
-        ctx.stroke()
-        */
+    // debug draw the arcText bounding box
+    const bb = this.boundingBox();
+    ctx.moveTo(bb.xMin, bb.yMin);
+    ctx.lineTo(bb.xMax, bb.yMin);
+    ctx.lineTo(bb.xMax, bb.yMax);
+    ctx.lineTo(bb.xMin, bb.yMax);
+    ctx.lineTo(bb.xMin, bb.yMin);
+    ctx.stroke();
+
+    // debug draw the text frame
+    const frameCorners = this.getTextFrameCorners();
+    ctx.moveTo(frameCorners[0].x, frameCorners[0].y);
+    ctx.lineTo(frameCorners[1].x, frameCorners[1].y);
+    ctx.lineTo(frameCorners[2].x, frameCorners[2].y);
+    ctx.lineTo(frameCorners[3].x, frameCorners[3].y);
+    ctx.lineTo(frameCorners[0].x, frameCorners[0].y);
+    ctx.stroke();
+    */
   }
 
   /**
@@ -489,15 +496,9 @@ export class Text extends Entity {
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
-    const rect = this.getBoundingRect();
-
-    const botLeft = new Point(rect.x, rect.y);
-    const botRight = new Point(rect.x + rect.width, rect.y);
-    const topLeft = new Point(rect.x, rect.y + rect.height);
-    const topRight = new Point(rect.x + rect.width, rect.y + rect.height);
-    const mid = new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
-
-    const snaps = [botLeft, botRight, topLeft, topRight, mid];
+    const frameCorners = this.getTextFrameCorners();
+    const mid = frameCorners[0].midPoint(frameCorners[2]);
+    const snaps = [...frameCorners, mid];
 
     return snaps;
   }
@@ -508,20 +509,16 @@ export class Text extends Entity {
    * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
-    // TODO: Support rotation
-    const rect = this.getBoundingRect();
-    const botLeft = new Point(rect.x, rect.y);
-    const topRight = new Point(rect.x + rect.width, rect.y + rect.height);
-    const mid = new Point(rect.x + rect.width / 2, rect.y + rect.height / 2);
+    const frameCorners = this.getTextFrameCorners();
+    const A = frameCorners[0];
+    const B = frameCorners[1];
+    const C = frameCorners[2];
+    const D = frameCorners[3];
 
+    const mid = A.midPoint(C);
     let distance = P.distance(mid);
 
-    // if P is inside the bounding box return distance 0
-    if (P.x > botLeft.x &&
-      P.x < topRight.x &&
-      P.y > botLeft.y &&
-      P.y < topRight.y
-    ) {
+    if (P.isInRectangle(A, B, C, D)) {
       distance = 0;
     }
 
@@ -529,21 +526,40 @@ export class Text extends Entity {
   }
 
   /**
+   * Get the corner points of a frame around the text (Tight bounding box)
+   * @return {Array} - array of 4 Points defining the text frame corners. Ordered: [bottomLeft, bottomRight, topRight, topLeft]
+   */
+  getTextFrameCorners() {
+    const rect = this.getBoundingRect();
+    // calculate corners before rotation accounting for backwards and upsideDown text
+    const xmin = Math.min(rect.x, this.backwards ? rect.x - rect.width : rect.x + rect.width);
+    const xmax = Math.max(rect.x, this.backwards ? rect.x - rect.width : rect.x + rect.width);
+    const ymin = Math.min(rect.y, this.upsideDown ? rect.y - rect.height : rect.y + rect.height);
+    const ymax = Math.max(rect.y, this.upsideDown ? rect.y - rect.height : rect.y + rect.height);
+
+    let bottomLeft = new Point(xmin, ymin);
+    let bottomRight = new Point(xmax, ymin);
+    let topLeft = new Point(xmin, ymax);
+    let topRight = new Point(xmax, ymax);
+
+    if (this.rotation !== 0) {
+      const angle = Utils.degrees2radians(this.rotation);
+      bottomLeft = bottomLeft.rotate(this.points[0], angle);
+      bottomRight = bottomRight.rotate(this.points[0], angle);
+      topLeft = topLeft.rotate(this.points[0], angle);
+      topRight = topRight.rotate(this.points[0], angle);
+    }
+
+    return [bottomLeft, bottomRight, topRight, topLeft];
+  }
+
+  /**
    * Return boundingbox for entity
    * @return {BoundingBox}
    */
   boundingBox() {
-    const rect = this.getBoundingRect();
-
-    const xmin = rect.x;
-    const xmax = rect.x + rect.width;
-    const ymin = rect.y;
-    const ymax = rect.y + rect.height;
-
-    const topLeft = new Point(xmin, ymax);
-    const bottomRight = new Point(xmax, ymin);
-
-    return new BoundingBox(topLeft, bottomRight);
+    const bb = BoundingBox.fromPoints(this.getTextFrameCorners());
+    return bb;
   }
 
   /**

@@ -67,13 +67,13 @@ export class BoundingBox {
    * @return {boolean} true if point is inside false if not
    */
   isInside(point) {
-    if (point.x > this.xMin && point.x < this.xMax) {
-      if (point.y > this.yMin && point.y < this.yMax) {
-        return true;
-      }
-    }
-
-    return false;
+    // get bounding box corners
+    const bottomLeft = new Point(this.xMin, this.yMin);
+    const bottomRight = new Point(this.xMax, this.yMin);
+    const topRight = new Point(this.xMax, this.yMax);
+    const topLeft = new Point(this.xMin, this.yMax);
+    // check if point is in rectangle
+    return point.isInRectangle(bottomLeft, bottomRight, topRight, topLeft);
   }
 
   /**

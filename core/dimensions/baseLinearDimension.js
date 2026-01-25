@@ -224,7 +224,7 @@ export class BaseLinearDimension extends BaseDimension {
     const textAndDimlineAligned = this.alignedOrOpposite(textRotation, dimLineAngle);
 
     // Check if the text is aligned with the extension line
-    const textAndExtlineAligned = this.alignedOrOpposite(textRotation, extensionLineAngle );
+    const textAndExtlineAligned = this.alignedOrOpposite(textRotation, extensionLineAngle);
 
     // Check if the text position is on an extension line
     let textIsOnExtensionLine = textPosition.perpendicular(Pt13, Pt13e).isSame(textPosition) || textPosition.perpendicular(Pt14, Pt14e).isSame(textPosition);

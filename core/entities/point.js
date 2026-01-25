@@ -309,6 +309,38 @@ export class Point {
   }
 
   /**
+   * Check if point is inside rectangle defined by points A, B, C, D
+   * @param {Point} A - Bottom left rectangle corner
+   * @param {Point} B - Bottom right rectangle corner
+   * @param {Point} C - Top right rectangle corner
+   * @param {Point} D - Top left rectangle corner
+   * @return {boolean} - true if point is inside rectangle
+   */
+  isInRectangle(A, B, C, D) {
+    /* Calculate area of rectangle ABCD */
+    const rectangleArea = Utils.areaOfTriangle(A, B, C) + Utils.areaOfTriangle(A, C, D);
+
+    /* Calculate area of triangle PAB */
+    const A1 = Utils.areaOfTriangle(this, A, B);
+
+    /* Calculate area of triangle PBC */
+    const A2 = Utils.areaOfTriangle(this, B, C);
+
+    /* Calculate area of triangle PCD */
+    const A3 = Utils.areaOfTriangle(this, C, D);
+
+    /* Calculate area of triangle PAD */
+    const A4 = Utils.areaOfTriangle(this, A, D);
+
+    /* Check if sum of A1, A2, A3 and A4 is same as A */
+    if (Utils.round(rectangleArea) === Utils.round(A1 + A2 + A3 + A4)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
    * Get the arc angle in radians from the bulge value
    * @return {Point} arc angle in radians
    */

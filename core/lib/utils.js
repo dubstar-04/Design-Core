@@ -116,6 +116,17 @@ export class Utils {
   }
 
   /**
+   * Calculate area of triangle given 3 points
+   * @param {Point} p1
+   * @param {Point} p2
+   * @param {Point} p3
+   * @return {number} area of triangle
+   */
+  static areaOfTriangle(p1, p2, p3) {
+    return Math.abs((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y) + p3.x * (p1.y - p2.y)) / 2.0);
+  }
+
+  /**
    * Returns a levenshtein edit distance to the input strings
    * The distance represents the minimum number of character edits required to change one string into the other.
    * a lower number suggests the strings are more similar and value of 0 means they are the same.

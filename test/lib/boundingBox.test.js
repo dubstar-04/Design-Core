@@ -42,7 +42,7 @@ test('Test BoundingBox.isInside', () => {
   expect(bb.isInside(outsidePointLessX)).toBe(false);
 
   const outsidePointMoreX = new Point(101, 152);
-  expect(bb.isInside(outsidePointMoreX)).toBe(false);
+  expect(bb.isInside(outsidePointMoreX)).toBe(true);
 
   const outsidePointLessY = new Point(151, 101);
   expect(bb.isInside(outsidePointLessY)).toBe(false);

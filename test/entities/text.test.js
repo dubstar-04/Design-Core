@@ -77,6 +77,58 @@ test('Test Text.closestPoint', () => {
   expect(closest1[1]).toBeCloseTo(21.21);
 });
 
+
+test('Test Text.getTextFrameCorners', () => {
+  const text = new Text({ points: [new Point(100, 100)] });
+  let corners = text.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(100);
+  expect(corners[0].y).toBeCloseTo(100);
+
+  expect(corners[1].x).toBeCloseTo(110);
+  expect(corners[1].y).toBeCloseTo(100);
+
+  expect(corners[2].x).toBeCloseTo(110);
+  expect(corners[2].y).toBeCloseTo(110);
+
+  expect(corners[3].x).toBeCloseTo(100);
+  expect(corners[3].y).toBeCloseTo(110);
+
+  // Rotate 45 degrees
+  text.setRotation(45);
+  corners = text.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(100);
+  expect(corners[0].y).toBeCloseTo(100);
+
+  expect(corners[1].x).toBeCloseTo(107.07106);
+  expect(corners[1].y).toBeCloseTo(107.07106);
+
+  expect(corners[2].x).toBeCloseTo(100);
+  expect(corners[2].y).toBeCloseTo(114.14213);
+
+  expect(corners[3].x).toBeCloseTo(92.92893);
+  expect(corners[3].y).toBeCloseTo(107.07106);
+
+  // backwards and upsideDown
+  text.setRotation(0);
+  text.backwards = true;
+  text.upsideDown = true;
+  corners = text.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(90);
+  expect(corners[0].y).toBeCloseTo(90);
+
+  expect(corners[1].x).toBeCloseTo(100);
+  expect(corners[1].y).toBeCloseTo(90);
+
+  expect(corners[2].x).toBeCloseTo(100);
+  expect(corners[2].y).toBeCloseTo(100);
+
+  expect(corners[3].x).toBeCloseTo(90);
+  expect(corners[3].y).toBeCloseTo(100);
+});
+
 test('Test Text.setRotation', () => {
   const setRotText = new Text({ points: [new Point()] });
 
