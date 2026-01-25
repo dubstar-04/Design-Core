@@ -742,6 +742,8 @@ export class Hatch extends Entity {
 
       // Consider the changes from the hatch points to be an offset and rotation
       if (property === 'points') {
+        // Special handling for hatch points to move child entities
+        // Consider the changes from the hatch points to be an offset and rotation
         const ang = value[0].angle(value.at(-1));
         const theta = ang - this.points[0].angle(this.points.at(-1));
 
