@@ -109,6 +109,24 @@ test('Test Text.getTextFrameCorners', () => {
 
   expect(corners[3].x).toBeCloseTo(92.92893);
   expect(corners[3].y).toBeCloseTo(107.07106);
+
+  // backwards and upsideDown
+  text.setRotation(0);
+  text.backwards = true;
+  text.upsideDown = true;
+  corners = text.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(90);
+  expect(corners[0].y).toBeCloseTo(90);
+
+  expect(corners[1].x).toBeCloseTo(100);
+  expect(corners[1].y).toBeCloseTo(90);
+
+  expect(corners[2].x).toBeCloseTo(100);
+  expect(corners[2].y).toBeCloseTo(100);
+
+  expect(corners[3].x).toBeCloseTo(90);
+  expect(corners[3].y).toBeCloseTo(100);
 });
 
 test('Test Text.setRotation', () => {
