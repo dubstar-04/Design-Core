@@ -178,7 +178,7 @@ export class Text extends Entity {
 
       // get properties from style
       const style = DesignCore.StyleManager.getItemByName(this.styleName);
-      if (style.textHeight) {
+      if (style?.textHeight) {
         this.height = style.textHeight;
       }
 

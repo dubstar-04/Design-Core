@@ -102,6 +102,30 @@ test('Test LayerManager.checkStyles', () => {
   expect(layers[2]).toHaveProperty('name', newItemName);
 });
 
+test('Test LayerManager.checkItems', () => {
+  layerManager.layers = [];
+
+  const newItemName = 'checkStyles';
+  const startPoint = new Point();
+  const endPoint = new Point(10, 10);
+
+  const data = {
+    points: [startPoint, endPoint],
+    colour: '#FFFFFF',
+    layer: newItemName,
+  };
+
+  core.scene.addItem('Line', data);
+
+  layerManager.checkItems();
+  const layers = layerManager.getItems();
+  expect(layers).toHaveLength(3);
+
+  expect(layers[0]).toHaveProperty('name', '0');
+  expect(layers[1]).toHaveProperty('name', 'DEFPOINTS');
+  expect(layers[2]).toHaveProperty('name', newItemName);
+});
+
 test('Test LayerManager.addStandardItems', () => {
   layerManager.clearItems();
 
@@ -127,9 +151,7 @@ test('Test LayerManager.getItemByName', () => {
   const layer = layerManager.getItemByName('test');
   expect(layer.name).toBe('test');
   // get a layer that doesn't exist
-  expect(() => {
-    layerManager.getItemByName('no-exist');
-  }).toThrow();
+  expect(layerManager.getItemByName('Non-Existent')).toBeUndefined();
 });
 
 test('Test LayerManager.getItemByIndex', () => {

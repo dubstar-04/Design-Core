@@ -265,7 +265,7 @@ export class ArcAlignedText extends Entity {
 
       // get properties from style
       const style = DesignCore.StyleManager.getItemByName(this.styleName);
-      if (style.textHeight) {
+      if (style?.textHeight) {
         this.height = style.textHeight;
       }
 
@@ -461,7 +461,7 @@ export class ArcAlignedText extends Entity {
 
     // Cairo
     ctx.setFontSize(this.height);
-    ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
+    ctx.selectFontFace(style?.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
 
     const ArcAlignedCharacters = this.getArcAlignedCharacters();
 
@@ -521,7 +521,7 @@ export class ArcAlignedText extends Entity {
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbArcAlignedText', DXFFile.Version.R2000);
     file.writeGroupCode('1', this.string);
-    file.writeGroupCode('2', style.font);
+    file.writeGroupCode('2', style?.font);
     file.writeGroupCode('3', '');
     file.writeGroupCode('7', this.styleName); // Test style name
     file.writeGroupCode('10', this.points[0].x); // x of arc center

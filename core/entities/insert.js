@@ -5,6 +5,7 @@ import { BoundingBox } from '../lib/boundingBox.js';
 import { Point } from './point.js';
 import { Utils } from '../lib/utils.js';
 import { Property } from '../properties/property.js';
+import { Logging } from '../lib/logging.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -278,7 +279,7 @@ export class Insert extends Entity {
   touched(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
-    if (!layer.isSelectable) {
+    if (!layer?.isSelectable) {
       return;
     }
 

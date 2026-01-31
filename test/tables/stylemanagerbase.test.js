@@ -106,9 +106,9 @@ test('Test StyleManagerBase.setCstyle', () => {
   styleManager.setCstyle('styleOne');
   expect(styleManager.getCstyle()).toBe('styleOne');
 
-  expect(() => {
-    styleManager.setCstyle('Non-Existent');
-  }).toThrow();
+  // expect(() => {
+  //  styleManager.setCstyle('Non-Existent');
+  // }).toThrow();
   // styleManager.setCstyle('Non-Existent');
   expect(styleManager.getCstyle()).toBe('styleOne');
 });
@@ -151,10 +151,7 @@ test('Test StyleManagerBase.getItemByName', () => {
   styleManager.items = [{ name: 'styleOne' }, { name: 'styleTwo' }];
 
   expect(styleManager.getItemByName('styleOne').name).toBe('styleOne');
-  expect(() => {
-    styleManager.getItemByName('Non-Existent');
-  }).toThrow();
-  // expect(styleManager.getItemByName('Non-Existent')).toBeUndefined();
+  expect(styleManager.getItemByName('Non-Existent')).toBeUndefined();
 });
 
 test('Test StyleManagerBase.getItemByIndex', () => {

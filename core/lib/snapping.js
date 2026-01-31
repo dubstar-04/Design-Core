@@ -83,7 +83,7 @@ export class Snapping {
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
       const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).layer);
 
-      if (!layer.isVisible) {
+      if (!layer?.isVisible) {
         continue;
       }
 
