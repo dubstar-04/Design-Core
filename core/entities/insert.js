@@ -5,6 +5,7 @@ import { BoundingBox } from '../lib/boundingBox.js';
 import { Point } from './point.js';
 import { Utils } from '../lib/utils.js';
 import { Property } from '../properties/property.js';
+import { Logging } from '../lib/logging.js';
 
 import { DesignCore } from '../designCore.js';
 
