@@ -1,5 +1,6 @@
 import { DesignCore } from '../designCore.js';
 import { Strings } from '../lib/strings.js';
+import { Logging } from '../lib/logging.js';
 
 /**
  * Table Manager Base Class
@@ -166,6 +167,7 @@ export class TableManagerBase {
    */
   getItemByName(itemName) {
     for (let i = 0; i < this.itemCount(); i++) {
+      // console.log('block name:', this.items[i].name.toUpperCase());
       if (this.items[i].name.toUpperCase() === itemName.toUpperCase()) {
         return this.items[i];
       }
@@ -173,7 +175,7 @@ export class TableManagerBase {
 
     const msg = 'Invalid Item Name';
     const err = (`${this.constructor.name} - ${msg}: ${itemName}`);
-    throw Error(err);
+    Logging.instance.warn(`${err}`);
   }
 
   /**
