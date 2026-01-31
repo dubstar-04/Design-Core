@@ -279,7 +279,7 @@ export class Insert extends Entity {
   touched(selectionExtremes) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
-    if (!layer.isSelectable) {
+    if (!layer?.isSelectable) {
       return;
     }
 
