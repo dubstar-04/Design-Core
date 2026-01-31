@@ -127,9 +127,7 @@ test('Test LayerManager.getItemByName', () => {
   const layer = layerManager.getItemByName('test');
   expect(layer.name).toBe('test');
   // get a layer that doesn't exist
-  expect(() => {
-    layerManager.getItemByName('no-exist');
-  }).toThrow();
+  expect(layerManager.getItemByName('Non-Existent')).toBeUndefined();
 });
 
 test('Test LayerManager.getItemByIndex', () => {
