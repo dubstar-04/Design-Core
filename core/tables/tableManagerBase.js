@@ -128,10 +128,23 @@ export class TableManagerBase {
     }
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
-      const item = (DesignCore.Scene.entities.get(i)[this.itemProperty]);
-      this.addItem({
-        'name': item,
-      });
+      const item = (DesignCore.Scene.entities.get(i));
+
+      // check the item has the required property
+      if (Object.hasOwn(item, this.itemProperty) === false) {
+        continue;
+      }
+
+      // get the property value
+      const propertyValue = (item[this.itemProperty]);
+
+      // create missing items
+      // example if an entity uses a missing layer, create the layer.
+      if (!this.itemExists(propertyValue)) {
+        this.addItem({
+          'name': propertyValue,
+        });
+      }
     }
   }
 

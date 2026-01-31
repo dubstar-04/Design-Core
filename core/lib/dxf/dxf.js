@@ -203,8 +203,13 @@ export class DXF {
 
       this.addItem(entity);
     });
-  }
 
+    // ensure all layers, ltypes, styles, dimstyles exist
+    DesignCore.LayerManager.checkItems();
+    DesignCore.LTypeManager.checkItems();
+    DesignCore.StyleManager.checkItems();
+    DesignCore.DimStyleManager.checkItems();
+  }
 
   /**
    * Add Item
