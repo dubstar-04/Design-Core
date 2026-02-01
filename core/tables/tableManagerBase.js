@@ -186,6 +186,8 @@ export class TableManagerBase {
       }
     }
 
+    // Log warning if item doesn't exist
+    // Consider nested blocks where block may not exist yet
     const msg = 'Invalid Item Name';
     const err = (`${this.constructor.name} - ${msg}: ${itemName}`);
     Logging.instance.warn(`${err}`);
