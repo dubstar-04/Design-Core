@@ -135,10 +135,7 @@ test('Test tableManagerBase.getItemByName', () => {
   tableManagerBase.items = [{ name: 'itemOne' }, { name: 'itemTwo' }];
 
   expect(tableManagerBase.getItemByName('itemOne').name).toBe('itemOne');
-  expect(() => {
-    tableManagerBase.getItemByName('Non-Existent');
-  }).toThrow();
-  // expect(tableManagerBase.getItemByName('Non-Existent')).toBeUndefined();
+  expect(tableManagerBase.getItemByName('Non-Existent')).toBeUndefined();
 });
 
 test('Test tableManagerBase.getItemByIndex', () => {

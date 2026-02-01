@@ -1,5 +1,6 @@
 import { DesignCore } from '../designCore.js';
 import { Strings } from '../lib/strings.js';
+import { Logging } from '../lib/logging.js';
 
 /**
  * Table Manager Base Class
@@ -127,10 +128,23 @@ export class TableManagerBase {
     }
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
-      const item = (DesignCore.Scene.entities.get(i)[this.itemProperty]);
-      this.addItem({
-        'name': item,
-      });
+      const item = (DesignCore.Scene.entities.get(i));
+
+      // check the item has the required property
+      if (Object.hasOwn(item, this.itemProperty) === false) {
+        continue;
+      }
+
+      // get the property value
+      const propertyValue = (item[this.itemProperty]);
+
+      // create missing items
+      // example if an entity uses a missing layer, create the layer.
+      if (!this.itemExists(propertyValue)) {
+        this.addItem({
+          'name': propertyValue,
+        });
+      }
     }
   }
 
@@ -166,14 +180,17 @@ export class TableManagerBase {
    */
   getItemByName(itemName) {
     for (let i = 0; i < this.itemCount(); i++) {
+      // console.log('block name:', this.items[i].name.toUpperCase());
       if (this.items[i].name.toUpperCase() === itemName.toUpperCase()) {
         return this.items[i];
       }
     }
 
+    // Log warning if item doesn't exist
+    // Consider nested blocks where block may not exist yet
     const msg = 'Invalid Item Name';
     const err = (`${this.constructor.name} - ${msg}: ${itemName}`);
-    throw Error(err);
+    Logging.instance.warn(`${err}`);
   }
 
   /**

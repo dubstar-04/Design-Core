@@ -109,7 +109,7 @@ export class EntityManager {
       // check the items layer is selectable - i.e. on, thawed, etc...
       const layer = DesignCore.LayerManager.getItemByName(this.#entities[i].layer);
 
-      if (!layer.isSelectable) {
+      if (!layer?.isSelectable) {
         continue;
       }
 

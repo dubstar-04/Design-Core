@@ -48,7 +48,5 @@ test('Test blockManager.getItemByName', () => {
   const block = blockManager.getItemByName('test');
   expect(block.name).toBe('test');
   // get a block that doesn't exist
-  expect(() => {
-    blockManager.getItemByName('no-exist');
-  }).toThrow();
+  expect(blockManager.getItemByName('Non-Existent')).toBeUndefined();
 });
