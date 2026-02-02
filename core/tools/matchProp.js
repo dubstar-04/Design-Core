@@ -37,17 +37,21 @@ export class MatchProp extends Tool {
    */
   async execute() {
     try {
-      if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
+      if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length === 1) {
+        // use selected item as source if only one selected
+        const selections = DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice();
+        this.sourceIndex = selections[0];
+      } else {
+        // prompt for source item
+        DesignCore.Scene.selectionManager.reset();
         const sourceSelection = new PromptOptions(Strings.Input.SOURCE, [Input.Type.SINGLESELECTION], []);
         const input = await DesignCore.Scene.inputManager.requestInput(sourceSelection);
         this.sourceIndex = input.selectedItemIndex;
       }
 
-
       const destinationSelection = new PromptOptions(Strings.Input.DESTINATIONSET, [Input.Type.SELECTIONSET]);
       const destInput = await DesignCore.Scene.inputManager.requestInput(destinationSelection);
       this.destinationSetIndices = destInput.selectionSet;
-
 
       DesignCore.Scene.inputManager.executeCommand();
     } catch (err) {
