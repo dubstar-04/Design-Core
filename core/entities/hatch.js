@@ -542,6 +542,11 @@ export class Hatch extends Entity {
    * @param {DXFFile} file
    */
   dxf(file) {
+    // skip if no boundary shapes
+    if (!this.childEntities.length) {
+      return;
+    }
+
     file.writeGroupCode('0', 'HATCH');
     file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
