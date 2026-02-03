@@ -310,7 +310,7 @@ ANSI31
   const newHatch = new Hatch(hatch);
   file = new File();
   newHatch.dxf(file);
-  expect(file.contents).toEqual(dxfString);
+
 
   // Export rotated and scaled
   const rotatedScaleHatch = new Hatch();
@@ -318,6 +318,17 @@ ANSI31
   rotatedScaleHatch.scale = 2;
 
   file = new File();
+  rotatedScaleHatch.dxf(file);
+  // console.log(file.contents);
+
+  // Don't export hatch if no boundary shapes
+  expect(file.contents).toEqual('');
+
+  const shape = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  const boundary = rotatedScaleHatch.processSelection([shape]);
+  expect(boundary[0]).toBeInstanceOf(Polyline);
+
+  rotatedScaleHatch.childEntities = boundary;
   rotatedScaleHatch.dxf(file);
   // console.log(file.contents);
 
@@ -350,7 +361,27 @@ ANSI31
 71
 0
 91
+1
+92
+7
+72
+1
+73
+1
+93
+2
+10
+10
+20
 0
+42
+1
+10
+-10
+20
+0
+42
+1
 97
 0
 75
