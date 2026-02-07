@@ -77,13 +77,10 @@ export class Text extends Entity {
     });
 
     if (data) {
-      if (data.hasOwnProperty('string') || data.hasOwnProperty('1')) {
-        // DXF Groupcode 1 - Default Value
-        // The string of the text entity
-
-        const string = (Property.loadValue([data.string, data[1]], ''));
-        if (string !== undefined) {
-          this.string = String(string);
+      // DXF Groupcode 11,21,31 - Second alignment point (optional, used for aligned, middle, or fit text)
+      if (data.points.length > 1) {
+        if (data.points[1].sequence == 11) {
+          this.points = [];
         }
       }
 
@@ -105,7 +102,6 @@ export class Text extends Entity {
       } else {
         // create points[1] used to determine the text rotation
         if (this.points.length && this.height !== undefined) {
-          this.points[1] = data.points[0].add(new Point(this.height, 0));
         }
       }
 
