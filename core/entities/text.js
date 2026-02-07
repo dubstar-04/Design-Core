@@ -80,6 +80,7 @@ export class Text extends Entity {
       if (data.points.length > 1) {
         if (data.points[1].sequence == 11) {
           this.points = [];
+          this.points.push(new Point(data.points[1].x, data.points[1].y));
         }
       }
 
@@ -101,6 +102,7 @@ export class Text extends Entity {
       } else {
         // create points[1] used to determine the text rotation
         if (this.points.length && this.height !== undefined) {
+          this.points[1] = this.points[0].add(new Point(this.height, 0));
         }
       }
 
