@@ -439,17 +439,31 @@ export class Text extends Entity {
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
-    file.writeGroupCode('10', this.points[0].x);
-    file.writeGroupCode('20', this.points[0].y);
+
+    const frameCorners = this.getTextFrameCorners();
+    const bottomLeft = frameCorners[0];
+
+    file.writeGroupCode('10', bottomLeft.x);
+    file.writeGroupCode('20', bottomLeft.y);
     file.writeGroupCode('30', '0.0');
+
     file.writeGroupCode('40', this.height);
     file.writeGroupCode('1', this.string);
     file.writeGroupCode('50', this.rotation);
     // file.writeGroupCode('7', 'STANDARD'); // TEXT STYLE
     file.writeGroupCode('71', this.flags.getFlagValue()); // Text generation flags
     file.writeGroupCode('72', this.horizontalAlignment); // Horizontal alignment
+
+    if (this.horizontalAlignment > 0 || this.verticalAlignment > 0) {
+      file.writeGroupCode('11', this.points[0].x);
+      file.writeGroupCode('21', this.points[0].y);
+      file.writeGroupCode('31', '0.0');
+    }
+
     file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
-    file.writeGroupCode('73', this.verticalAlignment); // Vertical alignment
+    if (this.verticalAlignment !== 0) {
+      file.writeGroupCode('73', this.verticalAlignment); // Vertical alignment
+    }
   }
 
   /**
