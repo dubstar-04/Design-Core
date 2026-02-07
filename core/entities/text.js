@@ -514,11 +514,56 @@ export class Text extends Entity {
    */
   getTextFrameCorners() {
     const rect = this.getBoundingRect();
-    // calculate corners before rotation accounting for backwards and upsideDown text
-    const xmin = Math.min(rect.x, this.backwards ? rect.x - rect.width : rect.x + rect.width);
-    const xmax = Math.max(rect.x, this.backwards ? rect.x - rect.width : rect.x + rect.width);
-    const ymin = Math.min(rect.y, this.upsideDown ? rect.y - rect.height : rect.y + rect.height);
-    const ymax = Math.max(rect.y, this.upsideDown ? rect.y - rect.height : rect.y + rect.height);
+
+    let offsetX = 0;
+    switch (this.horizontalAlignment) {
+      case 0: // left
+        offsetX = 0;
+        break;
+      case 1: // center
+        offsetX = -rect.width / 2;
+        break;
+      case 2: // right
+        offsetX = -rect.width;
+        break;
+      case 3: // aligned - not supported
+      case 4: // middle - not supported
+      case 5: // fit - not supported
+      default:
+        offsetX = 0;
+    }
+
+    let offsetY = 0;
+    switch (this.verticalAlignment) {
+      case 0: // baseline
+        offsetY = 0;
+        break;
+      case 1: // bottom
+        offsetY = -rect.height;
+        break;
+      case 2: // middle
+        offsetY = -rect.height / 2;
+        break;
+      case 3: // top
+        offsetY = -rect.height;
+        break;
+      default:
+        offsetY = 0;
+    }
+
+    // apply offsets to insertion point
+    const x0 = rect.x + offsetX;
+    const y0 = rect.y + offsetY;
+
+    // console.log('Text frame offsets:', offsetX, offsetY);
+    // console.log('Text frame position:', x0, y0);
+    // console.log('Text rect:', rect.x, rect.y);
+
+    // compute min/max depending on backwards/upsideDown (text direction)
+    const xmin = Math.min(x0, this.backwards ? x0 - rect.width : x0 + rect.width);
+    const xmax = Math.max(x0, this.backwards ? x0 - rect.width : x0 + rect.width);
+    const ymin = Math.min(y0, this.upsideDown ? y0 - rect.height : y0 + rect.height);
+    const ymax = Math.max(y0, this.upsideDown ? y0 - rect.height : y0 + rect.height);
 
     let bottomLeft = new Point(xmin, ymin);
     let bottomRight = new Point(xmax, ymin);
