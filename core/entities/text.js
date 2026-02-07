@@ -463,6 +463,12 @@ export class Text extends Entity {
     const mid = frameCorners[0].midPoint(frameCorners[2]);
     const snaps = [...frameCorners, mid];
 
+    // add insertion point if not already in snaps
+    // this adds an extra snap point when alignment != 0.
+    if (!snaps.some((point) => point.isSame(this.points[0]))) {
+      snaps.push(this.points[0]);
+    }
+
     return snaps;
   }
 
