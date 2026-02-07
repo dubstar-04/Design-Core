@@ -87,15 +87,15 @@ export class Text extends Entity {
         }
       }
 
-      if (data.hasOwnProperty('styleName') || data.hasOwnProperty('7')) {
-        // DXF Groupcode 7 - Text Style Name
-        this.styleName = data.styleName || data[7];
-      }
+      // DXF Groupcode 1 - Text String
+      this.string = (Property.loadValue([data?.string, data?.[1]], ''));
 
-      if (data.hasOwnProperty('height') || data.hasOwnProperty('40')) {
-        // DXF Groupcode 40 - Text Height
-        this.height = Property.loadValue([data.height, data[40]], 2.5);
-      }
+      // DXF Groupcode 7 - Text Style Name
+      this.styleName = (Property.loadValue([data?.styleName, data?.[7]], 'STANDARD'));
+
+
+      // DXF Groupcode 40 - Text Height
+      this.height = Property.loadValue([data.height, data[40]], 2.5);
 
       if (data.hasOwnProperty('rotation') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Text Rotation, angle in degrees
@@ -109,30 +109,27 @@ export class Text extends Entity {
         }
       }
 
-      if (data.hasOwnProperty('horizontalAlignment') || data.hasOwnProperty('72')) {
-        // DXF Groupcode 72 - Horizontal Alignment
-        // 0 = Left; 1= Center; 2 = Right
-        // 3 = Aligned (if vertical alignment = 0)
-        // 4 = Middle (if vertical alignment = 0)
-        // 5 = Fit (if vertical alignment = 0)
+      // DXF Groupcode 72 - Horizontal Alignment
+      // 0 = Left
+      // 1 = Center
+      // 2 = Right
+      // 3 = Aligned (if vertical alignment = 0) not supported, treated as center aligned
+      // 4 = Middle (if vertical alignment = 0) not supported, treated as center aligned
+      // 5 = Fit (if vertical alignment = 0) not supported, treated as center aligned
+      this.horizontalAlignment = Property.loadValue([data.horizontalAlignment, data[72]], 0);
 
-        this.horizontalAlignment = Property.loadValue([data.horizontalAlignment, data[72]], 0);
+      if (this.horizontalAlignment > 2) {
+        this.horizontalAlignment = 1; // unsupported alignment types treated as center aligned
       }
 
-      if (data.hasOwnProperty('verticalAlignment') || data.hasOwnProperty('73')) {
-        // DXF Groupcode 73 - Vertical Alignment
-        // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
+      // DXF Groupcode 73 - Vertical Alignment
+      // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
+      this.verticalAlignment = Property.loadValue([data.verticalAlignment, data[73]], 0);
 
-        this.verticalAlignment = Property.loadValue([data.verticalAlignment, data[73]], 0);
-      }
-
-      if (data.hasOwnProperty('flags') || data.hasOwnProperty('71')) {
-        // DXF Groupcode 71 - flags (bit-coded values):
-        // 2 = Text is backward (mirrored in X).
-        // 4 = Text is upside down (mirrored in Y).
-
-        this.flags.setFlagValue(Property.loadValue([data.flags, data[71]], 0));
-      }
+      // DXF Groupcode 71 - flags (bit-coded values):
+      // 2 = Text is backward (mirrored in X).
+      // 4 = Text is upside down (mirrored in Y).
+      this.flags.setFlagValue(Property.loadValue([data.flags, data[71]], 0));
     }
   }
 
