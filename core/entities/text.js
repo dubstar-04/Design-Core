@@ -367,7 +367,9 @@ export class Text extends Entity {
   draw(ctx, scale) {
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
-    ctx.translate(this.points[0].x, -this.points[0].y);
+    const corners = this.getTextFrameCorners();
+    const bottomLeft = corners[0];
+    ctx.translate(bottomLeft.x, -bottomLeft.y);
 
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
     // style.textHeight
