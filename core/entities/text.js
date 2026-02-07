@@ -28,7 +28,6 @@ export class Text extends Entity {
     this.verticalAlignment = 0;
     this.styleName = 'STANDARD';
 
-
     // hide inherited properties
     // needs to be enumerable=false to not appear in the object props
     Object.defineProperty(this, 'lineType', {
@@ -403,6 +402,7 @@ export class Text extends Entity {
       this.boundingRect = ctx.textExtents(String(this.string));
       ctx.showText(String(this.string));
     }
+
     ctx.stroke();
     ctx.restore(); // restore context before scale and translate
 
