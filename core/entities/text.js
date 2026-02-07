@@ -409,7 +409,7 @@ export class Text extends Entity {
     ctx.restore(); // restore context before scale and translate
 
     /*
-    // debug draw the arcText bounding box
+    // debug draw the bounding box
     const bb = this.boundingBox();
     ctx.moveTo(bb.xMin, bb.yMin);
     ctx.lineTo(bb.xMax, bb.yMin);
