@@ -401,38 +401,6 @@ export class Text extends Entity {
       ctx.setFontSize(this.height);
       ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
       this.boundingRect = ctx.textExtents(String(this.string));
-
-      let x = 0;
-      let y = 0;
-      switch (this.horizontalAlignment) {
-        case 0: // 0 = Left;
-          x = -this.boundingRect.xBearing;
-          break;
-        case 1: // 1= Center;
-          x = -this.boundingRect.xBearing - this.boundingRect.width / 2;
-          break;
-        case 2: // 2 = Right
-          x = -this.boundingRect.xBearing - this.boundingRect.width;
-          break;
-      }
-
-      switch (this.verticalAlignment) {
-        case 0: // 0 = Baseline;
-          y = 0;
-          break;
-        case 1: // 1 = Bottom;
-          y = -this.boundingRect.yBearing - this.boundingRect.height;
-          break;
-        case 2: // 2 = Middle
-          y = -this.boundingRect.yBearing - this.boundingRect.height / 2;
-          break;
-        case 3: // 3 = Top
-          y = -this.boundingRect.yBearing;
-          break;
-      }
-
-
-      ctx.moveTo(x, y);
       ctx.showText(String(this.string));
     }
     ctx.stroke();
