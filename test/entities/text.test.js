@@ -127,6 +127,107 @@ test('Test Text.getTextFrameCorners', () => {
 
   expect(corners[3].x).toBeCloseTo(90);
   expect(corners[3].y).toBeCloseTo(100);
+
+  // Text frame calculation with text alignment
+  // bounding rect is 10x10, so with center/middle alignment the text frame should be offset by 5 in both x and y from the insertion point
+  const alignedText = new Text({ points: [new Point(100, 100)] });
+  alignedText.horizontalAlignment = 1; // center
+  corners = alignedText.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(95);
+  expect(corners[0].y).toBeCloseTo(100);
+
+  expect(corners[1].x).toBeCloseTo(105);
+  expect(corners[1].y).toBeCloseTo(100);
+
+  expect(corners[2].x).toBeCloseTo(105);
+  expect(corners[2].y).toBeCloseTo(110);
+
+  expect(corners[3].x).toBeCloseTo(95);
+  expect(corners[3].y).toBeCloseTo(110);
+
+  // set vertical alignment to middle as well
+  // offset the text frame up by another 5 in y so the corners should be at 95,95 - 105,105
+  alignedText.verticalAlignment = 2; // middle
+  corners = alignedText.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(95);
+  expect(corners[0].y).toBeCloseTo(95);
+
+  expect(corners[1].x).toBeCloseTo(105);
+  expect(corners[1].y).toBeCloseTo(95);
+
+  expect(corners[2].x).toBeCloseTo(105);
+  expect(corners[2].y).toBeCloseTo(105);
+
+  expect(corners[3].x).toBeCloseTo(95);
+  expect(corners[3].y).toBeCloseTo(105);
+
+
+  // add rotation of 45 degrees to the center/middle aligned text and ensure the text frame corners are correctly calculated with both alignment and rotation applied
+  alignedText.setRotation(45);
+  corners = alignedText.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(100);
+  expect(corners[0].y).toBeCloseTo(92.92893);
+
+  expect(corners[1].x).toBeCloseTo(107.07106);
+  expect(corners[1].y).toBeCloseTo(100);
+
+  expect(corners[2].x).toBeCloseTo(100);
+  expect(corners[2].y).toBeCloseTo(107.07106);
+
+  expect(corners[3].x).toBeCloseTo(92.92893);
+  expect(corners[3].y).toBeCloseTo(100);
+
+  // flip the text backwards and ensure the text frame corners are still correctly calculated with the flipped text
+  alignedText.backwards = true;
+  corners = alignedText.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(92.92893);
+  expect(corners[0].y).toBeCloseTo(85.8579);
+
+  expect(corners[1].x).toBeCloseTo(100);
+  expect(corners[1].y).toBeCloseTo(92.92893);
+
+  expect(corners[2].x).toBeCloseTo(92.92893);
+  expect(corners[2].y).toBeCloseTo(100);
+
+  expect(corners[3].x).toBeCloseTo(85.8579);
+  expect(corners[3].y).toBeCloseTo(92.92893);
+
+  // test right and top alignement
+  const rightAlignedtext = new Text({ points: [new Point(100, 100)] });
+  rightAlignedtext.horizontalAlignment = 2; // right
+  corners = rightAlignedtext.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(90);
+  expect(corners[0].y).toBeCloseTo(100);
+
+  expect(corners[1].x).toBeCloseTo(100);
+  expect(corners[1].y).toBeCloseTo(100);
+
+  expect(corners[2].x).toBeCloseTo(100);
+  expect(corners[2].y).toBeCloseTo(110);
+
+  expect(corners[3].x).toBeCloseTo(90);
+  expect(corners[3].y).toBeCloseTo(110);
+
+  // add vertical alignment top and ensure the text frame is still correctly calculated with the right and top alignment applied
+  rightAlignedtext.verticalAlignment = 3; // top
+  corners = rightAlignedtext.getTextFrameCorners();
+
+  expect(corners[0].x).toBeCloseTo(90);
+  expect(corners[0].y).toBeCloseTo(90);
+
+  expect(corners[1].x).toBeCloseTo(100);
+  expect(corners[1].y).toBeCloseTo(90);
+
+  expect(corners[2].x).toBeCloseTo(100);
+  expect(corners[2].y).toBeCloseTo(100);
+
+  expect(corners[3].x).toBeCloseTo(90);
+  expect(corners[3].y).toBeCloseTo(100);
 });
 
 test('Test Text.setRotation', () => {
@@ -310,6 +411,10 @@ AcDbText
 
 
   // create new entity to test text alignment
+  // this should include dxf groupcodes 73 and 72 for vertical and horizontal alignment respectively
+  // and a second alignment point with groupcode 11,21,31 for the text insertion point
+  // bounding rect is 10x10, so second point should be at 100-(10*0.5), 200-(10*0.5) = 95, 195
+
   const centeredText = new Text(text);
   centeredText.horizontalAlignment = 1; // center
   centeredText.verticalAlignment = 2; // middle
