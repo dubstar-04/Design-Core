@@ -28,7 +28,6 @@ export class Text extends Entity {
     this.verticalAlignment = 0;
     this.styleName = 'STANDARD';
 
-
     // hide inherited properties
     // needs to be enumerable=false to not appear in the object props
     Object.defineProperty(this, 'lineType', {
@@ -77,25 +76,23 @@ export class Text extends Entity {
     });
 
     if (data) {
-      if (data.hasOwnProperty('string') || data.hasOwnProperty('1')) {
-        // DXF Groupcode 1 - Default Value
-        // The string of the text entity
-
-        const string = (Property.loadValue([data.string, data[1]], ''));
-        if (string !== undefined) {
-          this.string = String(string);
+      // DXF Groupcode 11,21,31 - Second alignment point (optional, used for aligned, middle, or fit text)
+      if (data?.points?.length > 1) {
+        if (data.points[1].sequence == 11) {
+          this.points = [];
+          this.points.push(new Point(data.points[1].x, data.points[1].y));
         }
       }
 
-      if (data.hasOwnProperty('styleName') || data.hasOwnProperty('7')) {
-        // DXF Groupcode 7 - Text Style Name
-        this.styleName = data.styleName || data[7];
-      }
+      // DXF Groupcode 1 - Text String
+      this.string = (Property.loadValue([data?.string, data?.[1]], ''));
 
-      if (data.hasOwnProperty('height') || data.hasOwnProperty('40')) {
-        // DXF Groupcode 40 - Text Height
-        this.height = Property.loadValue([data.height, data[40]], 2.5);
-      }
+      // DXF Groupcode 7 - Text Style Name
+      this.styleName = (Property.loadValue([data?.styleName, data?.[7]], 'STANDARD'));
+
+
+      // DXF Groupcode 40 - Text Height
+      this.height = Property.loadValue([data.height, data[40]], 2.5);
 
       if (data.hasOwnProperty('rotation') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Text Rotation, angle in degrees
@@ -105,34 +102,31 @@ export class Text extends Entity {
       } else {
         // create points[1] used to determine the text rotation
         if (this.points.length && this.height !== undefined) {
-          this.points[1] = data.points[0].add(new Point(this.height, 0));
+          this.points[1] = this.points[0].add(new Point(this.height, 0));
         }
       }
 
-      if (data.hasOwnProperty('horizontalAlignment') || data.hasOwnProperty('72')) {
-        // DXF Groupcode 72 - Horizontal Alignment
-        // 0 = Left; 1= Center; 2 = Right
-        // 3 = Aligned (if vertical alignment = 0)
-        // 4 = Middle (if vertical alignment = 0)
-        // 5 = Fit (if vertical alignment = 0)
+      // DXF Groupcode 72 - Horizontal Alignment
+      // 0 = Left
+      // 1 = Center
+      // 2 = Right
+      // 3 = Aligned (if vertical alignment = 0) not supported, treated as center aligned
+      // 4 = Middle (if vertical alignment = 0) not supported, treated as center aligned
+      // 5 = Fit (if vertical alignment = 0) not supported, treated as center aligned
+      this.horizontalAlignment = Property.loadValue([data.horizontalAlignment, data[72]], 0);
 
-        this.horizontalAlignment = Property.loadValue([data.horizontalAlignment, data[72]], 0);
+      if (this.horizontalAlignment > 2) {
+        this.horizontalAlignment = 1; // unsupported alignment types treated as center aligned
       }
 
-      if (data.hasOwnProperty('verticalAlignment') || data.hasOwnProperty('73')) {
-        // DXF Groupcode 73 - Vertical Alignment
-        // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
+      // DXF Groupcode 73 - Vertical Alignment
+      // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
+      this.verticalAlignment = Property.loadValue([data.verticalAlignment, data[73]], 0);
 
-        this.verticalAlignment = Property.loadValue([data.verticalAlignment, data[73]], 0);
-      }
-
-      if (data.hasOwnProperty('flags') || data.hasOwnProperty('71')) {
-        // DXF Groupcode 71 - flags (bit-coded values):
-        // 2 = Text is backward (mirrored in X).
-        // 4 = Text is upside down (mirrored in Y).
-
-        this.flags.setFlagValue(Property.loadValue([data.flags, data[71]], 0));
-      }
+      // DXF Groupcode 71 - flags (bit-coded values):
+      // 2 = Text is backward (mirrored in X).
+      // 4 = Text is upside down (mirrored in Y).
+      this.flags.setFlagValue(Property.loadValue([data.flags, data[71]], 0));
     }
   }
 
@@ -375,7 +369,9 @@ export class Text extends Entity {
   draw(ctx, scale) {
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
-    ctx.translate(this.points[0].x, -this.points[0].y);
+    const corners = this.getTextFrameCorners();
+    const bottomLeft = corners[0];
+    ctx.translate(bottomLeft.x, -bottomLeft.y);
 
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
     // style.textHeight
@@ -408,45 +404,14 @@ export class Text extends Entity {
       ctx.setFontSize(this.height);
       ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
       this.boundingRect = ctx.textExtents(String(this.string));
-
-      let x = 0;
-      let y = 0;
-      switch (this.horizontalAlignment) {
-        case 0: // 0 = Left;
-          x = -this.boundingRect.xBearing;
-          break;
-        case 1: // 1= Center;
-          x = -this.boundingRect.xBearing - this.boundingRect.width / 2;
-          break;
-        case 2: // 2 = Right
-          x = -this.boundingRect.xBearing - this.boundingRect.width;
-          break;
-      }
-
-      switch (this.verticalAlignment) {
-        case 0: // 0 = Baseline;
-          y = 0;
-          break;
-        case 1: // 1 = Bottom;
-          y = -this.boundingRect.yBearing - this.boundingRect.height;
-          break;
-        case 2: // 2 = Middle
-          y = -this.boundingRect.yBearing - this.boundingRect.height / 2;
-          break;
-        case 3: // 3 = Top
-          y = -this.boundingRect.yBearing;
-          break;
-      }
-
-
-      ctx.moveTo(x, y);
       ctx.showText(String(this.string));
     }
+
     ctx.stroke();
     ctx.restore(); // restore context before scale and translate
 
     /*
-    // debug draw the arcText bounding box
+    // debug draw the bounding box
     const bb = this.boundingBox();
     ctx.moveTo(bb.xMin, bb.yMin);
     ctx.lineTo(bb.xMax, bb.yMin);
@@ -476,17 +441,31 @@ export class Text extends Entity {
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
-    file.writeGroupCode('10', this.points[0].x);
-    file.writeGroupCode('20', this.points[0].y);
+
+    const frameCorners = this.getTextFrameCorners();
+    const bottomLeft = frameCorners[0];
+
+    file.writeGroupCode('10', bottomLeft.x);
+    file.writeGroupCode('20', bottomLeft.y);
     file.writeGroupCode('30', '0.0');
+
     file.writeGroupCode('40', this.height);
     file.writeGroupCode('1', this.string);
     file.writeGroupCode('50', this.rotation);
     // file.writeGroupCode('7', 'STANDARD'); // TEXT STYLE
     file.writeGroupCode('71', this.flags.getFlagValue()); // Text generation flags
     file.writeGroupCode('72', this.horizontalAlignment); // Horizontal alignment
+
+    if (this.horizontalAlignment > 0 || this.verticalAlignment > 0) {
+      file.writeGroupCode('11', this.points[0].x);
+      file.writeGroupCode('21', this.points[0].y);
+      file.writeGroupCode('31', '0.0');
+    }
+
     file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);
-    file.writeGroupCode('73', this.verticalAlignment); // Vertical alignment
+    if (this.verticalAlignment !== 0) {
+      file.writeGroupCode('73', this.verticalAlignment); // Vertical alignment
+    }
   }
 
   /**
@@ -499,6 +478,12 @@ export class Text extends Entity {
     const frameCorners = this.getTextFrameCorners();
     const mid = frameCorners[0].midPoint(frameCorners[2]);
     const snaps = [...frameCorners, mid];
+
+    // add insertion point if not already in snaps
+    // this adds an extra snap point when alignment != 0.
+    if (!snaps.some((point) => point.isSame(this.points[0]))) {
+      snaps.push(this.points[0]);
+    }
 
     return snaps;
   }
@@ -531,11 +516,56 @@ export class Text extends Entity {
    */
   getTextFrameCorners() {
     const rect = this.getBoundingRect();
-    // calculate corners before rotation accounting for backwards and upsideDown text
-    const xmin = Math.min(rect.x, this.backwards ? rect.x - rect.width : rect.x + rect.width);
-    const xmax = Math.max(rect.x, this.backwards ? rect.x - rect.width : rect.x + rect.width);
-    const ymin = Math.min(rect.y, this.upsideDown ? rect.y - rect.height : rect.y + rect.height);
-    const ymax = Math.max(rect.y, this.upsideDown ? rect.y - rect.height : rect.y + rect.height);
+
+    let offsetX = 0;
+    switch (this.horizontalAlignment) {
+      case 0: // left
+        offsetX = 0;
+        break;
+      case 1: // center
+        offsetX = -rect.width / 2;
+        break;
+      case 2: // right
+        offsetX = -rect.width;
+        break;
+      case 3: // aligned - not supported
+      case 4: // middle - not supported
+      case 5: // fit - not supported
+      default:
+        offsetX = 0;
+    }
+
+    let offsetY = 0;
+    switch (this.verticalAlignment) {
+      case 0: // baseline
+        offsetY = 0;
+        break;
+      case 1: // bottom
+        offsetY = -rect.height;
+        break;
+      case 2: // middle
+        offsetY = -rect.height / 2;
+        break;
+      case 3: // top
+        offsetY = -rect.height;
+        break;
+      default:
+        offsetY = 0;
+    }
+
+    // apply offsets to insertion point
+    const x0 = rect.x + offsetX;
+    const y0 = rect.y + offsetY;
+
+    // console.log('Text frame offsets:', offsetX, offsetY);
+    // console.log('Text frame position:', x0, y0);
+    // console.log('Text rect:', rect.x, rect.y);
+
+    // compute min/max depending on backwards/upsideDown (text direction)
+    const xmin = Math.min(x0, this.backwards ? x0 - rect.width : x0 + rect.width);
+    const xmax = Math.max(x0, this.backwards ? x0 - rect.width : x0 + rect.width);
+    const ymin = Math.min(y0, this.upsideDown ? y0 - rect.height : y0 + rect.height);
+    const ymax = Math.max(y0, this.upsideDown ? y0 - rect.height : y0 + rect.height);
 
     let bottomLeft = new Point(xmin, ymin);
     let bottomRight = new Point(xmax, ymin);
