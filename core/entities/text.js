@@ -77,7 +77,7 @@ export class Text extends Entity {
 
     if (data) {
       // DXF Groupcode 11,21,31 - Second alignment point (optional, used for aligned, middle, or fit text)
-      if (data.points.length > 1) {
+      if (data?.points?.length > 1) {
         if (data.points[1].sequence == 11) {
           this.points = [];
           this.points.push(new Point(data.points[1].x, data.points[1].y));
