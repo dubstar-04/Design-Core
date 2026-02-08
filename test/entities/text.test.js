@@ -298,8 +298,6 @@ AcDbText
 0
 100
 AcDbText
-73
-0
 `;
 
   expect(file.contents).toEqual(dxfString);
