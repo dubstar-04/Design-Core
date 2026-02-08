@@ -307,6 +307,55 @@ AcDbText
   file = new File();
   newText.dxf(file);
   expect(file.contents).toEqual(dxfString);
+
+
+  // create new entity to test text alignment
+  const centeredText = new Text(text);
+  centeredText.horizontalAlignment = 1; // center
+  centeredText.verticalAlignment = 2; // middle
+  file = new File();
+  centeredText.dxf(file);
+
+  const dxfCenteredString = `0
+TEXT
+5
+1
+100
+AcDbEntity
+8
+0
+100
+AcDbText
+10
+95
+20
+195
+30
+0.0
+40
+2.5
+1
+
+50
+0
+71
+0
+72
+1
+11
+100
+21
+200
+31
+0.0
+100
+AcDbText
+73
+2
+`;
+
+
+  expect(file.contents).toEqual(dxfCenteredString);
 });
 
 test('Text constructor covers all property branches', () => {
