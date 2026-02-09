@@ -562,10 +562,6 @@ export class Text extends Entity {
     const x0 = rect.x + offsetX;
     const y0 = rect.y + offsetY;
 
-    // console.log('Text frame offsets:', offsetX, offsetY);
-    // console.log('Text frame position:', x0, y0);
-    // console.log('Text rect:', rect.x, rect.y);
-
     // compute min/max depending on backwards/upsideDown (text direction)
     const xmin = Math.min(x0, this.backwards ? x0 - rect.width : x0 + rect.width);
     const xmax = Math.max(x0, this.backwards ? x0 - rect.width : x0 + rect.width);
