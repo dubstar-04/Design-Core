@@ -383,6 +383,8 @@ export class Text extends Entity {
     ctx.rotate(-rotation);
 
     if (this.upsideDown) {
+      const upsideDownOffset = corners[0].distance(corners[3]);
+      ctx.translate(0, -upsideDownOffset);
       ctx.scale(1, -1);
     }
 
