@@ -16,6 +16,8 @@ export class DXFWriter {
     file.writeGroupCode('2', 'HEADER');
     file.writeGroupCode('9', '$ACADVER');
     file.writeGroupCode('1', file.version);
+    file.writeGroupCode('9', '$TEXTSTYLE');
+    file.writeGroupCode('7', DesignCore.StyleManager.getCstyle());
     file.writeGroupCode('9', '$CLAYER');
     file.writeGroupCode('8', DesignCore.LayerManager.getCstyle());
     file.writeGroupCode('9', '$DIMSTYLE');
