@@ -76,10 +76,6 @@ test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) =
 
   await hatch.execute();
 
-  console.log(hatch);
-
-  console.log(hatch.childEntities[0].points);
-
   expect(hatch.childEntities.length).toBe(1);
 
   expect(hatch.childEntities[0].points.length).toBe(pointCount); // closed polyline adds extra point
