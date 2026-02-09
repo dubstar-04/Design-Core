@@ -210,6 +210,7 @@ export class Text extends Entity {
           points: this.points,
           height: this.height,
           rotation: this.rotation,
+          styleName: this.styleName,
           string: DesignCore.CommandLine.command,
         };
 
