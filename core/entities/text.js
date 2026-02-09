@@ -368,6 +368,10 @@ export class Text extends Entity {
    * @param {number} scale
    */
   draw(ctx, scale) {
+    if (this.string.length === 0) {
+      return;
+    }
+
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
     const corners = this.getTextFrameCorners();
