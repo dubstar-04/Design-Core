@@ -389,6 +389,8 @@ export class Text extends Entity {
     }
 
     if (this.backwards) {
+      const backwardsOffset = corners[0].distance(corners[1]);
+      ctx.translate(backwardsOffset, 0);
       ctx.scale(-1, 1);
     }
 
