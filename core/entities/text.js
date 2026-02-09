@@ -379,7 +379,8 @@ export class Text extends Entity {
     ctx.translate(bottomLeft.x, -bottomLeft.y);
 
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
-    // style.textHeight
+    const rotation = Utils.degrees2radians(this.rotation);
+    ctx.rotate(-rotation);
 
     if (this.upsideDown) {
       ctx.scale(1, -1);
@@ -387,14 +388,6 @@ export class Text extends Entity {
 
     if (this.backwards) {
       ctx.scale(-1, 1);
-    }
-
-    const rotation = Utils.degrees2radians(this.rotation);
-
-    if (this.backwards || this.upsideDown) {
-      ctx.rotate(rotation);
-    } else {
-      ctx.rotate(-rotation);
     }
 
     try { // HTML
