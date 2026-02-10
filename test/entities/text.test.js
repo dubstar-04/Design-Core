@@ -458,8 +458,12 @@ AcDbText
 73
 2
 `;
+  expect(file.contents).toEqual(dxfCenteredString);
 
-
+  // create new entity from entity data to ensure all props are loaded
+  const importCenteredText = new Text(centeredText);
+  file = new File();
+  importCenteredText.dxf(file);
   expect(file.contents).toEqual(dxfCenteredString);
 });
 
