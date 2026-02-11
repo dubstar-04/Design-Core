@@ -397,7 +397,7 @@ export class Text extends Entity {
     try { // HTML
       ctx.textAlign = this.getHorizontalAlignment();
       ctx.textBaseline = this.getVerticalAlignment();
-      ctx.font = this.height + 'pt Arial'; // TODO: use style.font
+      ctx.font = this.height + 'pt Arial';
       ctx.fillText(this.string, 0, 0);
       this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
@@ -411,7 +411,14 @@ export class Text extends Entity {
       ctx.setFontSize(this.height);
       const drawTextRect = ctx.textExtents(String(this.string));
 
-      // TODO: find a better way
+      /* GJS Cairo needs additional support for font handling
+      https://www.cairographics.org/tutorial/#L1understandingtext
+      https://www.cairographics.org/manual/cairo-cairo-scaled-font-t.html#cairo-font-extents-t
+
+      This needs to be implemented in GJS:
+      https://gitlab.gnome.org/GNOME/gjs/-/blob/master/modules/cairo-context.cpp?ref_type=heads#L773
+      https://gitlab.gnome.org/GNOME/gjs/-/blob/master/modules/cairo-context.cpp?ref_type=heads#L780
+      */
       // Adjust the font size by the ratio of the desired height to the drawn height to get closer to the desired text height.
       ctx.setFontSize(this.height * this.height / drawTextRect.height);
       this.boundingRect = ctx.textExtents(String(this.string));
@@ -550,10 +557,10 @@ export class Text extends Entity {
     let offsetY = 0;
     switch (this.verticalAlignment) {
       case 0: // baseline
-        offsetY = 0;
+        offsetY = 0; // see comments in draw method
         break;
       case 1: // bottom
-        offsetY = -rect.height;
+        offsetY = 0;
         break;
       case 2: // middle
         offsetY = -rect.height / 2;
