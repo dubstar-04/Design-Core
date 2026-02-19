@@ -64,6 +64,14 @@ export class DXF {
   loadHeader() {
     const header = this.reader.header;
 
+    if (header.hasOwnProperty('$TEXTSTYLE')) {
+      const cstyle = header['$TEXTSTYLE'];
+      if (cstyle.hasOwnProperty('7')) {
+        const styleName = cstyle['7'];
+        DesignCore.StyleManager.setCstyle(styleName);
+      }
+    }
+
     if (header.hasOwnProperty('$CLAYER')) {
       const clayer = header['$CLAYER'];
       if (clayer.hasOwnProperty('8')) {

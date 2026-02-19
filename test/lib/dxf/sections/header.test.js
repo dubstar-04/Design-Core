@@ -32,7 +32,15 @@ $EXTMAX
 300
  30
 0.0
+9
+$TEXTSTYLE
+  7
+Standard
   9
+$CLAYER
+  8
+0
+  0
 ENDSEC
 0
 EOF`;
@@ -43,7 +51,7 @@ const header = new Header();
 header.read(iterator);
 
 test('Test Header.read', () => {
-  expect(Object.keys(header)).toHaveLength(5);
+  expect(Object.keys(header)).toHaveLength(6);
   // check the entity type
   expect(header).toHaveProperty('$ACADVER');
   expect(header['$ACADVER']).toHaveProperty('1', 'AC1009');
@@ -59,4 +67,10 @@ test('Test Header.read', () => {
   expect(header['$EXTMIN'].points[0]).toHaveProperty('x', 100);
   expect(header['$EXTMIN'].points[0]).toHaveProperty('y', 100);
   expect(header['$EXTMIN'].points[0]).toHaveProperty('z', 100);
+
+  expect(header).toHaveProperty('$TEXTSTYLE');
+  expect(header['$TEXTSTYLE']).toHaveProperty('7', 'Standard');
+
+  expect(header).toHaveProperty('$CLAYER');
+  expect(header['$CLAYER']).toHaveProperty('8', '0');
 });

@@ -79,7 +79,6 @@ describe('EntityManager', () => {
     mgr.add(l2);
 
     const found = mgr.find('Line', 'lineWidth', 5);
-    console.log('FOUND:', found);
     expect(found).toEqual([0]);
 
     const anyFound = mgr.find('ANY', 'lineWidth', 2);
