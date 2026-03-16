@@ -395,8 +395,6 @@ export class Text extends Entity {
     }
 
     try { // HTML
-      ctx.textAlign = this.getHorizontalAlignment();
-      ctx.textBaseline = this.getVerticalAlignment();
       ctx.font = this.height + 'pt ' + style.font;
       ctx.fillText(this.string, 0, 0);
       // TODO: find a better way to define the boundingRect
