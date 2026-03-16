@@ -399,9 +399,9 @@ export class Text extends Entity {
       ctx.textBaseline = this.getVerticalAlignment();
       ctx.font = this.height + 'pt Arial';
       ctx.fillText(this.string, 0, 0);
-      this.boundingRect = ctx.measureText(String(this.string));
       // TODO: find a better way to define the boundingRect
-      this.boundingRect.height = this.height;
+      const metrics = ctx.measureText(String(this.string));
+      this.boundingRect = { width: metrics.width, height: this.height };
     } catch { // Cairo
       ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
 
