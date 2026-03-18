@@ -467,6 +467,9 @@ export class Hatch extends Entity {
     }
 
     const boundingBox = shape.boundingBox();
+    const centerPoint = boundingBox.centerPoint;
+    const bbXLength = boundingBox.xLength;
+    const bbYLength = boundingBox.yLength;
 
     const pattern = Patterns.getPattern(this.patternName);
     pattern.forEach((patternLine) => {
@@ -480,12 +483,13 @@ export class Hatch extends Entity {
 
       // define dashlength - i.e. the length of each dash summed
       // where there is no dash defined use half the boundingbox xlength
-      let dashLength = boundingBox.xLength / 2;
+      let dashLength = bbXLength / 2;
       if (patternLine.dashes.length) {
         dashLength = patternLine.getDashLength();
       }
 
-      let dashes = patternLine.dashes;
+      // copy dashes to avoid mutating the pattern line
+      let dashes = [...patternLine.dashes];
       let dashOffset = 0;
 
       if (dashes[0] < 0) {
@@ -500,29 +504,31 @@ export class Hatch extends Entity {
       try {
         ctx.setLineDash(dashes, 0);
         ctx.lineWidth = (1 / scale / this.scale);
+        ctx.beginPath();
       } catch { // Cairo
         ctx.setDash(dashes, 0);
         ctx.setLineWidth(1 / scale / this.scale);
+        ctx.newPath();
       }
 
-
       const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
-      const centerPoint = boundingBox.centerPoint;
 
       // TODO: Optimise the size of the hatch to reduce drawing
-      const hatchSize = Math.max(boundingBox.xLength, boundingBox.yLength, dashLength) / this.scale;
+      const hatchSize = Math.max(bbXLength, bbYLength, dashLength) / this.scale;
       const xIncrement = Math.abs(Math.ceil((hatchSize) / dashLength));
       const yIncrement = Math.abs(Math.ceil((hatchSize) / patternLine.yDelta));
 
+      // Set transform once for all lines in this pattern line family
+      ctx.save();
+      // translate to the center of the shape
+      // apply the origin offsets without rotation
+      ctx.translate(centerPoint.x + patternLine.xOrigin * this.scale, centerPoint.y + patternLine.yOrigin * this.scale);
+      // scale the context
+      ctx.scale(this.scale, this.scale);
+      // rotate the context
+      ctx.rotate(rotation);
+
       for (let i = -yIncrement; i < yIncrement; i++) {
-        ctx.save();
-        // translate to the center of the shape
-        // apply the origin offsets without rotation
-        ctx.translate(centerPoint.x + patternLine.xOrigin * this.scale, centerPoint.y + patternLine.yOrigin * this.scale);
-        // scale the context
-        ctx.scale(this.scale, this.scale);
-        // rotate the context
-        ctx.rotate(rotation);
         // apply the deltaX offset for odd iterations
         // define offsets for the current iteration
         const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
@@ -530,10 +536,10 @@ export class Hatch extends Entity {
 
         ctx.moveTo(-xOffset + dashOffset, yOffset);
         ctx.lineTo(xOffset, yOffset);
-
-        ctx.stroke();
-        ctx.restore();
       }
+
+      ctx.stroke();
+      ctx.restore();
     });
   }
 
