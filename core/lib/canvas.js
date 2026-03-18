@@ -318,7 +318,8 @@ export class Canvas {
    * @param {Object} context - scene painting context from ui
    * @param {Object} block - insert or dimension element for the current block, required for colour ByBlock
    */
-  setContext(item, context, block = undefined, scale = this.getScale()) {
+  setContext(item, context, block = undefined) {
+    const scale = this.getScale();
     let colour = item.getDrawColour();
     const lineType = item.getLineType();
     let lineWidth = item.lineWidth / scale;
