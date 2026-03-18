@@ -264,39 +264,49 @@ export class Canvas {
 
     this.paintGrid(context, width, height);
 
+    const scale = this.getScale();
+
     // Paint the primary scene items
     this.paintState = this.paintStates.ENTITIES;
-    for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
-      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).layer);
+
+    const entityCount = DesignCore.Scene.entities.count();
+    for (let i = 0; i < entityCount; i++) {
+      const entity = DesignCore.Scene.entities.get(i);
+      const layer = DesignCore.LayerManager.getItemByName(entity.layer);
 
       if (!layer?.isVisible) {
         continue;
       }
 
-      this.setContext(DesignCore.Scene.entities.get(i), context);
-      DesignCore.Scene.entities.get(i).draw(context, this.getScale());
+      this.setContext(entity, context, undefined, scale);
+      entity.draw(context, scale);
     }
 
     // Paint the temporary scene items
     this.paintState = this.paintStates.TEMPORARY;
-    for (let j = 0; j < DesignCore.Scene.tempEntities.count(); j++) {
-      this.setContext(DesignCore.Scene.tempEntities.get(j), context);
-      DesignCore.Scene.tempEntities.get(j).draw(context, this.getScale());
+    const tempCount = DesignCore.Scene.tempEntities.count();
+    for (let j = 0; j < tempCount; j++) {
+      const entity = DesignCore.Scene.tempEntities.get(j);
+      this.setContext(entity, context, undefined, scale);
+      entity.draw(context, scale);
     }
 
     // Paint the selected scene items
     this.paintState = this.paintStates.SELECTED;
-    for (let k = 0; k < DesignCore.Scene.selectionManager.selectedItems.length; k++) {
-      this.setContext(DesignCore.Scene.selectionManager.selectedItems[k], context);
-      DesignCore.Scene.selectionManager.selectedItems[k].draw(context, this.getScale());
+    const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
+    for (let k = 0; k < selectedItems.length; k++) {
+      const entity = selectedItems[k];
+      this.setContext(entity, context, undefined, scale);
+      entity.draw(context, scale);
     }
 
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
     this.paintState = this.paintStates.AUXILLARY;
-    for (let l = 0; l < DesignCore.Scene.auxiliaryEntities.count(); l++) {
-      DesignCore.Scene.auxiliaryEntities.get(l).draw(context, this.getScale());
+    const auxCount = DesignCore.Scene.auxiliaryEntities.count();
+    for (let l = 0; l < auxCount; l++) {
+      DesignCore.Scene.auxiliaryEntities.get(l).draw(context, scale);
     }
 
     this.paintState = undefined;
@@ -309,17 +319,18 @@ export class Canvas {
    * @param {Object} block - insert or dimension element for the current block, required for colour ByBlock
    */
   setContext(item, context, block = undefined) {
+    const scale = this.getScale();
     let colour = item.getDrawColour();
     const lineType = item.getLineType();
-    let lineWidth = item.lineWidth / this.getScale();
+    let lineWidth = item.lineWidth / scale;
 
     if (this.paintState === this.paintStates.SELECTED) {
       // Set Context for selected items
       colour = DesignCore.Core.settings.selecteditemscolour;
-      lineWidth = (item.lineWidth * 2) / this.getScale();
+      lineWidth = (item.lineWidth * 2) / scale;
     } else if (this.paintState === this.paintStates.TEMPORARY) {
       // Set context for temp items
-      lineWidth = (item.lineWidth * 2) / this.getScale();
+      lineWidth = (item.lineWidth * 2) / scale;
     }
 
     if (block && this.paintState != this.paintStates.SELECTED) {
@@ -333,12 +344,12 @@ export class Canvas {
       context.strokeStyle = Colours.rgbToString(colour);
       context.fillStyle = Colours.rgbToString(colour);
       context.lineWidth = lineWidth;
-      context.setLineDash(lineType.getPattern(this.getScale()));
+      context.setLineDash(lineType.getPattern(scale));
       context.beginPath();
     } catch { // Cairo
       const rgbColour = Colours.rgbToScaledRGB(colour);
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-      context.setDash(lineType.getPattern(this.getScale()), 1);
+      context.setDash(lineType.getPattern(scale), 1);
       context.setLineWidth(lineWidth);
     }
   }
