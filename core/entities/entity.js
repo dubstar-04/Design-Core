@@ -42,6 +42,8 @@ export class Entity {
     this.lineType = 'ByLayer';
     this.layer = '0';
 
+    // DXF Groupcode 5 - Handle
+    this.handle = Property.loadValue([data?.handle, data?.[5]]);
 
     if (data) {
       if (data.hasOwnProperty('points')) {

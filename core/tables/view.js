@@ -1,4 +1,5 @@
 import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Property } from '../properties/property.js';
 
 /** View Class */
 export class View {
@@ -8,6 +9,9 @@ export class View {
    */
   constructor(data) {
     this.name = '';
+
+    // DXF Groupcode 5 - Handle
+    this.handle = Property.loadValue([data?.handle, data?.[5]]);
 
     if (data) {
       if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {

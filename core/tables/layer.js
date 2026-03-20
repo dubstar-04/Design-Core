@@ -37,6 +37,9 @@ export class Layer {
       writable: true,
     });
 
+    // DXF Groupcode 5 - Handle
+    this.handle = Property.loadValue([data?.handle, data?.[5]]);
+
     if (data) {
       if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
         // DXF Groupcode 2 - Layer Name

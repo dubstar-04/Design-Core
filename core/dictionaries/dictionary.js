@@ -8,6 +8,8 @@ export class Dictionary {
    * @param {Object} data
    */
   constructor(data) {
+    // DXF Groupcode 5 - Handle
+    this.handle = Property.loadValue([data?.handle, data?.[5]]);
     this.name = Property.loadValue([data?.name, data?.[3]], '');
     this.duplicateRecordCloning = Property.loadValue([data?.duplicateRecordCloning, data?.[281]], 1);
     this.entries = Property.loadValue([data?.entries], []);
