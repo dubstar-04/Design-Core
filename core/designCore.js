@@ -153,6 +153,13 @@ export class DesignCore {
   }
 
   /**
+   * Get the DictionaryManager
+   */
+  static get DictionaryManager() {
+    return DesignCore.Core.dictionaryManager;
+  }
+
+  /**
    * Get the property manager
    */
   static get PropertyManager() {
