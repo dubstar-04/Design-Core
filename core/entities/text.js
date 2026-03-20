@@ -453,7 +453,7 @@ export class Text extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'TEXT');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);

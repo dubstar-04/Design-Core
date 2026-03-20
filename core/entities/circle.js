@@ -119,7 +119,7 @@ export class Circle extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'CIRCLE');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbCircle', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);

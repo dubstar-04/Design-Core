@@ -20,7 +20,7 @@ export class View {
    */
   dxf(file) {
     file.writeGroupCode('0', 'VIEW', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbViewTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name, DXFFile.Version.R2000);

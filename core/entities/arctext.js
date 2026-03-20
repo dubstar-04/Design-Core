@@ -516,7 +516,7 @@ export class ArcAlignedText extends Entity {
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
 
     file.writeGroupCode('0', 'ARCALIGNEDTEXT');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbArcAlignedText', DXFFile.Version.R2000);
