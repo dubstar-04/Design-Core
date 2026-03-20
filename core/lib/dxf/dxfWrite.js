@@ -54,53 +54,14 @@ export class DXFWriter {
     // vport table
     DesignCore.Scene.dxf(file);
 
-    // VIEW Table
-    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'VIEW', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
-
-    // UCS TABLE
-    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'UCS', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
-
-    // APPID Table
-    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'APPID', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('0', 'APPID', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbRegAppTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'ACAD', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '0', DXFFile.Version.R2000);
-    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
-
-    // BLOCK_RECORD Table
-    file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'BLOCK_RECORD', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '2', DXFFile.Version.R2000);
-
-    for (let i = 0; i < DesignCore.Scene.blockManager.items.length; i++) {
-      file.writeGroupCode('0', 'BLOCK_RECORD', DXFFile.Version.R2000);
-      file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-      file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
-      file.writeGroupCode('100', 'AcDbBlockTableRecord', DXFFile.Version.R2000);
-      file.writeGroupCode('2', DesignCore.Scene.blockManager.items[i].name, DXFFile.Version.R2000);
-      file.writeGroupCode('340', '0', DXFFile.Version.R2000);
-      // file.writeGroupCode('70', '4', DXFFile.Version.R2000); // Insertion Units
-      // file.writeGroupCode('280', '0', DXFFile.Version.R2000); // Explodeability
-      // file.writeGroupCode('281', '0', DXFFile.Version.R2000); // Scaleability
-    }
-
-    file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
+    // view table
+    DesignCore.ViewManager.dxf(file);
+    // ucs table
+    DesignCore.UCSManager.dxf(file);
+    // appid table
+    DesignCore.AppIDManager.dxf(file);
+    // block record table
+    DesignCore.BlockRecordManager.dxf(file);
 
     // end tables section
     file.writeGroupCode('0', 'ENDSEC');

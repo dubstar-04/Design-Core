@@ -15,13 +15,9 @@ export class BlockManager extends TableManagerBase {
     this.indelibleItems.push('*Model_Space', '*Paper_Space');
   }
 
-  /**
-   * Create a new block
-   * @param {Object} block
-   * @return {Object}
-   */
-  createItem(block) {
-    return new Block(block);
+  /** Get the item class */
+  get itemClass() {
+    return Block;
   }
 
   /**

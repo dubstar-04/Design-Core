@@ -7,7 +7,9 @@ import { TableManagerBase } from './tableManagerBase.js';
  * @extends TableManagerBase
  */
 export class StyleManagerBase extends TableManagerBase {
-  /** Create Style Manager */
+  /**
+   * Create Style Manager
+   */
   constructor() {
     super();
 

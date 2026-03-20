@@ -15,13 +15,9 @@ export class DimStyleManager extends StyleManagerBase {
     this.itemProperty = 'dimensionStyle';
   }
 
-  /**
- * Create a new DimStyle
- * @param {Object} style
- * @return {Object}
- */
-  createItem(style) {
-    return new DimStyle(style);
+  /** Get the item class */
+  get itemClass() {
+    return DimStyle;
   }
 
   /**

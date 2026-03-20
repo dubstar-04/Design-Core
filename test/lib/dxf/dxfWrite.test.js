@@ -19,6 +19,10 @@ const createCoreMock = (options = {}) => {
     ltypeManager: options.ltypeManager || createManager('Continuous'),
     styleManager: options.styleManager || createManager('Standard'),
     dimStyleManager: options.dimStyleManager || createManager('ISO-25'),
+    viewManager: options.viewManager || { dxf: jest.fn() },
+    ucsManager: options.ucsManager || { dxf: jest.fn() },
+    appIdManager: options.appIdManager || { dxf: jest.fn() },
+    blockRecordManager: options.blockRecordManager || { dxf: jest.fn() },
     scene: {
       dxf: jest.fn(),
       entities: {
@@ -84,11 +88,12 @@ describe('DXFWriter', () => {
     expect(core.styleManager.dxf).toHaveBeenCalledWith(file);
     expect(core.dimStyleManager.dxf).toHaveBeenCalledWith(file);
     expect(core.scene.dxf).toHaveBeenCalledWith(file);
+    expect(core.viewManager.dxf).toHaveBeenCalledWith(file);
+    expect(core.ucsManager.dxf).toHaveBeenCalledWith(file);
+    expect(core.appIdManager.dxf).toHaveBeenCalledWith(file);
+    expect(core.blockRecordManager.dxf).toHaveBeenCalledWith(file);
 
     expect(file.contents).toContain('0\nSECTION\n2\nTABLES\n');
-    expect(file.contents).toContain('2\nBLOCK_RECORD\n');
-    expect(file.contents).toContain('2\nBlockOne\n');
-    expect(file.contents).toContain('2\nBlockTwo\n');
     expect(file.contents).toContain('0\nENDSEC\n');
   });
 

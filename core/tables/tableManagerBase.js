@@ -6,13 +6,25 @@ import { Logging } from '../lib/logging.js';
  * Table Manager Base Class
  */
 export class TableManagerBase {
-  /** Create a Table Manager */
+  /**
+   * Create a Table Manager
+   */
   constructor() {
     this.items = [];
     this.addStandardItems();
 
     // list of mandatory items that cannot be deleted
     this.indelibleItems = [];
+  }
+
+  /**
+   * Create a new typed item
+   * @param {Object} data
+   * @return {Object}
+   */
+  createItem(data) {
+    const ItemClass = this.itemClass;
+    return new ItemClass(data);
   }
 
   /**

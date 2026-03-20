@@ -16,13 +16,9 @@ export class StyleManager extends StyleManagerBase {
     this.itemProperty = 'style';
   }
 
-  /**
-   * Create a new Style
-   * @param {Object} style
-   * @return {Object}
-   */
-  createItem(style) {
-    return new Style(style);
+  /** Get the item class */
+  get itemClass() {
+    return Style;
   }
 
   /** Add standard text styles */
