@@ -7,6 +7,10 @@ import { LayerManager } from '../tables/layerManager.js';
 import { LTypeManager } from '../tables/ltypeManager.js';
 import { StyleManager } from '../tables/styleManager.js';
 import { DimStyleManager } from '../tables/dimStyleManager.js';
+import { ViewManager } from '../tables/viewManager.js';
+import { UCSManager } from '../tables/ucsManager.js';
+import { AppIDManager } from '../tables/appIdManager.js';
+import { BlockRecordManager } from '../tables/blockRecordManager.js';
 import { PropertyManager } from '../properties/propertyManager.js';
 import { Clipboard } from '../lib/clipboard.js';
 
@@ -32,6 +36,10 @@ export class Core {
     this.ltypeManager = new LTypeManager();
     this.styleManager = new StyleManager();
     this.dimStyleManager = new DimStyleManager();
+    this.viewManager = new ViewManager();
+    this.ucsManager = new UCSManager();
+    this.appIdManager = new AppIDManager();
+    this.blockRecordManager = new BlockRecordManager();
     this.propertyManager = new PropertyManager();
     this.clipboard = new Clipboard();
 
