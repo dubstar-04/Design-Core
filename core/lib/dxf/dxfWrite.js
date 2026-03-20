@@ -119,16 +119,9 @@ export class DXFWriter {
     // Dictionary
     file.writeGroupCode('0', 'SECTION', DXFFile.Version.R2000);
     file.writeGroupCode('2', 'OBJECTS', DXFFile.Version.R2000);
-    file.writeGroupCode('0', 'DICTIONARY', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbDictionary', DXFFile.Version.R2000);
-    file.writeGroupCode('281', '1', DXFFile.Version.R2000);
-    file.writeGroupCode('3', 'ACAD_GROUP', DXFFile.Version.R2000);
-    file.writeGroupCode('350', 'D', DXFFile.Version.R2000);
-    file.writeGroupCode('0', 'DICTIONARY', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbDictionary', DXFFile.Version.R2000);
-    file.writeGroupCode('281', '1', DXFFile.Version.R2000);
+
+    DesignCore.DictionaryManager.dxf(file);
+
     file.writeGroupCode('0', 'ENDSEC', DXFFile.Version.R2000);
 
     // write end of file
