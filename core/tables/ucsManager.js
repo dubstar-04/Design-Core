@@ -14,6 +14,7 @@ export class UCSManager extends TableManagerBase {
     this.itemProperty = 'ucs';
   }
 
+  /** Get the item class */
   get itemClass() {
     return UCS;
   }

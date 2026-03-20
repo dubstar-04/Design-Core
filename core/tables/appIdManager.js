@@ -15,6 +15,7 @@ export class AppIDManager extends TableManagerBase {
     this.itemProperty = 'appid';
   }
 
+  /** Get the item class */
   get itemClass() {
     return AppID;
   }

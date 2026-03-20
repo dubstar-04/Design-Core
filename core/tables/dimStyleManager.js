@@ -15,6 +15,7 @@ export class DimStyleManager extends StyleManagerBase {
     this.itemProperty = 'dimensionStyle';
   }
 
+  /** Get the item class */
   get itemClass() {
     return DimStyle;
   }
