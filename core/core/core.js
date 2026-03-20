@@ -18,6 +18,7 @@ import { Clipboard } from '../lib/clipboard.js';
 import { FileIO } from '../lib/fileio.js';
 import { Settings } from '../lib/settings.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Handle } from '../lib/dxf/handle.js';
 import { Logging } from '../lib/logging.js';
 
 import { DesignCore } from '../designCore.js';
@@ -45,6 +46,7 @@ export class Core {
     this.propertyManager = new PropertyManager();
     this.clipboard = new Clipboard();
 
+    this.handle = new Handle();
     this.settings = new Settings();
 
     // function to call external notification command for the ui

@@ -167,6 +167,13 @@ export class DesignCore {
   }
 
   /**
+   * Get the Handle
+   */
+  static get Handle() {
+    return DesignCore.Core.handle;
+  }
+
+  /**
    * Get the property manager
    */
   static get Settings() {
