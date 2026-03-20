@@ -1,6 +1,6 @@
-/** Handle Class */
-export class Handle {
-  /** Create Handle */
+/** HandleManager Class */
+export class HandleManager {
+  /** Create HandleManager */
   constructor() {
     this.counter = 10;
   }
