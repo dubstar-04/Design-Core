@@ -8,6 +8,7 @@ import { BoundingBox } from '../lib/boundingBox.js';
 import { Point } from './point.js';
 import { Line } from './line.js';
 import { Arc } from './arc.js';
+import { Vertex } from './vertex.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
 
@@ -205,16 +206,11 @@ export class BasePolyline extends Entity {
    */
   vertices(file) {
     for (let i = 0; i < this.points.length; i++) {
-      file.writeGroupCode('0', 'VERTEX');
-      file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
-      file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-      file.writeGroupCode('100', 'AcDbVertex', DXFFile.Version.R2000);
-      file.writeGroupCode('100', 'AcDb2dVertex', DXFFile.Version.R2000);
-      file.writeGroupCode('8', this.layer);
-      file.writeGroupCode('10', this.points[i].x); // X
-      file.writeGroupCode('20', this.points[i].y); // Y
-      file.writeGroupCode('30', '0.0');
-      file.writeGroupCode('42', this.points[i].bulge);
+      const vertex = new Vertex({
+        points: [this.points[i]],
+        layer: this.layer,
+      });
+      vertex.dxf(file);
     }
   }
 
