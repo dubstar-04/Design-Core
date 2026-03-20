@@ -23,6 +23,7 @@ const createCoreMock = (options = {}) => {
     ucsManager: options.ucsManager || { dxf: jest.fn() },
     appIdManager: options.appIdManager || { dxf: jest.fn() },
     blockRecordManager: options.blockRecordManager || { dxf: jest.fn() },
+    dictionaryManager: options.dictionaryManager || { dxf: jest.fn() },
     scene: {
       dxf: jest.fn(),
       entities: {
@@ -163,7 +164,7 @@ describe('DXFWriter', () => {
     const output = writer.write('R2018');
 
     expect(output).toContain('2\nOBJECTS\n');
-    expect(output).toContain('0\nDICTIONARY\n');
+    expect(core.dictionaryManager.dxf).toHaveBeenCalled();
     expect(output).toContain('0\nEOF\n');
   });
 });
