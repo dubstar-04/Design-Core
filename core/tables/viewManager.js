@@ -14,13 +14,9 @@ export class ViewManager extends TableManagerBase {
     this.itemProperty = 'view';
   }
 
-  /**
-   * Create a new view item
-   * @param {Object} item
-   * @return {Object}
-   */
-  createItem(item) {
-    return new View(item);
+  /** @return {typeof View} */
+  get itemClass() {
+    return View;
   }
 
   /** Add standard items */

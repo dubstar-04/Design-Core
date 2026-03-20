@@ -14,13 +14,9 @@ export class UCSManager extends TableManagerBase {
     this.itemProperty = 'ucs';
   }
 
-  /**
-   * Create a new UCS item
-   * @param {Object} item
-   * @return {Object}
-   */
-  createItem(item) {
-    return new UCS(item);
+  /** @return {typeof UCS} */
+  get itemClass() {
+    return UCS;
   }
 
   /** Add standard items */

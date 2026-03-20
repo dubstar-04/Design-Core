@@ -15,13 +15,9 @@ export class LayerManager extends StyleManagerBase {
     this.itemProperty = 'layer';
   }
 
-  /**
-   * Create a new layer
-   * @param {Object} style
-   * @return {Object}
-   */
-  createItem(style) {
-    return new Layer(style);
+  /** @return {typeof Layer} */
+  get itemClass() {
+    return Layer;
   }
 
   /** Add standard layers */

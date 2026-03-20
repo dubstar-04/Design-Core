@@ -15,13 +15,9 @@ export class AppIDManager extends TableManagerBase {
     this.itemProperty = 'appid';
   }
 
-  /**
-   * Create a new AppID
-   * @param {Object} item
-   * @return {Object}
-   */
-  createItem(item) {
-    return new AppID(item);
+  /** @return {typeof AppID} */
+  get itemClass() {
+    return AppID;
   }
 
   /** Add standard items */

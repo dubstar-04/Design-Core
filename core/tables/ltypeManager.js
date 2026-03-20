@@ -15,13 +15,9 @@ export class LTypeManager extends StyleManagerBase {
     this.itemProperty = 'lineType';
   }
 
-  /**
-   * Create a new LineType
-   * @param {Object} style
-   * @return {Object}
-   */
-  createItem(style) {
-    return new LType(style);
+  /** @return {typeof LType} */
+  get itemClass() {
+    return LType;
   }
 
   /** Add standard line types */
