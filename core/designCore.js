@@ -125,6 +125,34 @@ export class DesignCore {
   }
 
   /**
+   * Get the ViewManager
+   */
+  static get ViewManager() {
+    return DesignCore.Core.viewManager;
+  }
+
+  /**
+   * Get the UCSManager
+   */
+  static get UCSManager() {
+    return DesignCore.Core.ucsManager;
+  }
+
+  /**
+   * Get the AppIDManager
+   */
+  static get AppIDManager() {
+    return DesignCore.Core.appIdManager;
+  }
+
+  /**
+   * Get the BlockRecordManager
+   */
+  static get BlockRecordManager() {
+    return DesignCore.Core.blockRecordManager;
+  }
+
+  /**
    * Get the property manager
    */
   static get PropertyManager() {
