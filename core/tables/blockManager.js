@@ -15,7 +15,6 @@ export class BlockManager extends TableManagerBase {
     this.indelibleItems.push('*Model_Space', '*Paper_Space');
   }
 
-  /** @type {typeof Block} */
   get itemClass() {
     return Block;
   }

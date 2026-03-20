@@ -15,7 +15,6 @@ export class LTypeManager extends StyleManagerBase {
     this.itemProperty = 'lineType';
   }
 
-  /** @type {typeof LType} */
   get itemClass() {
     return LType;
   }

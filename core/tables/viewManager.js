@@ -14,7 +14,6 @@ export class ViewManager extends TableManagerBase {
     this.itemProperty = 'view';
   }
 
-  /** @type {typeof View} */
   get itemClass() {
     return View;
   }

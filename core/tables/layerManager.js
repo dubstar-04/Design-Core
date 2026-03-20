@@ -15,7 +15,6 @@ export class LayerManager extends StyleManagerBase {
     this.itemProperty = 'layer';
   }
 
-  /** @type {typeof Layer} */
   get itemClass() {
     return Layer;
   }
