@@ -16,7 +16,7 @@ export class StyleManager extends StyleManagerBase {
     this.itemProperty = 'style';
   }
 
-  /** @return {typeof Style} */
+  /** @type {typeof Style} */
   get itemClass() {
     return Style;
   }
