@@ -44,6 +44,12 @@ export class Entity {
 
     // DXF Groupcode 5 - Handle
     this.handle = Property.loadValue([data?.handle, data?.[5]]);
+    // DXF Groupcode 6 - lineType
+    this.lineType = Property.loadValue([data?.lineType, data?.[6]], 'ByLayer');
+    // DXF Groupcode 39 - Thickness (lineWidth)
+    this.lineWidth = Property.loadValue([data?.lineWidth, data?.[39]], 2);
+    // DXF Groupcode 8 - layername
+    this.layer = Property.loadValue([data?.layer, data?.[8]], '0');
 
     if (data) {
       if (data.hasOwnProperty('points')) {
@@ -77,22 +83,6 @@ export class Entity {
         if (trueColour) {
           this.colour = trueColour;
         }
-      }
-
-
-      if (data.hasOwnProperty('lineType') || data.hasOwnProperty('6')) {
-        // DXF Groupcode 6 - lineType
-        this.lineType = data.lineType || data[6];
-      }
-
-      if (data.hasOwnProperty('lineWidth') || data.hasOwnProperty('39')) {
-        // DXF Groupcode 39 - Thickness (lineWidth)
-        this.lineWidth = Property.loadValue([data.lineWidth, data[39]], 2);
-      }
-
-      if (data.hasOwnProperty('layer') || data.hasOwnProperty('8')) {
-        // DXF Groupcode 8 - layername
-        this.layer = Property.loadValue([data.layer, data[8]], 0);
       }
     }
   }

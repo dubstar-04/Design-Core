@@ -22,65 +22,36 @@ export class Style {
 
     // DXF Groupcode 5 - Handle
     this.handle = Property.loadValue([data?.handle, data?.[5]]);
+    // DXF Groupcode 2 - ltype name
+    this.name = Property.loadValue([data?.name, data?.[2]], '');
+    // DXF Groupcode 3 - style font
+    this.font = Property.loadValue([data?.font, data?.[3]], 'Arial');
+    // DXF Groupcode 4 - big font
+    this.bigFont = Property.loadValue([data?.bigFont, data?.[4]]);
+    // DXF Groupcode 40 - Text height
+    this.textHeight = Property.loadValue([data?.textHeight, data?.[40]], 2.5);
+    // DXF Groupcode 41 - width factor
+    this.widthFactor = Property.loadValue([data?.widthFactor, data?.[41]], 1);
+    // DXF Groupcode 42 - Last text height
+    this.lastTextHeight = Property.loadValue([data?.lastTextHeight, data?.[42]], this.textHeight);
+    // DXF Groupcode 50 - test height
+    this.obliqueAngle = Property.loadValue([data?.obliqueAngle, data?.[50]], 0);
 
-    if (data) {
-      if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
-        // DXF Groupcode 2 - ltype name
-        this.name = data.name || data[2];
-      }
+    // DXF Groupcode 70 - standard flags
+    /*
+    1 = If set, this entry describes a shape
+    4 = Vertical text
+    16 = If set, table entry is externally dependent on an xref
+    32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved
+    64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
+    (This flag is for the benefit of AutoCAD commands. It can be ignored.
+    */
+    this.standardFlags.setFlagValue(Property.loadValue([data?.standardFlags, data?.[70]], 0));
 
-      if (data.hasOwnProperty('font') || data.hasOwnProperty('3')) {
-        // DXF Groupcode 3 - style font
-        this.font = data.font || data[3];
-      }
-
-      if (data.hasOwnProperty('bigFont') || data.hasOwnProperty('4')) {
-        // DXF Groupcode 4 - big font
-        this.bigFont = data.bigFont || data[4];
-      }
-
-      if (data.hasOwnProperty('textHeight') || data.hasOwnProperty('40')) {
-        // DXF Groupcode 40 - Text height
-        this.textHeight = data.textHeight || data[40];
-      }
-
-      if (data.hasOwnProperty('widthFactor') || data.hasOwnProperty('41')) {
-        // DXF Groupcode 41 - width factor
-        this.widthFactor = data.widthFactor || data[41];
-      }
-
-      if (data.hasOwnProperty('lastTextHeight') || data.hasOwnProperty('42')) {
-        // DXF Groupcode 42 - Last text height
-        this.lastTextHeight = data.lastTextHeight || data[42];
-      }
-
-      if (data.hasOwnProperty('obliqueAngle') || data.hasOwnProperty('50')) {
-        // DXF Groupcode 50 - test height
-        this.obliqueAngle = data.obliqueAngle || data[50];
-      }
-
-      if (data.hasOwnProperty('standardFlags') || data.hasOwnProperty('70')) {
-        // DXF Groupcode 70 - standard flags
-        /*
-        1 = If set, this entry describes a shape
-        4 = Vertical text
-        16 = If set, table entry is externally dependent on an xref
-        32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved
-        64 = If set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
-        (This flag is for the benefit of AutoCAD commands. It can be ignored.
-        */
-
-        this.standardFlags.setFlagValue(Property.loadValue([data.standardFlags, data[70]], 0));
-      }
-
-      if (data.hasOwnProperty('flags') || data.hasOwnProperty('71')) {
-        // DXF Groupcode 71 - flags (bit-coded values):
-        // 2 = Text is backward (mirrored in X).
-        // 4 = Text is upside down (mirrored in Y).
-
-        this.flags.setFlagValue(Property.loadValue([data.flags, data[71]], 0));
-      }
-    }
+    // DXF Groupcode 71 - flags (bit-coded values):
+    // 2 = Text is backward (mirrored in X).
+    // 4 = Text is upside down (mirrored in Y).
+    this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[71]], 0));
   }
 
   /**

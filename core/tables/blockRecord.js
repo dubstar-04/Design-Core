@@ -8,16 +8,10 @@ export class BlockRecord {
    * @param {Object} data
    */
   constructor(data) {
-    this.name = '';
-
     // DXF Groupcode 5 - Handle
     this.handle = Property.loadValue([data?.handle, data?.[5]]);
-
-    if (data) {
-      if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
-        this.name = data.name || data[2];
-      }
-    }
+    // DXF Groupcode 2 - Name
+    this.name = Property.loadValue([data?.name, data?.[2]], '');
   }
 
   /**

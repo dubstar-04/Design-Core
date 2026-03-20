@@ -8,21 +8,12 @@ export class AppID {
    * @param {Object} data
    */
   constructor(data) {
-    this.name = '';
-    this.flags = 0;
-
     // DXF Groupcode 5 - Handle
     this.handle = Property.loadValue([data?.handle, data?.[5]]);
-
-    if (data) {
-      if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
-        this.name = data.name || data[2];
-      }
-
-      if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
-        this.flags = data.flags || data[70] || 0;
-      }
-    }
+    // DXF Groupcode 2 - Name
+    this.name = Property.loadValue([data?.name, data?.[2]], '');
+    // DXF Groupcode 70 - Flags
+    this.flags = Property.loadValue([data?.flags, data?.[70]], 0);
   }
 
   /**
