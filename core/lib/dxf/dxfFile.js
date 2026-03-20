@@ -1,3 +1,4 @@
+import { Handle } from './handle.js';
 import { Logging } from '../logging.js';
 import { Strings } from '../strings.js';
 
@@ -16,7 +17,7 @@ export class DXFFile {
     }
 
     this.version = DXFFile.Version[version];
-    this.handleCounter = 10;
+    this.handle = new Handle();
   }
 
   /**
@@ -82,7 +83,7 @@ export class DXFFile {
    */
   clearFile() {
     this.contents = '';
-    this.handleCounter = 10;
+    this.handle.reset();
   }
 
   /**
@@ -93,9 +94,7 @@ export class DXFFile {
    * @return {string} handle value
    */
   nextHandle() {
-    const handle = this.formatHandle(this.handleCounter);
-    this.handleCounter++;
-    return handle;
+    return this.handle.next();
   }
 
   /**
@@ -105,7 +104,7 @@ export class DXFFile {
    * @return {string} handle hex value
    */
   formatHandle(value) {
-    return value.toString(16).toUpperCase();
+    return this.handle.format(value);
   }
 
   /**
