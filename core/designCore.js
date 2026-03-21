@@ -132,6 +132,13 @@ export class DesignCore {
   }
 
   /**
+   * Get the VPortManager
+   */
+  static get VPortManager() {
+    return DesignCore.Core.vportManager;
+  }
+
+  /**
    * Get the UCSManager
    */
   static get UCSManager() {
