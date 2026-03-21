@@ -24,7 +24,7 @@ export class BlockManager extends TableManagerBase {
    * Add standard blocks
    */
   addStandardItems() {
-    this.items.push(new Block({ 'name': '*Model_Space' }));
-    this.items.push(new Block({ 'name': '*Paper_Space' }));
+    this.addItem({ 'name': '*Model_Space' });
+    this.addItem({ 'name': '*Paper_Space' });
   }
 }
