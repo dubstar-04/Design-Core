@@ -31,6 +31,7 @@ export class EntityManager {
    * @param {object} entity
    */
   add(entity) {
+      entity.handle = DesignCore.HandleManager.next();
     this.#entities.push(entity);
   }
 
