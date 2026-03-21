@@ -46,8 +46,8 @@ export class DimStyle {
     DIMTXTDIRECTION - R2010
     */
 
-    // DXF Groupcode 5 - Handle
-    this.handle = Property.loadValue([data.handle, data[5]]);
+    // DXF Groupcode 105 - Handle (DIMSTYLE uses 105 instead of 5)
+    this.handle = Property.loadValue([data.handle, data[105]]);
 
     // DXF Groupcode 2 - ltype name
     this.name = Property.loadValue([data.name, data[2]], 'DimStyle');
