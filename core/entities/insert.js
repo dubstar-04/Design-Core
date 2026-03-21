@@ -140,7 +140,7 @@ export class Insert extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'INSERT');
-    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     this.writeDxfColour(file);

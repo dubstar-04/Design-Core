@@ -20,7 +20,7 @@ export class Vertex extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'VERTEX');
-    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbVertex', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDb2dVertex', DXFFile.Version.R2000);

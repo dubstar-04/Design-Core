@@ -221,7 +221,7 @@ test('ArcText getArcAlignedCharacters', () => {
 });
 
 test('ArcText.dxf', () => {
-  const arctext = new ArcAlignedText({ points: [new Point(100, 100)], string: 'Test', radius: 100 });
+  const arctext = new ArcAlignedText({ handle: '1', points: [new Point(100, 100)], string: 'Test', radius: 100 });
   let file = new File();
   arctext.dxf(file);
   // console.log(file.contents);
