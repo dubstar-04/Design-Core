@@ -15,6 +15,8 @@ export class TableManagerBase {
 
     // list of mandatory items that cannot be deleted
     this.indelibleItems = [];
+    // null handle
+    this.handle = null;
   }
 
   /**

@@ -47,6 +47,17 @@ export class Core {
     this.ucsManager = new UCSManager();
     this.appIdManager = new AppIDManager();
     this.blockRecordManager = new BlockRecordManager();
+    // Assign handles to table managers
+    this.ltypeManager.handle = this.handleManager.next();
+    this.layerManager.handle = this.handleManager.next();
+    this.styleManager.handle = this.handleManager.next();
+    this.dimStyleManager.handle = this.handleManager.next();
+    this.viewManager.handle = this.handleManager.next();
+    this.vportManager.handle = this.handleManager.next();
+    this.ucsManager.handle = this.handleManager.next();
+    this.appIdManager.handle = this.handleManager.next();
+    this.blockRecordManager.handle = this.handleManager.next();
+    // Create dictionary manager and property manager
     this.dictionaryManager = new DictionaryManager();
     this.propertyManager = new PropertyManager();
     // Create clipboard manager
