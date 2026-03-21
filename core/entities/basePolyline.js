@@ -194,10 +194,8 @@ export class BasePolyline extends Entity {
     file.writeGroupCode('70', this.flags.getFlagValue());
     file.writeGroupCode('66', '1'); // Vertices follow: required for R12, optional for R2000+
     this.vertices(file);
-    file.writeGroupCode('0', 'SEQEND');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
-    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    const seqend = new SeqEnd({ handle: this.seqendHandle, layer: this.layer });
+    seqend.dxf(file);
   }
 
   /**
