@@ -174,7 +174,7 @@ test('Test AlignedDimension.dxf', () => {
 
   points.push(Pt10, Pt14, Pt13, Pt11);
 
-  const dimension = new AlignedDimension({ points: points });
+  const dimension = new AlignedDimension({ points: points, handle: '1' });
   let file = new File();
   dimension.dxf(file);
   // console.log(file.contents);

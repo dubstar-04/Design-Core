@@ -192,7 +192,7 @@ test('Test AngularDimension.dxf', () => {
 
   points.push(Pt10, Pt11, Pt13, Pt14, Pt15, Pt16);
 
-  const dimension = new AngularDimension({ points: points });
+  const dimension = new AngularDimension({ points: points, handle: '1' });
   let file = new File();
   dimension.dxf(file);
   // console.log(file.contents);

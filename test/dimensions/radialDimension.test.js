@@ -172,7 +172,7 @@ test('Test RadialDimension.dxf', () => {
 
   points.push(Pt10, Pt11, Pt15);
 
-  const dimension = new RadialDimension({ points: points });
+  const dimension = new RadialDimension({ points: points, handle: '1' });
   let file = new File();
   dimension.dxf(file);
   // console.log(file.contents);

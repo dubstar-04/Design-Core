@@ -174,7 +174,7 @@ test('Test RotatedDimension.dxf', () => {
 
   points.push(Pt10, Pt14, Pt13, Pt11);
 
-  const dimension = new RotatedDimension({ points: points });
+  const dimension = new RotatedDimension({ points: points, handle: '1' });
   let file = new File();
   dimension.dxf(file);
   // console.log(file.contents);
