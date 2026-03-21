@@ -21,7 +21,7 @@ export class Dictionary {
    */
   dxf(file) {
     file.writeGroupCode('0', 'DICTIONARY', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDictionary', DXFFile.Version.R2000);
     file.writeGroupCode('281', this.duplicateRecordCloning.toString(), DXFFile.Version.R2000);
 

@@ -1,4 +1,5 @@
 import { Dictionary } from './dictionary.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * DictionaryManager Class
@@ -6,24 +7,26 @@ import { Dictionary } from './dictionary.js';
  */
 export class DictionaryManager {
   /** Create a DictionaryManager */
-  constructor() { }
+  constructor() {
+    // ACAD_GROUP child dictionary
+    this.acadGroup = new Dictionary({
+      'name': 'ACAD_GROUP',
+      'handle': DesignCore.HandleManager.next(),
+    });
+
+    // Root dictionary with entry pointing to ACAD_GROUP
+    this.rootDictionary = new Dictionary({
+      'handle': DesignCore.HandleManager.next(),
+      'entries': [{ 'name': 'ACAD_GROUP', 'handle': this.acadGroup.handle }],
+    });
+  }
 
   /**
    * Write the dictionaries to file in the dxf format
    * @param {DXFFile} file
    */
   dxf(file) {
-    // ACAD_GROUP child dictionary
-    const acadGroup = new Dictionary({
-      'name': 'ACAD_GROUP',
-    });
-
-    // Root dictionary with entry pointing to ACAD_GROUP
-    const rootDictionary = new Dictionary({
-      'entries': [{ 'name': 'ACAD_GROUP', 'handle': 'D' }],
-    });
-
-    rootDictionary.dxf(file);
-    acadGroup.dxf(file);
+    this.rootDictionary.dxf(file);
+    this.acadGroup.dxf(file);
   }
 }
