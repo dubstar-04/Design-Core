@@ -9,7 +9,9 @@ import { DesignCore } from '../designCore.js';
  */
 export class BlockRecordManager {
   /** Create a BlockRecordManager */
-  constructor() { }
+  constructor() {
+    this.handle = DesignCore.HandleManager.next();
+  }
 
   /**
    * Write the table to file in the dxf format

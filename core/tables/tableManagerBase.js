@@ -11,6 +11,7 @@ export class TableManagerBase {
    */
   constructor() {
     this.items = [];
+    this.handle = DesignCore.HandleManager.next();
     this.addStandardItems();
 
     // list of mandatory items that cannot be deleted
