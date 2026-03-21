@@ -44,7 +44,7 @@ export class DXFWriter {
     // dimstyle table
     DesignCore.DimStyleManager.dxf(file);
     // vport table
-    DesignCore.Scene.dxf(file);
+    DesignCore.VPortManager.dxf(file);
     // view table
     DesignCore.ViewManager.dxf(file);
     // ucs table
