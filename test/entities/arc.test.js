@@ -194,7 +194,7 @@ test('Test Arc.boundingBox', () => {
 });
 
 test('Test Arc.dxf', () => {
-  const arc = new Arc({ points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)] });
+  const arc = new Arc({ handle: '1', points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)] });
   let file = new File();
   arc.dxf(file);
   // console.log(file.contents);

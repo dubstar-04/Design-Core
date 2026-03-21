@@ -366,7 +366,7 @@ test('Test Text.boundingBox', () => {
 });
 
 test('Test Text.dxf', () => {
-  const text = new Text({ points: [new Point(100, 200)] });
+  const text = new Text({ handle: '1', points: [new Point(100, 200)] });
   let file = new File();
   text.dxf(file);
   // console.log(file.contents);

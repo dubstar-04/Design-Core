@@ -27,7 +27,7 @@ test('Test Vertex constructor with DXF group codes', () => {
 });
 
 test('Test Vertex.dxf', () => {
-  const vertex = new Vertex({ points: [new Point(100, 200, 0.5)], layer: 'TestLayer' });
+  const vertex = new Vertex({ handle: '1', points: [new Point(100, 200, 0.5)], layer: 'TestLayer' });
   const file = new File();
   vertex.dxf(file);
 
@@ -57,7 +57,7 @@ TestLayer
 });
 
 test('Test Vertex.dxf with zero bulge', () => {
-  const vertex = new Vertex({ points: [new Point(50, 75)] });
+  const vertex = new Vertex({ handle: '1', points: [new Point(50, 75)] });
   const file = new File();
   vertex.dxf(file);
 

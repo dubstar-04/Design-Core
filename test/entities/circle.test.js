@@ -84,7 +84,7 @@ test('Test Circle.boundingBox', () => {
 });
 
 test('Test Circle.dxf', () => {
-  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
+  const circle = new Circle({ handle: '1', points: [new Point(100, 100), new Point(200, 100)] });
   let file = new File();
   circle.dxf(file);
   // console.log(file.contents);
