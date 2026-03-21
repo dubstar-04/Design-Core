@@ -28,7 +28,7 @@ export class VPort {
    */
   dxf(file) {
     file.writeGroupCode('0', 'VPORT');
-    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbViewportTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name);

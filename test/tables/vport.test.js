@@ -29,7 +29,7 @@ test('Test VPort constructor with DXF group codes', () => {
 });
 
 test('Test VPort.dxf', () => {
-  const vport = new VPort({ name: '*ACTIVE', viewCenterX: 50, viewCenterY: 100, height: 200, ratio: 1.5 });
+  const vport = new VPort({ handle: '1', name: '*ACTIVE', viewCenterX: 50, viewCenterY: 100, height: 200, ratio: 1.5 });
   const file = new File();
   vport.dxf(file);
 
