@@ -28,18 +28,20 @@ import { DesignCore } from '../designCore.js';
 export class Core {
   /** Create a core object */
   constructor() {
-    // Create core components
+    // Create handle manager and activate to enable handle assignment during construction
     this.handleManager = new HandleManager();
+    this.activate();
+
+    // Create core components
     this.scene = new Scene();
     this.commandManager = new CommandManager();
     this.canvas = new Canvas();
-
     this.mouse = new Mouse();
     this.commandLine = new CommandLine();
 
     // Create table managers
-    this.layerManager = new LayerManager();
     this.ltypeManager = new LTypeManager();
+    this.layerManager = new LayerManager();
     this.styleManager = new StyleManager();
     this.dimStyleManager = new DimStyleManager();
     this.viewManager = new ViewManager();
@@ -47,16 +49,7 @@ export class Core {
     this.ucsManager = new UCSManager();
     this.appIdManager = new AppIDManager();
     this.blockRecordManager = new BlockRecordManager();
-    // Assign handles to table managers
-    this.ltypeManager.handle = this.handleManager.next();
-    this.layerManager.handle = this.handleManager.next();
-    this.styleManager.handle = this.handleManager.next();
-    this.dimStyleManager.handle = this.handleManager.next();
-    this.viewManager.handle = this.handleManager.next();
-    this.vportManager.handle = this.handleManager.next();
-    this.ucsManager.handle = this.handleManager.next();
-    this.appIdManager.handle = this.handleManager.next();
-    this.blockRecordManager.handle = this.handleManager.next();
+
     // Create dictionary manager and property manager
     this.dictionaryManager = new DictionaryManager();
     this.propertyManager = new PropertyManager();
@@ -67,13 +60,6 @@ export class Core {
 
     // function to call external notification command for the ui
     this.externalNotifyCallbackFunction;
-
-    // create a static reference to the instantiated core object
-    // DesignCore._instance = this;
-    // Design.Core = this;
-
-    // return Design;
-    this.activate();
   }
 
   /**
