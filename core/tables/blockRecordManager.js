@@ -27,7 +27,8 @@ export class BlockRecordManager {
     file.writeGroupCode('70', blocks.length.toString(), DXFFile.Version.R2000);
 
     for (let i = 0; i < blocks.length; i++) {
-      const record = new BlockRecord({ name: blocks[i].name });
+      // Temp hack for block record handle
+      const record = new BlockRecord({ name: blocks[i].name, handle: blocks[i].blockRecordHandle });
       record.dxf(file);
     }
 

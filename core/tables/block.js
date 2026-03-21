@@ -25,6 +25,7 @@ export class Block extends Entity {
     super(data);
     this.name = '';
     this.points = [new Point()];
+    this.blockRecordHandle = undefined;
 
     Object.defineProperty(this, 'flags', {
       value: new Flags(),

@@ -2,6 +2,7 @@
 // import {Strings} from '../lib/strings.js';
 import { TableManagerBase } from './tableManagerBase.js';
 import { Block } from './block.js';
+import { DesignCore } from '../designCore.js';
 
 /**
  * BlockManager Class
@@ -26,5 +27,19 @@ export class BlockManager extends TableManagerBase {
   addStandardItems() {
     this.addItem({ 'name': '*Model_Space' });
     this.addItem({ 'name': '*Paper_Space' });
+  }
+
+  /**
+   * Add a block to the list of items and assign a block record handle
+   * @param {Object} item
+   * @param {boolean} overwrite
+   * @return {Object}
+   */
+  addItem(item, overwrite = false) {
+    const newItem = super.addItem(item, overwrite);
+    if (newItem.blockRecordHandle === undefined) {
+      newItem.blockRecordHandle = DesignCore.HandleManager.next();
+    }
+    return newItem;
   }
 }
