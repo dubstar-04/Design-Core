@@ -1,5 +1,6 @@
 import { Point } from '../entities/point.js';
 import { Entity } from '../entities/entity.js';
+import { EndBlock } from './endblk.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
 import { Strings } from '../lib/strings.js';
@@ -173,10 +174,8 @@ export class Block extends Entity {
       this.items[i].dxf(file);
     }
 
-    file.writeGroupCode('0', 'ENDBLK');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
-    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
+    const endblk = new EndBlock();
+    endblk.dxf(file);
   }
 
   /**
