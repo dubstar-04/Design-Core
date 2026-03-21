@@ -45,7 +45,6 @@ export class DXFWriter {
     DesignCore.DimStyleManager.dxf(file);
     // vport table
     DesignCore.Scene.dxf(file);
-
     // view table
     DesignCore.ViewManager.dxf(file);
     // ucs table
@@ -90,6 +89,21 @@ export class DXFWriter {
   }
 
   /**
+   * Write Dictionary section
+   * @param {DXFFile} file
+   */
+  writeDictionaries(file) {
+    // Dictionary
+    file.writeGroupCode('0', 'SECTION', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'OBJECTS', DXFFile.Version.R2000);
+
+    DesignCore.DictionaryManager.dxf(file);
+
+    file.writeGroupCode('0', 'ENDSEC', DXFFile.Version.R2000);
+  }
+
+
+  /**
    * Write DXF file
    * @param {string} version
    * @return {string} dxf formatted string formatted
@@ -99,6 +113,7 @@ export class DXFWriter {
       version = DesignCore.Core.dxfVersion;
     }
     const file = new DXFFile(version);
+
     // write start of file
     file.writeGroupCode('999', 'DXF created from Design-Core');
 
@@ -107,14 +122,7 @@ export class DXFWriter {
     this.writeTables(file);
     this.writeBlocks(file);
     this.writeEntities(file);
-
-    // Dictionary
-    file.writeGroupCode('0', 'SECTION', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'OBJECTS', DXFFile.Version.R2000);
-
-    DesignCore.DictionaryManager.dxf(file);
-
-    file.writeGroupCode('0', 'ENDSEC', DXFFile.Version.R2000);
+    this.writeDictionaries(file);
 
     // write end of file
     file.writeGroupCode('0', 'EOF');
