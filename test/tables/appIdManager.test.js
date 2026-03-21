@@ -55,7 +55,7 @@ AcDbSymbolTable
 0
 APPID
 5
-A
+13
 100
 AcDbSymbolTableRecord
 100
