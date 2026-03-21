@@ -60,7 +60,7 @@ export class LType {
    */
   dxf(file) {
     file.writeGroupCode('0', 'LTYPE');
-    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbLinetypeTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name);

@@ -4,8 +4,8 @@ import { LType } from '../../core/tables/ltype.js';
 const file = new DXFFile();
 const R12File = new DXFFile('R12');
 
-const continuousLType = new LType({ 'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________' });
-const dashedLType = new LType({ 'name': 'DASHED', 'pattern': [12.7, -6.35], 'description': 'Dashed __ __ __ __ __ __ __ __ __ __ __ __ __ _' });
+const continuousLType = new LType({ 'handle': 'A', 'name': 'CONTINUOUS', 'description': 'Solid Line ________________________________________' });
+const dashedLType = new LType({ 'handle': 'A', 'name': 'DASHED', 'pattern': [12.7, -6.35], 'description': 'Dashed __ __ __ __ __ __ __ __ __ __ __ __ __ _' });
 
 
 const continuousDxf = `0
