@@ -98,6 +98,15 @@ export class DXF {
         DesignCore.Core.dxfVersion = versionNumber;
       }
     }
+
+    if (header.hasOwnProperty('$HANDSEED')) {
+      const handseed = header['$HANDSEED'];
+      if (handseed.hasOwnProperty('5')) {
+        const maxHandseed = handseed['5'];
+        Logging.instance.debug(`Opening DXF Handseed: ${maxHandseed}`);
+        DesignCore.HandleManager.handseed = maxHandseed;
+      }
+    }
   }
 
 
