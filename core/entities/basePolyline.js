@@ -71,6 +71,8 @@ export class BasePolyline extends Entity {
     // 128 = The linetype pattern is generated continuously around the vertices of this polyline
 
     this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[70]], 0));
+    // store a SEQEND object
+    this.seqend = new SeqEnd({ handle: DesignCore.HandleManager.next(), layer: this.layer });
   }
 
   /**
@@ -182,7 +184,7 @@ export class BasePolyline extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'POLYLINE');
-    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDb2dPolyline', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer); // LAYERNAME
@@ -194,8 +196,7 @@ export class BasePolyline extends Entity {
     file.writeGroupCode('70', this.flags.getFlagValue());
     file.writeGroupCode('66', '1'); // Vertices follow: required for R12, optional for R2000+
     this.vertices(file);
-    const seqend = new SeqEnd({ handle: this.seqendHandle, layer: this.layer });
-    seqend.dxf(file);
+    this.seqend.dxf(file);
   }
 
   /**

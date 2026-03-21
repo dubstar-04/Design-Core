@@ -72,32 +72,33 @@ beforeAll(() => {
   core.scene.entities.add(lwpolyline);
 });
 
-test('Test DXF output contains all entities', () => {
-  const dxf = core.saveFile('R2018');
+let dxfOutput;
 
-  expect(dxf).toContain('LINE');
-  expect(dxf).toContain('CIRCLE');
-  expect(dxf).toContain('ARC');
-  expect(dxf).toContain('TEXT');
-  expect(dxf).toContain('POLYLINE');
-  expect(dxf).toContain('LWPOLYLINE');
+beforeAll(() => {
+  dxfOutput = core.saveFile('R2018');
+});
+
+test('Test DXF output contains all entities', () => {
+  expect(dxfOutput).toContain('LINE');
+  expect(dxfOutput).toContain('CIRCLE');
+  expect(dxfOutput).toContain('ARC');
+  expect(dxfOutput).toContain('TEXT');
+  expect(dxfOutput).toContain('POLYLINE');
+  expect(dxfOutput).toContain('LWPOLYLINE');
 });
 
 test('Test DXF output contains all layers', () => {
-  const dxf = core.saveFile('R2018');
-
-  expect(dxf).toContain('LINE_LAYER');
-  expect(dxf).toContain('CIRCLE_LAYER');
-  expect(dxf).toContain('ARC_LAYER');
-  expect(dxf).toContain('TEXT_LAYER');
-  expect(dxf).toContain('POLYLINE_LAYER');
-  expect(dxf).toContain('LWPOLYLINE_LAYER');
+  expect(dxfOutput).toContain('LINE_LAYER');
+  expect(dxfOutput).toContain('CIRCLE_LAYER');
+  expect(dxfOutput).toContain('ARC_LAYER');
+  expect(dxfOutput).toContain('TEXT_LAYER');
+  expect(dxfOutput).toContain('POLYLINE_LAYER');
+  expect(dxfOutput).toContain('LWPOLYLINE_LAYER');
 });
 
 test('Test DXF output matches reference file', () => {
-  const dxf = core.saveFile('R2018');
   const referencePath = join(__dirname, 'exportIntegration.reference.dxf');
   const reference = readFileSync(referencePath, 'utf8');
 
-  expect(dxf).toBe(reference);
+  expect(dxfOutput).toBe(reference);
 });
