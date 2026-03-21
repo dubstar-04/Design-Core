@@ -46,7 +46,7 @@ export class Core {
     this.propertyManager = new PropertyManager();
     this.clipboard = new Clipboard();
 
-    this.handle = new HandleManager();
+    this.handleManager = new HandleManager();
     this.settings = new Settings();
 
     // function to call external notification command for the ui

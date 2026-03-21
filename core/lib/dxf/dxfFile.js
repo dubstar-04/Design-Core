@@ -1,4 +1,5 @@
-import { Handle } from './handle.js';
+import { HandleManager } from './handleManager.js';
+import { DesignCore } from '../../designCore.js';
 import { Logging } from '../logging.js';
 import { Strings } from '../strings.js';
 
@@ -17,7 +18,12 @@ export class DXFFile {
     }
 
     this.version = DXFFile.Version[version];
-    this.handle = new Handle();
+    this.handle = new HandleManager();
+
+    // Seed above all assigned handles to avoid collisions
+    if (DesignCore._core?.handle) {
+      this.handle.handseed = DesignCore.HandleManager.handseed;
+    }
   }
 
   /**
@@ -95,16 +101,6 @@ export class DXFFile {
    */
   nextHandle() {
     return this.handle.next();
-  }
-
-  /**
-   * Format a handle value
-   * A handle is an arbitrary but unique hex value as string up to 16 hexadecimal digits (8 bytes).
-   * @param {number} value
-   * @return {string} handle hex value
-   */
-  formatHandle(value) {
-    return this.handle.format(value);
   }
 
   /**

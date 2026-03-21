@@ -169,8 +169,8 @@ export class DesignCore {
   /**
    * Get the Handle
    */
-  static get Handle() {
-    return DesignCore.Core.handle;
+  static get HandleManager() {
+    return DesignCore.Core.handleManager;
   }
 
   /**

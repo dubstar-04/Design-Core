@@ -15,6 +15,11 @@ const createCoreMock = (options = {}) => {
 
   return {
     dxfVersion: options.dxfVersion || 'R2018',
+    handleManager: { next() {
+      return '1';
+    }, get handseed() {
+      return '1';
+    } },
     layerManager: options.layerManager || createManager('Layer0'),
     ltypeManager: options.ltypeManager || createManager('Continuous'),
     styleManager: options.styleManager || createManager('Standard'),
