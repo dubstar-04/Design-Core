@@ -51,7 +51,7 @@ export class LTypeManager extends StyleManagerBase {
     // The LTYPE Table must preceed the LAYER table
     file.writeGroupCode('0', 'TABLE');
     file.writeGroupCode('2', 'LTYPE');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
     file.writeGroupCode('70', this.itemCount());
 

@@ -20,7 +20,7 @@ export class BlockRecordManager {
 
     file.writeGroupCode('0', 'TABLE', DXFFile.Version.R2000);
     file.writeGroupCode('2', 'BLOCK_RECORD', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
     file.writeGroupCode('70', blocks.length.toString(), DXFFile.Version.R2000);
 
