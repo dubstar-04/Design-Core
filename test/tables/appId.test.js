@@ -24,7 +24,7 @@ test('Test AppID constructor with flags', () => {
 });
 
 test('Test AppID.dxf', () => {
-  const appId = new AppID({ name: 'ACAD' });
+  const appId = new AppID({ handle: 'A', name: 'ACAD' });
   const file = new DXFFile();
   appId.dxf(file);
 
