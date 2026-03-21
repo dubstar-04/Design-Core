@@ -8,6 +8,7 @@ import { LTypeManager } from '../tables/ltypeManager.js';
 import { StyleManager } from '../tables/styleManager.js';
 import { DimStyleManager } from '../tables/dimStyleManager.js';
 import { ViewManager } from '../tables/viewManager.js';
+import { VPortManager } from '../tables/vportManager.js';
 import { UCSManager } from '../tables/ucsManager.js';
 import { AppIDManager } from '../tables/appIdManager.js';
 import { BlockRecordManager } from '../tables/blockRecordManager.js';
@@ -27,6 +28,8 @@ import { DesignCore } from '../designCore.js';
 export class Core {
   /** Create a core object */
   constructor() {
+    // Create core components
+    this.handleManager = new HandleManager();
     this.scene = new Scene();
     this.commandManager = new CommandManager();
     this.canvas = new Canvas();
@@ -34,19 +37,21 @@ export class Core {
     this.mouse = new Mouse();
     this.commandLine = new CommandLine();
 
+    // Create table managers
     this.layerManager = new LayerManager();
     this.ltypeManager = new LTypeManager();
     this.styleManager = new StyleManager();
     this.dimStyleManager = new DimStyleManager();
     this.viewManager = new ViewManager();
+    this.vportManager = new VPortManager();
     this.ucsManager = new UCSManager();
     this.appIdManager = new AppIDManager();
     this.blockRecordManager = new BlockRecordManager();
     this.dictionaryManager = new DictionaryManager();
     this.propertyManager = new PropertyManager();
+    // Create clipboard manager
     this.clipboard = new Clipboard();
-
-    this.handleManager = new HandleManager();
+    // Create settings manager
     this.settings = new Settings();
 
     // function to call external notification command for the ui
