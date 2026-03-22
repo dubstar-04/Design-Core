@@ -143,6 +143,8 @@ export class EntityManager {
     }
 
     for (const property of Object.getOwnPropertyNames(data)) {
+      // Handle should be persistent - don't update handles
+      if (property === 'handle') continue;
       if (item.hasOwnProperty(property)) {
         item.setProperty(property, data[property]);
       }
