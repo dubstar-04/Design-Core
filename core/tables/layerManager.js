@@ -39,6 +39,8 @@ export class LayerManager extends StyleManagerBase {
     // TODO: understand how plot styles are managed
     if (newItem.plotStyleHandle === undefined) {
       newItem.plotStyleHandle = DesignCore.HandleManager.next();
+    } else {
+      DesignCore.HandleManager.checkHandle(newItem.plotStyleHandle);
     }
     return newItem;
   }
