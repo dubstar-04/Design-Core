@@ -85,16 +85,23 @@ export class TableManagerBase {
     const newItem = this.createItem(item);
     const newItemName = newItem.name;
 
+    const exists = this.itemExists(newItemName);
+
+    // Return the existing item if it already exists and overwrite is not requested
+    if (exists && !overwrite) {
+      return this.getItemByName(newItemName);
+    }
+
     if (newItem.handle === undefined) {
       newItem.handle = DesignCore.HandleManager.next();
     } else {
       DesignCore.HandleManager.checkHandle(newItem.handle);
     }
 
-    if (!this.itemExists(newItemName)) {
+    if (!exists) {
       this.items.push(newItem);
-    } else if (overwrite) {
-      // Overwrite The item existing item
+    } else {
+      // Overwrite the existing item
       // This is used when loading files;
       // Standard items already exist but should be overwritten by the incoming item
       this.items.splice(this.getItemIndex(newItemName), 1, newItem);
