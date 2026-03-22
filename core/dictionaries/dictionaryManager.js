@@ -60,6 +60,9 @@ export class DictionaryManager {
           this.acadGroup = new Dictionary(acadGroupData);
           this.acadGroup.name = 'ACAD_GROUP';
           DesignCore.HandleManager.checkHandle(this.acadGroup.handle);
+
+          // Only keep entries for dictionaries that Design manages
+          this.rootDictionary.entries = [{'name': 'ACAD_GROUP', 'handle': this.acadGroup.handle}];
           return;
         }
       }
