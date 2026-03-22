@@ -33,6 +33,12 @@ export class UCSManager extends TableManagerBase {
     file.writeGroupCode('2', 'UCS', DXFFile.Version.R2000);
     file.writeGroupCode('5', this.handle, DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
+    file.writeGroupCode('70', this.itemCount(), DXFFile.Version.R2000);
+
+    for (let i = 0; i < this.itemCount(); i++) {
+      this.getItemByIndex(i).dxf(file);
+    }
+
     file.writeGroupCode('0', 'ENDTAB', DXFFile.Version.R2000);
   }
 }
