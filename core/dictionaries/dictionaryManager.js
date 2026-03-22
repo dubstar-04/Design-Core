@@ -62,7 +62,7 @@ export class DictionaryManager {
           DesignCore.HandleManager.checkHandle(this.acadGroup.handle);
 
           // Only keep entries for dictionaries that Design manages
-          this.rootDictionary.entries = [{'name': 'ACAD_GROUP', 'handle': this.acadGroup.handle}];
+          this.rootDictionary.entries = [{ 'name': 'ACAD_GROUP', 'handle': this.acadGroup.handle }];
           return;
         }
       }
