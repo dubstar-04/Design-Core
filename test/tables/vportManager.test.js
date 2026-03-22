@@ -1,5 +1,8 @@
 import { Core } from '../../core/core/core.js';
 import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
+import { DesignCore } from '../../core/designCore.js';
+import { Line } from '../../core/entities/line.js';
+import { Point } from '../../core/entities/point.js';
 
 const core = new Core();
 const vportManager = core.vportManager;
@@ -34,4 +37,18 @@ test('Test VPortManager.dxf', () => {
 
   // Check ends with ENDTAB
   expect(file.contents).toContain('0\nENDTAB\n');
+});
+
+test('Test VPortManager.updateFromScene with zero height', () => {
+  // Add a horizontal line (zero height bounding box)
+  DesignCore.Scene.entities.add(new Line({ points: [new Point(0, 0), new Point(100, 0)] }));
+
+  const vport = vportManager.getItemByName('*ACTIVE');
+  vportManager.updateFromScene();
+
+  expect(vport.ratio).toBe(1);
+  expect(Number.isFinite(vport.ratio)).toBe(true);
+
+  // cleanup
+  DesignCore.Scene.entities.clear();
 });

@@ -39,7 +39,7 @@ export class VPortManager extends TableManagerBase {
       vport.viewCenterX = extents.xMin + width / 2;
       vport.viewCenterY = extents.yMin + height / 2;
       vport.height = height;
-      vport.ratio = width / height;
+      vport.ratio = height === 0 ? 1 : width / height;
     }
   }
 
