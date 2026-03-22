@@ -207,6 +207,12 @@ export class DXF {
           DesignCore.HandleManager.checkHandle(table[5]);
           DesignCore.ViewManager.handle = table[5];
         }
+        if (table.children.length) {
+          DesignCore.ViewManager.clearItems();
+        }
+        table.children.forEach((view) => {
+          DesignCore.ViewManager.addItem(view, true);
+        });
       }
 
       if (table[2] === 'UCS') {
