@@ -13,6 +13,16 @@ export class Dictionary {
     this.name = Property.loadValue([data?.name, data?.[3]], '');
     this.duplicateRecordCloning = Property.loadValue([data?.duplicateRecordCloning, data?.[281]], 1);
     this.entries = Property.loadValue([data?.entries], []);
+
+    // Build entries from DXF group codes 3 (name) and 350 (handle)
+    if (!this.entries.length && data?.[3] !== undefined && data?.[350] !== undefined) {
+      const names = Array.isArray(data[3]) ? data[3] : [data[3]];
+      const handles = Array.isArray(data[350]) ? data[350] : [data[350]];
+
+      for (let i = 0; i < names.length && i < handles.length; i++) {
+        this.entries.push({'name': names[i], 'handle': handles[i]});
+      }
+    }
   }
 
   /**
