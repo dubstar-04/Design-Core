@@ -19,7 +19,7 @@ new Core();
 const points = [new Point(100, 100, 1), new Point(200, 100, 1)];
 const boundaryShape = new BasePolyline({ points: points });
 
-const hatch = new Hatch({handle: '1'});
+const hatch = new Hatch({ handle: '1' });
 hatch.childEntities = [boundaryShape];
 
 const hatchInputScenarios = [
@@ -309,7 +309,7 @@ ANSI31
 
 
   // Export rotated and scaled
-  const rotatedScaleHatch = new Hatch({handle: '1'});
+  const rotatedScaleHatch = new Hatch({ handle: '1' });
   rotatedScaleHatch.angle = 45;
   rotatedScaleHatch.scale = 2;
 
