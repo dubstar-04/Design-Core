@@ -129,7 +129,7 @@ export class Style {
    */
   dxf(file) {
     file.writeGroupCode('0', 'STYLE');
-    file.writeGroupCode('5', this.handle || file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbTextStyleTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Stylename
