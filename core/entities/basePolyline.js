@@ -8,7 +8,6 @@ import { BoundingBox } from '../lib/boundingBox.js';
 import { Point } from './point.js';
 import { Line } from './line.js';
 import { Arc } from './arc.js';
-import { Vertex } from './vertex.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
 
@@ -71,8 +70,6 @@ export class BasePolyline extends Entity {
     // 128 = The linetype pattern is generated continuously around the vertices of this polyline
 
     this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[70]], 0));
-    // store a SEQEND object
-    this.seqend = new SeqEnd({ handle: DesignCore.HandleManager.next(), layer: this.layer });
   }
 
   /**
@@ -183,33 +180,19 @@ export class BasePolyline extends Entity {
    * @param {DXFFile} file
    */
   dxf(file) {
-    file.writeGroupCode('0', 'POLYLINE');
+    file.writeGroupCode('0', 'LWPOLYLINE');
     file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDb2dPolyline', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbPolyline', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer); // LAYERNAME
     file.writeGroupCode('6', this.lineType);
-    file.writeGroupCode('10', '0');
-    file.writeGroupCode('20', '0');
-    file.writeGroupCode('30', '0');
     file.writeGroupCode('39', this.lineWidth);
+    file.writeGroupCode('90', this.points.length);
     file.writeGroupCode('70', this.flags.getFlagValue());
-    file.writeGroupCode('66', '1'); // Vertices follow: required for R12, optional for R2000+
-    this.vertices(file);
-    this.seqend.dxf(file);
-  }
-
-  /**
-   * Write the vertices to file in the dxf format
-   * @param {DXFFile} file
-   */
-  vertices(file) {
     for (let i = 0; i < this.points.length; i++) {
-      const vertex = new Vertex({
-        points: [this.points[i]],
-        layer: this.layer,
-      });
-      vertex.dxf(file);
+      file.writeGroupCode('10', this.points[i].x);
+      file.writeGroupCode('20', this.points[i].y);
+      file.writeGroupCode('42', this.points[i].bulge);
     }
   }
 

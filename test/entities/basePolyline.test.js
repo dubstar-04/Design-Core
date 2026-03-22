@@ -258,102 +258,46 @@ test('Test BasePolyline.getBulgeFromSegment', () => {
 test('Test BasePolyline.dxf', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
-  const polyline = new BasePolyline({ points: points });
+  const polyline = new BasePolyline({ handle: '1', points: points });
   let file = new File();
   polyline.dxf(file);
   // console.log(file.contents);
 
   const dxfString = `0
-POLYLINE
+LWPOLYLINE
 5
 1
 100
 AcDbEntity
 100
-AcDb2dPolyline
+AcDbPolyline
 8
 0
 6
 ByLayer
-10
-0
-20
-0
-30
-0
 39
 2
+90
+3
 70
-0
-66
-1
-0
-VERTEX
-5
-1
-100
-AcDbEntity
-100
-AcDbVertex
-100
-AcDb2dVertex
-8
 0
 10
 100
 20
 100
-30
-0.0
 42
-0
-0
-VERTEX
-5
-1
-100
-AcDbEntity
-100
-AcDbVertex
-100
-AcDb2dVertex
-8
 0
 10
 200
 20
 100
-30
-0.0
 42
 -1
-0
-VERTEX
-5
-1
-100
-AcDbEntity
-100
-AcDbVertex
-100
-AcDb2dVertex
-8
-0
 10
 200
 20
 50
-30
-0.0
 42
-0
-0
-SEQEND
-5
-1
-100
-AcDbEntity
-8
 0
 `;
 
@@ -363,6 +307,7 @@ AcDbEntity
   const newPolyline = new Polyline(polyline);
   file = new File();
   newPolyline.dxf(file);
+
   expect(file.contents).toEqual(dxfString);
 });
 
