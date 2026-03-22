@@ -40,6 +40,9 @@ export class BlockManager extends TableManagerBase {
     if (newItem.blockRecordHandle === undefined) {
       newItem.blockRecordHandle = DesignCore.HandleManager.next();
     }
+    if (newItem.endblkHandle === undefined) {
+      newItem.endblkHandle = DesignCore.HandleManager.next();
+    }
     return newItem;
   }
 }

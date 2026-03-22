@@ -25,7 +25,9 @@ export class Block extends Entity {
     super(data);
     this.name = '';
     this.points = [new Point()];
-    this.blockRecordHandle = undefined;
+    // Store the block record handle and endblk handle for use when writing to dxf file
+    this.blockRecordHandle = data?.blockRecordHandle;
+    this.endblkHandle = data?.endblkHandle;
 
     Object.defineProperty(this, 'flags', {
       value: new Flags(),
@@ -175,7 +177,7 @@ export class Block extends Entity {
       this.items[i].dxf(file);
     }
 
-    const endblk = new EndBlock();
+    const endblk = new EndBlock({ handle: this.endblkHandle });
     endblk.dxf(file);
   }
 

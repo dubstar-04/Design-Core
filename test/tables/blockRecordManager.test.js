@@ -13,7 +13,7 @@ TABLE
 2
 BLOCK_RECORD
 5
-23
+25
 100
 AcDbSymbolTable
 70
@@ -33,7 +33,7 @@ AcDbBlockTableRecord
 0
 BLOCK_RECORD
 5
-E
+F
 100
 AcDbSymbolTableRecord
 100

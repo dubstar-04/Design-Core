@@ -12,7 +12,7 @@ test('Test EndBlock constructor with layer', () => {
 });
 
 test('Test EndBlock.dxf', () => {
-  const endblk = new EndBlock();
+  const endblk = new EndBlock({ handle: '1' });
   const file = new File();
   endblk.dxf(file);
 

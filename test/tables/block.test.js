@@ -70,7 +70,7 @@ test('Test Block.closestPoint', () => {
 });
 
 test('Test Block.dxf', () => {
-  const block = new Block();
+  const block = new Block({ handle: '1', endblkHandle: '1' });
   const line = new Line({ handle: '1', points: [new Point(101, 102), new Point(201, 202)] });
   block.addItem(line);
 

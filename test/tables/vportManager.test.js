@@ -26,7 +26,7 @@ test('Test VPortManager.dxf', () => {
   expect(lines[2]).toBe('2');
   expect(lines[3]).toBe('VPORT');
   expect(lines[4]).toBe('5');
-  expect(lines[5]).toBe('1E');
+  expect(lines[5]).toBe('20');
 
   // Check contains VPORT entry
   expect(file.contents).toContain('0\nVPORT\n');
