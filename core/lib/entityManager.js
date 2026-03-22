@@ -31,7 +31,12 @@ export class EntityManager {
    * @param {object} entity
    */
   add(entity) {
+    if (!entity) return;
+
+    if (entity.handle === undefined) {
       entity.handle = DesignCore.HandleManager.next();
+    }
+
     this.#entities.push(entity);
   }
 
