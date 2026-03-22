@@ -23,7 +23,7 @@ export class DXFWriter {
     file.writeGroupCode('9', '$DIMSTYLE');
     file.writeGroupCode('2', DesignCore.DimStyleManager.getCstyle());
     file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.handle.handseed, DXFFile.Version.R2000);
+    file.writeGroupCode('5', DesignCore.HandleManager.handseed, DXFFile.Version.R2000);
     file.writeGroupCode('0', 'ENDSEC');
   }
 
