@@ -220,6 +220,12 @@ export class DXF {
           DesignCore.HandleManager.checkHandle(table[5]);
           DesignCore.UCSManager.handle = table[5];
         }
+        if (table.children.length) {
+          DesignCore.UCSManager.clearItems();
+        }
+        table.children.forEach((ucs) => {
+          DesignCore.UCSManager.addItem(ucs, true);
+        });
       }
 
       if (table[2] === 'APPID') {
