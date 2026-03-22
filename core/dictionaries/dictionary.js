@@ -20,7 +20,7 @@ export class Dictionary {
       const handles = Array.isArray(data[350]) ? data[350] : [data[350]];
 
       for (let i = 0; i < names.length && i < handles.length; i++) {
-        this.entries.push({'name': names[i], 'handle': handles[i]});
+        this.entries.push({ 'name': names[i], 'handle': handles[i] });
       }
     }
   }
