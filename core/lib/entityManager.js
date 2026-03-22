@@ -35,6 +35,8 @@ export class EntityManager {
 
     if (entity.handle === undefined) {
       entity.handle = DesignCore.HandleManager.next();
+    } else {
+      DesignCore.HandleManager.checkHandle(entity.handle);
     }
 
     this.#entities.push(entity);

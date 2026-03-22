@@ -87,6 +87,8 @@ export class TableManagerBase {
 
     if (newItem.handle === undefined) {
       newItem.handle = DesignCore.HandleManager.next();
+    } else {
+      DesignCore.HandleManager.checkHandle(newItem.handle);
     }
 
     if (!this.itemExists(newItemName)) {
