@@ -43,7 +43,10 @@ export class Entity {
     this.layer = '0';
 
     // DXF Groupcode 5 - Handle
-    this.handle = Property.loadValue([data?.handle, data?.[5]]);
+    Object.defineProperty(this, 'handle', {
+      value: Property.loadValue([data?.handle, data?.[5]]),
+      writable: true,
+    });
     // DXF Groupcode 6 - lineType
     this.lineType = Property.loadValue([data?.lineType, data?.[6]], 'ByLayer');
     // DXF Groupcode 39 - Thickness (lineWidth)

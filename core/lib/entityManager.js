@@ -142,9 +142,7 @@ export class EntityManager {
       throw Error('Item not found in scene');
     }
 
-    for (const property of Object.getOwnPropertyNames(data)) {
-      // Handle should be persistent - don't update handles
-      if (property === 'handle') continue;
+    for (const property of Object.keys(data)) {
       if (item.hasOwnProperty(property)) {
         item.setProperty(property, data[property]);
       }
