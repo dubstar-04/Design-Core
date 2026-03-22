@@ -46,15 +46,37 @@ export class DXF {
     Logging.instance.debug('Loading File');
     this.read(data);
 
+    // load handseed first to ensure the handle counter is correctly set
+    // before any new handles are assigned during table/block/entity loading
+    this.loadHandseed();
+
     this.loadTables();
     this.loadBlocks();
     this.loadEntities();
 
-    // load headers last to ensure the elements and layers exist
+    // load headers for styles and version
     this.loadHeader();
 
     if (this.unsupportedElements) {
       DesignCore.Core.notify(Strings.Warning.UNSUPPORTEDENTITIES);
+    }
+  }
+
+  /**
+   * Load Handseed from header
+   * Must be called before loading tables/blocks/entities
+   * to ensure the handle counter is set beyond all handles in the file
+   */
+  loadHandseed() {
+    const header = this.reader.header;
+
+    if (header.hasOwnProperty('$HANDSEED')) {
+      const handseed = header['$HANDSEED'];
+      if (handseed.hasOwnProperty('5')) {
+        const maxHandseed = handseed['5'];
+        Logging.instance.debug(`Opening DXF Handseed: ${maxHandseed}`);
+        DesignCore.HandleManager.handseed = maxHandseed;
+      }
     }
   }
 
@@ -98,15 +120,6 @@ export class DXF {
         DesignCore.Core.dxfVersion = versionNumber;
       }
     }
-
-    if (header.hasOwnProperty('$HANDSEED')) {
-      const handseed = header['$HANDSEED'];
-      if (handseed.hasOwnProperty('5')) {
-        const maxHandseed = handseed['5'];
-        Logging.instance.debug(`Opening DXF Handseed: ${maxHandseed}`);
-        DesignCore.HandleManager.handseed = maxHandseed;
-      }
-    }
   }
 
 
@@ -118,27 +131,61 @@ export class DXF {
 
     tables.forEach((table) => {
       if (table[2] === 'LAYER') {
+        if (table[5]) DesignCore.LayerManager.handle = table[5];
         table.children.forEach((layer) => {
           DesignCore.LayerManager.addItem(layer, true);
         });
       }
 
       if (table[2] === 'LTYPE') {
+        if (table[5]) DesignCore.LTypeManager.handle = table[5];
         table.children.forEach((ltype) => {
           DesignCore.LTypeManager.addItem(ltype, true);
         });
       }
 
       if (table[2] === 'STYLE') {
+        if (table[5]) DesignCore.StyleManager.handle = table[5];
         table.children.forEach((style) => {
           DesignCore.StyleManager.addItem(style, true);
         });
       }
 
       if (table[2] === 'DIMSTYLE') {
+        if (table[5]) DesignCore.DimStyleManager.handle = table[5];
         table.children.forEach((style) => {
           DesignCore.DimStyleManager.addItem(style, true);
         });
+      }
+
+      if (table[2] === 'VPORT') {
+        if (table[5]) DesignCore.VPortManager.handle = table[5];
+      }
+
+      if (table[2] === 'VIEW') {
+        if (table[5]) DesignCore.ViewManager.handle = table[5];
+      }
+
+      if (table[2] === 'UCS') {
+        if (table[5]) DesignCore.UCSManager.handle = table[5];
+      }
+
+      if (table[2] === 'APPID') {
+        if (table[5]) DesignCore.AppIDManager.handle = table[5];
+      }
+
+      if (table[2] === 'BLOCK_RECORD') {
+        if (table[5]) DesignCore.BlockRecordManager.handle = table[5];
+        // Build a map of block name to block record handle
+        // This is used when loading blocks to assign the correct blockRecordHandle
+        this.blockRecordHandles = {};
+        if (table.children) {
+          table.children.forEach((record) => {
+            if (record[2] && record[5]) {
+              this.blockRecordHandles[record[2]] = record[5];
+            }
+          });
+        }
       }
     });
   }
@@ -180,6 +227,13 @@ export class DXF {
           if (child.hasOwnProperty('0') === false) {
             return;
           }
+
+          // Extract the ENDBLK handle from the block children
+          if (child[0] === 'ENDBLK' && child[5]) {
+            block.endblkHandle = child[5];
+            return;
+          }
+
           // Convert child points to design points
           if (child.hasOwnProperty('points')) {
             child.points = this.parsePoints(child.points);
@@ -201,6 +255,11 @@ export class DXF {
             block.items.push(item);
           }
         });
+      }
+
+      // Assign the block record handle from the BLOCK_RECORD table
+      if (this.blockRecordHandles && block[2] && this.blockRecordHandles[block[2]]) {
+        block.blockRecordHandle = this.blockRecordHandles[block[2]];
       }
 
       DesignCore.Scene.blockManager.addItem(block, true);
