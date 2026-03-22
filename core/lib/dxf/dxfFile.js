@@ -1,5 +1,3 @@
-import { HandleManager } from './handleManager.js';
-import { DesignCore } from '../../designCore.js';
 import { Logging } from '../logging.js';
 import { Strings } from '../strings.js';
 
@@ -18,12 +16,6 @@ export class DXFFile {
     }
 
     this.version = DXFFile.Version[version];
-    this.handle = new HandleManager();
-
-    // Seed above all assigned handles to avoid collisions
-    if (DesignCore._core?.handle) {
-      this.handle.handseed = DesignCore.HandleManager.handseed;
-    }
   }
 
   /**
@@ -89,18 +81,6 @@ export class DXFFile {
    */
   clearFile() {
     this.contents = '';
-    this.handle.reset();
-  }
-
-  /**
-   * Returns the next available handle value
-   * R12 handles are optional.
-   * R13+ handles are mandatory.
-   * The header variable $HANDSEED must be greater than the largest handle value
-   * @return {string} handle value
-   */
-  nextHandle() {
-    return this.handle.next();
   }
 
   /**
