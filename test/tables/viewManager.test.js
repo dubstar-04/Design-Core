@@ -38,6 +38,8 @@ VIEW
 21
 100
 AcDbSymbolTable
+70
+0
 0
 ENDTAB
 `;

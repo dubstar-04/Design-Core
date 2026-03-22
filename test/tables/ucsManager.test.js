@@ -38,6 +38,8 @@ UCS
 24
 100
 AcDbSymbolTable
+70
+0
 0
 ENDTAB
 `;
