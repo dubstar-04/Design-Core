@@ -63,7 +63,7 @@ test('Test Layer.isSelectable', () => {
 });
 
 test('Test Layer.dxf', () => {
-  const layer = new Layer({ handle: 'A', name: 'TestLayer', plotStyleHandle: 'B' });
+  const layer = new Layer({ handle: 'A', name: 'TestLayer' });
   const file = new File();
   layer.dxf(file);
   // console.log(file.contents);
@@ -87,7 +87,7 @@ CONTINUOUS
 290
 1
 390
-B
+0
 `;
 
   expect(file.contents).toEqual(dxfString);

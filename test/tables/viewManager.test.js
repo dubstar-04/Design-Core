@@ -35,7 +35,7 @@ TABLE
 2
 VIEW
 5
-21
+1F
 100
 AcDbSymbolTable
 70
