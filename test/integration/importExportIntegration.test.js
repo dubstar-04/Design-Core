@@ -8,6 +8,51 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+/**
+ * Strip handle values from a DXF string so that comparison
+ * is insensitive to handle allocation order.
+ * Only group codes that contain hex handles are stripped.
+ * Values are validated as hex before stripping.
+ * @param {string} dxfString
+ * @return {{stripped: string, invalidHandles: Array<{line: number, code: number, value: string}>}}
+ */
+function stripHandles(dxfString) {
+  const lines = dxfString.split('\n');
+  const invalidHandles = [];
+  let inDimStyle = false;
+
+  // DXF lines alternate: group code, value, group code, value...
+  for (let i = 0; i < lines.length - 1; i += 2) {
+    const code = parseInt(lines[i].trim(), 10);
+    if (isNaN(code)) continue;
+
+    const value = lines[i + 1].trim();
+
+    // Track DIMSTYLE context - groupcode 5 is an arrowhead
+    // block name in DIMSTYLE, not a handle (DIMSTYLE uses 105)
+    if (code === 0) {
+      inDimStyle = value === 'DIMSTYLE';
+    }
+
+    // Groupcode 5 = entity/table handle (except in DIMSTYLE)
+    // Groupcode 105 = dimstyle handle
+    // Groupcode 350 = dictionary entry handle
+    // Groupcode 390 = plotStyleHandle
+    const isHandleCode = (code === 5 && !inDimStyle) ||
+                         code === 105 || code === 350 || code === 390;
+
+    if (isHandleCode) {
+      if (/^[0-9A-Fa-f]+$/.test(value)) {
+        lines[i + 1] = '0';
+      } else {
+        invalidHandles.push({ line: i + 2, code, value });
+      }
+    }
+  }
+
+  return { stripped: lines.join('\n'), invalidHandles };
+}
+
 test('Test DXF round-trip: read reference and re-output matches', () => {
   const core = new Core();
 
@@ -20,5 +65,11 @@ test('Test DXF round-trip: read reference and re-output matches', () => {
 
   // Output a new DXF
   const output = core.saveFile('R2018');
-  expect(output).toBe(reference);
+
+  const strippedOutput = stripHandles(output);
+  const strippedReference = stripHandles(reference);
+
+  expect(strippedOutput.invalidHandles).toEqual([]);
+  expect(strippedReference.invalidHandles).toEqual([]);
+  expect(strippedOutput.stripped).toBe(strippedReference.stripped);
 });
