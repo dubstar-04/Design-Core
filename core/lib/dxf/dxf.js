@@ -233,6 +233,12 @@ export class DXF {
           DesignCore.HandleManager.checkHandle(table[5]);
           DesignCore.AppIDManager.handle = table[5];
         }
+        if (table.children.length) {
+          DesignCore.AppIDManager.clearItems();
+        }
+        table.children.forEach((appid) => {
+          DesignCore.AppIDManager.addItem(appid, true);
+        });
       }
 
       if (table[2] === 'BLOCK_RECORD') {
