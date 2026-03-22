@@ -1,5 +1,5 @@
-import {Objects} from '../../../../core/lib/dxf/sections/objects.js';
-import {DxfIterator} from '../../../../core/lib/dxf/dxfIterator.js';
+import { Objects } from '../../../../core/lib/dxf/sections/objects.js';
+import { DxfIterator } from '../../../../core/lib/dxf/dxfIterator.js';
 
 const objectData =
   `0
