@@ -285,6 +285,7 @@ export class DXF {
 
           // Extract the ENDBLK handle from the block children
           if (child[0] === 'ENDBLK' && child[5]) {
+            DesignCore.HandleManager.checkHandle(child[5]);
             block.endblkHandle = child[5];
             return;
           }
@@ -299,6 +300,11 @@ export class DXF {
           if (DesignCore.CommandManager.isCommand(command)) {
             // create an instance of the child entity
             const item = DesignCore.CommandManager.createNew(command, child);
+
+            // Register the child entity handle
+            if (item.handle) {
+              DesignCore.HandleManager.checkHandle(item.handle);
+            }
 
             if (block.hasOwnProperty('items') === false) {
               block.items = [];
