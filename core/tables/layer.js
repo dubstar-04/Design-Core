@@ -40,7 +40,7 @@ export class Layer {
     // DXF Groupcode 5 - Handle
     this.handle = Property.loadValue([data?.handle, data?.[5]]);
     // DXF Groupcode 390 - Plot style name handle
-    this.plotStyleHandle = Property.loadValue([data?.plotStyleHandle, data?.[390]]);
+    this.plotStyleHandle = Property.loadValue([data?.plotStyleHandle, data?.[390]], '0');
 
     if (data) {
       if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
@@ -212,7 +212,7 @@ export class Layer {
     }
     file.writeGroupCode('6', this.lineType);
     file.writeGroupCode('290', this.plotting ? 1 : 0); // plotting - required to be 0 for defpoints
-    file.writeGroupCode('390', this.plotStyleHandle, DXFFile.Version.R2000); // plotstylename handle - //TODO: this needs to be linked to the actual plotstyle
+    file.writeGroupCode('390', this.plotStyleHandle, DXFFile.Version.R2000);
 
     // file.writeGroupCode('370', 'this.lineWeight '); // lineWeight      |  These items codes don't seem to be supported in ACAD.
   }
