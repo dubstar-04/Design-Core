@@ -73,3 +73,54 @@ test('Test DXF round-trip: read reference and re-output matches', () => {
   expect(strippedReference.invalidHandles).toEqual([]);
   expect(strippedOutput.stripped).toBe(strippedReference.stripped);
 });
+
+test('Test DXF output has no duplicate handles', () => {
+  const core = new Core();
+
+  const referencePath = join(__dirname, 'exportIntegration.reference.dxf');
+  const reference = readFileSync(referencePath, 'utf8');
+
+  // Load the reference DXF
+  const dxf = new DXF();
+  dxf.loadDxf(reference);
+
+  // Output a new DXF
+  const output = core.saveFile('R2018');
+  const lines = output.split('\n');
+
+  const handles = new Map();
+  let inDimStyle = false;
+  let isHandseed = false;
+
+  for (let i = 0; i < lines.length - 1; i += 2) {
+    const code = parseInt(lines[i].trim(), 10);
+    if (isNaN(code)) continue;
+
+    const value = lines[i + 1].trim();
+
+    if (code === 0) {
+      inDimStyle = value === 'DIMSTYLE';
+    }
+
+    // $HANDSEED uses groupcode 5 for its value, not as a handle
+    if (code === 9 && value === '$HANDSEED') {
+      isHandseed = true;
+      continue;
+    }
+
+    // Only check groupcode 5 handles (entity/table handles)
+    // Skip DIMSTYLE where code 5 is arrowhead block name
+    // Skip $HANDSEED value
+    if (code === 5 && !inDimStyle && !isHandseed && /^[0-9A-Fa-f]+$/.test(value)) {
+      const lineNum = i + 2;
+      if (handles.has(value)) {
+        fail(`Duplicate handle ${value} at line ${lineNum} (first seen at line ${handles.get(value)})`);
+      }
+      handles.set(value, lineNum);
+    }
+
+    isHandseed = false;
+  }
+
+  expect(handles.size).toBeGreaterThan(0);
+});
