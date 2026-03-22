@@ -26,8 +26,8 @@ export class Scene {
     this.blockManager = new BlockManager();
 
     this.entities = new EntityManager();
-    this.tempEntities = new EntityManager();
-    this.auxiliaryEntities = new EntityManager();
+    this.tempEntities = new EntityManager(false);
+    this.auxiliaryEntities = new EntityManager(false);
 
     this.stateManager = new StateManager();
 

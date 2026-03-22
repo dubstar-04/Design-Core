@@ -7,12 +7,14 @@ import { DesignCore } from '../designCore.js';
  */
 export class EntityManager {
   #entities = [];
+  #trackHandles;
 
   /**
    * Create EntityManager
+   * @param {boolean} [trackHandles=true] - whether to track handles for entities
    */
-  constructor() {
-
+  constructor(trackHandles = true) {
+    this.#trackHandles = trackHandles;
   }
 
   /**
@@ -33,10 +35,12 @@ export class EntityManager {
   add(entity) {
     if (!entity) return;
 
-    if (entity.handle === undefined) {
-      entity.handle = DesignCore.HandleManager.next();
-    } else {
-      DesignCore.HandleManager.checkHandle(entity.handle);
+    if (this.#trackHandles) {
+      if (entity.handle === undefined) {
+        entity.handle = DesignCore.HandleManager.next();
+      } else {
+        DesignCore.HandleManager.checkHandle(entity.handle);
+      }
     }
 
     this.#entities.push(entity);
