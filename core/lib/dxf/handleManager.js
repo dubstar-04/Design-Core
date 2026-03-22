@@ -1,4 +1,4 @@
-import {Logging} from '../logging.js';
+import { Logging } from '../logging.js';
 
 /** HandleManager Class */
 export class HandleManager {
