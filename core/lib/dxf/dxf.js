@@ -16,6 +16,9 @@ export class DXF {
 
     // flag indicates if dxf contains unsupported elements
     this.unsupportedElements = false;
+
+    // map of block name to block record handle
+    this.blockRecordHandles = {};
   }
 
   /**
@@ -221,7 +224,7 @@ export class DXF {
         }
         // Build a map of block name to block record handle
         // This is used when loading blocks to assign the correct blockRecordHandle
-        this.blockRecordHandles = {};
+
         if (table.children) {
           table.children.forEach((record) => {
             if (record[2] && record[5]) {
@@ -286,7 +289,7 @@ export class DXF {
       }
 
       // Assign the block record handle from the BLOCK_RECORD table
-      if (this.blockRecordHandles && block[2] && this.blockRecordHandles[block[2]]) {
+      if (block[2] && this.blockRecordHandles[block[2]]) {
         block.blockRecordHandle = this.blockRecordHandles[block[2]];
       }
 
