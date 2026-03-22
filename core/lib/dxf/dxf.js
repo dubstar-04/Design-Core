@@ -194,6 +194,12 @@ export class DXF {
           DesignCore.HandleManager.checkHandle(table[5]);
           DesignCore.VPortManager.handle = table[5];
         }
+        if (table.children.length) {
+          DesignCore.VPortManager.clearItems();
+        }
+        table.children.forEach((vport) => {
+          DesignCore.VPortManager.addItem(vport, true);
+        });
       }
 
       if (table[2] === 'VIEW') {
