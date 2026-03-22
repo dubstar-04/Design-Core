@@ -3,6 +3,7 @@ import { Header } from './sections/header.js';
 import { Entities } from './sections/entities.js';
 import { Blocks } from './sections/blocks.js';
 import { Tables } from './sections/tables.js';
+import { Objects } from './sections/objects.js';
 import { DxfIterator } from './dxfIterator.js';
 
 /** DXF Reader Class */
@@ -14,6 +15,7 @@ export class DXFReader {
     this.header = new Header();
     this.entities = [];
     this.tables = [];
+    this.objects = [];
   }
 
   /**
@@ -49,6 +51,11 @@ export class DXFReader {
         case (currentPair.value === 'ENTITIES'):
           const entities = new Entities();
           this.entities = entities.read(this.iterator);
+          break;
+
+        case (currentPair.value === 'OBJECTS'):
+          const objects = new Objects();
+          this.objects = objects.read(this.iterator);
           break;
       }
     }

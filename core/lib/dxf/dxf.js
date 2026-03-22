@@ -60,6 +60,7 @@ export class DXF {
     this.loadTables();
     this.loadBlocks();
     this.loadEntities();
+    this.loadObjects();
 
     // load headers for styles and version
     this.loadHeader();
@@ -350,6 +351,14 @@ export class DXF {
     DesignCore.LTypeManager.checkItems();
     DesignCore.StyleManager.checkItems();
     DesignCore.DimStyleManager.checkItems();
+  }
+
+  /**
+   * Load Objects
+   */
+  loadObjects() {
+    const objects = this.reader.objects;
+    DesignCore.DictionaryManager.load(objects);
   }
 
   /**
