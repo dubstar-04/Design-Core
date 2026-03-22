@@ -40,7 +40,7 @@ export class Layer {
     // DXF Groupcode 5 - Handle
     this.handle = Property.loadValue([data?.handle, data?.[5]]);
     // DXF Groupcode 390 - Plot style name handle
-    this.plotStyleHandle = data?.plotStyleHandle;
+    this.plotStyleHandle = Property.loadValue([data?.plotStyleHandle, data?.[390]]);
 
     if (data) {
       if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
