@@ -84,7 +84,11 @@ export class TableManagerBase {
     // Call the subclass to create a new typed item object
     const newItem = this.createItem(item);
     const newItemName = newItem.name;
+
+    if (newItem.handle === undefined) {
       newItem.handle = DesignCore.HandleManager.next();
+    }
+
     if (!this.itemExists(newItemName)) {
       this.items.push(newItem);
     } else if (overwrite) {
