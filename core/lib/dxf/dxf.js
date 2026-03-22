@@ -46,6 +46,10 @@ export class DXF {
     Logging.instance.debug('Loading File');
     this.read(data);
 
+    // Reset handles before loading
+    // This prevents handle collisions between init handles and file handles
+    DesignCore.HandleManager.reset();
+
     // load handseed first to ensure the handle counter is correctly set
     // before any new handles are assigned during table/block/entity loading
     this.loadHandseed();
@@ -131,57 +135,97 @@ export class DXF {
 
     tables.forEach((table) => {
       if (table[2] === 'LAYER') {
-        if (table[5]) DesignCore.LayerManager.handle = table[5];
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.LayerManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.LayerManager.clearItems();
+        }
         table.children.forEach((layer) => {
           DesignCore.LayerManager.addItem(layer, true);
         });
       }
 
       if (table[2] === 'LTYPE') {
-        if (table[5]) DesignCore.LTypeManager.handle = table[5];
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.LTypeManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.LTypeManager.clearItems();
+        }
         table.children.forEach((ltype) => {
           DesignCore.LTypeManager.addItem(ltype, true);
         });
       }
 
       if (table[2] === 'STYLE') {
-        if (table[5]) DesignCore.StyleManager.handle = table[5];
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.StyleManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.StyleManager.clearItems();
+        }
         table.children.forEach((style) => {
           DesignCore.StyleManager.addItem(style, true);
         });
       }
 
       if (table[2] === 'DIMSTYLE') {
-        if (table[5]) DesignCore.DimStyleManager.handle = table[5];
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.DimStyleManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.DimStyleManager.clearItems();
+        }
         table.children.forEach((style) => {
           DesignCore.DimStyleManager.addItem(style, true);
         });
       }
 
       if (table[2] === 'VPORT') {
-        if (table[5]) DesignCore.VPortManager.handle = table[5];
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.VPortManager.handle = table[5];
+        }
       }
 
       if (table[2] === 'VIEW') {
-        if (table[5]) DesignCore.ViewManager.handle = table[5];
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.ViewManager.handle = table[5];
+        }
       }
 
       if (table[2] === 'UCS') {
-        if (table[5]) DesignCore.UCSManager.handle = table[5];
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.UCSManager.handle = table[5];
+        }
       }
 
       if (table[2] === 'APPID') {
-        if (table[5]) DesignCore.AppIDManager.handle = table[5];
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.AppIDManager.handle = table[5];
+        }
       }
 
       if (table[2] === 'BLOCK_RECORD') {
-        if (table[5]) DesignCore.BlockRecordManager.handle = table[5];
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.BlockRecordManager.handle = table[5];
+        }
         // Build a map of block name to block record handle
         // This is used when loading blocks to assign the correct blockRecordHandle
         this.blockRecordHandles = {};
         if (table.children) {
           table.children.forEach((record) => {
             if (record[2] && record[5]) {
+              DesignCore.HandleManager.checkHandle(record[5]);
               this.blockRecordHandles[record[2]] = record[5];
             }
           });
@@ -196,27 +240,11 @@ export class DXF {
   loadBlocks() {
     const blocks = this.reader.blocks;
 
-    blocks.forEach((block) => {
-      if (block.hasOwnProperty('2')) {
-        /*
-        Three empty definitions always appear in the BLOCKS section.
-        They are titled *Model_Space, *Paper_Space and *Paper_Space0.
-        These definitions manifest the representations of model space and paper space as block definitions internally.
-        The internal name of the first paper space layout is *Paper_Space,
-        the second is *Paper_Space0,
-        the third is *Paper_Space1,
-        and so on.
-        */
-        if (block[2].toUpperCase().includes('MODEL_SPACE')) {
-          // skip model_space blocks
-          return;
-        }
+    if (blocks.length) {
+      DesignCore.Scene.blockManager.clearItems();
+    }
 
-        if (block[2].toUpperCase().includes('PAPER_SPACE')) {
-          // skip paper_space blocks
-          return;
-        }
-      }
+    blocks.forEach((block) => {
       if (block.hasOwnProperty('points')) {
         block.points = this.parsePoints(block.points);
       }
@@ -271,6 +299,10 @@ export class DXF {
    */
   loadEntities() {
     const entities = this.reader.entities;
+
+    if (entities.length) {
+      DesignCore.Scene.entities.clear();
+    }
 
     entities.forEach((entity) => {
       if (entity.hasOwnProperty('points')) {
