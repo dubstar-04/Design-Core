@@ -5,6 +5,7 @@ import { Line } from '../../core/entities/line.js';
 import { Arc } from '../../core/entities/arc.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
+import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
 
 import { File } from '../test-helpers/test-helpers.js';
 
@@ -255,10 +256,10 @@ test('Test BasePolyline.getBulgeFromSegment', () => {
   expect(polyline.getBulgeFromSegment(new Point(64.6447, -14.6447))).toBeCloseTo(bulge);
 });
 
-test('Test BasePolyline.dxf', () => {
+test('Test Polyline.dxf', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
-  const polyline = new BasePolyline({ handle: '1', points: points });
+  const polyline = new Polyline({ handle: '1', points: points });
   let file = new File();
   polyline.dxf(file);
   // console.log(file.contents);
@@ -307,6 +308,68 @@ ByLayer
   const newPolyline = new Polyline(polyline);
   file = new File();
   newPolyline.dxf(file);
+
+  expect(file.contents).toEqual(dxfString);
+});
+
+test('Test Polyline.dxf R12', () => {
+  const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
+  points[1].bulge = -1;
+  const polyline = new Polyline({ handle: '1', points: points });
+  const file = new DXFFile('R12');
+  polyline.dxf(file);
+
+  const dxfString = `0
+POLYLINE
+8
+0
+6
+ByLayer
+66
+1
+70
+0
+0
+VERTEX
+8
+0
+10
+100
+20
+100
+30
+0.0
+42
+0
+0
+VERTEX
+8
+0
+10
+200
+20
+100
+30
+0.0
+42
+-1
+0
+VERTEX
+8
+0
+10
+200
+20
+50
+30
+0.0
+42
+0
+0
+SEQEND
+8
+0
+`;
 
   expect(file.contents).toEqual(dxfString);
 });
