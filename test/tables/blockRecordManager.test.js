@@ -13,7 +13,7 @@ TABLE
 2
 BLOCK_RECORD
 5
-25
+27
 100
 AcDbSymbolTable
 70

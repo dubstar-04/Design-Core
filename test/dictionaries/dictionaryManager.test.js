@@ -11,7 +11,7 @@ test('Test DictionaryManager.dxf', () => {
   const dxfString = `0
 DICTIONARY
 5
-27
+29
 100
 AcDbDictionary
 281
@@ -19,11 +19,11 @@ AcDbDictionary
 3
 ACAD_GROUP
 350
-26
+28
 0
 DICTIONARY
 5
-26
+28
 100
 AcDbDictionary
 281

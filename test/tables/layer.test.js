@@ -63,7 +63,7 @@ test('Test Layer.isSelectable', () => {
 });
 
 test('Test Layer.dxf', () => {
-  const layer = new Layer({ name: 'TestLayer' });
+  const layer = new Layer({ handle: 'A', name: 'TestLayer', plotStyleHandle: 'B' });
   const file = new File();
   layer.dxf(file);
   // console.log(file.contents);
@@ -71,7 +71,7 @@ test('Test Layer.dxf', () => {
   const dxfString = `0
 LAYER
 5
-1
+A
 100
 AcDbSymbolTableRecord
 100
@@ -87,7 +87,7 @@ CONTINUOUS
 290
 1
 390
-1
+B
 `;
 
   expect(file.contents).toEqual(dxfString);
