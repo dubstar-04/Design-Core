@@ -76,9 +76,7 @@ export class StyleManagerBase extends TableManagerBase {
    * Ensure that used styles and default styles exist
    */
   checkStyles() {
-    if (!this.itemCount()) {
-      this.addStandardItems();
-    }
+    this.addStandardItems();
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
       const style = (DesignCore.Scene.entities.get(i)[this.itemProperty]);

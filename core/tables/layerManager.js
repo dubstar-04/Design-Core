@@ -56,9 +56,7 @@ export class LayerManager extends StyleManagerBase {
     file.writeGroupCode('70', this.itemCount());
 
     for (let i = 0; i < this.itemCount(); i++) {
-      if (this.getItemByIndex(i).name !== 'DEFPOINTS') {
-        this.getItemByIndex(i).dxf(file);
-      }
+      this.getItemByIndex(i).dxf(file);
     }
 
     file.writeGroupCode('0', 'ENDTAB');

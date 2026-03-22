@@ -143,9 +143,7 @@ export class TableManagerBase {
    * Ensure that used items and default items exist
    */
   checkItems() {
-    if (!this.itemCount()) {
-      this.addStandardItems();
-    }
+    this.addStandardItems();
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
       const item = (DesignCore.Scene.entities.get(i));
