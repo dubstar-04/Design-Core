@@ -350,3 +350,50 @@ test('Test Trim.action polyline - trim middle segment', () => {
   expect(polylines[1].points[1].x).toBe(100);
   expect(polylines[1].points[2].x).toBe(150);
 });
+
+test('Test Trim.action polyline - trim bulged arc segment', () => {
+  // Polyline: (0,0) with bulge=1 -> arc -> (100,0) -> straight -> (200,0)
+  // With bulge=1 (CCW) the semicircular arc goes through (50,-50)
+  // Arc center: (50,0), radius: 50
+  // Boundary: vertical line at x=50
+  // Intersection at (50,-50) — bottom of semicircle
+  // Mouse at (75,-40) — right of intersection on the arc
+  // Expected: polyline trimmed to [(0,0) with partial bulge, (50,-50)]
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', {points: [new Point(0, 0, 1), new Point(100, 0), new Point(200, 0)]});
+  core.scene.addItem('Line', {points: [new Point(50, -100), new Point(50, 100)]});
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(75, -40));
+  trim.action();
+
+  // Original polyline removed, one new trimmed piece added, boundary remains
+  expect(core.scene.entities.count()).toBe(2);
+
+  // Find the trimmed polyline
+  let trimmed;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Lwpolyline') {
+      trimmed = core.scene.entities.get(i);
+    }
+  }
+
+  expect(trimmed).toBeDefined();
+  expect(trimmed.points.length).toBe(2);
+
+  // First point: (0,0) with partial bulge for 90° arc
+  // Original 180° arc split at midpoint -> 90° arc
+  // bulge = tan(includedAngle/4) = tan(π/8) = √2 - 1
+  expect(trimmed.points[0].x).toBeCloseTo(0, 10);
+  expect(trimmed.points[0].y).toBeCloseTo(0, 10);
+  expect(trimmed.points[0].bulge).toBeCloseTo(Math.tan(Math.PI / 8), 10);
+
+  // Second point: intersection at (50,-50), no bulge
+  expect(trimmed.points[1].x).toBeCloseTo(50, 10);
+  expect(trimmed.points[1].y).toBeCloseTo(-50, 10);
+  expect(trimmed.points[1].bulge).toBe(0);
+});
