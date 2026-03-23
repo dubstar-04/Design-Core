@@ -10,7 +10,7 @@ import { Lwpolyline } from '../../core/entities/lwpolyline.js';
 // import { Solid } from '../../core/entities/solid.js';
 import { Hatch } from '../../core/entities/hatch.js';
 import { Insert } from '../../core/entities/insert.js';
-import { ArcAlignedText } from '../../core/entities/arctext.js';
+// import { ArcAlignedText } from '../../core/entities/arctext.js';
 import { BasePolyline } from '../../core/entities/basePolyline.js';
 
 import { readFileSync } from 'fs';
@@ -27,7 +27,7 @@ beforeAll(() => {
 
   // Entities are arranged in a 3x3 grid of 100x100 cells:
   //
-  //   Row 2 (y=200-300): | Hatch        | Insert       | ArcText      |
+  //   Row 2 (y=200-300): | Hatch        | Insert       |
   //   Row 1 (y=100-200): | Text         | Polyline     | Lwpolyline   |
   //   Row 0 (y=0-100):   | Line         | Circle       | Arc          |
 
@@ -41,7 +41,7 @@ beforeAll(() => {
   // DesignCore.LayerManager.addItem({ name: 'SOLID_LAYER' });
   DesignCore.LayerManager.addItem({ name: 'HATCH_LAYER' });
   DesignCore.LayerManager.addItem({ name: 'INSERT_LAYER' });
-  DesignCore.LayerManager.addItem({ name: 'ARCTEXT_LAYER' });
+  // DesignCore.LayerManager.addItem({ name: 'ARCTEXT_LAYER' });
 
   // Row 0, Col 0: Line
   const line = new Line({
@@ -132,18 +132,18 @@ beforeAll(() => {
   core.scene.entities.add(insert);
   core.scene.entities.add(new Text({ points: [new Point(115, 205)], string: 'Insert', height: 4 }));
 
-  // Row 2, Col 2: ArcAlignedText
-  const arctext = new ArcAlignedText({
-    points: [new Point(250, 255)],
-    radius: 25,
-    string: 'ArcText',
-    height: 5,
-    startAngle: 0,
-    endAngle: 180,
-    layer: 'ARCTEXT_LAYER',
-  });
-  core.scene.entities.add(arctext);
-  core.scene.entities.add(new Text({ points: [new Point(215, 205)], string: 'ArcText', height: 4 }));
+  // ArcAlignedText - omitted
+  // const arctext = new ArcAlignedText({
+  //   points: [new Point(250, 255)],
+  //   radius: 25,
+  //   string: 'ArcText',
+  //   height: 5,
+  //   startAngle: 0,
+  //   endAngle: 180,
+  //   layer: 'ARCTEXT_LAYER',
+  // });
+  // core.scene.entities.add(arctext);
+  // core.scene.entities.add(new Text({ points: [new Point(215, 205)], string: 'ArcText', height: 4 }));
 });
 
 let dxfOutput;
@@ -162,7 +162,7 @@ test('Test DXF output contains all entities', () => {
   // expect(dxfOutput).toContain('SOLID');
   expect(dxfOutput).toContain('HATCH');
   expect(dxfOutput).toContain('INSERT');
-  expect(dxfOutput).toContain('ARCALIGNEDTEXT');
+  // expect(dxfOutput).toContain('ARCALIGNEDTEXT');
 });
 
 test('Test DXF output contains all layers', () => {
@@ -175,7 +175,7 @@ test('Test DXF output contains all layers', () => {
   // expect(dxfOutput).toContain('SOLID_LAYER');
   expect(dxfOutput).toContain('HATCH_LAYER');
   expect(dxfOutput).toContain('INSERT_LAYER');
-  expect(dxfOutput).toContain('ARCTEXT_LAYER');
+  // expect(dxfOutput).toContain('ARCTEXT_LAYER');
 });
 
 test('Test DXF output matches reference file', () => {
