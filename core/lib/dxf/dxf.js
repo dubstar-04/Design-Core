@@ -16,6 +16,9 @@ export class DXF {
 
     // flag indicates if dxf contains unsupported elements
     this.unsupportedElements = false;
+
+    // map of block name to block record handle
+    this.blockRecordHandles = {};
   }
 
   /**
@@ -46,15 +49,42 @@ export class DXF {
     Logging.instance.debug('Loading File');
     this.read(data);
 
+    // Reset handles before loading
+    // This prevents handle collisions between init handles and file handles
+    DesignCore.HandleManager.reset();
+
+    // load handseed first to ensure the handle counter is correctly set
+    // before any new handles are assigned during table/block/entity loading
+    this.loadHandseed();
+
     this.loadTables();
     this.loadBlocks();
     this.loadEntities();
+    this.loadObjects();
 
-    // load headers last to ensure the elements and layers exist
+    // load headers for styles and version
     this.loadHeader();
 
     if (this.unsupportedElements) {
       DesignCore.Core.notify(Strings.Warning.UNSUPPORTEDENTITIES);
+    }
+  }
+
+  /**
+   * Load Handseed from header
+   * Must be called before loading tables/blocks/entities
+   * to ensure the handle counter is set beyond all handles in the file
+   */
+  loadHandseed() {
+    const header = this.reader.header;
+
+    if (header.hasOwnProperty('$HANDSEED')) {
+      const handseed = header['$HANDSEED'];
+      if (handseed.hasOwnProperty('5')) {
+        const maxHandseed = handseed['5'];
+        Logging.instance.debug(`Opening DXF Handseed: ${maxHandseed}`);
+        DesignCore.HandleManager.handseed = maxHandseed;
+      }
     }
   }
 
@@ -109,27 +139,125 @@ export class DXF {
 
     tables.forEach((table) => {
       if (table[2] === 'LAYER') {
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.LayerManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.LayerManager.clearItems();
+        }
         table.children.forEach((layer) => {
           DesignCore.LayerManager.addItem(layer, true);
         });
       }
 
       if (table[2] === 'LTYPE') {
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.LTypeManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.LTypeManager.clearItems();
+        }
         table.children.forEach((ltype) => {
           DesignCore.LTypeManager.addItem(ltype, true);
         });
       }
 
       if (table[2] === 'STYLE') {
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.StyleManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.StyleManager.clearItems();
+        }
         table.children.forEach((style) => {
           DesignCore.StyleManager.addItem(style, true);
         });
       }
 
       if (table[2] === 'DIMSTYLE') {
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.DimStyleManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.DimStyleManager.clearItems();
+        }
         table.children.forEach((style) => {
           DesignCore.DimStyleManager.addItem(style, true);
         });
+      }
+
+      if (table[2] === 'VPORT') {
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.VPortManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.VPortManager.clearItems();
+        }
+        table.children.forEach((vport) => {
+          DesignCore.VPortManager.addItem(vport, true);
+        });
+      }
+
+      if (table[2] === 'VIEW') {
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.ViewManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.ViewManager.clearItems();
+        }
+        table.children.forEach((view) => {
+          DesignCore.ViewManager.addItem(view, true);
+        });
+      }
+
+      if (table[2] === 'UCS') {
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.UCSManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.UCSManager.clearItems();
+        }
+        table.children.forEach((ucs) => {
+          DesignCore.UCSManager.addItem(ucs, true);
+        });
+      }
+
+      if (table[2] === 'APPID') {
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.AppIDManager.handle = table[5];
+        }
+        if (table.children.length) {
+          DesignCore.AppIDManager.clearItems();
+        }
+        table.children.forEach((appid) => {
+          DesignCore.AppIDManager.addItem(appid, true);
+        });
+      }
+
+      if (table[2] === 'BLOCK_RECORD') {
+        if (table[5]) {
+          DesignCore.HandleManager.checkHandle(table[5]);
+          DesignCore.BlockRecordManager.handle = table[5];
+        }
+        // Build a map of block name to block record handle
+        // This is used when loading blocks to assign the correct blockRecordHandle
+
+        if (table.children) {
+          table.children.forEach((record) => {
+            if (record[2] && record[5]) {
+              DesignCore.HandleManager.checkHandle(record[5]);
+              this.blockRecordHandles[record[2]] = record[5];
+            }
+          });
+        }
       }
     });
   }
@@ -140,27 +268,11 @@ export class DXF {
   loadBlocks() {
     const blocks = this.reader.blocks;
 
-    blocks.forEach((block) => {
-      if (block.hasOwnProperty('2')) {
-        /*
-        Three empty definitions always appear in the BLOCKS section.
-        They are titled *Model_Space, *Paper_Space and *Paper_Space0.
-        These definitions manifest the representations of model space and paper space as block definitions internally.
-        The internal name of the first paper space layout is *Paper_Space,
-        the second is *Paper_Space0,
-        the third is *Paper_Space1,
-        and so on.
-        */
-        if (block[2].toUpperCase().includes('MODEL_SPACE')) {
-          // skip model_space blocks
-          return;
-        }
+    if (blocks.length) {
+      DesignCore.Scene.blockManager.clearItems();
+    }
 
-        if (block[2].toUpperCase().includes('PAPER_SPACE')) {
-          // skip paper_space blocks
-          return;
-        }
-      }
+    blocks.forEach((block) => {
       if (block.hasOwnProperty('points')) {
         block.points = this.parsePoints(block.points);
       }
@@ -171,6 +283,14 @@ export class DXF {
           if (child.hasOwnProperty('0') === false) {
             return;
           }
+
+          // Extract the ENDBLK handle from the block children
+          if (child[0] === 'ENDBLK' && child[5]) {
+            DesignCore.HandleManager.checkHandle(child[5]);
+            block.endblkHandle = child[5];
+            return;
+          }
+
           // Convert child points to design points
           if (child.hasOwnProperty('points')) {
             child.points = this.parsePoints(child.points);
@@ -181,6 +301,11 @@ export class DXF {
           if (DesignCore.CommandManager.isCommand(command)) {
             // create an instance of the child entity
             const item = DesignCore.CommandManager.createNew(command, child);
+
+            // Register the child entity handle
+            if (item.handle) {
+              DesignCore.HandleManager.checkHandle(item.handle);
+            }
 
             if (block.hasOwnProperty('items') === false) {
               block.items = [];
@@ -194,6 +319,11 @@ export class DXF {
         });
       }
 
+      // Assign the block record handle from the BLOCK_RECORD table
+      if (block[2] && this.blockRecordHandles[block[2]]) {
+        block.blockRecordHandle = this.blockRecordHandles[block[2]];
+      }
+
       DesignCore.Scene.blockManager.addItem(block, true);
     });
   }
@@ -203,6 +333,10 @@ export class DXF {
    */
   loadEntities() {
     const entities = this.reader.entities;
+
+    if (entities.length) {
+      DesignCore.Scene.entities.clear();
+    }
 
     entities.forEach((entity) => {
       if (entity.hasOwnProperty('points')) {
@@ -217,6 +351,26 @@ export class DXF {
     DesignCore.LTypeManager.checkItems();
     DesignCore.StyleManager.checkItems();
     DesignCore.DimStyleManager.checkItems();
+  }
+
+  /**
+   * Load Objects
+   */
+  loadObjects() {
+    const objects = this.reader.objects;
+
+    if (objects.length) {
+      DesignCore.DictionaryManager.clearItems();
+    }
+
+    objects.forEach((object) => {
+      if (object[0] === 'DICTIONARY') {
+        DesignCore.DictionaryManager.addItem(object);
+      }
+    });
+
+    // Ensure standard items exist
+    DesignCore.DictionaryManager.checkItems();
   }
 
   /**

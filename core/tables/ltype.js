@@ -19,38 +19,27 @@ export class LType {
       writable: true,
     });
 
-    if (data) {
-      if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
-        // DXF Groupcode 2 - ltype name
-        this.name = data.name || data[2];
-      }
+    // DXF Groupcode 5 - Handle
+    this.handle = Property.loadValue([data?.handle, data?.[5]]);
+    // DXF Groupcode 2 - ltype name
+    this.name = Property.loadValue([data?.name, data?.[2]], '');
+    // DXF Groupcode 3 - description text
+    this.description = Property.loadValue([data?.description, data?.[3]], '');
+    // DXF Groupcode 49 - line type pattern
+    this.pattern = Property.loadValue([data?.pattern, data?.[49]], []);
 
-      if (data.hasOwnProperty('description') || data.hasOwnProperty('3')) {
-        // DXF Groupcode 3 - description text
-        this.description = data.description || data[3];
-      }
-
-      if (data.hasOwnProperty('pattern') || data.hasOwnProperty('49')) {
-        // DXF Groupcode 49 - line type pattern
-        this.pattern = data.pattern || data[49];
-      }
-
-      if (data.hasOwnProperty('73')) {
-        // DXF Groupcode 73 - number of line type elements in data[49]
-        if (data[73] !== this.pattern.length) {
-          throw Error('invalid line type pattern');
-        }
-      }
-
-      if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
-        // DXF Groupcode 70 - Polyline flag (bit-coded; default = 0):
-        // 16 = If set, table entry is externally dependent on an xref
-        // 32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved
-        // 64 = line type was referenced by at least one entity in the drawing the last time the drawing was edited. (This flag can be ignored by most programs)
-
-        this.flags.setFlagValue(Property.loadValue([data.flags, data[70]], 0));
+    if (data?.hasOwnProperty('73')) {
+      // DXF Groupcode 73 - number of line type elements in data[49]
+      if (data[73] !== this.pattern.length) {
+        throw Error('invalid line type pattern');
       }
     }
+
+    // DXF Groupcode 70 - Polyline flag (bit-coded; default = 0):
+    // 16 = If set, table entry is externally dependent on an xref
+    // 32 = If this bit and bit 16 are both set, the externally dependent xref has been successfully resolved
+    // 64 = line type was referenced by at least one entity in the drawing the last time the drawing was edited. (This flag can be ignored by most programs)
+    this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[70]], 0));
   }
 
   /**
@@ -71,7 +60,7 @@ export class LType {
    */
   dxf(file) {
     file.writeGroupCode('0', 'LTYPE');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbLinetypeTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name);

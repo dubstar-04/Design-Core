@@ -35,9 +35,11 @@ TABLE
 2
 UCS
 5
-A
+22
 100
 AcDbSymbolTable
+70
+0
 0
 ENDTAB
 `;

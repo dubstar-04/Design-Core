@@ -1,5 +1,6 @@
 import { Point } from '../entities/point.js';
 import { Entity } from '../entities/entity.js';
+import { EndBlock } from './endblk.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
 import { Strings } from '../lib/strings.js';
@@ -24,6 +25,9 @@ export class Block extends Entity {
     super(data);
     this.name = '';
     this.points = [new Point()];
+    // Store the block record handle and endblk handle for use when writing to dxf file
+    this.blockRecordHandle = data?.blockRecordHandle;
+    this.endblkHandle = data?.endblkHandle;
 
     Object.defineProperty(this, 'flags', {
       value: new Flags(),
@@ -157,7 +161,7 @@ export class Block extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'BLOCK');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
@@ -173,10 +177,8 @@ export class Block extends Entity {
       this.items[i].dxf(file);
     }
 
-    file.writeGroupCode('0', 'ENDBLK');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
-    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbBlockEnd', DXFFile.Version.R2000);
+    const endblk = new EndBlock({ handle: this.endblkHandle });
+    endblk.dxf(file);
   }
 
   /**

@@ -1,4 +1,5 @@
 import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { Property } from '../properties/property.js';
 
 /** AppID Class */
 export class AppID {
@@ -7,18 +8,12 @@ export class AppID {
    * @param {Object} data
    */
   constructor(data) {
-    this.name = '';
-    this.flags = 0;
-
-    if (data) {
-      if (data.hasOwnProperty('name') || data.hasOwnProperty('2')) {
-        this.name = data.name || data[2];
-      }
-
-      if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
-        this.flags = data.flags || data[70] || 0;
-      }
-    }
+    // DXF Groupcode 5 - Handle
+    this.handle = Property.loadValue([data?.handle, data?.[5]]);
+    // DXF Groupcode 2 - Name
+    this.name = Property.loadValue([data?.name, data?.[2]], '');
+    // DXF Groupcode 70 - Flags
+    this.flags = Property.loadValue([data?.flags, data?.[70]], 0);
   }
 
   /**
@@ -27,7 +22,7 @@ export class AppID {
    */
   dxf(file) {
     file.writeGroupCode('0', 'APPID', DXFFile.Version.R2000);
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000);
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbRegAppTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name, DXFFile.Version.R2000);

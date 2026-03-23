@@ -17,7 +17,7 @@ test('Test View constructor with DXF group code', () => {
 });
 
 test('Test View.dxf', () => {
-  const view = new View({ name: 'TestView' });
+  const view = new View({ handle: 'A', name: 'TestView' });
   const file = new DXFFile();
   view.dxf(file);
 

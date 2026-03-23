@@ -57,21 +57,19 @@ export class BasePolyline extends Entity {
       if (data.hasOwnProperty('43')) {
         // DXF Groupcode 43 - Constant Width
       }
-
-      if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
-        // DXF Groupcode 70 - Polyline flag (bit-coded; default = 0):
-        // 1 = This is a closed polyline (or a polygon mesh closed in the M direction)
-        // 2 = Curve-fit vertices have been added
-        // 4 = Spline-fit vertices have been added
-        // 8 = This is a 3D polyline
-        // 16 = This is a 3D polygon mesh
-        // 32 = The polygon mesh is closed in the N direction
-        // 64 = The polyline is a polyface mesh
-        // 128 = The linetype pattern is generated continuously around the vertices of this polyline
-
-        this.flags.setFlagValue(Property.loadValue([data.flags, data[70]], 0));
-      }
     }
+
+    // DXF Groupcode 70 - Polyline flag (bit-coded; default = 0):
+    // 1 = This is a closed polyline (or a polygon mesh closed in the M direction)
+    // 2 = Curve-fit vertices have been added
+    // 4 = Spline-fit vertices have been added
+    // 8 = This is a 3D polyline
+    // 16 = This is a 3D polygon mesh
+    // 32 = The polygon mesh is closed in the N direction
+    // 64 = The polyline is a polyface mesh
+    // 128 = The linetype pattern is generated continuously around the vertices of this polyline
+
+    this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[70]], 0));
   }
 
   /**
@@ -82,10 +80,9 @@ export class BasePolyline extends Entity {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
-      let pt2;
-      let op2;
       let index;
       while (true) {
         let options;
@@ -93,8 +90,9 @@ export class BasePolyline extends Entity {
           options = this.inputMode === this.modes.LINE ? [this.modes.ARC] : [this.modes.LINE];
         }
 
-        op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC], options);
-        pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+        const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC], options);
+        const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (pt2 === undefined) break;
 
         if (Input.getType(pt2) === Input.Type.POINT) {
           if (this.inputMode === this.modes.ARC) {
@@ -182,40 +180,18 @@ export class BasePolyline extends Entity {
    * @param {DXFFile} file
    */
   dxf(file) {
-    file.writeGroupCode('0', 'POLYLINE');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('0', 'LWPOLYLINE');
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDb2dPolyline', DXFFile.Version.R2000);
+    file.writeGroupCode('100', 'AcDbPolyline', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer); // LAYERNAME
     file.writeGroupCode('6', this.lineType);
-    file.writeGroupCode('10', '0');
-    file.writeGroupCode('20', '0');
-    file.writeGroupCode('30', '0');
     file.writeGroupCode('39', this.lineWidth);
+    file.writeGroupCode('90', this.points.length);
     file.writeGroupCode('70', this.flags.getFlagValue());
-    file.writeGroupCode('66', '1'); // Vertices follow: required for R12, optional for R2000+
-    this.vertices(file);
-    file.writeGroupCode('0', 'SEQEND');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
-    file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
-  }
-
-  /**
-   * Write the vertices to file in the dxf format
-   * @param {DXFFile} file
-   */
-  vertices(file) {
     for (let i = 0; i < this.points.length; i++) {
-      file.writeGroupCode('0', 'VERTEX');
-      file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
-      file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-      file.writeGroupCode('100', 'AcDbVertex', DXFFile.Version.R2000);
-      file.writeGroupCode('100', 'AcDb2dVertex', DXFFile.Version.R2000);
-      file.writeGroupCode('8', this.layer);
-      file.writeGroupCode('10', this.points[i].x); // X
-      file.writeGroupCode('20', this.points[i].y); // Y
-      file.writeGroupCode('30', '0.0');
+      file.writeGroupCode('10', this.points[i].x);
+      file.writeGroupCode('20', this.points[i].y);
       file.writeGroupCode('42', this.points[i].bulge);
     }
   }

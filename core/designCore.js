@@ -132,6 +132,13 @@ export class DesignCore {
   }
 
   /**
+   * Get the VPortManager
+   */
+  static get VPortManager() {
+    return DesignCore.Core.vportManager;
+  }
+
+  /**
    * Get the UCSManager
    */
   static get UCSManager() {
@@ -164,6 +171,13 @@ export class DesignCore {
    */
   static get PropertyManager() {
     return DesignCore.Core.propertyManager;
+  }
+
+  /**
+   * Get the Handle
+   */
+  static get HandleManager() {
+    return DesignCore.Core.handleManager;
   }
 
   /**

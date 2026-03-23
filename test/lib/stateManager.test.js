@@ -1,9 +1,12 @@
+import { Core } from '../../core/core/core.js';
 import { StateManager } from '../../core/lib/stateManager.js';
 import { EntityManager } from '../../core/lib/entityManager.js';
 import { AddState, RemoveState, UpdateState } from '../../core/lib/stateManager.js';
 import { Line } from '../../core/entities/line.js';
 import { Point } from '../../core/entities/point.js';
 import { jest } from '@jest/globals';
+
+new Core();
 
 describe('StateManager', () => {
   let sm;

@@ -42,10 +42,12 @@ export class Rectangle extends Entity {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
       const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
       const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+      if (pt2 === undefined) return;
       this.points.push(pt2);
 
       const points = this.rectPoints(this.points[0], this.points[1]);

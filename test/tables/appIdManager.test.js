@@ -49,13 +49,13 @@ TABLE
 2
 APPID
 5
-A
+23
 100
 AcDbSymbolTable
 0
 APPID
 5
-B
+24
 100
 AcDbSymbolTableRecord
 100

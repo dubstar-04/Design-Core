@@ -3,7 +3,7 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Core } from '../../core/core/core.js';
 import { Line } from '../../core/entities/line.js';
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -20,44 +20,24 @@ const scenarios = [
 ];
 
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
-  const origInputManager = DesignCore.Scene.inputManager;
-  const origGetItem = DesignCore.Scene.entities.get;
-
   const { input, selectedItems, expectedDimType, dimensionValue } = scenario;
-  let requestInputCallCount = 0;
-  let selectedItemsCallCount = 0;
 
-  DesignCore.Scene.inputManager = {
-    requestInput: async () => {
-      requestInputCallCount++;
-      return input[requestInputCallCount - 1];
-    },
-    executeCommand: () => {},
-  };
+  await withMockInput(DesignCore.Scene, input, async () => {
+    const dim = new RotatedDimension();
+    await dim.execute();
 
-  DesignCore.Scene.entities.get = () => {
-    selectedItemsCallCount++;
-    return selectedItems[selectedItemsCallCount - 1];
-  };
+    expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
+    // get the text entities from the dimension block
+    const dimensionBlockEntities = dim.buildDimension();
+    expect(dimensionBlockEntities.length).toBe(7);
 
-  const dim = new RotatedDimension();
-  await dim.execute();
-
-  expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
-  // get the text entities from the dimension block
-  const dimensionBlockEntities = dim.buildDimension();
-  expect(dimensionBlockEntities.length).toBe(7);
-
-  // check if the text value matches the expected dimension value
-  for (const entity of dimensionBlockEntities) {
-    if (entity.type === 'Text') {
-      expect(Number(entity.string)).toBeCloseTo(dimensionValue);
+    // check if the text value matches the expected dimension value
+    for (const entity of dimensionBlockEntities) {
+      if (entity.type === 'Text') {
+        expect(Number(entity.string)).toBeCloseTo(dimensionValue);
+      }
     }
-  }
-
-  // Restore
-  DesignCore.Scene.inputManager = origInputManager;
-  DesignCore.Scene.entities.get = origGetItem;
+  }, { selectedItems });
 });
 
 test('constructor sets default properties', () => {
@@ -174,7 +154,7 @@ test('Test RotatedDimension.dxf', () => {
 
   points.push(Pt10, Pt14, Pt13, Pt11);
 
-  const dimension = new RotatedDimension({ points: points });
+  const dimension = new RotatedDimension({ points: points, handle: '1' });
   let file = new File();
   dimension.dxf(file);
   // console.log(file.contents);

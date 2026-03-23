@@ -8,16 +8,18 @@ import { LTypeManager } from '../tables/ltypeManager.js';
 import { StyleManager } from '../tables/styleManager.js';
 import { DimStyleManager } from '../tables/dimStyleManager.js';
 import { ViewManager } from '../tables/viewManager.js';
+import { VPortManager } from '../tables/vportManager.js';
 import { UCSManager } from '../tables/ucsManager.js';
 import { AppIDManager } from '../tables/appIdManager.js';
 import { BlockRecordManager } from '../tables/blockRecordManager.js';
-import { DictionaryManager } from '../dictionaries/dictionaryManager.js';
+import { DictionaryManager } from '../objects/dictionaryManager.js';
 import { PropertyManager } from '../properties/propertyManager.js';
 import { Clipboard } from '../lib/clipboard.js';
 
 import { FileIO } from '../lib/fileio.js';
 import { Settings } from '../lib/settings.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { HandleManager } from '../lib/dxf/handleManager.js';
 import { Logging } from '../lib/logging.js';
 
 import { DesignCore } from '../designCore.js';
@@ -26,36 +28,38 @@ import { DesignCore } from '../designCore.js';
 export class Core {
   /** Create a core object */
   constructor() {
+    // Create handle manager and activate to enable handle assignment during construction
+    this.handleManager = new HandleManager();
+    this.activate();
+
+    // Create core components
     this.scene = new Scene();
     this.commandManager = new CommandManager();
     this.canvas = new Canvas();
-
     this.mouse = new Mouse();
     this.commandLine = new CommandLine();
 
-    this.layerManager = new LayerManager();
+    // Create table managers
     this.ltypeManager = new LTypeManager();
+    this.layerManager = new LayerManager();
     this.styleManager = new StyleManager();
     this.dimStyleManager = new DimStyleManager();
     this.viewManager = new ViewManager();
+    this.vportManager = new VPortManager();
     this.ucsManager = new UCSManager();
     this.appIdManager = new AppIDManager();
     this.blockRecordManager = new BlockRecordManager();
+
+    // Create dictionary manager and property manager
     this.dictionaryManager = new DictionaryManager();
     this.propertyManager = new PropertyManager();
+    // Create clipboard manager
     this.clipboard = new Clipboard();
-
+    // Create settings manager
     this.settings = new Settings();
 
     // function to call external notification command for the ui
     this.externalNotifyCallbackFunction;
-
-    // create a static reference to the instantiated core object
-    // DesignCore._instance = this;
-    // Design.Core = this;
-
-    // return Design;
-    this.activate();
   }
 
   /**

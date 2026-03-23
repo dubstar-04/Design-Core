@@ -83,17 +83,16 @@ export class Text extends Entity {
           this.points.push(new Point(data.points[1].x, data.points[1].y));
         }
       }
+    }
 
-      // DXF Groupcode 1 - Text String
-      this.string = (Property.loadValue([data?.string, data?.[1]], ''));
+    // DXF Groupcode 1 - Text String
+    this.string = Property.loadValue([data?.string, data?.[1]], '');
+    // DXF Groupcode 7 - Text Style Name
+    this.styleName = Property.loadValue([data?.styleName, data?.[7]], 'STANDARD');
+    // DXF Groupcode 40 - Text Height
+    this.height = Property.loadValue([data?.height, data?.[40]], 2.5);
 
-      // DXF Groupcode 7 - Text Style Name
-      this.styleName = (Property.loadValue([data?.styleName, data?.[7]], 'STANDARD'));
-
-
-      // DXF Groupcode 40 - Text Height
-      this.height = Property.loadValue([data.height, data[40]], 2.5);
-
+    if (data) {
       if (data.hasOwnProperty('rotation') || data.hasOwnProperty('50')) {
         // DXF Groupcode 50 - Text Rotation, angle in degrees
         // if we get rotation data store this as a point[1] at an angle from point[0]
@@ -105,29 +104,29 @@ export class Text extends Entity {
           this.points[1] = this.points[0].add(new Point(this.height, 0));
         }
       }
-
-      // DXF Groupcode 72 - Horizontal Alignment
-      // 0 = Left
-      // 1 = Center
-      // 2 = Right
-      // 3 = Aligned (if vertical alignment = 0) not supported, treated as center aligned
-      // 4 = Middle (if vertical alignment = 0) not supported, treated as center aligned
-      // 5 = Fit (if vertical alignment = 0) not supported, treated as center aligned
-      this.horizontalAlignment = Property.loadValue([data.horizontalAlignment, data[72]], 0);
-
-      if (this.horizontalAlignment > 2) {
-        this.horizontalAlignment = 1; // unsupported alignment types treated as center aligned
-      }
-
-      // DXF Groupcode 73 - Vertical Alignment
-      // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
-      this.verticalAlignment = Property.loadValue([data.verticalAlignment, data[73]], 0);
-
-      // DXF Groupcode 71 - flags (bit-coded values):
-      // 2 = Text is backward (mirrored in X).
-      // 4 = Text is upside down (mirrored in Y).
-      this.flags.setFlagValue(Property.loadValue([data.flags, data[71]], 0));
     }
+
+    // DXF Groupcode 72 - Horizontal Alignment
+    // 0 = Left
+    // 1 = Center
+    // 2 = Right
+    // 3 = Aligned (if vertical alignment = 0) not supported, treated as center aligned
+    // 4 = Middle (if vertical alignment = 0) not supported, treated as center aligned
+    // 5 = Fit (if vertical alignment = 0) not supported, treated as center aligned
+    this.horizontalAlignment = Property.loadValue([data?.horizontalAlignment, data?.[72]], 0);
+
+    if (this.horizontalAlignment > 2) {
+      this.horizontalAlignment = 1; // unsupported alignment types treated as center aligned
+    }
+
+    // DXF Groupcode 73 - Vertical Alignment
+    // 0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
+    this.verticalAlignment = Property.loadValue([data?.verticalAlignment, data?.[73]], 0);
+
+    // DXF Groupcode 71 - flags (bit-coded values):
+    // 2 = Text is backward (mirrored in X).
+    // 4 = Text is upside down (mirrored in Y).
+    this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[71]], 0));
   }
 
   /**
@@ -164,6 +163,7 @@ export class Text extends Entity {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
       // set the text style to the current style
@@ -183,15 +183,18 @@ export class Text extends Entity {
       if (this.styleName.toUpperCase() === 'STANDARD') {
         const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
         const height = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (height === undefined) return;
         this.height = height;
       }
 
       const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
       const rotation = await DesignCore.Scene.inputManager.requestInput(op3);
+      if (rotation === undefined) return;
       this.setRotation(rotation);
 
       const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
       const string = await DesignCore.Scene.inputManager.requestInput(op4);
+      if (string === undefined) return;
       this.string = String(string);
 
       DesignCore.Scene.inputManager.executeCommand(this);
@@ -454,7 +457,7 @@ export class Text extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'TEXT');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbText', DXFFile.Version.R2000);

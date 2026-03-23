@@ -1,4 +1,3 @@
-import { Handle } from './handle.js';
 import { Logging } from '../logging.js';
 import { Strings } from '../strings.js';
 
@@ -17,7 +16,6 @@ export class DXFFile {
     }
 
     this.version = DXFFile.Version[version];
-    this.handle = new Handle();
   }
 
   /**
@@ -83,28 +81,6 @@ export class DXFFile {
    */
   clearFile() {
     this.contents = '';
-    this.handle.reset();
-  }
-
-  /**
-   * Returns the next available handle value
-   * R12 handles are optional.
-   * R13+ handles are mandatory.
-   * The header variable $HANDSEED must be greater than the largest handle value
-   * @return {string} handle value
-   */
-  nextHandle() {
-    return this.handle.next();
-  }
-
-  /**
-   * Format a handle value
-   * A handle is an arbitrary but unique hex value as string up to 16 hexadecimal digits (8 bytes).
-   * @param {number} value
-   * @return {string} handle hex value
-   */
-  formatHandle(value) {
-    return this.handle.format(value);
   }
 
   /**

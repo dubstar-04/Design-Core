@@ -240,6 +240,7 @@ export class ArcAlignedText extends Entity {
         DesignCore.Scene.selectionManager.reset();
 
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
+        if (selection === undefined) return;
         selectedArc = DesignCore.Scene.entities.get(selection.selectedItemIndex);
 
         if (selectedArc instanceof Arc === false) {
@@ -273,11 +274,13 @@ export class ArcAlignedText extends Entity {
       if (this.styleName.toUpperCase() === 'STANDARD') {
         const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
         const height = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (height === undefined) return;
         this.height = height;
       }
 
       const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
       const string = await DesignCore.Scene.inputManager.requestInput(op4);
+      if (string === undefined) return;
       this.string = String(string);
 
       DesignCore.Scene.inputManager.executeCommand(this);
@@ -516,7 +519,7 @@ export class ArcAlignedText extends Entity {
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
 
     file.writeGroupCode('0', 'ARCALIGNEDTEXT');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbArcAlignedText', DXFFile.Version.R2000);

@@ -130,9 +130,10 @@ export class Mouse {
     const delta = thisClick - this.lastClick;
     const isDoubleClick = delta < doubleClickThreshold;
     this.lastClick = thisClick;
+    const lastButton = this.lastButton;
     this.lastButton = button;
 
-    if (button === this.lastButton && isDoubleClick) {
+    if (button === lastButton && isDoubleClick) {
       this.doubleClick(button);
       return true;
     }

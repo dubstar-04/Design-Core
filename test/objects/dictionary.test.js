@@ -1,5 +1,5 @@
 import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
-import { Dictionary } from '../../core/dictionaries/dictionary.js';
+import { Dictionary } from '../../core/objects/dictionary.js';
 
 test('Test Dictionary constructor defaults', () => {
   const dict = new Dictionary();
@@ -38,14 +38,14 @@ test('Test Dictionary constructor with DXF group code 281', () => {
 });
 
 test('Test Dictionary.dxf with no entries', () => {
-  const dict = new Dictionary({ name: 'ACAD_GROUP' });
+  const dict = new Dictionary({ name: 'ACAD_GROUP', handle: '1A' });
   const file = new DXFFile();
   dict.dxf(file);
 
   const dxfString = `0
 DICTIONARY
 5
-A
+1A
 100
 AcDbDictionary
 281
@@ -57,6 +57,7 @@ AcDbDictionary
 
 test('Test Dictionary.dxf with entries', () => {
   const dict = new Dictionary({
+    handle: '1B',
     entries: [{ name: 'ACAD_GROUP', handle: 'D' }],
   });
   const file = new DXFFile();
@@ -65,7 +66,7 @@ test('Test Dictionary.dxf with entries', () => {
   const dxfString = `0
 DICTIONARY
 5
-A
+1B
 100
 AcDbDictionary
 281

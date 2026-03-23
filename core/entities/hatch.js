@@ -83,27 +83,16 @@ export class Hatch extends Entity {
       this.points.push(new Point());
     }
 
+    // DXF Groupcode 70 - Solid Fill Flag (1 = solid, 0 = pattern)
+    this.solid = Boolean(Property.loadValue([data?.solid, data?.[70]], 0));
+    // DXF Groupcode 2 - Hatch pattern name
+    this.patternName = Property.loadValue([data?.patternName, data?.[2]], 'ANSI31');
+    // DXF Groupcode 41 - Hatch pattern scale
+    this.scale = Property.loadValue([data?.scale, data?.[41]], 1);
+    // DXF Groupcode 52 - Hatch pattern angle
+    this.angle = Property.loadValue([data?.angle, data?.[52]], 0);
+
     if (data) {
-      if (data.hasOwnProperty('patternName') || data.hasOwnProperty('2')) {
-        // DXF Groupcode 2 - Hatch pattern name
-        this.patternName = data.patternName || data[2];
-      }
-
-      if (data.hasOwnProperty('scale') || data.hasOwnProperty('41')) {
-        // DXF Groupcode 41 - Hatch pattern scale
-        this.scale = data.scale || data[41];
-      }
-
-      if (data.hasOwnProperty('angle') || data.hasOwnProperty('52')) {
-        // DXF Groupcode 42 - Hatch pattern angle
-        this.angle = Property.loadValue([data.angle, data[52]], 0);
-      }
-
-      if (data.hasOwnProperty('solid') || data.hasOwnProperty('70')) {
-        // DXF Groupcode 70 - Solid Fill Flag (1 = solid, 0 = pattern)
-        this.solid = Boolean(Property.loadValue([data.solid, data[70]], 0));
-      }
-
       if (data.hasOwnProperty('childEntities')) {
         if (Array.isArray(data.childEntities)) {
           this.childEntities = data.childEntities;
@@ -314,7 +303,8 @@ export class Hatch extends Entity {
       let validBoundary = false;
 
       while (!validBoundary) {
-        await DesignCore.Scene.inputManager.requestInput(op);
+        const result = await DesignCore.Scene.inputManager.requestInput(op);
+        if (result === undefined) return;
 
         const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
         const boundary = this.processSelection(selectedItems);
@@ -554,7 +544,7 @@ export class Hatch extends Entity {
     }
 
     file.writeGroupCode('0', 'HATCH');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);
     file.writeGroupCode('100', 'AcDbHatch', DXFFile.Version.R2000);

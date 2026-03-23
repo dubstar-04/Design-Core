@@ -84,14 +84,17 @@ export class Arc extends Entity {
     try {
       const op = new PromptOptions(Strings.Input.CENTER, [Input.Type.POINT]);
       const pt = await DesignCore.Scene.inputManager.requestInput(op);
+      if (pt === undefined) return;
       this.points.push(pt);
 
       const op1 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op1);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
       const op2 = new PromptOptions(Strings.Input.ANGLE, [Input.Type.POINT, Input.Type.NUMBER]);
       const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+      if (pt2 === undefined) return;
 
       if (Input.getType(pt2) === Input.Type.POINT) {
         this.points.push(pt2);
@@ -190,7 +193,7 @@ export class Arc extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'ARC');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbCircle', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer); // LAYERNAME

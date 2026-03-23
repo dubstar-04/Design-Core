@@ -17,14 +17,14 @@ test('Test BlockRecord constructor with DXF group code', () => {
 });
 
 test('Test BlockRecord.dxf', () => {
-  const record = new BlockRecord({ name: '*Model_Space' });
+  const record = new BlockRecord({ name: '*Model_Space', handle: 'C' });
   const file = new DXFFile();
   record.dxf(file);
 
   const dxfString = `0
 BLOCK_RECORD
 5
-A
+C
 100
 AcDbSymbolTableRecord
 100

@@ -17,7 +17,7 @@ test('Test UCS constructor with DXF group code', () => {
 });
 
 test('Test UCS.dxf', () => {
-  const ucs = new UCS({ name: 'TestUCS' });
+  const ucs = new UCS({ handle: 'A', name: 'TestUCS' });
   const file = new DXFFile();
   ucs.dxf(file);
 

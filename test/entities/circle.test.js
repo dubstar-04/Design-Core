@@ -3,38 +3,24 @@ import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
 
 test('Circle.execute creates points from user input', async () => {
-  // Mock DesignCore.Scene.inputManager.requestInput to return points
-  const origInputManager = DesignCore.Scene.inputManager;
   const pt0 = new Point(0, 0);
   const pt1 = new Point(10, 0);
 
-  let callCount = 0;
-  DesignCore.Scene.inputManager = {
-    requestInput: async () => {
-      callCount++;
-      if (callCount === 1) return pt0;
-      if (callCount === 2) return pt1;
-      return pt2;
-    },
-    executeCommand: () => {},
-  };
+  await withMockInput(DesignCore.Scene, [pt0, pt1], async () => {
+    const circle = new Circle({});
+    await circle.execute();
 
-  const circle = new Circle({});
-  await circle.execute();
-
-  expect(circle.points.length).toBe(2);
-  expect(circle.points[0]).toBe(pt0);
-  expect(circle.points[1]).toBe(pt1);
-  expect(circle.getRadius()).toBe(10);
-
-  // Restore original inputManager
-  DesignCore.Scene.inputManager = origInputManager;
+    expect(circle.points.length).toBe(2);
+    expect(circle.points[0]).toBe(pt0);
+    expect(circle.points[1]).toBe(pt1);
+    expect(circle.getRadius()).toBe(10);
+  });
 });
 
 test('Test Circle.getRadius', () => {
@@ -84,7 +70,7 @@ test('Test Circle.boundingBox', () => {
 });
 
 test('Test Circle.dxf', () => {
-  const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
+  const circle = new Circle({ handle: '1', points: [new Point(100, 100), new Point(200, 100)] });
   let file = new File();
   circle.dxf(file);
   // console.log(file.contents);
@@ -160,6 +146,8 @@ test('Test Circle.trim does not modify circle', () => {
   let trimWithTwoPoints = circle.trim(intersections);
   let trimResult = trimWithTwoPoints[0].entity;
   expect(trimResult.type).toEqual('Arc');
+  // Verify trimmed arc has a unique handle (not the circle's)
+  expect(trimResult.handle).toBeUndefined();
   expect(trimResult.points[0].x).toEqual(0);
   expect(trimResult.points[0].y).toEqual(0);
 

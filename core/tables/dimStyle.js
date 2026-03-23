@@ -46,6 +46,9 @@ export class DimStyle {
     DIMTXTDIRECTION - R2010
     */
 
+    // DXF Groupcode 105 - Handle (DIMSTYLE uses 105 instead of 5)
+    this.handle = Property.loadValue([data.handle, data[105]]);
+
     // DXF Groupcode 2 - ltype name
     this.name = Property.loadValue([data.name, data[2]], 'DimStyle');
 
@@ -547,7 +550,7 @@ export class DimStyle {
    */
   dxf(file) {
     file.writeGroupCode('0', 'DIMSTYLE');
-    file.writeGroupCode('105', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('105', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimStyleTableRecord', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name); // Stylename

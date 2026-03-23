@@ -3,7 +3,7 @@ import { Point } from '../../core/entities/point.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { AddState, RemoveState } from '../../core/lib/stateManager.js';
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -40,32 +40,18 @@ const inputScenarios = [
 ];
 
 test.each(inputScenarios)('Line.execute handles $desc', async ({ input1, input2, expectedLength, expectedMid }) => {
-  // Mock DesignCore.Scene.inputManager.requestInput to return points
-  const origInputManager = DesignCore.Scene.inputManager;
+  await withMockInput(DesignCore.Scene, [input1, input2], async () => {
+    const line = new Line({});
+    await line.execute();
 
-  let callCount = 0;
-  DesignCore.Scene.inputManager = {
-    requestInput: async () => {
-      callCount++;
-      if (callCount === 1) return input1;
-      if (callCount === 2) return input2;
-    },
-    executeCommand: () => {},
-  };
+    expect(line.points.length).toBe(2);
+    expect(line.points[0]).toBe(input1);
+    expect(line.points[1]).toBe(input2);
 
-  const line = new Line({});
-  await line.execute();
-
-  expect(line.points.length).toBe(2);
-  expect(line.points[0]).toBe(input1);
-  expect(line.points[1]).toBe(input2);
-
-  expect(line.length()).toBeCloseTo(expectedLength);
-  expect(line.midPoint().x).toBeCloseTo(expectedMid.x);
-  expect(line.midPoint().y).toBeCloseTo(expectedMid.y);
-
-  // Restore original inputManager
-  DesignCore.Scene.inputManager = origInputManager;
+    expect(line.length()).toBeCloseTo(expectedLength);
+    expect(line.midPoint().x).toBeCloseTo(expectedMid.x);
+    expect(line.midPoint().y).toBeCloseTo(expectedMid.y);
+  });
 });
 
 test('Test Line.closestPoint', () => {
@@ -94,7 +80,7 @@ test('Test Line.boundingBox', () => {
 });
 
 test('Test Line.dxf', () => {
-  const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
+  const line = new Line({ handle: '1', points: [new Point(101, 102), new Point(201, 202)] });
   let file = new File();
   line.dxf(file);
   // console.log(file.contents);
@@ -150,7 +136,7 @@ test('Test Line.decompose', () => {
 
 
 test('Test Line.trim returns remove and add states', () => {
-  const line = new Line({ points: [new Point(0, 0), new Point(100, 0)] });
+  const line = new Line({ points: [new Point(0, 0), new Point(100, 0)], handle: 'A1' });
 
   // intersections along the line
   const i1 = new Point(30, 0);
@@ -166,6 +152,10 @@ test('Test Line.trim returns remove and add states', () => {
   expect(changes[0]).toBeInstanceOf(AddState);
   expect(changes[1]).toBeInstanceOf(AddState);
   expect(changes[2]).toBeInstanceOf(RemoveState);
+
+  // Verify trimmed lines have unique handles (not the original)
+  expect(changes[0].entity.handle).toBeUndefined();
+  expect(changes[1].entity.handle).toBeUndefined();
 });
 
 

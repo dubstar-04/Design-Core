@@ -7,12 +7,14 @@ import { DesignCore } from '../designCore.js';
  */
 export class EntityManager {
   #entities = [];
+  #trackHandles;
 
   /**
    * Create EntityManager
+   * @param {boolean} [trackHandles=true] - whether to track handles for entities
    */
-  constructor() {
-
+  constructor(trackHandles = true) {
+    this.#trackHandles = trackHandles;
   }
 
   /**
@@ -31,6 +33,16 @@ export class EntityManager {
    * @param {object} entity
    */
   add(entity) {
+    if (!entity) return;
+
+    if (this.#trackHandles) {
+      if (entity.handle === undefined) {
+        entity.handle = DesignCore.HandleManager.next();
+      } else {
+        DesignCore.HandleManager.checkHandle(entity.handle);
+      }
+    }
+
     this.#entities.push(entity);
   }
 
@@ -136,7 +148,7 @@ export class EntityManager {
       throw Error('Item not found in scene');
     }
 
-    for (const property of Object.getOwnPropertyNames(data)) {
+    for (const property of Object.keys(data)) {
       if (item.hasOwnProperty(property)) {
         item.setProperty(property, data[property]);
       }

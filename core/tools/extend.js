@@ -39,7 +39,8 @@ export class Extend extends Tool {
       const op = new PromptOptions(Strings.Input.BOUNDARY, [Input.Type.SELECTIONSET]);
 
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-        await DesignCore.Scene.inputManager.requestInput(op);
+        const boundary = await DesignCore.Scene.inputManager.requestInput(op);
+        if (boundary === undefined) return;
       }
 
       // add all selected items to boundary items
@@ -51,6 +52,7 @@ export class Extend extends Tool {
       const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       while (true) {
         const selection = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (selection === undefined) break;
         this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
         DesignCore.Scene.inputManager.actionCommand();

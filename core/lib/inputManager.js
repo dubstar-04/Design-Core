@@ -99,10 +99,12 @@ export class PromptOptions {
   }
 
   /**
-   * Reject the input request
+   * Cancel the input request by resolving with undefined
    */
-  reject() {
-    this.reject();
+  cancel() {
+    if (this.resolve) {
+      this.resolve(undefined);
+    }
   }
 
   /**
@@ -203,7 +205,11 @@ export class InputManager {
     this.snapping.active = false;
     DesignCore.CommandLine.resetPrompt();
     this.activeCommand = undefined;
-    // this.promptOption.reject('reject');
+
+    if (this.promptOption) {
+      this.promptOption.cancel();
+    }
+
     this.promptOption = undefined;
     DesignCore.Scene.reset();
   }

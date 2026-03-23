@@ -15,11 +15,17 @@ const createCoreMock = (options = {}) => {
 
   return {
     dxfVersion: options.dxfVersion || 'R2018',
+    handleManager: { next() {
+      return '1';
+    }, get handseed() {
+      return '1';
+    } },
     layerManager: options.layerManager || createManager('Layer0'),
     ltypeManager: options.ltypeManager || createManager('Continuous'),
     styleManager: options.styleManager || createManager('Standard'),
     dimStyleManager: options.dimStyleManager || createManager('ISO-25'),
     viewManager: options.viewManager || { dxf: jest.fn() },
+    vportManager: options.vportManager || { dxf: jest.fn() },
     ucsManager: options.ucsManager || { dxf: jest.fn() },
     appIdManager: options.appIdManager || { dxf: jest.fn() },
     blockRecordManager: options.blockRecordManager || { dxf: jest.fn() },
@@ -88,7 +94,7 @@ describe('DXFWriter', () => {
     expect(core.layerManager.dxf).toHaveBeenCalledWith(file);
     expect(core.styleManager.dxf).toHaveBeenCalledWith(file);
     expect(core.dimStyleManager.dxf).toHaveBeenCalledWith(file);
-    expect(core.scene.dxf).toHaveBeenCalledWith(file);
+    expect(core.vportManager.dxf).toHaveBeenCalledWith(file);
     expect(core.viewManager.dxf).toHaveBeenCalledWith(file);
     expect(core.ucsManager.dxf).toHaveBeenCalledWith(file);
     expect(core.appIdManager.dxf).toHaveBeenCalledWith(file);

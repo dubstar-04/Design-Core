@@ -11,6 +11,7 @@ export class TableManagerBase {
    */
   constructor() {
     this.items = [];
+    this.handle = DesignCore.HandleManager.next();
     this.addStandardItems();
 
     // list of mandatory items that cannot be deleted
@@ -83,10 +84,24 @@ export class TableManagerBase {
     // Call the subclass to create a new typed item object
     const newItem = this.createItem(item);
     const newItemName = newItem.name;
-    if (!this.itemExists(newItemName)) {
+
+    const exists = this.itemExists(newItemName);
+
+    // Return the existing item if it already exists and overwrite is not requested
+    if (exists && !overwrite) {
+      return this.getItemByName(newItemName);
+    }
+
+    if (newItem.handle === undefined) {
+      newItem.handle = DesignCore.HandleManager.next();
+    } else {
+      DesignCore.HandleManager.checkHandle(newItem.handle);
+    }
+
+    if (!exists) {
       this.items.push(newItem);
-    } else if (overwrite) {
-      // Overwrite The item existing item
+    } else {
+      // Overwrite the existing item
       // This is used when loading files;
       // Standard items already exist but should be overwritten by the incoming item
       this.items.splice(this.getItemIndex(newItemName), 1, newItem);
@@ -135,9 +150,7 @@ export class TableManagerBase {
    * Ensure that used items and default items exist
    */
   checkItems() {
-    if (!this.itemCount()) {
-      this.addStandardItems();
-    }
+    this.addStandardItems();
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
       const item = (DesignCore.Scene.entities.get(i));

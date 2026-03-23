@@ -9,7 +9,7 @@ import { File } from '../test-helpers/test-helpers.js';
 new Core();
 
 
-const insert = new Insert({ points: [new Point()] });
+const insert = new Insert({ handle: '1', points: [new Point()] });
 const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
 insert.block.addItem(line);
 

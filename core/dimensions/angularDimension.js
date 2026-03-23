@@ -520,7 +520,7 @@ export class AngularDimension extends BaseDimension {
     const Pt16 = this.getPointBySequence(this.points, 16);
 
     file.writeGroupCode('0', 'DIMENSION');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimension', DXFFile.Version.R2000);
     file.writeGroupCode('8', this.layer);

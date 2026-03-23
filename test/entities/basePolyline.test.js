@@ -5,8 +5,9 @@ import { Line } from '../../core/entities/line.js';
 import { Arc } from '../../core/entities/arc.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
+import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
 
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -26,40 +27,22 @@ const inputScenarios = [
 
 test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => {
   const { inputs, expectedPoints } = scenario;
-  const origInputManager = DesignCore.Scene.inputManager;
-  let callCount = 0;
-  DesignCore.Scene.inputManager = {
 
-    actionCommand: () => {},
+  await withMockInput(DesignCore.Scene, inputs, async () => {
+    const polyline = new BasePolyline({});
+    await polyline.execute();
 
-    executeCommand: () => {},
+    expect(polyline.points.length).toBe(expectedPoints);
+    expect(polyline.points[0]).toBe(inputs[0]);
+    expect(polyline.points[0].bulge).toBe(0);
+    expect(polyline.points[1]).toBe(inputs[1]);
 
-    requestInput: async () => {
-      if (callCount < inputs.length) {
-        const input = inputs[callCount];
-        callCount++;
-        return input;
-      }
-    },
-  };
-
-  const polyline = new BasePolyline({});
-  await polyline.execute();
-
-  // console.log(polyline);
-  expect(polyline.points.length).toBe(expectedPoints);
-  expect(polyline.points[0]).toBe(inputs[0]);
-  expect(polyline.points[0].bulge).toBe(0);
-  expect(polyline.points[1]).toBe(inputs[1]);
-
-  // validate arc segment bulge and end point
-  if (inputs.length > 2) {
-    expect(polyline.points[1].bulge).toBeCloseTo(1);
-    expect(polyline.points[2]).toBe(inputs[3]);
-  }
-
-  // Restore original inputManager
-  DesignCore.Scene.inputManager = origInputManager;
+    // validate arc segment bulge and end point
+    if (inputs.length > 2) {
+      expect(polyline.points[1].bulge).toBeCloseTo(1);
+      expect(polyline.points[2]).toBe(inputs[3]);
+    }
+  }, { extraMethods: { actionCommand: () => {} } });
 });
 
 test('Test BasePolyline.getClosestSegment', () => {
@@ -255,48 +238,81 @@ test('Test BasePolyline.getBulgeFromSegment', () => {
   expect(polyline.getBulgeFromSegment(new Point(64.6447, -14.6447))).toBeCloseTo(bulge);
 });
 
-test('Test BasePolyline.dxf', () => {
+test('Test Polyline.dxf', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
-  const polyline = new BasePolyline({ points: points });
+  const polyline = new Polyline({ handle: '1', points: points });
   let file = new File();
   polyline.dxf(file);
   // console.log(file.contents);
 
   const dxfString = `0
-POLYLINE
+LWPOLYLINE
 5
 1
 100
 AcDbEntity
 100
-AcDb2dPolyline
+AcDbPolyline
 8
 0
 6
 ByLayer
-10
-0
-20
-0
-30
-0
 39
 2
+90
+3
 70
 0
+10
+100
+20
+100
+42
+0
+10
+200
+20
+100
+42
+-1
+10
+200
+20
+50
+42
+0
+`;
+
+  expect(file.contents).toEqual(dxfString);
+
+  // create new entity from entity data to ensure all props are loaded
+  const newPolyline = new Polyline(polyline);
+  file = new File();
+  newPolyline.dxf(file);
+
+  expect(file.contents).toEqual(dxfString);
+});
+
+test('Test Polyline.dxf R12', () => {
+  const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
+  points[1].bulge = -1;
+  const polyline = new Polyline({ handle: '1', points: points });
+  const file = new DXFFile('R12');
+  polyline.dxf(file);
+
+  const dxfString = `0
+POLYLINE
+8
+0
+6
+ByLayer
 66
 1
+70
+0
 0
 VERTEX
-5
-1
-100
-AcDbEntity
-100
-AcDbVertex
-100
-AcDb2dVertex
 8
 0
 10
@@ -309,14 +325,6 @@ AcDb2dVertex
 0
 0
 VERTEX
-5
-1
-100
-AcDbEntity
-100
-AcDbVertex
-100
-AcDb2dVertex
 8
 0
 10
@@ -329,14 +337,6 @@ AcDb2dVertex
 -1
 0
 VERTEX
-5
-1
-100
-AcDbEntity
-100
-AcDbVertex
-100
-AcDb2dVertex
 8
 0
 10
@@ -349,20 +349,10 @@ AcDb2dVertex
 0
 0
 SEQEND
-5
-1
-100
-AcDbEntity
 8
 0
 `;
 
-  expect(file.contents).toEqual(dxfString);
-
-  // create new entity from entity data to ensure all props are loaded
-  const newPolyline = new Polyline(polyline);
-  file = new File();
-  newPolyline.dxf(file);
   expect(file.contents).toEqual(dxfString);
 });
 

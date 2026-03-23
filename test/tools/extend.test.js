@@ -3,6 +3,7 @@ import { Point } from '../../core/entities/point.js';
 import { Extend } from '../../core/tools/extend.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 import { expect, jest } from '@jest/globals';
+import { withMockInput } from '../test-helpers/test-helpers.js';
 
 const core = new Core();
 
@@ -16,23 +17,7 @@ const inputScenarios = [
 
 test.each(inputScenarios)('Trim.execute handles $desc', async (scenario) => {
   const { inputs } = scenario;
-  const origInputManager = core.scene.inputManager;
-
-  // mock action function
   const actionSpy = jest.fn();
-
-  let callCount = 0;
-  core.scene.inputManager = {
-    requestInput: async () => {
-      if (callCount < inputs.length) {
-        const input = inputs[callCount];
-        callCount++;
-        return input;
-      }
-    },
-    // mock the ation command
-    actionCommand: () => actionSpy(),
-  };
 
   // clear all scene entities
   core.scene.clear();
@@ -43,15 +28,14 @@ test.each(inputScenarios)('Trim.execute handles $desc', async (scenario) => {
   // select line
   core.scene.selectionManager.selectionSet.selectionSet.push(0);
 
-  const extend = new Extend();
-  await extend.execute();
+  await withMockInput(core.scene, inputs, async () => {
+    const extend = new Extend();
+    await extend.execute();
 
-  expect(extend.selectedBoundaryItems[0]).toEqual(core.scene.entities.get(0));
-  expect(extend.selectedItem).toBe(core.scene.entities.get(1));
-  expect(actionSpy).toHaveBeenCalled();
-
-  // Restore original inputManager
-  core.scene.inputManager = origInputManager;
+    expect(extend.selectedBoundaryItems[0]).toEqual(core.scene.entities.get(0));
+    expect(extend.selectedItem).toBe(core.scene.entities.get(1));
+    expect(actionSpy).toHaveBeenCalled();
+  }, { extraMethods: { actionCommand: () => actionSpy() } });
 });
 
 test('Test Extend.action', () => {

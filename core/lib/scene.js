@@ -2,7 +2,6 @@ import { SelectionManager } from './selectionManager.js';
 import { Logging } from './logging.js';
 import { Strings } from './strings.js';
 import { InputManager } from './inputManager.js';
-import { DXFFile } from './dxf/dxfFile.js';
 import { BoundingBox } from './boundingBox.js';
 import { EntityManager } from './entityManager.js';
 
@@ -27,8 +26,8 @@ export class Scene {
     this.blockManager = new BlockManager();
 
     this.entities = new EntityManager();
-    this.tempEntities = new EntityManager();
-    this.auxiliaryEntities = new EntityManager();
+    this.tempEntities = new EntityManager(false);
+    this.auxiliaryEntities = new EntityManager(false);
 
     this.stateManager = new StateManager();
 
@@ -136,73 +135,5 @@ export class Scene {
     } else {
       DesignCore.Core.notify(Strings.Message.NOREDO);
     }
-  }
-
-  /**
-   * Write the scene data to file in the dxf format
-   * @param {DXFFile} file
-   */
-  dxf(file) {
-    let width = 0;
-    let height = 0;
-    let viewCenterX = 0;
-    let viewCenterY = 0;
-    let ratio = 0;
-
-    const extents = this.boundingBox();
-
-    if (extents) {
-      width = extents.xLength;
-      height = extents.yLength;
-      viewCenterX = extents.xMin + width / 2;
-      viewCenterY = extents.yMin + height / 2;
-      ratio = width / height;
-    }
-
-    file.writeGroupCode('0', 'TABLE');
-    file.writeGroupCode('2', 'VPORT'); // Table Name
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
-    file.writeGroupCode('100', 'AcDbSymbolTable', DXFFile.Version.R2000);
-    file.writeGroupCode('70', '1'); // Number of entries in table
-    file.writeGroupCode('0', 'VPORT');
-    file.writeGroupCode('5', file.nextHandle(), DXFFile.Version.R2000); // Handle
-    file.writeGroupCode('100', 'AcDbSymbolTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('100', 'AcDbViewportTableRecord', DXFFile.Version.R2000);
-    file.writeGroupCode('2', '*ACTIVE');
-    file.writeGroupCode('70', '0'); // vport flags
-    file.writeGroupCode('10', '0.0'); // lower left corner x pos
-    file.writeGroupCode('20', '0.0'); // lower left corner y pos
-    file.writeGroupCode('11', '1.0'); // upper right corner x pos
-    file.writeGroupCode('21', '1.0'); // upper right corner y pos
-    file.writeGroupCode('12', viewCenterX); // view centre x pos
-    file.writeGroupCode('22', viewCenterY); // view centre y pos
-    file.writeGroupCode('13', '0.0'); // snap base point x
-    file.writeGroupCode('23', '0.0'); // snap base point y
-    file.writeGroupCode('14', '10.0'); // snap spacing x
-    file.writeGroupCode('24', '10.0'); // snap spacing y
-    file.writeGroupCode('15', '10.0'); // grid spacing x
-    file.writeGroupCode('25', '10.0'); // grid spacing y
-    file.writeGroupCode('16', '0.0'); // view direction (x) from target point
-    file.writeGroupCode('26', '0.0'); // view direction (y) from target point
-    file.writeGroupCode('36', '1.0'); // view direction (z) from target point
-    file.writeGroupCode('17', '0.0'); // view target point x
-    file.writeGroupCode('27', '0.0'); // view target point y
-    file.writeGroupCode('37', '0.0'); // view target point z
-    file.writeGroupCode('40', height); // VPort Height
-    file.writeGroupCode('41', ratio); // Vport height/width ratio
-    file.writeGroupCode('42', '50.0'); // Lens Length
-    file.writeGroupCode('43', '0.0');// Front Clipping Plane
-    file.writeGroupCode('44', '0.0'); // Back Clipping Plane
-    file.writeGroupCode('50', '0.0'); // Snap Rotation Angle
-    file.writeGroupCode('51', '0.0'); // View Twist Angle
-    file.writeGroupCode('71', '0.0'); // Viewmode (System constiable)
-    file.writeGroupCode('72', '1000'); // Circle sides
-    file.writeGroupCode('73', '1'); // fast zoom setting
-    file.writeGroupCode('74', '3');// UCSICON Setting
-    file.writeGroupCode('75', '0'); // snap on/off
-    file.writeGroupCode('76', '1'); // grid on/off
-    file.writeGroupCode('77', '0'); // snap style
-    file.writeGroupCode('78', '0'); // snap isopair
-    file.writeGroupCode('0', 'ENDTAB');
   }
 }

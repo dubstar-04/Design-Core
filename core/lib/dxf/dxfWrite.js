@@ -23,15 +23,7 @@ export class DXFWriter {
     file.writeGroupCode('9', '$DIMSTYLE');
     file.writeGroupCode('2', DesignCore.DimStyleManager.getCstyle());
     file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
-    // Horrible hack to generate a handseed value
-    // TODO: refactor core to track handle values properly and assigned them on creation
-    const handseed = (DesignCore.Scene.entities.count() +
-      (DesignCore.LayerManager.items.length * 2)+
-      DesignCore.LTypeManager.items.length +
-      DesignCore.StyleManager.items.length +
-      DesignCore.DimStyleManager.items.length +
-      DesignCore.Scene.blockManager.items.length * 2) * 3;
-    file.writeGroupCode('5', file.formatHandle(parseInt(handseed)), DXFFile.Version.R2000); // TODO: This needs to reflect the actual handle values
+    file.writeGroupCode('5', DesignCore.HandleManager.handseed, DXFFile.Version.R2000);
     file.writeGroupCode('0', 'ENDSEC');
   }
 
@@ -52,8 +44,7 @@ export class DXFWriter {
     // dimstyle table
     DesignCore.DimStyleManager.dxf(file);
     // vport table
-    DesignCore.Scene.dxf(file);
-
+    DesignCore.VPortManager.dxf(file);
     // view table
     DesignCore.ViewManager.dxf(file);
     // ucs table
@@ -98,6 +89,21 @@ export class DXFWriter {
   }
 
   /**
+   * Write Dictionary section
+   * @param {DXFFile} file
+   */
+  writeObjects(file) {
+    // Dictionary
+    file.writeGroupCode('0', 'SECTION', DXFFile.Version.R2000);
+    file.writeGroupCode('2', 'OBJECTS', DXFFile.Version.R2000);
+
+    DesignCore.DictionaryManager.dxf(file);
+
+    file.writeGroupCode('0', 'ENDSEC', DXFFile.Version.R2000);
+  }
+
+
+  /**
    * Write DXF file
    * @param {string} version
    * @return {string} dxf formatted string formatted
@@ -107,6 +113,7 @@ export class DXFWriter {
       version = DesignCore.Core.dxfVersion;
     }
     const file = new DXFFile(version);
+
     // write start of file
     file.writeGroupCode('999', 'DXF created from Design-Core');
 
@@ -115,14 +122,7 @@ export class DXFWriter {
     this.writeTables(file);
     this.writeBlocks(file);
     this.writeEntities(file);
-
-    // Dictionary
-    file.writeGroupCode('0', 'SECTION', DXFFile.Version.R2000);
-    file.writeGroupCode('2', 'OBJECTS', DXFFile.Version.R2000);
-
-    DesignCore.DictionaryManager.dxf(file);
-
-    file.writeGroupCode('0', 'ENDSEC', DXFFile.Version.R2000);
+    this.writeObjects(file);
 
     // write end of file
     file.writeGroupCode('0', 'EOF');

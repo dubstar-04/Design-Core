@@ -1,13 +1,17 @@
-/** Handle Class */
-export class Handle {
-  /** Create Handle */
+import { Logging } from '../logging.js';
+
+/** HandleManager Class */
+export class HandleManager {
+  /** Create HandleManager */
   constructor() {
     this.counter = 10;
+    this.usedHandles = new Set();
   }
 
   /** Reset the handle counter */
   reset() {
     this.counter = 10;
+    this.usedHandles.clear();
   }
 
   /**
@@ -19,6 +23,7 @@ export class Handle {
    */
   next() {
     const handle = this.format(this.counter);
+    this.usedHandles.add(handle);
     this.counter++;
     return handle;
   }
@@ -38,6 +43,35 @@ export class Handle {
    */
   set handseed(value) {
     this.counter = parseInt(value, 16);
+  }
+
+  /**
+   * Check the given handle value and ensure the counter is above it.
+   * Call this when a handle is loaded from a file to keep the counter valid.
+   * @param {string} handle - hex string
+   */
+  checkHandle(handle) {
+    if (handle === undefined || handle === null) {
+      return;
+    }
+
+    const normalised = String(handle).toUpperCase();
+
+    if (!normalised.length || !/^[0-9A-F]+$/.test(normalised)) {
+      Logging.instance.warn(`Invalid handle: ${handle}`);
+      return;
+    }
+
+    if (this.usedHandles.has(normalised)) {
+      Logging.instance.error(`Duplicate handle: ${normalised}`);
+    }
+
+    this.usedHandles.add(normalised);
+
+    const value = parseInt(normalised, 16);
+    if (value >= this.counter) {
+      this.counter = value + 1;
+    }
   }
 
   /**

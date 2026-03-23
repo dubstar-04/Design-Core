@@ -1,7 +1,7 @@
 import { RadialDimension } from '../../core/dimensions/radialDimension.js';
 import { Point } from '../../core/entities/point.js';
 import { Arc } from '../../core/entities/arc.js';
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
@@ -46,47 +46,27 @@ const scenarios = [
 ];
 
 test.each(scenarios)('RadialDimension.execute handles $desc', async (scenario) => {
-  const origInputManager = DesignCore.Scene.inputManager;
-  const origGetItem = DesignCore.Scene.entities.get;
-
   const { input, selectedItems, expectedDimType, dimensionValue, dimensionEntities } = scenario;
-  let requestInputCallCount = 0;
-  let selectedItemsCallCount = 0;
 
-  DesignCore.Scene.inputManager = {
-    requestInput: async () => {
-      requestInputCallCount++;
-      return input[requestInputCallCount - 1];
-    },
-    executeCommand: () => {},
-  };
+  await withMockInput(DesignCore.Scene, input, async () => {
+    const dim = new RadialDimension();
+    await dim.execute();
 
-  DesignCore.Scene.entities.get = () => {
-    selectedItemsCallCount++;
-    return selectedItems[selectedItemsCallCount - 1];
-  };
+    expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
+    // get the text entities from the dimension block
+    const dimensionBlockEntities = dim.buildDimension();
+    expect(dimensionBlockEntities.length).toBe(dimensionEntities);
 
-  const dim = new RadialDimension();
-  await dim.execute();
-
-  expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
-  // get the text entities from the dimension block
-  const dimensionBlockEntities = dim.buildDimension();
-  expect(dimensionBlockEntities.length).toBe(dimensionEntities);
-
-  // check if the text value matches the expected dimension value
-  for (const entity of dimensionBlockEntities) {
-    if (entity.type === 'Text') {
-      // remove all non-numeric characters except . and -
-      const numbersOnly = entity.string.replace(/[^0-9.-]+/g, '');
-      expect(Number(numbersOnly)).toBeCloseTo(dimensionValue);
-      expect(entity.string).toContain('R');
+    // check if the text value matches the expected dimension value
+    for (const entity of dimensionBlockEntities) {
+      if (entity.type === 'Text') {
+        // remove all non-numeric characters except . and -
+        const numbersOnly = entity.string.replace(/[^0-9.-]+/g, '');
+        expect(Number(numbersOnly)).toBeCloseTo(dimensionValue);
+        expect(entity.string).toContain('R');
+      }
     }
-  }
-
-  // Restore
-  DesignCore.Scene.inputManager = origInputManager;
-  DesignCore.Scene.entities.get = origGetItem;
+  }, { selectedItems });
 });
 
 test('constructor sets default properties', () => {
@@ -172,7 +152,7 @@ test('Test RadialDimension.dxf', () => {
 
   points.push(Pt10, Pt11, Pt15);
 
-  const dimension = new RadialDimension({ points: points });
+  const dimension = new RadialDimension({ points: points, handle: '1' });
   let file = new File();
   dimension.dxf(file);
   // console.log(file.contents);

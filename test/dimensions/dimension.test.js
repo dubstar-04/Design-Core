@@ -8,6 +8,7 @@ import { Polyline } from '../../core/entities/polyline.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
+import { withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -64,34 +65,14 @@ const scenarios = [
 ];
 
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
-  const origInputManager = DesignCore.Scene.inputManager;
-  const origGetItem = DesignCore.Scene.entities.get;
-
   const { input, selectedItems, expectedDimType } = scenario;
-  let requestInputCallCount = 0;
-  let selectedItemsCallCount = 0;
 
-  DesignCore.Scene.inputManager = {
-    requestInput: async () => {
-      requestInputCallCount++;
-      return input[requestInputCallCount - 1];
-    },
-    executeCommand: () => {},
-  };
+  await withMockInput(DesignCore.Scene, input, async () => {
+    const dim = new Dimension();
+    await dim.execute();
 
-  DesignCore.Scene.entities.get = () => {
-    selectedItemsCallCount++;
-    return selectedItems[selectedItemsCallCount - 1];
-  };
-
-  const dim = new Dimension();
-  await dim.execute();
-
-  expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
-
-  // Restore
-  DesignCore.Scene.inputManager = origInputManager;
-  DesignCore.Scene.entities.get = origGetItem;
+    expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
+  }, { selectedItems });
 });
 
 test('constructor instantiates correct dimension type', () => {
