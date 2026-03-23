@@ -149,26 +149,32 @@ test('Test Extend.action', () => {
 });
 
 test('Test Extend.action line - endpoint coincident with intersection', () => {
-  // Line from (0,50) to (50,50)
-  // Zig-zag boundary polyline crossing at x=50 and x=100
-  // Endpoint is already at x=50 (coincident with first intersection)
-  // Expected: line extends to x=100 (next intersection)
+  // Line from (0,50) to (25,50)
+  // Zig-zag boundary polyline crossing at x=50, x=100, x=150, x=200
+  // Successive extends should step through each crossing
 
   const extend = new Extend();
   core.scene.clear();
 
-  core.scene.addItem('Line', { points: [new Point(0, 50), new Point(50, 50)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(50, 0), new Point(50, 100), new Point(100, 100), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 50), new Point(25, 50)] });
+  core.scene.addItem('Lwpolyline', { points: [
+    new Point(50, 0), new Point(50, 100), new Point(100, 100),
+    new Point(100, 0), new Point(150, 0), new Point(150, 100),
+    new Point(200, 100), new Point(200, 0),
+  ] });
 
-  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
-  core.mouse.setPosFromScenePoint(new Point(45, 50));
-  extend.action();
+  const boundary = core.scene.entities.get(1);
+  const line = core.scene.entities.get(0);
 
-  expect(core.scene.entities.get(0).points[0].x).toBe(0);
-  expect(core.scene.entities.get(0).points[0].y).toBe(50);
-  expect(core.scene.entities.get(0).points[1].x).toBe(100);
-  expect(core.scene.entities.get(0).points[1].y).toBe(50);
+  const expected = [50, 100, 150, 200];
+  for (const ex of expected) {
+    extend.selectedBoundaryItems = [boundary];
+    extend.selectedItem = line;
+    core.mouse.setPosFromScenePoint(new Point(line.points[1].x - 5, 50));
+    extend.action();
+    expect(line.points[1].x).toBe(ex);
+    expect(line.points[1].y).toBe(50);
+  }
 });
 
 test('Test Extend.action polyline - endpoint coincident with intersection', () => {
