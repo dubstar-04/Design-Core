@@ -86,6 +86,7 @@ export class Dimension extends BaseDimension {
         DesignCore.Scene.selectionManager.reset();
         const options = new PromptOptions(`${Strings.Input.START} ${Strings.Strings.OR} ${Strings.Input.SELECT}`, [Input.Type.POINT, Input.Type.SINGLESELECTION]);
         const input1 = await DesignCore.Scene.inputManager.requestInput(options);
+        if (input1 === undefined) return;
 
         if (input1 instanceof Point) {
           inputValid = true;
@@ -93,6 +94,7 @@ export class Dimension extends BaseDimension {
           // select a second point to define the dimension
           const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
           const pt14 = await DesignCore.Scene.inputManager.requestInput(op1);
+          if (pt14 === undefined) return;
           // Create a temporary line using the selected points
           const tempLine = new Line({ points: [input1, pt14] });
           this.selectedItems.push(tempLine);
@@ -164,6 +166,7 @@ export class Dimension extends BaseDimension {
         }
 
         const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (input2 === undefined) return;
 
         if (Input.getType(input2) === Input.Type.POINT) {
           const Pt11 = input2;

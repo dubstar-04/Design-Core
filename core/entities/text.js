@@ -163,6 +163,7 @@ export class Text extends Entity {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
       // set the text style to the current style
@@ -182,15 +183,18 @@ export class Text extends Entity {
       if (this.styleName.toUpperCase() === 'STANDARD') {
         const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
         const height = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (height === undefined) return;
         this.height = height;
       }
 
       const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
       const rotation = await DesignCore.Scene.inputManager.requestInput(op3);
+      if (rotation === undefined) return;
       this.setRotation(rotation);
 
       const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
       const string = await DesignCore.Scene.inputManager.requestInput(op4);
+      if (string === undefined) return;
       this.string = String(string);
 
       DesignCore.Scene.inputManager.executeCommand(this);

@@ -303,7 +303,8 @@ export class Hatch extends Entity {
       let validBoundary = false;
 
       while (!validBoundary) {
-        await DesignCore.Scene.inputManager.requestInput(op);
+        const result = await DesignCore.Scene.inputManager.requestInput(op);
+        if (result === undefined) return;
 
         const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
         const boundary = this.processSelection(selectedItems);

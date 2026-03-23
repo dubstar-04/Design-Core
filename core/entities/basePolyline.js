@@ -80,10 +80,9 @@ export class BasePolyline extends Entity {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
-      let pt2;
-      let op2;
       let index;
       while (true) {
         let options;
@@ -91,8 +90,9 @@ export class BasePolyline extends Entity {
           options = this.inputMode === this.modes.LINE ? [this.modes.ARC] : [this.modes.LINE];
         }
 
-        op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC], options);
-        pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+        const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC], options);
+        const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (pt2 === undefined) break;
 
         if (Input.getType(pt2) === Input.Type.POINT) {
           if (this.inputMode === this.modes.ARC) {
