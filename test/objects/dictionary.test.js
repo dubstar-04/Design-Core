@@ -1,5 +1,5 @@
 import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
-import { Dictionary } from '../../core/dictionaries/dictionary.js';
+import { Dictionary } from '../../core/objects/dictionary.js';
 
 test('Test Dictionary constructor defaults', () => {
   const dict = new Dictionary();
