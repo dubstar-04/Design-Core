@@ -241,3 +241,112 @@ test('Test Trim.action', () => {
   expect(core.scene.entities.get(1).points[1].x).toBe(crossingLineEnd.x);
   expect(core.scene.entities.get(1).points[1].y).toBe(crossingLineEnd.y);
 });
+
+test('Test Trim.action polyline - trim end segment', () => {
+  // Polyline from (0,0) to (50,0) to (100,0)
+  // Vertical line at x=75 as boundary
+  // Mouse near (90,0) - to the right of the boundary
+  // Expected: Polyline trimmed to (0,0) (50,0) (75,0)
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(75, -50), new Point(75, 50)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(90, 0));
+  trim.action();
+
+  // Original polyline removed, new one added
+  // Line boundary should still exist at index 0
+  expect(core.scene.entities.get(0).points[0].x).toBe(75);
+  expect(core.scene.entities.get(0).points[0].y).toBe(-50);
+
+  // Trimmed polyline at index 1
+  const trimmed = core.scene.entities.get(1);
+  expect(trimmed.points.length).toBe(3);
+  expect(trimmed.points[0].x).toBe(0);
+  expect(trimmed.points[0].y).toBe(0);
+  expect(trimmed.points[1].x).toBe(50);
+  expect(trimmed.points[1].y).toBe(0);
+  expect(trimmed.points[2].x).toBe(75);
+  expect(trimmed.points[2].y).toBe(0);
+});
+
+test('Test Trim.action polyline - trim start segment', () => {
+  // Polyline from (0,0) to (50,0) to (100,0)
+  // Vertical line at x=25 as boundary
+  // Mouse near (10,0) - to the left of the boundary
+  // Expected: Polyline trimmed to (25,0) (50,0) (100,0)
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(25, -50), new Point(25, 50)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(10, 0));
+  trim.action();
+
+  // Trimmed polyline
+  const trimmed = core.scene.entities.get(1);
+  expect(trimmed.points.length).toBe(3);
+  expect(trimmed.points[0].x).toBe(25);
+  expect(trimmed.points[0].y).toBe(0);
+  expect(trimmed.points[1].x).toBe(50);
+  expect(trimmed.points[1].y).toBe(0);
+  expect(trimmed.points[2].x).toBe(100);
+  expect(trimmed.points[2].y).toBe(0);
+});
+
+test('Test Trim.action polyline - trim middle segment', () => {
+  // Polyline from (0,0) to (50,0) to (100,0) to (150,0)
+  // Vertical line at x=25 and x=75 as boundary
+  // Mouse near (50,0) - between the two boundaries
+  // Expected: Two polylines: (0,0)-(25,0) and (75,0)-(100,0)-(150,0)
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0), new Point(150, 0)] });
+  core.scene.addItem('Line', { points: [new Point(25, -50), new Point(25, 50)] });
+  core.scene.addItem('Line', { points: [new Point(75, -50), new Point(75, 50)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1), core.scene.entities.get(2)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(50, 0));
+  trim.action();
+
+  // Two boundary lines remain, original polyline removed, two new polylines added
+  // Count entities - should have 4 (2 lines + 2 polylines)
+  expect(core.scene.entities.count()).toBe(4);
+
+  // Find the two polylines
+  const polylines = [];
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    const entity = core.scene.entities.get(i);
+    if (entity.type === 'Lwpolyline') {
+      polylines.push(entity);
+    }
+  }
+
+  expect(polylines.length).toBe(2);
+
+  // Sort polylines by first point x
+  polylines.sort((a, b) => a.points[0].x - b.points[0].x);
+
+  // First polyline: (0,0) to (25,0)
+  expect(polylines[0].points.length).toBe(2);
+  expect(polylines[0].points[0].x).toBe(0);
+  expect(polylines[0].points[1].x).toBe(25);
+
+  // Second polyline: (75,0) to (100,0) to (150,0)
+  expect(polylines[1].points.length).toBe(3);
+  expect(polylines[1].points[0].x).toBe(75);
+  expect(polylines[1].points[1].x).toBe(100);
+  expect(polylines[1].points[2].x).toBe(150);
+});
