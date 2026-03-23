@@ -606,6 +606,75 @@ export class Intersection {
   }
 
   /**
+   * Find intersections between polyline and polyline
+   * @param {Polyline} polyline1
+   * @param {Polyline} polyline2
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectPolylinePolyline(polyline1, polyline2, extend) {
+    const result = new Intersection('No Intersection');
+    const length = polyline1.points.length;
+
+    for (let i = 0; i < length - 1; i++) {
+      const b1 = polyline1.points[i];
+      const b2 = polyline1.points[(i + 1) % length];
+
+      if (b1.bulge === 0) {
+        const line = { start: b1, end: b2 };
+        const inter = this.intersectPolylineLine(polyline2, line, extend);
+        result.appendPoints(inter.points);
+      } else {
+        const arc = {};
+        arc.centre = b1.bulgeCentrePoint(b2);
+        arc.startPoint = b1;
+        arc.endPoint = b2;
+        arc.radius = arc.centre.distance(b1);
+        arc.direction = b1.bulge;
+
+        const inter = this.intersectPolylineArc(polyline2, arc, extend);
+        result.appendPoints(inter.points);
+      }
+    }
+
+    if (result.points.length > 0) result.status = 'Intersection';
+    return result;
+  }
+
+  /**
+   * Find intersections between lwpolyline and lwpolyline
+   * @param {Lwpolyline} lwpolyline1
+   * @param {Lwpolyline} lwpolyline2
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectLwpolylineLwpolyline(lwpolyline1, lwpolyline2, extend) {
+    return this.intersectPolylinePolyline(lwpolyline1, lwpolyline2, extend);
+  }
+
+  /**
+   * Find intersections between polyline and lwpolyline
+   * @param {Polyline} polyline
+   * @param {Lwpolyline} lwpolyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectPolylineLwpolyline(polyline, lwpolyline, extend) {
+    return this.intersectPolylinePolyline(polyline, lwpolyline, extend);
+  }
+
+  /**
+   * Find intersections between lwpolyline and polyline
+   * @param {Lwpolyline} lwpolyline
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectLwpolylinePolyline(lwpolyline, polyline, extend) {
+    return this.intersectPolylinePolyline(lwpolyline, polyline, extend);
+  }
+
+  /**
    * Find intersections between polyline and circle segments
    * @param {Polyline} polyline
    * @param {Circle} circle
