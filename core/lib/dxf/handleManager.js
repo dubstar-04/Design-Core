@@ -51,14 +51,24 @@ export class HandleManager {
    * @param {string} handle - hex string
    */
   checkHandle(handle) {
-    const normalised = handle.toUpperCase();
+    if (handle === undefined || handle === null) {
+      return;
+    }
+
+    const normalised = String(handle).toUpperCase();
+
+    if (!normalised.length || !/^[0-9A-F]+$/.test(normalised)) {
+      Logging.instance.warn(`Invalid handle: ${handle}`);
+      return;
+    }
+
     if (this.usedHandles.has(normalised)) {
       Logging.instance.error(`Duplicate handle: ${normalised}`);
     }
 
     this.usedHandles.add(normalised);
 
-    const value = parseInt(handle, 16);
+    const value = parseInt(normalised, 16);
     if (value >= this.counter) {
       this.counter = value + 1;
     }
