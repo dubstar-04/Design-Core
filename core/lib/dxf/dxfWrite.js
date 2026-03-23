@@ -92,7 +92,7 @@ export class DXFWriter {
    * Write Dictionary section
    * @param {DXFFile} file
    */
-  writeDictionaries(file) {
+  writeObjects(file) {
     // Dictionary
     file.writeGroupCode('0', 'SECTION', DXFFile.Version.R2000);
     file.writeGroupCode('2', 'OBJECTS', DXFFile.Version.R2000);
@@ -122,7 +122,7 @@ export class DXFWriter {
     this.writeTables(file);
     this.writeBlocks(file);
     this.writeEntities(file);
-    this.writeDictionaries(file);
+    this.writeObjects(file);
 
     // write end of file
     file.writeGroupCode('0', 'EOF');
