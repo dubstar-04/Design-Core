@@ -363,8 +363,8 @@ test('Test Trim.action polyline - trim bulged arc segment', () => {
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Lwpolyline', {points: [new Point(0, 0, 1), new Point(100, 0), new Point(200, 0)]});
-  core.scene.addItem('Line', {points: [new Point(50, -100), new Point(50, 100)]});
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0, 1), new Point(100, 0), new Point(200, 0)] });
+  core.scene.addItem('Line', { points: [new Point(50, -100), new Point(50, 100)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
