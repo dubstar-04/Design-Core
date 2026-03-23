@@ -471,9 +471,10 @@ export class Intersection {
       const ub = numeratorB / denominator;
 
       // If ua and ub are between 0 and 1, the intersection is within the line segments
-      // If 'extend' is true, allow intersection if it lies on either segment
+      // When extend is true, line1 (boundary) must contain the intersection (ua in [0,1])
+      // but line2 (selected) can extend beyond its endpoints (ub unconstrained)
       const isWithinSegments = (0 <= ua && ua <= 1) && (0 <= ub && ub <= 1);
-      const isExtended = ((0 <= ua && ua <= 1) || (0 <= ub && ub <= 1)) && extend;
+      const isExtended = (0 <= ua && ua <= 1) && extend;
 
       if (isWithinSegments || isExtended) {
         result = new Intersection('Intersection');
@@ -520,7 +521,33 @@ export class Intersection {
    * @return {Intersect}
    */
   static intersectLinePolyline(line, polyline, extend) {
-    return this.intersectPolylineLine(polyline, line, extend);
+    const result = new Intersection('No Intersection');
+    const length = polyline.points.length;
+
+    for (let i = 0; i < length - 1; i++) {
+      const b1 = polyline.points[i];
+      const b2 = polyline.points[i + 1];
+
+      if (b1.bulge === 0) {
+        const line2 = { start: b1, end: b2 };
+        // line (boundary) stays as arg1, polyline segment (selected) as arg2
+        const inter = this.intersectLineLine(line, line2, extend);
+        result.appendPoints(inter.points);
+      } else {
+        const arc = {};
+        arc.centre = b1.bulgeCentrePoint(b2);
+        arc.startPoint = b1;
+        arc.endPoint = b2;
+        arc.radius = arc.centre.distance(b1);
+        arc.direction = b1.bulge;
+
+        const interArc = this.intersectArcLine(arc, line, extend);
+        result.appendPoints(interArc.points);
+      }
+    }
+
+    if (result.points.length > 0) result.status = 'Intersection';
+    return result;
   }
 
   /**
@@ -531,7 +558,7 @@ export class Intersection {
    * @return {Intersect}
    */
   static intersectLineLwpolyline(line, lwpolyline, extend) {
-    return this.intersectPolylineLine(lwpolyline, line, extend);
+    return this.intersectLinePolyline(line, lwpolyline, extend);
   }
 
   /**
@@ -547,12 +574,13 @@ export class Intersection {
 
     for (let i = 0; i < length - 1; i++) {
       const b1 = polyline.points[i];
-      const b2 = polyline.points[(i + 1) % length];
+      const b2 = polyline.points[i + 1];
 
 
       if (b1.bulge === 0) {
         const line2 = { start: b1, end: b2 };
-        const inter = this.intersectLineLine(line, line2, extend);
+        // polyline segment (boundary) as arg1, line (selected) as arg2
+        const inter = this.intersectLineLine(line2, line, extend);
         result.appendPoints(inter.points);
       } else {
         const arc = {};
@@ -614,15 +642,17 @@ export class Intersection {
    */
   static intersectPolylinePolyline(polyline1, polyline2, extend) {
     const result = new Intersection('No Intersection');
-    const length = polyline1.points.length;
+    // Decompose polyline2 (selected) so polyline1 (boundary) stays as arg1
+    const length = polyline2.points.length;
 
     for (let i = 0; i < length - 1; i++) {
-      const b1 = polyline1.points[i];
-      const b2 = polyline1.points[(i + 1) % length];
+      const b1 = polyline2.points[i];
+      const b2 = polyline2.points[i + 1];
 
       if (b1.bulge === 0) {
         const line = { start: b1, end: b2 };
-        const inter = this.intersectPolylineLine(polyline2, line, extend);
+        // polyline1 (boundary) as arg1, polyline2 segment (selected) as arg2
+        const inter = this.intersectPolylineLine(polyline1, line, extend);
         result.appendPoints(inter.points);
       } else {
         const arc = {};
@@ -632,7 +662,8 @@ export class Intersection {
         arc.radius = arc.centre.distance(b1);
         arc.direction = b1.bulge;
 
-        const inter = this.intersectPolylineArc(polyline2, arc, extend);
+        // polyline1 (boundary) as arg1, polyline2 arc segment (selected) as arg2
+        const inter = this.intersectPolylineArc(polyline1, arc, extend);
         result.appendPoints(inter.points);
       }
     }
@@ -687,7 +718,7 @@ export class Intersection {
 
     for (let i = 0; i < length - 1; i++) {
       const b1 = polyline.points[i];
-      const b2 = polyline.points[(i + 1) % length];
+      const b2 = polyline.points[i + 1];
 
 
       if (b1.bulge === 0) {
