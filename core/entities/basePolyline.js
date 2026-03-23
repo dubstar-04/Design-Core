@@ -401,10 +401,24 @@ export class BasePolyline extends Entity {
         const B = this.points[i];
 
         if (this.isPointOnSegment(point, A, B)) {
+          let positionAlongSegment;
+
+          if (A.bulge !== 0) {
+            // For arc segments, use normalised angular position
+            const center = A.bulgeCentrePoint(B);
+            const direction = A.bulge > 0 ? 1 : -1;
+            const startAngle = center.angle(A);
+            const pointAngle = center.angle(point);
+            positionAlongSegment = ((pointAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
+          } else {
+            // For line segments, chord distance is accurate
+            positionAlongSegment = A.distance(point);
+          }
+
           locatedIntersections.push({
             segmentIndex: i,
             point: point,
-            distanceFromStart: A.distance(point),
+            positionAlongSegment: positionAlongSegment,
           });
           break;
         }
@@ -415,10 +429,10 @@ export class BasePolyline extends Entity {
       return stateChanges;
     }
 
-    // Sort by segment index, then by distance from start of segment
+    // Sort by segment index, then by position along segment
     locatedIntersections.sort((a, b) => {
       if (a.segmentIndex !== b.segmentIndex) return a.segmentIndex - b.segmentIndex;
-      return a.distanceFromStart - b.distanceFromStart;
+      return a.positionAlongSegment - b.positionAlongSegment;
     });
 
     // Find the nearest intersection(s) that bracket the mouse segment
@@ -432,35 +446,26 @@ export class BasePolyline extends Entity {
         trimBefore = loc;
       } else if (loc.segmentIndex === mouseSegmentIndex) {
         const A = this.points[mouseSegmentIndex - 1];
-        const mouseDistFromA = A.distance(mousePosition.closestPointOnLine(A, this.points[mouseSegmentIndex]));
+        const B = this.points[mouseSegmentIndex];
 
+        let mousePositionAlongSegment;
         if (A.bulge !== 0) {
-          // For arc segments, compare angular position
-          const B = this.points[mouseSegmentIndex];
           const center = A.bulgeCentrePoint(B);
           const direction = A.bulge > 0 ? 1 : -1;
           const mouseClosest = mousePosition.closestPointOnArc(A, B, center, direction);
-          if (mouseClosest) {
-            const mouseAngle = center.angle(mouseClosest);
-            const intAngle = center.angle(loc.point);
-            const startAngle = center.angle(A);
-
-            // Normalise angles relative to start
-            const normMouse = ((mouseAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
-            const normInt = ((intAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
-
-            if (normInt <= normMouse) {
-              trimBefore = loc;
-            } else if (!trimAfter) {
-              trimAfter = loc;
-            }
-          }
+          if (!mouseClosest) continue;
+          const startAngle = center.angle(A);
+          const mouseAngle = center.angle(mouseClosest);
+          mousePositionAlongSegment = ((mouseAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
         } else {
-          if (loc.distanceFromStart <= mouseDistFromA) {
-            trimBefore = loc;
-          } else if (!trimAfter) {
-            trimAfter = loc;
-          }
+          const mouseClosest = mousePosition.closestPointOnLine(A, B);
+          mousePositionAlongSegment = A.distance(mouseClosest);
+        }
+
+        if (loc.positionAlongSegment <= mousePositionAlongSegment) {
+          trimBefore = loc;
+        } else if (!trimAfter) {
+          trimAfter = loc;
         }
       } else {
         if (!trimAfter) {
