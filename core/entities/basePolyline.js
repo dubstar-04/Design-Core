@@ -427,9 +427,19 @@ export class BasePolyline extends Entity {
     if (distToFirst < distToLast) {
       endPointIndex = 0;
       endSegmentBulge = this.points[0].bulge;
-    } else {
+    } else if (distToLast < distToFirst) {
       endPointIndex = lastIndex;
       endSegmentBulge = this.points[lastIndex - 1].bulge;
+    } else {
+      // Tie (includes 2-point polyline where both segments are the same)
+      // Break tie by distance to the actual endpoints
+      if (mousePosition.distance(this.points[0]) <= mousePosition.distance(this.points[lastIndex])) {
+        endPointIndex = 0;
+        endSegmentBulge = this.points[0].bulge;
+      } else {
+        endPointIndex = lastIndex;
+        endSegmentBulge = this.points[lastIndex - 1].bulge;
+      }
     }
 
     // Only allow extending line segments (not arcs)
