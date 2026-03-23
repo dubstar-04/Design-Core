@@ -552,7 +552,7 @@ export class Intersection {
 
       if (b1.bulge === 0) {
         const line2 = { start: b1, end: b2 };
-        const inter = this.intersectLineLine(line2, line, extend);
+        const inter = this.intersectLineLine(line, line2, extend);
         result.appendPoints(inter.points);
       } else {
         const arc = {};
