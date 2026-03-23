@@ -112,6 +112,11 @@ export class Utils {
       }
     }
 
+    // Clear handle so a fresh unique handle is assigned when added to the scene
+    if (clone.handle !== undefined) {
+      clone.handle = undefined;
+    }
+
     return clone;
   }
 
