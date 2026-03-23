@@ -10,7 +10,7 @@ import { Line } from './line.js';
 import { Arc } from './arc.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
-import { AddState, RemoveState } from '../lib/stateManager.js';
+import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -349,6 +349,76 @@ export class BasePolyline extends Entity {
       return point.isOnArc(A, B, center, direction);
     }
     return point.isOnLine(A, B);
+  }
+
+  /**
+   * Extend the entity
+   * Only extends when the end segment closest to the mouse is a line segment (bulge === 0)
+   * @param {Array} intersections - array of intersection points
+   * @return {Array} - array of state changes
+   */
+  extend(intersections) {
+    const stateChanges = [];
+
+    if (!intersections?.length) {
+      return stateChanges;
+    }
+
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+    const lastIndex = this.points.length - 1;
+
+    // Determine which end segment is closer to the mouse
+    // First segment: points[0]→points[1], last segment: points[lastIndex-1]→points[lastIndex]
+    const firstSegStart = this.points[0];
+    const firstSegEnd = this.points[1];
+    const lastSegStart = this.points[lastIndex - 1];
+    const lastSegEnd = this.points[lastIndex];
+
+    const closestOnFirst = mousePosition.closestPointOnLine(firstSegStart, firstSegEnd);
+    const closestOnLast = mousePosition.closestPointOnLine(lastSegStart, lastSegEnd);
+    const distToFirst = mousePosition.distance(closestOnFirst || firstSegStart);
+    const distToLast = mousePosition.distance(closestOnLast || lastSegEnd);
+
+    // Identify the selected end: the endpoint index and the bulge of its segment
+    let endPointIndex;
+    let endSegmentBulge;
+
+    if (distToFirst < distToLast) {
+      endPointIndex = 0;
+      endSegmentBulge = this.points[0].bulge;
+    } else {
+      endPointIndex = lastIndex;
+      endSegmentBulge = this.points[lastIndex - 1].bulge;
+    }
+
+    // Only allow extending line segments (not arcs)
+    if (endSegmentBulge !== 0) {
+      DesignCore.Core.notify(`${this.type} ${Strings.Message.NOEXTEND}`);
+      return stateChanges;
+    }
+
+    const endPoint = this.points[endPointIndex];
+    const adjacentPoint = endPointIndex === 0 ? this.points[1] : this.points[lastIndex - 1];
+
+    // Sort intersections by distance from the end point
+    Utils.sortPointsByDistance(intersections, endPoint);
+    const newEndPoint = intersections[0];
+
+    // The intersection must be on the extension side (further from the adjacent point)
+    if (newEndPoint.distance(endPoint) > newEndPoint.distance(adjacentPoint)) {
+      return stateChanges;
+    }
+
+    // Build the new points array
+    const newPoints = this.points.map((p) => p.clone());
+    newPoints[endPointIndex] = newEndPoint;
+
+    if (newPoints[endPointIndex].isSame(this.points[endPointIndex])) {
+      return stateChanges;
+    }
+
+    stateChanges.push(new UpdateState(this, { points: newPoints }));
+    return stateChanges;
   }
 
   /**
