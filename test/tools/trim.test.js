@@ -259,13 +259,23 @@ test('Test Trim.action polyline - trim end segment', () => {
   core.mouse.setPosFromScenePoint(new Point(90, 0));
   trim.action();
 
-  // Original polyline removed, new one added
-  // Line boundary should still exist at index 0
-  expect(core.scene.entities.get(0).points[0].x).toBe(75);
-  expect(core.scene.entities.get(0).points[0].y).toBe(-50);
+  // Original polyline removed, new one added, boundary line remains
+  expect(core.scene.entities.count()).toBe(2);
 
-  // Trimmed polyline at index 1
-  const trimmed = core.scene.entities.get(1);
+  // Find entities by type
+  let boundary;
+  let trimmed;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    const entity = core.scene.entities.get(i);
+    if (entity.type === 'Line') boundary = entity;
+    if (entity.type === 'Lwpolyline') trimmed = entity;
+  }
+
+  // Boundary line unchanged
+  expect(boundary.points[0].x).toBe(75);
+  expect(boundary.points[0].y).toBe(-50);
+
+  // Trimmed polyline
   expect(trimmed.points.length).toBe(3);
   expect(trimmed.points[0].x).toBe(0);
   expect(trimmed.points[0].y).toBe(0);
@@ -292,8 +302,18 @@ test('Test Trim.action polyline - trim start segment', () => {
   core.mouse.setPosFromScenePoint(new Point(10, 0));
   trim.action();
 
-  // Trimmed polyline
-  const trimmed = core.scene.entities.get(1);
+  // Original polyline removed, new one added, boundary line remains
+  expect(core.scene.entities.count()).toBe(2);
+
+  // Find trimmed polyline by type
+  let trimmed;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Lwpolyline') {
+      trimmed = core.scene.entities.get(i);
+    }
+  }
+
+  expect(trimmed).toBeDefined();
   expect(trimmed.points.length).toBe(3);
   expect(trimmed.points[0].x).toBe(25);
   expect(trimmed.points[0].y).toBe(0);
