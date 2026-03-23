@@ -179,9 +179,9 @@ test('Test Extend.action line - endpoint coincident with intersection', () => {
 
 test('Test Extend.action polyline - endpoint coincident with intersection', () => {
   // Polyline from (0,0) to (50,50)
-  // Boundary polyline crossing at (50,50) and (100,50)
+  // Boundary line from (100,0) to (100,100)
   // Endpoint is already at (50,50) (coincident with first intersection)
-  // Expected: polyline extends to (100,50)
+  // Expected: polyline extends to (100,100)
 
   const extend = new Extend();
   core.scene.clear();
