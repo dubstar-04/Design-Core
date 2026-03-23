@@ -1,6 +1,5 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
-import { DesignCore } from '../../core/designCore.js';
 import { Matrix } from '../../core/lib/matrix.js';
 
 const core = new Core();

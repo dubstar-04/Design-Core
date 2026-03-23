@@ -38,7 +38,6 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
       }
     }
   });
-
 });
 
 test('constructor sets default properties', () => {

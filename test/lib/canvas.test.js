@@ -1,11 +1,14 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
-import { DesignCore } from '../../core/designCore.js';
 import { Matrix } from '../../core/lib/matrix.js';
 
 const core = new Core();
 const canvas = core.canvas;
 
+/**
+ * Create a mock canvas rendering context for testing
+ * @return {object} mock context
+ */
 function createMockContext() {
   return {
     setTransform: () => {},
@@ -48,7 +51,9 @@ test('Test Canvas.paintStates', () => {
 
 test('Test Canvas.setExternalPaintCallbackFunction', () => {
   let called = false;
-  const callback = () => { called = true; };
+  const callback = () => {
+    called = true;
+  };
   canvas.setExternalPaintCallbackFunction(callback);
   canvas.requestPaint();
   expect(called).toBe(true);
@@ -126,7 +131,6 @@ test('Test Canvas.paint sets width and height', () => {
 test('Test Canvas.paint flips only once', () => {
   const context = createMockContext();
   canvas.flipped = true;
-  const matrixBefore = { ...canvas.matrix };
   canvas.paint(context, 1024, 768);
   // matrix should not have additional flip translation
   expect(canvas.flipped).toBe(true);
