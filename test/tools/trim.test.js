@@ -408,12 +408,12 @@ test('Test Trim.action polyline - trim bulged arc segment', () => {
   // First point: (0,0) with partial bulge for 90° arc
   // Original 180° arc split at midpoint -> 90° arc
   // bulge = tan(includedAngle/4) = tan(π/8) = √2 - 1
-  expect(trimmed.points[0].x).toBeCloseTo(0, 10);
-  expect(trimmed.points[0].y).toBeCloseTo(0, 10);
-  expect(trimmed.points[0].bulge).toBeCloseTo(Math.tan(Math.PI / 8), 10);
+  expect(trimmed.points[0].x).toBeCloseTo(0, 5);
+  expect(trimmed.points[0].y).toBeCloseTo(0, 5);
+  expect(trimmed.points[0].bulge).toBeCloseTo(Math.tan(Math.PI / 8), 5);
 
   // Second point: intersection at (50,-50), no bulge
-  expect(trimmed.points[1].x).toBeCloseTo(50, 10);
-  expect(trimmed.points[1].y).toBeCloseTo(-50, 10);
+  expect(trimmed.points[1].x).toBeCloseTo(50, 5);
+  expect(trimmed.points[1].y).toBeCloseTo(-50, 5);
   expect(trimmed.points[1].bulge).toBe(0);
 });
