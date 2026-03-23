@@ -358,7 +358,19 @@ export class DXF {
    */
   loadObjects() {
     const objects = this.reader.objects;
-    DesignCore.DictionaryManager.load(objects);
+
+    if (objects.length) {
+      DesignCore.DictionaryManager.clearItems();
+    }
+
+    objects.forEach((object) => {
+      if (object[0] === 'DICTIONARY') {
+        DesignCore.DictionaryManager.addItem(object);
+      }
+    });
+
+    // Ensure standard items exist
+    DesignCore.DictionaryManager.checkItems();
   }
 
   /**
