@@ -513,6 +513,28 @@ export class Intersection {
   }
 
   /**
+   * Find intersections between line and polyline
+   * @param {Line} line
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectLinePolyline(line, polyline, extend) {
+    return this.intersectPolylineLine(polyline, line, extend);
+  }
+
+  /**
+   * Find intersections between line and lwpolyline
+   * @param {Line} line
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectLineLwpolyline(line, polyline, extend) {
+    return this.intersectPolylineLine(polyline, line, extend);
+  }
+
+  /**
    * Find intersections between polyline and line
    * @param {Polyline} polyline
    * @param {Line} line
@@ -559,6 +581,28 @@ export class Intersection {
    */
   static intersectCirclePolyline(circle, polyline, extend) {
     return this.intersectPolylineCircle(polyline, circle, extend);
+  }
+
+  /**
+   * Find intersections between circle and lwpolyline
+   * @param {Circle} circle
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectCircleLwpolyline(circle, polyline, extend) {
+    return this.intersectPolylineCircle(polyline, circle, extend);
+  }
+
+  /**
+   * Find intersections between arc and lwpolyline
+   * @param {Arc} arc
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectArcLwpolyline(arc, polyline, extend) {
+    return this.intersectPolylineArc(polyline, arc, extend);
   }
 
   /**
