@@ -199,6 +199,30 @@ test('Test Extend.action polyline - endpoint coincident with intersection', () =
   expect(polyline.points[1].y).toBe(100);
 });
 
+test('Test Extend.action polyline - 2-point polyline extend start', () => {
+  // 2-point polyline from (50,0) to (100,0)
+  // Boundary line at x=0
+  // Mouse near (50,0) - the start of the polyline
+  // Expected: first point extended to (0,0)
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(50, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, -50), new Point(0, 50)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(55, 0));
+  extend.action();
+
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.points[0].x).toBe(0);
+  expect(polyline.points[0].y).toBe(0);
+  expect(polyline.points[1].x).toBe(100);
+  expect(polyline.points[1].y).toBe(0);
+});
+
 test('Test Extend.action polyline - extend end segment', () => {
   // Polyline from (0,0) to (50,0) to (75,0)
   // Vertical boundary line at x=100
