@@ -591,7 +591,7 @@ export class BasePolyline extends Entity {
       if (points.length >= 2) {
         const polyline = Utils.cloneObject(this);
         polyline.points = points;
-        polyline.flags.setFlagValue(0); // open
+        polyline.flags.removeValue(1); // clear closed bit
         stateChanges.push(new AddState(polyline));
       }
     }
@@ -620,7 +620,7 @@ export class BasePolyline extends Entity {
       if (points.length >= 2) {
         const polyline = Utils.cloneObject(this);
         polyline.points = points;
-        polyline.flags.setFlagValue(0); // open
+        polyline.flags.removeValue(1); // clear closed bit
         stateChanges.push(new AddState(polyline));
       }
     }
