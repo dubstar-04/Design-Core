@@ -92,5 +92,9 @@ describe('Pasteclip Tool', () => {
     const pasted = DesignCore.Clipboard.Entities[0];
     expect(pasted.points[0].x).toBe(0);
     expect(pasted.points[0].y).toBe(0);
+
+    // Verify pasted entity has a unique handle
+    expect(newEntity.handle).toBeDefined();
+    expect(newEntity.handle).not.toBe(line.handle);
   });
 });

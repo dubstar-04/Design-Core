@@ -2,7 +2,7 @@ import { Text } from '../../core/entities/text.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 import { Core } from '../../core/core/core.js';
 
 // initialise core
@@ -37,35 +37,19 @@ const textInputScenarios = [
 
 test.each(textInputScenarios)('Text.execute handles $desc', async (scenario) => {
   const { pt0, styleName, heightInput, rotationInput, stringInput, expectedHeight, expectedRotation, expectedString } = scenario;
-  const origInputManager = DesignCore.Scene.inputManager;
 
-  let callCount = 0;
-  DesignCore.Scene.inputManager = {
-    requestInput: async (op) => {
-      callCount++;
-      if (callCount === 1) return pt0;
-      if (callCount === 2) return heightInput;
-      if (callCount === 3) return rotationInput;
-      if (callCount === 4) return stringInput;
-    },
-    executeCommand: () => {},
-  };
+  await withMockInput(DesignCore.Scene, [pt0, heightInput, rotationInput, stringInput], async () => {
+    const text = new Text({});
+    await text.execute();
 
-  const text = new Text({});
-  await text.execute();
-
-  expect(text.points.length).toBeGreaterThanOrEqual(1);
-  expect(text.points[0].x).toBe(pt0.x);
-  expect(text.points[0].y).toBe(pt0.y);
-  expect(text.height).toBe(expectedHeight);
-  expect(text.rotation).toBe(expectedRotation);
-  expect(text.string).toBe(expectedString);
-  expect(text.styleName).toBe(styleName);
-  // expect(text.backwards).toBe(style.backwards);
-  // expect(text.upsideDown).toBe(style.upsideDown);
-
-  // Restore original managers
-  DesignCore.Scene.inputManager = origInputManager;
+    expect(text.points.length).toBeGreaterThanOrEqual(1);
+    expect(text.points[0].x).toBe(pt0.x);
+    expect(text.points[0].y).toBe(pt0.y);
+    expect(text.height).toBe(expectedHeight);
+    expect(text.rotation).toBe(expectedRotation);
+    expect(text.string).toBe(expectedString);
+    expect(text.styleName).toBe(styleName);
+  });
 });
 
 test('Test Text.closestPoint', () => {

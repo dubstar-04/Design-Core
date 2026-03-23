@@ -4,7 +4,7 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 import { AddState, RemoveState } from '../../core/lib/stateManager.js';
 
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -32,36 +32,21 @@ const arcInputScenarios = [
 
 test.each(arcInputScenarios)('Arc.execute handles $desc', async (scenario) => {
   const { input1, input2, input3, expectedPt2, expectedStart, expectedEnd } = scenario;
-  const origInputManager = DesignCore.Scene.inputManager;
-  let callCount = 0;
-  DesignCore.Scene.inputManager = {
-    requestInput: async () => {
-      callCount++;
-      if (callCount === 1) return input1;
-      if (callCount === 2) return input2;
-      if (callCount === 3) return input3;
-      return input3;
-    },
-    executeCommand: () => {},
-  };
 
-  const arc = new Arc({});
-  await arc.execute();
+  await withMockInput(DesignCore.Scene, [input1, input2, input3, input3], async () => {
+    const arc = new Arc({});
+    await arc.execute();
 
-  expect(arc.points.length).toBe(3);
-  expect(arc.points[0]).toBe(input1);
-  expect(arc.points[1]).toBe(input2);
-  const expPt2 = expectedPt2(input1, input2, input3);
-  expect(arc.points[2].x).toBeCloseTo(expPt2.x);
-  expect(arc.points[2].y).toBeCloseTo(expPt2.y);
+    expect(arc.points.length).toBe(3);
+    expect(arc.points[0]).toBe(input1);
+    expect(arc.points[1]).toBe(input2);
+    const expPt2 = expectedPt2(input1, input2, input3);
+    expect(arc.points[2].x).toBeCloseTo(expPt2.x);
+    expect(arc.points[2].y).toBeCloseTo(expPt2.y);
 
-  // if (checkAngles) {
-  expect(arc.startAngle()).toBe(expectedStart);
-  expect(arc.endAngle()).toBeCloseTo(expectedEnd);
-  // }
-
-  // Restore original inputManager
-  DesignCore.Scene.inputManager = origInputManager;
+    expect(arc.startAngle()).toBe(expectedStart);
+    expect(arc.endAngle()).toBeCloseTo(expectedEnd);
+  });
 });
 
 test('Test Arc.startAngle', () => {
@@ -279,7 +264,7 @@ test('Arc.trim returns empty for no intersections', () => {
 
 
 test('Arc.trim returns remove + add states when trimming between two intersections', () => {
-  const arc = new Arc({ points: [new Point(), new Point(10, 0), new Point(-10, 0)] });
+  const arc = new Arc({ points: [new Point(), new Point(10, 0), new Point(-10, 0)], handle: 'B2' });
   // Intersection points on the arc.
   const i1 = new Point(7.71, 7.71);
   const i2 = new Point(-7.71, 7.71);
@@ -296,6 +281,10 @@ test('Arc.trim returns remove + add states when trimming between two intersectio
   expect(changes[0]).toBeInstanceOf(AddState);
   expect(changes[1]).toBeInstanceOf(AddState);
   expect(changes[2]).toBeInstanceOf(RemoveState);
+
+  // Verify trimmed arcs have unique handles (not the original)
+  expect(changes[0].entity.handle).toBeUndefined();
+  expect(changes[1].entity.handle).toBeUndefined();
 
   expect(changes[0].entity.points[0].x).toBe(0);
   expect(changes[0].entity.points[0].y).toBe(0);

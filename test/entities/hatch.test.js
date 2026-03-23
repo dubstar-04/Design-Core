@@ -9,7 +9,7 @@ import { Polyline } from '../../core/entities/polyline.js';
 import { Arc } from '../../core/entities/arc.js';
 import { Text } from '../../core/entities/text.js';
 
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 import { Core } from '../../core/core/core.js';
 
@@ -53,48 +53,35 @@ const hatchInputScenarios = [
 
 test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) => {
   const { boundaryItems, pointCount, pattern, scale, angle, expectedPattern, expectedScale, expectedAngle } = scenario;
-  const origInputManager = DesignCore.Scene.inputManager;
-  // let callCount = 0;
-  DesignCore.Scene.inputManager = {
-    requestInput: async () => {
-      // return to accept input
-      return null;
-    },
-    executeCommand: () => {},
-  };
 
-  // Manual mock for selected items
-  DesignCore.Scene.selectionManager.selectedItems = [];
+  await withMockInput(DesignCore.Scene, [true], async () => {
+    // Manual mock for selected items
+    DesignCore.Scene.selectionManager.selectedItems = [];
 
-  for (let i = 0; i < boundaryItems.length; i++) {
-    DesignCore.Scene.selectionManager.selectedItems.push(boundaryItems[i]);
-  }
+    for (let i = 0; i < boundaryItems.length; i++) {
+      DesignCore.Scene.selectionManager.selectedItems.push(boundaryItems[i]);
+    }
 
-  // const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
+    const hatch = new Hatch({ patternName: pattern, scale: scale, angle: angle });
 
-  const hatch = new Hatch({ patternName: pattern, scale: scale, angle: angle });
+    await hatch.execute();
 
-  await hatch.execute();
+    expect(hatch.childEntities.length).toBe(1);
 
-  expect(hatch.childEntities.length).toBe(1);
+    expect(hatch.childEntities[0].points.length).toBe(pointCount); // closed polyline adds extra point
 
-  expect(hatch.childEntities[0].points.length).toBe(pointCount); // closed polyline adds extra point
-
-  expect(hatch.points.length).toBe(2);
-  // hatch first point should be at 0,0
-  expect(hatch.points.at(0).x).toBe(0);
-  expect(hatch.points.at(0).y).toBe(0);
-  // hatch last point should be at 1,1
-  expect(hatch.points.at(-1).x).toBe(1);
-  expect(hatch.points.at(-1).y).toBe(1);
-  expect(hatch.pattern).toBe(expectedPattern);
-  expect(hatch.scale).toBe(expectedScale);
-  expect(hatch.angle).toBe(expectedAngle);
-  expect(hatch.solid).toBe(expectedPattern === 'SOLID');
-
-
-  // Restore original inputManager
-  DesignCore.Scene.inputManager = origInputManager;
+    expect(hatch.points.length).toBe(2);
+    // hatch first point should be at 0,0
+    expect(hatch.points.at(0).x).toBe(0);
+    expect(hatch.points.at(0).y).toBe(0);
+    // hatch last point should be at 1,1
+    expect(hatch.points.at(-1).x).toBe(1);
+    expect(hatch.points.at(-1).y).toBe(1);
+    expect(hatch.pattern).toBe(expectedPattern);
+    expect(hatch.scale).toBe(expectedScale);
+    expect(hatch.angle).toBe(expectedAngle);
+    expect(hatch.solid).toBe(expectedPattern === 'SOLID');
+  });
 });
 
 test('Test Hatch', () => {

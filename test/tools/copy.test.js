@@ -39,4 +39,12 @@ test('Test Copy.action', () => {
     expect(core.scene.entities.get(i).points[0].x).toBe(10);
     expect(core.scene.entities.get(i).points[0].y).toBe(0);
   }
+
+  // Verify copied entities have unique handles
+  for (let i = 0; i < 6; i++) {
+    const original = core.scene.entities.get(i);
+    const copy = core.scene.entities.get(i + 6);
+    expect(copy.handle).toBeDefined();
+    expect(copy.handle).not.toBe(original.handle);
+  }
 });

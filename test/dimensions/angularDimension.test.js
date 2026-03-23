@@ -7,7 +7,7 @@ import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInputAndEntities } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -54,47 +54,27 @@ const scenarios = [
 ];
 
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
-  const origInputManager = DesignCore.Scene.inputManager;
-  const origGetItem = DesignCore.Scene.entities.get;
-
   const { input, selectedItems, expectedDimType, dimensionValue, dimensionEntities } = scenario;
-  let requestInputCallCount = 0;
-  let selectedItemsCallCount = 0;
 
-  DesignCore.Scene.inputManager = {
-    requestInput: async () => {
-      requestInputCallCount++;
-      return input[requestInputCallCount - 1];
-    },
-    executeCommand: () => {},
-  };
+  await withMockInputAndEntities(DesignCore.Scene, input, selectedItems, async () => {
+    const dim = new AngularDimension();
+    await dim.execute();
 
-  DesignCore.Scene.entities.get = () => {
-    selectedItemsCallCount++;
-    return selectedItems[selectedItemsCallCount - 1];
-  };
+    expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
+    // get the text entities from the dimension block
+    const dimensionBlockEntities = dim.buildDimension();
+    expect(dimensionBlockEntities.length).toBe(dimensionEntities);
 
-  const dim = new AngularDimension();
-  await dim.execute();
-
-  expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
-  // get the text entities from the dimension block
-  const dimensionBlockEntities = dim.buildDimension();
-  expect(dimensionBlockEntities.length).toBe(dimensionEntities);
-
-  // check if the text value matches the expected dimension value
-  for (const entity of dimensionBlockEntities) {
-    if (entity.type === 'Text') {
-      // remove all non-numeric characters except . and -
-      const numbersOnly = entity.string.replace(/[^0-9.-]+/g, '');
-      expect(Number(numbersOnly)).toBeCloseTo(dimensionValue);
-      expect(entity.string).toContain('°');
+    // check if the text value matches the expected dimension value
+    for (const entity of dimensionBlockEntities) {
+      if (entity.type === 'Text') {
+        // remove all non-numeric characters except . and -
+        const numbersOnly = entity.string.replace(/[^0-9.-]+/g, '');
+        expect(Number(numbersOnly)).toBeCloseTo(dimensionValue);
+        expect(entity.string).toContain('°');
+      }
     }
-  }
-
-  // Restore
-  DesignCore.Scene.inputManager = origInputManager;
-  DesignCore.Scene.entities.get = origGetItem;
+  });
 });
 
 test('constructor sets default properties', () => {

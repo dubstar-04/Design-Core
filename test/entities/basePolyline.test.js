@@ -7,7 +7,7 @@ import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
 
-import { File } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -27,40 +27,22 @@ const inputScenarios = [
 
 test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => {
   const { inputs, expectedPoints } = scenario;
-  const origInputManager = DesignCore.Scene.inputManager;
-  let callCount = 0;
-  DesignCore.Scene.inputManager = {
 
-    actionCommand: () => {},
+  await withMockInput(DesignCore.Scene, inputs, async () => {
+    const polyline = new BasePolyline({});
+    await polyline.execute();
 
-    executeCommand: () => {},
+    expect(polyline.points.length).toBe(expectedPoints);
+    expect(polyline.points[0]).toBe(inputs[0]);
+    expect(polyline.points[0].bulge).toBe(0);
+    expect(polyline.points[1]).toBe(inputs[1]);
 
-    requestInput: async () => {
-      if (callCount < inputs.length) {
-        const input = inputs[callCount];
-        callCount++;
-        return input;
-      }
-    },
-  };
-
-  const polyline = new BasePolyline({});
-  await polyline.execute();
-
-  // console.log(polyline);
-  expect(polyline.points.length).toBe(expectedPoints);
-  expect(polyline.points[0]).toBe(inputs[0]);
-  expect(polyline.points[0].bulge).toBe(0);
-  expect(polyline.points[1]).toBe(inputs[1]);
-
-  // validate arc segment bulge and end point
-  if (inputs.length > 2) {
-    expect(polyline.points[1].bulge).toBeCloseTo(1);
-    expect(polyline.points[2]).toBe(inputs[3]);
-  }
-
-  // Restore original inputManager
-  DesignCore.Scene.inputManager = origInputManager;
+    // validate arc segment bulge and end point
+    if (inputs.length > 2) {
+      expect(polyline.points[1].bulge).toBeCloseTo(1);
+      expect(polyline.points[2]).toBe(inputs[3]);
+    }
+  }, { actionCommand: () => {} });
 });
 
 test('Test BasePolyline.getClosestSegment', () => {

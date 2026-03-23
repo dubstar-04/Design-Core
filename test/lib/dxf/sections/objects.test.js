@@ -39,23 +39,23 @@ test('Test Objects.read', () => {
   expect(readObjects).toHaveLength(2);
 
   const rootDictionary = readObjects[0];
-  const acadGroup = readObjects[1];
+  const groupDictionary = readObjects[1];
 
   // check the object types
   expect(rootDictionary).toHaveProperty('0', 'DICTIONARY');
-  expect(acadGroup).toHaveProperty('0', 'DICTIONARY');
+  expect(groupDictionary).toHaveProperty('0', 'DICTIONARY');
 
   // check handles
   expect(rootDictionary).toHaveProperty('5', '27');
-  expect(acadGroup).toHaveProperty('5', '26');
+  expect(groupDictionary).toHaveProperty('5', '26');
 
   // check AcDbDictionary subclass marker
   expect(rootDictionary).toHaveProperty('100', 'AcDbDictionary');
-  expect(acadGroup).toHaveProperty('100', 'AcDbDictionary');
+  expect(groupDictionary).toHaveProperty('100', 'AcDbDictionary');
 
   // check duplicate record cloning
   expect(rootDictionary).toHaveProperty('281', 1);
-  expect(acadGroup).toHaveProperty('281', 1);
+  expect(groupDictionary).toHaveProperty('281', 1);
 
   // check root dictionary entries
   expect(rootDictionary).toHaveProperty('3', 'ACAD_GROUP');

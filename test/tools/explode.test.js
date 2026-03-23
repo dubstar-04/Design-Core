@@ -30,10 +30,16 @@ test('Test Explode.action', () => {
 
   // loop through all exploded items, check the type and
   // check the points have be modified when exploded
+  const handles = new Set();
   for (let i = 0; i < core.scene.entities.count(); i++) {
     const item = core.scene.entities.get(i);
     expect(item instanceof Line).toBe(true);
     expect(item.points[0].x).toBe(0 + insertPoint.x);
     expect(item.points[0].y).toBe(i * 10 + insertPoint.y);
+
+    // Verify each exploded entity has a unique handle
+    expect(item.handle).toBeDefined();
+    expect(handles.has(item.handle)).toBe(false);
+    handles.add(item.handle);
   }
 });
