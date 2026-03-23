@@ -364,7 +364,14 @@ export class BasePolyline extends Entity {
     if (A.bulge !== 0) {
       const center = A.bulgeCentrePoint(B);
       const direction = A.bulge > 0 ? 1 : -1;
-      return point.closestPointOnArc(A, B, center, direction);
+      const closest = point.closestPointOnArc(A, B, center, direction);
+
+      if (closest) {
+        return closest;
+      }
+
+      // Point not on arc - return the nearer endpoint
+      return point.distance(A) < point.distance(B) ? A : B;
     }
 
     return point.closestPointOnLine(A, B);
@@ -408,16 +415,10 @@ export class BasePolyline extends Entity {
     const lastIndex = this.points.length - 1;
 
     // Determine which end segment is closer to the mouse
-    // First segment: points[0]→points[1], last segment: points[lastIndex-1]→points[lastIndex]
-    const firstSegStart = this.points[0];
-    const firstSegEnd = this.points[1];
-    const lastSegStart = this.points[lastIndex - 1];
-    const lastSegEnd = this.points[lastIndex];
-
-    const closestOnFirst = mousePosition.closestPointOnLine(firstSegStart, firstSegEnd);
-    const closestOnLast = mousePosition.closestPointOnLine(lastSegStart, lastSegEnd);
-    const distToFirst = mousePosition.distance(closestOnFirst || firstSegStart);
-    const distToLast = mousePosition.distance(closestOnLast || lastSegEnd);
+    const closestOnFirst = this.closestPointOnSegment(mousePosition, 1);
+    const closestOnLast = this.closestPointOnSegment(mousePosition, lastIndex);
+    const distToFirst = mousePosition.distance(closestOnFirst);
+    const distToLast = mousePosition.distance(closestOnLast);
 
     // Identify the selected end: the endpoint index and the bulge of its segment
     let endPointIndex;
