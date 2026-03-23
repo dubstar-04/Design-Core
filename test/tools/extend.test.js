@@ -147,3 +147,85 @@ test('Test Extend.action', () => {
   expect(core.scene.entities.get(1).points[1].x).toBe(100);
   expect(core.scene.entities.get(1).points[1].y).toBe(100);
 });
+
+test('Test Extend.action polyline - extend end segment', () => {
+  // Polyline from (0,0) to (50,0) to (75,0)
+  // Vertical boundary line at x=100
+  // Mouse near (75,0) - the end of the polyline
+  // Expected: last point extended to (100,0)
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(75, 0)] });
+  core.scene.addItem('Line', { points: [new Point(100, -50), new Point(100, 50)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(80, 0));
+  extend.action();
+
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.points.length).toBe(3);
+  expect(polyline.points[0].x).toBe(0);
+  expect(polyline.points[0].y).toBe(0);
+  expect(polyline.points[1].x).toBe(50);
+  expect(polyline.points[1].y).toBe(0);
+  expect(polyline.points[2].x).toBe(100);
+  expect(polyline.points[2].y).toBe(0);
+});
+
+test('Test Extend.action polyline - extend start segment', () => {
+  // Polyline from (25,0) to (50,0) to (100,0)
+  // Vertical boundary line at x=0
+  // Mouse near (25,0) - the start of the polyline
+  // Expected: first point extended to (0,0)
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(25, 0), new Point(50, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, -50), new Point(0, 50)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(20, 0));
+  extend.action();
+
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.points.length).toBe(3);
+  expect(polyline.points[0].x).toBe(0);
+  expect(polyline.points[0].y).toBe(0);
+  expect(polyline.points[1].x).toBe(50);
+  expect(polyline.points[1].y).toBe(0);
+  expect(polyline.points[2].x).toBe(100);
+  expect(polyline.points[2].y).toBe(0);
+});
+
+test('Test Extend.action polyline - reject arc end segment', () => {
+  // Polyline: (0,0) -> straight -> (50,0) with bulge=1 -> arc -> (100,0)
+  // Vertical boundary line at x=125
+  // Mouse near (100,0) - the end of the polyline (arc segment)
+  // Expected: no extension, polyline unchanged
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0, 1), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(125, -50), new Point(125, 50)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(100, 0));
+  extend.action();
+
+  // Polyline should be unchanged
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.points.length).toBe(3);
+  expect(polyline.points[0].x).toBe(0);
+  expect(polyline.points[0].y).toBe(0);
+  expect(polyline.points[1].x).toBe(50);
+  expect(polyline.points[1].y).toBe(0);
+  expect(polyline.points[2].x).toBe(100);
+  expect(polyline.points[2].y).toBe(0);
+});
