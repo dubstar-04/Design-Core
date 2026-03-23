@@ -471,9 +471,9 @@ export class Intersection {
       const ub = numeratorB / denominator;
 
       // If ua and ub are between 0 and 1, the intersection is within the line segments
-      // If 'extend' is true, allow intersection outside the segments
+      // If 'extend' is true, allow intersection if it lies on either segment
       const isWithinSegments = (0 <= ua && ua <= 1) && (0 <= ub && ub <= 1);
-      const isExtended = (0 <= ua && ua <= 1) && extend;
+      const isExtended = ((0 <= ua && ua <= 1) || (0 <= ub && ub <= 1)) && extend;
 
       if (isWithinSegments || isExtended) {
         result = new Intersection('Intersection');

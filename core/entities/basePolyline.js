@@ -443,7 +443,12 @@ export class BasePolyline extends Entity {
 
     // Sort intersections by distance from the end point
     Utils.sortPointsByDistance(intersections, endPoint);
-    const newEndPoint = intersections[0];
+
+    // Skip intersections coincident with the current endpoint
+    const newEndPoint = intersections.find((p) => !p.isSame(endPoint));
+    if (!newEndPoint) {
+      return stateChanges;
+    }
 
     // The intersection must lie beyond the endpoint along the ray from adjacent→endpoint
     // 1. Dot product must be positive (same direction, not behind)
