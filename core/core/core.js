@@ -12,7 +12,7 @@ import { VPortManager } from '../tables/vportManager.js';
 import { UCSManager } from '../tables/ucsManager.js';
 import { AppIDManager } from '../tables/appIdManager.js';
 import { BlockRecordManager } from '../tables/blockRecordManager.js';
-import { DictionaryManager } from '../dictionaries/dictionaryManager.js';
+import { DictionaryManager } from '../objects/dictionaryManager.js';
 import { PropertyManager } from '../properties/propertyManager.js';
 import { Clipboard } from '../lib/clipboard.js';
 
