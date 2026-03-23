@@ -392,10 +392,17 @@ export class BasePolyline extends Entity {
     }
 
     // For each intersection, determine which segment it falls on
-    // Store as {segmentIndex, point, distanceAlongSegment}
+    // Filter out intersections that coincide with existing polyline vertices
+    const filteredIntersections = intersections.filter((point) => !this.points.some((vertex) => vertex.isSame(point)));
+
+    if (!filteredIntersections.length) {
+      return stateChanges;
+    }
+
+    // Store position along segment for ordering
     const locatedIntersections = [];
 
-    for (const point of intersections) {
+    for (const point of filteredIntersections) {
       for (let i = 1; i < this.points.length; i++) {
         const A = this.points[i - 1];
         const B = this.points[i];
@@ -492,9 +499,11 @@ export class BasePolyline extends Entity {
       }
       points.push(segStartClone);
 
-      // Add the trim point
+      // Add the trim point (skip if it coincides with the last added point)
       const trimPoint = trimBefore.point.clone();
-      points.push(trimPoint);
+      if (!points.at(-1).isSame(trimPoint)) {
+        points.push(trimPoint);
+      }
 
       if (points.length >= 2) {
         const polyline = Utils.cloneObject(this);
@@ -510,7 +519,6 @@ export class BasePolyline extends Entity {
 
       // Add the intersection point
       const trimPoint = trimAfter.point.clone();
-      points.push(trimPoint);
 
       // If the segment is an arc, add remaining arc portion
       const segStart = this.points[trimAfter.segmentIndex - 1];
@@ -518,9 +526,14 @@ export class BasePolyline extends Entity {
         trimPoint.bulge = this.getPartialBulge(segStart, this.points[trimAfter.segmentIndex], trimPoint, true);
       }
 
-      // Add remaining points
+      points.push(trimPoint);
+
+      // Add remaining points (skip first if it coincides with the trim point)
       for (let i = trimAfter.segmentIndex; i < this.points.length; i++) {
-        points.push(this.points[i].clone());
+        const nextPoint = this.points[i].clone();
+        if (!points.at(-1).isSame(nextPoint)) {
+          points.push(nextPoint);
+        }
       }
 
       if (points.length >= 2) {
