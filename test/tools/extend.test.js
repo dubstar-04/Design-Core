@@ -229,3 +229,92 @@ test('Test Extend.action polyline - reject arc end segment', () => {
   expect(polyline.points[2].x).toBe(100);
   expect(polyline.points[2].y).toBe(0);
 });
+
+test('Test Extend.action polyline - reject intersection behind endpoint', () => {
+  // Polyline from (50,0) to (75,0) to (100,0)
+  // Boundary line at x=25 (behind the start)
+  // Mouse near (100,0) - the end of the polyline
+  // The boundary is behind the end, so no extension should occur
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(50, 0), new Point(75, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(25, -50), new Point(25, 50)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(95, 0));
+  extend.action();
+
+  // Polyline should be unchanged - intersection is behind the endpoint
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.points[2].x).toBe(100);
+  expect(polyline.points[2].y).toBe(0);
+});
+
+test('Test Extend.action polyline - reject shortening intersection', () => {
+  // Polyline from (0,0) to (50,0) to (100,0)
+  // Boundary line at x=75 (between adjacent and endpoint)
+  // Mouse near (100,0) - the end of the polyline
+  // Intersection is in the correct direction but would shorten the polyline
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(75, -50), new Point(75, 50)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(95, 0));
+  extend.action();
+
+  // Polyline should be unchanged - intersection would shorten it
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.points[2].x).toBe(100);
+  expect(polyline.points[2].y).toBe(0);
+});
+
+test('Test Extend.action polyline - extend with arc start segment', () => {
+  // Polyline: bulge=1 arc -> (50,0) -> straight -> (100,0)
+  // Boundary at x=125, mouse near (100,0)
+  // The mouse is near the end (line segment), not the arc start
+  // Should extend the line segment end
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0, 1), new Point(50, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(125, -50), new Point(125, 50)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(110, 0));
+  extend.action();
+
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.points[2].x).toBe(125);
+  expect(polyline.points[2].y).toBe(0);
+});
+
+test('Test Extend.action polyline - no intersections', () => {
+  // Polyline from (0,0) to (50,0)
+  // Boundary line parallel to polyline (no intersection possible)
+  // Expected: no extension
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 50), new Point(100, 50)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(45, 0));
+  extend.action();
+
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.points[0].x).toBe(0);
+  expect(polyline.points[1].x).toBe(50);
+});
