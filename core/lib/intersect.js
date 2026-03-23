@@ -503,13 +503,13 @@ export class Intersection {
 
   /**
    * Find intersections between lwpolyline and line
-   * @param {Polyline} polyline
+   * @param {Lwpolyline} lwpolyline
    * @param {Line} line
    * @param {boolean} extend
    * @return {Intersect}
    */
-  static intersectLwpolylineLine(polyline, line, extend) {
-    return this.intersectPolylineLine(polyline, line, extend);
+  static intersectLwpolylineLine(lwpolyline, line, extend) {
+    return this.intersectPolylineLine(lwpolyline, line, extend);
   }
 
   /**
@@ -526,12 +526,12 @@ export class Intersection {
   /**
    * Find intersections between line and lwpolyline
    * @param {Line} line
-   * @param {Polyline} polyline
+   * @param {Lwpolyline} lwpolyline
    * @param {boolean} extend
    * @return {Intersect}
    */
-  static intersectLineLwpolyline(line, polyline, extend) {
-    return this.intersectPolylineLine(polyline, line, extend);
+  static intersectLineLwpolyline(line, lwpolyline, extend) {
+    return this.intersectPolylineLine(lwpolyline, line, extend);
   }
 
   /**
@@ -586,23 +586,23 @@ export class Intersection {
   /**
    * Find intersections between circle and lwpolyline
    * @param {Circle} circle
-   * @param {Polyline} polyline
+   * @param {Lwpolyline} lwpolyline
    * @param {boolean} extend
    * @return {Intersect}
    */
-  static intersectCircleLwpolyline(circle, polyline, extend) {
-    return this.intersectPolylineCircle(polyline, circle, extend);
+  static intersectCircleLwpolyline(circle, lwpolyline, extend) {
+    return this.intersectPolylineCircle(lwpolyline, circle, extend);
   }
 
   /**
    * Find intersections between arc and lwpolyline
    * @param {Arc} arc
-   * @param {Polyline} polyline
+   * @param {Lwpolyline} lwpolyline
    * @param {boolean} extend
    * @return {Intersect}
    */
-  static intersectArcLwpolyline(arc, polyline, extend) {
-    return this.intersectPolylineArc(polyline, arc, extend);
+  static intersectArcLwpolyline(arc, lwpolyline, extend) {
+    return this.intersectPolylineArc(lwpolyline, arc, extend);
   }
 
   /**
