@@ -213,8 +213,16 @@ export class Line extends Entity {
     // closest point is the extension point
     const newEndPoint = intersections.at(0);
 
-    if (newEndPoint.distance(this.points[originPoint]) > newEndPoint.distance(this.points[1 - originPoint])) {
-      // end of the line selected is further away than the opposite end - no extension
+    const endPoint = this.points[originPoint];
+    const adjacentPoint = this.points[1 - originPoint];
+
+    // The intersection must lie beyond the endpoint along the ray from adjacent→endpoint
+    const dot = newEndPoint.subtract(endPoint).dot(endPoint.subtract(adjacentPoint));
+    if (dot < 0) {
+      return stateChanges;
+    }
+
+    if (adjacentPoint.distance(newEndPoint) <= adjacentPoint.distance(endPoint)) {
       return stateChanges;
     }
 

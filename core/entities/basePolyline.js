@@ -444,8 +444,15 @@ export class BasePolyline extends Entity {
     Utils.sortPointsByDistance(intersections, endPoint);
     const newEndPoint = intersections[0];
 
-    // The intersection must be on the extension side (further from the adjacent point)
-    if (newEndPoint.distance(endPoint) > newEndPoint.distance(adjacentPoint)) {
+    // The intersection must lie beyond the endpoint along the ray from adjacent→endpoint
+    // 1. Dot product must be positive (same direction, not behind)
+    const dot = newEndPoint.subtract(endPoint).dot(endPoint.subtract(adjacentPoint));
+    if (dot < 0) {
+      return stateChanges;
+    }
+
+    // 2. New endpoint must be farther from adjacent than the current endpoint
+    if (adjacentPoint.distance(newEndPoint) <= adjacentPoint.distance(endPoint)) {
       return stateChanges;
     }
 
