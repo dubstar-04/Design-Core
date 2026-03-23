@@ -336,7 +336,7 @@ export class Intersection {
     const result = new Intersection('No Intersection');
 
     if (extend) {
-      result.appendPoint(inter1.points[i]);
+      result.appendPoints(inter1.points);
     } else {
       for (let i = 0; i < inter1.points.length; i++) {
         if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
