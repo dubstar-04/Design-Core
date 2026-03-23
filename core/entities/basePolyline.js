@@ -352,6 +352,46 @@ export class BasePolyline extends Entity {
   }
 
   /**
+   * Get the closest point on a segment to a given point
+   * @param {Point} point - the reference point
+   * @param {number} segmentIndex - 1-based segment index
+   * @return {Point|null}
+   */
+  closestPointOnSegment(point, segmentIndex) {
+    const A = this.points[segmentIndex - 1];
+    const B = this.points[segmentIndex];
+
+    if (A.bulge !== 0) {
+      const center = A.bulgeCentrePoint(B);
+      const direction = A.bulge > 0 ? 1 : -1;
+      return point.closestPointOnArc(A, B, center, direction);
+    }
+
+    return point.closestPointOnLine(A, B);
+  }
+
+  /**
+   * Get the normalised position of a point along a segment for ordering
+   * @param {Point} point - a point on the segment
+   * @param {number} segmentIndex - 1-based segment index
+   * @return {number}
+   */
+  positionOnSegment(point, segmentIndex) {
+    const A = this.points[segmentIndex - 1];
+    const B = this.points[segmentIndex];
+
+    if (A.bulge !== 0) {
+      const center = A.bulgeCentrePoint(B);
+      const direction = A.bulge > 0 ? 1 : -1;
+      const startAngle = center.angle(A);
+      const pointAngle = center.angle(point);
+      return ((pointAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
+    }
+
+    return A.distance(point);
+  }
+
+  /**
    * Extend the entity
    * Only extends when the end segment closest to the mouse is a line segment (bulge === 0)
    * @param {Array} intersections - array of intersection points
@@ -440,18 +480,7 @@ export class BasePolyline extends Entity {
     let minDistance = Infinity;
 
     for (let i = 1; i < this.points.length; i++) {
-      const A = this.points[i - 1];
-      const B = this.points[i];
-
-      let closestPoint;
-      if (A.bulge !== 0) {
-        const center = A.bulgeCentrePoint(B);
-        const direction = A.bulge > 0 ? 1 : -1;
-        closestPoint = mousePosition.closestPointOnArc(A, B, center, direction);
-      } else {
-        closestPoint = mousePosition.closestPointOnLine(A, B);
-      }
-
+      const closestPoint = this.closestPointOnSegment(mousePosition, i);
       if (closestPoint) {
         const dist = mousePosition.distance(closestPoint);
         if (dist < minDistance) {
@@ -461,7 +490,6 @@ export class BasePolyline extends Entity {
       }
     }
 
-    // For each intersection, determine which segment it falls on
     // Filter out intersections that coincide with existing polyline vertices
     const filteredIntersections = intersections.filter((point) => !this.points.some((vertex) => vertex.isSame(point)));
 
@@ -469,33 +497,16 @@ export class BasePolyline extends Entity {
       return stateChanges;
     }
 
-    // Store position along segment for ordering
+    // Locate each intersection on its segment with an ordering value
     const locatedIntersections = [];
 
     for (const point of filteredIntersections) {
       for (let i = 1; i < this.points.length; i++) {
-        const A = this.points[i - 1];
-        const B = this.points[i];
-
-        if (this.isPointOnSegment(point, A, B)) {
-          let positionAlongSegment;
-
-          if (A.bulge !== 0) {
-            // For arc segments, use normalised angular position
-            const center = A.bulgeCentrePoint(B);
-            const direction = A.bulge > 0 ? 1 : -1;
-            const startAngle = center.angle(A);
-            const pointAngle = center.angle(point);
-            positionAlongSegment = ((pointAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
-          } else {
-            // For line segments, chord distance is accurate
-            positionAlongSegment = A.distance(point);
-          }
-
+        if (this.isPointOnSegment(point, this.points[i - 1], this.points[i])) {
           locatedIntersections.push({
             segmentIndex: i,
             point: point,
-            positionAlongSegment: positionAlongSegment,
+            positionAlongSegment: this.positionOnSegment(point, i),
           });
           break;
         }
@@ -512,9 +523,13 @@ export class BasePolyline extends Entity {
       return a.positionAlongSegment - b.positionAlongSegment;
     });
 
-    // Find the nearest intersection(s) that bracket the mouse segment
-    // - trimBefore: the last intersection at or before the mouse segment
-    // - trimAfter: the first intersection at or after the mouse segment
+    // Precompute the mouse position along its segment
+    const mouseClosest = this.closestPointOnSegment(mousePosition, mouseSegmentIndex);
+    const mousePos = mouseClosest ? this.positionOnSegment(mouseClosest, mouseSegmentIndex) : 0;
+
+    // Find the nearest intersections that bracket the mouse segment
+    // - trimBefore: the last intersection at or before the mouse
+    // - trimAfter: the first intersection at or after the mouse
     let trimBefore = null;
     let trimAfter = null;
 
@@ -522,32 +537,13 @@ export class BasePolyline extends Entity {
       if (loc.segmentIndex < mouseSegmentIndex) {
         trimBefore = loc;
       } else if (loc.segmentIndex === mouseSegmentIndex) {
-        const A = this.points[mouseSegmentIndex - 1];
-        const B = this.points[mouseSegmentIndex];
-
-        let mousePositionAlongSegment;
-        if (A.bulge !== 0) {
-          const center = A.bulgeCentrePoint(B);
-          const direction = A.bulge > 0 ? 1 : -1;
-          const mouseClosest = mousePosition.closestPointOnArc(A, B, center, direction);
-          if (!mouseClosest) continue;
-          const startAngle = center.angle(A);
-          const mouseAngle = center.angle(mouseClosest);
-          mousePositionAlongSegment = ((mouseAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
-        } else {
-          const mouseClosest = mousePosition.closestPointOnLine(A, B);
-          mousePositionAlongSegment = A.distance(mouseClosest);
-        }
-
-        if (loc.positionAlongSegment <= mousePositionAlongSegment) {
+        if (loc.positionAlongSegment <= mousePos) {
           trimBefore = loc;
         } else if (!trimAfter) {
           trimAfter = loc;
         }
-      } else {
-        if (!trimAfter) {
-          trimAfter = loc;
-        }
+      } else if (!trimAfter) {
+        trimAfter = loc;
       }
     }
 
@@ -556,7 +552,6 @@ export class BasePolyline extends Entity {
     if (trimBefore) {
       const points = [];
 
-      // Add all points before the trim segment start
       for (let i = 0; i < trimBefore.segmentIndex - 1; i++) {
         points.push(this.points[i].clone());
       }
@@ -586,11 +581,9 @@ export class BasePolyline extends Entity {
     // Portion 2: trimAfter point to end of polyline
     if (trimAfter) {
       const points = [];
-
-      // Add the intersection point
       const trimPoint = trimAfter.point.clone();
 
-      // If the segment is an arc, add remaining arc portion
+      // If the segment is an arc, set remaining arc bulge
       const segStart = this.points[trimAfter.segmentIndex - 1];
       if (segStart.bulge !== 0) {
         trimPoint.bulge = segStart.partialBulge(this.points[trimAfter.segmentIndex], trimPoint, true);
@@ -598,7 +591,7 @@ export class BasePolyline extends Entity {
 
       points.push(trimPoint);
 
-      // Add remaining points (skip first if it coincides with the trim point)
+      // Add remaining points (skip if coincides with the trim point)
       for (let i = trimAfter.segmentIndex; i < this.points.length; i++) {
         const nextPoint = this.points[i].clone();
         if (!points.at(-1).isSame(nextPoint)) {
@@ -614,7 +607,6 @@ export class BasePolyline extends Entity {
       }
     }
 
-    // Only trim if at least one intersection was found to bracket the mouse
     if (trimBefore || trimAfter) {
       stateChanges.push(new RemoveState(this));
     }
