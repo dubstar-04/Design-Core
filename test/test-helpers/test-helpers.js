@@ -25,9 +25,12 @@ export class File {
  * @param {object} scene - DesignCore.Scene
  * @param {Array} inputs - sequential values returned by requestInput
  * @param {Function} testFn - async function to run with the mock active
- * @param {object} [extraMethods] - additional methods to add to the mock inputManager
+ * @param {object} [options] - optional configuration
+ * @param {object} [options.extraMethods] - additional methods to add to the mock inputManager
+ * @param {Array} [options.selectedItems] - sequential values returned by entities.get
  */
-export async function withMockInput(scene, inputs, testFn, extraMethods = {}) {
+export async function withMockInput(scene, inputs, testFn, options = {}) {
+  const { extraMethods = {}, selectedItems } = options;
   const origInputManager = scene.inputManager;
   let callCount = 0;
 
@@ -41,45 +44,22 @@ export async function withMockInput(scene, inputs, testFn, extraMethods = {}) {
     ...extraMethods,
   };
 
-  try {
-    await testFn();
-  } finally {
-    scene.inputManager = origInputManager;
+  let origGetItem;
+  if (selectedItems) {
+    origGetItem = scene.entities.get;
+    let selectedItemsCallCount = 0;
+    scene.entities.get = () => {
+      return selectedItems[selectedItemsCallCount++];
+    };
   }
-}
-
-/**
- * Run an async test with mock inputManager and entities.get, restoring both afterwards.
- * @param {object} scene - DesignCore.Scene
- * @param {Array} inputs - sequential values returned by requestInput
- * @param {Array} selectedItems - sequential values returned by entities.get
- * @param {Function} testFn - async function to run with the mocks active
- */
-export async function withMockInputAndEntities(scene, inputs, selectedItems, testFn) {
-  const origInputManager = scene.inputManager;
-  const origGetItem = scene.entities.get;
-
-  let requestInputCallCount = 0;
-  let selectedItemsCallCount = 0;
-
-  scene.inputManager = {
-    requestInput: async () => {
-      requestInputCallCount++;
-      return inputs[requestInputCallCount - 1];
-    },
-    executeCommand: () => {},
-  };
-
-  scene.entities.get = () => {
-    selectedItemsCallCount++;
-    return selectedItems[selectedItemsCallCount - 1];
-  };
 
   try {
     await testFn();
   } finally {
     scene.inputManager = origInputManager;
-    scene.entities.get = origGetItem;
+    if (selectedItems) {
+      scene.entities.get = origGetItem;
+    }
   }
 }
 

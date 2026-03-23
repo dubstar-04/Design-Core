@@ -3,7 +3,7 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Core } from '../../core/core/core.js';
 import { Line } from '../../core/entities/line.js';
-import { File, withMockInputAndEntities } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -22,7 +22,7 @@ const scenarios = [
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
   const { input, selectedItems, expectedDimType, dimensionValue } = scenario;
 
-  await withMockInputAndEntities(DesignCore.Scene, input, selectedItems, async () => {
+  await withMockInput(DesignCore.Scene, input, async () => {
     const dim = new AlignedDimension();
     await dim.execute();
 
@@ -37,7 +37,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
         expect(Number(entity.string)).toBeCloseTo(dimensionValue);
       }
     }
-  });
+  }, { selectedItems });
 });
 
 test('constructor sets default properties', () => {

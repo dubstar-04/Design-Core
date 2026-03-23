@@ -8,7 +8,7 @@ import { Polyline } from '../../core/entities/polyline.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
-import { withMockInputAndEntities } from '../test-helpers/test-helpers.js';
+import { withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -67,12 +67,12 @@ const scenarios = [
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
   const { input, selectedItems, expectedDimType } = scenario;
 
-  await withMockInputAndEntities(DesignCore.Scene, input, selectedItems, async () => {
+  await withMockInput(DesignCore.Scene, input, async () => {
     const dim = new Dimension();
     await dim.execute();
 
     expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
-  });
+  }, { selectedItems });
 });
 
 test('constructor instantiates correct dimension type', () => {

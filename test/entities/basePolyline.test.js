@@ -42,7 +42,7 @@ test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => 
       expect(polyline.points[1].bulge).toBeCloseTo(1);
       expect(polyline.points[2]).toBe(inputs[3]);
     }
-  }, { actionCommand: () => {} });
+  }, { extraMethods: { actionCommand: () => {} } });
 });
 
 test('Test BasePolyline.getClosestSegment', () => {

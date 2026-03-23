@@ -6,7 +6,7 @@ import { BoundingBox } from '../../core/lib/boundingBox.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 
-import { File, withMockInputAndEntities } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 import { Core } from '../../core/core/core.js';
 
 // initialise core
@@ -25,7 +25,7 @@ const arcInputScenarios = [
 test.each(arcInputScenarios)('ArcText.execute handles $desc', async (scenario) => {
   const { input, selectedItems, expectedTextHeight, expectedText } = scenario;
 
-  await withMockInputAndEntities(DesignCore.Scene, input, selectedItems, async () => {
+  await withMockInput(DesignCore.Scene, input, async () => {
     const arcText = new ArcAlignedText();
     await arcText.execute();
 
@@ -37,7 +37,7 @@ test.each(arcInputScenarios)('ArcText.execute handles $desc', async (scenario) =
     expect(arcText.radius).toBe(100);
     expect(arcText.startAngle()).toBe(0);
     expect(arcText.endAngle()).toBeCloseTo(3.14159);
-  });
+  }, { selectedItems });
 });
 
 test('ArcAlignedCharacter', () => {

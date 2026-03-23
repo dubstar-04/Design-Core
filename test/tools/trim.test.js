@@ -35,7 +35,7 @@ test.each(inputScenarios)('Trim.execute handles $desc', async (scenario) => {
     expect(trim.selectedBoundaryItems[0]).toEqual(core.scene.entities.get(0));
     expect(trim.selectedItem).toBe(core.scene.entities.get(1));
     expect(actionSpy).toHaveBeenCalled();
-  }, { actionCommand: () => actionSpy() });
+  }, { extraMethods: { actionCommand: () => actionSpy() } });
 });
 
 test('Test Trim.action', () => {

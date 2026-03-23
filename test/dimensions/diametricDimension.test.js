@@ -1,7 +1,7 @@
 import { DiametricDimension } from '../../core/dimensions/diametricDimension.js';
 import { Point } from '../../core/entities/point.js';
 import { Arc } from '../../core/entities/arc.js';
-import { File, withMockInputAndEntities } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
@@ -48,7 +48,7 @@ const scenarios = [
 test.each(scenarios)('DiametricDimension.execute handles $desc', async (scenario) => {
   const { input, selectedItems, expectedDimType, dimensionValue, dimensionEntities } = scenario;
 
-  await withMockInputAndEntities(DesignCore.Scene, input, selectedItems, async () => {
+  await withMockInput(DesignCore.Scene, input, async () => {
     const dim = new DiametricDimension();
     await dim.execute();
 
@@ -66,7 +66,7 @@ test.each(scenarios)('DiametricDimension.execute handles $desc', async (scenario
         expect(entity.string).toContain('Ø');
       }
     }
-  });
+  }, { selectedItems });
 });
 
 test('constructor sets default properties', () => {

@@ -7,7 +7,7 @@ import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 
-import { File, withMockInputAndEntities } from '../test-helpers/test-helpers.js';
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
 new Core();
@@ -56,7 +56,7 @@ const scenarios = [
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
   const { input, selectedItems, expectedDimType, dimensionValue, dimensionEntities } = scenario;
 
-  await withMockInputAndEntities(DesignCore.Scene, input, selectedItems, async () => {
+  await withMockInput(DesignCore.Scene, input, async () => {
     const dim = new AngularDimension();
     await dim.execute();
 
@@ -74,7 +74,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
         expect(entity.string).toContain('°');
       }
     }
-  });
+  }, { selectedItems });
 });
 
 test('constructor sets default properties', () => {
