@@ -402,4 +402,34 @@ export class Point {
 
     return centre;
   }
+
+  /**
+   * Calculate the bulge for a partial arc segment
+   * @param {Point} nextPoint - segment end point
+   * @param {Point} splitPoint - point where the arc is split
+   * @param {boolean} afterSplit - if true, return bulge for the portion after the split point
+   * @return {number} - the partial bulge value
+   */
+  partialBulge(nextPoint, splitPoint, afterSplit = false) {
+    const center = this.bulgeCentrePoint(nextPoint);
+    const direction = this.bulge > 0 ? 1 : -1;
+
+    const startAngle = center.angle(this);
+    const endAngle = center.angle(nextPoint);
+    const splitAngle = center.angle(splitPoint);
+
+    let includedAngle;
+    if (afterSplit) {
+      // Angle from split point to end
+      includedAngle = (endAngle - splitAngle) * direction;
+    } else {
+      // Angle from start to split point
+      includedAngle = (splitAngle - startAngle) * direction;
+    }
+
+    // Normalise to 0..2PI
+    includedAngle = ((includedAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+    return Math.tan(includedAngle / 4) * direction;
+  }
 }

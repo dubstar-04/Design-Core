@@ -565,7 +565,7 @@ export class BasePolyline extends Entity {
       const segStart = this.points[trimBefore.segmentIndex - 1];
       const segStartClone = segStart.clone();
       if (segStart.bulge !== 0) {
-        segStartClone.bulge = this.getPartialBulge(segStart, this.points[trimBefore.segmentIndex], trimBefore.point);
+        segStartClone.bulge = segStart.partialBulge(this.points[trimBefore.segmentIndex], trimBefore.point);
       }
       points.push(segStartClone);
 
@@ -593,7 +593,7 @@ export class BasePolyline extends Entity {
       // If the segment is an arc, add remaining arc portion
       const segStart = this.points[trimAfter.segmentIndex - 1];
       if (segStart.bulge !== 0) {
-        trimPoint.bulge = this.getPartialBulge(segStart, this.points[trimAfter.segmentIndex], trimPoint, true);
+        trimPoint.bulge = segStart.partialBulge(this.points[trimAfter.segmentIndex], trimPoint, true);
       }
 
       points.push(trimPoint);
@@ -620,37 +620,6 @@ export class BasePolyline extends Entity {
     }
 
     return stateChanges;
-  }
-
-  /**
-   * Calculate the bulge for a partial arc segment
-   * @param {Point} segStart - original segment start point (has bulge)
-   * @param {Point} segEnd - original segment end point
-   * @param {Point} splitPoint - point where the arc is split
-   * @param {boolean} afterSplit - if true, return bulge for the portion after the split point
-   * @return {number} - the partial bulge value
-   */
-  getPartialBulge(segStart, segEnd, splitPoint, afterSplit = false) {
-    const center = segStart.bulgeCentrePoint(segEnd);
-    const direction = segStart.bulge > 0 ? 1 : -1;
-
-    const startAngle = center.angle(segStart);
-    const endAngle = center.angle(segEnd);
-    const splitAngle = center.angle(splitPoint);
-
-    let includedAngle;
-    if (afterSplit) {
-      // Angle from split point to end
-      includedAngle = (endAngle - splitAngle) * direction;
-    } else {
-      // Angle from start to split point
-      includedAngle = (splitAngle - startAngle) * direction;
-    }
-
-    // Normalise to 0..2PI
-    includedAngle = ((includedAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-
-    return Math.tan(includedAngle / 4) * direction;
   }
 
   /**
