@@ -10,6 +10,7 @@ import { Line } from './line.js';
 import { Arc } from './arc.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
+import { AddState, RemoveState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -332,6 +333,236 @@ export class BasePolyline extends Entity {
     }
 
     return [minPnt, distance];
+  }
+
+  /**
+   * Check if a point falls on a specific segment of the polyline
+   * @param {Point} point - the point to test
+   * @param {Point} A - segment start point
+   * @param {Point} B - segment end point
+   * @return {boolean}
+   */
+  isPointOnSegment(point, A, B) {
+    if (A.bulge !== 0) {
+      const center = A.bulgeCentrePoint(B);
+      const direction = A.bulge > 0 ? 1 : -1;
+      return point.isOnArc(A, B, center, direction);
+    }
+    return point.isOnLine(A, B);
+  }
+
+  /**
+   * Trim the entity
+   * @param {Array} intersections - array of intersection points
+   * @return {Array} - array of state changes
+   */
+  trim(intersections) {
+    const stateChanges = [];
+
+    if (!intersections?.length) {
+      return stateChanges;
+    }
+
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+
+    // Find the segment index closest to the mouse
+    let mouseSegmentIndex = 0;
+    let minDistance = Infinity;
+
+    for (let i = 1; i < this.points.length; i++) {
+      const A = this.points[i - 1];
+      const B = this.points[i];
+
+      let closestPoint;
+      if (A.bulge !== 0) {
+        const center = A.bulgeCentrePoint(B);
+        const direction = A.bulge > 0 ? 1 : -1;
+        closestPoint = mousePosition.closestPointOnArc(A, B, center, direction);
+      } else {
+        closestPoint = mousePosition.closestPointOnLine(A, B);
+      }
+
+      if (closestPoint) {
+        const dist = mousePosition.distance(closestPoint);
+        if (dist < minDistance) {
+          minDistance = dist;
+          mouseSegmentIndex = i;
+        }
+      }
+    }
+
+    // For each intersection, determine which segment it falls on
+    // Store as {segmentIndex, point, distanceAlongSegment}
+    const locatedIntersections = [];
+
+    for (const point of intersections) {
+      for (let i = 1; i < this.points.length; i++) {
+        const A = this.points[i - 1];
+        const B = this.points[i];
+
+        if (this.isPointOnSegment(point, A, B)) {
+          locatedIntersections.push({
+            segmentIndex: i,
+            point: point,
+            distanceFromStart: A.distance(point),
+          });
+          break;
+        }
+      }
+    }
+
+    if (!locatedIntersections.length) {
+      return stateChanges;
+    }
+
+    // Sort by segment index, then by distance from start of segment
+    locatedIntersections.sort((a, b) => {
+      if (a.segmentIndex !== b.segmentIndex) return a.segmentIndex - b.segmentIndex;
+      return a.distanceFromStart - b.distanceFromStart;
+    });
+
+    // Find the nearest intersection(s) that bracket the mouse segment
+    // - trimBefore: the last intersection at or before the mouse segment
+    // - trimAfter: the first intersection at or after the mouse segment
+    let trimBefore = null;
+    let trimAfter = null;
+
+    for (const loc of locatedIntersections) {
+      if (loc.segmentIndex < mouseSegmentIndex) {
+        trimBefore = loc;
+      } else if (loc.segmentIndex === mouseSegmentIndex) {
+        const A = this.points[mouseSegmentIndex - 1];
+        const mouseDistFromA = A.distance(mousePosition.closestPointOnLine(A, this.points[mouseSegmentIndex]));
+
+        if (A.bulge !== 0) {
+          // For arc segments, compare angular position
+          const B = this.points[mouseSegmentIndex];
+          const center = A.bulgeCentrePoint(B);
+          const direction = A.bulge > 0 ? 1 : -1;
+          const mouseClosest = mousePosition.closestPointOnArc(A, B, center, direction);
+          if (mouseClosest) {
+            const mouseAngle = center.angle(mouseClosest);
+            const intAngle = center.angle(loc.point);
+            const startAngle = center.angle(A);
+
+            // Normalise angles relative to start
+            const normMouse = ((mouseAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
+            const normInt = ((intAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
+
+            if (normInt <= normMouse) {
+              trimBefore = loc;
+            } else if (!trimAfter) {
+              trimAfter = loc;
+            }
+          }
+        } else {
+          if (loc.distanceFromStart <= mouseDistFromA) {
+            trimBefore = loc;
+          } else if (!trimAfter) {
+            trimAfter = loc;
+          }
+        }
+      } else {
+        if (!trimAfter) {
+          trimAfter = loc;
+        }
+      }
+    }
+
+    // Build new polyline(s) from the remaining portions
+    // Portion 1: start of polyline to trimBefore point
+    if (trimBefore) {
+      const points = [];
+
+      // Add all points before the trim segment start
+      for (let i = 0; i < trimBefore.segmentIndex - 1; i++) {
+        points.push(this.points[i].clone());
+      }
+
+      // Add the segment start point (with adjusted bulge for arcs)
+      const segStart = this.points[trimBefore.segmentIndex - 1];
+      const segStartClone = segStart.clone();
+      if (segStart.bulge !== 0) {
+        segStartClone.bulge = this.getPartialBulge(segStart, this.points[trimBefore.segmentIndex], trimBefore.point);
+      }
+      points.push(segStartClone);
+
+      // Add the trim point
+      const trimPoint = trimBefore.point.clone();
+      points.push(trimPoint);
+
+      if (points.length >= 2) {
+        const polyline = Utils.cloneObject(this);
+        polyline.points = points;
+        polyline.flags.setFlagValue(0); // open
+        stateChanges.push(new AddState(polyline));
+      }
+    }
+
+    // Portion 2: trimAfter point to end of polyline
+    if (trimAfter) {
+      const points = [];
+
+      // Add the intersection point
+      const trimPoint = trimAfter.point.clone();
+      points.push(trimPoint);
+
+      // If the segment is an arc, add remaining arc portion
+      const segStart = this.points[trimAfter.segmentIndex - 1];
+      if (segStart.bulge !== 0) {
+        trimPoint.bulge = this.getPartialBulge(segStart, this.points[trimAfter.segmentIndex], trimPoint, true);
+      }
+
+      // Add remaining points
+      for (let i = trimAfter.segmentIndex; i < this.points.length; i++) {
+        points.push(this.points[i].clone());
+      }
+
+      if (points.length >= 2) {
+        const polyline = Utils.cloneObject(this);
+        polyline.points = points;
+        polyline.flags.setFlagValue(0); // open
+        stateChanges.push(new AddState(polyline));
+      }
+    }
+
+    // Only trim if at least one intersection was found to bracket the mouse
+    if (trimBefore || trimAfter) {
+      stateChanges.push(new RemoveState(this));
+    }
+
+    return stateChanges;
+  }
+
+  /**
+   * Calculate the bulge for a partial arc segment
+   * @param {Point} segStart - original segment start point (has bulge)
+   * @param {Point} segEnd - original segment end point
+   * @param {Point} splitPoint - point where the arc is split
+   * @param {boolean} afterSplit - if true, return bulge for the portion after the split point
+   * @return {number} - the partial bulge value
+   */
+  getPartialBulge(segStart, segEnd, splitPoint, afterSplit = false) {
+    const center = segStart.bulgeCentrePoint(segEnd);
+    const direction = segStart.bulge > 0 ? 1 : -1;
+
+    const startAngle = center.angle(segStart);
+    const endAngle = center.angle(segEnd);
+    const splitAngle = center.angle(splitPoint);
+
+    let includedAngle;
+    if (afterSplit) {
+      // Angle from split point to end
+      includedAngle = (endAngle - splitAngle) * direction;
+    } else {
+      // Angle from start to split point
+      includedAngle = (splitAngle - startAngle) * direction;
+    }
+
+    // Normalise to 0..2PI
+    includedAngle = ((includedAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+    return Math.tan(includedAngle / 4) * direction;
   }
 
   /**
