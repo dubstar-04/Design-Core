@@ -148,6 +148,51 @@ test('Test Extend.action', () => {
   expect(core.scene.entities.get(1).points[1].y).toBe(100);
 });
 
+test('Test Extend.action line - endpoint coincident with intersection', () => {
+  // Line from (0,50) to (50,50)
+  // Zig-zag boundary polyline crossing at x=50 and x=100
+  // Endpoint is already at x=50 (coincident with first intersection)
+  // Expected: line extends to x=100 (next intersection)
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Line', { points: [new Point(0, 50), new Point(50, 50)] });
+  core.scene.addItem('Lwpolyline', { points: [new Point(50, 0), new Point(50, 100), new Point(100, 100), new Point(100, 0)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(45, 50));
+  extend.action();
+
+  expect(core.scene.entities.get(0).points[0].x).toBe(0);
+  expect(core.scene.entities.get(0).points[0].y).toBe(50);
+  expect(core.scene.entities.get(0).points[1].x).toBe(100);
+  expect(core.scene.entities.get(0).points[1].y).toBe(50);
+});
+
+test('Test Extend.action polyline - endpoint coincident with intersection', () => {
+  // Polyline from (0,0) to (50,50)
+  // Boundary polyline crossing at (50,50) and (100,50)
+  // Endpoint is already at (50,50) (coincident with first intersection)
+  // Expected: polyline extends to (100,50)
+
+  const extend = new Extend();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 50)] });
+  core.scene.addItem('Line', { points: [new Point(100, 0), new Point(100, 100)] });
+
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(45, 45));
+  extend.action();
+
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.points[1].x).toBe(100);
+  expect(polyline.points[1].y).toBe(100);
+});
+
 test('Test Extend.action polyline - extend end segment', () => {
   // Polyline from (0,0) to (50,0) to (75,0)
   // Vertical boundary line at x=100
