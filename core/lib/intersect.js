@@ -479,49 +479,5 @@ export class Intersection {
     if (result.points.length > 0) result.status = 'Intersection';
     return result;
   };
-
-
-  /**
-   * Find intersections between polyline and rectangle
-   * @param {Polyline} polyline
-   * @param {Rectangle} rectangle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectPolylineRectangle(polyline, rectangle, extend) {
-    const r1 = rectangle.start;
-    const r2 = rectangle.end;
-    extend = extend || false;
-
-    const min = r1.min(r2);
-    const max = r1.max(r2);
-    const topRight = new Point(max.x, min.y);
-    const bottomLeft = new Point(min.x, max.y);
-
-    let rectPoints = { start: min, end: topRight };
-    const inter1 = this.intersectPolylineLine(polyline, rectPoints, extend);
-
-    rectPoints = { start: topRight, end: max };
-    const inter2 = this.intersectPolylineLine(polyline, rectPoints, extend);
-
-    rectPoints = { start: max, end: bottomLeft };
-    const inter3 = this.intersectPolylineLine(polyline, rectPoints, extend);
-
-    rectPoints = { start: bottomLeft, end: min };
-    const inter4 = this.intersectPolylineLine(polyline, rectPoints, extend);
-
-    const result = new Intersection('No Intersection');
-
-    result.appendPoints(inter1.points);
-    result.appendPoints(inter2.points);
-    result.appendPoints(inter3.points);
-    result.appendPoints(inter4.points);
-
-    if (result.points.length > 0) {
-      result.status = 'Intersection';
-    }
-
-    return result;
-  };
 }
 

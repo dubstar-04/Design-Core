@@ -199,15 +199,16 @@ export class Entity {
       return;
     }
 
-    const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
-    const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
+    const bottomLeft = new Point(selectionExtremes[0], selectionExtremes[2]);
+    const bottomRight = new Point(selectionExtremes[1], selectionExtremes[2]);
+    const topRight = new Point(selectionExtremes[1], selectionExtremes[3]);
+    const topLeft = new Point(selectionExtremes[0], selectionExtremes[3]);
 
     const rectPoints = {
-      start: rP1,
-      end: rP2,
+      points: [bottomLeft, bottomRight, topRight, topLeft, bottomLeft],
     };
 
-    const output = Intersection.intersectPolylineRectangle(this.intersectPoints(), rectPoints);
+    const output = Intersection.intersectEntities(this.intersectPoints(), rectPoints);
 
     if (output.status === 'Intersection') {
       return true;
