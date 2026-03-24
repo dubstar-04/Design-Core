@@ -160,69 +160,9 @@ export class Intersection {
     const inter1 = this.intersectCircleLine(arc, line, extend);
     const result = new Intersection('No Intersection');
 
-    if (!extend) {
-      for (let i = 0; i < inter1.points.length; i++) {
-        if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
-          result.appendPoint(inter1.points[i]);
-        }
-      }
-
-      if (result.points.length > 0) {
-        result.status = 'Intersection';
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Find intersections between circle and arc segment
-   * @param {Circle} circle
-   * @param {Arc} arc
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectCircleArc(circle, arc, extend) {
-    const inter1 = this.intersectCircleCircle(circle, arc, extend);
-    const result = new Intersection('No Intersection');
-
-    if (!extend) {
-      for (let i = 0; i < inter1.points.length; i++) {
-        if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
-          result.appendPoint(inter1.points[i]);
-        }
-      }
-
-      if (result.points.length > 0) {
-        result.status = 'Intersection';
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Find intersections between two segments
-   * @param {Arc} arc1
-   * @param {Arc} arc2
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectArcArc(arc1, arc2, extend) {
-    const inter1 = this.intersectCircleCircle(arc1, arc2, extend);
-    const result = new Intersection('No Intersection');
-
-
     for (let i = 0; i < inter1.points.length; i++) {
-      if (extend) {
+      if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
         result.appendPoint(inter1.points[i]);
-      } else {
-        // check the point in on the arcs
-        if (inter1.points[i].isOnArc(arc1.startPoint, arc1.endPoint, arc1.centre, arc1.direction)) {
-          if (inter1.points[i].isOnArc(arc2.startPoint, arc2.endPoint, arc2.centre, arc2.direction)) {
-            result.appendPoint(inter1.points[i]);
-          }
-        }
       }
     }
 
@@ -230,10 +170,8 @@ export class Intersection {
       result.status = 'Intersection';
     }
 
-
     return result;
   }
-
 
   /**
    * Find intersections between polyline and arc segments
@@ -243,24 +181,48 @@ export class Intersection {
    * @return {Intersect}
    */
   static intersectPolylineArc(polyline, arc, extend) {
-    const inter1 = this.intersectPolylineCircle(polyline, arc, extend);
     const result = new Intersection('No Intersection');
+    const length = polyline.points.length;
 
-    if (extend) {
-      result.appendPoints(inter1.points);
-    } else {
-      for (let i = 0; i < inter1.points.length; i++) {
-        if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
-          result.appendPoint(inter1.points[i]);
+    for (let i = 0; i < length - 1; i++) {
+      const b1 = polyline.points[i];
+      const b2 = polyline.points[i + 1];
+
+      let segmentPoints;
+
+      if (b1.bulge === 0) {
+        const line2 = { start: b1, end: b2 };
+        const inter = this.intersectCircleLine(arc, line2, extend);
+        segmentPoints = inter.points;
+      } else {
+        const polyArc = {};
+        polyArc.centre = b1.bulgeCentrePoint(b2);
+        polyArc.startPoint = b1;
+        polyArc.endPoint = b2;
+        polyArc.radius = polyArc.centre.distance(b1);
+        polyArc.direction = b1.bulge;
+
+        const inter = this.intersectCircleCircle(arc, polyArc);
+        segmentPoints = [];
+        for (let j = 0; j < inter.points.length; j++) {
+          if (inter.points[j].isOnArc(polyArc.startPoint, polyArc.endPoint, polyArc.centre, polyArc.direction)) {
+            segmentPoints.push(inter.points[j]);
+          }
+        }
+      }
+
+      if (extend) {
+        result.appendPoints(segmentPoints);
+      } else {
+        for (let j = 0; j < segmentPoints.length; j++) {
+          if (segmentPoints[j].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
+            result.appendPoint(segmentPoints[j]);
+          }
         }
       }
     }
 
-    if (result.points.length > 0) {
-      result.status = 'Intersection';
-    }
-
-
+    if (result.points.length > 0) result.status = 'Intersection';
     return result;
   }
 
@@ -442,42 +404,5 @@ export class Intersection {
     if (result.points.length > 0) result.status = 'Intersection';
     return result;
   }
-
-  /**
-   * Find intersections between polyline and circle segments
-   * @param {Polyline} polyline
-   * @param {Circle} circle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectPolylineCircle(polyline, circle, extend) {
-    const result = new Intersection('No Intersection');
-    const length = polyline.points.length;
-
-    for (let i = 0; i < length - 1; i++) {
-      const b1 = polyline.points[i];
-      const b2 = polyline.points[i + 1];
-
-
-      if (b1.bulge === 0) {
-        const line2 = { start: b1, end: b2 };
-        const inter = this.intersectCircleLine(circle, line2, extend);
-        result.appendPoints(inter.points);
-      } else {
-        const arc = {};
-        arc.centre = b1.bulgeCentrePoint(b2);
-        arc.startPoint = b1;
-        arc.endPoint = b2;
-        arc.radius = arc.centre.distance(b1);
-        arc.direction = b1.bulge;
-
-        const interArc = this.intersectCircleArc(circle, arc, extend);
-        result.appendPoints(interArc.points);
-      }
-    }
-
-    if (result.points.length > 0) result.status = 'Intersection';
-    return result;
-  };
 }
 
