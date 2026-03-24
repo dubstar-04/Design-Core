@@ -77,11 +77,30 @@ export class Point {
 
   /**
    * Return dot product of this and that
+   * Measures how much two vectors point in the same direction.
+   * Equal to |this| * |that| * cos(angle between them).
+   * Positive: vectors point in the same direction (angle < 90°)
+   * Zero: vectors are perpendicular (angle = 90°)
+   * Negative: vectors point in opposite directions (angle > 90°)
    * @param  {Point} that
    * @return {number}
    */
   dot(that) {
     return this.x * that.x + this.y * that.y;
+  };
+
+  /**
+   * Return 2D cross product of this and that
+   * Measures the signed area of the parallelogram formed by the two vectors.
+   * Equal to |this| * |that| * sin(angle from this to that).
+   * Positive: that is counter-clockwise from this
+   * Zero: vectors are parallel (or one is zero length)
+   * Negative: that is clockwise from this
+   * @param  {Point} that
+   * @return {number}
+   */
+  cross(that) {
+    return this.x * that.y - this.y * that.x;
   };
 
   /**
