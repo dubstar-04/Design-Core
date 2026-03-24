@@ -632,17 +632,6 @@ export class ArcAlignedText extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
    */
-  intersectPoints() {
-    const ArcAlignedCharacters = this.getArcAlignedCharacters();
-
-    if (ArcAlignedCharacters.length > 0) {
-      const pts = ArcAlignedCharacters.map((char) => char.position);
-      return { points: pts };
-    }
-
-    return {};
   }
 }

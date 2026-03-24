@@ -178,6 +178,16 @@ export class Entity {
   }
 
   /**
+   * Intersect points
+   * @return {Object} - object defining data required by intersect methods
+   */
+  intersectPoints() {
+    return {
+      points: this.decompose(),
+    };
+  }
+
+  /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
    * @return {boolean} true if touched
