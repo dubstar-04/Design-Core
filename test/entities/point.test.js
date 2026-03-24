@@ -86,6 +86,20 @@ test('Test Point.dot', () => {
   expect(pt1.dot(pt3)).toBe(-200);
 });
 
+test('Test Point.cross', () => {
+  // Perpendicular vectors
+  const pt1 = new Point(1, 0);
+  const pt2 = new Point(0, 1);
+  expect(pt1.cross(pt2)).toBe(1);
+
+  // Reversed order negates the result
+  expect(pt2.cross(pt1)).toBe(-1);
+
+  // Parallel vectors
+  const pt3 = new Point(2, 0);
+  expect(pt1.cross(pt3)).toBe(0);
+});
+
 test('Test Point.rotate', () => {
   const centre = new Point();
 
