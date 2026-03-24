@@ -78,9 +78,8 @@ export class Trim extends Tool {
 
       for (const boundaryItem of this.selectedBoundaryItems) {
         if (boundaryItem !== this.selectedItem) {
-          const functionName = 'intersect' + boundaryItem.type + this.selectedItem.type;
           try {
-            const intersect = Intersection[functionName](boundaryItem.intersectPoints(), this.selectedItem.intersectPoints());
+            const intersect = Intersection.intersectEntities(boundaryItem.intersectPoints(), this.selectedItem.intersectPoints());
             if (intersect.points.length) {
               for (let point = 0; point < intersect.points.length; point++) {
                 intersectPoints.push(intersect.points[point]);

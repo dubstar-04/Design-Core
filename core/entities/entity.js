@@ -207,15 +207,7 @@ export class Entity {
       end: rP2,
     };
 
-    const intersectFunction = `intersect${this.type}Rectangle`;
-
-    if (Intersection.hasOwnProperty(intersectFunction) === false) {
-      const msg = `${Strings.Error.INVALIDINTERSECTTYPE}: ${this.type}`;
-      DesignCore.Core.notify(msg);
-      throw Error(msg);
-    }
-
-    const output = Intersection[intersectFunction](this.intersectPoints(), rectPoints);
+    const output = Intersection.intersectPolylineRectangle(this.intersectPoints(), rectPoints);
 
     if (output.status === 'Intersection') {
       return true;
