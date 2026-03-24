@@ -458,27 +458,31 @@ export class Intersection {
       return result;
     }
 
-    // Calculate the denominator of the intersection formula
-    const denominator = (bEnd.y - bStart.y) * (aEnd.x - aStart.x) - (bEnd.x - bStart.x) * (aEnd.y - aStart.y);
+    // Direction vectors and offset between start points
+    const line1Dir = aEnd.subtract(aStart);
+    const line2Dir = bEnd.subtract(bStart);
+    const startDiff = aStart.subtract(bStart);
 
-    // Calculate numerators for ua and ub
-    const numeratorA = (bEnd.x - bStart.x) * (aStart.y - bStart.y) - (bEnd.y - bStart.y) * (aStart.x - bStart.x);
-    const numeratorB = (aEnd.x - aStart.x) * (aStart.y - bStart.y) - (aEnd.y - aStart.y) * (aStart.x - bStart.x);
+    // Cross products determine parallelism and lerp parameters
+    const denominator = line1Dir.cross(line2Dir);
+    const numeratorA = line2Dir.cross(startDiff);
+    const numeratorB = line1Dir.cross(startDiff);
 
     if (denominator !== 0) {
       // Lines are not parallel
-      const ua = numeratorA / denominator;
-      const ub = numeratorB / denominator;
+      // lerp parameters: 0 = segment start, 1 = segment end
+      const line1Lerp = numeratorA / denominator;
+      const line2Lerp = numeratorB / denominator;
 
-      // If ua and ub are between 0 and 1, the intersection is within the line segments
-      // When extend is true, line1 (boundary) must contain the intersection (ua in [0,1])
-      // but line2 (selected) can extend beyond its endpoints (ub unconstrained)
-      const isWithinSegments = (0 <= ua && ua <= 1) && (0 <= ub && ub <= 1);
-      const isExtended = (0 <= ua && ua <= 1) && extend;
+      // If both lerp values are between 0 and 1, the intersection is within the line segments
+      // When extend is true, line1 (boundary) must contain the intersection (line1Lerp in [0,1])
+      // but line2 (selected) can extend beyond its endpoints (line2Lerp unconstrained)
+      const isWithinSegments = (0 <= line1Lerp && line1Lerp <= 1) && (0 <= line2Lerp && line2Lerp <= 1);
+      const isExtended = (0 <= line1Lerp && line1Lerp <= 1) && extend;
 
       if (isWithinSegments || isExtended) {
         result = new Intersection('Intersection');
-        result.appendPoint(aStart.lerp(aEnd, ua));
+        result.appendPoint(aStart.lerp(aEnd, line1Lerp));
       } else {
         result = new Intersection('No Intersection');
       }
