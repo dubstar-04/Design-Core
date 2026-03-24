@@ -232,11 +232,6 @@ describe('BaseDimension', () => {
     expect(baseDim.within([])).toBe(true);
   });
 
-  test('intersectPoints delegates to block', () => {
-    baseDim.block = { intersectPoints: () => 'ip' };
-    expect(baseDim.intersectPoints()).toBe('ip');
-  });
-
   test('touched delegates to block', () => {
     baseDim.block = { touched: () => false };
     expect(baseDim.touched([])).toBe(false);

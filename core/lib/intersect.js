@@ -41,19 +41,19 @@ export class Intersection {
 
   /**
    * Find intersections between two polylines
-   * @param {Polyline} polyline1 - boundary entity
-   * @param {Polyline} polyline2 - selected entity
+   * @param {Array} points1 - boundary points array
+   * @param {Array} points2 - selected points array
    * @param {boolean} extend - extend the selected entity
    * @return {Intersect}
    */
-  static intersectPolylinePolyline(polyline1, polyline2, extend) {
+  static intersectPolylinePolyline(points1, points2, extend) {
     const result = new Intersection('No Intersection');
 
-    for (let i = 0; i < polyline1.points.length - 1; i++) {
-      for (let j = 0; j < polyline2.points.length - 1; j++) {
+    for (let i = 0; i < points1.length - 1; i++) {
+      for (let j = 0; j < points2.length - 1; j++) {
         const inter = this.intersectSegmentSegment(
-            polyline1.points[i], polyline1.points[i + 1],
-            polyline2.points[j], polyline2.points[j + 1],
+            points1[i], points1[i + 1],
+            points2[j], points2[j + 1],
             extend,
         );
         result.appendPoints(inter.points);

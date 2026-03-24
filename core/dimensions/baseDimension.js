@@ -519,14 +519,6 @@ export class BaseDimension extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return this.block.intersectPoints();
-  }
-
-  /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
    * @return {boolean} true if touched

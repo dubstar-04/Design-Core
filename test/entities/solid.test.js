@@ -118,16 +118,15 @@ test('Solid.closestPoint returns input point and Infinity', () => {
   expect(dist).toBe(Infinity);
 });
 
-test('Solid.intersectPoints returns correct points array', () => {
+test('Solid.decompose returns correct points array', () => {
   const pts = [new Point(0, 0), new Point(1, 0), new Point(1, 1), new Point(0, 1)];
   const solid = new Solid({ points: pts });
-  const result = solid.intersectPoints();
-  expect(result).toHaveProperty('points');
-  expect(result.points.length).toBe(5);
-  expect(result.points[0].x).toBe(0);
-  expect(result.points[0].y).toBe(0);
-  expect(result.points[4].x).toBe(0);
-  expect(result.points[4].y).toBe(0);
+  const result = solid.decompose();
+  expect(result.length).toBe(5);
+  expect(result[0].x).toBe(0);
+  expect(result[0].y).toBe(0);
+  expect(result[4].x).toBe(0);
+  expect(result[4].y).toBe(0);
 });
 
 test('Test Solid.decompose', () => {

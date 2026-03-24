@@ -647,15 +647,15 @@ export class Hatch extends Entity {
       const shape = this.childEntities[i];
 
       if (shape.boundingBox().isInside(P)) {
-        const polyline = { points: [...shape.points] };
+        const polyline = [...shape.points];
 
         // check the polyline is closed
         if (!shape.points.at(0).isSame(shape.points.at(-1))) {
-          polyline.points.push(shape.points.at(0));
+          polyline.push(shape.points.at(0));
         }
 
         // create a line from P, twice the length of the bounding box
-        const line = { points: [P, new Point(P.x + shape.boundingBox().xLength, P.y)] };
+        const line = [P, new Point(P.x + shape.boundingBox().xLength, P.y)];
 
         const intersect = Intersection.intersectPolylinePolyline(polyline, line);
         const intersects = intersect.points.length;

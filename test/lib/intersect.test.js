@@ -63,8 +63,8 @@ test('Test intersectSegmentSegment - line line', () => {
 test('Test intersectPolylinePolyline - polyline line', () => {
   // Intersection
   let points = [new Point(), new Point(0, 10)];
-  let polyline = { points: points };
-  let line = { points: [new Point(-10, 5), new Point(10, 5)] };
+  let polyline = points;
+  let line = [new Point(-10, 5), new Point(10, 5)];
 
   // Test polyline with single segment
   let result = Intersection.intersectPolylinePolyline(polyline, line, false);
@@ -82,7 +82,7 @@ test('Test intersectPolylinePolyline - polyline line', () => {
   expect(result.points[1].y).toBeCloseTo(5);
 
   // No Intersection
-  const line2 = { points: [new Point(5, 0), new Point(5, 10)] };
+  const line2 = [new Point(5, 0), new Point(5, 10)];
   result = Intersection.intersectPolylinePolyline(polyline, line2, false);
   expect(result.status).toBe('No Intersection');
   expect(result.points.length).toBe(0);
@@ -90,7 +90,7 @@ test('Test intersectPolylinePolyline - polyline line', () => {
   // Test polyline with 180 degree arc segment - 270 - 90 - negative bulge
   // counter clockwise bulge = +ve, clockwise bulge = -ve,
   points = [new Point(0, 0, -1), new Point(0, 10)];
-  polyline = { points: points };
+  polyline = points;
   result = Intersection.intersectPolylinePolyline(polyline, line, false);
   expect(result.status).toBe('Intersection');
   expect(result.points.length).toBe(1);
@@ -100,7 +100,7 @@ test('Test intersectPolylinePolyline - polyline line', () => {
   // Test polyline with 180 degree arc segment - 270 - 90 - positive bulge
   // counter clockwise bulge = +ve, clockwise bulge = -ve,
   points = [new Point(0, 0, 1), new Point(0, 10)];
-  polyline = { points: points };
+  polyline = points;
   result = Intersection.intersectPolylinePolyline(polyline, line, false);
   expect(result.status).toBe('Intersection');
   expect(result.points.length).toBe(1);
@@ -110,8 +110,8 @@ test('Test intersectPolylinePolyline - polyline line', () => {
   // Test polyline with 180 degree arc segment 180 - 0 - negative bulge
   // counter clockwise bulge = +ve, clockwise bulge = -ve,
   points = [new Point(-5, 5, -1), new Point(5, 5)];
-  polyline = { points: points };
-  line = { points: [new Point(-10, 5), new Point(10, 5)] };
+  polyline = points;
+  line = [new Point(-10, 5), new Point(10, 5)];
   result = Intersection.intersectPolylinePolyline(polyline, line, false);
   expect(result.status).toBe('Intersection');
   expect(result.points.length).toBe(2);
@@ -123,8 +123,8 @@ test('Test intersectPolylinePolyline - polyline line', () => {
   // Test polyline with 180 degree arc segment 180 - 0 - positive bulge
   // counter clockwise bulge = +ve, clockwise bulge = -ve,
   points = [new Point(-5, 5, 1), new Point(5, 5)];
-  polyline = { points: points };
-  line = { points: [new Point(-10, 5), new Point(10, 5)] };
+  polyline = points;
+  line = [new Point(-10, 5), new Point(10, 5)];
   result = Intersection.intersectPolylinePolyline(polyline, line, false);
   expect(result.status).toBe('Intersection');
   expect(result.points.length).toBe(2);
@@ -137,8 +137,8 @@ test('Test intersectPolylinePolyline - polyline line', () => {
   // counter clockwise bulge = +ve, clockwise bulge = -ve
   // direction: - ccw > 0, cw <= 0
   points = [new Point(-5, 5, -1), new Point(5, 5)];
-  polyline = { points: points };
-  line = { points: [new Point(0, 7), new Point(10, 7)] };
+  polyline = points;
+  line = [new Point(0, 7), new Point(10, 7)];
   result = Intersection.intersectPolylinePolyline(polyline, line, false);
   expect(result.status).toBe('Intersection');
   expect(result.points.length).toBe(1);
@@ -148,8 +148,8 @@ test('Test intersectPolylinePolyline - polyline line', () => {
   // Test polyline with 180 degree arc segment 180 - 0 - positive bulge - offset line
   // counter clockwise bulge = +ve, clockwise bulge = -ve,
   points = [new Point(-5, 5, 1), new Point(5, 5)];
-  polyline = { points: points };
-  line = { points: [new Point(0, 7), new Point(10, 7)] };
+  polyline = points;
+  line = [new Point(0, 7), new Point(10, 7)];
   result = Intersection.intersectPolylinePolyline(polyline, line, false);
   expect(result.status).toBe('No Intersection');
   expect(result.points.length).toBe(0);
@@ -157,8 +157,8 @@ test('Test intersectPolylinePolyline - polyline line', () => {
 
 test('Test intersectPolylinePolyline with rectangle polyline', () => {
   const points = [new Point(-5, 5), new Point(5, 5)];
-  const polyline = { points: points };
-  const rectangle = { points: [new Point(), new Point(25, 0), new Point(25, 25), new Point(0, 25), new Point()] };
+  const polyline = points;
+  const rectangle = [new Point(), new Point(25, 0), new Point(25, 25), new Point(0, 25), new Point()];
 
   // Test polyline with single segment
   const result = Intersection.intersectPolylinePolyline(polyline, rectangle, false);
@@ -179,18 +179,18 @@ test('Test intersectPolylinePolyline with rectangle polyline', () => {
 
   // No Intersection
   const points2 = [new Point(5, 5), new Point(20, 20)];
-  const polyline2 = { points: points2 };
-  const result3 = Intersection.intersectPolylinePolyline(polyline2, { points: [new Point(), new Point(25, 25)] }, false);
+  const polyline2 = points2;
+  const result3 = Intersection.intersectPolylinePolyline(polyline2, [new Point(), new Point(25, 25)], false);
   expect(result3.status).toBe('Intersection');
   expect(result3.points.length).toBe(1);
 });
 
 test('Test intersectPolylinePolyline - polyline arc', () => {
   // Intersection - polyline(boundary) vs arc segment(selected)
-  const polyline = { points: [new Point(), new Point(0, 25)] };
+  const polyline = [new Point(), new Point(0, 25)];
   // Arc segment from (10,10) to (-10,10) with bulge=1
   // This creates a CCW semicircular arc with centre (0,10), radius 10
-  const arcPolyline = { points: [new Point(10, 10, 1), new Point(-10, 10)] };
+  const arcPolyline = [new Point(10, 10, 1), new Point(-10, 10)];
   const result = Intersection.intersectPolylinePolyline(polyline, arcPolyline, false);
   expect(result.status).toBe('Intersection');
   expect(result.points.length).toBe(1);
@@ -200,8 +200,8 @@ test('Test intersectPolylinePolyline - polyline arc', () => {
 
 test('Test Intersection.intersectPolylinePolyline()', () => {
   // Two crossing polylines with line segments
-  const polyline1 = { points: [new Point(-10, 0), new Point(10, 0)] };
-  const polyline2 = { points: [new Point(0, -10), new Point(0, 10)] };
+  const polyline1 = [new Point(-10, 0), new Point(10, 0)];
+  const polyline2 = [new Point(0, -10), new Point(0, 10)];
 
   const result = Intersection.intersectPolylinePolyline(polyline1, polyline2, false);
   expect(result.status).toBe('Intersection');
@@ -210,15 +210,15 @@ test('Test Intersection.intersectPolylinePolyline()', () => {
   expect(result.points[0].y).toBeCloseTo(0);
 
   // No intersection
-  const polyline3 = { points: [new Point(20, 0), new Point(30, 0)] };
+  const polyline3 = [new Point(20, 0), new Point(30, 0)];
   const result2 = Intersection.intersectPolylinePolyline(polyline1, polyline3, false);
   expect(result2.status).toBe('No Intersection');
   expect(result2.points.length).toBe(0);
 
   // Polyline with arc segment intersecting a line-segment polyline
   // CCW arc from (-5,0) to (5,0) with bulge=1 goes through (0,-5)
-  const polyline4 = { points: [new Point(-5, 0, 1), new Point(5, 0)] };
-  const polyline5 = { points: [new Point(0, -10), new Point(0, -3)] };
+  const polyline4 = [new Point(-5, 0, 1), new Point(5, 0)];
+  const polyline5 = [new Point(0, -10), new Point(0, -3)];
 
   const result3 = Intersection.intersectPolylinePolyline(polyline4, polyline5, false);
   expect(result3.status).toBe('Intersection');
@@ -230,10 +230,10 @@ test('Test Intersection.intersectPolylinePolyline()', () => {
 test('Test intersectPolylinePolyline - polyline arc with extend', () => {
   // Arc: quarter circle from (10,0) to (0,10) centred at origin, radius 10, CCW
   // Represent as polyline with arc segment
-  const arcPolyline = { points: [new Point(10, 0, 1), new Point(0, 10)] };
+  const arcPolyline = [new Point(10, 0, 1), new Point(0, 10)];
 
   // Polyline crossing the arc
-  const polyline = { points: [new Point(0, 0), new Point(15, 15)] };
+  const polyline = [new Point(0, 0), new Point(15, 15)];
 
   // Without extend - intersection should be on the arc
   const result1 = Intersection.intersectPolylinePolyline(polyline, arcPolyline, false);

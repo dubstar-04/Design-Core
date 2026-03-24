@@ -30,9 +30,9 @@ function selectionExtremes(p1, p2) {
 }
 
 // ========================================================
-// Entity decompose / intersectPoints format tests
+// Entity decompose format tests
 // ========================================================
-describe('Entity decompose and intersectPoints', () => {
+describe('Entity decompose', () => {
   test('Line.decompose returns 2 points with bulge 0', () => {
     const line = new Line({ points: [new Point(0, 0), new Point(10, 5)] });
     const pts = line.decompose();
@@ -43,13 +43,6 @@ describe('Entity decompose and intersectPoints', () => {
     expect(pts[1].x).toBe(10);
     expect(pts[1].y).toBe(5);
     expect(pts[1].bulge).toBe(0);
-  });
-
-  test('Line.intersectPoints returns {points} from decompose', () => {
-    const line = new Line({ points: [new Point(0, 0), new Point(10, 5)] });
-    const ip = line.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points).toEqual(line.decompose());
   });
 
   test('Circle.decompose returns 3 points with bulge 1', () => {
@@ -64,13 +57,6 @@ describe('Entity decompose and intersectPoints', () => {
     expect(pts[2].y).toBe(pts[0].y);
   });
 
-  test('Circle.intersectPoints returns {points} from decompose', () => {
-    const circle = new Circle({ points: [new Point(10, 10), new Point(15, 10)] });
-    const ip = circle.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points.length).toBe(3);
-  });
-
   test('Arc.decompose returns 2 points with calculated bulge', () => {
     // CCW arc from (10,0) to (0,10) centred at origin, radius 10
     const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
@@ -78,13 +64,6 @@ describe('Entity decompose and intersectPoints', () => {
     expect(pts.length).toBe(2);
     expect(pts[0].bulge).not.toBe(0);
     expect(pts[1].bulge).toBe(0);
-  });
-
-  test('Arc.intersectPoints returns {points} from decompose', () => {
-    const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
-    const ip = arc.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points.length).toBe(2);
   });
 
   test('Polyline.decompose returns points array', () => {
@@ -96,24 +75,10 @@ describe('Entity decompose and intersectPoints', () => {
     expect(pts[2].y).toBe(10);
   });
 
-  test('Polyline.intersectPoints returns {points} from decompose', () => {
-    const poly = new Polyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
-    const ip = poly.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points.length).toBe(3);
-  });
-
   test('Lwpolyline.decompose returns points array', () => {
     const lwpoly = new Lwpolyline({ points: [new Point(0, 0), new Point(5, 5), new Point(10, 0)] });
     const pts = lwpoly.decompose();
     expect(pts.length).toBe(3);
-  });
-
-  test('Lwpolyline.intersectPoints returns {points} from decompose', () => {
-    const lwpoly = new Lwpolyline({ points: [new Point(0, 0), new Point(5, 5), new Point(10, 0)] });
-    const ip = lwpoly.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points.length).toBe(3);
   });
 
   test('Solid.decompose returns closed polygon', () => {
@@ -123,13 +88,6 @@ describe('Entity decompose and intersectPoints', () => {
     expect(pts.length).toBe(4);
     expect(pts[3].x).toBe(pts[0].x);
     expect(pts[3].y).toBe(pts[0].y);
-  });
-
-  test('Solid.intersectPoints returns {points} from decompose', () => {
-    const solid = new Solid({ points: [new Point(0, 0), new Point(10, 0), new Point(5, 10)] });
-    const ip = solid.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points.length).toBe(4);
   });
 
   test('Solid.decompose with 4 points returns 5 points', () => {
@@ -150,14 +108,6 @@ describe('Entity decompose and intersectPoints', () => {
     expect(pts[4].y).toBe(pts[0].y);
   });
 
-  test('Text.intersectPoints returns {points} from decompose', () => {
-    const text = new Text({ points: [new Point(0, 0)] });
-    text.boundingRect = { width: 10, height: 5 };
-    const ip = text.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points.length).toBe(5);
-  });
-
   test('ArcAlignedText.decompose returns character positions', () => {
     const arcText = new ArcAlignedText({
       points: [new Point(0, 0)],
@@ -173,20 +123,6 @@ describe('Entity decompose and intersectPoints', () => {
     pts.forEach((pt) => {
       expect(pt).toBeInstanceOf(Point);
     });
-  });
-
-  test('ArcAlignedText.intersectPoints returns {points} from decompose', () => {
-    const arcText = new ArcAlignedText({
-      points: [new Point(0, 0)],
-      string: 'Test',
-      radius: 20,
-      height: 2.5,
-      startAngle: 0,
-      endAngle: 180,
-    });
-    const ip = arcText.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points.length).toBe(4);
   });
 
   test('ArcAlignedText with empty string returns empty points', () => {
@@ -391,7 +327,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Line vs Line - crossing', () => {
     const line1 = new Line({ points: [new Point(-10, 0), new Point(10, 0)] });
     const line2 = new Line({ points: [new Point(0, -10), new Point(0, 10)] });
-    const result = Intersection.intersectPolylinePolyline(line1.intersectPoints(), line2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line1.decompose(), line2.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(1);
     expect(result.points[0].x).toBeCloseTo(0);
@@ -401,7 +337,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Line vs Line - no intersection', () => {
     const line1 = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
     const line2 = new Line({ points: [new Point(0, 5), new Point(10, 5)] });
-    const result = Intersection.intersectPolylinePolyline(line1.intersectPoints(), line2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line1.decompose(), line2.decompose());
     expect(result.status).toBe('No Intersection');
     expect(result.points.length).toBe(0);
   });
@@ -409,7 +345,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Line vs Circle', () => {
     const line = new Line({ points: [new Point(-10, 0), new Point(10, 0)] });
     const circle = new Circle({ points: [new Point(0, 0), new Point(5, 0)] }); // radius=5
-    const result = Intersection.intersectPolylinePolyline(line.intersectPoints(), circle.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line.decompose(), circle.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(2);
   });
@@ -419,7 +355,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     const line = new Line({ points: [new Point(-20, 5), new Point(20, 5)] });
     // CCW arc from (10,0) to (0,10) centred at origin, radius 10
     const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
-    const result = Intersection.intersectPolylinePolyline(line.intersectPoints(), arc.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line.decompose(), arc.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBeGreaterThanOrEqual(1);
   });
@@ -427,7 +363,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Line vs Polyline - multiple intersections', () => {
     const line = new Line({ points: [new Point(5, -5), new Point(5, 25)] });
     const poly = new Polyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
-    const result = Intersection.intersectPolylinePolyline(line.intersectPoints(), poly.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line.decompose(), poly.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(2);
     // Line at x=5 crosses bottom edge (y=0) and top edge (y=10) - but poly is not closed
@@ -438,7 +374,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Line vs Solid', () => {
     const line = new Line({ points: [new Point(-5, 5), new Point(25, 5)] });
     const solid = new Solid({ points: [new Point(0, 0), new Point(20, 0), new Point(20, 20), new Point(0, 20)] });
-    const result = Intersection.intersectPolylinePolyline(line.intersectPoints(), solid.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line.decompose(), solid.decompose());
     expect(result.status).toBe('Intersection');
     // Line crosses left and right edges of the closed solid
     expect(result.points.length).toBe(2);
@@ -447,7 +383,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Circle vs Circle - overlapping', () => {
     const circle1 = new Circle({ points: [new Point(0, 0), new Point(5, 0)] }); // radius=5
     const circle2 = new Circle({ points: [new Point(5, 0), new Point(10, 0)] }); // radius=5
-    const result = Intersection.intersectPolylinePolyline(circle1.intersectPoints(), circle2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(circle1.decompose(), circle2.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(2);
   });
@@ -455,7 +391,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Circle vs Circle - no intersection', () => {
     const circle1 = new Circle({ points: [new Point(0, 0), new Point(5, 0)] }); // radius=5
     const circle2 = new Circle({ points: [new Point(50, 50), new Point(55, 50)] }); // radius=5
-    const result = Intersection.intersectPolylinePolyline(circle1.intersectPoints(), circle2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(circle1.decompose(), circle2.decompose());
     expect(result.status).toBe('No Intersection');
   });
 
@@ -463,7 +399,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     const circle = new Circle({ points: [new Point(10, 0), new Point(15, 0)] }); // radius=5 at (10,0)
     // CCW arc from (10,0) to (0,10) centred at origin, radius 10
     const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
-    const result = Intersection.intersectPolylinePolyline(circle.intersectPoints(), arc.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(circle.decompose(), arc.decompose());
     expect(result.status).toBe('Intersection');
   });
 
@@ -471,7 +407,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     // Two overlapping arcs: arc1 upper semicircle, arc2 shifted
     const arc1 = new Arc({ points: [new Point(0, 0), new Point(-10, 0), new Point(10, 0)] }); // upper semicircle r=10
     const arc2 = new Arc({ points: [new Point(5, 0), new Point(-5, 0), new Point(15, 0)] }); // upper semicircle r=10 shifted right
-    const result = Intersection.intersectPolylinePolyline(arc1.intersectPoints(), arc2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(arc1.decompose(), arc2.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBeGreaterThanOrEqual(1);
   });
@@ -479,7 +415,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Polyline vs Polyline - crossing', () => {
     const poly1 = new Polyline({ points: [new Point(-10, 0), new Point(10, 0)] });
     const poly2 = new Polyline({ points: [new Point(0, -10), new Point(0, 10)] });
-    const result = Intersection.intersectPolylinePolyline(poly1.intersectPoints(), poly2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(poly1.decompose(), poly2.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(1);
     expect(result.points[0].x).toBeCloseTo(0);
@@ -490,7 +426,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     // V-shaped polyline vs horizontal line
     const poly1 = new Polyline({ points: [new Point(0, 10), new Point(10, 0), new Point(20, 10)] });
     const poly2 = new Polyline({ points: [new Point(-5, 5), new Point(25, 5)] });
-    const result = Intersection.intersectPolylinePolyline(poly1.intersectPoints(), poly2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(poly1.decompose(), poly2.decompose());
     expect(result.status).toBe('Intersection');
     // Crosses both segments of poly1
     expect(result.points.length).toBe(2);
@@ -499,7 +435,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Lwpolyline vs Line', () => {
     const lwpoly = new Lwpolyline({ points: [new Point(-10, 0), new Point(10, 0)] });
     const line = new Line({ points: [new Point(0, -10), new Point(0, 10)] });
-    const result = Intersection.intersectPolylinePolyline(lwpoly.intersectPoints(), line.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(lwpoly.decompose(), line.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(1);
   });
@@ -507,7 +443,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Lwpolyline vs Polyline', () => {
     const lwpoly = new Lwpolyline({ points: [new Point(-10, 0), new Point(10, 0)] });
     const poly = new Polyline({ points: [new Point(0, -10), new Point(0, 10)] });
-    const result = Intersection.intersectPolylinePolyline(lwpoly.intersectPoints(), poly.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(lwpoly.decompose(), poly.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(1);
   });
@@ -515,7 +451,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Lwpolyline vs Lwpolyline', () => {
     const lwpoly1 = new Lwpolyline({ points: [new Point(-10, 0), new Point(10, 0)] });
     const lwpoly2 = new Lwpolyline({ points: [new Point(0, -10), new Point(0, 10)] });
-    const result = Intersection.intersectPolylinePolyline(lwpoly1.intersectPoints(), lwpoly2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(lwpoly1.decompose(), lwpoly2.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(1);
   });
@@ -525,7 +461,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     const poly = new Polyline({ points: [new Point(0, 0, 1), new Point(0, 10)] });
     // Vertical line through the middle of the arc
     const line = new Line({ points: [new Point(3, -5), new Point(3, 15)] });
-    const result = Intersection.intersectPolylinePolyline(poly.intersectPoints(), line.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(poly.decompose(), line.decompose());
     expect(result.status).toBe('Intersection');
     // Line should cross the arc in two places
     expect(result.points.length).toBe(2);
@@ -536,7 +472,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     const solid = new Solid({ points: [new Point(0, 0), new Point(20, 0), new Point(10, 20)] });
     // Horizontal line crossing two edges
     const line = new Line({ points: [new Point(-5, 10), new Point(25, 10)] });
-    const result = Intersection.intersectPolylinePolyline(solid.intersectPoints(), line.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(solid.decompose(), line.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(2);
   });
@@ -544,7 +480,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
   test('Solid vs Polyline', () => {
     const solid = new Solid({ points: [new Point(0, 0), new Point(20, 0), new Point(20, 20), new Point(0, 20)] });
     const poly = new Polyline({ points: [new Point(10, -5), new Point(10, 25)] });
-    const result = Intersection.intersectPolylinePolyline(solid.intersectPoints(), poly.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(solid.decompose(), poly.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(2);
   });
@@ -553,7 +489,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     // Square solid with a circle crossing through an edge
     const solid = new Solid({ points: [new Point(0, 0), new Point(20, 0), new Point(20, 20), new Point(0, 20)] });
     const circle = new Circle({ points: [new Point(0, 10), new Point(5, 10)] }); // radius=5 at left edge
-    const result = Intersection.intersectPolylinePolyline(solid.intersectPoints(), circle.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(solid.decompose(), circle.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBeGreaterThanOrEqual(2);
   });
@@ -563,7 +499,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     text.boundingRect = { width: 20, height: 10 };
     // Line crossing through the text frame
     const line = new Line({ points: [new Point(-5, 5), new Point(25, 5)] });
-    const result = Intersection.intersectPolylinePolyline(text.intersectPoints(), line.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(text.decompose(), line.decompose());
     expect(result.status).toBe('Intersection');
     // Line enters and exits the text frame
     expect(result.points.length).toBe(2);
@@ -573,7 +509,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     const text = new Text({ points: [new Point(0, 0)] });
     text.boundingRect = { width: 20, height: 10 };
     const circle = new Circle({ points: [new Point(0, 5), new Point(5, 5)] }); // radius=5 at left edge
-    const result = Intersection.intersectPolylinePolyline(text.intersectPoints(), circle.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(text.decompose(), circle.decompose());
     expect(result.status).toBe('Intersection');
   });
 });
@@ -588,7 +524,7 @@ describe('Cross-type entity intersections', () => {
     const solid = new Solid({ points: [new Point(5, -5), new Point(15, -5), new Point(15, 5), new Point(5, 5)] });
 
     // Line crosses left and right edges of solid
-    const result = Intersection.intersectPolylinePolyline(line.intersectPoints(), solid.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line.decompose(), solid.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(2);
     expect(result.points[0].x).toBeCloseTo(15);
@@ -602,7 +538,7 @@ describe('Cross-type entity intersections', () => {
     const poly = new Polyline({ points: [new Point(0, -5, 1), new Point(0, 5)] });
     // Circle overlapping the arc
     const circle = new Circle({ points: [new Point(5, 0), new Point(10, 0)] }); // radius=5
-    const result = Intersection.intersectPolylinePolyline(poly.intersectPoints(), circle.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(poly.decompose(), circle.decompose());
     expect(result.status).toBe('Intersection');
   });
 
@@ -614,7 +550,7 @@ describe('Cross-type entity intersections', () => {
     const poly2 = new Polyline({
       points: [new Point(5, 5), new Point(15, 5), new Point(15, 15), new Point(5, 15), new Point(5, 5)],
     });
-    const result = Intersection.intersectPolylinePolyline(poly1.intersectPoints(), poly2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(poly1.decompose(), poly2.decompose());
     expect(result.status).toBe('Intersection');
     // Two overlapping squares intersect at multiple points
     expect(result.points.length).toBeGreaterThanOrEqual(2);
@@ -623,14 +559,14 @@ describe('Cross-type entity intersections', () => {
   test('Arc vs Solid - crossing triangle', () => {
     const arc = new Arc({ points: [new Point(10, 0), new Point(20, 0), new Point(0, 0)] }); // semicircle top
     const solid = new Solid({ points: [new Point(0, 0), new Point(20, 0), new Point(10, 15)] });
-    const result = Intersection.intersectPolylinePolyline(arc.intersectPoints(), solid.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(arc.decompose(), solid.decompose());
     expect(result.status).toBe('Intersection');
   });
 
   test('Line vs Lwpolyline', () => {
     const line = new Line({ points: [new Point(0, 5), new Point(20, 5)] });
     const lwpoly = new Lwpolyline({ points: [new Point(10, 0), new Point(10, 10)] });
-    const result = Intersection.intersectPolylinePolyline(line.intersectPoints(), lwpoly.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line.decompose(), lwpoly.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(1);
     expect(result.points[0].x).toBeCloseTo(10);
@@ -640,7 +576,7 @@ describe('Cross-type entity intersections', () => {
   test('Circle vs Lwpolyline', () => {
     const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] }); // radius=10
     const lwpoly = new Lwpolyline({ points: [new Point(0, -15), new Point(0, 15)] });
-    const result = Intersection.intersectPolylinePolyline(circle.intersectPoints(), lwpoly.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(circle.decompose(), lwpoly.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(2);
   });
@@ -648,7 +584,7 @@ describe('Cross-type entity intersections', () => {
   test('Arc vs Lwpolyline', () => {
     const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
     const lwpoly = new Lwpolyline({ points: [new Point(0, 0), new Point(15, 15)] });
-    const result = Intersection.intersectPolylinePolyline(arc.intersectPoints(), lwpoly.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(arc.decompose(), lwpoly.decompose());
     expect(result.status).toBe('Intersection');
   });
 });
@@ -738,9 +674,8 @@ describe('Dimension touched tests', () => {
     expect(dim.touched(sE)).toBe(false);
   });
 
-  test('AlignedDimension.touched uses block.touched not intersectPoints', () => {
+  test('AlignedDimension.touched uses block.touched not decompose', () => {
     // Dimensions delegate touched() to block.touched() which iterates block items.
-    // block.intersectPoints() is not implemented - dimensions rely on block.touched() instead.
     const pt13 = new Point(0, 0, 0, 13);
     const pt14 = new Point(100, 0, 0, 14);
     const pt11 = new Point(50, 20, 0, 11);
@@ -753,9 +688,6 @@ describe('Dimension touched tests', () => {
     // touched() works via block delegation - returns boolean
     const sE = selectionExtremes(new Point(-10, -10), new Point(110, 30));
     expect(dim.touched(sE)).toBe(false);
-
-    // intersectPoints() throws because block doesn't implement it
-    expect(() => dim.intersectPoints()).toThrow();
   });
 });
 
@@ -809,11 +741,10 @@ describe('Hatch touched tests', () => {
 // Edge cases
 // ========================================================
 describe('Intersection edge cases', () => {
-  test('Zero-length line intersectPoints', () => {
+  test('Zero-length line decompose', () => {
     const line = new Line({ points: [new Point(5, 5), new Point(5, 5)] });
-    const ip = line.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points.length).toBe(2);
+    const pts = line.decompose();
+    expect(pts.length).toBe(2);
   });
 
   test('Large line touched by large rectangle', () => {
@@ -831,17 +762,16 @@ describe('Intersection edge cases', () => {
     expect(line.touched(sE)).toBe(true);
   });
 
-  test('Polyline with single point returns valid intersectPoints', () => {
+  test('Polyline with single point returns valid decompose', () => {
     const poly = new Polyline({ points: [new Point(5, 5)] });
-    const ip = poly.intersectPoints();
-    expect(ip).toHaveProperty('points');
-    expect(ip.points.length).toBe(1);
+    const pts = poly.decompose();
+    expect(pts.length).toBe(1);
   });
 
   test('Coincident lines intersection', () => {
     const line1 = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
     const line2 = new Line({ points: [new Point(2, 0), new Point(8, 0)] });
-    const result = Intersection.intersectPolylinePolyline(line1.intersectPoints(), line2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line1.decompose(), line2.decompose());
     // Coincident lines have special status
     expect(result.points.length).toBe(1);
   });
@@ -849,7 +779,7 @@ describe('Intersection edge cases', () => {
   test('Perpendicular lines at endpoint', () => {
     const line1 = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
     const line2 = new Line({ points: [new Point(10, 0), new Point(10, 10)] });
-    const result = Intersection.intersectPolylinePolyline(line1.intersectPoints(), line2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line1.decompose(), line2.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points[0].x).toBeCloseTo(10);
     expect(result.points[0].y).toBeCloseTo(0);
@@ -858,7 +788,7 @@ describe('Intersection edge cases', () => {
   test('Diagonal line through circle centre', () => {
     const line = new Line({ points: [new Point(-20, -20), new Point(20, 20)] });
     const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] }); // radius=10
-    const result = Intersection.intersectPolylinePolyline(line.intersectPoints(), circle.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(line.decompose(), circle.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(2);
     // Points should be equidistant from centre
@@ -871,7 +801,7 @@ describe('Intersection edge cases', () => {
   test('Two concentric circles - no intersection', () => {
     const circle1 = new Circle({ points: [new Point(0, 0), new Point(5, 0)] }); // radius=5
     const circle2 = new Circle({ points: [new Point(0, 0), new Point(10, 0)] }); // radius=10
-    const result = Intersection.intersectPolylinePolyline(circle1.intersectPoints(), circle2.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(circle1.decompose(), circle2.decompose());
     expect(result.status).toBe('No Intersection');
   });
 
@@ -879,7 +809,7 @@ describe('Intersection edge cases', () => {
     // Negative bulge = clockwise arc
     const poly = new Polyline({ points: [new Point(0, 0, -1), new Point(0, 10)] });
     const line = new Line({ points: [new Point(-10, 5), new Point(10, 5)] });
-    const result = Intersection.intersectPolylinePolyline(poly.intersectPoints(), line.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(poly.decompose(), line.decompose());
     expect(result.status).toBe('Intersection');
     // CW arc bulges to the left, line crosses through
     expect(result.points.length).toBeGreaterThanOrEqual(1);
@@ -891,7 +821,7 @@ describe('Intersection edge cases', () => {
     // Small bulge creates a shallow arc
     const poly = new Polyline({ points: [new Point(0, 0, 0.1), new Point(10, 0)] });
     const line = new Line({ points: [new Point(5, -5), new Point(5, 5)] });
-    const result = Intersection.intersectPolylinePolyline(poly.intersectPoints(), line.intersectPoints());
+    const result = Intersection.intersectPolylinePolyline(poly.decompose(), line.decompose());
     expect(result.status).toBe('Intersection');
     expect(result.points.length).toBe(1);
   });
@@ -923,8 +853,8 @@ describe('Intersection with extend flag', () => {
 
   test('intersectPolylinePolyline with extend', () => {
     // Polyline (boundary) is long, line (selected) doesn't reach it
-    const poly = { points: [new Point(10, -10), new Point(10, 10)] };
-    const line = { points: [new Point(0, 0), new Point(5, 0)] };
+    const poly = [new Point(10, -10), new Point(10, 10)];
+    const line = [new Point(0, 0), new Point(5, 0)];
     const result = Intersection.intersectPolylinePolyline(poly, line, true);
     expect(result.status).toBe('Intersection');
     expect(result.points[0].x).toBeCloseTo(10);
@@ -932,9 +862,9 @@ describe('Intersection with extend flag', () => {
 
   test('intersectPolylinePolyline arc with extend finds full circle intersection', () => {
     // Arc from (5,0) to (-5,0) CCW, bulge=1 -> upper semicircle centred at (0,0), r=5
-    const arcPolyline = { points: [new Point(5, 0, 1), new Point(-5, 0)] };
+    const arcPolyline = [new Point(5, 0, 1), new Point(-5, 0)];
     // Line below the arc - doesn't intersect the arc without extend
-    const polyline = { points: [new Point(0, -10), new Point(0, -3)] };
+    const polyline = [new Point(0, -10), new Point(0, -3)];
     const result1 = Intersection.intersectPolylinePolyline(polyline, arcPolyline, false);
     expect(result1.status).toBe('No Intersection');
     // With extend - uses full circle, finds intersection at (0,-5)

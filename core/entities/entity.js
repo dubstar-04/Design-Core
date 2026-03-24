@@ -178,16 +178,6 @@ export class Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      points: this.decompose(),
-    };
-  }
-
-  /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
    * @return {boolean} true if touched
@@ -204,11 +194,9 @@ export class Entity {
     const topRight = new Point(selectionExtremes[1], selectionExtremes[3]);
     const topLeft = new Point(selectionExtremes[0], selectionExtremes[3]);
 
-    const rectPoints = {
-      points: [bottomLeft, bottomRight, topRight, topLeft, bottomLeft],
-    };
+    const rectPoints = [bottomLeft, bottomRight, topRight, topLeft, bottomLeft];
 
-    const output = Intersection.intersectPolylinePolyline(this.intersectPoints(), rectPoints);
+    const output = Intersection.intersectPolylinePolyline(this.decompose(), rectPoints);
 
     if (output.status === 'Intersection') {
       return true;

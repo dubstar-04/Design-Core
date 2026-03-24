@@ -561,18 +561,17 @@ test('Text boundingBox returns BoundingBox', () => {
   expect(box.height).toBe(10);
 });
 
-test('Text intersectPoints returns correct object', () => {
+test('Text decompose returns correct array', () => {
   const t = new Text({ points: [new Point(1, 2)] });
   t.boundingRect = { width: 10, height: 10 };
-  const pts = t.intersectPoints();
-  expect(pts).toHaveProperty('points');
-  expect(pts.points.length).toBe(5);
-  expect(pts.points[0].x).toBe(1);
-  expect(pts.points[0].y).toBe(2);
-  expect(pts.points[2].x).toBe(11);
-  expect(pts.points[2].y).toBe(12);
-  expect(pts.points[4].x).toBe(pts.points[0].x);
-  expect(pts.points[4].y).toBe(pts.points[0].y);
+  const pts = t.decompose();
+  expect(pts.length).toBe(5);
+  expect(pts[0].x).toBe(1);
+  expect(pts[0].y).toBe(2);
+  expect(pts[2].x).toBe(11);
+  expect(pts[2].y).toBe(12);
+  expect(pts[4].x).toBe(pts[0].x);
+  expect(pts[4].y).toBe(pts[0].y);
 });
 
 test('Text setBackwards and setUpsideDown edge cases', () => {
