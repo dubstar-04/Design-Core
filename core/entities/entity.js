@@ -208,7 +208,7 @@ export class Entity {
       points: [bottomLeft, bottomRight, topRight, topLeft, bottomLeft],
     };
 
-    const output = Intersection.intersectEntities(this.intersectPoints(), rectPoints);
+    const output = Intersection.intersectPolylinePolyline(this.intersectPoints(), rectPoints);
 
     if (output.status === 'Intersection') {
       return true;

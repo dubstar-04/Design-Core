@@ -362,7 +362,7 @@ export class Hatch extends Entity {
 
         const currentItem = selectedItems[i];
         // if the item can't be decomposed to a polyline, remove from selected items and go again
-        if (typeof currentItem.decompose === 'undefined') {
+        if (typeof currentItem.decompose === 'undefined' || currentItem.type === 'Text' || currentItem.type === 'ArcAlignedText') {
           selectedItems.splice(i, 1);
           break;
         }
@@ -655,9 +655,9 @@ export class Hatch extends Entity {
         }
 
         // create a line from P, twice the length of the bounding box
-        const line = { start: P, end: new Point(P.x + shape.boundingBox().xLength, P.y) };
+        const line = { points: [P, new Point(P.x + shape.boundingBox().xLength, P.y)] };
 
-        const intersect = Intersection.intersectPolylineLine(polyline, line);
+        const intersect = Intersection.intersectPolylinePolyline(polyline, line);
         const intersects = intersect.points.length;
         // P is inside shape if there is a odd number of intersects
         if (Math.abs(intersects % 2) == 1) {
