@@ -201,7 +201,7 @@ export class BasePolyline extends Entity {
    * Return a list of points representing a polyline version of this entity
    * @return {Array}
    */
-  decompose() {
+  toPolylinePoints() {
     return this.points;
   }
 

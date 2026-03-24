@@ -79,7 +79,7 @@ export class Extend extends Tool {
       for (const boundaryItem of this.selectedBoundaryItems) {
         if (boundaryItem !== this.selectedItem) {
           try {
-            const intersect = Intersection.intersectPolylinePolyline(boundaryItem.decompose(), this.selectedItem.decompose(), true);
+            const intersect = Intersection.intersectPolylinePolyline(boundaryItem.toPolylinePoints(), this.selectedItem.toPolylinePoints(), true);
             if (intersect.points.length) {
               for (let point = 0; point < intersect.points.length; point++) {
                 intersectPoints.push(intersect.points[point]);

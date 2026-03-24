@@ -118,10 +118,10 @@ test('Solid.closestPoint returns input point and Infinity', () => {
   expect(dist).toBe(Infinity);
 });
 
-test('Solid.decompose returns correct points array', () => {
+test('Solid.toPolylinePoints returns correct points array', () => {
   const pts = [new Point(0, 0), new Point(1, 0), new Point(1, 1), new Point(0, 1)];
   const solid = new Solid({ points: pts });
-  const result = solid.decompose();
+  const result = solid.toPolylinePoints();
   expect(result.length).toBe(5);
   expect(result[0].x).toBe(0);
   expect(result[0].y).toBe(0);
@@ -129,28 +129,28 @@ test('Solid.decompose returns correct points array', () => {
   expect(result[4].y).toBe(0);
 });
 
-test('Test Solid.decompose', () => {
+test('Test Solid.toPolylinePoints', () => {
   const solid = new Solid({ points: [new Point(100, 100), new Point(200, 100), new Point(200, 200)] });
-  const decomposed = solid.decompose();
-  expect(decomposed.length).toBe(4);
-  expect(decomposed[0].x).toBe(100);
-  expect(decomposed[0].y).toBe(100);
-  expect(decomposed[0].bulge).toBe(0);
-  expect(decomposed[1].x).toBe(200);
-  expect(decomposed[1].y).toBe(100);
-  expect(decomposed[2].x).toBe(200);
-  expect(decomposed[2].y).toBe(200);
+  const solidPoints = solid.toPolylinePoints();
+  expect(solidPoints.length).toBe(4);
+  expect(solidPoints[0].x).toBe(100);
+  expect(solidPoints[0].y).toBe(100);
+  expect(solidPoints[0].bulge).toBe(0);
+  expect(solidPoints[1].x).toBe(200);
+  expect(solidPoints[1].y).toBe(100);
+  expect(solidPoints[2].x).toBe(200);
+  expect(solidPoints[2].y).toBe(200);
   // closing point matches first point
-  expect(decomposed[3].x).toBe(100);
-  expect(decomposed[3].y).toBe(100);
+  expect(solidPoints[3].x).toBe(100);
+  expect(solidPoints[3].y).toBe(100);
 });
 
-test('Test Solid.decompose with 4 points', () => {
+test('Test Solid.toPolylinePoints with 4 points', () => {
   const solid = new Solid({ points: [new Point(0, 0), new Point(1, 0), new Point(1, 1), new Point(0, 1)] });
-  const decomposed = solid.decompose();
-  expect(decomposed.length).toBe(5);
-  expect(decomposed[4].x).toBe(0);
-  expect(decomposed[4].y).toBe(0);
+  const solidPoints = solid.toPolylinePoints();
+  expect(solidPoints.length).toBe(5);
+  expect(solidPoints[4].x).toBe(0);
+  expect(solidPoints[4].y).toBe(0);
 });
 
 

@@ -208,7 +208,7 @@ export class Hatch extends Entity {
                 shapePoints.push(startPoint);
                 shapePoints.push(endPoint);
                 const line = new Line({ points: shapePoints });
-                shape.points.push(...line.decompose());
+                shape.points.push(...line.toPolylinePoints());
               } else if (edgeType === 2) {
                 // ARC
                 // 10 - X; 20 - Y;  40 - Radius;  50 - Start Angle;  51 - End Angle; 73 - Is Counter Clockwise
@@ -234,7 +234,7 @@ export class Hatch extends Entity {
                 }
 
                 const arc = new Arc(shapeData);
-                shape.points.push(...arc.decompose());
+                shape.points.push(...arc.toPolylinePoints());
               } else if (edge.edgeType === 3) {
                 // Ellipse
                 // 10 - X; 20 - Y; 11 - X; 21 - Y; 40 - Length of minor axis (percentage of major axis length);
@@ -361,13 +361,13 @@ export class Hatch extends Entity {
         // no points collected - get the first index from selected items
 
         const currentItem = selectedItems[i];
-        // if the item can't be decomposed to a polyline, remove from selected items and go again
-        if (typeof currentItem.decompose === 'undefined' || currentItem.type === 'Text' || currentItem.type === 'ArcAlignedText') {
+        // if the item can't be converted to polyline points, remove from selected items and go again
+        if (typeof currentItem.toPolylinePoints === 'undefined' || currentItem.type === 'Text' || currentItem.type === 'ArcAlignedText') {
           selectedItems.splice(i, 1);
           break;
         }
 
-        let currentPoints = currentItem.decompose();
+        let currentPoints = currentItem.toPolylinePoints();
 
         // check if the start or end point of the item are connected to the end of the iteration points
         if (!iterationPoints.length || currentPoints.at(0).isSame(iterationPoints.at(-1)) || currentPoints.at(-1).isSame(iterationPoints.at(-1))) {

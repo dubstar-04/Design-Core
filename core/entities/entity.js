@@ -196,7 +196,7 @@ export class Entity {
 
     const rectPoints = [bottomLeft, bottomRight, topRight, topLeft, bottomLeft];
 
-    const output = Intersection.intersectPolylinePolyline(this.decompose(), rectPoints);
+    const output = Intersection.intersectPolylinePolyline(this.toPolylinePoints(), rectPoints);
 
     if (output.status === 'Intersection') {
       return true;

@@ -320,9 +320,9 @@ test('Test ArcText.boundingBox', () => {
   expect(arcText.boundingBox().yMax).toBeCloseTo(102.49685);
 });
 
-test('Test ArcText.decompose - returns correct points array', () => {
+test('Test ArcText.toPolylinePoints - returns correct points array', () => {
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
-  const result = arcText.decompose();
+  const result = arcText.toPolylinePoints();
   expect(result.length).toBe(4);
   expect(result[0].x).toBeCloseTo(-2.39222);
   expect(result[0].y).toBeCloseTo(101.22173);

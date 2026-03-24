@@ -109,20 +109,20 @@ ByLayer
   expect(file.contents).toEqual(dxfString);
 });
 
-test('Test Circle.decompose', () => {
+test('Test Circle.toPolylinePoints', () => {
   const circle = new Circle({ points: [new Point(100, 100), new Point(200, 100)] });
-  const decomposedCircle = circle.decompose();
-  expect(decomposedCircle[0].x).toBe(200);
-  expect(decomposedCircle[0].y).toBe(100);
-  expect(decomposedCircle[0].bulge).toBeCloseTo(1);
+  const circlePoints = circle.toPolylinePoints();
+  expect(circlePoints[0].x).toBe(200);
+  expect(circlePoints[0].y).toBe(100);
+  expect(circlePoints[0].bulge).toBeCloseTo(1);
 
-  expect(decomposedCircle[1].x).toBe(0);
-  expect(decomposedCircle[1].y).toBe(100);
-  expect(decomposedCircle[1].bulge).toBeCloseTo(1);
+  expect(circlePoints[1].x).toBe(0);
+  expect(circlePoints[1].y).toBe(100);
+  expect(circlePoints[1].bulge).toBeCloseTo(1);
 
-  expect(decomposedCircle[2].x).toBe(200);
-  expect(decomposedCircle[2].y).toBe(100);
-  expect(decomposedCircle[2].bulge).toBe(0);
+  expect(circlePoints[2].x).toBe(200);
+  expect(circlePoints[2].y).toBe(100);
+  expect(circlePoints[2].bulge).toBe(0);
 });
 
 test('Test Circle.trim returns empty array when provided with empty intersection list', () => {

@@ -212,7 +212,7 @@ export class Arc extends Entity {
    * Return a list of points representing a polyline version of this entity
    * @return {Array}
    */
-  decompose() {
+  toPolylinePoints() {
     // counter clockwise bulge = +ve, clockwise bulge = -ve,
     // ccw arc = 0, clockwise arc = 1
 

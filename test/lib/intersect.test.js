@@ -13,7 +13,7 @@ test('Test intersectSegmentSegment - circle line', () => {
       new Point(), new Point(10, 10),
       false,
   );
-  // Note: circle decomposed as full arc so this tests the math
+  // Note: circle converted to polyline points as full arc so this tests the math
   // Use intersectPolylinePolyline for full entity tests
   expect(true).toBeTruthy();
 });

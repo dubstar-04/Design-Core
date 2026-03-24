@@ -356,21 +356,21 @@ SEQEND
   expect(file.contents).toEqual(dxfString);
 });
 
-test('Test BasePolyline.decompose', () => {
+test('Test BasePolyline.toPolylinePoints', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
   const polyline = new BasePolyline({ points: points });
 
-  const decomposedPolyline = polyline.decompose();
-  expect(decomposedPolyline[0].x).toBe(100);
-  expect(decomposedPolyline[0].y).toBe(100);
-  expect(decomposedPolyline[0].bulge).toBe(0);
+  const polylinePoints = polyline.toPolylinePoints();
+  expect(polylinePoints[0].x).toBe(100);
+  expect(polylinePoints[0].y).toBe(100);
+  expect(polylinePoints[0].bulge).toBe(0);
 
-  expect(decomposedPolyline[1].x).toBe(200);
-  expect(decomposedPolyline[1].y).toBe(100);
-  expect(decomposedPolyline[1].bulge).toBe(-1);
+  expect(polylinePoints[1].x).toBe(200);
+  expect(polylinePoints[1].y).toBe(100);
+  expect(polylinePoints[1].bulge).toBe(-1);
 
-  expect(decomposedPolyline[2].x).toBe(200);
-  expect(decomposedPolyline[2].y).toBe(50);
-  expect(decomposedPolyline[2].bulge).toBe(0);
+  expect(polylinePoints[2].x).toBe(200);
+  expect(polylinePoints[2].y).toBe(50);
+  expect(polylinePoints[2].bulge).toBe(0);
 });

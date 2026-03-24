@@ -561,10 +561,10 @@ test('Text boundingBox returns BoundingBox', () => {
   expect(box.height).toBe(10);
 });
 
-test('Text decompose returns correct array', () => {
+test('Text toPolylinePoints returns correct array', () => {
   const t = new Text({ points: [new Point(1, 2)] });
   t.boundingRect = { width: 10, height: 10 };
-  const pts = t.decompose();
+  const pts = t.toPolylinePoints();
   expect(pts.length).toBe(5);
   expect(pts[0].x).toBe(1);
   expect(pts[0].y).toBe(2);
