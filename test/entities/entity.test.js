@@ -20,8 +20,8 @@ test('Test Entity.getLineType', () => {
 
 test('Test Entity.Within', () => {
   const entity = new Line({ points: [new Point(100, 100), new Point(200, 200)] });
-  const selectionExtremesFalse = [101, 199, 101, 199];
-  const selectionExtremesTrue = [99, 201, 99, 201];
+  const selectionExtremesFalse = { min: new Point(101, 101), max: new Point(199, 199) };
+  const selectionExtremesTrue = { min: new Point(99, 99), max: new Point(201, 201) };
 
   expect(entity.within(selectionExtremesFalse)).toBe(false);
   expect(entity.within(selectionExtremesTrue)).toBe(true);
@@ -29,8 +29,8 @@ test('Test Entity.Within', () => {
 
 test('Test Entity.touched', () => {
   const entity = new Line({ points: [new Point(100, 100), new Point(200, 200)] });
-  const selectionExtremesTrue = [101, 199, 101, 199];
-  const selectionExtremesFalse = [99, 201, 99, 201];
+  const selectionExtremesTrue = { min: new Point(101, 101), max: new Point(199, 199) };
+  const selectionExtremesFalse = { min: new Point(99, 99), max: new Point(201, 201) };
 
   expect(entity.touched(selectionExtremesFalse)).toBe(false);
   expect(entity.touched(selectionExtremesTrue)).toBe(true);

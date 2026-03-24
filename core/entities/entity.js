@@ -154,22 +154,21 @@ export class Entity {
 
   /**
    * Determine if the entity is within the selection
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if within
    */
-  within(selectionExtremes) {
+  within(selection) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
     if (!layer?.isSelectable) {
       return;
     }
 
-    // Determine if this entities is within a the window specified by selectionExtremes
     const boundingBox = this.boundingBox();
-    if (boundingBox.xMin > selectionExtremes[0] &&
-      boundingBox.xMax < selectionExtremes[1] &&
-      boundingBox.yMin > selectionExtremes[2] &&
-      boundingBox.yMax < selectionExtremes[3]
+    if (boundingBox.xMin > selection.min.x &&
+      boundingBox.xMax < selection.max.x &&
+      boundingBox.yMin > selection.min.y &&
+      boundingBox.yMax < selection.max.y
     ) {
       return true;
     }
@@ -179,22 +178,23 @@ export class Entity {
 
   /**
    * Determine if the entity is touch the selection window
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if touched
    */
-  touched(selectionExtremes) {
+  touched(selection) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
     if (!layer?.isSelectable) {
       return;
     }
 
-    const bottomLeft = new Point(selectionExtremes[0], selectionExtremes[2]);
-    const bottomRight = new Point(selectionExtremes[1], selectionExtremes[2]);
-    const topRight = new Point(selectionExtremes[1], selectionExtremes[3]);
-    const topLeft = new Point(selectionExtremes[0], selectionExtremes[3]);
-
-    const rectPoints = [bottomLeft, bottomRight, topRight, topLeft, bottomLeft];
+    const rectPoints = [
+      selection.min,
+      new Point(selection.max.x, selection.min.y),
+      selection.max,
+      new Point(selection.min.x, selection.max.y),
+      selection.min,
+    ];
 
     const output = Intersection.intersectPolylinePolyline(this.toPolylinePoints(), rectPoints);
 

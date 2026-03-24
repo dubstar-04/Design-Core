@@ -1,4 +1,5 @@
 import { Utils } from './utils.js';
+import { Point } from '../entities/point.js';
 import { SelectionWindow } from './selectionWindow.js';
 import { DesignCore } from '../designCore.js';
 
@@ -111,18 +112,16 @@ export class SelectionManager {
 
   /**
    * Get the rectangle points formed between mouseDown and current mouse location
-   * @return {Array} selectionRect - [x1, x2, y1, y2]
+   * @return {Object} selectionRect - {min: Point, max: Point}
    */
   getSelectionRect() {
-    // TODO: It would be nice if this returned an object {xmin: xmin, ymin:ymin ...}
-    const xmin = Math.min(DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint).x, DesignCore.Mouse.pointOnScene().x);
-    const xmax = Math.max(DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint).x, DesignCore.Mouse.pointOnScene().x);
-    const ymin = Math.min(DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint).y, DesignCore.Mouse.pointOnScene().y);
-    const ymax = Math.max(DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint).y, DesignCore.Mouse.pointOnScene().y);
+    const p1 = DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint);
+    const p2 = DesignCore.Mouse.pointOnScene();
 
-    const selectionRect = [xmin, xmax, ymin, ymax];
-
-    return selectionRect;
+    return {
+      min: new Point(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y)),
+      max: new Point(Math.max(p1.x, p2.x), Math.max(p1.y, p2.y)),
+    };
   }
 
 

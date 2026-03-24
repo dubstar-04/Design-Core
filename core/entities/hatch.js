@@ -702,18 +702,12 @@ export class Hatch extends Entity {
 
   /**
    * Determine if the entity is touch the selection window
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if touched
    */
-  touched(selectionExtremes) {
-    // const se = [
-    //  selectionExtremes[0] - this.points[0].x,
-    //  selectionExtremes[1]- this.points[0].y,
-    //  selectionExtremes[2]- this.points[0].x,
-    //  selectionExtremes[3]- this.points[0].y,
-    // ];
+  touched(selection) {
     for (let i = 0; i < this.childEntities.length; i++) {
-      if (this.childEntities[i].touched(selectionExtremes)) {
+      if (this.childEntities[i].touched(selection)) {
         return true;
       }
     }

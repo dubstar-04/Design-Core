@@ -21,13 +21,16 @@ beforeAll(() => {
 });
 
 /**
- * Dummy Selection Extremes from two points
+ * Create selection bounds from two points
  * @param {Point} p1
  * @param {Point} p2
- * @return {Array} [xmin, xmax, ymin, ymax]
+ * @return {Object} {min: Point, max: Point}
  */
 function selectionExtremes(p1, p2) {
-  return [Math.min(p1.x, p2.x), Math.max(p1.x, p2.x), Math.min(p1.y, p2.y), Math.max(p1.y, p2.y)];
+  return {
+    min: new Point(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y)),
+    max: new Point(Math.max(p1.x, p2.x), Math.max(p1.y, p2.y)),
+  };
 }
 
 // ========================================================

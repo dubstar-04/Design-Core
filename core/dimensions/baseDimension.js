@@ -511,20 +511,20 @@ export class BaseDimension extends Entity {
 
   /**
    * Determine if the entity is within the selection
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if within
    */
-  within(selectionExtremes) {
-    return this.block.within(selectionExtremes);
+  within(selection) {
+    return this.block.within(selection);
   }
 
   /**
    * Determine if the entity is touch the selection window
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if touched
    */
-  touched(selectionExtremes) {
-    return this.block.touched(selectionExtremes);
+  touched(selection) {
+    return this.block.touched(selection);
   }
 
   /**

@@ -229,11 +229,11 @@ describe('BaseDimension', () => {
 
   test('within delegates to block', () => {
     baseDim.block = { within: () => true };
-    expect(baseDim.within([])).toBe(true);
+    expect(baseDim.within({})).toBe(true);
   });
 
   test('touched delegates to block', () => {
     baseDim.block = { touched: () => false };
-    expect(baseDim.touched([])).toBe(false);
+    expect(baseDim.touched({})).toBe(false);
   });
 });

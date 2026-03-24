@@ -309,12 +309,12 @@ export class Block extends Entity {
 
   /**
    * Determine if the entity is touch the selection window
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if touched
    */
-  touched(selectionExtremes) {
+  touched(selection) {
     for (let idx = 0; idx < this.items.length; idx++) {
-      const touched = this.items[idx].touched(selectionExtremes);
+      const touched = this.items[idx].touched(selection);
       if (touched) {
         return true;
       }
