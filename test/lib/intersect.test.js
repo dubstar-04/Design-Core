@@ -8,7 +8,7 @@ test('Test Intersection.intersectCircleEllipse()', () => {
 
 test('Test intersectSegmentSegment - circle line', () => {
   // Intersection - arc segment vs line segment
-  const result = Intersection.intersectSegmentSegment(
+  Intersection.intersectSegmentSegment(
       new Point(10, 10, 1), new Point(10, 10),
       new Point(), new Point(10, 10),
       false,
