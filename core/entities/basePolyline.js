@@ -206,16 +206,6 @@ export class BasePolyline extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      points: this.points,
-    };
-  }
-
-  /**
    * Get snap points
    * @param {Point} mousePoint
    * @param {number} delta

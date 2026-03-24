@@ -701,15 +701,6 @@ export class Hatch extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    // return all the polyline boundary shapes
-    return this.childEntities;
-  }
-
-  /**
    * Determine if the entity is touch the selection window
    * @param {Array} selectionExtremes
    * @return {boolean} true if touched

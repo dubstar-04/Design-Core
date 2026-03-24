@@ -236,17 +236,6 @@ export class Insert extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      start: this.points[0],
-      end: this.points[0],
-    };
-  }
-
-  /**
    * Get closest point on entity
    * @param {Point} P
    * @return {Array} - [Point, distance]

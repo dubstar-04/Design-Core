@@ -306,20 +306,6 @@ export class Arc extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      centre: this.points[0],
-      startPoint: this.points[1],
-      endPoint: this.points[2],
-      radius: this.radius,
-      direction: this.direction,
-    };
-  }
-
-  /**
    * Get snap points
    * @param {Point} mousePoint
    * @param {number} delta

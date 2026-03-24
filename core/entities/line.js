@@ -247,17 +247,6 @@ export class Line extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      start: this.points[0],
-      end: this.points[1],
-    };
-  }
-
-  /**
    * Get the length of a line
    * @return {number}
    */

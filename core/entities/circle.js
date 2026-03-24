@@ -202,17 +202,6 @@ export class Circle extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      centre: this.points[0],
-      radius: this.radius,
-    };
-  }
-
-  /**
    * Get snap points
    * @param {Point} mousePoint
    * @param {number} delta
