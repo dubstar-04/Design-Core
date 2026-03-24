@@ -7,15 +7,18 @@ test('Test Intersection.intersectCircleEllipse()', () => {
 });
 
 test('Test intersectSegmentSegment - circle line', () => {
-  // Intersection - arc segment vs line segment
-  Intersection.intersectSegmentSegment(
-      new Point(10, 10, 1), new Point(10, 10),
-      new Point(), new Point(10, 10),
+  // CCW semicircular arc from (10,0) to (-10,0) with bulge=1
+  // centre (0,0), radius 10, passes through (0,10)
+  // Vertical line from (0,-15) to (0,15) crosses the arc at (0,10)
+  const result = Intersection.intersectSegmentSegment(
+      new Point(10, 0, 1), new Point(-10, 0),
+      new Point(0, -15), new Point(0, 15),
       false,
   );
-  // Note: circle converted to polyline points as full arc so this tests the math
-  // Use intersectPolylinePolyline for full entity tests
-  expect(true).toBeTruthy();
+  expect(result.status).toBe('Intersection');
+  expect(result.points.length).toBe(1);
+  expect(result.points[0].x).toBeCloseTo(0);
+  expect(result.points[0].y).toBeCloseTo(10);
 });
 
 test('Test intersectSegmentSegment - line line', () => {
@@ -177,7 +180,7 @@ test('Test intersectPolylinePolyline with rectangle polyline', () => {
   expect(result2.points[1].x).toBeCloseTo(25);
   expect(result2.points[1].y).toBeCloseTo(20);
 
-  // No Intersection
+  // Overlapping collinear segments
   const points2 = [new Point(5, 5), new Point(20, 20)];
   const polyline2 = points2;
   const result3 = Intersection.intersectPolylinePolyline(polyline2, [new Point(), new Point(25, 25)], false);
