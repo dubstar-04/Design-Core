@@ -541,7 +541,8 @@ export class Intersection {
         arc.radius = arc.centre.distance(b1);
         arc.direction = b1.bulge;
 
-        const interArc = this.intersectArcLine(arc, line, extend);
+        // Don't pass extend: intersectArcLine would extend the boundary line
+        const interArc = this.intersectArcLine(arc, line, false);
         result.appendPoints(interArc.points);
       }
     }
