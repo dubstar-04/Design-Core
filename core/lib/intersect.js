@@ -478,12 +478,7 @@ export class Intersection {
 
       if (isWithinSegments || isExtended) {
         result = new Intersection('Intersection');
-        // Calculate intersection point
-        const intersectionPoint = new Point(
-            aStart.x + ua * (aEnd.x - aStart.x),
-            aStart.y + ua * (aEnd.y - aStart.y),
-        );
-        result.appendPoint(intersectionPoint);
+        result.appendPoint(aStart.lerp(aEnd, ua));
       } else {
         result = new Intersection('No Intersection');
       }
