@@ -463,16 +463,14 @@ export class Intersection {
     const line2Dir = bEnd.subtract(bStart);
     const startDiff = aStart.subtract(bStart);
 
-    // Cross products determine parallelism and lerp parameters
-    const denominator = line1Dir.cross(line2Dir);
-    const numeratorA = line2Dir.cross(startDiff);
-    const numeratorB = line1Dir.cross(startDiff);
+    // Zero cross product means the lines are parallel
+    const directionCross = line1Dir.cross(line2Dir);
 
-    if (denominator !== 0) {
+    if (directionCross !== 0) {
       // Lines are not parallel
       // lerp parameters: 0 = segment start, 1 = segment end
-      const line1Lerp = numeratorA / denominator;
-      const line2Lerp = numeratorB / denominator;
+      const line1Lerp = line2Dir.cross(startDiff) / directionCross;
+      const line2Lerp = line1Dir.cross(startDiff) / directionCross;
 
       // If both lerp values are between 0 and 1, the intersection is within the line segments
       // When extend is true, line1 (boundary) must contain the intersection (line1Lerp in [0,1])
@@ -488,7 +486,7 @@ export class Intersection {
       }
     } else {
       // Lines are parallel or coincident
-      if (numeratorA === 0 || numeratorB === 0) {
+      if (line2Dir.cross(startDiff) === 0 || line1Dir.cross(startDiff) === 0) {
         // Lines are coincident (overlap)
         result = new Intersection('Coincident');
         // No specific intersection point added here
