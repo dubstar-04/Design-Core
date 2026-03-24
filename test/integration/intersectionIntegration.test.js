@@ -16,8 +16,9 @@ import { AngularDimension } from '../../core/dimensions/angularDimension.js';
 import { Intersection } from '../../core/lib/intersect.js';
 import { Core } from '../../core/core/core.js';
 
-// initialise core
-new Core();
+beforeAll(() => {
+  new Core();
+});
 
 /**
  * Dummy Selection Extremes from two points
