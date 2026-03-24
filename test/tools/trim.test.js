@@ -241,3 +241,179 @@ test('Test Trim.action', () => {
   expect(core.scene.entities.get(1).points[1].x).toBe(crossingLineEnd.x);
   expect(core.scene.entities.get(1).points[1].y).toBe(crossingLineEnd.y);
 });
+
+test('Test Trim.action polyline - trim end segment', () => {
+  // Polyline from (0,0) to (50,0) to (100,0)
+  // Vertical line at x=75 as boundary
+  // Mouse near (90,0) - to the right of the boundary
+  // Expected: Polyline trimmed to (0,0) (50,0) (75,0)
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(75, -50), new Point(75, 50)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(90, 0));
+  trim.action();
+
+  // Original polyline removed, new one added, boundary line remains
+  expect(core.scene.entities.count()).toBe(2);
+
+  // Find entities by type
+  let boundary;
+  let trimmed;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    const entity = core.scene.entities.get(i);
+    if (entity.type === 'Line') boundary = entity;
+    if (entity.type === 'Lwpolyline') trimmed = entity;
+  }
+
+  // Boundary line unchanged
+  expect(boundary.points[0].x).toBe(75);
+  expect(boundary.points[0].y).toBe(-50);
+
+  // Trimmed polyline
+  expect(trimmed.points.length).toBe(3);
+  expect(trimmed.points[0].x).toBe(0);
+  expect(trimmed.points[0].y).toBe(0);
+  expect(trimmed.points[1].x).toBe(50);
+  expect(trimmed.points[1].y).toBe(0);
+  expect(trimmed.points[2].x).toBe(75);
+  expect(trimmed.points[2].y).toBe(0);
+});
+
+test('Test Trim.action polyline - trim start segment', () => {
+  // Polyline from (0,0) to (50,0) to (100,0)
+  // Vertical line at x=25 as boundary
+  // Mouse near (10,0) - to the left of the boundary
+  // Expected: Polyline trimmed to (25,0) (50,0) (100,0)
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(25, -50), new Point(25, 50)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(10, 0));
+  trim.action();
+
+  // Original polyline removed, new one added, boundary line remains
+  expect(core.scene.entities.count()).toBe(2);
+
+  // Find trimmed polyline by type
+  let trimmed;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Lwpolyline') {
+      trimmed = core.scene.entities.get(i);
+    }
+  }
+
+  expect(trimmed).toBeDefined();
+  expect(trimmed.points.length).toBe(3);
+  expect(trimmed.points[0].x).toBe(25);
+  expect(trimmed.points[0].y).toBe(0);
+  expect(trimmed.points[1].x).toBe(50);
+  expect(trimmed.points[1].y).toBe(0);
+  expect(trimmed.points[2].x).toBe(100);
+  expect(trimmed.points[2].y).toBe(0);
+});
+
+test('Test Trim.action polyline - trim middle segment', () => {
+  // Polyline from (0,0) to (50,0) to (100,0) to (150,0)
+  // Vertical line at x=25 and x=75 as boundary
+  // Mouse near (50,0) - between the two boundaries
+  // Expected: Two polylines: (0,0)-(25,0) and (75,0)-(100,0)-(150,0)
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0), new Point(150, 0)] });
+  core.scene.addItem('Line', { points: [new Point(25, -50), new Point(25, 50)] });
+  core.scene.addItem('Line', { points: [new Point(75, -50), new Point(75, 50)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1), core.scene.entities.get(2)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(50, 0));
+  trim.action();
+
+  // Two boundary lines remain, original polyline removed, two new polylines added
+  // Count entities - should have 4 (2 lines + 2 polylines)
+  expect(core.scene.entities.count()).toBe(4);
+
+  // Find the two polylines
+  const polylines = [];
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    const entity = core.scene.entities.get(i);
+    if (entity.type === 'Lwpolyline') {
+      polylines.push(entity);
+    }
+  }
+
+  expect(polylines.length).toBe(2);
+
+  // Sort polylines by first point x
+  polylines.sort((a, b) => a.points[0].x - b.points[0].x);
+
+  // First polyline: (0,0) to (25,0)
+  expect(polylines[0].points.length).toBe(2);
+  expect(polylines[0].points[0].x).toBe(0);
+  expect(polylines[0].points[1].x).toBe(25);
+
+  // Second polyline: (75,0) to (100,0) to (150,0)
+  expect(polylines[1].points.length).toBe(3);
+  expect(polylines[1].points[0].x).toBe(75);
+  expect(polylines[1].points[1].x).toBe(100);
+  expect(polylines[1].points[2].x).toBe(150);
+});
+
+test('Test Trim.action polyline - trim bulged arc segment', () => {
+  // Polyline: (0,0) with bulge=1 -> arc -> (100,0) -> straight -> (200,0)
+  // With bulge=1 (CCW) the semicircular arc goes through (50,-50)
+  // Arc center: (50,0), radius: 50
+  // Boundary: vertical line at x=50
+  // Intersection at (50,-50) — bottom of semicircle
+  // Mouse at (75,-40) — right of intersection on the arc
+  // Expected: polyline trimmed to [(0,0) with partial bulge, (50,-50)]
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0, 1), new Point(100, 0), new Point(200, 0)] });
+  core.scene.addItem('Line', { points: [new Point(50, -100), new Point(50, 100)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(75, -40));
+  trim.action();
+
+  // Original polyline removed, one new trimmed piece added, boundary remains
+  expect(core.scene.entities.count()).toBe(2);
+
+  // Find the trimmed polyline
+  let trimmed;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Lwpolyline') {
+      trimmed = core.scene.entities.get(i);
+    }
+  }
+
+  expect(trimmed).toBeDefined();
+  expect(trimmed.points.length).toBe(2);
+
+  // First point: (0,0) with partial bulge for 90° arc
+  // Original 180° arc split at midpoint -> 90° arc
+  // bulge = tan(includedAngle/4) = tan(π/8) = √2 - 1
+  expect(trimmed.points[0].x).toBeCloseTo(0, 5);
+  expect(trimmed.points[0].y).toBeCloseTo(0, 5);
+  expect(trimmed.points[0].bulge).toBeCloseTo(Math.tan(Math.PI / 8), 5);
+
+  // Second point: intersection at (50,-50), no bulge
+  expect(trimmed.points[1].x).toBeCloseTo(50, 5);
+  expect(trimmed.points[1].y).toBeCloseTo(-50, 5);
+  expect(trimmed.points[1].bulge).toBe(0);
+});

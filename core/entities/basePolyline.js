@@ -10,6 +10,7 @@ import { Line } from './line.js';
 import { Arc } from './arc.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
+import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -332,6 +333,303 @@ export class BasePolyline extends Entity {
     }
 
     return [minPnt, distance];
+  }
+
+  /**
+   * Check if a point falls on a specific segment of the polyline
+   * @param {Point} point - the point to test
+   * @param {Point} A - segment start point
+   * @param {Point} B - segment end point
+   * @return {boolean}
+   */
+  isPointOnSegment(point, A, B) {
+    if (A.bulge !== 0) {
+      const center = A.bulgeCentrePoint(B);
+      const direction = A.bulge > 0 ? 1 : -1;
+      return point.isOnArc(A, B, center, direction);
+    }
+    return point.isOnLine(A, B);
+  }
+
+  /**
+   * Get the closest point on a segment to a given point
+   * @param {Point} point - the reference point
+   * @param {number} segmentIndex - 1-based segment index
+   * @return {Point|null}
+   */
+  closestPointOnSegment(point, segmentIndex) {
+    const A = this.points[segmentIndex - 1];
+    const B = this.points[segmentIndex];
+
+    if (A.bulge !== 0) {
+      const center = A.bulgeCentrePoint(B);
+      const direction = A.bulge > 0 ? 1 : -1;
+      const closest = point.closestPointOnArc(A, B, center, direction);
+
+      if (closest) {
+        return closest;
+      }
+
+      // Point not on arc - return the nearer endpoint
+      return point.distance(A) < point.distance(B) ? A : B;
+    }
+
+    return point.closestPointOnLine(A, B);
+  }
+
+  /**
+   * Get the normalised position of a point along a segment for ordering
+   * @param {Point} point - a point on the segment
+   * @param {number} segmentIndex - 1-based segment index
+   * @return {number}
+   */
+  positionOnSegment(point, segmentIndex) {
+    const A = this.points[segmentIndex - 1];
+    const B = this.points[segmentIndex];
+
+    if (A.bulge !== 0) {
+      const center = A.bulgeCentrePoint(B);
+      const direction = A.bulge > 0 ? 1 : -1;
+      const startAngle = center.angle(A);
+      const pointAngle = center.angle(point);
+      return ((pointAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
+    }
+
+    return A.distance(point);
+  }
+
+  /**
+   * Extend the entity
+   * Only extends when the end segment closest to the mouse is a line segment (bulge === 0)
+   * @param {Array} intersections - array of intersection points
+   * @return {Array} - array of state changes
+   */
+  extend(intersections) {
+    const stateChanges = [];
+
+    if (!intersections?.length) {
+      return stateChanges;
+    }
+
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+    const lastIndex = this.points.length - 1;
+
+    // Determine which end segment is closer to the mouse
+    const closestOnFirst = this.closestPointOnSegment(mousePosition, 1);
+    const closestOnLast = this.closestPointOnSegment(mousePosition, lastIndex);
+    const distToFirst = mousePosition.distance(closestOnFirst);
+    const distToLast = mousePosition.distance(closestOnLast);
+
+    // Identify the selected end: the endpoint index and the bulge of its segment
+    let endPointIndex;
+    let endSegmentBulge;
+
+    if (distToFirst < distToLast) {
+      endPointIndex = 0;
+      endSegmentBulge = this.points[0].bulge;
+    } else if (distToLast < distToFirst) {
+      endPointIndex = lastIndex;
+      endSegmentBulge = this.points[lastIndex - 1].bulge;
+    } else {
+      // Tie (includes 2-point polyline where both segments are the same)
+      // Break tie by distance to the actual endpoints
+      if (mousePosition.distance(this.points[0]) <= mousePosition.distance(this.points[lastIndex])) {
+        endPointIndex = 0;
+        endSegmentBulge = this.points[0].bulge;
+      } else {
+        endPointIndex = lastIndex;
+        endSegmentBulge = this.points[lastIndex - 1].bulge;
+      }
+    }
+
+    // Only allow extending line segments (not arcs)
+    if (endSegmentBulge !== 0) {
+      DesignCore.Core.notify(`${this.type} ${Strings.Message.NOEXTEND}`);
+      return stateChanges;
+    }
+
+    const endPoint = this.points[endPointIndex];
+    const adjacentPoint = endPointIndex === 0 ? this.points[1] : this.points[lastIndex - 1];
+
+    // Sort intersections by distance from the end point
+    Utils.sortPointsByDistance(intersections, endPoint);
+
+    // Find the closest intersection that lies beyond the endpoint
+    const direction = endPoint.subtract(adjacentPoint);
+    const newEndPoint = intersections.find((p) => {
+      if (p.isSame(endPoint)) return false;
+      if (p.subtract(endPoint).dot(direction) <= 0) return false;
+      if (adjacentPoint.distance(p) <= adjacentPoint.distance(endPoint)) return false;
+      return true;
+    });
+
+    if (!newEndPoint) {
+      return stateChanges;
+    }
+
+    // Build the new points array
+    const newPoints = this.points.map((p) => p.clone());
+    newPoints[endPointIndex] = newEndPoint;
+
+    if (newPoints[endPointIndex].isSame(this.points[endPointIndex])) {
+      return stateChanges;
+    }
+
+    stateChanges.push(new UpdateState(this, { points: newPoints }));
+    return stateChanges;
+  }
+
+  /**
+   * Trim the entity
+   * @param {Array} intersections - array of intersection points
+   * @return {Array} - array of state changes
+   */
+  trim(intersections) {
+    const stateChanges = [];
+
+    if (!intersections?.length) {
+      return stateChanges;
+    }
+
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+
+    // Find the segment index closest to the mouse
+    let mouseSegmentIndex = 0;
+    let minDistance = Infinity;
+
+    for (let i = 1; i < this.points.length; i++) {
+      const closestPoint = this.closestPointOnSegment(mousePosition, i);
+      if (closestPoint) {
+        const dist = mousePosition.distance(closestPoint);
+        if (dist < minDistance) {
+          minDistance = dist;
+          mouseSegmentIndex = i;
+        }
+      }
+    }
+
+    // Filter out intersections that coincide with existing polyline vertices
+    const filteredIntersections = intersections.filter((point) => !this.points.some((vertex) => vertex.isSame(point)));
+
+    if (!filteredIntersections.length) {
+      return stateChanges;
+    }
+
+    // Locate each intersection on its segment with an ordering value
+    const locatedIntersections = [];
+
+    for (const point of filteredIntersections) {
+      for (let i = 1; i < this.points.length; i++) {
+        if (this.isPointOnSegment(point, this.points[i - 1], this.points[i])) {
+          locatedIntersections.push({
+            segmentIndex: i,
+            point: point,
+            positionAlongSegment: this.positionOnSegment(point, i),
+          });
+          break;
+        }
+      }
+    }
+
+    if (!locatedIntersections.length) {
+      return stateChanges;
+    }
+
+    // Sort by segment index, then by position along segment
+    locatedIntersections.sort((a, b) => {
+      if (a.segmentIndex !== b.segmentIndex) return a.segmentIndex - b.segmentIndex;
+      return a.positionAlongSegment - b.positionAlongSegment;
+    });
+
+    // Precompute the mouse position along its segment
+    const mouseClosest = this.closestPointOnSegment(mousePosition, mouseSegmentIndex);
+    const mousePos = mouseClosest ? this.positionOnSegment(mouseClosest, mouseSegmentIndex) : 0;
+
+    // Find the nearest intersections that bracket the mouse segment
+    // - trimBefore: the last intersection at or before the mouse
+    // - trimAfter: the first intersection at or after the mouse
+    let trimBefore = null;
+    let trimAfter = null;
+
+    for (const loc of locatedIntersections) {
+      if (loc.segmentIndex < mouseSegmentIndex) {
+        trimBefore = loc;
+      } else if (loc.segmentIndex === mouseSegmentIndex) {
+        if (loc.positionAlongSegment <= mousePos) {
+          trimBefore = loc;
+        } else if (!trimAfter) {
+          trimAfter = loc;
+        }
+      } else if (!trimAfter) {
+        trimAfter = loc;
+      }
+    }
+
+    // Build new polyline(s) from the remaining portions
+    // Portion 1: start of polyline to trimBefore point
+    if (trimBefore) {
+      const points = [];
+
+      for (let i = 0; i < trimBefore.segmentIndex - 1; i++) {
+        points.push(this.points[i].clone());
+      }
+
+      // Add the segment start point (with adjusted bulge for arcs)
+      const segStart = this.points[trimBefore.segmentIndex - 1];
+      const segStartClone = segStart.clone();
+      if (segStart.bulge !== 0) {
+        segStartClone.bulge = segStart.partialBulge(this.points[trimBefore.segmentIndex], trimBefore.point);
+      }
+      points.push(segStartClone);
+
+      // Add the trim point (skip if it coincides with the last added point)
+      const trimPoint = trimBefore.point.clone();
+      if (!points.at(-1).isSame(trimPoint)) {
+        points.push(trimPoint);
+      }
+
+      if (points.length >= 2) {
+        const polyline = Utils.cloneObject(this);
+        polyline.points = points;
+        polyline.flags.removeValue(1); // clear closed bit
+        stateChanges.push(new AddState(polyline));
+      }
+    }
+
+    // Portion 2: trimAfter point to end of polyline
+    if (trimAfter) {
+      const points = [];
+      const trimPoint = trimAfter.point.clone();
+
+      // If the segment is an arc, set remaining arc bulge
+      const segStart = this.points[trimAfter.segmentIndex - 1];
+      if (segStart.bulge !== 0) {
+        trimPoint.bulge = segStart.partialBulge(this.points[trimAfter.segmentIndex], trimPoint, true);
+      }
+
+      points.push(trimPoint);
+
+      // Add remaining points (skip if coincides with the trim point)
+      for (let i = trimAfter.segmentIndex; i < this.points.length; i++) {
+        const nextPoint = this.points[i].clone();
+        if (!points.at(-1).isSame(nextPoint)) {
+          points.push(nextPoint);
+        }
+      }
+
+      if (points.length >= 2) {
+        const polyline = Utils.cloneObject(this);
+        polyline.points = points;
+        polyline.flags.removeValue(1); // clear closed bit
+        stateChanges.push(new AddState(polyline));
+      }
+    }
+
+    if (trimBefore || trimAfter) {
+      stateChanges.push(new RemoveState(this));
+    }
+
+    return stateChanges;
   }
 
   /**

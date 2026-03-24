@@ -210,11 +210,20 @@ export class Line extends Entity {
     }
 
     Utils.sortPointsByDistance(intersections, this.points[originPoint]);
-    // closest point is the extension point
-    const newEndPoint = intersections.at(0);
 
-    if (newEndPoint.distance(this.points[originPoint]) > newEndPoint.distance(this.points[1 - originPoint])) {
-      // end of the line selected is further away than the opposite end - no extension
+    const endPoint = this.points[originPoint];
+    const adjacentPoint = this.points[1 - originPoint];
+
+    // Find the closest intersection that lies beyond the endpoint
+    const direction = endPoint.subtract(adjacentPoint);
+    const newEndPoint = intersections.find((p) => {
+      if (p.isSame(endPoint)) return false;
+      if (p.subtract(endPoint).dot(direction) <= 0) return false;
+      if (adjacentPoint.distance(p) <= adjacentPoint.distance(endPoint)) return false;
+      return true;
+    });
+
+    if (!newEndPoint) {
       return stateChanges;
     }
 

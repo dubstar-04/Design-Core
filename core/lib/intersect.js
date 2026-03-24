@@ -336,7 +336,7 @@ export class Intersection {
     const result = new Intersection('No Intersection');
 
     if (extend) {
-      result.appendPoint(inter1.points[i]);
+      result.appendPoints(inter1.points);
     } else {
       for (let i = 0; i < inter1.points.length; i++) {
         if (inter1.points[i].isOnArc(arc.startPoint, arc.endPoint, arc.centre, arc.direction)) {
@@ -458,37 +458,35 @@ export class Intersection {
       return result;
     }
 
-    // Calculate the denominator of the intersection formula
-    const denominator = (bEnd.y - bStart.y) * (aEnd.x - aStart.x) - (bEnd.x - bStart.x) * (aEnd.y - aStart.y);
+    // Direction vectors and offset between start points
+    const line1Dir = aEnd.subtract(aStart);
+    const line2Dir = bEnd.subtract(bStart);
+    const startDiff = aStart.subtract(bStart);
 
-    // Calculate numerators for ua and ub
-    const numeratorA = (bEnd.x - bStart.x) * (aStart.y - bStart.y) - (bEnd.y - bStart.y) * (aStart.x - bStart.x);
-    const numeratorB = (aEnd.x - aStart.x) * (aStart.y - bStart.y) - (aEnd.y - aStart.y) * (aStart.x - bStart.x);
+    // Zero cross product means the lines are parallel
+    const directionCross = line1Dir.cross(line2Dir);
 
-    if (denominator !== 0) {
+    if (directionCross !== 0) {
       // Lines are not parallel
-      const ua = numeratorA / denominator;
-      const ub = numeratorB / denominator;
+      // lerp parameters: 0 = segment start, 1 = segment end
+      const line1Lerp = line2Dir.cross(startDiff) / directionCross;
+      const line2Lerp = line1Dir.cross(startDiff) / directionCross;
 
-      // If ua and ub are between 0 and 1, the intersection is within the line segments
-      // If 'extend' is true, allow intersection outside the segments
-      const isWithinSegments = (0 <= ua && ua <= 1) && (0 <= ub && ub <= 1);
-      const isExtended = (0 <= ua && ua <= 1) && extend;
+      // If both lerp values are between 0 and 1, the intersection is within the line segments
+      // When extend is true, line1 (boundary) must contain the intersection (line1Lerp in [0,1])
+      // but line2 (selected) can extend beyond its endpoints (line2Lerp unconstrained)
+      const isWithinSegments = (0 <= line1Lerp && line1Lerp <= 1) && (0 <= line2Lerp && line2Lerp <= 1);
+      const isExtended = (0 <= line1Lerp && line1Lerp <= 1) && extend;
 
       if (isWithinSegments || isExtended) {
         result = new Intersection('Intersection');
-        // Calculate intersection point
-        const intersectionPoint = new Point(
-            aStart.x + ua * (aEnd.x - aStart.x),
-            aStart.y + ua * (aEnd.y - aStart.y),
-        );
-        result.appendPoint(intersectionPoint);
+        result.appendPoint(aStart.lerp(aEnd, line1Lerp));
       } else {
         result = new Intersection('No Intersection');
       }
     } else {
       // Lines are parallel or coincident
-      if (numeratorA === 0 || numeratorB === 0) {
+      if (line2Dir.cross(startDiff) === 0 || line1Dir.cross(startDiff) === 0) {
         // Lines are coincident (overlap)
         result = new Intersection('Coincident');
         // No specific intersection point added here
@@ -503,13 +501,62 @@ export class Intersection {
 
   /**
    * Find intersections between lwpolyline and line
-   * @param {Polyline} polyline
+   * @param {Lwpolyline} lwpolyline
    * @param {Line} line
    * @param {boolean} extend
    * @return {Intersect}
    */
-  static intersectLwpolylineLine(polyline, line, extend) {
-    return this.intersectPolylineLine(polyline, line, extend);
+  static intersectLwpolylineLine(lwpolyline, line, extend) {
+    return this.intersectPolylineLine(lwpolyline, line, extend);
+  }
+
+  /**
+   * Find intersections between line and polyline
+   * @param {Line} line
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectLinePolyline(line, polyline, extend) {
+    const result = new Intersection('No Intersection');
+    const length = polyline.points.length;
+
+    for (let i = 0; i < length - 1; i++) {
+      const b1 = polyline.points[i];
+      const b2 = polyline.points[i + 1];
+
+      if (b1.bulge === 0) {
+        const line2 = { start: b1, end: b2 };
+        // line (boundary) stays as arg1, polyline segment (selected) as arg2
+        const inter = this.intersectLineLine(line, line2, extend);
+        result.appendPoints(inter.points);
+      } else {
+        const arc = {};
+        arc.centre = b1.bulgeCentrePoint(b2);
+        arc.startPoint = b1;
+        arc.endPoint = b2;
+        arc.radius = arc.centre.distance(b1);
+        arc.direction = b1.bulge;
+
+        // Don't pass extend: intersectArcLine would extend the boundary line
+        const interArc = this.intersectArcLine(arc, line, false);
+        result.appendPoints(interArc.points);
+      }
+    }
+
+    if (result.points.length > 0) result.status = 'Intersection';
+    return result;
+  }
+
+  /**
+   * Find intersections between line and lwpolyline
+   * @param {Line} line
+   * @param {Lwpolyline} lwpolyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectLineLwpolyline(line, lwpolyline, extend) {
+    return this.intersectLinePolyline(line, lwpolyline, extend);
   }
 
   /**
@@ -525,11 +572,12 @@ export class Intersection {
 
     for (let i = 0; i < length - 1; i++) {
       const b1 = polyline.points[i];
-      const b2 = polyline.points[(i + 1) % length];
+      const b2 = polyline.points[i + 1];
 
 
       if (b1.bulge === 0) {
         const line2 = { start: b1, end: b2 };
+        // polyline segment (boundary) as arg1, line (selected) as arg2
         const inter = this.intersectLineLine(line2, line, extend);
         result.appendPoints(inter.points);
       } else {
@@ -562,6 +610,100 @@ export class Intersection {
   }
 
   /**
+   * Find intersections between circle and lwpolyline
+   * @param {Circle} circle
+   * @param {Lwpolyline} lwpolyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectCircleLwpolyline(circle, lwpolyline, extend) {
+    return this.intersectPolylineCircle(lwpolyline, circle, extend);
+  }
+
+  /**
+   * Find intersections between arc and lwpolyline
+   * @param {Arc} arc
+   * @param {Lwpolyline} lwpolyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectArcLwpolyline(arc, lwpolyline, extend) {
+    return this.intersectPolylineArc(lwpolyline, arc, extend);
+  }
+
+  /**
+   * Find intersections between polyline and polyline
+   * @param {Polyline} polyline1
+   * @param {Polyline} polyline2
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectPolylinePolyline(polyline1, polyline2, extend) {
+    const result = new Intersection('No Intersection');
+    // Decompose polyline2 (selected) so polyline1 (boundary) stays as arg1
+    const length = polyline2.points.length;
+
+    for (let i = 0; i < length - 1; i++) {
+      const b1 = polyline2.points[i];
+      const b2 = polyline2.points[i + 1];
+
+      if (b1.bulge === 0) {
+        const line = { start: b1, end: b2 };
+        // polyline1 (boundary) as arg1, polyline2 segment (selected) as arg2
+        const inter = this.intersectPolylineLine(polyline1, line, extend);
+        result.appendPoints(inter.points);
+      } else {
+        const arc = {};
+        arc.centre = b1.bulgeCentrePoint(b2);
+        arc.startPoint = b1;
+        arc.endPoint = b2;
+        arc.radius = arc.centre.distance(b1);
+        arc.direction = b1.bulge;
+
+        // polyline1 (boundary) as arg1, polyline2 arc segment (selected) as arg2
+        const inter = this.intersectPolylineArc(polyline1, arc, extend);
+        result.appendPoints(inter.points);
+      }
+    }
+
+    if (result.points.length > 0) result.status = 'Intersection';
+    return result;
+  }
+
+  /**
+   * Find intersections between lwpolyline and lwpolyline
+   * @param {Lwpolyline} lwpolyline1
+   * @param {Lwpolyline} lwpolyline2
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectLwpolylineLwpolyline(lwpolyline1, lwpolyline2, extend) {
+    return this.intersectPolylinePolyline(lwpolyline1, lwpolyline2, extend);
+  }
+
+  /**
+   * Find intersections between polyline and lwpolyline
+   * @param {Polyline} polyline
+   * @param {Lwpolyline} lwpolyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectPolylineLwpolyline(polyline, lwpolyline, extend) {
+    return this.intersectPolylinePolyline(polyline, lwpolyline, extend);
+  }
+
+  /**
+   * Find intersections between lwpolyline and polyline
+   * @param {Lwpolyline} lwpolyline
+   * @param {Polyline} polyline
+   * @param {boolean} extend
+   * @return {Intersect}
+   */
+  static intersectLwpolylinePolyline(lwpolyline, polyline, extend) {
+    return this.intersectPolylinePolyline(lwpolyline, polyline, extend);
+  }
+
+  /**
    * Find intersections between polyline and circle segments
    * @param {Polyline} polyline
    * @param {Circle} circle
@@ -574,7 +716,7 @@ export class Intersection {
 
     for (let i = 0; i < length - 1; i++) {
       const b1 = polyline.points[i];
-      const b2 = polyline.points[(i + 1) % length];
+      const b2 = polyline.points[i + 1];
 
 
       if (b1.bulge === 0) {

@@ -77,11 +77,30 @@ export class Point {
 
   /**
    * Return dot product of this and that
+   * Measures how much two vectors point in the same direction.
+   * Equal to |this| * |that| * cos(angle between them).
+   * Positive: vectors point in the same direction (angle < 90°)
+   * Zero: vectors are perpendicular (angle = 90°)
+   * Negative: vectors point in opposite directions (angle > 90°)
    * @param  {Point} that
    * @return {number}
    */
   dot(that) {
     return this.x * that.x + this.y * that.y;
+  };
+
+  /**
+   * Return 2D cross product of this and that
+   * Measures the signed area of the parallelogram formed by the two vectors.
+   * Equal to |this| * |that| * sin(angle from this to that).
+   * Positive: that is counter-clockwise from this
+   * Zero: vectors are parallel (or one is zero length)
+   * Negative: that is clockwise from this
+   * @param  {Point} that
+   * @return {number}
+   */
+  cross(that) {
+    return this.x * that.y - this.y * that.x;
   };
 
   /**
@@ -401,5 +420,35 @@ export class Point {
     const centre = midp.project(direction, a);
 
     return centre;
+  }
+
+  /**
+   * Calculate the bulge for a partial arc segment
+   * @param {Point} nextPoint - segment end point
+   * @param {Point} splitPoint - point where the arc is split
+   * @param {boolean} afterSplit - if true, return bulge for the portion after the split point
+   * @return {number} - the partial bulge value
+   */
+  partialBulge(nextPoint, splitPoint, afterSplit = false) {
+    const center = this.bulgeCentrePoint(nextPoint);
+    const direction = this.bulge > 0 ? 1 : -1;
+
+    const startAngle = center.angle(this);
+    const endAngle = center.angle(nextPoint);
+    const splitAngle = center.angle(splitPoint);
+
+    let includedAngle;
+    if (afterSplit) {
+      // Angle from split point to end
+      includedAngle = (endAngle - splitAngle) * direction;
+    } else {
+      // Angle from start to split point
+      includedAngle = (splitAngle - startAngle) * direction;
+    }
+
+    // Normalise to 0..2PI
+    includedAngle = ((includedAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+    return Math.tan(includedAngle / 4) * direction;
   }
 }

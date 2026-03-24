@@ -608,3 +608,89 @@ test('Test Intersection.intersectArcAlignedTextRectangle', () => {
   expect(result.points[1].x).toBeCloseTo(0);
   expect(result.points[1].y).toBeCloseTo(25);
 });
+
+test('Test Intersection.intersectPolylinePolyline()', () => {
+  // Two crossing polylines with line segments
+  const polyline1 = { points: [new Point(-10, 0), new Point(10, 0)] };
+  const polyline2 = { points: [new Point(0, -10), new Point(0, 10)] };
+
+  const result = Intersection.intersectPolylinePolyline(polyline1, polyline2, false);
+  expect(result.status).toBe('Intersection');
+  expect(result.points.length).toBe(1);
+  expect(result.points[0].x).toBeCloseTo(0);
+  expect(result.points[0].y).toBeCloseTo(0);
+
+  // No intersection
+  const polyline3 = { points: [new Point(20, 0), new Point(30, 0)] };
+  const result2 = Intersection.intersectPolylinePolyline(polyline1, polyline3, false);
+  expect(result2.status).toBe('No Intersection');
+  expect(result2.points.length).toBe(0);
+
+  // Polyline with arc segment intersecting a line-segment polyline
+  // CCW arc from (-5,0) to (5,0) with bulge=1 goes through (0,-5)
+  const polyline4 = { points: [new Point(-5, 0, 1), new Point(5, 0)] };
+  const polyline5 = { points: [new Point(0, -10), new Point(0, -3)] };
+
+  const result3 = Intersection.intersectPolylinePolyline(polyline4, polyline5, false);
+  expect(result3.status).toBe('Intersection');
+  expect(result3.points.length).toBe(1);
+  expect(result3.points[0].x).toBeCloseTo(0);
+  expect(result3.points[0].y).toBeCloseTo(-5);
+});
+
+test('Test Intersection.intersectLwpolylineLwpolyline()', () => {
+  const polyline1 = { points: [new Point(-10, 0), new Point(10, 0)] };
+  const polyline2 = { points: [new Point(0, -10), new Point(0, 10)] };
+
+  const result = Intersection.intersectLwpolylineLwpolyline(polyline1, polyline2, false);
+  expect(result.status).toBe('Intersection');
+  expect(result.points.length).toBe(1);
+  expect(result.points[0].x).toBeCloseTo(0);
+  expect(result.points[0].y).toBeCloseTo(0);
+});
+
+test('Test Intersection.intersectPolylineLwpolyline()', () => {
+  const polyline = { points: [new Point(-10, 0), new Point(10, 0)] };
+  const lwpolyline = { points: [new Point(0, -10), new Point(0, 10)] };
+
+  const result = Intersection.intersectPolylineLwpolyline(polyline, lwpolyline, false);
+  expect(result.status).toBe('Intersection');
+  expect(result.points.length).toBe(1);
+  expect(result.points[0].x).toBeCloseTo(0);
+  expect(result.points[0].y).toBeCloseTo(0);
+});
+
+test('Test Intersection.intersectLwpolylinePolyline()', () => {
+  const lwpolyline = { points: [new Point(-10, 0), new Point(10, 0)] };
+  const polyline = { points: [new Point(0, -10), new Point(0, 10)] };
+
+  const result = Intersection.intersectLwpolylinePolyline(lwpolyline, polyline, false);
+  expect(result.status).toBe('Intersection');
+  expect(result.points.length).toBe(1);
+  expect(result.points[0].x).toBeCloseTo(0);
+  expect(result.points[0].y).toBeCloseTo(0);
+});
+
+test('Test Intersection.intersectPolylineArc() with extend', () => {
+  // Arc: quarter circle from (10,0) to (0,10) centred at origin, radius 10, CCW
+  const arc = {
+    centre: new Point(0, 0),
+    startPoint: new Point(10, 0),
+    endPoint: new Point(0, 10),
+    radius: 10,
+    direction: 1,
+  };
+
+  // Polyline crossing the arc
+  const polyline = { points: [new Point(0, 0), new Point(15, 15)] };
+
+  // Without extend - intersection should be on the arc
+  const result1 = Intersection.intersectPolylineArc(polyline, arc, false);
+  expect(result1.status).toBe('Intersection');
+  expect(result1.points.length).toBe(1);
+
+  // With extend - all circle intersections returned (not filtered by arc bounds)
+  const result2 = Intersection.intersectPolylineArc(polyline, arc, true);
+  expect(result2.status).toBe('Intersection');
+  expect(result2.points.length).toBeGreaterThanOrEqual(1);
+});
