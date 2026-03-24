@@ -609,6 +609,13 @@ export class Text extends Entity {
   }
 
   /**
+   * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
+  decompose() {
+    const corners = this.getTextFrameCorners();
+    // Close the rectangle
+    corners.push(corners[0].clone());
+    return corners;
   }
 }

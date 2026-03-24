@@ -71,7 +71,14 @@ export class Solid extends Entity {
   }
 
   /**
+   * Decompose the entity into polyline points
+   * @return {Array} array of points representing the solid as a polyline
    */
+  decompose() {
+    const points = this.points.map((point) => point.clone());
+    // Close the shape
+    points.push(this.points[0].clone());
+    return points;
   }
 
   /**

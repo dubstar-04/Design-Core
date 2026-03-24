@@ -632,6 +632,11 @@ export class ArcAlignedText extends Entity {
   }
 
   /**
+   * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
+  decompose() {
+    const characters = this.getArcAlignedCharacters();
+    return characters.map((char) => char.position);
   }
 }
