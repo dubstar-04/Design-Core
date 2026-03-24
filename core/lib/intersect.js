@@ -104,17 +104,6 @@ export class Intersection {
   };
 
   /**
-   * Find intersections between circle and line
-   * @param {Line} line
-   * @param {Circle} circle
-   * @param {boolean} extend - extend the line as a ray
-   * @return {Intersect}
-   */
-  static intersectLineCircle(line, circle, extend) {
-    return this.intersectCircleLine(circle, line, extend);
-  }
-
-  /**
    * Find intersections between two circles
    * @param {Circle} circle1
    * @param {Circle} circle2
@@ -161,51 +150,6 @@ export class Intersection {
   };
 
   /**
-   * Find intersections between arc segment and rectangle
-   * @param {Arc} arc
-   * @param {Rectangle} rectangle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectArcRectangle(arc, rectangle, extend) {
-    const r1 = rectangle.start;
-    const r2 = rectangle.end;
-
-    const min = r1.min(r2);
-    const max = r1.max(r2);
-    const topRight = new Point(max.x, min.y);
-    const bottomLeft = new Point(min.x, max.y);
-
-
-    let rectPoints = { start: min, end: topRight };
-    const inter1 = this.intersectArcLine(arc, rectPoints, extend);
-
-    rectPoints = { start: topRight, end: max };
-    const inter2 = this.intersectArcLine(arc, rectPoints, extend);
-
-    rectPoints = { start: max, end: bottomLeft };
-    const inter3 = this.intersectArcLine(arc, rectPoints, extend);
-
-    rectPoints = { start: bottomLeft, end: min };
-    const inter4 = this.intersectArcLine(arc, rectPoints, extend);
-
-    const result = new Intersection('No Intersection');
-
-    result.appendPoints(inter1.points);
-    result.appendPoints(inter2.points);
-    result.appendPoints(inter3.points);
-    result.appendPoints(inter4.points);
-
-    if (result.points.length > 0) {
-      result.status = 'Intersection';
-    } else {
-      result.status = inter1.status;
-    }
-
-    return result;
-  }
-
-  /**
    * Find intersections between arc segment and line
    * @param {Arc} arc
    * @param {Line} line
@@ -229,17 +173,6 @@ export class Intersection {
     }
 
     return result;
-  }
-
-  /**
-   * Find intersections between line and arc segment
-   * @param {Line} line
-   * @param {Arc} arc
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectLineArc(line, arc, extend) {
-    return this.intersectArcLine(arc, line, extend);
   }
 
   /**
@@ -301,28 +234,6 @@ export class Intersection {
     return result;
   }
 
-  /**
-   * Find intersections between arc and circle segments
-   * @param {Arc} arc
-   * @param {Circle} circle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectArcCircle(arc, circle, extend) {
-    return this.intersectCircleArc(circle, arc, extend);
-  }
-
-
-  /**
-   * Find intersections between arc and polyline segments
-   * @param {Arc} arc
-   * @param {Polyline} polyline
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectArcPolyline(arc, polyline, extend) {
-    return this.intersectPolylineArc(polyline, arc, extend);
-  }
 
   /**
    * Find intersections between polyline and arc segments
@@ -352,51 +263,6 @@ export class Intersection {
 
     return result;
   }
-
-  /**
-   * Find intersections between circle and rectangle
-   * @param {Circle} circle
-   * @param {Rectangle} rectangle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectCircleRectangle(circle, rectangle, extend) {
-    const r1 = rectangle.start;
-    const r2 = rectangle.end;
-    extend = extend || false;
-
-    const min = r1.min(r2);
-    const max = r1.max(r2);
-    const topRight = new Point(max.x, min.y);
-    const bottomLeft = new Point(min.x, max.y);
-
-    let rectPoints = { start: min, end: topRight };
-    const inter1 = this.intersectCircleLine(circle, rectPoints);
-
-    rectPoints = { start: topRight, end: max };
-    const inter2 = this.intersectCircleLine(circle, rectPoints);
-
-    rectPoints = { start: max, end: bottomLeft };
-    const inter3 = this.intersectCircleLine(circle, rectPoints);
-
-    rectPoints = { start: bottomLeft, end: min };
-    const inter4 = this.intersectCircleLine(circle, rectPoints);
-
-    const result = new Intersection('No Intersection');
-
-    result.appendPoints(inter1.points);
-    result.appendPoints(inter2.points);
-    result.appendPoints(inter3.points);
-    result.appendPoints(inter4.points);
-
-    if (result.points.length > 0) {
-      result.status = 'Intersection';
-    } else {
-      result.status = inter1.status;
-    }
-
-    return result;
-  };
 
   /**
    * Find intersections between two lines
@@ -500,66 +366,6 @@ export class Intersection {
   };
 
   /**
-   * Find intersections between lwpolyline and line
-   * @param {Lwpolyline} lwpolyline
-   * @param {Line} line
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectLwpolylineLine(lwpolyline, line, extend) {
-    return this.intersectPolylineLine(lwpolyline, line, extend);
-  }
-
-  /**
-   * Find intersections between line and polyline
-   * @param {Line} line
-   * @param {Polyline} polyline
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectLinePolyline(line, polyline, extend) {
-    const result = new Intersection('No Intersection');
-    const length = polyline.points.length;
-
-    for (let i = 0; i < length - 1; i++) {
-      const b1 = polyline.points[i];
-      const b2 = polyline.points[i + 1];
-
-      if (b1.bulge === 0) {
-        const line2 = { start: b1, end: b2 };
-        // line (boundary) stays as arg1, polyline segment (selected) as arg2
-        const inter = this.intersectLineLine(line, line2, extend);
-        result.appendPoints(inter.points);
-      } else {
-        const arc = {};
-        arc.centre = b1.bulgeCentrePoint(b2);
-        arc.startPoint = b1;
-        arc.endPoint = b2;
-        arc.radius = arc.centre.distance(b1);
-        arc.direction = b1.bulge;
-
-        // Don't pass extend: intersectArcLine would extend the boundary line
-        const interArc = this.intersectArcLine(arc, line, false);
-        result.appendPoints(interArc.points);
-      }
-    }
-
-    if (result.points.length > 0) result.status = 'Intersection';
-    return result;
-  }
-
-  /**
-   * Find intersections between line and lwpolyline
-   * @param {Line} line
-   * @param {Lwpolyline} lwpolyline
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectLineLwpolyline(line, lwpolyline, extend) {
-    return this.intersectLinePolyline(line, lwpolyline, extend);
-  }
-
-  /**
    * Find intersections between polyline and line
    * @param {Polyline} polyline
    * @param {Line} line
@@ -599,46 +405,13 @@ export class Intersection {
 
 
   /**
-   * Find intersections between circle and polyline segments
-   * @param {Circle} circle
-   * @param {Polyline} polyline
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectCirclePolyline(circle, polyline, extend) {
-    return this.intersectPolylineCircle(polyline, circle, extend);
-  }
-
-  /**
-   * Find intersections between circle and lwpolyline
-   * @param {Circle} circle
-   * @param {Lwpolyline} lwpolyline
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectCircleLwpolyline(circle, lwpolyline, extend) {
-    return this.intersectPolylineCircle(lwpolyline, circle, extend);
-  }
-
-  /**
-   * Find intersections between arc and lwpolyline
-   * @param {Arc} arc
-   * @param {Lwpolyline} lwpolyline
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectArcLwpolyline(arc, lwpolyline, extend) {
-    return this.intersectPolylineArc(lwpolyline, arc, extend);
-  }
-
-  /**
    * Find intersections between polyline and polyline
    * @param {Polyline} polyline1
    * @param {Polyline} polyline2
    * @param {boolean} extend
    * @return {Intersect}
    */
-  static intersectPolylinePolyline(polyline1, polyline2, extend) {
+  static intersectEntities(polyline1, polyline2, extend) {
     const result = new Intersection('No Intersection');
     // Decompose polyline2 (selected) so polyline1 (boundary) stays as arg1
     const length = polyline2.points.length;
@@ -671,39 +444,6 @@ export class Intersection {
   }
 
   /**
-   * Find intersections between lwpolyline and lwpolyline
-   * @param {Lwpolyline} lwpolyline1
-   * @param {Lwpolyline} lwpolyline2
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectLwpolylineLwpolyline(lwpolyline1, lwpolyline2, extend) {
-    return this.intersectPolylinePolyline(lwpolyline1, lwpolyline2, extend);
-  }
-
-  /**
-   * Find intersections between polyline and lwpolyline
-   * @param {Polyline} polyline
-   * @param {Lwpolyline} lwpolyline
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectPolylineLwpolyline(polyline, lwpolyline, extend) {
-    return this.intersectPolylinePolyline(polyline, lwpolyline, extend);
-  }
-
-  /**
-   * Find intersections between lwpolyline and polyline
-   * @param {Lwpolyline} lwpolyline
-   * @param {Polyline} polyline
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectLwpolylinePolyline(lwpolyline, polyline, extend) {
-    return this.intersectPolylinePolyline(lwpolyline, polyline, extend);
-  }
-
-  /**
    * Find intersections between polyline and circle segments
    * @param {Polyline} polyline
    * @param {Circle} circle
@@ -721,7 +461,7 @@ export class Intersection {
 
       if (b1.bulge === 0) {
         const line2 = { start: b1, end: b2 };
-        const inter = this.intersectLineCircle(line2, circle, extend);
+        const inter = this.intersectCircleLine(circle, line2, extend);
         result.appendPoints(inter.points);
       } else {
         const arc = {};
@@ -731,7 +471,7 @@ export class Intersection {
         arc.radius = arc.centre.distance(b1);
         arc.direction = b1.bulge;
 
-        const interArc = this.intersectArcCircle(arc, circle, extend);
+        const interArc = this.intersectCircleArc(circle, arc, extend);
         result.appendPoints(interArc.points);
       }
     }
@@ -740,36 +480,6 @@ export class Intersection {
     return result;
   };
 
-
-  /**
-   * Find intersections between hatch and rectangle
-   * @param {Array} polylines
-   * @param {Rectangle} rectangle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectHatchRectangle(polylines, rectangle, extend) {
-    for (let i = 0; i < polylines.length; i++) {
-      const intersect = this.intersectPolylineRectangle(polylines[i], rectangle, extend);
-
-      if (intersect.points.length > 0) {
-        return intersect;
-      }
-    }
-
-    return new Intersection('No Intersection');
-  }
-
-  /**
-   * Find intersections between lwpolyline and rectangle
-   * @param {Polyline} polyline
-   * @param {Rectangle} rectangle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectLwpolylineRectangle(polyline, rectangle, extend) {
-    return this.intersectPolylineRectangle(polyline, rectangle, extend);
-  }
 
   /**
    * Find intersections between polyline and rectangle
@@ -812,143 +522,6 @@ export class Intersection {
     }
 
     return result;
-  };
-
-
-  /**
-   * Find intersections between line and rectangle
-   * @param {Line} line
-   * @param {Rectangle} rectangle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectLineRectangle(line, rectangle, extend) {
-    const r1 = rectangle.start;
-    const r2 = rectangle.end;
-    extend = extend || false;
-
-    const min = r1.min(r2);
-    const max = r1.max(r2);
-    const topRight = new Point(max.x, min.y);
-    const bottomLeft = new Point(min.x, max.y);
-
-    let rectPoints = { start: min, end: topRight };
-    const inter1 = this.intersectLineLine(rectPoints, line, extend);
-
-    rectPoints = { start: topRight, end: max };
-    const inter2 = this.intersectLineLine(rectPoints, line, extend);
-
-    rectPoints = { start: max, end: bottomLeft };
-    const inter3 = this.intersectLineLine(rectPoints, line, extend);
-
-    rectPoints = { start: bottomLeft, end: min };
-    const inter4 = this.intersectLineLine(rectPoints, line, extend);
-
-    const result = new Intersection('No Intersection');
-
-    result.appendPoints(inter1.points);
-    result.appendPoints(inter2.points);
-    result.appendPoints(inter3.points);
-    result.appendPoints(inter4.points);
-
-    if (result.points.length > 0) {
-      result.status = 'Intersection';
-    }
-
-    return result;
-  };
-
-  /**
-   * Find intersections between rectangle and line
-   * @param {Rectangle} rectangle
-   * @param {Line} line
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectRectangleLine(rectangle, line, extend) {
-    return this.intersectLineRectangle(line, rectangle, extend);
-  }
-
-  /**
-   * Find intersections between text and rectangles
-   * Text is represented by its bounding box
-   * @param {Text} text
-   * @param {Rectangle} rectangle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectTextRectangle(text, rectangle, extend) {
-    return this.intersectRectangleRectangle(text, rectangle, extend);
-  }
-
-  /**
-   * Find intersections between two rectangles
-   * @param {Rectangle} rectangle1
-   * @param {Rectangle} rectangle2
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectRectangleRectangle(rectangle1, rectangle2, extend) {
-    const a1 = rectangle1.start;
-    const a2 = rectangle1.end;
-    // const b1 = rectangle2.start;
-    // const b2 = rectangle2.end;
-    extend = extend || false;
-
-
-    const min = a1.min(a2);
-    const max = a1.max(a2);
-    const topRight = new Point(max.x, min.y);
-    const bottomLeft = new Point(min.x, max.y);
-
-    let rectPoints = { start: min, end: topRight };
-    const inter1 = this.intersectLineRectangle(rectPoints, rectangle2);
-
-    rectPoints = { start: topRight, end: max };
-    const inter2 = this.intersectLineRectangle(rectPoints, rectangle2);
-
-    rectPoints = { start: max, end: bottomLeft };
-    const inter3 = this.intersectLineRectangle(rectPoints, rectangle2);
-
-    rectPoints = { start: bottomLeft, end: min };
-    const inter4 = this.intersectLineRectangle(rectPoints, rectangle2);
-
-    const result = new Intersection('No Intersection');
-
-    result.appendPoints(inter1.points);
-    result.appendPoints(inter2.points);
-    result.appendPoints(inter3.points);
-    result.appendPoints(inter4.points);
-
-    if (result.points.length > 0) {
-      result.status = 'Intersection';
-    }
-
-    return result;
-  };
-
-
-  /**
-   * Find intersections between solid and rectangle
-   * @param {Solid} solid
-   * @param {Rectangle} rectangle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectSolidRectangle(solid, rectangle, extend) {
-    return this.intersectPolylineRectangle(solid, rectangle, extend);
-  };
-
-  /**
-   * Find intersections between arc aligned text and rectangle
-   * ArcAlignedText is treated as a polyline for intersection purposes
-   * @param {Polyline} polyline
-   * @param {Rectangle} rectangle
-   * @param {boolean} extend
-   * @return {Intersect}
-   */
-  static intersectArcAlignedTextRectangle(polyline, rectangle, extend) {
-    return this.intersectPolylineRectangle(polyline, rectangle, extend);
   };
 }
 
