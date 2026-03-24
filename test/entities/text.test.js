@@ -565,8 +565,14 @@ test('Text intersectPoints returns correct object', () => {
   const t = new Text({ points: [new Point(1, 2)] });
   t.boundingRect = { width: 10, height: 10 };
   const pts = t.intersectPoints();
-  expect(pts.start.x).toBe(1);
-  expect(pts.end.y).toBe(12);
+  expect(pts).toHaveProperty('points');
+  expect(pts.points.length).toBe(5);
+  expect(pts.points[0].x).toBe(1);
+  expect(pts.points[0].y).toBe(2);
+  expect(pts.points[2].x).toBe(11);
+  expect(pts.points[2].y).toBe(12);
+  expect(pts.points[4].x).toBe(pts.points[0].x);
+  expect(pts.points[4].y).toBe(pts.points[0].y);
 });
 
 test('Text setBackwards and setUpsideDown edge cases', () => {

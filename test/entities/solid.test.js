@@ -123,7 +123,35 @@ test('Solid.intersectPoints returns correct points array', () => {
   const solid = new Solid({ points: pts });
   const result = solid.intersectPoints();
   expect(result).toHaveProperty('points');
-  expect(result.points).toEqual(pts);
+  expect(result.points.length).toBe(5);
+  expect(result.points[0].x).toBe(0);
+  expect(result.points[0].y).toBe(0);
+  expect(result.points[4].x).toBe(0);
+  expect(result.points[4].y).toBe(0);
+});
+
+test('Test Solid.decompose', () => {
+  const solid = new Solid({ points: [new Point(100, 100), new Point(200, 100), new Point(200, 200)] });
+  const decomposed = solid.decompose();
+  expect(decomposed.length).toBe(4);
+  expect(decomposed[0].x).toBe(100);
+  expect(decomposed[0].y).toBe(100);
+  expect(decomposed[0].bulge).toBe(0);
+  expect(decomposed[1].x).toBe(200);
+  expect(decomposed[1].y).toBe(100);
+  expect(decomposed[2].x).toBe(200);
+  expect(decomposed[2].y).toBe(200);
+  // closing point matches first point
+  expect(decomposed[3].x).toBe(100);
+  expect(decomposed[3].y).toBe(100);
+});
+
+test('Test Solid.decompose with 4 points', () => {
+  const solid = new Solid({ points: [new Point(0, 0), new Point(1, 0), new Point(1, 1), new Point(0, 1)] });
+  const decomposed = solid.decompose();
+  expect(decomposed.length).toBe(5);
+  expect(decomposed[4].x).toBe(0);
+  expect(decomposed[4].y).toBe(0);
 });
 
 
