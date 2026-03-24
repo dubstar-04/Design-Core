@@ -257,13 +257,13 @@ test('Test Intersection.intersectPolylineLine()', () => {
   expect(result.points.length).toBe(0);
 });
 
-test('Test Intersection.intersectPolylineRectangle()', () => {
+test('Test intersectEntities with rectangle polyline', () => {
   const points = [new Point(-5, 5), new Point(5, 5)];
   const polyline = { points: points };
-  const rectangle = { start: new Point(), end: new Point(25, 25) };
+  const rectangle = { points: [new Point(), new Point(25, 0), new Point(25, 25), new Point(0, 25), new Point()] };
 
   // Test polyline with single segment
-  const result = Intersection.intersectPolylineRectangle(polyline, rectangle, false);
+  const result = Intersection.intersectEntities(polyline, rectangle, false);
   expect(result.status).toBe('Intersection');
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(0);
@@ -271,7 +271,7 @@ test('Test Intersection.intersectPolylineRectangle()', () => {
 
   // Test polyline with multiple segments
   points.push(new Point(5, 20), new Point(30, 20));
-  const result2 = Intersection.intersectPolylineRectangle(polyline, rectangle, false);
+  const result2 = Intersection.intersectEntities(polyline, rectangle, false);
   expect(result2.status).toBe('Intersection');
   expect(result2.points.length).toBe(2);
   expect(result2.points[0].x).toBeCloseTo(25);
@@ -280,7 +280,7 @@ test('Test Intersection.intersectPolylineRectangle()', () => {
   // No Intersection
   const points2 = [new Point(5, 5), new Point(20, 20)];
   const polyline2 = { points: points2 };
-  const result3 = Intersection.intersectPolylineLine(polyline2, rectangle, false);
+  const result3 = Intersection.intersectPolylineLine(polyline2, { start: new Point(), end: new Point(25, 25) }, false);
   expect(result3.status).toBe('Intersection');
   expect(result3.points.length).toBe(1);
 });
