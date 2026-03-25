@@ -20,36 +20,47 @@ export class PromptOptions {
   }
 
   /**
+   * Check if the input matches the accepted types
+   * @param {any} input
+   * @return {boolean}
+   */
+  acceptsInput(input) {
+    const inputType = Input.getType(input);
+    if (this.types.includes(inputType)) return true;
+    if (this.types.includes(Input.Type.DYNAMIC) && !isNaN(input)) return true;
+    return false;
+  }
+
+  /**
+   * Create a new promise for this prompt
+   * @return {Promise}
+   */
+  createPromise() {
+    return new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+
+  /**
    * Return data to the input request
    * @param {any} input
+   * @return {boolean} true if input was accepted
    */
   respond(input) {
-    if (this.types.includes(Input.getType(input))) {
-      if (Input.getType(input) === Input.Type.DYNAMIC) {
-        // NUMBER input received
-        // If the prompt allows for DYNAMIC input - convert NUMBER to a POINT
-        if (!isNaN(input)) {
-          const basePoint = DesignCore.Scene.inputManager.inputPoint;
-          const angle = DesignCore.Scene.inputManager.inputPoint.angle(DesignCore.Mouse.pointOnScene());
-          const point = basePoint.project(angle, input);
-          input = point;
-        }
-      }
-
-      // Update the last input point on inputManager
-      if (Input.getType(input) === Input.Type.POINT) {
-        DesignCore.Scene.inputManager.inputPoint = input;
-      }
-
-      // expected type input, pass to active command
+    if (this.acceptsInput(input)) {
       this.resolve(input);
-    } else if (this.parseInputToOption(input) !== undefined) {
-      // input matches command option, pass to active command
-      this.resolve(this.parseInputToOption(input));
-    } else {
-      // Invalid input receieved. notify the user.
-      DesignCore.Core.notify(`${Strings.Error.INPUT}: ${this.promptMessage}`);
+      return true;
     }
+
+    const matchedOption = this.parseInputToOption(input);
+    if (matchedOption !== undefined) {
+      this.resolve(matchedOption);
+      return true;
+    }
+
+    DesignCore.Core.notify(`${Strings.Error.INPUT}: ${this.promptMessage}`);
+    return false;
   }
 
   /**
@@ -117,21 +128,5 @@ export class PromptOptions {
   getOptionWithShortcut(option) {
     const optionWithShortcut = `${option.substring(0, 1)}\u0332${option.substring(1, option.length)}`;
     return optionWithShortcut;
-  }
-
-  /**
-   * Set the resolve callback
-   * @param {any} resolve - callback function
-   */
-  setResolve(resolve) {
-    this.resolve = resolve;
-  }
-
-  /**
-   * Set the reject callback
-   * @param {any} reject - callback function
-   */
-  setReject(reject) {
-    this.reject = reject;
   }
 }
