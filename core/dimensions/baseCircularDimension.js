@@ -138,7 +138,7 @@ export class BaseCircularDimension extends BaseDimension {
       Pt11 = intersect.points[0];
     }
 
-    // set a minimum postion for the text
+    // set a minimum position for the text
     if (Pt15.distance(Pt11) < DIMASZ + DIMTXT) {
       Pt11 = Pt15.project(Pt10.angle(Pt11), DIMASZ + DIMTXT);
     }

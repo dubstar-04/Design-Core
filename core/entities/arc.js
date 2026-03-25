@@ -149,7 +149,7 @@ export class Arc extends Entity {
   /**
    * Calculate the angle between the start and end of the arc
    * Clockwise returns positive angle
-   * Counter clockwise returns negtive
+   * Counter clockwise returns negative
    * @return {number} angle in degrees
    */
   get totalAngle() {
@@ -217,7 +217,7 @@ export class Arc extends Entity {
     // ccw arc = 0, clockwise arc = 1
 
     // If the arc forms a complete circle
-    // Split into two seperate polyline arcs
+    // Split into two separate polyline arcs
     if (Math.abs(this.totalAngle) === 360) {
       const startPoint = this.points[0].project(0, this.radius);
       startPoint.bulge = 1;

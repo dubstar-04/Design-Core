@@ -180,7 +180,7 @@ test('Test Text.getTextFrameCorners', () => {
   expect(corners[3].x).toBeCloseTo(85.8579);
   expect(corners[3].y).toBeCloseTo(92.92893);
 
-  // test right and top alignement
+  // test right and top alignment
   const rightAlignedtext = new Text({ points: [new Point(100, 100)] });
   rightAlignedtext.horizontalAlignment = 2; // right
   corners = rightAlignedtext.getTextFrameCorners();

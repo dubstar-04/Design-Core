@@ -272,9 +272,9 @@ export class BaseDimension extends Entity {
         formattedDimensionValue = `${linearDimensionValue}`;
     }
 
-    // Decimal seperator - DIMDSEP
+    // Decimal separator - DIMDSEP
     const DIMDSEP = this.getDimensionStyle().getValue('DIMDSEP');
-    // Replace dot with specified seperator
+    // Replace dot with specified separator
     if (DIMDSEP !== '.') {
       formattedDimensionValue = formattedDimensionValue.replace('.', DIMDSEP);
     }
@@ -285,7 +285,7 @@ export class BaseDimension extends Entity {
     }
 
     // TODO: Implement prefix and postsuffix - DIMPOST
-    // prefix and suffix included in DIMPOST value seperated by <>
+    // prefix and suffix included in DIMPOST value separated by <>
     // e.g. prefix<>suffix
     // const DIMPOST = this.getDimensionStyle().getValue('DIMPOST');
     // const DIMAPOST = this.getDimensionStyle().getValue('DIMAPOST');
@@ -475,7 +475,7 @@ export class BaseDimension extends Entity {
    */
   draw(ctx, scale) {
     if (this.block.items.length === 0) {
-      this.refesh();
+      this.refresh();
     }
 
     this.block.draw(ctx, scale, this);
@@ -530,7 +530,7 @@ export class BaseDimension extends Entity {
   /**
    * Refesh the dimension geometry
    */
-  refesh() {
+  refresh() {
     const entities = this.buildDimension();
 
     if (entities) {
@@ -552,7 +552,7 @@ export class BaseDimension extends Entity {
   setProperty(property, value) {
     if (this.hasOwnProperty(property)) {
       this[property] = value;
-      this.refesh();
+      this.refresh();
     }
   }
 }

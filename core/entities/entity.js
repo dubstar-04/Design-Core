@@ -211,7 +211,7 @@ export class Entity {
    * @return {Array} - array of state changes
    */
   extend(points) {
-    // extend function to be overidden by implementation
+    // extend function to be overridden by implementation
     DesignCore.Core.notify(`${this.type} ${Strings.Message.NOEXTEND}`);
     return [];
   }
@@ -222,7 +222,7 @@ export class Entity {
    * @return {Array} - array of state changes
    */
   trim(points) {
-    // trim function to be overidden by implementation
+    // trim function to be overridden by implementation
     DesignCore.Core.notify(`${this.type} ${Strings.Message.NOTRIM}`);
     return [];
   }

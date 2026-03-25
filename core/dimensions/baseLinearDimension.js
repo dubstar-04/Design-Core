@@ -340,13 +340,13 @@ export class BaseLinearDimension extends BaseDimension {
     // generate dimension geometry
     */
     const extLine1 = new Line({ points: [extLineOneStart, extLineOneEnd] });
-    // Supress extension line 1 if DIMS1 is true
+    // Suppress extension line 1 if DIMS1 is true
     if (!DIMSE1) {
       entities.push(extLine1);
     }
 
     const extLine2 = new Line({ points: [extLineTwoStart, extLineTwoEnd] });
-    // Supress extendsion line 2 if DIMSE2 is true
+    // Suppress extension line 2 if DIMSE2 is true
     if (!DIMSE2) {
       entities.push(extLine2);
     }
@@ -355,13 +355,13 @@ export class BaseLinearDimension extends BaseDimension {
     const arrowHead2 = this.getArrowHead(Pt14e, arrowsOutSide ? dimLineAngle : reverseDimLineAngle);
 
     const dimLine1 = new Line({ points: [dimLineOneStart, dimLineOneEnd] });
-    // Supress dimension line 1 if DIMSD1 is true
+    // Suppress dimension line 1 if DIMSD1 is true
     if (!DIMSD1) {
       entities.push(dimLine1, arrowHead1);
     }
 
     const dimLine2 = new Line({ points: [dimLineTwoStart, dimLineTwoEnd] });
-    // Supress dimension line 2 if DIMSD2 is true
+    // Suppress dimension line 2 if DIMSD2 is true
     if (!DIMSD2) {
       entities.push(dimLine2, arrowHead2);
     }

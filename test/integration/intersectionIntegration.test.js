@@ -139,7 +139,7 @@ describe('Entity toPolylinePoints', () => {
     expect(pts.length).toBe(0);
   });
 
-  test('Polyline with bulge segments toPolylinePointss correctly', () => {
+  test('Polyline with bulge segments toPolylinePoints correctly', () => {
     // Polyline with an arc segment (bulge=1 is a semicircle)
     const poly = new Polyline({ points: [new Point(0, 0, 1), new Point(10, 0)] });
     const pts = poly.toPolylinePoints();
@@ -605,7 +605,7 @@ describe('Dimension touched tests', () => {
     const dim = new AlignedDimension({
       points: [pt13, pt14, pt11, pt10],
     });
-    dim.refesh();
+    dim.refresh();
 
     // Selection rectangle around the dimension text area
     const sE = selectionExtremes(new Point(40, 15), new Point(60, 25));
@@ -621,7 +621,7 @@ describe('Dimension touched tests', () => {
     const dim = new AlignedDimension({
       points: [pt13, pt14, pt11, pt10],
     });
-    dim.refesh();
+    dim.refresh();
 
     // Selection rectangle far from dimension
     const sE = selectionExtremes(new Point(500, 500), new Point(600, 600));
@@ -636,7 +636,7 @@ describe('Dimension touched tests', () => {
     const dim = new RotatedDimension({
       points: [pt13, pt14, pt11, pt10],
     });
-    dim.refesh();
+    dim.refresh();
 
     const sE = selectionExtremes(new Point(500, 500), new Point(600, 600));
     expect(dim.touched(sE)).toBe(false);
@@ -646,7 +646,7 @@ describe('Dimension touched tests', () => {
     const dim = new DiametricDimension({
       points: [new Point(0, 0), new Point(100, 0)],
     });
-    dim.refesh();
+    dim.refresh();
 
     const sE = selectionExtremes(new Point(500, 500), new Point(600, 600));
     expect(dim.touched(sE)).toBe(false);
@@ -656,7 +656,7 @@ describe('Dimension touched tests', () => {
     const dim = new RadialDimension({
       points: [new Point(0, 0), new Point(100, 0)],
     });
-    dim.refesh();
+    dim.refresh();
 
     const sE = selectionExtremes(new Point(500, 500), new Point(600, 600));
     expect(dim.touched(sE)).toBe(false);
@@ -672,7 +672,7 @@ describe('Dimension touched tests', () => {
     const dim = new AngularDimension({
       points: [pt13, pt14, pt15, pt10, pt16, pt11],
     });
-    dim.refesh();
+    dim.refresh();
 
     const sE = selectionExtremes(new Point(500, 500), new Point(600, 600));
     expect(dim.touched(sE)).toBe(false);
@@ -687,7 +687,7 @@ describe('Dimension touched tests', () => {
     const dim = new AlignedDimension({
       points: [pt13, pt14, pt11, pt10],
     });
-    dim.refesh();
+    dim.refresh();
 
     // touched() works via block delegation - returns boolean
     const sE = selectionExtremes(new Point(-10, -10), new Point(110, 30));
