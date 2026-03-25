@@ -139,7 +139,7 @@ test('Test CommandLine.parseInput', () => {
   expect(relPoint1.x).toBe(101);
   expect(relPoint1.y).toBe(102);
 
-  core.scene.inputManager.initialiseItem('Line');
+  core.scene.inputManager.startCommand('Line');
   core.scene.inputManager.activeCommand.points.push(relPoint1);
   const relPoint2 = commandline.parseInput('@101,102');
   expect(relPoint2.constructor.name).toBe('Point');
