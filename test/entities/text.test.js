@@ -180,7 +180,7 @@ test('Test Text.getTextFrameCorners', () => {
   expect(corners[3].x).toBeCloseTo(85.8579);
   expect(corners[3].y).toBeCloseTo(92.92893);
 
-  // test right and top alignement
+  // test right and top alignment
   const rightAlignedtext = new Text({ points: [new Point(100, 100)] });
   rightAlignedtext.horizontalAlignment = 2; // right
   corners = rightAlignedtext.getTextFrameCorners();
@@ -561,12 +561,17 @@ test('Text boundingBox returns BoundingBox', () => {
   expect(box.height).toBe(10);
 });
 
-test('Text intersectPoints returns correct object', () => {
+test('Text toPolylinePoints returns correct array', () => {
   const t = new Text({ points: [new Point(1, 2)] });
   t.boundingRect = { width: 10, height: 10 };
-  const pts = t.intersectPoints();
-  expect(pts.start.x).toBe(1);
-  expect(pts.end.y).toBe(12);
+  const pts = t.toPolylinePoints();
+  expect(pts.length).toBe(5);
+  expect(pts[0].x).toBe(1);
+  expect(pts[0].y).toBe(2);
+  expect(pts[2].x).toBe(11);
+  expect(pts[2].y).toBe(12);
+  expect(pts[4].x).toBe(pts[0].x);
+  expect(pts[4].y).toBe(pts[0].y);
 });
 
 test('Text setBackwards and setUpsideDown edge cases', () => {

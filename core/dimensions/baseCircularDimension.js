@@ -132,13 +132,13 @@ export class BaseCircularDimension extends BaseDimension {
       // Find the intersection between Pt10 > Pt15 and a horizontal ray from Pt11
       const line2 = { start: Pt10, end: Pt15 };
       const line1 = { start: Pt11, end: new Point(Pt10.x, Pt11.y) };
-      const intersect = Intersection.intersectLineLine(line1, line2, true);
+      const intersect = Intersection.intersectSegmentSegment(line1.start, line1.end, line2.start, line2.end, true);
       // Reset Pt11 - This should be the same as the originally selected Pt11
       // Pt11 position can be changed depending on the dimstyle
       Pt11 = intersect.points[0];
     }
 
-    // set a minimum postion for the text
+    // set a minimum position for the text
     if (Pt15.distance(Pt11) < DIMASZ + DIMTXT) {
       Pt11 = Pt15.project(Pt10.angle(Pt11), DIMASZ + DIMTXT);
     }

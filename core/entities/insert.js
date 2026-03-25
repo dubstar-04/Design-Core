@@ -224,26 +224,15 @@ export class Insert extends Entity {
 
   /**
    * Determine if the entity is within the selection
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if within
    */
-  within(selectionExtremes) {
-    // adjust selectionExtremes by the insert position
-    const [xmin, xmax, ymin, ymax] = selectionExtremes;
+  within(selection) {
     const pt = this.points[0];
-    const sE = [xmin - pt.x, xmax - pt.x, ymin - pt.y, ymax - pt.y];
-    return this.block.within(sE);
-  }
-
-  /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      start: this.points[0],
-      end: this.points[0],
-    };
+    return this.block.within({
+      min: selection.min.subtract(pt),
+      max: selection.max.subtract(pt),
+    });
   }
 
   /**
@@ -273,20 +262,20 @@ export class Insert extends Entity {
 
   /**
    * Determine if the entity is touch the selection window
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if touched
    */
-  touched(selectionExtremes) {
+  touched(selection) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
     if (!layer?.isSelectable) {
       return;
     }
 
-    // adjust selectionExtremes by the insert position
-    const [xmin, xmax, ymin, ymax] = selectionExtremes;
     const pt = this.points[0];
-    const sE = [xmin - pt.x, xmax - pt.x, ymin - pt.y, ymax - pt.y];
-    return this.block.touched(sE);
+    return this.block.touched({
+      min: selection.min.subtract(pt),
+      max: selection.max.subtract(pt),
+    });
   }
 }

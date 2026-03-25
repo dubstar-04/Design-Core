@@ -208,7 +208,7 @@ export class Hatch extends Entity {
                 shapePoints.push(startPoint);
                 shapePoints.push(endPoint);
                 const line = new Line({ points: shapePoints });
-                shape.points.push(...line.decompose());
+                shape.points.push(...line.toPolylinePoints());
               } else if (edgeType === 2) {
                 // ARC
                 // 10 - X; 20 - Y;  40 - Radius;  50 - Start Angle;  51 - End Angle; 73 - Is Counter Clockwise
@@ -234,7 +234,7 @@ export class Hatch extends Entity {
                 }
 
                 const arc = new Arc(shapeData);
-                shape.points.push(...arc.decompose());
+                shape.points.push(...arc.toPolylinePoints());
               } else if (edge.edgeType === 3) {
                 // Ellipse
                 // 10 - X; 20 - Y; 11 - X; 21 - Y; 40 - Length of minor axis (percentage of major axis length);
@@ -361,13 +361,13 @@ export class Hatch extends Entity {
         // no points collected - get the first index from selected items
 
         const currentItem = selectedItems[i];
-        // if the item can't be decomposed to a polyline, remove from selected items and go again
-        if (typeof currentItem.decompose === 'undefined') {
+        // if the item can't be converted to polyline points, remove from selected items and go again
+        if (typeof currentItem.toPolylinePoints === 'undefined' || currentItem.type === 'Text' || currentItem.type === 'ArcAlignedText') {
           selectedItems.splice(i, 1);
           break;
         }
 
-        let currentPoints = currentItem.decompose();
+        let currentPoints = currentItem.toPolylinePoints();
 
         // check if the start or end point of the item are connected to the end of the iteration points
         if (!iterationPoints.length || currentPoints.at(0).isSame(iterationPoints.at(-1)) || currentPoints.at(-1).isSame(iterationPoints.at(-1))) {
@@ -647,17 +647,17 @@ export class Hatch extends Entity {
       const shape = this.childEntities[i];
 
       if (shape.boundingBox().isInside(P)) {
-        const polyline = { points: [...shape.points] };
+        const polyline = [...shape.points];
 
         // check the polyline is closed
         if (!shape.points.at(0).isSame(shape.points.at(-1))) {
-          polyline.points.push(shape.points.at(0));
+          polyline.push(shape.points.at(0));
         }
 
         // create a line from P, twice the length of the bounding box
-        const line = { start: P, end: new Point(P.x + shape.boundingBox().xLength, P.y) };
+        const line = [P, new Point(P.x + shape.boundingBox().xLength, P.y)];
 
-        const intersect = Intersection.intersectPolylineLine(polyline, line);
+        const intersect = Intersection.intersectPolylinePolyline(polyline, line);
         const intersects = intersect.points.length;
         // P is inside shape if there is a odd number of intersects
         if (Math.abs(intersects % 2) == 1) {
@@ -701,28 +701,13 @@ export class Hatch extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    // return all the polyline boundary shapes
-    return this.childEntities;
-  }
-
-  /**
    * Determine if the entity is touch the selection window
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if touched
    */
-  touched(selectionExtremes) {
-    // const se = [
-    //  selectionExtremes[0] - this.points[0].x,
-    //  selectionExtremes[1]- this.points[0].y,
-    //  selectionExtremes[2]- this.points[0].x,
-    //  selectionExtremes[3]- this.points[0].y,
-    // ];
+  touched(selection) {
     for (let i = 0; i < this.childEntities.length; i++) {
-      if (this.childEntities[i].touched(selectionExtremes)) {
+      if (this.childEntities[i].touched(selection)) {
         return true;
       }
     }

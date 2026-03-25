@@ -71,13 +71,14 @@ export class Solid extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
+   * Convert the entity to polyline points
+   * @return {Array} array of points representing the solid as a polyline
    */
-  intersectPoints() {
-    return {
-      points: this.points,
-    };
+  toPolylinePoints() {
+    const points = this.points.map((point) => point.clone());
+    // Close the shape
+    points.push(this.points[0].clone());
+    return points;
   }
 
   /**

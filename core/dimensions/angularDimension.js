@@ -171,7 +171,7 @@ export class AngularDimension extends BaseDimension {
     const tempPt14 = item2.points[1];
 
     // Check the lines intersect
-    const intersect = Intersection.intersectLineLine({ start: tempPt15, end: tempPt10 }, { start: tempPt13, end: tempPt14 }, true);
+    const intersect = Intersection.intersectSegmentSegment(tempPt15, tempPt10, tempPt13, tempPt14, true);
     const intersectPt = intersect.points[0];
 
     if (intersectPt === undefined) {
@@ -236,7 +236,7 @@ export class AngularDimension extends BaseDimension {
     let tempPt14 = this.getPointBySequence(this.points, 14); // Pt14 is the first line end point
 
     // Check the lines intersect
-    const intersect = Intersection.intersectLineLine({ start: tempPt15, end: tempPt10 }, { start: tempPt13, end: tempPt14 }, true);
+    const intersect = Intersection.intersectSegmentSegment(tempPt15, tempPt10, tempPt13, tempPt14, true);
     const intersectPt = intersect.points[0];
 
     if (tempPt10.distance(intersectPt) < tempPt15.distance(intersectPt)) {
@@ -328,7 +328,7 @@ export class AngularDimension extends BaseDimension {
     const DIMSD2 = this.getDimensionStyle().getValue('DIMSD2'); // Suppress second dimension line
 
     // Intersection and radius
-    const intersectPt = Intersection.intersectLineLine({ start: Pt15, end: Pt10 }, { start: Pt13, end: Pt14 }, true).points[0];
+    const intersectPt = Intersection.intersectSegmentSegment(Pt15, Pt10, Pt13, Pt14, true).points[0];
     const radius = intersectPt.distance(Pt16);
 
     // check dimension is valid

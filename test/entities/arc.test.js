@@ -224,29 +224,29 @@ AcDbArc
 });
 
 
-test('Test Arc.decompose', () => {
+test('Test Arc.toPolylinePoints', () => {
   // clockwise 45 degrees 0 - 45
   let arc = new Arc({ points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)], direction: 0 });
-  let decomposedArc = arc.decompose();
-  expect(decomposedArc[0].x).toBe(200);
-  expect(decomposedArc[0].y).toBe(100);
-  expect(decomposedArc[0].bulge).toBeCloseTo(-5.02734);
+  let arcPoints = arc.toPolylinePoints();
+  expect(arcPoints[0].x).toBe(200);
+  expect(arcPoints[0].y).toBe(100);
+  expect(arcPoints[0].bulge).toBeCloseTo(-5.02734);
 
-  expect(decomposedArc[1].x).toBeCloseTo(170.71);
-  expect(decomposedArc[1].y).toBeCloseTo(170.71);
-  expect(decomposedArc[1].bulge).toBeCloseTo(0);
+  expect(arcPoints[1].x).toBeCloseTo(170.71);
+  expect(arcPoints[1].y).toBeCloseTo(170.71);
+  expect(arcPoints[1].bulge).toBeCloseTo(0);
 
 
   // counter clockwise 45 degrees 0 - 45
   arc = new Arc({ points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)], direction: 1 });
-  decomposedArc = arc.decompose();
-  expect(decomposedArc[0].x).toBe(200);
-  expect(decomposedArc[0].y).toBe(100);
-  expect(decomposedArc[0].bulge).toBeCloseTo(0.1989);
+  arcPoints = arc.toPolylinePoints();
+  expect(arcPoints[0].x).toBe(200);
+  expect(arcPoints[0].y).toBe(100);
+  expect(arcPoints[0].bulge).toBeCloseTo(0.1989);
 
-  expect(decomposedArc[1].x).toBeCloseTo(170.71);
-  expect(decomposedArc[1].y).toBeCloseTo(170.71);
-  expect(decomposedArc[1].bulge).toBeCloseTo(0);
+  expect(arcPoints[1].x).toBeCloseTo(170.71);
+  expect(arcPoints[1].y).toBeCloseTo(170.71);
+  expect(arcPoints[1].bulge).toBeCloseTo(0);
 });
 
 test('Arc constructor handles missing/invalid data', () => {

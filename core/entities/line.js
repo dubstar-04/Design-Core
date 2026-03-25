@@ -117,7 +117,7 @@ export class Line extends Entity {
    * Return a list of points representing a polyline version of this entity
    * @return {Array}
    */
-  decompose() {
+  toPolylinePoints() {
     return this.points;
   }
 
@@ -244,17 +244,6 @@ export class Line extends Entity {
     stateChanges.push(addState);
 
     return stateChanges;
-  }
-
-  /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      start: this.points[0],
-      end: this.points[1],
-    };
   }
 
   /**

@@ -609,18 +609,13 @@ export class Text extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
+   * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
-  intersectPoints() {
-    const rect = this.getBoundingRect();
-
-    const botLeft = new Point(rect.x, rect.y);
-    const topRight = new Point(rect.x + rect.width, rect.y + rect.height);
-
-    return {
-      start: botLeft,
-      end: topRight,
-    };
+  toPolylinePoints() {
+    const corners = this.getTextFrameCorners();
+    // Close the rectangle
+    corners.push(corners[0].clone());
+    return corners;
   }
 }

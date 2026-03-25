@@ -149,7 +149,7 @@ export class Arc extends Entity {
   /**
    * Calculate the angle between the start and end of the arc
    * Clockwise returns positive angle
-   * Counter clockwise returns negtive
+   * Counter clockwise returns negative
    * @return {number} angle in degrees
    */
   get totalAngle() {
@@ -212,12 +212,12 @@ export class Arc extends Entity {
    * Return a list of points representing a polyline version of this entity
    * @return {Array}
    */
-  decompose() {
+  toPolylinePoints() {
     // counter clockwise bulge = +ve, clockwise bulge = -ve,
     // ccw arc = 0, clockwise arc = 1
 
     // If the arc forms a complete circle
-    // Split into two seperate polyline arcs
+    // Split into two separate polyline arcs
     if (Math.abs(this.totalAngle) === 360) {
       const startPoint = this.points[0].project(0, this.radius);
       startPoint.bulge = 1;
@@ -303,20 +303,6 @@ export class Arc extends Entity {
     }
 
     return stateChanges;
-  }
-
-  /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      centre: this.points[0],
-      startPoint: this.points[1],
-      endPoint: this.points[2],
-      radius: this.radius,
-      direction: this.direction,
-    };
   }
 
   /**

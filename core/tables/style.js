@@ -12,7 +12,7 @@ export class Style {
     // Define Properties
     this.type = this.constructor.name;
     this.name = '';
-    this.font = 'Arial'; // TODO: how to set the font to one thats available. See style.js also.
+    this.font = 'Arial'; // TODO: how to set the font to one that's available. See style.js also.
     this.textHeight = 2.5;
     this.widthFactor = 1;
     this.obliqueAngle = 0;

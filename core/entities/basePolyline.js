@@ -201,18 +201,8 @@ export class BasePolyline extends Entity {
    * Return a list of points representing a polyline version of this entity
    * @return {Array}
    */
-  decompose() {
+  toPolylinePoints() {
     return this.points;
-  }
-
-  /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      points: this.points,
-    };
   }
 
   /**
@@ -681,7 +671,7 @@ export class BasePolyline extends Entity {
       // angle is perpendicular to the center-to-end point ray, in the direction of the bulge
       lastSegAngle = centerPoint.angle(this.points.at(-1)) + (Math.PI / 2) * Math.sign(lastSegBulge);
     } else {
-      // line segment angle is the angle from point 0 to to point 1
+      // line segment angle is the angle from point 0 to point 1
       lastSegAngle = this.points.at(-2).angle(this.points.at(-1));
     }
 

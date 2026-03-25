@@ -19,6 +19,7 @@ export class Strings {
     SELECTION: 'Invalid Selection',
     PARALLELLINES: 'Parallel Lines',
     INVALIDCLIPBOARD: 'Invalid Clipboard Data',
+    INVALIDBOUNDARY: 'Invalid Boundary Item',
   };
 
   // Warning Strings

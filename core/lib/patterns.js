@@ -72,7 +72,7 @@ export class Patterns {
     const pattern = [];
     // get the pattern string
     const patternString = Patterns.hatch_patterns[name.toUpperCase()];
-    // split the pattern into seperate lines
+    // split the pattern into separate lines
     const patternLines = patternString.pattern.split('\n');
 
     patternLines.forEach((line) => {
@@ -90,7 +90,7 @@ export class Patterns {
   static getPatternLineCount(name) {
     // get the pattern string
     const patternString = Patterns.hatch_patterns[name.toUpperCase()];
-    // split the pattern into seperate lines
+    // split the pattern into separate lines
     const patternLines = patternString.pattern.split('\n');
 
     return patternLines.length;

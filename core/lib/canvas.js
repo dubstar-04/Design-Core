@@ -72,7 +72,7 @@ export class Canvas {
       case 0: // left button
         break;
       case 1: // middle button
-        // TODO: Reenable cursor styles
+        // TODO: Re-enable cursor styles
         // ev.target.style.cursor = "move";
         break;
       case 2: // right button
@@ -92,7 +92,7 @@ export class Canvas {
       case 1: // middle button
         this.lastDelta = new Point();
         this.requestPaint();
-        // TODO: Reenable cursor styles
+        // TODO: Re-enable cursor styles
         // ev.target.style.cursor = "crosshair";
         break;
       case 2: // right button
@@ -230,7 +230,7 @@ export class Canvas {
       this.flipped = true;
     }
 
-    // set the tranform for the context
+    // set the transform for the context
     // this will set all the pan and zoom actions
     try {
       context.setTransform(this.matrix);

@@ -632,17 +632,11 @@ export class ArcAlignedText extends Entity {
   }
 
   /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
+   * Return a list of points representing a polyline version of this entity
+   * @return {Array}
    */
-  intersectPoints() {
-    const ArcAlignedCharacters = this.getArcAlignedCharacters();
-
-    if (ArcAlignedCharacters.length > 0) {
-      const pts = ArcAlignedCharacters.map((char) => char.position);
-      return { points: pts };
-    }
-
-    return {};
+  toPolylinePoints() {
+    const characters = this.getArcAlignedCharacters();
+    return characters.map((char) => char.position);
   }
 }

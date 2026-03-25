@@ -154,22 +154,21 @@ export class Entity {
 
   /**
    * Determine if the entity is within the selection
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if within
    */
-  within(selectionExtremes) {
+  within(selection) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
     if (!layer?.isSelectable) {
       return;
     }
 
-    // Determine if this entities is within a the window specified by selectionExtremes
     const boundingBox = this.boundingBox();
-    if (boundingBox.xMin > selectionExtremes[0] &&
-      boundingBox.xMax < selectionExtremes[1] &&
-      boundingBox.yMin > selectionExtremes[2] &&
-      boundingBox.yMax < selectionExtremes[3]
+    if (boundingBox.xMin > selection.min.x &&
+      boundingBox.xMax < selection.max.x &&
+      boundingBox.yMin > selection.min.y &&
+      boundingBox.yMax < selection.max.y
     ) {
       return true;
     }
@@ -179,35 +178,27 @@ export class Entity {
 
   /**
    * Determine if the entity is touch the selection window
-   * @param {Array} selectionExtremes
+   * @param {Object} selection - {min: Point, max: Point}
    * @return {boolean} true if touched
    */
-  touched(selectionExtremes) {
+  touched(selection) {
     const layer = DesignCore.LayerManager.getItemByName(this.layer);
 
     if (!layer?.isSelectable) {
       return;
     }
 
-    const rP1 = new Point(selectionExtremes[0], selectionExtremes[2]);
-    const rP2 = new Point(selectionExtremes[1], selectionExtremes[3]);
+    const rectPoints = [
+      selection.min,
+      new Point(selection.max.x, selection.min.y),
+      selection.max,
+      new Point(selection.min.x, selection.max.y),
+      selection.min,
+    ];
 
-    const rectPoints = {
-      start: rP1,
-      end: rP2,
-    };
+    const output = Intersection.intersectPolylinePolyline(this.toPolylinePoints(), rectPoints);
 
-    const intersectFunction = `intersect${this.type}Rectangle`;
-
-    if (Intersection.hasOwnProperty(intersectFunction) === false) {
-      const msg = `${Strings.Error.INVALIDINTERSECTTYPE}: ${this.type}`;
-      DesignCore.Core.notify(msg);
-      throw Error(msg);
-    }
-
-    const output = Intersection[intersectFunction](this.intersectPoints(), rectPoints);
-
-    if (output.status === 'Intersection') {
+    if (output.status === Intersection.Status.INTERSECTION) {
       return true;
     }
     // no intersection found. return false
@@ -220,7 +211,7 @@ export class Entity {
    * @return {Array} - array of state changes
    */
   extend(points) {
-    // extend function to be overidden by implementation
+    // extend function to be overridden by implementation
     DesignCore.Core.notify(`${this.type} ${Strings.Message.NOEXTEND}`);
     return [];
   }
@@ -231,7 +222,7 @@ export class Entity {
    * @return {Array} - array of state changes
    */
   trim(points) {
-    // trim function to be overidden by implementation
+    // trim function to be overridden by implementation
     DesignCore.Core.notify(`${this.type} ${Strings.Message.NOTRIM}`);
     return [];
   }

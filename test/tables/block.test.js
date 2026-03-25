@@ -144,9 +144,9 @@ AcDbBlockEnd
 test('Test Block.touched', () => {
   const block = new Block();
 
-  // Selection Extremes xmin, xmax, ymin, ymax
-  const selectionExtremesTrue = [110, 190, 90, 210];
-  const selectionExtremesFalse = [250, 400, 250, 400];
+  // Selection {min, max}
+  const selectionExtremesTrue = { min: new Point(110, 90), max: new Point(190, 210) };
+  const selectionExtremesFalse = { min: new Point(250, 250), max: new Point(400, 400) };
 
   expect(block.touched(selectionExtremesTrue)).toBe(false);
 

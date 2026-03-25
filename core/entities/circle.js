@@ -138,7 +138,7 @@ export class Circle extends Entity {
    * Return a list of points representing a polyline version of this entity
    * @return {Array}
    */
-  decompose() {
+  toPolylinePoints() {
     const startPoint = this.points[0].project(0, this.radius);
     startPoint.bulge = 1;
     const endPoint = this.points[0].project(0, -this.radius);
@@ -199,17 +199,6 @@ export class Circle extends Entity {
     }
 
     return stateChanges;
-  }
-
-  /**
-   * Intersect points
-   * @return {Object} - object defining data required by intersect methods
-   */
-  intersectPoints() {
-    return {
-      centre: this.points[0],
-      radius: this.radius,
-    };
   }
 
   /**

@@ -19,14 +19,14 @@ export class Tool {
    * Preview the command during execution
    */
   preview() {
-    // preview function to be overidden by implementation
+    // preview function to be overridden by implementation
   };
 
   /**
    * Perform the command
    */
   action() {
-    // action function to be overidden by implementation
+    // action function to be overridden by implementation
   };
 }
 

@@ -41,7 +41,7 @@ describe('BaseDimension', () => {
     // Test cases for dimension value formatting
     const scenarios = [
 
-      { desc: 'comma seperator, 2 decimal places',
+      { desc: 'comma separator, 2 decimal places',
         dimType: 0,
         inputValue: 12.34,
         expectedValue: '12,34',
@@ -50,7 +50,7 @@ describe('BaseDimension', () => {
         DIMADEC: 2,
         DIMRND: 0.0000,
       },
-      { desc: 'comma seperator, 3 decimal places',
+      { desc: 'comma separator, 3 decimal places',
         dimType: 0,
         inputValue: 12.34,
         expectedValue: '12,340',
@@ -59,7 +59,7 @@ describe('BaseDimension', () => {
         DIMADEC: 2,
         DIMRND: 0.0000,
       },
-      { desc: 'dot seperator, 3 decimal places',
+      { desc: 'dot separator, 3 decimal places',
         dimType: 0,
         inputValue: 12.34,
         expectedValue: '12.340',
@@ -68,7 +68,7 @@ describe('BaseDimension', () => {
         DIMADEC: 2,
         DIMRND: 0.0000,
       },
-      { desc: 'hash seperator, 4 decimal places',
+      { desc: 'hash separator, 4 decimal places',
         dimType: 0,
         inputValue: 12.3456789,
         expectedValue: '12#3457',
@@ -77,7 +77,7 @@ describe('BaseDimension', () => {
         DIMADEC: 2,
         DIMRND: 0.0000,
       },
-      { desc: 'hash seperator, 2 decimal places, rounded to nearest 1',
+      { desc: 'hash separator, 2 decimal places, rounded to nearest 1',
         dimType: 0,
         inputValue: 12.3456789,
         expectedValue: '12#00',
@@ -86,7 +86,7 @@ describe('BaseDimension', () => {
         DIMADEC: 2,
         DIMRND: 1,
       },
-      { desc: 'comma seperator, 2 decimal places, rounded to nearest 1',
+      { desc: 'comma separator, 2 decimal places, rounded to nearest 1',
         dimType: 0,
         inputValue: 0.23456,
         expectedValue: '0,00',
@@ -95,7 +95,7 @@ describe('BaseDimension', () => {
         DIMADEC: 2,
         DIMRND: 1,
       },
-      { desc: 'comma seperator, 2 decimal places, rounded to nearest 0.25',
+      { desc: 'comma separator, 2 decimal places, rounded to nearest 0.25',
         dimType: 0,
         inputValue: 0.23456,
         expectedValue: '0,25',
@@ -104,7 +104,7 @@ describe('BaseDimension', () => {
         DIMADEC: 2,
         DIMRND: 0.25,
       },
-      { desc: 'Angular dimension, comma seperator, 2 decimal places, rounded to nearest 0.25',
+      { desc: 'Angular dimension, comma separator, 2 decimal places, rounded to nearest 0.25',
         dimType: 2,
         inputValue: 0.23457,
         expectedValue: '0,23°',
@@ -113,7 +113,7 @@ describe('BaseDimension', () => {
         DIMADEC: 2,
         DIMRND: 0.25,
       },
-      { desc: 'negative value, dot seperator, 4 decimal places, rounded to nearest 2',
+      { desc: 'negative value, dot separator, 4 decimal places, rounded to nearest 2',
         dimType: 0,
         inputValue: -123.45678,
         expectedValue: '124.0000',
@@ -122,7 +122,7 @@ describe('BaseDimension', () => {
         DIMADEC: 2,
         DIMRND: 2,
       },
-      { desc: 'negative value, dot seperator, 4 decimal places, rounded to nearest 2, remove trailing zeros',
+      { desc: 'negative value, dot separator, 4 decimal places, rounded to nearest 2, remove trailing zeros',
         dimType: 0,
         inputValue: -123.45678,
         expectedValue: '124',
@@ -229,16 +229,11 @@ describe('BaseDimension', () => {
 
   test('within delegates to block', () => {
     baseDim.block = { within: () => true };
-    expect(baseDim.within([])).toBe(true);
-  });
-
-  test('intersectPoints delegates to block', () => {
-    baseDim.block = { intersectPoints: () => 'ip' };
-    expect(baseDim.intersectPoints()).toBe('ip');
+    expect(baseDim.within({})).toBe(true);
   });
 
   test('touched delegates to block', () => {
     baseDim.block = { touched: () => false };
-    expect(baseDim.touched([])).toBe(false);
+    expect(baseDim.touched({})).toBe(false);
   });
 });

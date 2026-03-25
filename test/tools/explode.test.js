@@ -29,7 +29,7 @@ test('Test Explode.action', () => {
   expect(core.scene.entities.count()).toBe(5);
 
   // loop through all exploded items, check the type and
-  // check the points have be modified when exploded
+  // check the points have been modified when exploded
   const handles = new Set();
   for (let i = 0; i < core.scene.entities.count(); i++) {
     const item = core.scene.entities.get(i);
