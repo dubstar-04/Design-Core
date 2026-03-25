@@ -95,6 +95,11 @@ export class Intersection {
             extend,
         );
         result.appendPoints(inter.points);
+        // COINCIDENT (identical concentric circles) produces no discrete points,
+        // so it must be promoted to INTERSECTION explicitly.
+        if (inter.status === Intersection.Status.COINCIDENT) {
+          result.status = Intersection.Status.INTERSECTION;
+        }
       }
     }
 
@@ -421,7 +426,10 @@ export class Intersection {
           // Segments are collinear but disjoint
           result = new Intersection(Intersection.Status.NONE);
         } else {
+          // Segments overlap — return the two endpoints of the shared interval
           result = new Intersection(Intersection.Status.OVERLAPPING);
+          result.appendPoint(aStart.lerp(aEnd, Math.max(t0, bMin)));
+          result.appendPoint(aStart.lerp(aEnd, Math.min(t1, bMax)));
         }
       } else {
         // Lines are parallel but not coincident
