@@ -253,7 +253,7 @@ export class InputManager {
       case 0: // left button
         this.singleSelect();
         if (this.promptOption?.types.includes(Input.Type.MOUSEDOWN)) {
-          this.promptOption.resolve?.();
+          this.promptOption.resolve?.(true);
         }
         break;
       case 1: // middle button
@@ -273,7 +273,7 @@ export class InputManager {
         // Clear tempItems - This is here to remove the crossing window
         DesignCore.Scene.auxiliaryEntities.clear();
         if (this.promptOption?.types.includes(Input.Type.MOUSEUP)) {
-          this.promptOption.resolve?.();
+          this.promptOption.resolve?.(true);
           return;
         }
 
