@@ -167,7 +167,7 @@ export class Input {
    */
   static getType(value) {
     if (value === undefined) {
-      throw Error('Input.Type: Undefined input type');
+      return undefined;
     }
 
     const po = DesignCore.Scene.inputManager.promptOption;
@@ -254,13 +254,7 @@ export class InputManager {
       let handledByPrompt = false;
 
       if (this.promptOption) {
-        let inputType;
-        try {
-          inputType = Input.getType(input);
-        } catch {
-          inputType = undefined;
-        }
-
+        const inputType = Input.getType(input);
         const matchesType = inputType !== undefined && this.promptOption.types.includes(inputType);
         const matchesOption = this.promptOption.parseInputToOption(input) !== undefined;
 
@@ -276,8 +270,7 @@ export class InputManager {
           this.initialiseItem(DesignCore.CommandManager.getCommand(input));
           this.activeCommand.execute();
         } else if (this.promptOption) {
-          // unknown input for the active command prompt
-          // this.promptOption.respond(input);
+          // input does not match the active prompt type or any option — ignore it
           return;
         }
       }
@@ -292,7 +285,7 @@ export class InputManager {
    */
   onEnterPressed() {
     if (this.activeCommand !== undefined) {
-      if (this.promptOption.types.includes(Input.Type.SELECTIONSET) && DesignCore.Scene.selectionManager.selectionSet.accepted !== true) {
+      if (this.promptOption?.types.includes(Input.Type.SELECTIONSET) && DesignCore.Scene.selectionManager.selectionSet.accepted !== true) {
         DesignCore.Scene.selectionManager.selectionSet.accepted = true;
         this.promptOption.respond(DesignCore.Scene.selectionManager.selectionSet);
       } else {
@@ -337,7 +330,12 @@ export class InputManager {
     // Select entity only mouse is close to an entity and no snap point is available
     // Do allow selection when there is no command active
     // Don't allow selection of there is an active command that does't require a selection i.e. prompt option includes SINGLESELECTION
-    if (index !== undefined && !snap && (this.activeCommand === undefined || this.promptOption !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION) || this.promptOption.types.includes(Input.Type.SELECTIONSET)))) {
+    const canSelectEntity = index !== undefined && !snap &&
+      (this.activeCommand === undefined ||
+        this.promptOption?.types.includes(Input.Type.SINGLESELECTION) ||
+        this.promptOption?.types.includes(Input.Type.SELECTIONSET));
+
+    if (canSelectEntity) {
       const selection = DesignCore.Scene.selectionManager.singleSelect(DesignCore.Mouse.pointOnScene());
       this.onSelection(selection);
     } else if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {
@@ -370,7 +368,7 @@ export class InputManager {
 
     // Determine if the mouse is over a scene item only if no snap point is available
     if (snapped === undefined) {
-      if (this.activeCommand === undefined || this.activeCommand !== undefined && (this.promptOption.types.includes(Input.Type.SINGLESELECTION) || this.promptOption.types.includes(Input.Type.SELECTIONSET))) {
+      if (this.activeCommand === undefined || this.promptOption?.types.includes(Input.Type.SINGLESELECTION) || this.promptOption?.types.includes(Input.Type.SELECTIONSET)) {
         const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
         if (index !== undefined) {
           const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(index));
@@ -414,19 +412,16 @@ export class InputManager {
         // TODO: can't select and window select at the same time
         // This needs combining with canvas.mouseMove to define selection, snapping and window selection
         this.singleSelect();
+        if (this.promptOption?.types.includes(Input.Type.MOUSESTATECHANGE)) {
+          const point = DesignCore.Mouse.pointOnScene();
+          const mouseStateChange = new MouseStateChange(point);
+          this.promptOption.respond(mouseStateChange);
+        }
         break;
       case 1: // middle button
         break;
       case 2: // right button
         break;
-    }
-
-    if (this.promptOption !== undefined) {
-      if (this.promptOption.types.includes(Input.Type.MOUSESTATECHANGE)) {
-        const point = DesignCore.Mouse.pointOnScene();
-        const mouseStateChange = new MouseStateChange(point);
-        this.promptOption.respond(mouseStateChange);
-      }
     }
   };
 
@@ -478,8 +473,6 @@ export class InputManager {
       if (Input.getType(selection) === Input.Type.SINGLESELECTION) {
         DesignCore.Scene.selectionManager.addToSelectionSet(selection.selectedItemIndex);
       }
-
-      // update selection set
     }
   }
 
