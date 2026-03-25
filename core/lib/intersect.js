@@ -352,9 +352,23 @@ export class Intersection {
     } else {
       // Lines are parallel or coincident
       if (line2Dir.cross(startDiff) === 0 || line1Dir.cross(startDiff) === 0) {
-        // Lines are coincident (overlap)
-        result = new Intersection('Coincident');
-        // No specific intersection point added here
+        // Lines are collinear — check whether the segments actually overlap
+        // Project all four endpoints onto the shared direction axis
+        const len2 = line1Dir.x * line1Dir.x + line1Dir.y * line1Dir.y;
+        const t0 = 0; // aStart projects to 0
+        const t1 = 1; // aEnd projects to 1 (parametric)
+        const t2 = (bStart.subtract(aStart).x * line1Dir.x + bStart.subtract(aStart).y * line1Dir.y) / len2;
+        const t3 = (bEnd.subtract(aStart).x * line1Dir.x + bEnd.subtract(aStart).y * line1Dir.y) / len2;
+
+        const bMin = Math.min(t2, t3);
+        const bMax = Math.max(t2, t3);
+
+        if (bMax < t0 || bMin > t1) {
+          // Segments are collinear but disjoint
+          result = new Intersection('No Intersection');
+        } else {
+          result = new Intersection('Coincident');
+        }
       } else {
         // Lines are parallel but not coincident
         result = new Intersection('Parallel');

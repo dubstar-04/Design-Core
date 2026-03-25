@@ -97,6 +97,15 @@ test('Test intersectSegmentSegment - line line', () => {
   );
   expect(result3.status).toBe('Coincident');
   expect(result3.points.length).toBe(1);
+
+  // No Intersection - Collinear but disjoint (no overlap)
+  const result4 = Intersection.intersectSegmentSegment(
+      new Point(0, 0), new Point(0, 5),
+      new Point(0, 7), new Point(0, 10),
+      false,
+  );
+  expect(result4.status).toBe('No Intersection');
+  expect(result4.points.length).toBe(0);
 });
 
 test('Test intersectPolylinePolyline - polyline line', () => {
