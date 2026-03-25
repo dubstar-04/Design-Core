@@ -4,9 +4,9 @@ import { Utils } from './utils.js';
 
 import { DesignCore } from '../designCore.js';
 import { Point } from '../entities/point.js';
-import { Input } from './input.js';
+import { Input, MouseDown, MouseUp } from './input.js';
 
-export { Input } from './input.js';
+export { Input, MouseDown, MouseUp } from './input.js';
 export { PromptOptions } from './promptOptions.js';
 
 /** InputManager Class */
@@ -286,7 +286,7 @@ export class InputManager {
       case 0: // left button
         this.singleSelect();
         if (this.promptOption?.types.includes(Input.Type.MOUSEDOWN)) {
-          this.promptOption.resolve?.(true);
+          this.promptOption.resolve?.(new MouseDown());
         }
         break;
       case 1: // middle button
@@ -306,7 +306,7 @@ export class InputManager {
         // Clear tempItems - This is here to remove the crossing window
         DesignCore.Scene.auxiliaryEntities.clear();
         if (this.promptOption?.types.includes(Input.Type.MOUSEUP)) {
-          this.promptOption.resolve?.(true);
+          this.promptOption.resolve?.(new MouseUp());
           return;
         }
 
