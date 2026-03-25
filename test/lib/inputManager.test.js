@@ -210,6 +210,74 @@ test('Test tool switching with invalid command', () => {
   inputManager.reset();
 });
 
+// ─── onCommandButton ──────────────────────────────────────────────────────────
+
+test('onCommandButton with valid shortcut - starts command, ignores active prompt', async () => {
+  inputManager.reset();
+  // Simulate an active command with a STRING prompt waiting
+  inputManager.activeCommand = new Line();
+  const po = new PromptOptions('Enter text', [Input.Type.STRING]);
+  const p = inputManager.requestInput(po);
+
+  // clicking a toolbar button while STRING prompt is active should switch commands
+  inputManager.onCommandButton('L');
+  expect(inputManager.activeCommand).toBeDefined();
+  expect(inputManager.activeCommand.constructor.name).toBe('Line');
+
+  // the STRING promise should have been cancelled (resolved with undefined)
+  await expect(p).resolves.toBeUndefined();
+  inputManager.reset();
+});
+
+test('onCommandButton with invalid command - does nothing', () => {
+  inputManager.reset();
+  inputManager.onCommand('Line');
+  const original = inputManager.activeCommand;
+  inputManager.onCommandButton('NOTACOMMAND');
+  expect(inputManager.activeCommand).toBe(original);
+  inputManager.reset();
+});
+
+test('onCommandButton with no active command - starts command', () => {
+  inputManager.reset();
+  expect(inputManager.activeCommand).toBeUndefined();
+  inputManager.onCommandButton('REC');
+  expect(inputManager.activeCommand).toBeDefined();
+  expect(inputManager.activeCommand.constructor.name).toBe('Rectangle');
+  inputManager.reset();
+});
+
+// ─── onCommand - command shortcut while non-accepting prompt is active ─────────
+
+test('onCommand with valid shortcut while POINT prompt active - switches command without notifying', () => {
+  inputManager.reset();
+  inputManager.onCommand('Line');
+  expect(inputManager.promptOption.types).toContain(Input.Type.POINT);
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  inputManager.onCommand('C');
+  expect(notifySpy).not.toHaveBeenCalled();
+  expect(inputManager.activeCommand.constructor.name).toBe('Circle');
+  notifySpy.mockRestore();
+  inputManager.reset();
+});
+
+test('onCommand with valid shortcut while STRING prompt active - sends string to prompt', async () => {
+  inputManager.reset();
+  // Simulate an active command with a STRING prompt waiting
+  inputManager.activeCommand = new Line();
+  const po = new PromptOptions('Enter text', [Input.Type.STRING]);
+  const p = inputManager.requestInput(po);
+
+  // 'L' is the Line shortcut but a STRING prompt accepts any string - should go to prompt
+  inputManager.onCommand('L');
+  const result = await p;
+  expect(result).toBe('L');
+  // activeCommand is still the original Line stub, not a newly-started Line
+  expect(inputManager.activeCommand.constructor.name).toBe('Line');
+  inputManager.reset();
+});
+
 test('parse input to option with shortcut', () => {
   let po = new PromptOptions('Select option', [Input.Type.STRING], ['Apple', 'Banana', 'Cherry']);
   expect(po.parseInputToOption('A')).toBe('Apple');
