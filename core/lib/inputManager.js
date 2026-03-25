@@ -101,12 +101,7 @@ export class InputManager {
     // If it's a recognised command/shortcut, switch commands without
     // passing through the prompt (avoids a spurious invalid-input notification)
     if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
-      if (this.activeCommand !== undefined) {
-        this.reset();
-      }
-
-      this.initialiseItem(DesignCore.CommandManager.getCommand(input));
-      this.activeCommand.execute();
+      this.startCommand(input);
       return;
     }
 
@@ -123,15 +118,23 @@ export class InputManager {
    * @param {string} command
    */
   onCommandButton(command) {
-    if (!DesignCore.CommandManager.isCommandOrShortcut(command)) {
-      return;
+    if (DesignCore.CommandManager.isCommandOrShortcut(command)) {
+      this.startCommand(command);
     }
+  }
 
+  /**
+   * Reset any active command and start a new one.
+   * @param {string} command - command name or shortcut
+   */
+  startCommand(command) {
     if (this.activeCommand !== undefined) {
       this.reset();
     }
 
-    this.initialiseItem(DesignCore.CommandManager.getCommand(command));
+    const resolvedCommand = DesignCore.CommandManager.getCommand(command);
+    DesignCore.CommandLine.addToCommandHistory(resolvedCommand);
+    this.activeCommand = DesignCore.CommandManager.createNew(resolvedCommand);
     this.activeCommand.execute();
   }
 
@@ -163,8 +166,7 @@ export class InputManager {
       const lastCommand = DesignCore.CommandLine.lastCommand[0];
       // if there was a previous command - repeat it...
       if (lastCommand) {
-        this.initialiseItem(lastCommand);
-        this.activeCommand.execute();
+        this.startCommand(lastCommand);
       }
     }
   }
@@ -342,15 +344,6 @@ export class InputManager {
       DesignCore.Scene.selectionManager.addToSelectionSet(selection.selectedItemIndex);
     }
   }
-
-  /**
- * Initialise commands
- * @param {string} command
- */
-  initialiseItem(command) {
-    DesignCore.CommandLine.addToCommandHistory(command);
-    this.activeCommand = DesignCore.CommandManager.createNew(command);
-  };
 
   /**
    * Set the command prompt
