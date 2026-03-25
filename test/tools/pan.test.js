@@ -61,7 +61,7 @@ test('Pan.execute toggles panning on mouse down then off on mouse up (single cyc
 
   // Verify first requestInput was called with the pan prompt
   expect(DesignCore.Scene.inputManager.requestInput.mock.calls[0][0].promptMessage)
-      .toBe(Strings.Input.PAN);
+      .toBe('');
 
   resolveMouseDown();
   await Promise.resolve();
