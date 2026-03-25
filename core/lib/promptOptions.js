@@ -1,5 +1,4 @@
 import { DesignCore } from '../designCore.js';
-import { Point } from '../entities/point.js';
 import { Strings } from './strings.js';
 import { Input } from './input.js';
 
@@ -74,13 +73,8 @@ export class PromptOptions {
       return;
     }
 
-    // can't match numbers options
-    if (typeof(input) === 'number') {
-      return;
-    }
-
-    // can't match points to options
-    if (input instanceof Point) {
+    // can't match non-string values to options
+    if (typeof input !== 'string') {
       return;
     }
 
