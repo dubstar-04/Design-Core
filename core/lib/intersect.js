@@ -369,6 +369,13 @@ export class Intersection {
       return result;
     }
 
+    // Guard against zero-length (degenerate) segments.
+    // Endpoint and touching cases were already handled above; anything remaining
+    // means the point simply does not lie on the other segment.
+    if (aStart.isSame(aEnd) || bStart.isSame(bEnd)) {
+      return new Intersection(Intersection.Status.NONE);
+    }
+
     // Direction vectors and offset between start points
     const line1Dir = aEnd.subtract(aStart);
     const line2Dir = bEnd.subtract(bStart);
