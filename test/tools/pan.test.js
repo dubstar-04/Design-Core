@@ -7,6 +7,11 @@ import { jest } from '@jest/globals';
 // initialise core
 new Core();
 
+afterEach(() => {
+  jest.restoreAllMocks();
+  DesignCore.Scene.inputManager.activeCommand = undefined;
+});
+
 test('Pan.execute toggles panning on mouse down then off on mouse up (single cycle)', async () => {
   const pan = new Pan();
   DesignCore.Scene.inputManager.activeCommand = pan;
@@ -17,8 +22,7 @@ test('Pan.execute toggles panning on mouse down then off on mouse up (single cyc
   const mouseDownPromise = new Promise((r) => (resolveMouseDown = r));
   const mouseUpPromise = new Promise((r) => (resolveMouseUp = r));
 
-  DesignCore.Scene.inputManager.requestInput = jest
-      .fn()
+  jest.spyOn(DesignCore.Scene.inputManager, 'requestInput')
       .mockImplementationOnce(() => mouseDownPromise)
       .mockImplementationOnce(() => mouseUpPromise);
 
@@ -28,7 +32,7 @@ test('Pan.execute toggles panning on mouse down then off on mouse up (single cyc
   expect(DesignCore.Scene.inputManager.requestInput.mock.calls[0][0].promptMessage)
       .toBe('');
 
-  resolveMouseDown();
+  resolveMouseDown(true);
   await Promise.resolve();
   expect(pan.panning).toBe(true);
 
@@ -36,11 +40,9 @@ test('Pan.execute toggles panning on mouse down then off on mouse up (single cyc
   expect(panSpy).toHaveBeenCalledTimes(1);
 
   DesignCore.Scene.inputManager.activeCommand = false;
-  resolveMouseUp();
+  resolveMouseUp(true);
   await execPromise;
   expect(pan.panning).toBe(false);
-
-  panSpy.mockRestore();
 });
 
 
