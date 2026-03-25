@@ -4,7 +4,7 @@ import { Core } from '../../core/core/core.js';
 import { Line } from '../../core/entities/line.js';
 import { Point } from '../../core/entities/point.js';
 import { PromptOptions } from '../../core/lib/inputManager.js';
-import { Input } from '../../core/lib/inputManager.js';
+import { Input, MouseDown, MouseUp } from '../../core/lib/inputManager.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 import { expect, jest } from '@jest/globals';
 
@@ -443,7 +443,7 @@ test('mouseDown case 0 with MOUSEDOWN prompt - resolves the prompt', async () =>
   const po = new PromptOptions('', [Input.Type.MOUSEDOWN]);
   const p = inputManager.requestInput(po);
   inputManager.mouseDown(0);
-  await expect(p).resolves.toBe(true);
+  await expect(p).resolves.toBeInstanceOf(MouseDown);
   singleSelectSpy.mockRestore();
   inputManager.reset();
 });
@@ -463,7 +463,7 @@ test('mouseUp case 0 with MOUSEUP prompt - resolves the prompt and returns early
   const po = new PromptOptions('', [Input.Type.MOUSEUP]);
   const p = inputManager.requestInput(po);
   inputManager.mouseUp(0);
-  await expect(p).resolves.toBe(true);
+  await expect(p).resolves.toBeInstanceOf(MouseUp);
   expect(windowSelectSpy).not.toHaveBeenCalled();
   windowSelectSpy.mockRestore();
   inputManager.reset();
