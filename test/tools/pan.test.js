@@ -1,6 +1,7 @@
 import { Pan } from '../../core/tools/pan.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Core } from '../../core/core/core.js';
+import { MouseDown, MouseUp } from '../../core/lib/input.js';
 
 import { jest } from '@jest/globals';
 
@@ -32,7 +33,7 @@ test('Pan.execute toggles panning on mouse down then off on mouse up (single cyc
   expect(DesignCore.Scene.inputManager.requestInput.mock.calls[0][0].promptMessage)
       .toBe('');
 
-  resolveMouseDown(true);
+  resolveMouseDown(new MouseDown());
   await Promise.resolve();
   expect(pan.panning).toBe(true);
 
@@ -40,7 +41,7 @@ test('Pan.execute toggles panning on mouse down then off on mouse up (single cyc
   expect(panSpy).toHaveBeenCalledTimes(1);
 
   DesignCore.Scene.inputManager.activeCommand = undefined;
-  resolveMouseUp(true);
+  resolveMouseUp(new MouseUp());
   await execPromise;
   expect(pan.panning).toBe(false);
 });
