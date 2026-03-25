@@ -335,7 +335,7 @@ export class InputManager {
    * @param {Selection} selection
    */
   onSelection(selection) {
-    if (this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
+    if (this.activeCommand !== undefined && this.promptOption?.types.includes(Input.Type.SINGLESELECTION)) {
       this.promptOption.respond(selection);
       return;
     }
