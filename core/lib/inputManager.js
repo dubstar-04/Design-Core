@@ -88,8 +88,18 @@ export class InputManager {
    * @param {any} input
    */
   onCommand(input) {
-    // If the input is a recognised command/shortcut, switch commands immediately
-    // without passing it through the active prompt (avoids a spurious invalid-input notification)
+    // If the active prompt would accept this input, pass it through directly
+    if (this.activeCommand !== undefined && this.promptOption) {
+      const accepted = this.promptOption.acceptsInput(input) ||
+                       this.promptOption.parseInputToOption(input) !== undefined;
+      if (accepted) {
+        this.promptOption.respond(input);
+        return;
+      }
+    }
+
+    // If it's a recognised command/shortcut, switch commands without
+    // passing through the prompt (avoids a spurious invalid-input notification)
     if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
       if (this.activeCommand !== undefined) {
         this.reset();
@@ -100,10 +110,29 @@ export class InputManager {
       return;
     }
 
-    // Try to handle input with the active prompt
-    if (this.activeCommand !== undefined && this.handlePromptInput(input)) {
+    // Input is neither accepted by the prompt nor a command — let the prompt notify
+    if (this.activeCommand !== undefined) {
+      this.handlePromptInput(input);
+    }
+  }
+
+  /**
+   * Handle a command triggered by a UI button press.
+   * Always resets any active command and starts the new one,
+   * bypassing the active prompt entirely.
+   * @param {string} command
+   */
+  onCommandButton(command) {
+    if (!DesignCore.CommandManager.isCommandOrShortcut(command)) {
       return;
     }
+
+    if (this.activeCommand !== undefined) {
+      this.reset();
+    }
+
+    this.initialiseItem(DesignCore.CommandManager.getCommand(command));
+    this.activeCommand.execute();
   }
 
   /**
