@@ -198,7 +198,7 @@ export class Entity {
 
     const output = Intersection.intersectPolylinePolyline(this.toPolylinePoints(), rectPoints);
 
-    if (output.status === 'Intersection') {
+    if (output.status === Intersection.Status.INTERSECTION) {
       return true;
     }
     // no intersection found. return false

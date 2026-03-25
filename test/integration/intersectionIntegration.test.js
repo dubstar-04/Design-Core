@@ -342,7 +342,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     const line1 = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
     const line2 = new Line({ points: [new Point(0, 5), new Point(10, 5)] });
     const result = Intersection.intersectPolylinePolyline(line1.toPolylinePoints(), line2.toPolylinePoints());
-    expect(result.status).toBe('No Intersection');
+    expect(result.status).toBe('None');
     expect(result.points.length).toBe(0);
   });
 
@@ -396,7 +396,7 @@ describe('Entity-to-entity intersection via intersectPolylinePolyline', () => {
     const circle1 = new Circle({ points: [new Point(0, 0), new Point(5, 0)] }); // radius=5
     const circle2 = new Circle({ points: [new Point(50, 50), new Point(55, 50)] }); // radius=5
     const result = Intersection.intersectPolylinePolyline(circle1.toPolylinePoints(), circle2.toPolylinePoints());
-    expect(result.status).toBe('No Intersection');
+    expect(result.status).toBe('None');
   });
 
   test('Circle vs Arc', () => {
@@ -806,7 +806,7 @@ describe('Intersection edge cases', () => {
     const circle1 = new Circle({ points: [new Point(0, 0), new Point(5, 0)] }); // radius=5
     const circle2 = new Circle({ points: [new Point(0, 0), new Point(10, 0)] }); // radius=10
     const result = Intersection.intersectPolylinePolyline(circle1.toPolylinePoints(), circle2.toPolylinePoints());
-    expect(result.status).toBe('No Intersection');
+    expect(result.status).toBe('None');
   });
 
   test('Polyline segment with negative bulge', () => {
@@ -843,14 +843,14 @@ describe('Intersection with extend flag', () => {
         new Point(0, 0), new Point(5, 0),
         false,
     );
-    expect(result1.status).toBe('No Intersection');
+    expect(result1.status).toBe('None');
     // With extend - line2 projects beyond its endpoint
     const result2 = Intersection.intersectSegmentSegment(
         new Point(10, -10), new Point(10, 10),
         new Point(0, 0), new Point(5, 0),
         true,
     );
-    expect(result2.status).toBe('Intersection');
+    expect(result2.status).toBe('Perpendicular');
     expect(result2.points[0].x).toBeCloseTo(10);
     expect(result2.points[0].y).toBeCloseTo(0);
   });
@@ -870,7 +870,7 @@ describe('Intersection with extend flag', () => {
     // Line below the arc - doesn't intersect the arc without extend
     const polyline = [new Point(0, -10), new Point(0, -3)];
     const result1 = Intersection.intersectPolylinePolyline(polyline, arcPolyline, false);
-    expect(result1.status).toBe('No Intersection');
+    expect(result1.status).toBe('None');
     // With extend - uses full circle, finds intersection at (0,-5)
     const result2 = Intersection.intersectPolylinePolyline(polyline, arcPolyline, true);
     expect(result2.status).toBe('Intersection');

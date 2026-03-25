@@ -58,24 +58,32 @@ test('Test intersectSegmentSegment - concentric arcs different radius', () => {
 });
 
 test('Test intersectSegmentSegment - line line', () => {
-  // Intersection
+  // Crossing - segments cross in their interiors
   const result = Intersection.intersectSegmentSegment(
       new Point(), new Point(0, 10),
       new Point(-5, 5), new Point(5, 5),
       false,
   );
-  expect(result.status).toBe('Intersection');
+  expect(result.status).toBe('Perpendicular');
   expect(result.points.length).toBe(1);
   expect(result.points[0].x).toBeCloseTo(0);
   expect(result.points[0].y).toBeCloseTo(5);
 
-  // Intersection - Extend
+  // Crossing - non-perpendicular crossing
+  const resultCross = Intersection.intersectSegmentSegment(
+      new Point(0, 0), new Point(10, 5),
+      new Point(0, 5), new Point(10, 0),
+      false,
+  );
+  expect(resultCross.status).toBe('Crossing');
+
+  // Crossing - Extend (perpendicular - vertical boundary, horizontal selected extended)
   const result1 = Intersection.intersectSegmentSegment(
       new Point(), new Point(0, 10),
       new Point(1, 5), new Point(5, 5),
       true,
   );
-  expect(result1.status).toBe('Intersection');
+  expect(result1.status).toBe('Perpendicular');
   expect(result1.points.length).toBe(1);
   expect(result1.points[0].x).toBeCloseTo(0);
   expect(result1.points[0].y).toBeCloseTo(5);
@@ -89,13 +97,13 @@ test('Test intersectSegmentSegment - line line', () => {
   expect(result2.status).toBe('Parallel');
   expect(result2.points.length).toBe(0);
 
-  // No Intersection - Coincident
+  // Touching - endpoint of one segment lies on interior of the other
   const result3 = Intersection.intersectSegmentSegment(
       new Point(), new Point(0, 10),
       new Point(0, 1), new Point(0, 8),
       false,
   );
-  expect(result3.status).toBe('Coincident');
+  expect(result3.status).toBe('Touching');
   expect(result3.points.length).toBe(1);
 
   // No Intersection - Collinear but disjoint (no overlap)
@@ -104,8 +112,19 @@ test('Test intersectSegmentSegment - line line', () => {
       new Point(0, 7), new Point(0, 10),
       false,
   );
-  expect(result4.status).toBe('No Intersection');
+  expect(result4.status).toBe('None');
   expect(result4.points.length).toBe(0);
+
+  // Endpoint - segments share an endpoint
+  const result5 = Intersection.intersectSegmentSegment(
+      new Point(0, 0), new Point(0, 10),
+      new Point(0, 10), new Point(10, 10),
+      false,
+  );
+  expect(result5.status).toBe('Endpoint');
+  expect(result5.points.length).toBe(1);
+  expect(result5.points[0].x).toBeCloseTo(0);
+  expect(result5.points[0].y).toBeCloseTo(10);
 });
 
 test('Test intersectPolylinePolyline - polyline line', () => {
@@ -132,7 +151,7 @@ test('Test intersectPolylinePolyline - polyline line', () => {
   // No Intersection
   const line2 = [new Point(5, 0), new Point(5, 10)];
   result = Intersection.intersectPolylinePolyline(polyline, line2, false);
-  expect(result.status).toBe('No Intersection');
+  expect(result.status).toBe('None');
   expect(result.points.length).toBe(0);
 
   // Test polyline with 180 degree arc segment - 270 - 90 - negative bulge
@@ -199,7 +218,7 @@ test('Test intersectPolylinePolyline - polyline line', () => {
   polyline = points;
   line = [new Point(0, 7), new Point(10, 7)];
   result = Intersection.intersectPolylinePolyline(polyline, line, false);
-  expect(result.status).toBe('No Intersection');
+  expect(result.status).toBe('None');
   expect(result.points.length).toBe(0);
 });
 
@@ -260,7 +279,7 @@ test('Test Intersection.intersectPolylinePolyline()', () => {
   // No intersection
   const polyline3 = [new Point(20, 0), new Point(30, 0)];
   const result2 = Intersection.intersectPolylinePolyline(polyline1, polyline3, false);
-  expect(result2.status).toBe('No Intersection');
+  expect(result2.status).toBe('None');
   expect(result2.points.length).toBe(0);
 
   // Polyline with arc segment intersecting a line-segment polyline

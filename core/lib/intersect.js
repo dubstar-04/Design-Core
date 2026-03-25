@@ -3,6 +3,38 @@ import { Point } from '../entities/point.js';
 /** Intersection Class */
 export class Intersection {
   /**
+   * Enumeration of all possible intersection status values.
+   * Use these constants instead of magic strings when comparing or setting
+   * `Intersection#status`.
+   */
+  static Status = {
+    /** The geometries do not intersect. */
+    NONE: 'None',
+    /** The geometries intersect at one or more discrete points (arc/circle/polyline aggregate). */
+    INTERSECTION: 'Intersection',
+    /** Two line segments cross in their interiors (both intersection parameters strictly inside [0,1]). */
+    CROSSING: 'Crossing',
+    /** Two line segments cross in their interiors at exactly 90°. */
+    PERPENDICULAR: 'Perpendicular',
+    /** An endpoint of one segment lies in the interior of the other segment (T-intersection). */
+    TOUCHING: 'Touching',
+    /** The segments share an endpoint exactly. */
+    ENDPOINT: 'Endpoint',
+    /** The geometries are collinear and their intervals overlap (line-line). */
+    OVERLAPPING: 'Overlapping',
+    /** The geometries are collinear / coincident (used for concentric equal-radius arcs/circles). */
+    COINCIDENT: 'Coincident',
+    /** The geometries are parallel but distinct. */
+    PARALLEL: 'Parallel',
+    /** The geometries are tangent (touch at exactly one point). */
+    TANGENT: 'Tangent',
+    /** One geometry is fully inside the other with no intersection points. */
+    INSIDE: 'Inside',
+    /** The geometries are entirely separate with one outside the other. */
+    OUTSIDE: 'Outside',
+  };
+
+  /**
    * Intersection constructor
    * @param {string} status - defined status of the intersection i.e inside or outside of shape
    */
@@ -40,14 +72,19 @@ export class Intersection {
   };
 
   /**
-   * Find intersections between two polylines
+   * Find intersections between two polylines.
+   * Aggregates all segment-level results and collapses the status to a binary
+   * outcome: {@link Intersection.Status.NONE} or {@link Intersection.Status.INTERSECTION}.
+   * Use this method when you only need to know whether any intersection exists
+   * (e.g. selection / touch tests). For granular status detail (CROSSING, TOUCHING,
+   * ENDPOINT, OVERLAPPING, etc.) call {@link intersectSegmentSegment} directly.
    * @param {Array} points1 - boundary points array
    * @param {Array} points2 - selected points array
    * @param {boolean} extend - extend the selected entity
-   * @return {Intersect}
+   * @return {Intersection}
    */
   static intersectPolylinePolyline(points1, points2, extend) {
-    const result = new Intersection('No Intersection');
+    const result = new Intersection(Intersection.Status.NONE);
 
     for (let i = 0; i < points1.length - 1; i++) {
       for (let j = 0; j < points2.length - 1; j++) {
@@ -60,18 +97,20 @@ export class Intersection {
       }
     }
 
-    if (result.points.length > 0) result.status = 'Intersection';
+    if (result.points.length > 0) result.status = Intersection.Status.INTERSECTION;
     return result;
   }
 
   /**
-   * Find intersections between two polyline segments
+   * Find intersections between two polyline segments.
+   * Returns the full granular status (CROSSING, PERPENDICULAR, TOUCHING, ENDPOINT,
+   * OVERLAPPING, TANGENT, etc.) needed by geometric operations such as trim and extend.
    * @param {Point} b1 - boundary segment start point
    * @param {Point} b2 - boundary segment end point
    * @param {Point} b3 - selected segment start point
    * @param {Point} b4 - selected segment end point
    * @param {boolean} extend - extend the selected segment
-   * @return {Intersect}
+   * @return {Intersection}
    */
   static intersectSegmentSegment(b1, b2, b3, b4, extend) {
     const seg1IsArc = b1.bulge !== 0 && b1.bulge !== undefined;
@@ -105,7 +144,7 @@ export class Intersection {
       innerStatus = inter.status;
     }
 
-    const result = new Intersection(innerStatus || 'No Intersection');
+    const result = new Intersection(innerStatus || Intersection.Status.NONE);
 
     for (let i = 0; i < candidatePoints.length; i++) {
       const pt = candidatePoints[i];
@@ -128,7 +167,7 @@ export class Intersection {
       }
     }
 
-    if (result.points.length > 0 && result.status !== 'Tangent') result.status = 'Intersection';
+    if (result.points.length > 0 && result.status !== Intersection.Status.TANGENT) result.status = Intersection.Status.INTERSECTION;
     return result;
   }
 
@@ -157,9 +196,9 @@ export class Intersection {
     const deter = b * b - 4 * a * cc;
 
     if (deter < 0) {
-      result = new Intersection('Outside');
+      result = new Intersection(Intersection.Status.OUTSIDE);
     } else if (deter == 0) {
-      result = new Intersection('Tangent');
+      result = new Intersection(Intersection.Status.TANGENT);
       const u = -b / (2 * a);
       if (0 <= u && u <= 1 || extend) {
         result.appendPoint(a1.lerp(a2, u));
@@ -171,20 +210,20 @@ export class Intersection {
 
       if ((u1 < 0 || u1 > 1) && (u2 < 0 || u2 > 1)) {
         if ((u1 < 0 && u2 < 0) || (u1 > 1 && u2 > 1)) {
-          result = new Intersection('Outside');
+          result = new Intersection(Intersection.Status.OUTSIDE);
           if (extend) {
             result.appendPoint(a1.lerp(a2, u1));
             result.appendPoint(a1.lerp(a2, u2));
           }
         } else {
-          result = new Intersection('Inside');
+          result = new Intersection(Intersection.Status.INSIDE);
           if (extend) {
             result.appendPoint(a1.lerp(a2, u1));
             result.appendPoint(a1.lerp(a2, u2));
           }
         }
       } else {
-        result = new Intersection('Intersection');
+        result = new Intersection(Intersection.Status.INTERSECTION);
 
         if (0 <= u1 && u1 <= 1 || extend) {
           result.appendPoint(a1.lerp(a2, u1));
@@ -221,13 +260,13 @@ export class Intersection {
     const cDist = c1.distance(c2);
 
     if (cDist === 0) {
-      result = new Intersection(r1 === r2 ? 'Coincident' : 'Inside');
+      result = new Intersection(r1 === r2 ? Intersection.Status.COINCIDENT : Intersection.Status.INSIDE);
     } else if (cDist > rMax) {
-      result = new Intersection('Outside');
+      result = new Intersection(Intersection.Status.OUTSIDE);
     } else if (cDist < rMin) {
-      result = new Intersection('Inside');
+      result = new Intersection(Intersection.Status.INSIDE);
     } else {
-      result = new Intersection('Intersection');
+      result = new Intersection(Intersection.Status.INTERSECTION);
 
       const a = (r1 * r1 - r2 * r2 + cDist * cDist) / (2 * cDist);
       const h = Math.sqrt(r1 * r1 - a * a);
@@ -281,44 +320,50 @@ export class Intersection {
 
     // Check if any endpoints are coincident
     if (aStart.isSame(bStart)) {
-      result = new Intersection('Coincident');
+      result = new Intersection(Intersection.Status.ENDPOINT);
       result.appendPoint(new Point(aStart.x, aStart.y));
       return result;
     }
+
     if (aStart.isSame(bEnd)) {
-      result = new Intersection('Coincident');
+      result = new Intersection(Intersection.Status.ENDPOINT);
       result.appendPoint(new Point(aStart.x, aStart.y));
       return result;
     }
+
     if (aEnd.isSame(bStart)) {
-      result = new Intersection('Coincident');
+      result = new Intersection(Intersection.Status.ENDPOINT);
       result.appendPoint(new Point(aEnd.x, aEnd.y));
       return result;
     }
+
     if (aEnd.isSame(bEnd)) {
-      result = new Intersection('Coincident');
+      result = new Intersection(Intersection.Status.ENDPOINT);
       result.appendPoint(new Point(aEnd.x, aEnd.y));
       return result;
     }
 
     // Check if any endpoints of one line are on the other line
     if (aStart.isOnLine(bStart, bEnd)) {
-      result = new Intersection('Coincident');
+      result = new Intersection(Intersection.Status.TOUCHING);
       result.appendPoint(new Point(aStart.x, aStart.y));
       return result;
     }
+
     if (aEnd.isOnLine(bStart, bEnd)) {
-      result = new Intersection('Coincident');
+      result = new Intersection(Intersection.Status.TOUCHING);
       result.appendPoint(new Point(aEnd.x, aEnd.y));
       return result;
     }
+
     if (bStart.isOnLine(aStart, aEnd)) {
-      result = new Intersection('Coincident');
+      result = new Intersection(Intersection.Status.TOUCHING);
       result.appendPoint(new Point(bStart.x, bStart.y));
       return result;
     }
+
     if (bEnd.isOnLine(aStart, aEnd)) {
-      result = new Intersection('Coincident');
+      result = new Intersection(Intersection.Status.TOUCHING);
       result.appendPoint(new Point(bEnd.x, bEnd.y));
       return result;
     }
@@ -344,10 +389,11 @@ export class Intersection {
       const isExtended = (0 <= line1Lerp && line1Lerp <= 1) && extend;
 
       if (isWithinSegments || isExtended) {
-        result = new Intersection('Intersection');
+        const isPerpendicular = line1Dir.dot(line2Dir) === 0;
+        result = new Intersection(isPerpendicular ? Intersection.Status.PERPENDICULAR : Intersection.Status.CROSSING);
         result.appendPoint(aStart.lerp(aEnd, line1Lerp));
       } else {
-        result = new Intersection('No Intersection');
+        result = new Intersection(Intersection.Status.NONE);
       }
     } else {
       // Lines are parallel or coincident
@@ -365,13 +411,13 @@ export class Intersection {
 
         if (bMax < t0 || bMin > t1) {
           // Segments are collinear but disjoint
-          result = new Intersection('No Intersection');
+          result = new Intersection(Intersection.Status.NONE);
         } else {
-          result = new Intersection('Coincident');
+          result = new Intersection(Intersection.Status.OVERLAPPING);
         }
       } else {
         // Lines are parallel but not coincident
-        result = new Intersection('Parallel');
+        result = new Intersection(Intersection.Status.PARALLEL);
       }
     }
 
