@@ -1,7 +1,6 @@
 import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
-
 import { DesignCore } from '../designCore.js';
 
 /**
@@ -30,12 +29,9 @@ export class Pan extends Tool {
   async execute() {
     try {
       while (DesignCore.Scene.inputManager.activeCommand) {
-        const mouseState = new PromptOptions('', [Input.Type.MOUSESTATECHANGE]);
-        // wait for mouse down
-        await DesignCore.Scene.inputManager.requestInput(mouseState);
-        this.panning = DesignCore.Mouse.buttonOneDown ? true : false;
-        // wait for mouse up
-        await DesignCore.Scene.inputManager.requestInput(mouseState);
+        await DesignCore.Scene.inputManager.requestInput(new PromptOptions('', [Input.Type.MOUSEDOWN]));
+        this.panning = true;
+        await DesignCore.Scene.inputManager.requestInput(new PromptOptions('', [Input.Type.MOUSEUP]));
         this.panning = false;
       }
     } catch (err) {
