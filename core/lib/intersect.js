@@ -97,10 +97,12 @@ export class Intersection {
       // arc(boundary) vs line(selected)
       const inter = this.#intersectCircleLine(arc1, { start: b3, end: b4 }, extend);
       candidatePoints = inter.points;
+      innerStatus = inter.status;
     } else {
       // line(boundary) vs arc(selected)
       const inter = this.#intersectCircleLine(arc2, { start: b1, end: b2 }, false);
       candidatePoints = inter.points;
+      innerStatus = inter.status;
     }
 
     const result = new Intersection(innerStatus || 'No Intersection');
@@ -126,7 +128,7 @@ export class Intersection {
       }
     }
 
-    if (result.points.length > 0) result.status = 'Intersection';
+    if (result.points.length > 0 && result.status !== 'Tangent') result.status = 'Intersection';
     return result;
   }
 
@@ -158,7 +160,10 @@ export class Intersection {
       result = new Intersection('Outside');
     } else if (deter == 0) {
       result = new Intersection('Tangent');
-      // NOTE: should calculate this point
+      const u = -b / (2 * a);
+      if (0 <= u && u <= 1 || extend) {
+        result.appendPoint(a1.lerp(a2, u));
+      }
     } else {
       const e = Math.sqrt(deter);
       const u1 = (-b + e) / (2 * a);

@@ -21,6 +21,20 @@ test('Test intersectSegmentSegment - circle line', () => {
   expect(result.points[0].y).toBeCloseTo(10);
 });
 
+test('Test intersectSegmentSegment - tangent arc line', () => {
+  // CCW semicircular arc from (10,0) to (-10,0), centre (0,0), radius 10
+  // Horizontal line y=10 is tangent to the top of the arc at (0,10)
+  const result = Intersection.intersectSegmentSegment(
+      new Point(10, 0, 1), new Point(-10, 0),
+      new Point(-15, 10), new Point(15, 10),
+      false,
+  );
+  expect(result.status).toBe('Tangent');
+  expect(result.points.length).toBe(1);
+  expect(result.points[0].x).toBeCloseTo(0);
+  expect(result.points[0].y).toBeCloseTo(10);
+});
+
 test('Test intersectSegmentSegment - concentric arcs same radius', () => {
   // Two semicircular arcs with the same centre and radius
   const result = Intersection.intersectSegmentSegment(
