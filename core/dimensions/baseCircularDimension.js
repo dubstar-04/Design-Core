@@ -135,7 +135,9 @@ export class BaseCircularDimension extends BaseDimension {
       const intersect = Intersection.intersectSegmentSegment(line1.start, line1.end, line2.start, line2.end, true);
       // Reset Pt11 - This should be the same as the originally selected Pt11
       // Pt11 position can be changed depending on the dimstyle
-      Pt11 = intersect.points[0];
+      if (intersect.points[0]) {
+        Pt11 = intersect.points[0];
+      }
     }
 
     // set a minimum position for the text
