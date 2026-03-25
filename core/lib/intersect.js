@@ -86,11 +86,13 @@ export class Intersection {
     const arc2 = seg2IsArc ? this.#buildArc(b3, b4) : null;
 
     let candidatePoints;
+    let innerStatus;
 
     if (seg1IsArc && seg2IsArc) {
       // arc vs arc
       const inter = this.#intersectCircleCircle(arc1, arc2);
       candidatePoints = inter.points;
+      innerStatus = inter.status;
     } else if (seg1IsArc) {
       // arc(boundary) vs line(selected)
       const inter = this.#intersectCircleLine(arc1, { start: b3, end: b4 }, extend);
@@ -101,7 +103,7 @@ export class Intersection {
       candidatePoints = inter.points;
     }
 
-    const result = new Intersection('No Intersection');
+    const result = new Intersection(innerStatus || 'No Intersection');
 
     for (let i = 0; i < candidatePoints.length; i++) {
       const pt = candidatePoints[i];
@@ -213,7 +215,9 @@ export class Intersection {
     // Determine actual distance between circle circles
     const cDist = c1.distance(c2);
 
-    if (cDist > rMax) {
+    if (cDist === 0) {
+      result = new Intersection(r1 === r2 ? 'Coincident' : 'Inside');
+    } else if (cDist > rMax) {
       result = new Intersection('Outside');
     } else if (cDist < rMin) {
       result = new Intersection('Inside');

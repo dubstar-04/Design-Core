@@ -21,6 +21,28 @@ test('Test intersectSegmentSegment - circle line', () => {
   expect(result.points[0].y).toBeCloseTo(10);
 });
 
+test('Test intersectSegmentSegment - concentric arcs same radius', () => {
+  // Two semicircular arcs with the same centre and radius
+  const result = Intersection.intersectSegmentSegment(
+      new Point(10, 0, 1), new Point(-10, 0),
+      new Point(0, 10, 1), new Point(0, -10),
+      false,
+  );
+  expect(result.status).toBe('Coincident');
+  expect(result.points.length).toBe(0);
+});
+
+test('Test intersectSegmentSegment - concentric arcs different radius', () => {
+  // Two semicircular arcs with the same centre but different radii
+  const result = Intersection.intersectSegmentSegment(
+      new Point(10, 0, 1), new Point(-10, 0),
+      new Point(5, 0, 1), new Point(-5, 0),
+      false,
+  );
+  expect(result.status).toBe('Inside');
+  expect(result.points.length).toBe(0);
+});
+
 test('Test intersectSegmentSegment - line line', () => {
   // Intersection
   const result = Intersection.intersectSegmentSegment(
