@@ -39,7 +39,7 @@ test('Pan.execute toggles panning on mouse down then off on mouse up (single cyc
   pan.preview();
   expect(panSpy).toHaveBeenCalledTimes(1);
 
-  DesignCore.Scene.inputManager.activeCommand = false;
+  DesignCore.Scene.inputManager.activeCommand = undefined;
   resolveMouseUp(true);
   await execPromise;
   expect(pan.panning).toBe(false);
