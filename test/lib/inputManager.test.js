@@ -375,7 +375,7 @@ test('mouseDown case 0 with MOUSEDOWN prompt - resolves the prompt', async () =>
   const po = new PromptOptions('', [Input.Type.MOUSEDOWN]);
   const p = inputManager.requestInput(po);
   inputManager.mouseDown(0);
-  await expect(p).resolves.toBeUndefined();
+  await expect(p).resolves.toBe(true);
   singleSelectSpy.mockRestore();
   inputManager.reset();
 });
@@ -395,7 +395,7 @@ test('mouseUp case 0 with MOUSEUP prompt - resolves the prompt and returns early
   const po = new PromptOptions('', [Input.Type.MOUSEUP]);
   const p = inputManager.requestInput(po);
   inputManager.mouseUp(0);
-  await expect(p).resolves.toBeUndefined();
+  await expect(p).resolves.toBe(true);
   expect(windowSelectSpy).not.toHaveBeenCalled();
   windowSelectSpy.mockRestore();
   inputManager.reset();
