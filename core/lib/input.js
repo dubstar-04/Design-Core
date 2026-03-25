@@ -1,3 +1,9 @@
+/** Sentinel resolved when a MOUSEDOWN prompt completes */
+export class MouseDown {}
+
+/** Sentinel resolved when a MOUSEUP prompt completes */
+export class MouseUp {}
+
 /** Input Class */
 export class Input {
   static Type = {
