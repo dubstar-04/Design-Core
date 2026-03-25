@@ -79,34 +79,42 @@ export class InputManager {
    * @param {any} input
    */
   onCommand(input) {
-    if (this.activeCommand !== undefined) {
-      let handledByPrompt = false;
+    // Try to handle input with the active prompt
+    if (this.activeCommand !== undefined && this.handlePromptInput(input)) {
+      return;
+    }
 
-      if (this.promptOption) {
-        const inputType = Input.getType(input);
-        const matchesType = inputType !== undefined && this.promptOption.types.includes(inputType);
-        const matchesOption = this.promptOption.parseInputToOption(input) !== undefined;
-
-        if (matchesType || matchesOption) {
-          this.promptOption.respond(input);
-          handledByPrompt = true;
-        }
+    // Start or switch to a new command
+    if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
+      if (this.activeCommand !== undefined) {
+        this.reset();
       }
 
-      if (!handledByPrompt) {
-        if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
-          this.reset();
-          this.initialiseItem(DesignCore.CommandManager.getCommand(input));
-          this.activeCommand.execute();
-        } else if (this.promptOption) {
-          // input does not match the active prompt type or any option — ignore it
-          return;
-        }
-      }
-    } else if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
       this.initialiseItem(DesignCore.CommandManager.getCommand(input));
       this.activeCommand.execute();
     }
+  }
+
+  /**
+   * Try to handle input with the active prompt
+   * @param {any} input
+   * @return {boolean} true if handled
+   */
+  handlePromptInput(input) {
+    if (!this.promptOption) {
+      return false;
+    }
+
+    const inputType = Input.getType(input);
+    const matchesType = inputType !== undefined && this.promptOption.types.includes(inputType);
+    const matchesOption = this.promptOption.parseInputToOption(input) !== undefined;
+
+    if (matchesType || matchesOption) {
+      this.promptOption.respond(input);
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -188,24 +196,8 @@ export class InputManager {
       }
     }
 
-    // store the snapped point
-    let snapped;
-    let selecting = false;
-    if (this.snapping.active) {
-      snapped = this.snapping.snap();
-    }
-
-    // Determine if the mouse is over a scene item only if no snap point is available
-    if (snapped === undefined) {
-      if (this.activeCommand === undefined || this.promptOption?.types.includes(Input.Type.SINGLESELECTION) || this.promptOption?.types.includes(Input.Type.SELECTIONSET)) {
-        const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
-        if (index !== undefined) {
-          const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(index));
-          DesignCore.Scene.tempEntities.add(copyofitem);
-          selecting = true;
-        }
-      }
-    }
+    const snapped = this.snapping.active && this.snapping.snap();
+    const selecting = !snapped && this.highlightEntityUnderMouse();
 
     // preview active commands when items are not being selected
     if (this.activeCommand !== undefined && !selecting) {
@@ -213,6 +205,26 @@ export class InputManager {
     }
 
     DesignCore.Canvas.requestPaint();
+  }
+
+  /**
+   * Highlight the entity under the mouse cursor
+   * @return {boolean} true if an entity was highlighted
+   */
+  highlightEntityUnderMouse() {
+    if (this.activeCommand !== undefined &&
+      !this.promptOption?.types.includes(Input.Type.SINGLESELECTION) &&
+      !this.promptOption?.types.includes(Input.Type.SELECTIONSET)) {
+      return false;
+    }
+
+    const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
+    if (index !== undefined) {
+      DesignCore.Scene.tempEntities.add(Utils.cloneObject(DesignCore.Scene.entities.get(index)));
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -241,11 +253,7 @@ export class InputManager {
         // TODO: can't select and window select at the same time
         // This needs combining with canvas.mouseMove to define selection, snapping and window selection
         this.singleSelect();
-        if (this.promptOption?.types.includes(Input.Type.MOUSESTATECHANGE)) {
-          const point = DesignCore.Mouse.pointOnScene();
-          const mouseStateChange = new MouseStateChange(point);
-          this.promptOption.respond(mouseStateChange);
-        }
+        this.respondWithMouseStateChange();
         break;
       case 1: // middle button
         break;
@@ -264,13 +272,8 @@ export class InputManager {
         // Clear tempItems - This is here to remove the crossing window
         DesignCore.Scene.auxiliaryEntities.clear();
 
-
         if (this.promptOption !== undefined) {
-          if (this.promptOption.types.includes(Input.Type.MOUSESTATECHANGE)) {
-            const point = DesignCore.Mouse.pointOnScene();
-            const mouseStateChange = new MouseStateChange(point);
-            this.promptOption.respond(mouseStateChange);
-          }
+          this.respondWithMouseStateChange();
           // check if the active command requires a selection set
           if (!this.promptOption.types.includes(Input.Type.SELECTIONSET)) {
             return;
@@ -292,16 +295,26 @@ export class InputManager {
   };
 
   /**
+   * Respond to a MOUSESTATECHANGE prompt with the current mouse position
+   */
+  respondWithMouseStateChange() {
+    if (this.promptOption?.types.includes(Input.Type.MOUSESTATECHANGE)) {
+      this.promptOption.respond(new MouseStateChange(DesignCore.Mouse.pointOnScene()));
+    }
+  }
+
+  /**
    * Handle canvas selection
    * @param {Selection} selection
    */
   onSelection(selection) {
     if (this.activeCommand !== undefined && this.promptOption.types.includes(Input.Type.SINGLESELECTION)) {
       this.promptOption.respond(selection);
-    } else {
-      if (Input.getType(selection) === Input.Type.SINGLESELECTION) {
-        DesignCore.Scene.selectionManager.addToSelectionSet(selection.selectedItemIndex);
-      }
+      return;
+    }
+
+    if (Input.getType(selection) === Input.Type.SINGLESELECTION) {
+      DesignCore.Scene.selectionManager.addToSelectionSet(selection.selectedItemIndex);
     }
   }
 
