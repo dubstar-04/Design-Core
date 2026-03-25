@@ -1,4 +1,5 @@
 import { Point } from '../entities/point.js';
+import { Utils } from './utils.js';
 
 /** Intersection Class */
 export class Intersection {
@@ -389,7 +390,7 @@ export class Intersection {
       const isExtended = (0 <= line1Lerp && line1Lerp <= 1) && extend;
 
       if (isWithinSegments || isExtended) {
-        const isPerpendicular = line1Dir.dot(line2Dir) === 0;
+        const isPerpendicular = Utils.round(line1Dir.dot(line2Dir)) === 0;
         result = new Intersection(isPerpendicular ? Intersection.Status.PERPENDICULAR : Intersection.Status.CROSSING);
         result.appendPoint(aStart.lerp(aEnd, line1Lerp));
       } else {
