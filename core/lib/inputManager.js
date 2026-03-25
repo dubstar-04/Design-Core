@@ -6,7 +6,6 @@ import { DesignCore } from '../designCore.js';
 import { Point } from '../entities/point.js';
 import { MouseStateChange } from './mouseStateChange.js';
 import { Input } from './input.js';
-import { PromptOptions } from './promptOptions.js';
 
 export { MouseStateChange } from './mouseStateChange.js';
 export { Input } from './input.js';
