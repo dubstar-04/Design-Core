@@ -11,6 +11,13 @@ import { expect, jest } from '@jest/globals';
 const core = new Core();
 const inputManager = core.scene.inputManager;
 
+afterEach(() => {
+  // Cancel any in-flight prompt and clear command/snapping state so tests
+  // cannot leak into one another regardless of pass/fail or input path taken.
+  inputManager.reset();
+  // Restore all spies unconditionally so mocks don't bleed across tests.
+  jest.restoreAllMocks();
+});
 
 test('requestInput resolves when PromptOptions.respond is called', async () => {
   const po = new PromptOptions('Enter text', [Input.Type.STRING]);
