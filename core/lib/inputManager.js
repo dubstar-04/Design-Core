@@ -88,12 +88,8 @@ export class InputManager {
    * @param {any} input
    */
   onCommand(input) {
-    // Try to handle input with the active prompt
-    if (this.activeCommand !== undefined && this.handlePromptInput(input)) {
-      return;
-    }
-
-    // Start or switch to a new command
+    // If the input is a recognised command/shortcut, switch commands immediately
+    // without passing it through the active prompt (avoids a spurious invalid-input notification)
     if (DesignCore.CommandManager.isCommandOrShortcut(input)) {
       if (this.activeCommand !== undefined) {
         this.reset();
@@ -101,6 +97,12 @@ export class InputManager {
 
       this.initialiseItem(DesignCore.CommandManager.getCommand(input));
       this.activeCommand.execute();
+      return;
+    }
+
+    // Try to handle input with the active prompt
+    if (this.activeCommand !== undefined && this.handlePromptInput(input)) {
+      return;
     }
   }
 
