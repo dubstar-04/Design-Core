@@ -4,10 +4,8 @@ import { Utils } from './utils.js';
 
 import { DesignCore } from '../designCore.js';
 import { Point } from '../entities/point.js';
-import { MouseStateChange } from './mouseStateChange.js';
 import { Input } from './input.js';
 
-export { MouseStateChange } from './mouseStateChange.js';
 export { Input } from './input.js';
 export { PromptOptions } from './promptOptions.js';
 
@@ -64,13 +62,24 @@ export class InputManager {
     });
 
     if (promptOption.types.includes(Input.Type.POINT)) {
-      // turn on snapping
       this.snapping.active = true;
     }
 
-    return new Promise((resolve, reject) => {
-      this.promptOption.setResolve(resolve);
-      this.promptOption.setReject(reject);
+    return promptOption.createPromise().then((input) => {
+      if (input === undefined) return undefined;
+
+      // Handle DYNAMIC: convert number to projected point
+      if (promptOption.types.includes(Input.Type.DYNAMIC) && !isNaN(input)) {
+        const angle = this.inputPoint.angle(DesignCore.Mouse.pointOnScene());
+        input = this.inputPoint.project(angle, input);
+      }
+
+      // Track the last input point
+      if (input instanceof Point) {
+        this.inputPoint = input;
+      }
+
+      return input;
     });
   }
 
@@ -105,16 +114,7 @@ export class InputManager {
       return false;
     }
 
-    const inputType = Input.getType(input);
-    const matchesType = inputType !== undefined && this.promptOption.types.includes(inputType);
-    const matchesOption = this.promptOption.parseInputToOption(input) !== undefined;
-
-    if (matchesType || matchesOption) {
-      this.promptOption.respond(input);
-      return true;
-    }
-
-    return false;
+    return this.promptOption.respond(input);
   }
 
   /**
@@ -189,7 +189,8 @@ export class InputManager {
     DesignCore.Scene.auxiliaryEntities.clear();
 
     if (DesignCore.Mouse.buttonOneDown) {
-      const windowSelect = !this.promptOption || this.promptOption.types.includes(Input.Type.SELECTIONSET);
+      const windowSelect = (this.activeCommand === undefined && !this.promptOption) ||
+        this.promptOption?.types.includes(Input.Type.SELECTIONSET);
 
       if (windowSelect) {
         DesignCore.Scene.selectionManager.drawSelectionWindow();
@@ -250,10 +251,10 @@ export class InputManager {
   mouseDown(button) {
     switch (button) {
       case 0: // left button
-        // TODO: can't select and window select at the same time
-        // This needs combining with canvas.mouseMove to define selection, snapping and window selection
         this.singleSelect();
-        this.respondWithMouseStateChange();
+        if (this.promptOption?.types.includes(Input.Type.MOUSEDOWN)) {
+          this.promptOption.resolve?.();
+        }
         break;
       case 1: // middle button
         break;
@@ -271,13 +272,15 @@ export class InputManager {
       case 0: // left button
         // Clear tempItems - This is here to remove the crossing window
         DesignCore.Scene.auxiliaryEntities.clear();
+        if (this.promptOption?.types.includes(Input.Type.MOUSEUP)) {
+          this.promptOption.resolve?.();
+          return;
+        }
 
-        if (this.promptOption !== undefined) {
-          this.respondWithMouseStateChange();
-          // check if the active command requires a selection set
-          if (!this.promptOption.types.includes(Input.Type.SELECTIONSET)) {
-            return;
-          }
+        // Skip window selection when there is an active prompt or command, unless it is a selection set
+        if ((this.promptOption !== undefined || this.activeCommand !== undefined) &&
+            !this.promptOption?.types.includes(Input.Type.SELECTIONSET)) {
+          return;
         }
 
         // check if the mouse position has changed since mousedown
@@ -293,15 +296,6 @@ export class InputManager {
         break;
     }
   };
-
-  /**
-   * Respond to a MOUSESTATECHANGE prompt with the current mouse position
-   */
-  respondWithMouseStateChange() {
-    if (this.promptOption?.types.includes(Input.Type.MOUSESTATECHANGE)) {
-      this.promptOption.respond(new MouseStateChange(DesignCore.Mouse.pointOnScene()));
-    }
-  }
 
   /**
    * Handle canvas selection
