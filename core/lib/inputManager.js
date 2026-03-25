@@ -61,9 +61,7 @@ export class InputManager {
       }
     });
 
-    if (promptOption.types.includes(Input.Type.POINT)) {
-      this.snapping.active = true;
-    }
+    this.snapping.active = promptOption.types.includes(Input.Type.POINT);
 
     return promptOption.createPromise().then((input) => {
       if (input === undefined) return undefined;
@@ -79,6 +77,7 @@ export class InputManager {
         this.inputPoint = input;
       }
 
+      this.snapping.active = false;
       return input;
     });
   }
