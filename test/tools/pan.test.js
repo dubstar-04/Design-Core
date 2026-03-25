@@ -1,46 +1,11 @@
 import { Pan } from '../../core/tools/pan.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Core } from '../../core/core/core.js';
-import { Strings } from '../../core/lib/strings.js';
+
 import { jest } from '@jest/globals';
 
 // initialise core
 new Core();
-
-/*
-test('Pan.execute should set panning true on mouse down and false on mouse up', async () => {
-  // Mock inputManager.requestInput to simulate mouse down and up
-  const pan = new Pan();
-
-  // Mock requestInput to resolve immediately
-  DesignCore.Scene.inputManager.requestInput = jest.fn()
-      .mockResolvedValueOnce() // Simulate mouse down
-      .mockResolvedValueOnce(); // Simulate mouse up
-
-  // Run execute once (simulate one pan cycle)
-  // const executePromise = pan.execute();
-
-  DesignCore.Scene.inputManager.activeCommand = true; // Start the loop
-  await pan.execute(2); // Run the method
-
-  // Wait for the first mouse down
-  DesignCore.Mouse.buttonOneDown = true;
-  await DesignCore.Scene.inputManager.requestInput.mock.results[0].value;
-  expect(pan.panning).toBe(true);
-
-  // Simulate mouse up
-  DesignCore.Mouse.buttonOneDown = false;
-  await DesignCore.Scene.inputManager.requestInput.mock.results[1].value;
-  expect(pan.panning).toBe(false);
-
-  DesignCore.Scene.inputManager.activeCommand = false;
-
-
-  // Stop the infinite loop
-  // executePromise.catch(() => {});
-});
-*/
-
 
 test('Pan.execute toggles panning on mouse down then off on mouse up (single cycle)', async () => {
   const pan = new Pan();
