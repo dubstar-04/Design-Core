@@ -259,7 +259,7 @@ test('Chamfer.action notifies when distance is too large for the segments', () =
   chamfer.secondClickPoint = new Point(0, 2);
   chamfer.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.RADIUSTOOLARGE));
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.DISTANCETOOLARGE));
   expect(core.scene.entities.count()).toBe(2);
   notifySpy.mockRestore();
 });
