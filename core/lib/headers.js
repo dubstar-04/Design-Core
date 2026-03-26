@@ -156,7 +156,7 @@ export class Headers {
    */
   dxf(file) {
     file.writeGroupCode('9', '$ACADVER');
-    file.writeGroupCode('1', DXFFile.Version[this.dxfVersion]);
+    file.writeGroupCode('1', file.version);
     file.writeGroupCode('9', '$TEXTSTYLE');
     // TODO: StyleManager write to headers?
     file.writeGroupCode('7', DesignCore.StyleManager.getCstyle());
