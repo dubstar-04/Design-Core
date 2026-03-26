@@ -122,8 +122,13 @@ export class Fillet extends Tool {
   action() {
     if (!this.firstEntity || !this.secondEntity) return;
 
-    if (this.firstEntity.type !== 'Line' || this.secondEntity.type !== 'Line') {
+    if (this.firstEntity.type !== 'Line') {
       DesignCore.Core.notify(`${this.firstEntity.type} ${Strings.Message.NOFILLET}`);
+      return;
+    }
+
+    if (this.secondEntity.type !== 'Line') {
+      DesignCore.Core.notify(`${this.secondEntity.type} ${Strings.Message.NOFILLET}`);
       return;
     }
 
