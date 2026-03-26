@@ -101,7 +101,6 @@ export class Fillet extends Tool {
 
   /**
    * Perform the fillet
-   * Supports Line–Line fillet with optional tangent-arc insertion and trim.
    */
   action() {
     if (!this.firstEntity || !this.secondEntity) return;
