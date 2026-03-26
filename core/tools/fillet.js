@@ -19,6 +19,8 @@ export class Fillet extends Tool {
     this.trim = true;
     this.firstEntity = null;
     this.secondEntity = null;
+    // If the lines form a cross there are four possible fillet locations.
+    // The click points are used to determine the arc location.
     this.firstClickPoint = null;
     this.secondClickPoint = null;
   }
@@ -111,103 +113,126 @@ export class Fillet extends Tool {
       return;
     }
 
-    const p1 = this.firstEntity.points[0];
-    const p2 = this.firstEntity.points[1];
-    const p3 = this.secondEntity.points[0];
-    const p4 = this.secondEntity.points[1];
+    // Endpoints of the first line
+    const firstLineStart = this.firstEntity.points[0];
+    const firstLineEnd = this.firstEntity.points[1];
 
-    // Direction vectors
-    const d1 = p2.subtract(p1);
-    const d2 = p4.subtract(p3);
-    const cross = d1.cross(d2);
+    // Endpoints of the second line
+    const secondLineStart = this.secondEntity.points[0];
+    const secondLineEnd = this.secondEntity.points[1];
 
-    if (Math.abs(cross) < 1e-10) {
+    // Direction vectors along each line
+    const firstLineDirection = firstLineEnd.subtract(firstLineStart);
+    const secondLineDirection = secondLineEnd.subtract(secondLineStart);
+
+    // Cross product of the two direction vectors; zero means the lines are parallel
+    const directionCross = firstLineDirection.cross(secondLineDirection);
+
+    if (Math.abs(directionCross) < 1e-10) {
       DesignCore.Core.notify(Strings.Error.PARALLELLINES);
       return;
     }
 
-    // Virtual intersection point I (parametric line–line intersection)
-    const diff = p3.subtract(p1);
-    const t = diff.cross(d2) / cross;
-    const I = new Point(p1.x + t * d1.x, p1.y + t * d1.y);
+    // Find where the two infinite lines intersect using the parametric form:
+    // point = firstLineStart + (intersectParam * firstLineDirection)
+    // intersectParam = 0 is firstLineStart, intersectParam = 1 is firstLineEnd
+    const startDiff = secondLineStart.subtract(firstLineStart);
+    const intersectParam = startDiff.cross(secondLineDirection) / directionCross;
 
-    // Determine which endpoint of each line is on the "kept" side
-    const farEnd1 = this.firstClickPoint.distance(p1) >= this.firstClickPoint.distance(p2) ? p1 : p2;
-    const farEnd2 = this.secondClickPoint.distance(p3) >= this.secondClickPoint.distance(p4) ? p3 : p4;
+    // Virtual intersection point of the two (infinite) lines
+    const intersectionPoint = new Point(
+        firstLineStart.x + intersectParam * firstLineDirection.x,
+        firstLineStart.y + intersectParam * firstLineDirection.y,
+    );
 
-    // radius = 0: sharp corner only
+    // The endpoint of each line farthest from the intersection is the one to keep after trimming
+    const firstLineKeptEnd = intersectionPoint.distance(firstLineStart) >= intersectionPoint.distance(firstLineEnd) ? firstLineStart : firstLineEnd;
+    const secondLineKeptEnd = intersectionPoint.distance(secondLineStart) >= intersectionPoint.distance(secondLineEnd) ? secondLineStart : secondLineEnd;
+
+    // radius = 0: trim/extend both lines to the sharp intersection with no arc
     if (this.radius === 0) {
       if (this.trim) {
         const stateChanges = [
-          new UpdateState(this.firstEntity, { points: [farEnd1, I] }),
-          new UpdateState(this.secondEntity, { points: [farEnd2, I] }),
+          new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, intersectionPoint] }),
+          new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, intersectionPoint] }),
         ];
         DesignCore.Scene.commit(stateChanges);
       }
       return;
     }
 
-    // Project click points onto their respective lines to get accurate direction vectors
-    const c1 = this.firstClickPoint.perpendicular(p1, p2);
-    const c2 = this.secondClickPoint.perpendicular(p3, p4);
+    // Project the click points onto their respective lines so they sit exactly on the line.
+    // This gives a point on the clicked side of the intersection, used to determine
+    // which of the four corners formed by the two lines receives the fillet arc.
+    const firstClickOnLine = this.firstClickPoint.perpendicular(firstLineStart, firstLineEnd);
+    const secondClickOnLine = this.secondClickPoint.perpendicular(secondLineStart, secondLineEnd);
 
-    const v1 = c1.subtract(I);
-    const v2 = c2.subtract(I);
-    const len1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
-    const len2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+    // Vectors from the intersection toward the clicked side of each line
+    const firstClickDirection = firstClickOnLine.subtract(intersectionPoint);
+    const secondClickDirection = secondClickOnLine.subtract(intersectionPoint);
 
-    if (len1 < 1e-10 || len2 < 1e-10) {
+    const firstClickDistance = Math.sqrt(firstClickDirection.x ** 2 + firstClickDirection.y ** 2);
+    const secondClickDistance = Math.sqrt(secondClickDirection.x ** 2 + secondClickDirection.y ** 2);
+
+    if (firstClickDistance < 1e-10 || secondClickDistance < 1e-10) {
       DesignCore.Core.notify(`${this.type} ${Strings.Message.NOFILLET}`);
       return;
     }
 
-    const u1 = new Point(v1.x / len1, v1.y / len1);
-    const u2 = new Point(v2.x / len2, v2.y / len2);
+    // Unit vectors pointing from the intersection toward the clicked side of each line
+    const firstClickUnit = new Point(firstClickDirection.x / firstClickDistance, firstClickDirection.y / firstClickDistance);
+    const secondClickUnit = new Point(secondClickDirection.x / secondClickDistance, secondClickDirection.y / secondClickDistance);
 
-    const cosAlpha = Math.min(1, Math.max(-1, u1.x * u2.x + u1.y * u2.y));
-    const alpha = Math.acos(cosAlpha);
+    // Angle between the two clicked-side direction vectors (i.e. the opening angle of the chosen corner)
+    const cosAngle = Math.min(1, Math.max(-1, firstClickUnit.x * secondClickUnit.x + firstClickUnit.y * secondClickUnit.y));
+    const cornerAngle = Math.acos(cosAngle);
 
     // Collinear or antiparallel lines cannot be filleted
-    if (alpha < 1e-10 || alpha > Math.PI - 1e-10) {
+    if (cornerAngle < 1e-10 || cornerAngle > Math.PI - 1e-10) {
       DesignCore.Core.notify(`${this.type} ${Strings.Message.NOFILLET}`);
       return;
     }
 
-    // Bisector direction (points into the corner toward the fillet center)
-    const bisSum = new Point(u1.x + u2.x, u1.y + u2.y);
-    const bisLen = Math.sqrt(bisSum.x * bisSum.x + bisSum.y * bisSum.y);
+    // Bisector unit vector: points into the chosen corner toward the fillet centre
+    const bisectorSum = new Point(firstClickUnit.x + secondClickUnit.x, firstClickUnit.y + secondClickUnit.y);
+    const bisectorLength = Math.sqrt(bisectorSum.x ** 2 + bisectorSum.y ** 2);
 
-    if (bisLen < 1e-10) {
+    if (bisectorLength < 1e-10) {
       DesignCore.Core.notify(`${this.type} ${Strings.Message.NOFILLET}`);
       return;
     }
 
-    const bisector = new Point(bisSum.x / bisLen, bisSum.y / bisLen);
+    const bisectorUnit = new Point(bisectorSum.x / bisectorLength, bisectorSum.y / bisectorLength);
 
-    // Distance from I to fillet centre along the bisector
-    const dist = this.radius / Math.sin(alpha / 2);
-    const C = new Point(I.x + bisector.x * dist, I.y + bisector.y * dist);
+    // Distance from the intersection point to the fillet centre along the bisector
+    const intersectToCentreDistance = this.radius / Math.sin(cornerAngle / 2);
 
-    // Tangent points: foot of perpendicular from C to each line
-    const T1 = C.perpendicular(p1, p2);
-    const T2 = C.perpendicular(p3, p4);
+    // Fillet arc centre point
+    const arcCentre = new Point(
+        intersectionPoint.x + bisectorUnit.x * intersectToCentreDistance,
+        intersectionPoint.y + bisectorUnit.y * intersectToCentreDistance,
+    );
 
-    // Arc winding direction: CCW if (T1–C) × (T2–C) > 0
-    const cT1 = T1.subtract(C);
-    const cT2 = T2.subtract(C);
-    const dirCross = cT1.x * cT2.y - cT1.y * cT2.x;
-    const direction = dirCross > 0 ? 1 : -1;
+    // Tangent points where the fillet arc meets each line (foot of perpendicular from centre to line)
+    const firstTangentPoint = arcCentre.perpendicular(firstLineStart, firstLineEnd);
+    const secondTangentPoint = arcCentre.perpendicular(secondLineStart, secondLineEnd);
+
+    // Determine arc winding direction: CCW (1) if (T1–C) × (T2–C) > 0, otherwise CW (-1)
+    const centreToFirst = firstTangentPoint.subtract(arcCentre);
+    const centreToSecond = secondTangentPoint.subtract(arcCentre);
+    const windingCross = centreToFirst.x * centreToSecond.y - centreToFirst.y * centreToSecond.x;
+    const arcDirection = windingCross > 0 ? 1 : -1;
 
     const arc = DesignCore.CommandManager.createNew('Arc', {
-      points: [C, T1, T2],
-      direction: direction,
+      points: [arcCentre, firstTangentPoint, secondTangentPoint],
+      direction: arcDirection,
     });
 
     const stateChanges = [new AddState(arc)];
 
     if (this.trim) {
-      stateChanges.push(new UpdateState(this.firstEntity, { points: [farEnd1, T1] }));
-      stateChanges.push(new UpdateState(this.secondEntity, { points: [farEnd2, T2] }));
+      stateChanges.push(new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, firstTangentPoint] }));
+      stateChanges.push(new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, secondTangentPoint] }));
     }
 
     DesignCore.Scene.commit(stateChanges);
