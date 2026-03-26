@@ -75,7 +75,7 @@ export class Core {
    * Get the current dxf version
    */
   get dxfVersion() {
-    return this.scene.dxfVersion;
+    return this.scene.headers.dxfVersion;
   }
 
   /**
@@ -83,18 +83,7 @@ export class Core {
    * @param {string} version
    */
   set dxfVersion(version) {
-    // version should be the RXXXX format for the dxf version
-
-    // Check if we have the ACXXXX value
-    if (DXFFile.validDxfVersion(version)) {
-      // convert the ACXXXX value to the key RXXXX value
-      version = DXFFile.getVersionKey(version);
-    }
-
-    // Check if we have the RXXXX value
-    if (DXFFile.validDxfKey(version)) {
-      this.scene.dxfVersion = version;
-    }
+    this.scene.headers.dxfVersion = version;
   }
 
   /**
