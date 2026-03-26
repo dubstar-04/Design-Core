@@ -202,7 +202,7 @@ export class Chamfer extends Tool {
 
     // Unit vectors pointing from the intersection toward the clicked side of each line
     if (firstClickDistance < 1e-10 || secondClickDistance < 1e-10) {
-      DesignCore.Core.notify(`${this.type} ${Strings.Message.NOCHAMFER}`);
+      DesignCore.Core.notify(`Selected corner ${Strings.Message.NOCHAMFER}`);
       return;
     }
     const firstClickUnit = new Point(firstClickDir.x / firstClickDistance, firstClickDir.y / firstClickDistance);
@@ -246,7 +246,7 @@ export class Chamfer extends Tool {
       const alpha = DesignCore.Scene.headers.chamferAngle * (Math.PI / 180);
 
       if (alpha <= 0 || alpha >= Math.PI) {
-        DesignCore.Core.notify(`${this.type} ${Strings.Message.NOCHAMFER}`);
+        DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
         return;
       }
 
@@ -272,7 +272,7 @@ export class Chamfer extends Tool {
       const chamferCross = chamferDir.cross(secondLineDirection);
       if (Math.abs(chamferCross) < 1e-10) {
         // Chamfer direction is parallel to line2 — no intersection
-        DesignCore.Core.notify(`${this.type} ${Strings.Message.NOCHAMFER}`);
+        DesignCore.Core.notify(Strings.Error.PARALLELLINES);
         return;
       }
       const diff = secondLineStart.subtract(firstChamferPoint);
@@ -287,7 +287,7 @@ export class Chamfer extends Tool {
     if (trimMode) {
       if (!firstChamferPoint.isOnLine(firstLineStart, firstLineEnd) ||
         !secondChamferPoint.isOnLine(secondLineStart, secondLineEnd)) {
-        DesignCore.Core.notify(`${this.type}: ${Strings.Error.RADIUSTOOLARGE}`);
+        DesignCore.Core.notify(`${Strings.Error.DISTANCETOOLARGE}`);
         return;
       }
     }
