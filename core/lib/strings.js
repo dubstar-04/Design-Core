@@ -19,6 +19,7 @@ export class Strings {
     SELECTION: 'Invalid Selection',
     PARALLELLINES: 'Parallel Lines',
     RADIUSTOOLARGE: 'Radius too large',
+    DISTANCETOOLARGE: 'Distance too large',
     INVALIDCLIPBOARD: 'Invalid Clipboard Data',
     INVALIDBOUNDARY: 'Invalid Boundary Item',
   };
