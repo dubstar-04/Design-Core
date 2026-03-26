@@ -154,10 +154,7 @@ export class Fillet extends Tool {
     const intersectParam = startDiff.cross(secondLineDirection) / directionCross;
 
     // Virtual intersection point of the two (infinite) lines
-    const intersectionPoint = new Point(
-        firstLineStart.x + intersectParam * firstLineDirection.x,
-        firstLineStart.y + intersectParam * firstLineDirection.y,
-    );
+    const intersectionPoint = firstLineStart.lerp(firstLineEnd, intersectParam);
 
     // The endpoint of each line farthest from the intersection is the one to keep after trimming
     const firstLineKeptEnd = intersectionPoint.distance(firstLineStart) >= intersectionPoint.distance(firstLineEnd) ? firstLineStart : firstLineEnd;
@@ -183,12 +180,9 @@ export class Fillet extends Tool {
     const firstClickOnLine = this.firstClickPoint.perpendicular(firstLineStart, firstLineEnd);
     const secondClickOnLine = this.secondClickPoint.perpendicular(secondLineStart, secondLineEnd);
 
-    // Vectors from the intersection toward the clicked side of each line
-    const firstClickDirection = firstClickOnLine.subtract(intersectionPoint);
-    const secondClickDirection = secondClickOnLine.subtract(intersectionPoint);
-
-    const firstClickDistance = Math.sqrt(firstClickDirection.x ** 2 + firstClickDirection.y ** 2);
-    const secondClickDistance = Math.sqrt(secondClickDirection.x ** 2 + secondClickDirection.y ** 2);
+    // Distances from the intersection to the clicked projection on each line
+    const firstClickDistance = firstClickOnLine.distance(intersectionPoint);
+    const secondClickDistance = secondClickOnLine.distance(intersectionPoint);
 
     if (firstClickDistance < 1e-10 || secondClickDistance < 1e-10) {
       DesignCore.Core.notify(`${this.type} ${Strings.Message.NOFILLET}`);
@@ -196,11 +190,13 @@ export class Fillet extends Tool {
     }
 
     // Unit vectors pointing from the intersection toward the clicked side of each line
+    const firstClickDirection = firstClickOnLine.subtract(intersectionPoint);
+    const secondClickDirection = secondClickOnLine.subtract(intersectionPoint);
     const firstClickUnit = new Point(firstClickDirection.x / firstClickDistance, firstClickDirection.y / firstClickDistance);
     const secondClickUnit = new Point(secondClickDirection.x / secondClickDistance, secondClickDirection.y / secondClickDistance);
 
     // Angle between the two clicked-side direction vectors (i.e. the opening angle of the chosen corner)
-    const cosAngle = Math.min(1, Math.max(-1, firstClickUnit.x * secondClickUnit.x + firstClickUnit.y * secondClickUnit.y));
+    const cosAngle = Math.min(1, Math.max(-1, firstClickUnit.dot(secondClickUnit)));
     const cornerAngle = Math.acos(cosAngle);
 
     // Collinear or antiparallel lines cannot be filleted
@@ -210,7 +206,7 @@ export class Fillet extends Tool {
     }
 
     // Bisector unit vector: points into the chosen corner toward the fillet centre
-    const bisectorSum = new Point(firstClickUnit.x + secondClickUnit.x, firstClickUnit.y + secondClickUnit.y);
+    const bisectorSum = firstClickUnit.add(secondClickUnit);
     const bisectorLength = Math.sqrt(bisectorSum.x ** 2 + bisectorSum.y ** 2);
 
     if (bisectorLength < 1e-10) {
@@ -245,7 +241,7 @@ export class Fillet extends Tool {
     // Determine arc winding direction: CCW (1) if (T1–C) × (T2–C) > 0, otherwise CW (-1)
     const centreToFirst = firstTangentPoint.subtract(arcCentre);
     const centreToSecond = secondTangentPoint.subtract(arcCentre);
-    const windingCross = centreToFirst.x * centreToSecond.y - centreToFirst.y * centreToSecond.x;
+    const windingCross = centreToFirst.cross(centreToSecond);
     const arcDirection = windingCross > 0 ? 1 : -1;
 
     const arc = DesignCore.CommandManager.createNew('Arc', {
