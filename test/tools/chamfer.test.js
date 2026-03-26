@@ -447,6 +447,22 @@ test('Chamfer.execute notifies INVALIDNUMBER for negative first distance', async
   notifySpy.mockRestore();
 });
 
+test('Chamfer.execute notifies INVALIDNUMBER for negative second distance', async () => {
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  await withMockInput(
+      core.scene,
+      ['Distance', 3, -1, undefined],
+      async () => {
+        const chamfer = new Chamfer();
+        await chamfer.execute();
+      },
+  );
+
+  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  notifySpy.mockRestore();
+});
+
 test('Chamfer.execute sets chamferDistanceA and chamferAngle via Angle option', async () => {
   core.scene.headers.chamferDistanceA = 0;
   core.scene.headers.chamferAngle = 0;
@@ -462,6 +478,38 @@ test('Chamfer.execute sets chamferDistanceA and chamferAngle via Angle option', 
 
   expect(core.scene.headers.chamferDistanceA).toBe(3);
   expect(core.scene.headers.chamferAngle).toBe(60);
+});
+
+test('Chamfer.execute notifies INVALIDNUMBER for negative length in Angle option', async () => {
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  await withMockInput(
+      core.scene,
+      ['Angle', -1, undefined],
+      async () => {
+        const chamfer = new Chamfer();
+        await chamfer.execute();
+      },
+  );
+
+  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  notifySpy.mockRestore();
+});
+
+test('Chamfer.execute notifies INVALIDNUMBER for out-of-range angle in Angle option', async () => {
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  await withMockInput(
+      core.scene,
+      ['Angle', 3, 200, undefined], // 200° is >= 180, invalid
+      async () => {
+        const chamfer = new Chamfer();
+        await chamfer.execute();
+      },
+  );
+
+  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  notifySpy.mockRestore();
 });
 
 test('Chamfer.execute sets trimMode to false via Trim option', async () => {
