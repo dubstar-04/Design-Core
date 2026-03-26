@@ -291,3 +291,136 @@ test('Fillet.action selects correct corner when lines form a cross', () => {
   expect(arc.points[0].x).toBeGreaterThan(0);
   expect(arc.points[0].y).toBeGreaterThan(0);
 });
+
+// ─── action: second entity type guard ────────────────────────────────────────
+
+test('Fillet.action notifies when second entity type is not supported', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  const fillet = new Fillet();
+  fillet.firstEntity = core.scene.entities.get(0); // Line
+  fillet.secondEntity = core.scene.entities.get(1); // Circle
+  fillet.firstClickPoint = new Point(5, 0);
+  fillet.secondClickPoint = new Point(0, 0);
+  fillet.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOFILLET));
+  notifySpy.mockRestore();
+});
+
+// ─── action: click at intersection ───────────────────────────────────────────
+
+test('Fillet.action notifies when click coincides with intersection', () => {
+  // L-corner at origin. Clicking firstClickPoint exactly at (0,0) makes
+  // firstClickDistance = 0, triggering the invalid-selection guard.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  const fillet = new Fillet();
+  fillet.firstEntity = core.scene.entities.get(0);
+  fillet.secondEntity = core.scene.entities.get(1);
+  fillet.firstClickPoint = new Point(0, 0); // exactly at the intersection
+  fillet.secondClickPoint = new Point(0, 5);
+  fillet.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.SELECTION);
+  expect(core.scene.entities.count()).toBe(2); // no arc added
+  notifySpy.mockRestore();
+});
+
+// ─── execute: option branches ─────────────────────────────────────────────────
+
+test('Fillet.execute sets filletRadius when Radius option is selected', async () => {
+  core.scene.headers.filletRadius = 0;
+
+  await withMockInput(
+      core.scene,
+      ['Radius', 5, undefined],
+      async () => {
+        const fillet = new Fillet();
+        await fillet.execute();
+      },
+  );
+
+  expect(core.scene.headers.filletRadius).toBe(5);
+});
+
+test('Fillet.execute notifies INVALIDNUMBER when negative radius is provided', async () => {
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  await withMockInput(
+      core.scene,
+      ['Radius', -3, undefined],
+      async () => {
+        const fillet = new Fillet();
+        await fillet.execute();
+      },
+  );
+
+  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  notifySpy.mockRestore();
+});
+
+test('Fillet.execute sets trimMode to false when No trim option is selected', async () => {
+  core.scene.headers.trimMode = true;
+
+  await withMockInput(
+      core.scene,
+      ['Trim', 'No trim', undefined],
+      async () => {
+        const fillet = new Fillet();
+        await fillet.execute();
+      },
+  );
+
+  expect(core.scene.headers.trimMode).toBe(false);
+});
+
+test('Fillet.execute re-prompts and notifies when first selected entity is not a Line', async () => {
+  core.scene.clear();
+  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  await withMockInput(
+      core.scene,
+      [new SingleSelection(0, new Point(0, 0)), undefined],
+      async () => {
+        const fillet = new Fillet();
+        await fillet.execute();
+      },
+  );
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOFILLET));
+  notifySpy.mockRestore();
+});
+
+test('Fillet.execute re-prompts and notifies when second selected entity is not a Line', async () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
+  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  await withMockInput(
+      core.scene,
+      [new SingleSelection(0, new Point(5, 0)), new SingleSelection(1, new Point(0, 0)), undefined],
+      async () => {
+        const fillet = new Fillet();
+        await fillet.execute();
+      },
+  );
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOFILLET));
+  notifySpy.mockRestore();
+});
