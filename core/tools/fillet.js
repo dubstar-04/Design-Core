@@ -199,7 +199,7 @@ export class Fillet extends Tool {
     }
 
     if (firstClickDistance < 1e-10 || secondClickDistance < 1e-10) {
-      DesignCore.Core.notify(`${this.type} ${Strings.Message.NOFILLET}`);
+      DesignCore.Core.notify(`${Strings.Error.SELECTION}`);
       return;
     }
 
@@ -213,7 +213,7 @@ export class Fillet extends Tool {
 
     // Collinear or antiparallel lines cannot be filleted
     if (cornerAngle < 1e-10 || cornerAngle > Math.PI - 1e-10) {
-      DesignCore.Core.notify(`${this.type} ${Strings.Message.NOFILLET}`);
+      DesignCore.Core.notify(Strings.Error.PARALLELLINES);
       return;
     }
 
@@ -222,7 +222,7 @@ export class Fillet extends Tool {
     const bisectorLength = Math.sqrt(bisectorSum.x ** 2 + bisectorSum.y ** 2);
 
     if (bisectorLength < 1e-10) {
-      DesignCore.Core.notify(`${this.type} ${Strings.Message.NOFILLET}`);
+      DesignCore.Core.notify(Strings.Error.PARALLELLINES);
       return;
     }
 
