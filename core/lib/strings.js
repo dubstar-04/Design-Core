@@ -18,6 +18,7 @@ export class Strings {
     INVALIDINTERSECTTYPE: 'Invalid Intersect Type',
     SELECTION: 'Invalid Selection',
     PARALLELLINES: 'Parallel Lines',
+    RADIUSTOOLARGE: 'Radius too large',
     INVALIDCLIPBOARD: 'Invalid Clipboard Data',
     INVALIDBOUNDARY: 'Invalid Boundary Item',
   };
@@ -42,6 +43,7 @@ export class Strings {
     NOREDO: 'No actions to redo',
     NOTRIM: 'cannot be trimmed',
     NOEXTEND: 'cannot be extended',
+    NOFILLET: 'cannot be filleted',
   };
 
   // Strings
