@@ -60,7 +60,7 @@ export class Fillet extends Tool {
             }
             this.#notifySettings();
           } else if (input1 === 'Trim') {
-            const top = new PromptOptions(Strings.Input.OPTION, [Input.Type.STRING], ['Trim', 'No trim']);
+            const top = new PromptOptions(Strings.Input.OPTION, [], ['Trim', 'No trim']);
             const trimInput = await DesignCore.Scene.inputManager.requestInput(top);
             if (trimInput === undefined) return;
             DesignCore.Scene.headers.trimMode = (trimInput === 'Trim');
