@@ -161,9 +161,28 @@ export class Fillet extends Tool {
     // Virtual intersection point of the two (infinite) lines
     const intersectionPoint = firstLineStart.lerp(firstLineEnd, intersectParam);
 
-    // The endpoint of each line farthest from the intersection is the one to keep after trimming
-    const firstLineKeptEnd = intersectionPoint.distance(firstLineStart) >= intersectionPoint.distance(firstLineEnd) ? firstLineStart : firstLineEnd;
-    const secondLineKeptEnd = intersectionPoint.distance(secondLineStart) >= intersectionPoint.distance(secondLineEnd) ? secondLineStart : secondLineEnd;
+    // Project the click points onto their respective lines so they sit exactly on the line.
+    // This gives a point on the clicked side of the intersection, used to determine
+    // which of the four corners formed by the two lines receives the fillet arc.
+    const firstClickOnLine = this.firstClickPoint.perpendicular(firstLineStart, firstLineEnd);
+    const secondClickOnLine = this.secondClickPoint.perpendicular(secondLineStart, secondLineEnd);
+
+    // Distances from the intersection to the clicked projection on each line
+    const firstClickDistance = firstClickOnLine.distance(intersectionPoint);
+    const secondClickDistance = secondClickOnLine.distance(intersectionPoint);
+
+    // Vectors pointing from the intersection toward the clicked side of each line.
+    // Using the click direction (rather than "farthest endpoint") correctly handles
+    // cases where the intersection lies inside the segment and both endpoints are
+    // equidistant from the intersection.
+    const firstClickDir = firstClickOnLine.subtract(intersectionPoint);
+    const secondClickDir = secondClickOnLine.subtract(intersectionPoint);
+
+    // Pick the endpoint whose direction from the intersection is more aligned with the click.
+    // Comparing the two dot products against each other (rather than against zero) correctly
+    // handles the case where one endpoint is exactly at the intersection (dot product = 0).
+    const firstLineKeptEnd = firstClickDir.dot(firstLineStart.subtract(intersectionPoint)) >= firstClickDir.dot(firstLineEnd.subtract(intersectionPoint)) ? firstLineStart : firstLineEnd;
+    const secondLineKeptEnd = secondClickDir.dot(secondLineStart.subtract(intersectionPoint)) >= secondClickDir.dot(secondLineEnd.subtract(intersectionPoint)) ? secondLineStart : secondLineEnd;
 
     // radius = 0: trim/extend both lines to the sharp intersection with no arc
     const filletRadius = DesignCore.Scene.headers.filletRadius;
@@ -179,26 +198,14 @@ export class Fillet extends Tool {
       return;
     }
 
-    // Project the click points onto their respective lines so they sit exactly on the line.
-    // This gives a point on the clicked side of the intersection, used to determine
-    // which of the four corners formed by the two lines receives the fillet arc.
-    const firstClickOnLine = this.firstClickPoint.perpendicular(firstLineStart, firstLineEnd);
-    const secondClickOnLine = this.secondClickPoint.perpendicular(secondLineStart, secondLineEnd);
-
-    // Distances from the intersection to the clicked projection on each line
-    const firstClickDistance = firstClickOnLine.distance(intersectionPoint);
-    const secondClickDistance = secondClickOnLine.distance(intersectionPoint);
-
     if (firstClickDistance < 1e-10 || secondClickDistance < 1e-10) {
       DesignCore.Core.notify(`${this.type} ${Strings.Message.NOFILLET}`);
       return;
     }
 
     // Unit vectors pointing from the intersection toward the clicked side of each line
-    const firstClickDirection = firstClickOnLine.subtract(intersectionPoint);
-    const secondClickDirection = secondClickOnLine.subtract(intersectionPoint);
-    const firstClickUnit = new Point(firstClickDirection.x / firstClickDistance, firstClickDirection.y / firstClickDistance);
-    const secondClickUnit = new Point(secondClickDirection.x / secondClickDistance, secondClickDirection.y / secondClickDistance);
+    const firstClickUnit = new Point(firstClickDir.x / firstClickDistance, firstClickDir.y / firstClickDistance);
+    const secondClickUnit = new Point(secondClickDir.x / secondClickDistance, secondClickDir.y / secondClickDistance);
 
     // Angle between the two clicked-side direction vectors (i.e. the opening angle of the chosen corner)
     const cosAngle = Math.min(1, Math.max(-1, firstClickUnit.dot(secondClickUnit)));
