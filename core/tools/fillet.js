@@ -69,19 +69,36 @@ export class Fillet extends Tool {
           continue;
         }
 
-        // input1 is a selection — store first entity
-        this.firstEntity = DesignCore.Scene.entities.get(input1.selectedItemIndex);
+        // input1 is a selection — validate and store first entity
+        const firstEntity = DesignCore.Scene.entities.get(input1.selectedItemIndex);
+        DesignCore.Scene.selectionManager.removeLastSelection();
+        // Only Line entities can be filleted
+        if (firstEntity.type !== 'Line') {
+          DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOFILLET}`);
+          continue;
+        }
+        this.firstEntity = firstEntity;
         this.firstClickPoint = input1.selectedPoint;
-        DesignCore.Scene.selectionManager.removeLastSelection();
 
-        // Prompt for second object
+        // Prompt for second object — re-prompt if the selection is not a Line
         const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
-        const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
-        if (input2 === undefined) return;
+        let secondEntity;
+        while (true) {
+          const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
+          if (input2 === undefined) return;
 
-        this.secondEntity = DesignCore.Scene.entities.get(input2.selectedItemIndex);
-        this.secondClickPoint = input2.selectedPoint;
-        DesignCore.Scene.selectionManager.removeLastSelection();
+          const candidate = DesignCore.Scene.entities.get(input2.selectedItemIndex);
+          DesignCore.Scene.selectionManager.removeLastSelection();
+          // Only Line entities can be filleted
+          if (candidate.type !== 'Line') {
+            DesignCore.Core.notify(`${candidate.type} ${Strings.Message.NOFILLET}`);
+            continue;
+          }
+          secondEntity = candidate;
+          this.secondClickPoint = input2.selectedPoint;
+          break;
+        }
+        this.secondEntity = secondEntity;
 
         // Apply fillet then reset
         DesignCore.Scene.inputManager.executeCommand();
