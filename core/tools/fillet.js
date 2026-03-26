@@ -241,10 +241,10 @@ export class Fillet extends Tool {
     const firstTangentPoint = arcCentre.perpendicular(firstLineStart, firstLineEnd);
     const secondTangentPoint = arcCentre.perpendicular(secondLineStart, secondLineEnd);
 
-    // Verify both tangent points lie within the actual line segments when trim mode is on
+    // Verify both tangent points lie within the actual line segments when trim mode is on.
     if (trimMode) {
-      if (intersectionPoint.distance(firstTangentPoint) > intersectionPoint.distance(firstLineKeptEnd) ||
-        intersectionPoint.distance(secondTangentPoint) > intersectionPoint.distance(secondLineKeptEnd)) {
+      if (!firstTangentPoint.isOnLine(firstLineStart, firstLineEnd) ||
+        !secondTangentPoint.isOnLine(secondLineStart, secondLineEnd)) {
         DesignCore.Core.notify(`${this.type}: ${Strings.Error.RADIUSTOOLARGE}`);
         return;
       }
