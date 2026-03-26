@@ -15,8 +15,6 @@ export class Fillet extends Tool {
   /** Create a Fillet command */
   constructor() {
     super();
-    this.radius = 0;
-    this.trim = true;
     this.firstEntity = null;
     this.secondEntity = null;
     // If the lines form a cross there are four possible fillet locations.
@@ -58,14 +56,14 @@ export class Fillet extends Tool {
             if (r < 0) {
               DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
             } else {
-              this.radius = r;
+              DesignCore.Scene.headers.filletRadius = r;
             }
             this.#notifySettings();
           } else if (input1 === 'Trim') {
             const top = new PromptOptions(Strings.Input.OPTION, [Input.Type.STRING], ['Trim', 'No trim']);
             const trimInput = await DesignCore.Scene.inputManager.requestInput(top);
             if (trimInput === undefined) return;
-            this.trim = (trimInput === 'Trim');
+            DesignCore.Scene.headers.trimMode = (trimInput === 'Trim');
             this.#notifySettings();
           }
           continue;
@@ -150,8 +148,10 @@ export class Fillet extends Tool {
     const secondLineKeptEnd = intersectionPoint.distance(secondLineStart) >= intersectionPoint.distance(secondLineEnd) ? secondLineStart : secondLineEnd;
 
     // radius = 0: trim/extend both lines to the sharp intersection with no arc
-    if (this.radius === 0) {
-      if (this.trim) {
+    const filletRadius = DesignCore.Scene.headers.filletRadius;
+    const trimMode = DesignCore.Scene.headers.trimMode;
+    if (filletRadius === 0) {
+      if (trimMode) {
         const stateChanges = [
           new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, intersectionPoint] }),
           new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, intersectionPoint] }),
@@ -205,7 +205,7 @@ export class Fillet extends Tool {
     const bisectorUnit = new Point(bisectorSum.x / bisectorLength, bisectorSum.y / bisectorLength);
 
     // Distance from the intersection point to the fillet centre along the bisector
-    const intersectToCentreDistance = this.radius / Math.sin(cornerAngle / 2);
+    const intersectToCentreDistance = filletRadius / Math.sin(cornerAngle / 2);
 
     // Fillet arc centre point
     const arcCentre = new Point(
@@ -230,7 +230,7 @@ export class Fillet extends Tool {
 
     const stateChanges = [new AddState(arc)];
 
-    if (this.trim) {
+    if (trimMode) {
       stateChanges.push(new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, firstTangentPoint] }));
       stateChanges.push(new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, secondTangentPoint] }));
     }
@@ -242,6 +242,8 @@ export class Fillet extends Tool {
    * Display the current fillet settings to the command line
    */
   #notifySettings() {
-    DesignCore.Core.notify(`Current settings: Mode = ${this.trim ? 'TRIM' : 'NOTRIM'}, Radius = ${this.radius}`);
+    const filletRadius = DesignCore.Scene.headers.filletRadius;
+    const trimMode = DesignCore.Scene.headers.trimMode;
+    DesignCore.Core.notify(`Current settings: Mode = ${trimMode ? 'TRIM' : 'NOTRIM'}, Radius = ${filletRadius}`);
   }
 }
