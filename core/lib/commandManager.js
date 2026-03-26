@@ -33,6 +33,7 @@ import { Distance } from '../tools/distance.js';
 import { Identify } from '../tools/identify.js';
 import { Extend } from '../tools/extend.js';
 import { Fillet } from '../tools/fillet.js';
+import { Chamfer } from '../tools/chamfer.js';
 import { Trim } from '../tools/trim.js';
 import { Purge } from '../tools/purge.js';
 import { Pan } from '../tools/pan.js';
@@ -84,6 +85,7 @@ const classes = {
   Identify,
   Extend,
   Fillet,
+  Chamfer,
   Trim,
   Purge,
 
