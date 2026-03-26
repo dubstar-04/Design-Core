@@ -29,6 +29,9 @@ export class Headers {
   // $CHAMFERD (group code 40)
   #chamferAngle = 0;
 
+  // $CHAMMODE (group code 70) - false = distances, true = angle
+  #chamferMode = false;
+
   // $ACADVER (group code 1)
   #dxfVersion = 'R2018';
 
@@ -118,6 +121,17 @@ export class Headers {
     this.#chamferAngle = num;
   }
 
+  /** @type {boolean} Chamfer method ($CHAMMODE): false = distances, true = angle */
+  get chamferMode() {
+    return this.#chamferMode;
+  }
+
+  /** @param {boolean} value */
+  set chamferMode(value) {
+    if (typeof value !== 'boolean') throw new Error(`Invalid chamferMode: ${value}`);
+    this.#chamferMode = value;
+  }
+
   /** @type {string} DXF version key ($ACADVER) */
   get dxfVersion() {
     return this.#dxfVersion;
@@ -145,6 +159,9 @@ export class Headers {
 
     const trimModeRaw = Property.loadValue([header?.['$TRIMMODE']?.['70']]);
     if (trimModeRaw !== undefined) this.trimMode = parseInt(trimModeRaw) !== 0;
+
+    const chamferModeRaw = Property.loadValue([header?.['$CHAMMODE']?.['70']]);
+    if (chamferModeRaw !== undefined) this.chamferMode = parseInt(chamferModeRaw) !== 0;
 
     const acadVer = Property.loadValue([header?.['$ACADVER']?.['1']]);
     if (acadVer !== undefined) this.dxfVersion = acadVer;
@@ -182,5 +199,7 @@ export class Headers {
     file.writeGroupCode('40', this.chamferLength);
     file.writeGroupCode('9', '$CHAMFERD');
     file.writeGroupCode('40', this.chamferAngle);
+    file.writeGroupCode('9', '$CHAMMODE');
+    file.writeGroupCode('70', this.chamferMode ? 1 : 0);
   }
 }
