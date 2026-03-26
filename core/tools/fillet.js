@@ -217,6 +217,15 @@ export class Fillet extends Tool {
     const firstTangentPoint = arcCentre.perpendicular(firstLineStart, firstLineEnd);
     const secondTangentPoint = arcCentre.perpendicular(secondLineStart, secondLineEnd);
 
+    // Verify both tangent points lie within the actual line segments when trim mode is on
+    if (trimMode) {
+      if (intersectionPoint.distance(firstTangentPoint) > intersectionPoint.distance(firstLineKeptEnd) ||
+        intersectionPoint.distance(secondTangentPoint) > intersectionPoint.distance(secondLineKeptEnd)) {
+        DesignCore.Core.notify(`${this.type}: ${Strings.Error.RADIUSTOOLARGE}`);
+        return;
+      }
+    }
+
     // Determine arc winding direction: CCW (1) if (T1–C) × (T2–C) > 0, otherwise CW (-1)
     const centreToFirst = firstTangentPoint.subtract(arcCentre);
     const centreToSecond = secondTangentPoint.subtract(arcCentre);
