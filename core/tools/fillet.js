@@ -250,7 +250,9 @@ export class Fillet extends Tool {
       }
     }
 
-    // Determine arc winding direction: CCW (1) if (T1–C) × (T2–C) > 0, otherwise CW (-1)
+    // Determine arc winding direction: if the cross product of the two centre-to-tangent
+    // vectors is positive, the short arc from firstTangentPoint to secondTangentPoint
+    // travels CCW (direction = 1), otherwise CW (direction = -1).
     const centreToFirst = firstTangentPoint.subtract(arcCentre);
     const centreToSecond = secondTangentPoint.subtract(arcCentre);
     const windingCross = centreToFirst.cross(centreToSecond);
