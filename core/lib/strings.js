@@ -44,6 +44,7 @@ export class Strings {
     NOTRIM: 'cannot be trimmed',
     NOEXTEND: 'cannot be extended',
     NOFILLET: 'cannot be filleted',
+    NOCHAMFER: 'cannot be chamfered',
   };
 
   // Strings
