@@ -1,8 +1,10 @@
 import { Tool } from './tool.js';
 import { Strings } from '../lib/strings.js';
+import { Point } from '../entities/point.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { RemoveState, UpdateState } from '../lib/stateManager.js';
+import { CornerEntity } from './cornerEntity.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -16,49 +18,34 @@ export class ChamferFilletBase extends Tool {
   /** Create a ChamferFilletBase command */
   constructor() {
     super();
-    this.firstEntity = null;
-    this.secondEntity = null;
+    this.first = new CornerEntity();
+    this.second = new CornerEntity();
+    // Shared corner geometry computed by resolveCornerGeometry() before action()
     // If the lines form a cross there are four possible locations.
     // The click points are used to determine which corner to operate on.
-    this.firstClickPoint = null;
-    this.secondClickPoint = null;
-    // For polyline selections: the resolved Line segment and its 1-based index
-    this.firstSegment = null;
-    this.firstSegmentIndex = null;
-    this.secondSegment = null;
-    this.secondSegmentIndex = null;
-    // Corner geometry computed by resolveCornerGeometry() before action()
-    this.firstLineStart = null;
-    this.firstLineEnd = null;
-    this.secondLineStart = null;
-    this.secondLineEnd = null;
-    this.secondLineDirection = null;
     this.intersectionPoint = null;
-    this.firstClickDir = null;
-    this.secondClickDir = null;
-    this.firstClickDistance = null;
-    this.secondClickDistance = null;
-    this.firstLineKeptEnd = null;
-    this.secondLineKeptEnd = null;
+    this.secondLineDirection = null;
   }
 
   /**
-   * Resolve an entity to its closest straight segment and 1-based index.
-   * Returns null and notifies the user if the closest segment is an arc.
-   * @param {Line|BasePolyline} entity
-   * @param {Point} clickPoint
+   * Resolve a CornerEntity's entity to its closest straight segment.
+   * Populates corner.segment and corner.segmentIndex for polyline entities.
+   * Returns false and notifies the user if the closest segment is an arc.
+   * @param {CornerEntity} corner
    * @param {string} arcSegmentErrorMsg - notification string shown when the segment is an arc
-   * @return {Object|null}
+   * @return {boolean}
    */
-  resolveSegment(entity, clickPoint, arcSegmentErrorMsg) {
-    if (!(entity instanceof BasePolyline)) return { segment: entity, index: null };
-    const index = entity.getClosestSegmentIndex(clickPoint);
-    const segment = entity.getClosestSegment(clickPoint);
+  resolveSegment(corner, arcSegmentErrorMsg) {
+    if (!(corner.entity instanceof BasePolyline)) return true;
+    const index = corner.entity.getClosestSegmentIndex(corner.clickPoint);
+    const segment = corner.entity.getClosestSegment(corner.clickPoint);
     if (!(segment instanceof Line)) {
       DesignCore.Core.notify(arcSegmentErrorMsg);
-      return null;
+      return false;
     }
-    return { segment, index };
+    corner.segment = segment;
+    corner.segmentIndex = index;
+    return true;
   }
 
   /**
@@ -70,25 +57,25 @@ export class ChamferFilletBase extends Tool {
    * @return {boolean}
    */
   resolveCornerGeometry(noEntityMsg) {
-    const firstSeg = this.firstSegment ?? this.firstEntity;
-    const secondSeg = this.secondSegment ?? this.secondEntity;
+    const firstSeg = this.first.segment ?? this.first.entity;
+    const secondSeg = this.second.segment ?? this.second.entity;
 
     if (!(firstSeg instanceof Line)) {
-      DesignCore.Core.notify(`${this.firstEntity.type} ${noEntityMsg}`);
+      DesignCore.Core.notify(`${this.first.entity.type} ${noEntityMsg}`);
       return false;
     }
     if (!(secondSeg instanceof Line)) {
-      DesignCore.Core.notify(`${this.secondEntity.type} ${noEntityMsg}`);
+      DesignCore.Core.notify(`${this.second.entity.type} ${noEntityMsg}`);
       return false;
     }
 
-    this.firstLineStart = firstSeg.points[0];
-    this.firstLineEnd = firstSeg.points[1];
-    this.secondLineStart = secondSeg.points[0];
-    this.secondLineEnd = secondSeg.points[1];
+    this.first.lineStart = firstSeg.points[0];
+    this.first.lineEnd = firstSeg.points[1];
+    this.second.lineStart = secondSeg.points[0];
+    this.second.lineEnd = secondSeg.points[1];
 
-    const firstLineDirection = this.firstLineEnd.subtract(this.firstLineStart);
-    this.secondLineDirection = this.secondLineEnd.subtract(this.secondLineStart);
+    const firstLineDirection = this.first.lineEnd.subtract(this.first.lineStart);
+    this.secondLineDirection = this.second.lineEnd.subtract(this.second.lineStart);
     const directionCross = firstLineDirection.cross(this.secondLineDirection);
 
     if (Math.abs(directionCross) < 1e-10) {
@@ -96,21 +83,24 @@ export class ChamferFilletBase extends Tool {
       return false;
     }
 
-    const startDiff = this.secondLineStart.subtract(this.firstLineStart);
+    const startDiff = this.second.lineStart.subtract(this.first.lineStart);
     const intersectParam = startDiff.cross(this.secondLineDirection) / directionCross;
-    this.intersectionPoint = this.firstLineStart.lerp(this.firstLineEnd, intersectParam);
+    this.intersectionPoint = this.first.lineStart.lerp(this.first.lineEnd, intersectParam);
 
-    const firstClickOnLine = this.firstClickPoint.perpendicular(this.firstLineStart, this.firstLineEnd);
-    const secondClickOnLine = this.secondClickPoint.perpendicular(this.secondLineStart, this.secondLineEnd);
+    const firstClickOnLine = this.first.clickPoint.perpendicular(this.first.lineStart, this.first.lineEnd);
+    const secondClickOnLine = this.second.clickPoint.perpendicular(this.second.lineStart, this.second.lineEnd);
 
-    this.firstClickDistance = firstClickOnLine.distance(this.intersectionPoint);
-    this.secondClickDistance = secondClickOnLine.distance(this.intersectionPoint);
+    this.first.clickDistance = firstClickOnLine.distance(this.intersectionPoint);
+    this.second.clickDistance = secondClickOnLine.distance(this.intersectionPoint);
 
-    this.firstClickDir = firstClickOnLine.subtract(this.intersectionPoint);
-    this.secondClickDir = secondClickOnLine.subtract(this.intersectionPoint);
+    this.first.clickDir = firstClickOnLine.subtract(this.intersectionPoint);
+    this.second.clickDir = secondClickOnLine.subtract(this.intersectionPoint);
 
-    this.firstLineKeptEnd = this.firstClickDir.dot(this.firstLineStart.subtract(this.intersectionPoint)) >= this.firstClickDir.dot(this.firstLineEnd.subtract(this.intersectionPoint)) ? this.firstLineStart : this.firstLineEnd;
-    this.secondLineKeptEnd = this.secondClickDir.dot(this.secondLineStart.subtract(this.intersectionPoint)) >= this.secondClickDir.dot(this.secondLineEnd.subtract(this.intersectionPoint)) ? this.secondLineStart : this.secondLineEnd;
+    this.first.lineKeptEnd = this.first.clickDir.dot(this.first.lineStart.subtract(this.intersectionPoint)) >= this.first.clickDir.dot(this.first.lineEnd.subtract(this.intersectionPoint)) ? this.first.lineStart : this.first.lineEnd;
+    this.second.lineKeptEnd = this.second.clickDir.dot(this.second.lineStart.subtract(this.intersectionPoint)) >= this.second.clickDir.dot(this.second.lineEnd.subtract(this.intersectionPoint)) ? this.second.lineStart : this.second.lineEnd;
+
+    this.first.clickUnit = new Point(this.first.clickDir.x / this.first.clickDistance, this.first.clickDir.y / this.first.clickDistance);
+    this.second.clickUnit = new Point(this.second.clickDir.x / this.second.clickDistance, this.second.clickDir.y / this.second.clickDistance);
 
     return true;
   }
@@ -122,54 +112,51 @@ export class ChamferFilletBase extends Tool {
    * @return {Array} - array of state changes to be committed by the caller
    */
   applySharpTrim() {
-    const firstIsPolyline = this.firstEntity instanceof BasePolyline;
-    const secondIsPolyline = this.secondEntity instanceof BasePolyline;
-    const { intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd } = this;
+    const firstIsPolyline = this.first.entity instanceof BasePolyline;
+    const secondIsPolyline = this.second.entity instanceof BasePolyline;
+    const { intersectionPoint } = this;
     let stateChanges;
     if (!firstIsPolyline && !secondIsPolyline) {
       stateChanges = [
-        new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, intersectionPoint] }),
-        new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, intersectionPoint] }),
+        new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd, intersectionPoint] }),
+        new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd, intersectionPoint] }),
       ];
-    } else if (firstIsPolyline && secondIsPolyline && this.firstEntity === this.secondEntity) {
-      const lastIdx = this.firstEntity.points.length - 1;
-      const isOpenEnds = (this.firstSegmentIndex === 1 && this.secondSegmentIndex === lastIdx) ||
-                         (this.firstSegmentIndex === lastIdx && this.secondSegmentIndex === 1);
-      const newPoints = this.firstEntity.points.map((p) => p.clone());
+    } else if (firstIsPolyline && secondIsPolyline && this.first.entity === this.second.entity) {
+      const lastIdx = this.first.entity.points.length - 1;
+      const isOpenEnds = (this.first.segmentIndex === 1 && this.second.segmentIndex === lastIdx) ||
+                         (this.first.segmentIndex === lastIdx && this.second.segmentIndex === 1);
+      const newPoints = this.first.entity.points.map((p) => p.clone());
       if (isOpenEnds) {
         newPoints[0] = intersectionPoint.clone();
         newPoints[lastIdx] = intersectionPoint.clone();
       } else {
-        const cornerIdx = Math.min(this.firstSegmentIndex, this.secondSegmentIndex);
+        const cornerIdx = Math.min(this.first.segmentIndex, this.second.segmentIndex);
         newPoints.splice(cornerIdx, 1, intersectionPoint.clone());
       }
-      stateChanges = [new UpdateState(this.firstEntity, { points: newPoints })];
+      stateChanges = [new UpdateState(this.first.entity, { points: newPoints })];
     } else {
-      const lineEntity = !firstIsPolyline ? this.firstEntity : this.secondEntity;
-      const polyEntity = firstIsPolyline ? this.firstEntity : this.secondEntity;
-      const lineKeptEnd = !firstIsPolyline ? firstLineKeptEnd : secondLineKeptEnd;
-      const polySegIdx = firstIsPolyline ? this.firstSegmentIndex : this.secondSegmentIndex;
-      const polyClickDir = firstIsPolyline ? firstClickDir : secondClickDir;
-      const segStart = polyEntity.points[polySegIdx - 1];
-      const segEnd = polyEntity.points[polySegIdx];
-      const keepStart = polyClickDir.dot(segStart.subtract(intersectionPoint)) >= polyClickDir.dot(segEnd.subtract(intersectionPoint));
+      const [poly, line] = firstIsPolyline ? [this.first, this.second] : [this.second, this.first];
+      const polySegIdx = poly.segmentIndex;
+      const segStart = poly.entity.points[polySegIdx - 1];
+      const segEnd = poly.entity.points[polySegIdx];
+      const keepStart = poly.clickDir.dot(segStart.subtract(intersectionPoint)) >= poly.clickDir.dot(segEnd.subtract(intersectionPoint));
       let newPoints;
       if (keepStart) {
         newPoints = [
-          ...polyEntity.points.slice(0, polySegIdx).map((p) => p.clone()),
+          ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
           intersectionPoint.clone(),
-          lineKeptEnd.clone(),
+          line.lineKeptEnd.clone(),
         ];
       } else {
         newPoints = [
-          lineKeptEnd.clone(),
+          line.lineKeptEnd.clone(),
           intersectionPoint.clone(),
-          ...polyEntity.points.slice(polySegIdx).map((p) => p.clone()),
+          ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),
         ];
       }
       stateChanges = [
-        new RemoveState(lineEntity),
-        new UpdateState(polyEntity, { points: newPoints }),
+        new RemoveState(line.entity),
+        new UpdateState(poly.entity, { points: newPoints }),
       ];
     }
     return stateChanges;
