@@ -284,6 +284,26 @@ export class BasePolyline extends Entity {
     }
 
     return closestSegment;
+  /**
+   * Determine if two segments (by 1-based index) are consecutive in this polyline
+   * @param {number} segIndex1
+   * @param {number} segIndex2
+   * @return {boolean}
+   */
+  areConsecutiveSegments(segIndex1, segIndex2) {
+    const diff = Math.abs(segIndex1 - segIndex2);
+    if (diff === 1) return true;
+    // Closed polyline: last segment and first segment are consecutive
+    if (this.flags.hasFlag(1)) {
+      const lastIndex = this.points.length - 1;
+      if ((segIndex1 === 1 && segIndex2 === lastIndex) ||
+          (segIndex2 === 1 && segIndex1 === lastIndex)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   }
 
   /**
