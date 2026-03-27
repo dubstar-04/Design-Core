@@ -178,7 +178,7 @@ test('ChamferFilletBase.applySharpTrim poly+poly open ends: moves both endpoints
   const chamfer = new Chamfer();
   chamfer.first.entity = polyEntity;
   chamfer.second.entity = polyEntity;
-  chamfer.first.segmentIndex = 1;  // open start
+  chamfer.first.segmentIndex = 1; // open start
   chamfer.second.segmentIndex = 3; // open end (lastIdx = 3)
   chamfer.intersectionPoint = new Point(3, 2);
 
