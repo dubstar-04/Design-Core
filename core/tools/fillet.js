@@ -1,5 +1,5 @@
 import { Strings } from '../lib/strings.js';
-import { Tool } from './tool.js';
+import { ChamferFilletBase } from './chamferFilletBase.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Point } from '../entities/point.js';
@@ -11,25 +11,9 @@ import { DesignCore } from '../designCore.js';
 
 /**
  * Fillet Command Class
- * @extends Tool
+ * @extends ChamferFilletBase
  */
-export class Fillet extends Tool {
-  /** Create a Fillet command */
-  constructor() {
-    super();
-    this.firstEntity = null;
-    this.secondEntity = null;
-    // If the lines form a cross there are four possible fillet locations.
-    // The click points are used to determine the arc location.
-    this.firstClickPoint = null;
-    this.secondClickPoint = null;
-    // For polyline selections: the resolved Line segment and its 1-based index
-    this.firstSegment = null;
-    this.firstSegmentIndex = null;
-    this.secondSegment = null;
-    this.secondSegmentIndex = null;
-  }
-
+export class Fillet extends ChamferFilletBase {
   /**
    * Register the command
    * @return {Object}
@@ -83,7 +67,7 @@ export class Fillet extends Tool {
           DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOFILLET}`);
           continue;
         }
-        const firstResolved = this.#resolveSegment(firstEntity, input1.selectedPoint);
+        const firstResolved = this.resolveSegment(firstEntity, input1.selectedPoint, Strings.Message.NOFILLETARCSEGMENT);
         if (!firstResolved) continue;
         this.firstEntity = firstEntity;
         this.firstSegment = firstResolved.segment;
@@ -105,7 +89,7 @@ export class Fillet extends Tool {
             DesignCore.Core.notify(`${candidate.type} ${Strings.Message.NOFILLET}`);
             continue;
           }
-          const candidateResolved = this.#resolveSegment(candidate, input2.selectedPoint);
+          const candidateResolved = this.resolveSegment(candidate, input2.selectedPoint, Strings.Message.NOFILLETARCSEGMENT);
           if (!candidateResolved) continue;
           const { segment: candidateSegment, index: candidateSegmentIndex } = candidateResolved;
           // If both selections are the same polyline, segments must be consecutive
@@ -222,58 +206,7 @@ export class Fillet extends Tool {
     const filletRadius = DesignCore.Scene.headers.filletRadius;
     const trimMode = DesignCore.Scene.headers.trimMode;
     if (filletRadius === 0) {
-      if (trimMode) {
-        const firstIsPolyline = this.firstEntity instanceof BasePolyline;
-        const secondIsPolyline = this.secondEntity instanceof BasePolyline;
-        let stateChanges;
-        if (!firstIsPolyline && !secondIsPolyline) {
-          stateChanges = [
-            new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, intersectionPoint] }),
-            new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, intersectionPoint] }),
-          ];
-        } else if (firstIsPolyline && secondIsPolyline && this.firstEntity === this.secondEntity) {
-          const lastIdx = this.firstEntity.points.length - 1;
-          const isOpenEnds = (this.firstSegmentIndex === 1 && this.secondSegmentIndex === lastIdx) ||
-                             (this.firstSegmentIndex === lastIdx && this.secondSegmentIndex === 1);
-          const newPoints = this.firstEntity.points.map((p) => p.clone());
-          if (isOpenEnds) {
-            newPoints[0] = intersectionPoint.clone();
-            newPoints[lastIdx] = intersectionPoint.clone();
-          } else {
-            const cornerIdx = Math.min(this.firstSegmentIndex, this.secondSegmentIndex);
-            newPoints.splice(cornerIdx, 1, intersectionPoint.clone());
-          }
-          stateChanges = [new UpdateState(this.firstEntity, { points: newPoints })];
-        } else {
-          const lineEntity = !firstIsPolyline ? this.firstEntity : this.secondEntity;
-          const polyEntity = firstIsPolyline ? this.firstEntity : this.secondEntity;
-          const lineKeptEnd = !firstIsPolyline ? firstLineKeptEnd : secondLineKeptEnd;
-          const polySegIdx = firstIsPolyline ? this.firstSegmentIndex : this.secondSegmentIndex;
-          const polyClickDir = firstIsPolyline ? firstClickDir : secondClickDir;
-          const segStart = polyEntity.points[polySegIdx - 1];
-          const segEnd = polyEntity.points[polySegIdx];
-          const keepStart = polyClickDir.dot(segStart.subtract(intersectionPoint)) >= polyClickDir.dot(segEnd.subtract(intersectionPoint));
-          let newPoints;
-          if (keepStart) {
-            newPoints = [
-              ...polyEntity.points.slice(0, polySegIdx).map((p) => p.clone()),
-              intersectionPoint.clone(),
-              lineKeptEnd.clone(),
-            ];
-          } else {
-            newPoints = [
-              lineKeptEnd.clone(),
-              intersectionPoint.clone(),
-              ...polyEntity.points.slice(polySegIdx).map((p) => p.clone()),
-            ];
-          }
-          stateChanges = [
-            new RemoveState(lineEntity),
-            new UpdateState(polyEntity, { points: newPoints }),
-          ];
-        }
-        DesignCore.Scene.commit(stateChanges);
-      }
+      if (trimMode) this.applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd);
       return;
     }
 
@@ -356,24 +289,6 @@ export class Fillet extends Tool {
     } else {
       this.#trimLineAndPoly(firstTangentPoint, secondTangentPoint, firstLineKeptEnd, secondLineKeptEnd, firstClickDir, secondClickDir, arcDirection, arcCentre, intersectionPoint);
     }
-  }
-
-  /**
-   * Resolve an entity to its closest straight segment and 1-based index.
-   * Returns null and notifies the user if the closest segment is an arc.
-   * @param {Line|BasePolyline} entity
-   * @param {Point} clickPoint
-   * @return {Object|null}
-   */
-  #resolveSegment(entity, clickPoint) {
-    if (!(entity instanceof BasePolyline)) return { segment: entity, index: null };
-    const index = entity.getClosestSegmentIndex(clickPoint);
-    const segment = entity.getClosestSegment(clickPoint);
-    if (!(segment instanceof Line)) {
-      DesignCore.Core.notify(Strings.Message.NOFILLETARCSEGMENT);
-      return null;
-    }
-    return { segment, index };
   }
 
   /**

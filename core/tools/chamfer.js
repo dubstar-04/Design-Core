@@ -1,5 +1,5 @@
 import { Strings } from '../lib/strings.js';
-import { Tool } from './tool.js';
+import { ChamferFilletBase } from './chamferFilletBase.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Point } from '../entities/point.js';
@@ -11,24 +11,9 @@ import { DesignCore } from '../designCore.js';
 
 /**
  * Chamfer Command Class
- * @extends Tool
+ * @extends ChamferFilletBase
  */
-export class Chamfer extends Tool {
-  /** Create a Chamfer command */
-  constructor() {
-    super();
-    this.firstEntity = null;
-    this.secondEntity = null;
-    // Click points are used to identify which side of the intersection to chamfer.
-    this.firstClickPoint = null;
-    this.secondClickPoint = null;
-    // For polyline selections: the resolved Line segment and its 1-based index
-    this.firstSegment = null;
-    this.firstSegmentIndex = null;
-    this.secondSegment = null;
-    this.secondSegmentIndex = null;
-  }
-
+export class Chamfer extends ChamferFilletBase {
   /**
    * Register the command
    * @return {Object}
@@ -114,22 +99,11 @@ export class Chamfer extends Tool {
           DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOCHAMFER}`);
           continue;
         }
-        // Resolve polyline to its closest straight segment
-        let firstSegment;
-        let firstSegmentIndex = null;
-        if (firstEntity instanceof BasePolyline) {
-          firstSegmentIndex = firstEntity.getClosestSegmentIndex(input1.selectedPoint);
-          firstSegment = firstEntity.getClosestSegment(input1.selectedPoint);
-          if (!(firstSegment instanceof Line)) {
-            DesignCore.Core.notify(Strings.Message.NOCHAMFERARCSEGMENT);
-            continue;
-          }
-        } else {
-          firstSegment = firstEntity;
-        }
+        const firstResolved = this.resolveSegment(firstEntity, input1.selectedPoint, Strings.Message.NOCHAMFERARCSEGMENT);
+        if (!firstResolved) continue;
         this.firstEntity = firstEntity;
-        this.firstSegment = firstSegment;
-        this.firstSegmentIndex = firstSegmentIndex;
+        this.firstSegment = firstResolved.segment;
+        this.firstSegmentIndex = firstResolved.index;
         this.firstClickPoint = input1.selectedPoint;
 
         // Prompt for second object
@@ -147,27 +121,17 @@ export class Chamfer extends Tool {
             DesignCore.Core.notify(`${candidate.type} ${Strings.Message.NOCHAMFER}`);
             continue;
           }
-          // Resolve polyline to its closest straight segment
-          let candidateSegment;
-          let candidateSegmentIndex = null;
-          if (candidate instanceof BasePolyline) {
-            candidateSegmentIndex = candidate.getClosestSegmentIndex(input2.selectedPoint);
-            candidateSegment = candidate.getClosestSegment(input2.selectedPoint);
-            if (!(candidateSegment instanceof Line)) {
-              DesignCore.Core.notify(Strings.Message.NOCHAMFERARCSEGMENT);
-              continue;
-            }
-          } else {
-            candidateSegment = candidate;
-          }
+          const candidateResolved = this.resolveSegment(candidate, input2.selectedPoint, Strings.Message.NOCHAMFERARCSEGMENT);
+          if (!candidateResolved) continue;
+          const { segment: candidateSegment, index: candidateSegmentIndex } = candidateResolved;
           // If both selections are the same polyline, segments must be consecutive
           // or they must be the open-end segments of an open polyline.
           if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
-            const isConsecutive = firstEntity.areConsecutiveSegments(firstSegmentIndex, candidateSegmentIndex);
+            const isConsecutive = firstEntity.areConsecutiveSegments(this.firstSegmentIndex, candidateSegmentIndex);
             const lastIdx = firstEntity.points.length - 1;
             const isOpenEnds = !firstEntity.flags.hasFlag(1) &&
-              ((firstSegmentIndex === 1 && candidateSegmentIndex === lastIdx) ||
-               (candidateSegmentIndex === 1 && firstSegmentIndex === lastIdx));
+              ((this.firstSegmentIndex === 1 && candidateSegmentIndex === lastIdx) ||
+               (candidateSegmentIndex === 1 && this.firstSegmentIndex === lastIdx));
             if (!isConsecutive && !isOpenEnds) {
               DesignCore.Core.notify(Strings.Message.NONCONSECUTIVESEGMENTS);
               continue;
@@ -273,58 +237,7 @@ export class Chamfer extends Tool {
 
     // distA = distB = 0: trim/extend both lines to the sharp intersection with no chamfer line
     if (!chamferMode && distA === 0 && DesignCore.Scene.headers.chamferDistanceB === 0) {
-      if (trimMode) {
-        const firstIsPolyline = this.firstEntity instanceof BasePolyline;
-        const secondIsPolyline = this.secondEntity instanceof BasePolyline;
-        let stateChanges;
-        if (!firstIsPolyline && !secondIsPolyline) {
-          stateChanges = [
-            new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, intersectionPoint] }),
-            new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, intersectionPoint] }),
-          ];
-        } else if (firstIsPolyline && secondIsPolyline && this.firstEntity === this.secondEntity) {
-          const lastIdx = this.firstEntity.points.length - 1;
-          const isOpenEnds = (this.firstSegmentIndex === 1 && this.secondSegmentIndex === lastIdx) ||
-                             (this.firstSegmentIndex === lastIdx && this.secondSegmentIndex === 1);
-          const newPoints = this.firstEntity.points.map((p) => p.clone());
-          if (isOpenEnds) {
-            newPoints[0] = intersectionPoint.clone();
-            newPoints[lastIdx] = intersectionPoint.clone();
-          } else {
-            const cornerIdx = Math.min(this.firstSegmentIndex, this.secondSegmentIndex);
-            newPoints.splice(cornerIdx, 1, intersectionPoint.clone());
-          }
-          stateChanges = [new UpdateState(this.firstEntity, { points: newPoints })];
-        } else {
-          const lineEntity = !firstIsPolyline ? this.firstEntity : this.secondEntity;
-          const polyEntity = firstIsPolyline ? this.firstEntity : this.secondEntity;
-          const lineKeptEnd = !firstIsPolyline ? firstLineKeptEnd : secondLineKeptEnd;
-          const polySegIdx = firstIsPolyline ? this.firstSegmentIndex : this.secondSegmentIndex;
-          const polyClickDir = firstIsPolyline ? firstClickDir : secondClickDir;
-          const segStart = polyEntity.points[polySegIdx - 1];
-          const segEnd = polyEntity.points[polySegIdx];
-          const keepStart = polyClickDir.dot(segStart.subtract(intersectionPoint)) >= polyClickDir.dot(segEnd.subtract(intersectionPoint));
-          let newPoints;
-          if (keepStart) {
-            newPoints = [
-              ...polyEntity.points.slice(0, polySegIdx).map((p) => p.clone()),
-              intersectionPoint.clone(),
-              lineKeptEnd.clone(),
-            ];
-          } else {
-            newPoints = [
-              lineKeptEnd.clone(),
-              intersectionPoint.clone(),
-              ...polyEntity.points.slice(polySegIdx).map((p) => p.clone()),
-            ];
-          }
-          stateChanges = [
-            new RemoveState(lineEntity),
-            new UpdateState(polyEntity, { points: newPoints }),
-          ];
-        }
-        DesignCore.Scene.commit(stateChanges);
-      }
+      if (trimMode) this.applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd);
       return;
     }
 
