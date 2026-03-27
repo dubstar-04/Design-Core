@@ -237,7 +237,10 @@ export class Chamfer extends ChamferFilletBase {
 
     // distA = distB = 0: trim/extend both lines to the sharp intersection with no chamfer line
     if (!chamferMode && distA === 0 && DesignCore.Scene.headers.chamferDistanceB === 0) {
-      if (trimMode) this.applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd);
+      if (trimMode) {
+        const stateChanges = this.applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd);
+        DesignCore.Scene.commit(stateChanges);
+      }
       return;
     }
 

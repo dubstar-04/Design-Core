@@ -55,6 +55,7 @@ export class ChamferFilletBase extends Tool {
    * @param {Point} secondClickDir - vector from intersection toward the second click
    * @param {Point} firstLineKeptEnd - endpoint of the first segment on the kept side
    * @param {Point} secondLineKeptEnd - endpoint of the second segment on the kept side
+   * @return {Array} - array of state changes to be committed by the caller
    */
   applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd) {
     const firstIsPolyline = this.firstEntity instanceof BasePolyline;
@@ -106,6 +107,6 @@ export class ChamferFilletBase extends Tool {
         new UpdateState(polyEntity, { points: newPoints }),
       ];
     }
-    DesignCore.Scene.commit(stateChanges);
+    return stateChanges;
   }
 }

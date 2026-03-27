@@ -206,7 +206,10 @@ export class Fillet extends ChamferFilletBase {
     const filletRadius = DesignCore.Scene.headers.filletRadius;
     const trimMode = DesignCore.Scene.headers.trimMode;
     if (filletRadius === 0) {
-      if (trimMode) this.applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd);
+      if (trimMode) {
+        const stateChanges = this.applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd);
+        DesignCore.Scene.commit(stateChanges);
+      }
       return;
     }
 
