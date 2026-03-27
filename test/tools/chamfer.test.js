@@ -580,3 +580,258 @@ test('Chamfer.execute re-prompts and notifies when second selected entity is not
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOCHAMFER));
   notifySpy.mockRestore();
 });
+
+// ─── action: polyline scenarios ───────────────────────────────────────────────
+
+// Geometry shared across the Line + Lwpolyline tests:
+//   Line:       (0,0)→(0,10)  (vertical)
+//   Lwpolyline: [(-20,0), (-10,0), (0,0), (10,0)]  (horizontal, 3 segments)
+//   Infinite extensions of the y=0 and x=0 lines meet at (0,0).
+//   With distance 2:
+//     polyChamfer  = (-2, 0)   (on the polyline segment y=0)
+//     lineChamfer  = ( 0, 2)   (on the external line x=0)
+
+test('Chamfer.action dist>0 trimMode=true Line first + Lwpolyline second keepStart: chamfer embedded in polyline', () => {
+  // Click polyline near (-15,0) → segment 1. keepStart keeps the start portion.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = true;
+
+  const lineEntity = core.scene.entities.get(0);
+  const polyEntity = core.scene.entities.get(1);
+  const polyClickPoint = new Point(-15, 0);
+
+  const chamfer = new Chamfer();
+  chamfer.firstEntity = lineEntity;
+  chamfer.firstSegment = lineEntity;
+  chamfer.firstSegmentIndex = null;
+  chamfer.firstClickPoint = new Point(0, 5);
+  chamfer.secondEntity = polyEntity;
+  chamfer.secondSegment = polyEntity.getClosestSegment(polyClickPoint);
+  chamfer.secondSegmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  chamfer.secondClickPoint = polyClickPoint;
+  chamfer.action();
+
+  // Line is consumed into the polyline; no separate chamfer Line entity
+  expect(core.scene.entities.count()).toBe(1);
+
+  const poly = core.scene.entities.get(0);
+  // [(-20,0), polyChamfer(-2,0), lineChamfer(0,2), lineKeptEnd(0,10)]
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[0].x).toBeCloseTo(-20);
+  expect(poly.points[0].y).toBeCloseTo(0);
+  expect(poly.points[1].x).toBeCloseTo(-2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  expect(poly.points[2].x).toBeCloseTo(0);
+  expect(poly.points[2].y).toBeCloseTo(2);
+  expect(poly.points[3].x).toBeCloseTo(0);
+  expect(poly.points[3].y).toBeCloseTo(10);
+});
+
+test('Chamfer.action dist>0 trimMode=true Lwpolyline first + Line second keepStart: same result with entities reversed', () => {
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = true;
+
+  const polyEntity = core.scene.entities.get(0);
+  const lineEntity = core.scene.entities.get(1);
+  const polyClickPoint = new Point(-15, 0);
+
+  const chamfer = new Chamfer();
+  chamfer.firstEntity = polyEntity;
+  chamfer.firstSegment = polyEntity.getClosestSegment(polyClickPoint);
+  chamfer.firstSegmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  chamfer.firstClickPoint = polyClickPoint;
+  chamfer.secondEntity = lineEntity;
+  chamfer.secondSegment = lineEntity;
+  chamfer.secondSegmentIndex = null;
+  chamfer.secondClickPoint = new Point(0, 5);
+  chamfer.action();
+
+  // Line is consumed; no separate chamfer Line entity
+  expect(core.scene.entities.count()).toBe(1);
+
+  const poly = core.scene.entities.get(0);
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[0].x).toBeCloseTo(-20);
+  expect(poly.points[1].x).toBeCloseTo(-2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  expect(poly.points[2].x).toBeCloseTo(0);
+  expect(poly.points[2].y).toBeCloseTo(2);
+  expect(poly.points[3].x).toBeCloseTo(0);
+  expect(poly.points[3].y).toBeCloseTo(10);
+});
+
+test('Chamfer.action dist>0 trimMode=true Line + Lwpolyline keepEnd: keeps end portion of polyline', () => {
+  // Click polyline near (8,0) → segment 3 (right of intersection). keepEnd.
+  // polyChamfer = (2,0), lineChamfer = (0,2).
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = true;
+
+  const lineEntity = core.scene.entities.get(0);
+  const polyEntity = core.scene.entities.get(1);
+  const polyClickPoint = new Point(8, 0);
+
+  const chamfer = new Chamfer();
+  chamfer.firstEntity = lineEntity;
+  chamfer.firstSegment = lineEntity;
+  chamfer.firstSegmentIndex = null;
+  chamfer.firstClickPoint = new Point(0, 5);
+  chamfer.secondEntity = polyEntity;
+  chamfer.secondSegment = polyEntity.getClosestSegment(polyClickPoint);
+  chamfer.secondSegmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  chamfer.secondClickPoint = polyClickPoint;
+  chamfer.action();
+
+  // Line consumed; end portion of polyline kept; no separate chamfer Line entity
+  expect(core.scene.entities.count()).toBe(1);
+
+  const poly = core.scene.entities.get(0);
+  // [lineKeptEnd(0,10), lineChamfer(0,2), polyChamfer(2,0), (10,0)]
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[0].x).toBeCloseTo(0);
+  expect(poly.points[0].y).toBeCloseTo(10);
+  expect(poly.points[1].x).toBeCloseTo(0);
+  expect(poly.points[1].y).toBeCloseTo(2);
+  expect(poly.points[2].x).toBeCloseTo(2);
+  expect(poly.points[2].y).toBeCloseTo(0);
+  expect(poly.points[3].x).toBeCloseTo(10);
+  expect(poly.points[3].y).toBeCloseTo(0);
+});
+
+test('Chamfer.action dist>0 trimMode=true same Lwpolyline consecutive segments: chamfer points inserted', () => {
+  // L-shaped polyline; chamfer the inner corner. No separate chamfer Line entity.
+  // Segment 1: (-10,0)→(0,0), Segment 2: (0,0)→(0,10). Corner at (0,0).
+  // dist=2 → chamfer at (-2,0) and (0,2).
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = true;
+
+  const polyEntity = core.scene.entities.get(0);
+
+  const chamfer = new Chamfer();
+  chamfer.firstEntity = polyEntity;
+  chamfer.secondEntity = polyEntity;
+  chamfer.firstSegment = polyEntity.getClosestSegment(new Point(-5, 0));
+  chamfer.firstSegmentIndex = polyEntity.getClosestSegmentIndex(new Point(-5, 0));
+  chamfer.firstClickPoint = new Point(-5, 0);
+  chamfer.secondSegment = polyEntity.getClosestSegment(new Point(0, 5));
+  chamfer.secondSegmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  chamfer.secondClickPoint = new Point(0, 5);
+  chamfer.action();
+
+  // Chamfer segment is a straight polyline segment — no separate Line entity
+  expect(core.scene.entities.count()).toBe(1);
+
+  const poly = core.scene.entities.get(0);
+  // Corner vertex replaced: [(-10,0), (-2,0), (0,2), (0,10)]
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[0].x).toBeCloseTo(-10);
+  expect(poly.points[0].y).toBeCloseTo(0);
+  expect(poly.points[1].x).toBeCloseTo(-2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  expect(poly.points[2].x).toBeCloseTo(0);
+  expect(poly.points[2].y).toBeCloseTo(2);
+  expect(poly.points[3].x).toBeCloseTo(0);
+  expect(poly.points[3].y).toBeCloseTo(10);
+});
+
+test('Chamfer.action dist>0 trimMode=true same Lwpolyline open ends: separate chamfer Line fills gap', () => {
+  // 4-point polyline: [(-5,0),(0,0),(1,0),(1,5)]. Segments 1 and 3 are the open ends.
+  // They are non-adjacent (diff=2) so the open-ends path is taken.
+  // Infinite lines of seg1 (y=0) and seg3 (x=1) meet at (1,0).
+  // dist=2, clicks at (-3,0) and (1,3):
+  //   firstChamfer = (-1,0), secondChamfer = (1,2).
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-5, 0), new Point(0, 0), new Point(1, 0), new Point(1, 5)] });
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = true;
+
+  const polyEntity = core.scene.entities.get(0);
+
+  const chamfer = new Chamfer();
+  chamfer.firstEntity = polyEntity;
+  chamfer.secondEntity = polyEntity;
+  chamfer.firstSegment = polyEntity.getClosestSegment(new Point(-3, 0)); // segment 1 (index 1)
+  chamfer.firstSegmentIndex = polyEntity.getClosestSegmentIndex(new Point(-3, 0));
+  chamfer.firstClickPoint = new Point(-3, 0);
+  chamfer.secondSegment = polyEntity.getClosestSegment(new Point(1, 3)); // segment 3 (last, index 3)
+  chamfer.secondSegmentIndex = polyEntity.getClosestSegmentIndex(new Point(1, 3));
+  chamfer.secondClickPoint = new Point(1, 3);
+  chamfer.action();
+
+  // Separate chamfer Line entity fills the gap between the trimmed open ends
+  expect(core.scene.entities.count()).toBe(2);
+
+  const chamferLine = core.scene.entities.get(1);
+  expect(chamferLine.type).toBe('Line');
+  // Chamfer line from firstChamfer(-1,0) to secondChamfer(1,2)
+  expect(chamferLine.points[0].x).toBeCloseTo(-1);
+  expect(chamferLine.points[0].y).toBeCloseTo(0);
+  expect(chamferLine.points[1].x).toBeCloseTo(1);
+  expect(chamferLine.points[1].y).toBeCloseTo(2);
+
+  const poly = core.scene.entities.get(0);
+  expect(poly.points.length).toBe(4);
+  // Start of polyline trimmed to first chamfer point: (-1,0)
+  expect(poly.points[0].x).toBeCloseTo(-1);
+  expect(poly.points[0].y).toBeCloseTo(0);
+  // End of polyline trimmed to second chamfer point: (1,2)
+  expect(poly.points[3].x).toBeCloseTo(1);
+  expect(poly.points[3].y).toBeCloseTo(2);
+});
+
+test('Chamfer.action dist>0 trimMode=false Line + Lwpolyline: standalone chamfer Line added, entities unchanged', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = false;
+
+  const lineEntity = core.scene.entities.get(0);
+  const polyEntity = core.scene.entities.get(1);
+  const polyClickPoint = new Point(-15, 0);
+
+  const chamfer = new Chamfer();
+  chamfer.firstEntity = lineEntity;
+  chamfer.firstSegment = lineEntity;
+  chamfer.firstSegmentIndex = null;
+  chamfer.firstClickPoint = new Point(0, 5);
+  chamfer.secondEntity = polyEntity;
+  chamfer.secondSegment = polyEntity.getClosestSegment(polyClickPoint);
+  chamfer.secondSegmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  chamfer.secondClickPoint = polyClickPoint;
+  chamfer.action();
+
+  // Chamfer Line added as standalone entity; original line and polyline untouched
+  expect(core.scene.entities.count()).toBe(3);
+  expect(core.scene.entities.get(2).type).toBe('Line');
+  expect(core.scene.entities.get(0).points.length).toBe(2);
+  expect(core.scene.entities.get(1).points.length).toBe(4);
+});
