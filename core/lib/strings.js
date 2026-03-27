@@ -46,10 +46,12 @@ export class Strings {
     NOEXTEND: 'cannot be extended',
     NOFILLET: 'cannot be filleted',
     NOCHAMFER: 'cannot be chamfered',
+    NONCONSECUTIVESEGMENTS: 'segments must be consecutive',
   };
 
   // Strings
   static Strings = {
+    ARC: 'Arc',
     LENGTH: 'Length',
     LINE: 'Line',
     VARIES: 'Varies',

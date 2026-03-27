@@ -67,7 +67,7 @@ export class Fillet extends ChamferFilletBase {
           DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOFILLET}`);
           continue;
         }
-        const firstResolved = this.resolveSegment(firstEntity, input1.selectedPoint, Strings.Message.NOFILLETARCSEGMENT);
+        const firstResolved = this.resolveSegment(firstEntity, input1.selectedPoint, `${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`);
         if (!firstResolved) continue;
         this.firstEntity = firstEntity;
         this.firstSegment = firstResolved.segment;
@@ -89,7 +89,7 @@ export class Fillet extends ChamferFilletBase {
             DesignCore.Core.notify(`${candidate.type} ${Strings.Message.NOFILLET}`);
             continue;
           }
-          const candidateResolved = this.resolveSegment(candidate, input2.selectedPoint, Strings.Message.NOFILLETARCSEGMENT);
+          const candidateResolved = this.resolveSegment(candidate, input2.selectedPoint, `${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`);
           if (!candidateResolved) continue;
           const { segment: candidateSegment, index: candidateSegmentIndex } = candidateResolved;
           // If both selections are the same polyline, segments must be consecutive
