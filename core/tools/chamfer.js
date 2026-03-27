@@ -168,62 +168,15 @@ export class Chamfer extends ChamferFilletBase {
    */
   action() {
     if (!this.firstEntity || !this.secondEntity) return;
+    if (!this.resolveCornerGeometry(Strings.Message.NOCHAMFER)) return;
 
-    // Resolve segments: execute() populates firstSegment/secondSegment for polylines,
-    const firstSeg = this.firstSegment ?? this.firstEntity;
-    const secondSeg = this.secondSegment ?? this.secondEntity;
+    const {
+      secondLineStart, secondLineDirection,
+      intersectionPoint, firstClickDir, secondClickDir,
+      firstClickDistance, secondClickDistance,
+      firstLineKeptEnd, secondLineKeptEnd,
+    } = this;
 
-    if (!(firstSeg instanceof Line)) {
-      DesignCore.Core.notify(`${this.firstEntity.type} ${Strings.Message.NOCHAMFER}`);
-      return;
-    }
-    if (!(secondSeg instanceof Line)) {
-      DesignCore.Core.notify(`${this.secondEntity.type} ${Strings.Message.NOCHAMFER}`);
-      return;
-    }
-
-    // Endpoints of the first line (or the resolved segment from a polyline)
-    const firstLineStart = firstSeg.points[0];
-    const firstLineEnd = firstSeg.points[1];
-
-    // Endpoints of the second line (or the resolved segment from a polyline)
-    const secondLineStart = secondSeg.points[0];
-    const secondLineEnd = secondSeg.points[1];
-
-    // Direction vectors along each line
-    const firstLineDirection = firstLineEnd.subtract(firstLineStart);
-    const secondLineDirection = secondLineEnd.subtract(secondLineStart);
-
-    // Zero cross product means the lines are parallel — no intersection
-    const directionCross = firstLineDirection.cross(secondLineDirection);
-    if (Math.abs(directionCross) < 1e-10) {
-      DesignCore.Core.notify(Strings.Error.PARALLELLINES);
-      return;
-    }
-
-    // Virtual intersection point of the two infinite lines
-    const startDiff = secondLineStart.subtract(firstLineStart);
-    const intersectParam = startDiff.cross(secondLineDirection) / directionCross;
-    const intersectionPoint = firstLineStart.lerp(firstLineEnd, intersectParam);
-
-    // Project the click points onto their respective lines to get a point on the
-    // clicked side of the intersection, used to determine which corner is chamfered.
-    const firstClickOnLine = this.firstClickPoint.perpendicular(firstLineStart, firstLineEnd);
-    const secondClickOnLine = this.secondClickPoint.perpendicular(secondLineStart, secondLineEnd);
-
-    const firstClickDistance = firstClickOnLine.distance(intersectionPoint);
-    const secondClickDistance = secondClickOnLine.distance(intersectionPoint);
-
-    // Vectors from the intersection toward the clicked side of each line
-    const firstClickDir = firstClickOnLine.subtract(intersectionPoint);
-    const secondClickDir = secondClickOnLine.subtract(intersectionPoint);
-
-    // Pick the endpoint on the same side as the click (dot-product comparison handles the
-    // edge case where one endpoint coincides with the intersection)
-    const firstLineKeptEnd = firstClickDir.dot(firstLineStart.subtract(intersectionPoint)) >= firstClickDir.dot(firstLineEnd.subtract(intersectionPoint)) ? firstLineStart : firstLineEnd;
-    const secondLineKeptEnd = secondClickDir.dot(secondLineStart.subtract(intersectionPoint)) >= secondClickDir.dot(secondLineEnd.subtract(intersectionPoint)) ? secondLineStart : secondLineEnd;
-
-    // Unit vectors pointing from the intersection toward the clicked side of each line
     if (firstClickDistance < 1e-10 || secondClickDistance < 1e-10) {
       DesignCore.Core.notify(`Selected corner ${Strings.Message.NOCHAMFER}`);
       return;
@@ -238,7 +191,7 @@ export class Chamfer extends ChamferFilletBase {
     // distA = distB = 0: trim/extend both lines to the sharp intersection with no chamfer line
     if (!chamferMode && distA === 0 && DesignCore.Scene.headers.chamferDistanceB === 0) {
       if (trimMode) {
-        const stateChanges = this.applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd);
+        const stateChanges = this.applySharpTrim();
         DesignCore.Scene.commit(stateChanges);
       }
       return;
@@ -313,7 +266,7 @@ export class Chamfer extends ChamferFilletBase {
       const secondChamferDot = secondChamferPoint.subtract(intersectionPoint).dot(secondKeptDir);
       if (firstChamferDot < 0 || firstChamferDot > firstKeptDir.dot(firstKeptDir) ||
           secondChamferDot < 0 || secondChamferDot > secondKeptDir.dot(secondKeptDir)) {
-        DesignCore.Core.notify(`${Strings.Error.DISTANCETOOLARGE}`);
+        DesignCore.Core.notify(Strings.Error.DISTANCETOOLARGE);
         return;
       }
     }

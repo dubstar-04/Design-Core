@@ -136,78 +136,21 @@ export class Fillet extends ChamferFilletBase {
    */
   action() {
     if (!this.firstEntity || !this.secondEntity) return;
+    if (!this.resolveCornerGeometry(Strings.Message.NOFILLET)) return;
 
-    // Resolve segments: execute() populates firstSegment/secondSegment for polylines,
-    const firstSeg = this.firstSegment ?? this.firstEntity;
-    const secondSeg = this.secondSegment ?? this.secondEntity;
-
-    if (!(firstSeg instanceof Line)) {
-      DesignCore.Core.notify(`${this.firstEntity.type} ${Strings.Message.NOFILLET}`);
-      return;
-    }
-    if (!(secondSeg instanceof Line)) {
-      DesignCore.Core.notify(`${this.secondEntity.type} ${Strings.Message.NOFILLET}`);
-      return;
-    }
-
-    // Endpoints of the first line (or the resolved segment from a polyline)
-    const firstLineStart = firstSeg.points[0];
-    const firstLineEnd = firstSeg.points[1];
-
-    // Endpoints of the second line (or the resolved segment from a polyline)
-    const secondLineStart = secondSeg.points[0];
-    const secondLineEnd = secondSeg.points[1];
-
-    // Direction vectors along each line
-    const firstLineDirection = firstLineEnd.subtract(firstLineStart);
-    const secondLineDirection = secondLineEnd.subtract(secondLineStart);
-
-    // Cross product of the two direction vectors; zero means the lines are parallel
-    const directionCross = firstLineDirection.cross(secondLineDirection);
-
-    if (Math.abs(directionCross) < 1e-10) {
-      DesignCore.Core.notify(Strings.Error.PARALLELLINES);
-      return;
-    }
-
-    // Find where the two infinite lines intersect using the parametric form:
-    // point = firstLineStart + (intersectParam * firstLineDirection)
-    // intersectParam = 0 is firstLineStart, intersectParam = 1 is firstLineEnd
-    const startDiff = secondLineStart.subtract(firstLineStart);
-    const intersectParam = startDiff.cross(secondLineDirection) / directionCross;
-
-    // Virtual intersection point of the two (infinite) lines
-    const intersectionPoint = firstLineStart.lerp(firstLineEnd, intersectParam);
-
-    // Project the click points onto their respective lines so they sit exactly on the line.
-    // This gives a point on the clicked side of the intersection, used to determine
-    // which of the four corners formed by the two lines receives the fillet arc.
-    const firstClickOnLine = this.firstClickPoint.perpendicular(firstLineStart, firstLineEnd);
-    const secondClickOnLine = this.secondClickPoint.perpendicular(secondLineStart, secondLineEnd);
-
-    // Distances from the intersection to the clicked projection on each line
-    const firstClickDistance = firstClickOnLine.distance(intersectionPoint);
-    const secondClickDistance = secondClickOnLine.distance(intersectionPoint);
-
-    // Vectors pointing from the intersection toward the clicked side of each line.
-    // Using the click direction (rather than "farthest endpoint") correctly handles
-    // cases where the intersection lies inside the segment and both endpoints are
-    // equidistant from the intersection.
-    const firstClickDir = firstClickOnLine.subtract(intersectionPoint);
-    const secondClickDir = secondClickOnLine.subtract(intersectionPoint);
-
-    // Pick the endpoint whose direction from the intersection is more aligned with the click.
-    // Comparing the two dot products against each other (rather than against zero) correctly
-    // handles the case where one endpoint is exactly at the intersection (dot product = 0).
-    const firstLineKeptEnd = firstClickDir.dot(firstLineStart.subtract(intersectionPoint)) >= firstClickDir.dot(firstLineEnd.subtract(intersectionPoint)) ? firstLineStart : firstLineEnd;
-    const secondLineKeptEnd = secondClickDir.dot(secondLineStart.subtract(intersectionPoint)) >= secondClickDir.dot(secondLineEnd.subtract(intersectionPoint)) ? secondLineStart : secondLineEnd;
+    const {
+      firstLineStart, firstLineEnd, secondLineStart, secondLineEnd,
+      intersectionPoint, firstClickDir, secondClickDir,
+      firstClickDistance, secondClickDistance,
+      firstLineKeptEnd, secondLineKeptEnd,
+    } = this;
 
     // radius = 0: trim/extend both lines to the sharp intersection with no arc
     const filletRadius = DesignCore.Scene.headers.filletRadius;
     const trimMode = DesignCore.Scene.headers.trimMode;
     if (filletRadius === 0) {
       if (trimMode) {
-        const stateChanges = this.applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd);
+        const stateChanges = this.applySharpTrim();
         DesignCore.Scene.commit(stateChanges);
       }
       return;
@@ -286,28 +229,29 @@ export class Fillet extends ChamferFilletBase {
     }
 
     if (!firstIsPolyline && !secondIsPolyline) {
-      this.#trimLineAndLine(firstLineKeptEnd, secondLineKeptEnd, firstTangentPoint, secondTangentPoint, arc);
+      const stateChanges = this.#trimLineAndLine(firstTangentPoint, secondTangentPoint, arc);
+      DesignCore.Scene.commit(stateChanges);
     } else if (firstIsPolyline && secondIsPolyline && this.firstEntity === this.secondEntity) {
-      this.#trimPolyAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre, arc);
+      const stateChanges = this.#trimPolyAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre, arc);
+      DesignCore.Scene.commit(stateChanges);
     } else {
-      this.#trimLineAndPoly(firstTangentPoint, secondTangentPoint, firstLineKeptEnd, secondLineKeptEnd, firstClickDir, secondClickDir, arcDirection, arcCentre, intersectionPoint);
+      const stateChanges = this.#trimLineAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre);
+      DesignCore.Scene.commit(stateChanges);
     }
   }
 
   /**
    * Apply trim and arc for a Line + Line fillet.
-   * @param {Point} firstLineKeptEnd
-   * @param {Point} secondLineKeptEnd
    * @param {Point} firstTangentPoint
    * @param {Point} secondTangentPoint
    * @param {Arc} arc
    */
-  #trimLineAndLine(firstLineKeptEnd, secondLineKeptEnd, firstTangentPoint, secondTangentPoint, arc) {
-    DesignCore.Scene.commit([
+  #trimLineAndLine(firstTangentPoint, secondTangentPoint, arc) {
+    return [
       new AddState(arc),
-      new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, firstTangentPoint] }),
-      new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, secondTangentPoint] }),
-    ]);
+      new UpdateState(this.firstEntity, { points: [this.firstLineKeptEnd, firstTangentPoint] }),
+      new UpdateState(this.secondEntity, { points: [this.secondLineKeptEnd, secondTangentPoint] }),
+    ];
   }
 
   /**
@@ -354,7 +298,7 @@ export class Fillet extends ChamferFilletBase {
     }
 
     stateChanges.push(new UpdateState(this.firstEntity, { points: newPoints }));
-    DesignCore.Scene.commit(stateChanges);
+    return stateChanges;
   }
 
   /**
@@ -362,21 +306,16 @@ export class Fillet extends ChamferFilletBase {
    * The line is consumed into the polyline with the arc encoded as a bulge.
    * @param {Point} firstTangentPoint
    * @param {Point} secondTangentPoint
-   * @param {Point} firstLineKeptEnd
-   * @param {Point} secondLineKeptEnd
-   * @param {Point} firstClickDir
-   * @param {Point} secondClickDir
    * @param {number} arcDirection
    * @param {Point} arcCentre
-   * @param {Point} intersectionPoint
    */
-  #trimLineAndPoly(firstTangentPoint, secondTangentPoint, firstLineKeptEnd, secondLineKeptEnd, firstClickDir, secondClickDir, arcDirection, arcCentre, intersectionPoint) {
+  #trimLineAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre) {
     const firstIsPolyline = this.firstEntity instanceof BasePolyline;
     const lineEntity = !firstIsPolyline ? this.firstEntity : this.secondEntity;
     const polyEntity = firstIsPolyline ? this.firstEntity : this.secondEntity;
     const lineTangentPoint = !firstIsPolyline ? firstTangentPoint : secondTangentPoint;
     const polyTangentPoint = firstIsPolyline ? firstTangentPoint : secondTangentPoint;
-    const lineKeptEnd = !firstIsPolyline ? firstLineKeptEnd : secondLineKeptEnd;
+    const lineKeptEnd = !firstIsPolyline ? this.firstLineKeptEnd : this.secondLineKeptEnd;
     const polySegIdx = firstIsPolyline ? this.firstSegmentIndex : this.secondSegmentIndex;
     const polyToLineDir = firstIsPolyline ? arcDirection : -arcDirection;
 
@@ -387,10 +326,10 @@ export class Fillet extends ChamferFilletBase {
     const arcStartPoint = polyTangentPoint.clone();
     arcStartPoint.bulge = bulge;
 
-    const polyClickDir = firstIsPolyline ? firstClickDir : secondClickDir;
+    const polyClickDir = firstIsPolyline ? this.firstClickDir : this.secondClickDir;
     const segStart = polyEntity.points[polySegIdx - 1];
     const segEnd = polyEntity.points[polySegIdx];
-    const keepStart = polyClickDir.dot(segStart.subtract(intersectionPoint)) >= polyClickDir.dot(segEnd.subtract(intersectionPoint));
+    const keepStart = polyClickDir.dot(segStart.subtract(this.intersectionPoint)) >= polyClickDir.dot(segEnd.subtract(this.intersectionPoint));
     let newPoints;
     if (keepStart) {
       newPoints = [
@@ -410,10 +349,10 @@ export class Fillet extends ChamferFilletBase {
       ];
     }
 
-    DesignCore.Scene.commit([
+    return [
       new RemoveState(lineEntity),
       new UpdateState(polyEntity, { points: newPoints }),
-    ]);
+    ];
   }
 
   /**

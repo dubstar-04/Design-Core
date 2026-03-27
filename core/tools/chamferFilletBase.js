@@ -1,4 +1,5 @@
 import { Tool } from './tool.js';
+import { Strings } from '../lib/strings.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { RemoveState, UpdateState } from '../lib/stateManager.js';
@@ -26,6 +27,19 @@ export class ChamferFilletBase extends Tool {
     this.firstSegmentIndex = null;
     this.secondSegment = null;
     this.secondSegmentIndex = null;
+    // Corner geometry computed by resolveCornerGeometry() before action()
+    this.firstLineStart = null;
+    this.firstLineEnd = null;
+    this.secondLineStart = null;
+    this.secondLineEnd = null;
+    this.secondLineDirection = null;
+    this.intersectionPoint = null;
+    this.firstClickDir = null;
+    this.secondClickDir = null;
+    this.firstClickDistance = null;
+    this.secondClickDistance = null;
+    this.firstLineKeptEnd = null;
+    this.secondLineKeptEnd = null;
   }
 
   /**
@@ -48,18 +62,69 @@ export class ChamferFilletBase extends Tool {
   }
 
   /**
+   * Compute the corner geometry shared by Fillet and Chamfer and store it on the instance.
+   * Validates that both resolved segments are Lines, finds the virtual intersection
+   * of the two infinite lines, and derives click-side directions and kept endpoints.
+   * Returns false and notifies the user on any invalid configuration.
+   * @param {string} noEntityMsg - message shown when a resolved segment is not a Line
+   * @return {boolean}
+   */
+  resolveCornerGeometry(noEntityMsg) {
+    const firstSeg = this.firstSegment ?? this.firstEntity;
+    const secondSeg = this.secondSegment ?? this.secondEntity;
+
+    if (!(firstSeg instanceof Line)) {
+      DesignCore.Core.notify(`${this.firstEntity.type} ${noEntityMsg}`);
+      return false;
+    }
+    if (!(secondSeg instanceof Line)) {
+      DesignCore.Core.notify(`${this.secondEntity.type} ${noEntityMsg}`);
+      return false;
+    }
+
+    this.firstLineStart = firstSeg.points[0];
+    this.firstLineEnd = firstSeg.points[1];
+    this.secondLineStart = secondSeg.points[0];
+    this.secondLineEnd = secondSeg.points[1];
+
+    const firstLineDirection = this.firstLineEnd.subtract(this.firstLineStart);
+    this.secondLineDirection = this.secondLineEnd.subtract(this.secondLineStart);
+    const directionCross = firstLineDirection.cross(this.secondLineDirection);
+
+    if (Math.abs(directionCross) < 1e-10) {
+      DesignCore.Core.notify(Strings.Error.PARALLELLINES);
+      return false;
+    }
+
+    const startDiff = this.secondLineStart.subtract(this.firstLineStart);
+    const intersectParam = startDiff.cross(this.secondLineDirection) / directionCross;
+    this.intersectionPoint = this.firstLineStart.lerp(this.firstLineEnd, intersectParam);
+
+    const firstClickOnLine = this.firstClickPoint.perpendicular(this.firstLineStart, this.firstLineEnd);
+    const secondClickOnLine = this.secondClickPoint.perpendicular(this.secondLineStart, this.secondLineEnd);
+
+    this.firstClickDistance = firstClickOnLine.distance(this.intersectionPoint);
+    this.secondClickDistance = secondClickOnLine.distance(this.intersectionPoint);
+
+    this.firstClickDir = firstClickOnLine.subtract(this.intersectionPoint);
+    this.secondClickDir = secondClickOnLine.subtract(this.intersectionPoint);
+
+    this.firstLineKeptEnd = this.firstClickDir.dot(this.firstLineStart.subtract(this.intersectionPoint)) >= this.firstClickDir.dot(this.firstLineEnd.subtract(this.intersectionPoint)) ? this.firstLineStart : this.firstLineEnd;
+    this.secondLineKeptEnd = this.secondClickDir.dot(this.secondLineStart.subtract(this.intersectionPoint)) >= this.secondClickDir.dot(this.secondLineEnd.subtract(this.intersectionPoint)) ? this.secondLineStart : this.secondLineEnd;
+
+    return true;
+  }
+
+  /**
    * Trim both entities to the sharp intersection point with no arc or chamfer line.
    * Handles Line+Line, Polyline+Polyline (same entity), and Line+Polyline cases.
-   * @param {Point} intersectionPoint - virtual intersection of the two infinite lines
-   * @param {Point} firstClickDir - vector from intersection toward the first click
-   * @param {Point} secondClickDir - vector from intersection toward the second click
-   * @param {Point} firstLineKeptEnd - endpoint of the first segment on the kept side
-   * @param {Point} secondLineKeptEnd - endpoint of the second segment on the kept side
+   * Reads geometry from instance fields set by resolveCornerGeometry().
    * @return {Array} - array of state changes to be committed by the caller
    */
-  applySharpTrim(intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd) {
+  applySharpTrim() {
     const firstIsPolyline = this.firstEntity instanceof BasePolyline;
     const secondIsPolyline = this.secondEntity instanceof BasePolyline;
+    const { intersectionPoint, firstClickDir, secondClickDir, firstLineKeptEnd, secondLineKeptEnd } = this;
     let stateChanges;
     if (!firstIsPolyline && !secondIsPolyline) {
       stateChanges = [
