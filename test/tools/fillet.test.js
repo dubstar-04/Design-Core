@@ -424,3 +424,289 @@ test('Fillet.execute re-prompts and notifies when second selected entity is not 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOFILLET));
   notifySpy.mockRestore();
 });
+
+// ─── action: polyline scenarios ───────────────────────────────────────────────
+
+// Geometry shared across the Line + Lwpolyline tests:
+//   Line:       (0,0)→(0,10)  (vertical)
+//   Lwpolyline: [(-20,0), (-10,0), (0,0), (10,0)]  (horizontal, 3 segments)
+//   Infinite extensions of the y=0 and x=0 lines meet at (0,0).
+//   With radius 2 and a 90° corner:
+//     arc centre  = (-2, 2)
+//     polyTangent = (-2,  0)   (tangent on the polyline segment y=0)
+//     lineTangent = ( 0,  2)   (tangent on the external line x=0)
+
+test('Fillet.action radius>0 trimMode=true Line first + Lwpolyline second keepStart: arc embedded as bulge', () => {
+  // Click polyline near (-15,0) → segment 1. keepStart keeps the start portion.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const lineEntity = core.scene.entities.get(0);
+  const polyEntity = core.scene.entities.get(1);
+  const polyClickPoint = new Point(-15, 0);
+
+  const fillet = new Fillet();
+  fillet.firstEntity = lineEntity;
+  fillet.firstSegment = lineEntity;
+  fillet.firstSegmentIndex = null;
+  fillet.firstClickPoint = new Point(0, 5);
+  fillet.secondEntity = polyEntity;
+  fillet.secondSegment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.secondSegmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.secondClickPoint = polyClickPoint;
+  fillet.action();
+
+  // Line is consumed into the polyline; no separate Arc entity
+  expect(core.scene.entities.count()).toBe(1);
+
+  const poly = core.scene.entities.get(0);
+  // [(-20,0), polyTangent(-2,0)[bulge], lineTangent(0,2), lineKeptEnd(0,10)]
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[0].x).toBeCloseTo(-20);
+  expect(poly.points[0].y).toBeCloseTo(0);
+  expect(poly.points[1].x).toBeCloseTo(-2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  expect(poly.points[1].bulge).not.toBe(0);
+  expect(poly.points[2].x).toBeCloseTo(0);
+  expect(poly.points[2].y).toBeCloseTo(2);
+  expect(poly.points[3].x).toBeCloseTo(0);
+  expect(poly.points[3].y).toBeCloseTo(10);
+});
+
+test('Fillet.action radius>0 trimMode=true Lwpolyline first + Line second keepStart: arc direction correct', () => {
+  // Same geometry but entity order reversed — tests the polyToLineDir arc direction fix.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const polyEntity = core.scene.entities.get(0);
+  const lineEntity = core.scene.entities.get(1);
+  const polyClickPoint = new Point(-15, 0);
+
+  const fillet = new Fillet();
+  fillet.firstEntity = polyEntity;
+  fillet.firstSegment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.firstSegmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.firstClickPoint = polyClickPoint;
+  fillet.secondEntity = lineEntity;
+  fillet.secondSegment = lineEntity;
+  fillet.secondSegmentIndex = null;
+  fillet.secondClickPoint = new Point(0, 5);
+  fillet.action();
+
+  // Line is consumed; no separate Arc entity
+  expect(core.scene.entities.count()).toBe(1);
+
+  const poly = core.scene.entities.get(0);
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[0].x).toBeCloseTo(-20);
+  expect(poly.points[1].x).toBeCloseTo(-2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  // CCW arc: bulge should be positive
+  expect(poly.points[1].bulge).toBeGreaterThan(0);
+  expect(poly.points[2].x).toBeCloseTo(0);
+  expect(poly.points[2].y).toBeCloseTo(2);
+  expect(poly.points[3].x).toBeCloseTo(0);
+  expect(poly.points[3].y).toBeCloseTo(10);
+});
+
+test('Fillet.action radius>0 trimMode=true Line + Lwpolyline keepEnd: keeps end portion of polyline', () => {
+  // Click polyline near (8,0) → segment 3 (right of intersection). keepEnd.
+  // arc centre = (2,2), polyTangent = (2,0), lineTangent = (0,2).
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const lineEntity = core.scene.entities.get(0);
+  const polyEntity = core.scene.entities.get(1);
+  const polyClickPoint = new Point(8, 0);
+
+  const fillet = new Fillet();
+  fillet.firstEntity = lineEntity;
+  fillet.firstSegment = lineEntity;
+  fillet.firstSegmentIndex = null;
+  fillet.firstClickPoint = new Point(0, 5);
+  fillet.secondEntity = polyEntity;
+  fillet.secondSegment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.secondSegmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.secondClickPoint = polyClickPoint;
+  fillet.action();
+
+  // Line consumed; end portion kept; no separate Arc entity
+  expect(core.scene.entities.count()).toBe(1);
+
+  const poly = core.scene.entities.get(0);
+  // [lineKeptEnd(0,10), lineTangent(0,2)[bulge], polyTangent(2,0), (10,0)]
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[0].x).toBeCloseTo(0);
+  expect(poly.points[0].y).toBeCloseTo(10);
+  expect(poly.points[1].x).toBeCloseTo(0);
+  expect(poly.points[1].y).toBeCloseTo(2);
+  expect(poly.points[1].bulge).not.toBe(0);
+  expect(poly.points[2].x).toBeCloseTo(2);
+  expect(poly.points[2].y).toBeCloseTo(0);
+  expect(poly.points[3].x).toBeCloseTo(10);
+  expect(poly.points[3].y).toBeCloseTo(0);
+});
+
+test('Fillet.action radius=0 trimMode=true Line + Lwpolyline keepStart: line consumed to sharp corner', () => {
+  // radius=0 → sharp intersection at (0,0), no arc.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+
+  core.scene.headers.filletRadius = 0;
+  core.scene.headers.trimMode = true;
+
+  const lineEntity = core.scene.entities.get(0);
+  const polyEntity = core.scene.entities.get(1);
+  const polyClickPoint = new Point(-15, 0);
+
+  const fillet = new Fillet();
+  fillet.firstEntity = lineEntity;
+  fillet.firstSegment = lineEntity;
+  fillet.firstSegmentIndex = null;
+  fillet.firstClickPoint = new Point(0, 5);
+  fillet.secondEntity = polyEntity;
+  fillet.secondSegment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.secondSegmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.secondClickPoint = polyClickPoint;
+  fillet.action();
+
+  // Line removed; polyline updated with sharp corner; no arc entity
+  expect(core.scene.entities.count()).toBe(1);
+
+  const poly = core.scene.entities.get(0);
+  // [(-20,0), intersection(0,0), lineKeptEnd(0,10)]
+  expect(poly.points.length).toBe(3);
+  expect(poly.points[0].x).toBeCloseTo(-20);
+  expect(poly.points[0].y).toBeCloseTo(0);
+  expect(poly.points[1].x).toBeCloseTo(0);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  expect(poly.points[2].x).toBeCloseTo(0);
+  expect(poly.points[2].y).toBeCloseTo(10);
+});
+
+test('Fillet.action radius>0 trimMode=true same Lwpolyline consecutive segments: arc inserted as bulge', () => {
+  // L-shaped polyline; fillet the inner corner. Arc encoded as a bulge — no separate Arc entity.
+  // Segment 1: (-10,0)→(0,0), Segment 2: (0,0)→(0,10). Corner at (0,0).
+  // radius=2 → arc centre (-2,2), tangents at (-2,0) and (0,2).
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const polyEntity = core.scene.entities.get(0);
+
+  const fillet = new Fillet();
+  fillet.firstEntity = polyEntity;
+  fillet.secondEntity = polyEntity;
+  fillet.firstSegment = polyEntity.getClosestSegment(new Point(-5, 0));
+  fillet.firstSegmentIndex = polyEntity.getClosestSegmentIndex(new Point(-5, 0));
+  fillet.firstClickPoint = new Point(-5, 0);
+  fillet.secondSegment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.secondSegmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.secondClickPoint = new Point(0, 5);
+  fillet.action();
+
+  // Arc is embedded as a bulge — no separate Arc entity
+  expect(core.scene.entities.count()).toBe(1);
+
+  const poly = core.scene.entities.get(0);
+  // Corner vertex replaced: [(-10,0), (-2,0)[bulge], (0,2), (0,10)]
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[0].x).toBeCloseTo(-10);
+  expect(poly.points[0].y).toBeCloseTo(0);
+  expect(poly.points[1].x).toBeCloseTo(-2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  expect(poly.points[1].bulge).not.toBe(0);
+  expect(poly.points[2].x).toBeCloseTo(0);
+  expect(poly.points[2].y).toBeCloseTo(2);
+  expect(poly.points[3].x).toBeCloseTo(0);
+  expect(poly.points[3].y).toBeCloseTo(10);
+});
+
+test('Fillet.action radius>0 trimMode=true same Lwpolyline open ends: separate Arc entity fills gap', () => {
+  // 4-point polyline: [(-5,0),(0,0),(1,0),(1,5)]. Segments 1 and 3 are the open ends.
+  // They are non-adjacent (diff=2) so the open-ends path is taken.
+  // Infinite lines of seg1 (y=0) and seg3 (x=1) meet at (1,0).
+  // radius=2, clicks at (-3,0) and (1,3):
+  //   arc centre = (-1,2), firstTangent = (-1,0), secondTangent = (1,2).
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-5, 0), new Point(0, 0), new Point(1, 0), new Point(1, 5)] });
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const polyEntity = core.scene.entities.get(0);
+
+  const fillet = new Fillet();
+  fillet.firstEntity = polyEntity;
+  fillet.secondEntity = polyEntity;
+  fillet.firstSegment = polyEntity.getClosestSegment(new Point(-3, 0)); // segment 1 (index 1)
+  fillet.firstSegmentIndex = polyEntity.getClosestSegmentIndex(new Point(-3, 0));
+  fillet.firstClickPoint = new Point(-3, 0);
+  fillet.secondSegment = polyEntity.getClosestSegment(new Point(1, 3)); // segment 3 (last, index 3)
+  fillet.secondSegmentIndex = polyEntity.getClosestSegmentIndex(new Point(1, 3));
+  fillet.secondClickPoint = new Point(1, 3);
+  fillet.action();
+
+  // Separate Arc entity fills the gap between the trimmed open ends
+  expect(core.scene.entities.count()).toBe(2);
+
+  const arc = core.scene.entities.get(1);
+  expect(arc.type).toBe('Arc');
+  // Arc centre at (-1,2)
+  expect(arc.points[0].x).toBeCloseTo(-1);
+  expect(arc.points[0].y).toBeCloseTo(2);
+
+  const poly = core.scene.entities.get(0);
+  expect(poly.points.length).toBe(4);
+  // Start of polyline trimmed to tangent on segment 1: (-1,0)
+  expect(poly.points[0].x).toBeCloseTo(-1);
+  expect(poly.points[0].y).toBeCloseTo(0);
+  // End of polyline trimmed to tangent on segment 3: (1,2)
+  expect(poly.points[3].x).toBeCloseTo(1);
+  expect(poly.points[3].y).toBeCloseTo(2);
+});
+
+test('Fillet.action radius>0 trimMode=false Line + Lwpolyline: standalone arc added, entities unchanged', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = false;
+
+  const lineEntity = core.scene.entities.get(0);
+  const polyEntity = core.scene.entities.get(1);
+  const polyClickPoint = new Point(-15, 0);
+
+  const fillet = new Fillet();
+  fillet.firstEntity = lineEntity;
+  fillet.firstSegment = lineEntity;
+  fillet.firstSegmentIndex = null;
+  fillet.firstClickPoint = new Point(0, 5);
+  fillet.secondEntity = polyEntity;
+  fillet.secondSegment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.secondSegmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.secondClickPoint = polyClickPoint;
+  fillet.action();
+
+  // Arc added as standalone entity; original line and polyline untouched
+  expect(core.scene.entities.count()).toBe(3);
+  expect(core.scene.entities.get(2).type).toBe('Arc');
+  expect(core.scene.entities.get(0).points.length).toBe(2);
+  expect(core.scene.entities.get(1).points.length).toBe(4);
+});
