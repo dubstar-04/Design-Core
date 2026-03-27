@@ -70,7 +70,7 @@ export class Fillet extends ChamferFilletBase {
         }
         this.first.entity = firstEntity;
         this.first.clickPoint = input1.selectedPoint;
-        if (!this.resolveSegment(this.first, `${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
+        if (!this.first.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
 
         // Prompt for second object
         const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -87,7 +87,7 @@ export class Fillet extends ChamferFilletBase {
           const secondCorner = new CornerEntity();
           secondCorner.entity = candidate;
           secondCorner.clickPoint = input2.selectedPoint;
-          if (!this.resolveSegment(secondCorner, `${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
+          if (!secondCorner.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
           // If both selections are the same polyline, segments must be consecutive
           // or they must be the open-end segments of an open polyline.
           if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
@@ -309,9 +309,7 @@ export class Fillet extends ChamferFilletBase {
     arcStartPoint.bulge = bulge;
 
     const polySegIdx = poly.segmentIndex;
-    const segStart = poly.entity.points[polySegIdx - 1];
-    const segEnd = poly.entity.points[polySegIdx];
-    const keepStart = poly.clickDir.dot(segStart.subtract(this.intersectionPoint)) >= poly.clickDir.dot(segEnd.subtract(this.intersectionPoint));
+    const keepStart = poly.keepStart(this.intersectionPoint);
     let newPoints;
     if (keepStart) {
       newPoints = [

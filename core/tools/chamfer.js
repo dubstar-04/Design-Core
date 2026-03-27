@@ -102,7 +102,7 @@ export class Chamfer extends ChamferFilletBase {
         }
         this.first.entity = firstEntity;
         this.first.clickPoint = input1.selectedPoint;
-        if (!this.resolveSegment(this.first, `${Strings.Strings.ARC} ${Strings.Message.NOCHAMFER}`)) continue;
+        if (!this.first.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOCHAMFER}`)) continue;
 
         // Prompt for second object
         const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -119,7 +119,7 @@ export class Chamfer extends ChamferFilletBase {
           const secondCorner = new CornerEntity();
           secondCorner.entity = candidate;
           secondCorner.clickPoint = input2.selectedPoint;
-          if (!this.resolveSegment(secondCorner, `${Strings.Strings.ARC} ${Strings.Message.NOCHAMFER}`)) continue;
+          if (!secondCorner.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOCHAMFER}`)) continue;
           // If both selections are the same polyline, segments must be consecutive
           // or they must be the open-end segments of an open polyline.
           if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
@@ -226,14 +226,14 @@ export class Chamfer extends ChamferFilletBase {
       );
 
       // Intersect chamfer ray from firstChamferPoint with the infinite line2
-      const chamferCross = chamferDir.cross(this.secondLineDirection);
+      const chamferCross = chamferDir.cross(this.second.direction);
       if (Math.abs(chamferCross) < 1e-10) {
         // Chamfer direction is parallel to line2 — no intersection
         DesignCore.Core.notify(Strings.Error.PARALLELLINES);
         return;
       }
       const diff = this.second.lineStart.subtract(firstChamferPoint);
-      const t = diff.cross(this.secondLineDirection) / chamferCross;
+      const t = diff.cross(this.second.direction) / chamferCross;
       secondChamferPoint = new Point(
           firstChamferPoint.x + chamferDir.x * t,
           firstChamferPoint.y + chamferDir.y * t,
@@ -309,10 +309,7 @@ export class Chamfer extends ChamferFilletBase {
         const polyChamferPoint = poly === this.first ? firstChamferPoint : secondChamferPoint;
         const lineChamferPoint = line === this.first ? firstChamferPoint : secondChamferPoint;
         const polySegIdx = poly.segmentIndex;
-
-        const segStart = poly.entity.points[polySegIdx - 1];
-        const segEnd = poly.entity.points[polySegIdx];
-        const keepStart = poly.clickDir.dot(segStart.subtract(this.intersectionPoint)) >= poly.clickDir.dot(segEnd.subtract(this.intersectionPoint));
+        const keepStart = poly.keepStart(this.intersectionPoint);
         let newPoints;
         if (keepStart) {
           // Keep start portion: points[0..polySegIdx-1], then chamfer, then line end

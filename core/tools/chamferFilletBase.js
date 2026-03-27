@@ -1,7 +1,5 @@
 import { Tool } from './tool.js';
 import { Strings } from '../lib/strings.js';
-import { Point } from '../entities/point.js';
-import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { RemoveState, UpdateState } from '../lib/stateManager.js';
 import { CornerEntity } from './cornerEntity.js';
@@ -24,28 +22,6 @@ export class ChamferFilletBase extends Tool {
     // If the lines form a cross there are four possible locations.
     // The click points are used to determine which corner to operate on.
     this.intersectionPoint = null;
-    this.secondLineDirection = null;
-  }
-
-  /**
-   * Resolve a CornerEntity's entity to its closest straight segment.
-   * Populates corner.segment and corner.segmentIndex for polyline entities.
-   * Returns false and notifies the user if the closest segment is an arc.
-   * @param {CornerEntity} corner
-   * @param {string} arcSegmentErrorMsg - notification string shown when the segment is an arc
-   * @return {boolean}
-   */
-  resolveSegment(corner, arcSegmentErrorMsg) {
-    if (!(corner.entity instanceof BasePolyline)) return true;
-    const index = corner.entity.getClosestSegmentIndex(corner.clickPoint);
-    const segment = corner.entity.getClosestSegment(corner.clickPoint);
-    if (!(segment instanceof Line)) {
-      DesignCore.Core.notify(arcSegmentErrorMsg);
-      return false;
-    }
-    corner.segment = segment;
-    corner.segmentIndex = index;
-    return true;
   }
 
   /**
@@ -57,26 +33,16 @@ export class ChamferFilletBase extends Tool {
    * @return {boolean}
    */
   resolveCornerGeometry(noEntityMsg) {
-    const firstSeg = this.first.segment ?? this.first.entity;
-    const secondSeg = this.second.segment ?? this.second.entity;
-
-    if (!(firstSeg instanceof Line)) {
+    if (!this.first.resolveEndpoints()) {
       DesignCore.Core.notify(`${this.first.entity.type} ${noEntityMsg}`);
       return false;
     }
-    if (!(secondSeg instanceof Line)) {
+    if (!this.second.resolveEndpoints()) {
       DesignCore.Core.notify(`${this.second.entity.type} ${noEntityMsg}`);
       return false;
     }
 
-    this.first.lineStart = firstSeg.points[0];
-    this.first.lineEnd = firstSeg.points[1];
-    this.second.lineStart = secondSeg.points[0];
-    this.second.lineEnd = secondSeg.points[1];
-
-    const firstLineDirection = this.first.lineEnd.subtract(this.first.lineStart);
-    this.secondLineDirection = this.second.lineEnd.subtract(this.second.lineStart);
-    const directionCross = firstLineDirection.cross(this.secondLineDirection);
+    const directionCross = this.first.direction.cross(this.second.direction);
 
     if (Math.abs(directionCross) < 1e-10) {
       DesignCore.Core.notify(Strings.Error.PARALLELLINES);
@@ -84,23 +50,11 @@ export class ChamferFilletBase extends Tool {
     }
 
     const startDiff = this.second.lineStart.subtract(this.first.lineStart);
-    const intersectParam = startDiff.cross(this.secondLineDirection) / directionCross;
+    const intersectParam = startDiff.cross(this.second.direction) / directionCross;
     this.intersectionPoint = this.first.lineStart.lerp(this.first.lineEnd, intersectParam);
 
-    const firstClickOnLine = this.first.clickPoint.perpendicular(this.first.lineStart, this.first.lineEnd);
-    const secondClickOnLine = this.second.clickPoint.perpendicular(this.second.lineStart, this.second.lineEnd);
-
-    this.first.clickDistance = firstClickOnLine.distance(this.intersectionPoint);
-    this.second.clickDistance = secondClickOnLine.distance(this.intersectionPoint);
-
-    this.first.clickDir = firstClickOnLine.subtract(this.intersectionPoint);
-    this.second.clickDir = secondClickOnLine.subtract(this.intersectionPoint);
-
-    this.first.lineKeptEnd = this.first.clickDir.dot(this.first.lineStart.subtract(this.intersectionPoint)) >= this.first.clickDir.dot(this.first.lineEnd.subtract(this.intersectionPoint)) ? this.first.lineStart : this.first.lineEnd;
-    this.second.lineKeptEnd = this.second.clickDir.dot(this.second.lineStart.subtract(this.intersectionPoint)) >= this.second.clickDir.dot(this.second.lineEnd.subtract(this.intersectionPoint)) ? this.second.lineStart : this.second.lineEnd;
-
-    this.first.clickUnit = new Point(this.first.clickDir.x / this.first.clickDistance, this.first.clickDir.y / this.first.clickDistance);
-    this.second.clickUnit = new Point(this.second.clickDir.x / this.second.clickDistance, this.second.clickDir.y / this.second.clickDistance);
+    this.first.resolveGeometry(this.intersectionPoint);
+    this.second.resolveGeometry(this.intersectionPoint);
 
     return true;
   }
@@ -137,9 +91,7 @@ export class ChamferFilletBase extends Tool {
     } else {
       const [poly, line] = firstIsPolyline ? [this.first, this.second] : [this.second, this.first];
       const polySegIdx = poly.segmentIndex;
-      const segStart = poly.entity.points[polySegIdx - 1];
-      const segEnd = poly.entity.points[polySegIdx];
-      const keepStart = poly.clickDir.dot(segStart.subtract(intersectionPoint)) >= poly.clickDir.dot(segEnd.subtract(intersectionPoint));
+      const keepStart = poly.keepStart(intersectionPoint);
       let newPoints;
       if (keepStart) {
         newPoints = [
