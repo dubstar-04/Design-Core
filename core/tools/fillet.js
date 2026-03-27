@@ -3,7 +3,9 @@ import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Point } from '../entities/point.js';
-import { AddState, UpdateState } from '../lib/stateManager.js';
+import { Line } from '../entities/line.js';
+import { BasePolyline } from '../entities/basePolyline.js';
+import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -21,6 +23,11 @@ export class Fillet extends Tool {
     // The click points are used to determine the arc location.
     this.firstClickPoint = null;
     this.secondClickPoint = null;
+    // For polyline selections: the resolved Line segment and its 1-based index
+    this.firstSegment = null;
+    this.firstSegmentIndex = null;
+    this.secondSegment = null;
+    this.secondSegmentIndex = null;
   }
 
   /**
@@ -72,33 +79,57 @@ export class Fillet extends Tool {
         // input1 is a selection — validate and store first entity
         const firstEntity = DesignCore.Scene.entities.get(input1.selectedItemIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
-        // Only Line entities can be filleted
-        if (firstEntity.type !== 'Line') {
+        if (!(firstEntity instanceof Line) && !(firstEntity instanceof BasePolyline)) {
           DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOFILLET}`);
           continue;
         }
+        const firstResolved = this.#resolveSegment(firstEntity, input1.selectedPoint);
+        if (!firstResolved) continue;
         this.firstEntity = firstEntity;
+        this.firstSegment = firstResolved.segment;
+        this.firstSegmentIndex = firstResolved.index;
         this.firstClickPoint = input1.selectedPoint;
 
-        // Prompt for second object — re-prompt if the selection is not a Line
+        // Prompt for second object
         const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         let secondEntity;
+        let secondSegment;
+        let secondSegmentIndex = null;
         while (true) {
           const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
           if (input2 === undefined) return;
 
           const candidate = DesignCore.Scene.entities.get(input2.selectedItemIndex);
           DesignCore.Scene.selectionManager.removeLastSelection();
-          // Only Line entities can be filleted
-          if (candidate.type !== 'Line') {
+          if (!(candidate instanceof Line) && !(candidate instanceof BasePolyline)) {
             DesignCore.Core.notify(`${candidate.type} ${Strings.Message.NOFILLET}`);
             continue;
           }
+          const candidateResolved = this.#resolveSegment(candidate, input2.selectedPoint);
+          if (!candidateResolved) continue;
+          const { segment: candidateSegment, index: candidateSegmentIndex } = candidateResolved;
+          // If both selections are the same polyline, segments must be consecutive
+          // or they must be the open-end segments of an open polyline.
+          if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
+            const isConsecutive = firstEntity.areConsecutiveSegments(this.firstSegmentIndex, candidateSegmentIndex);
+            const lastIdx = firstEntity.points.length - 1;
+            const isOpenEnds = !firstEntity.flags.hasFlag(1) &&
+              ((this.firstSegmentIndex === 1 && candidateSegmentIndex === lastIdx) ||
+               (candidateSegmentIndex === 1 && this.firstSegmentIndex === lastIdx));
+            if (!isConsecutive && !isOpenEnds) {
+              DesignCore.Core.notify(Strings.Message.NONCONSECUTIVESEGMENTS);
+              continue;
+            }
+          }
           secondEntity = candidate;
+          secondSegment = candidateSegment;
+          secondSegmentIndex = candidateSegmentIndex;
           this.secondClickPoint = input2.selectedPoint;
           break;
         }
         this.secondEntity = secondEntity;
+        this.secondSegment = secondSegment;
+        this.secondSegmentIndex = secondSegmentIndex;
 
         // Apply fillet then reset
         DesignCore.Scene.inputManager.executeCommand();
@@ -122,23 +153,26 @@ export class Fillet extends Tool {
   action() {
     if (!this.firstEntity || !this.secondEntity) return;
 
-    if (this.firstEntity.type !== 'Line') {
+    // Resolve segments: execute() populates firstSegment/secondSegment for polylines,
+    const firstSeg = this.firstSegment ?? this.firstEntity;
+    const secondSeg = this.secondSegment ?? this.secondEntity;
+
+    if (!(firstSeg instanceof Line)) {
       DesignCore.Core.notify(`${this.firstEntity.type} ${Strings.Message.NOFILLET}`);
       return;
     }
-
-    if (this.secondEntity.type !== 'Line') {
+    if (!(secondSeg instanceof Line)) {
       DesignCore.Core.notify(`${this.secondEntity.type} ${Strings.Message.NOFILLET}`);
       return;
     }
 
-    // Endpoints of the first line
-    const firstLineStart = this.firstEntity.points[0];
-    const firstLineEnd = this.firstEntity.points[1];
+    // Endpoints of the first line (or the resolved segment from a polyline)
+    const firstLineStart = firstSeg.points[0];
+    const firstLineEnd = firstSeg.points[1];
 
-    // Endpoints of the second line
-    const secondLineStart = this.secondEntity.points[0];
-    const secondLineEnd = this.secondEntity.points[1];
+    // Endpoints of the second line (or the resolved segment from a polyline)
+    const secondLineStart = secondSeg.points[0];
+    const secondLineEnd = secondSeg.points[1];
 
     // Direction vectors along each line
     const firstLineDirection = firstLineEnd.subtract(firstLineStart);
@@ -189,10 +223,55 @@ export class Fillet extends Tool {
     const trimMode = DesignCore.Scene.headers.trimMode;
     if (filletRadius === 0) {
       if (trimMode) {
-        const stateChanges = [
-          new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, intersectionPoint] }),
-          new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, intersectionPoint] }),
-        ];
+        const firstIsPolyline = this.firstEntity instanceof BasePolyline;
+        const secondIsPolyline = this.secondEntity instanceof BasePolyline;
+        let stateChanges;
+        if (!firstIsPolyline && !secondIsPolyline) {
+          stateChanges = [
+            new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, intersectionPoint] }),
+            new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, intersectionPoint] }),
+          ];
+        } else if (firstIsPolyline && secondIsPolyline && this.firstEntity === this.secondEntity) {
+          const lastIdx = this.firstEntity.points.length - 1;
+          const isOpenEnds = (this.firstSegmentIndex === 1 && this.secondSegmentIndex === lastIdx) ||
+                             (this.firstSegmentIndex === lastIdx && this.secondSegmentIndex === 1);
+          const newPoints = this.firstEntity.points.map((p) => p.clone());
+          if (isOpenEnds) {
+            newPoints[0] = intersectionPoint.clone();
+            newPoints[lastIdx] = intersectionPoint.clone();
+          } else {
+            const cornerIdx = Math.min(this.firstSegmentIndex, this.secondSegmentIndex);
+            newPoints.splice(cornerIdx, 1, intersectionPoint.clone());
+          }
+          stateChanges = [new UpdateState(this.firstEntity, { points: newPoints })];
+        } else {
+          const lineEntity = !firstIsPolyline ? this.firstEntity : this.secondEntity;
+          const polyEntity = firstIsPolyline ? this.firstEntity : this.secondEntity;
+          const lineKeptEnd = !firstIsPolyline ? firstLineKeptEnd : secondLineKeptEnd;
+          const polySegIdx = firstIsPolyline ? this.firstSegmentIndex : this.secondSegmentIndex;
+          const polyClickDir = firstIsPolyline ? firstClickDir : secondClickDir;
+          const segStart = polyEntity.points[polySegIdx - 1];
+          const segEnd = polyEntity.points[polySegIdx];
+          const keepStart = polyClickDir.dot(segStart.subtract(intersectionPoint)) >= polyClickDir.dot(segEnd.subtract(intersectionPoint));
+          let newPoints;
+          if (keepStart) {
+            newPoints = [
+              ...polyEntity.points.slice(0, polySegIdx).map((p) => p.clone()),
+              intersectionPoint.clone(),
+              lineKeptEnd.clone(),
+            ];
+          } else {
+            newPoints = [
+              lineKeptEnd.clone(),
+              intersectionPoint.clone(),
+              ...polyEntity.points.slice(polySegIdx).map((p) => p.clone()),
+            ];
+          }
+          stateChanges = [
+            new RemoveState(lineEntity),
+            new UpdateState(polyEntity, { points: newPoints }),
+          ];
+        }
         DesignCore.Scene.commit(stateChanges);
       }
       return;
@@ -220,12 +299,6 @@ export class Fillet extends Tool {
     // Bisector unit vector: points into the chosen corner toward the fillet centre
     const bisectorSum = firstClickUnit.add(secondClickUnit);
     const bisectorLength = Math.sqrt(bisectorSum.x ** 2 + bisectorSum.y ** 2);
-
-    if (bisectorLength < 1e-10) {
-      DesignCore.Core.notify(Strings.Error.PARALLELLINES);
-      return;
-    }
-
     const bisectorUnit = new Point(bisectorSum.x / bisectorLength, bisectorSum.y / bisectorLength);
 
     // Distance from the intersection point to the fillet centre along the bisector
@@ -241,10 +314,15 @@ export class Fillet extends Tool {
     const firstTangentPoint = arcCentre.perpendicular(firstLineStart, firstLineEnd);
     const secondTangentPoint = arcCentre.perpendicular(secondLineStart, secondLineEnd);
 
-    // Verify both tangent points lie within the actual line segments when trim mode is on.
+    // Verify the tangent points are reachable — same direction as the kept end from the
+    // intersection and not farther than the kept end (which would flip the line direction).
     if (trimMode) {
-      if (!firstTangentPoint.isOnLine(firstLineStart, firstLineEnd) ||
-        !secondTangentPoint.isOnLine(secondLineStart, secondLineEnd)) {
+      const firstKeptDir = firstLineKeptEnd.subtract(intersectionPoint);
+      const secondKeptDir = secondLineKeptEnd.subtract(intersectionPoint);
+      const firstTangentDot = firstTangentPoint.subtract(intersectionPoint).dot(firstKeptDir);
+      const secondTangentDot = secondTangentPoint.subtract(intersectionPoint).dot(secondKeptDir);
+      if (firstTangentDot < 0 || firstTangentDot > firstKeptDir.dot(firstKeptDir) ||
+          secondTangentDot < 0 || secondTangentDot > secondKeptDir.dot(secondKeptDir)) {
         DesignCore.Core.notify(`${this.type}: ${Strings.Error.RADIUSTOOLARGE}`);
         return;
       }
@@ -263,14 +341,161 @@ export class Fillet extends Tool {
       direction: arcDirection,
     });
 
-    const stateChanges = [new AddState(arc)];
+    const firstIsPolyline = this.firstEntity instanceof BasePolyline;
+    const secondIsPolyline = this.secondEntity instanceof BasePolyline;
 
-    if (trimMode) {
-      stateChanges.push(new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, firstTangentPoint] }));
-      stateChanges.push(new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, secondTangentPoint] }));
+    if (!trimMode) {
+      DesignCore.Scene.commit([new AddState(arc)]);
+      return;
     }
 
+    if (!firstIsPolyline && !secondIsPolyline) {
+      this.#trimLineAndLine(firstLineKeptEnd, secondLineKeptEnd, firstTangentPoint, secondTangentPoint, arc);
+    } else if (firstIsPolyline && secondIsPolyline && this.firstEntity === this.secondEntity) {
+      this.#trimPolyAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre, arc);
+    } else {
+      this.#trimLineAndPoly(firstTangentPoint, secondTangentPoint, firstLineKeptEnd, secondLineKeptEnd, firstClickDir, secondClickDir, arcDirection, arcCentre, intersectionPoint);
+    }
+  }
+
+  /**
+   * Resolve an entity to its closest straight segment and 1-based index.
+   * Returns null and notifies the user if the closest segment is an arc.
+   * @param {Line|BasePolyline} entity
+   * @param {Point} clickPoint
+   * @return {Object|null}
+   */
+  #resolveSegment(entity, clickPoint) {
+    if (!(entity instanceof BasePolyline)) return { segment: entity, index: null };
+    const index = entity.getClosestSegmentIndex(clickPoint);
+    const segment = entity.getClosestSegment(clickPoint);
+    if (!(segment instanceof Line)) {
+      DesignCore.Core.notify(Strings.Message.NOFILLETARCSEGMENT);
+      return null;
+    }
+    return { segment, index };
+  }
+
+  /**
+   * Apply trim and arc for a Line + Line fillet.
+   * @param {Point} firstLineKeptEnd
+   * @param {Point} secondLineKeptEnd
+   * @param {Point} firstTangentPoint
+   * @param {Point} secondTangentPoint
+   * @param {Arc} arc
+   */
+  #trimLineAndLine(firstLineKeptEnd, secondLineKeptEnd, firstTangentPoint, secondTangentPoint, arc) {
+    DesignCore.Scene.commit([
+      new AddState(arc),
+      new UpdateState(this.firstEntity, { points: [firstLineKeptEnd, firstTangentPoint] }),
+      new UpdateState(this.secondEntity, { points: [secondLineKeptEnd, secondTangentPoint] }),
+    ]);
+  }
+
+  /**
+   * Apply trim and arc for a Polyline + Polyline (same entity) fillet.
+   * Handles both the open-ends case and the consecutive-segments case.
+   * @param {Point} firstTangentPoint
+   * @param {Point} secondTangentPoint
+   * @param {number} arcDirection
+   * @param {Point} arcCentre
+   * @param {Arc} arc
+   */
+  #trimPolyAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre, arc) {
+    const lastIdx = this.firstEntity.points.length - 1;
+    const segDiff = Math.abs(this.firstSegmentIndex - this.secondSegmentIndex);
+    const isOpenEnds = segDiff !== 1 && (
+      (this.firstSegmentIndex === 1 && this.secondSegmentIndex === lastIdx) ||
+      (this.firstSegmentIndex === lastIdx && this.secondSegmentIndex === 1)
+    );
+    const newPoints = this.firstEntity.points.map((p) => p.clone());
+    const stateChanges = [];
+
+    if (isOpenEnds) {
+      stateChanges.push(new AddState(arc));
+      if (this.firstSegmentIndex === 1) {
+        newPoints[0] = firstTangentPoint.clone();
+        newPoints[lastIdx] = secondTangentPoint.clone();
+      } else {
+        newPoints[0] = secondTangentPoint.clone();
+        newPoints[lastIdx] = firstTangentPoint.clone();
+      }
+    } else {
+      const isFirstLower = this.firstSegmentIndex < this.secondSegmentIndex;
+      const cornerIdx = Math.min(this.firstSegmentIndex, this.secondSegmentIndex);
+      const lowerTangent = isFirstLower ? firstTangentPoint : secondTangentPoint;
+      const upperTangent = isFirstLower ? secondTangentPoint : firstTangentPoint;
+      const polyArcDir = isFirstLower ? arcDirection : -arcDirection;
+      const startAngle = arcCentre.angle(lowerTangent);
+      const endAngle = arcCentre.angle(upperTangent);
+      const includedAngle = ((endAngle - startAngle) * polyArcDir + 4 * Math.PI) % (2 * Math.PI);
+      const bulge = polyArcDir * Math.tan(includedAngle / 4);
+      const arcStartPoint = lowerTangent.clone();
+      arcStartPoint.bulge = bulge;
+      newPoints.splice(cornerIdx, 1, arcStartPoint, upperTangent.clone());
+    }
+
+    stateChanges.push(new UpdateState(this.firstEntity, { points: newPoints }));
     DesignCore.Scene.commit(stateChanges);
+  }
+
+  /**
+   * Apply trim and arc for a Line + Polyline (or Polyline + Line) fillet.
+   * The line is consumed into the polyline with the arc encoded as a bulge.
+   * @param {Point} firstTangentPoint
+   * @param {Point} secondTangentPoint
+   * @param {Point} firstLineKeptEnd
+   * @param {Point} secondLineKeptEnd
+   * @param {Point} firstClickDir
+   * @param {Point} secondClickDir
+   * @param {number} arcDirection
+   * @param {Point} arcCentre
+   * @param {Point} intersectionPoint
+   */
+  #trimLineAndPoly(firstTangentPoint, secondTangentPoint, firstLineKeptEnd, secondLineKeptEnd, firstClickDir, secondClickDir, arcDirection, arcCentre, intersectionPoint) {
+    const firstIsPolyline = this.firstEntity instanceof BasePolyline;
+    const lineEntity = !firstIsPolyline ? this.firstEntity : this.secondEntity;
+    const polyEntity = firstIsPolyline ? this.firstEntity : this.secondEntity;
+    const lineTangentPoint = !firstIsPolyline ? firstTangentPoint : secondTangentPoint;
+    const polyTangentPoint = firstIsPolyline ? firstTangentPoint : secondTangentPoint;
+    const lineKeptEnd = !firstIsPolyline ? firstLineKeptEnd : secondLineKeptEnd;
+    const polySegIdx = firstIsPolyline ? this.firstSegmentIndex : this.secondSegmentIndex;
+    const polyToLineDir = firstIsPolyline ? arcDirection : -arcDirection;
+
+    const startAngle = arcCentre.angle(polyTangentPoint);
+    const endAngle = arcCentre.angle(lineTangentPoint);
+    const includedAngle = ((endAngle - startAngle) * polyToLineDir + 4 * Math.PI) % (2 * Math.PI);
+    const bulge = polyToLineDir * Math.tan(includedAngle / 4);
+    const arcStartPoint = polyTangentPoint.clone();
+    arcStartPoint.bulge = bulge;
+
+    const polyClickDir = firstIsPolyline ? firstClickDir : secondClickDir;
+    const segStart = polyEntity.points[polySegIdx - 1];
+    const segEnd = polyEntity.points[polySegIdx];
+    const keepStart = polyClickDir.dot(segStart.subtract(intersectionPoint)) >= polyClickDir.dot(segEnd.subtract(intersectionPoint));
+    let newPoints;
+    if (keepStart) {
+      newPoints = [
+        ...polyEntity.points.slice(0, polySegIdx).map((p) => p.clone()),
+        arcStartPoint,
+        lineTangentPoint.clone(),
+        lineKeptEnd.clone(),
+      ];
+    } else {
+      const revArcStartPoint = lineTangentPoint.clone();
+      revArcStartPoint.bulge = -bulge;
+      newPoints = [
+        lineKeptEnd.clone(),
+        revArcStartPoint,
+        polyTangentPoint.clone(),
+        ...polyEntity.points.slice(polySegIdx).map((p) => p.clone()),
+      ];
+    }
+
+    DesignCore.Scene.commit([
+      new RemoveState(lineEntity),
+      new UpdateState(polyEntity, { points: newPoints }),
+    ]);
   }
 
   /**
