@@ -149,6 +149,32 @@ test('Test Point.normalise', () => {
   expect(Math.sqrt(r4.x ** 2 + r4.y ** 2)).toBeCloseTo(1);
 });
 
+test('Test Point.scale', () => {
+  // Scale by positive factor
+  const pt1 = new Point(3, 4);
+  const r1 = pt1.scale(2);
+  expect(r1.x).toBeCloseTo(6);
+  expect(r1.y).toBeCloseTo(8);
+
+  // Scale by fractional factor
+  const pt2 = new Point(10, -5);
+  const r2 = pt2.scale(0.5);
+  expect(r2.x).toBeCloseTo(5);
+  expect(r2.y).toBeCloseTo(-2.5);
+
+  // Scale by zero → origin
+  const pt3 = new Point(7, -3);
+  const r3 = pt3.scale(0);
+  expect(r3.x).toBeCloseTo(0);
+  expect(r3.y).toBeCloseTo(0);
+
+  // Scale by negative factor
+  const pt4 = new Point(1, 2);
+  const r4 = pt4.scale(-3);
+  expect(r4.x).toBeCloseTo(-3);
+  expect(r4.y).toBeCloseTo(-6);
+});
+
 test('Test Point.min', () => {
   const pt1 = new Point(10, 10);
 

@@ -126,6 +126,15 @@ export class Point {
   }
 
   /**
+   * Return a new point scaled by a scalar factor.
+   * @param  {number} scalar
+   * @return {Point}
+   */
+  scale(scalar) {
+    return new Point(this.x * scalar, this.y * scalar);
+  }
+
+  /**
    * Return new point with minimum values for x and y from this and that
    * @param  {Point} that
    * @return {Point}

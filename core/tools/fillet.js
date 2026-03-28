@@ -162,10 +162,7 @@ export class Fillet extends ChamferFilletBase {
     const intersectToCentreDistance = filletRadius / Math.sin(cornerAngle / 2);
 
     // Fillet arc centre point
-    const arcCentre = new Point(
-        this.intersectionPoint.x + bisectorUnit.x * intersectToCentreDistance,
-        this.intersectionPoint.y + bisectorUnit.y * intersectToCentreDistance,
-    );
+    const arcCentre = this.intersectionPoint.add(bisectorUnit.scale(intersectToCentreDistance));
 
     // Tangent points where the fillet arc meets each line (foot of perpendicular from centre to line)
     const firstTangentPoint = arcCentre.perpendicular(this.firstPick.lineStart, this.firstPick.lineEnd);

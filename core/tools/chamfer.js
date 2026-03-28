@@ -186,14 +186,8 @@ export class Chamfer extends ChamferFilletBase {
     if (!chamferMode) {
       // Distance method: measure distA along line1 and distB along line2 from intersection
       const distB = DesignCore.Scene.headers.chamferDistanceB;
-      firstChamferPoint = new Point(
-          this.intersectionPoint.x + firstUnit.x * distA,
-          this.intersectionPoint.y + firstUnit.y * distA,
-      );
-      secondChamferPoint = new Point(
-          this.intersectionPoint.x + secondUnit.x * distB,
-          this.intersectionPoint.y + secondUnit.y * distB,
-      );
+      firstChamferPoint = this.intersectionPoint.add(firstUnit.scale(distA));
+      secondChamferPoint = this.intersectionPoint.add(secondUnit.scale(distB));
     } else {
       // Angle method: measure distA along line1, then project using chamferAngle to find
       // where the chamfer line meets line2.
@@ -205,10 +199,7 @@ export class Chamfer extends ChamferFilletBase {
         return;
       }
 
-      firstChamferPoint = new Point(
-          this.intersectionPoint.x + firstUnit.x * distA,
-          this.intersectionPoint.y + firstUnit.y * distA,
-      );
+      firstChamferPoint = this.intersectionPoint.add(firstUnit.scale(distA));
 
       // Rotate firstUnit by ±(π - alpha) to get the chamfer direction from
       // firstChamferPoint. Choose the rotation that points toward line2 (positive
@@ -232,10 +223,7 @@ export class Chamfer extends ChamferFilletBase {
       }
       const diff = this.secondPick.lineStart.subtract(firstChamferPoint);
       const t = diff.cross(this.secondPick.direction) / chamferCross;
-      secondChamferPoint = new Point(
-          firstChamferPoint.x + chamferDir.x * t,
-          firstChamferPoint.y + chamferDir.y * t,
-      );
+      secondChamferPoint = firstChamferPoint.add(chamferDir.scale(t));
     }
 
     // Verify both chamfer endpoints lie on the correct side of the intersection and
