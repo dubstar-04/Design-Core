@@ -74,6 +74,7 @@ export class Strings {
     DIAMETER: '\u00D8',
     DEGREE: '\u00B0',
     RADIUS: 'R',
+    DELTA: '\u0394',
   };
 
   // Input Strings
