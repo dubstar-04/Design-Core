@@ -37,10 +37,10 @@ test('Chamfer.action notifies when first entity type is not supported', () => {
   const notifySpy = jest.spyOn(core, 'notify');
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0); // Circle
-  chamfer.second.entity = core.scene.entities.get(1); // Line
-  chamfer.first.clickPoint = new Point(0, 0);
-  chamfer.second.clickPoint = new Point(5, 0);
+  chamfer.firstPick.entity = core.scene.entities.get(0); // Circle
+  chamfer.secondPick.entity = core.scene.entities.get(1); // Line
+  chamfer.firstPick.clickPoint = new Point(0, 0);
+  chamfer.secondPick.clickPoint = new Point(5, 0);
   chamfer.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOCHAMFER));
@@ -55,10 +55,10 @@ test('Chamfer.action notifies when second entity type is not supported', () => {
   const notifySpy = jest.spyOn(core, 'notify');
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0); // Line
-  chamfer.second.entity = core.scene.entities.get(1); // Circle
-  chamfer.first.clickPoint = new Point(5, 0);
-  chamfer.second.clickPoint = new Point(0, 0);
+  chamfer.firstPick.entity = core.scene.entities.get(0); // Line
+  chamfer.secondPick.entity = core.scene.entities.get(1); // Circle
+  chamfer.firstPick.clickPoint = new Point(5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 0);
   chamfer.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOCHAMFER));
@@ -73,10 +73,10 @@ test('Chamfer.action notifies for parallel lines', () => {
   const notifySpy = jest.spyOn(core, 'notify');
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(5, 0);
-  chamfer.second.clickPoint = new Point(5, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(5, 0);
+  chamfer.secondPick.clickPoint = new Point(5, 5);
   chamfer.action();
 
   expect(notifySpy).toHaveBeenCalledWith(Strings.Error.PARALLELLINES);
@@ -98,10 +98,10 @@ test('Chamfer.action dist=0 trimMode=true trims both lines to intersection', () 
   core.scene.headers.trimMode = true;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(4, 0);
-  chamfer.second.clickPoint = new Point(10, -6);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(4, 0);
+  chamfer.secondPick.clickPoint = new Point(10, -6);
   chamfer.action();
 
   // No chamfer line added
@@ -130,10 +130,10 @@ test('Chamfer.action dist=0 trimMode=false makes no changes', () => {
   core.scene.headers.trimMode = false;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(4, 0);
-  chamfer.second.clickPoint = new Point(10, -6);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(4, 0);
+  chamfer.secondPick.clickPoint = new Point(10, -6);
   chamfer.action();
 
   expect(core.scene.entities.count()).toBe(2);
@@ -154,10 +154,10 @@ test('Chamfer.action distance method trimMode=true adds chamfer line and trims',
   core.scene.headers.trimMode = true;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(-5, 0);
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   expect(core.scene.entities.count()).toBe(3);
@@ -199,10 +199,10 @@ test('Chamfer.action distance method asymmetric distances', () => {
   core.scene.headers.trimMode = true;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(-5, 0);
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   const chamferLine = core.scene.entities.get(2);
@@ -224,10 +224,10 @@ test('Chamfer.action distance method trimMode=false adds chamfer line only', () 
   core.scene.headers.trimMode = false;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(-5, 0);
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   // Chamfer line added, original lines unchanged
@@ -255,10 +255,10 @@ test('Chamfer.action notifies when distance is too large for the segments', () =
   const notifySpy = jest.spyOn(core, 'notify');
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(-2, 0);
-  chamfer.second.clickPoint = new Point(0, 2);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-2, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 2);
   chamfer.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.DISTANCETOOLARGE));
@@ -282,10 +282,10 @@ test('Chamfer.action angle method 45° on perpendicular lines matches distance m
   core.scene.headers.trimMode = true;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(-5, 0);
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   expect(core.scene.entities.count()).toBe(3);
@@ -318,10 +318,10 @@ test('Chamfer.action notifies when click coincides with intersection', () => {
   const notifySpy = jest.spyOn(core, 'notify');
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(0, 0); // exactly at the intersection
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(0, 0); // exactly at the intersection
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   expect(notifySpy).toHaveBeenCalledWith(Strings.Error.SELECTION);
@@ -344,10 +344,10 @@ test('Chamfer.action angle method notifies INVALIDNUMBER when angle is zero', ()
   const notifySpy = jest.spyOn(core, 'notify');
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(-5, 0);
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
@@ -373,10 +373,10 @@ test('Chamfer.action angle method notifies PARALLELLINES when chamfer direction 
   const notifySpy = jest.spyOn(core, 'notify');
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(-5, 0);
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   expect(notifySpy).toHaveBeenCalledWith(Strings.Error.PARALLELLINES);
@@ -607,14 +607,14 @@ test('Chamfer.action dist>0 trimMode=true Line first + Lwpolyline second keepSta
   const polyClickPoint = new Point(-15, 0);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = lineEntity;
-  chamfer.first.segment = lineEntity;
-  chamfer.first.segmentIndex = null;
-  chamfer.first.clickPoint = new Point(0, 5);
-  chamfer.second.entity = polyEntity;
-  chamfer.second.segment = polyEntity.getClosestSegment(polyClickPoint);
-  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  chamfer.second.clickPoint = polyClickPoint;
+  chamfer.firstPick.entity = lineEntity;
+  chamfer.firstPick.segment = lineEntity;
+  chamfer.firstPick.segmentIndex = null;
+  chamfer.firstPick.clickPoint = new Point(0, 5);
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.secondPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  chamfer.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  chamfer.secondPick.clickPoint = polyClickPoint;
   chamfer.action();
 
   // Line is consumed into the polyline; no separate chamfer Line entity
@@ -648,14 +648,14 @@ test('Chamfer.action dist>0 trimMode=true Lwpolyline first + Line second keepSta
   const polyClickPoint = new Point(-15, 0);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.first.segment = polyEntity.getClosestSegment(polyClickPoint);
-  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  chamfer.first.clickPoint = polyClickPoint;
-  chamfer.second.entity = lineEntity;
-  chamfer.second.segment = lineEntity;
-  chamfer.second.segmentIndex = null;
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.firstPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  chamfer.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  chamfer.firstPick.clickPoint = polyClickPoint;
+  chamfer.secondPick.entity = lineEntity;
+  chamfer.secondPick.segment = lineEntity;
+  chamfer.secondPick.segmentIndex = null;
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   // Line is consumed; no separate chamfer Line entity
@@ -689,14 +689,14 @@ test('Chamfer.action dist>0 trimMode=true Line + Lwpolyline keepEnd: keeps end p
   const polyClickPoint = new Point(8, 0);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = lineEntity;
-  chamfer.first.segment = lineEntity;
-  chamfer.first.segmentIndex = null;
-  chamfer.first.clickPoint = new Point(0, 5);
-  chamfer.second.entity = polyEntity;
-  chamfer.second.segment = polyEntity.getClosestSegment(polyClickPoint);
-  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  chamfer.second.clickPoint = polyClickPoint;
+  chamfer.firstPick.entity = lineEntity;
+  chamfer.firstPick.segment = lineEntity;
+  chamfer.firstPick.segmentIndex = null;
+  chamfer.firstPick.clickPoint = new Point(0, 5);
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.secondPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  chamfer.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  chamfer.secondPick.clickPoint = polyClickPoint;
   chamfer.action();
 
   // Line consumed; end portion of polyline kept; no separate chamfer Line entity
@@ -730,14 +730,14 @@ test('Chamfer.action dist>0 trimMode=true same Lwpolyline consecutive segments: 
   const polyEntity = core.scene.entities.get(0);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
-  chamfer.first.segment = polyEntity.getClosestSegment(new Point(-5, 0));
-  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-5, 0));
-  chamfer.first.clickPoint = new Point(-5, 0);
-  chamfer.second.segment = polyEntity.getClosestSegment(new Point(0, 5));
-  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.firstPick.segment = polyEntity.getClosestSegment(new Point(-5, 0));
+  chamfer.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-5, 0));
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  chamfer.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   // Chamfer segment is a straight polyline segment — no separate Line entity
@@ -773,14 +773,14 @@ test('Chamfer.action dist>0 trimMode=true same Lwpolyline open ends: separate ch
   const polyEntity = core.scene.entities.get(0);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
-  chamfer.first.segment = polyEntity.getClosestSegment(new Point(-3, 0)); // segment 1 (index 1)
-  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-3, 0));
-  chamfer.first.clickPoint = new Point(-3, 0);
-  chamfer.second.segment = polyEntity.getClosestSegment(new Point(1, 3)); // segment 3 (last, index 3)
-  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(1, 3));
-  chamfer.second.clickPoint = new Point(1, 3);
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.firstPick.segment = polyEntity.getClosestSegment(new Point(-3, 0)); // segment 1 (index 1)
+  chamfer.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-3, 0));
+  chamfer.firstPick.clickPoint = new Point(-3, 0);
+  chamfer.secondPick.segment = polyEntity.getClosestSegment(new Point(1, 3)); // segment 3 (last, index 3)
+  chamfer.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(1, 3));
+  chamfer.secondPick.clickPoint = new Point(1, 3);
   chamfer.action();
 
   // Separate chamfer Line entity fills the gap between the trimmed open ends
@@ -819,15 +819,15 @@ test('Chamfer.action dist>0 trimMode=true closed Lwpolyline seg3+closing-seg: co
   core.scene.headers.trimMode = true;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
   // Click on segment 3 near (5,10) and on closing segment near (0,5)
-  chamfer.first.segment = polyEntity.getClosestSegment(new Point(5, 10));
-  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 10));
-  chamfer.first.clickPoint = new Point(5, 10);
-  chamfer.second.segment = polyEntity.getClosestSegment(new Point(0, 5));
-  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.segment = polyEntity.getClosestSegment(new Point(5, 10));
+  chamfer.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 10));
+  chamfer.firstPick.clickPoint = new Point(5, 10);
+  chamfer.secondPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  chamfer.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
   // Corner-splice: no extra entity, just the modified polyline
@@ -857,15 +857,15 @@ test('Chamfer.action dist>0 trimMode=true closed Lwpolyline closing-wrap (seg4+s
   core.scene.headers.trimMode = true;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
   // closing segment near (0,5), seg 1 near (5,0)
-  chamfer.first.segment = polyEntity.getClosestSegment(new Point(0, 5));
-  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
-  chamfer.first.clickPoint = new Point(0, 5);
-  chamfer.second.segment = polyEntity.getClosestSegment(new Point(5, 0));
-  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
-  chamfer.second.clickPoint = new Point(5, 0);
+  chamfer.firstPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  chamfer.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  chamfer.firstPick.clickPoint = new Point(0, 5);
+  chamfer.secondPick.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  chamfer.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  chamfer.secondPick.clickPoint = new Point(5, 0);
   chamfer.action();
 
   // Must take corner-splice path (not open-ends): no extra chamfer Line entity
@@ -893,14 +893,14 @@ test('Chamfer.action dist>0 trimMode=false closed Lwpolyline closing-wrap: stand
   core.scene.headers.trimMode = false;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
-  chamfer.first.segment = polyEntity.getClosestSegment(new Point(0, 5));
-  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
-  chamfer.first.clickPoint = new Point(0, 5);
-  chamfer.second.segment = polyEntity.getClosestSegment(new Point(5, 0));
-  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
-  chamfer.second.clickPoint = new Point(5, 0);
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.firstPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  chamfer.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  chamfer.firstPick.clickPoint = new Point(0, 5);
+  chamfer.secondPick.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  chamfer.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  chamfer.secondPick.clickPoint = new Point(5, 0);
   chamfer.action();
 
   // trimMode=false: polyline unchanged, chamfer Line added
@@ -923,14 +923,14 @@ test('Chamfer.action dist>0 trimMode=true open Lwpolyline seg1+lastIdx still tak
   core.scene.headers.trimMode = true;
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
-  chamfer.first.segment = polyEntity.getClosestSegment(new Point(-3, 0));
-  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-3, 0));
-  chamfer.first.clickPoint = new Point(-3, 0);
-  chamfer.second.segment = polyEntity.getClosestSegment(new Point(1, 3));
-  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(1, 3));
-  chamfer.second.clickPoint = new Point(1, 3);
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.firstPick.segment = polyEntity.getClosestSegment(new Point(-3, 0));
+  chamfer.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-3, 0));
+  chamfer.firstPick.clickPoint = new Point(-3, 0);
+  chamfer.secondPick.segment = polyEntity.getClosestSegment(new Point(1, 3));
+  chamfer.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(1, 3));
+  chamfer.secondPick.clickPoint = new Point(1, 3);
   chamfer.action();
 
   // Open-ends path: separate chamfer Line entity added
@@ -953,14 +953,14 @@ test('Chamfer.action dist>0 trimMode=false Line + Lwpolyline: standalone chamfer
   const polyClickPoint = new Point(-15, 0);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = lineEntity;
-  chamfer.first.segment = lineEntity;
-  chamfer.first.segmentIndex = null;
-  chamfer.first.clickPoint = new Point(0, 5);
-  chamfer.second.entity = polyEntity;
-  chamfer.second.segment = polyEntity.getClosestSegment(polyClickPoint);
-  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  chamfer.second.clickPoint = polyClickPoint;
+  chamfer.firstPick.entity = lineEntity;
+  chamfer.firstPick.segment = lineEntity;
+  chamfer.firstPick.segmentIndex = null;
+  chamfer.firstPick.clickPoint = new Point(0, 5);
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.secondPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  chamfer.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  chamfer.secondPick.clickPoint = polyClickPoint;
   chamfer.action();
 
   // Chamfer Line added as standalone entity; original line and polyline untouched

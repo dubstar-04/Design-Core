@@ -101,9 +101,9 @@ export class Chamfer extends ChamferFilletBase {
           DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOCHAMFER}`);
           continue;
         }
-        this.first.entity = firstEntity;
-        this.first.clickPoint = input1.selectedPoint;
-        if (!this.first.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOCHAMFER}`)) continue;
+        this.firstPick.entity = firstEntity;
+        this.firstPick.clickPoint = input1.selectedPoint;
+        if (!this.firstPick.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOCHAMFER}`)) continue;
 
         // Prompt for second object
         const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -124,20 +124,20 @@ export class Chamfer extends ChamferFilletBase {
           // If both selections are the same polyline, segments must be consecutive
           // or they must be the open-end segments of an open polyline.
           if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
-            const isConsecutive = firstEntity.areConsecutiveSegments(this.first.segmentIndex, secondCorner.segmentIndex);
+            const isConsecutive = firstEntity.areConsecutiveSegments(this.firstPick.segmentIndex, secondCorner.segmentIndex);
             const lastIdx = firstEntity.points.length - 1;
             const isOpenEnds = !firstEntity.flags.hasFlag(1) &&
-              ((this.first.segmentIndex === 1 && secondCorner.segmentIndex === lastIdx) ||
-               (secondCorner.segmentIndex === 1 && this.first.segmentIndex === lastIdx));
+              ((this.firstPick.segmentIndex === 1 && secondCorner.segmentIndex === lastIdx) ||
+               (secondCorner.segmentIndex === 1 && this.firstPick.segmentIndex === lastIdx));
             if (!isConsecutive && !isOpenEnds) {
               DesignCore.Core.notify(Strings.Message.NONCONSECUTIVESEGMENTS);
               continue;
             }
           }
-          this.second.entity = candidate;
-          this.second.clickPoint = input2.selectedPoint;
-          this.second.segment = secondCorner.segment;
-          this.second.segmentIndex = secondCorner.segmentIndex;
+          this.secondPick.entity = candidate;
+          this.secondPick.clickPoint = input2.selectedPoint;
+          this.secondPick.segment = secondCorner.segment;
+          this.secondPick.segmentIndex = secondCorner.segmentIndex;
           break;
         }
 
@@ -161,7 +161,7 @@ export class Chamfer extends ChamferFilletBase {
    * Perform the chamfer
    */
   action() {
-    if (!this.first.entity || !this.second.entity) return;
+    if (!this.firstPick.entity || !this.secondPick.entity) return;
     if (!this.resolveCornerGeometry(Strings.Message.NOCHAMFER)) return;
 
     const trimMode = DesignCore.Scene.headers.trimMode;
@@ -178,8 +178,8 @@ export class Chamfer extends ChamferFilletBase {
     }
 
     // Compute the two chamfer endpoints on each line
-    const firstUnit = this.first.clickUnit(this.intersectionPoint);
-    const secondUnit = this.second.clickUnit(this.intersectionPoint);
+    const firstUnit = this.firstPick.clickUnit(this.intersectionPoint);
+    const secondUnit = this.secondPick.clickUnit(this.intersectionPoint);
     let firstChamferPoint;
     let secondChamferPoint;
 
@@ -224,14 +224,14 @@ export class Chamfer extends ChamferFilletBase {
       );
 
       // Intersect chamfer ray from firstChamferPoint with the infinite line2
-      const chamferCross = chamferDir.cross(this.second.direction);
+      const chamferCross = chamferDir.cross(this.secondPick.direction);
       if (Math.abs(chamferCross) < Constants.Tolerance.EPSILON) {
         // Chamfer direction is parallel to line2 — no intersection
         DesignCore.Core.notify(Strings.Error.PARALLELLINES);
         return;
       }
-      const diff = this.second.lineStart.subtract(firstChamferPoint);
-      const t = diff.cross(this.second.direction) / chamferCross;
+      const diff = this.secondPick.lineStart.subtract(firstChamferPoint);
+      const t = diff.cross(this.secondPick.direction) / chamferCross;
       secondChamferPoint = new Point(
           firstChamferPoint.x + chamferDir.x * t,
           firstChamferPoint.y + chamferDir.y * t,
@@ -242,8 +242,8 @@ export class Chamfer extends ChamferFilletBase {
     // not beyond the kept endpoints.  Uses the same dot-product approach as Fillet so
     // that segments are treated as infinite lines (extensions are allowed).
     if (trimMode) {
-      const firstKeptDir = this.first.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
-      const secondKeptDir = this.second.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
+      const firstKeptDir = this.firstPick.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
+      const secondKeptDir = this.secondPick.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
       const firstChamferDot = firstChamferPoint.subtract(this.intersectionPoint).dot(firstKeptDir);
       const secondChamferDot = secondChamferPoint.subtract(this.intersectionPoint).dot(secondKeptDir);
       if (firstChamferDot < 0 || firstChamferDot > firstKeptDir.dot(firstKeptDir) ||
@@ -257,8 +257,8 @@ export class Chamfer extends ChamferFilletBase {
       points: [firstChamferPoint, secondChamferPoint],
     });
 
-    const firstIsPolyline = this.first.entity instanceof BasePolyline;
-    const secondIsPolyline = this.second.entity instanceof BasePolyline;
+    const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
+    const secondIsPolyline = this.secondPick.entity instanceof BasePolyline;
 
     // The standalone chamfer Line entity is added when no polyline trimming is involved.
     // For polyline trim cases the chamfer segment is encoded as a straight polyline segment,
@@ -271,21 +271,21 @@ export class Chamfer extends ChamferFilletBase {
     if (trimMode) {
       if (!firstIsPolyline && !secondIsPolyline) {
         // Line + Line: trim both lines
-        stateChanges.push(new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd(this.intersectionPoint), firstChamferPoint] }));
-        stateChanges.push(new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd(this.intersectionPoint), secondChamferPoint] }));
-      } else if (firstIsPolyline && secondIsPolyline && this.first.entity === this.second.entity) {
-        const closeSegIdx = this.first.entity.points.length;
+        stateChanges.push(new UpdateState(this.firstPick.entity, { points: [this.firstPick.lineKeptEnd(this.intersectionPoint), firstChamferPoint] }));
+        stateChanges.push(new UpdateState(this.secondPick.entity, { points: [this.secondPick.lineKeptEnd(this.intersectionPoint), secondChamferPoint] }));
+      } else if (firstIsPolyline && secondIsPolyline && this.firstPick.entity === this.secondPick.entity) {
+        const closeSegIdx = this.firstPick.entity.points.length;
         const lastIdx = closeSegIdx - 1;
-        const segDiff = Math.abs(this.first.segmentIndex - this.second.segmentIndex);
-        const isOpenEnds = !this.first.entity.flags.hasFlag(1) && segDiff !== 1 && (
-          (this.first.segmentIndex === 1 && this.second.segmentIndex === lastIdx) ||
-          (this.first.segmentIndex === lastIdx && this.second.segmentIndex === 1)
+        const segDiff = Math.abs(this.firstPick.segmentIndex - this.secondPick.segmentIndex);
+        const isOpenEnds = !this.firstPick.entity.flags.hasFlag(1) && segDiff !== 1 && (
+          (this.firstPick.segmentIndex === 1 && this.secondPick.segmentIndex === lastIdx) ||
+          (this.firstPick.segmentIndex === lastIdx && this.secondPick.segmentIndex === 1)
         );
-        const newPoints = this.first.entity.points.map((p) => p.clone());
+        const newPoints = this.firstPick.entity.points.map((p) => p.clone());
         if (isOpenEnds) {
           // Open ends: trim both endpoints to their chamfer points; chamfer line fills the gap.
           stateChanges.push(new AddState(chamferLine));
-          if (this.first.segmentIndex === 1) {
+          if (this.firstPick.segmentIndex === 1) {
             newPoints[0] = firstChamferPoint.clone();
             newPoints[lastIdx] = secondChamferPoint.clone();
           } else {
@@ -295,8 +295,8 @@ export class Chamfer extends ChamferFilletBase {
         } else {
           // Consecutive segments: replace the shared corner vertex with the two chamfer points
           // as a straight polyline segment — no separate chamfer Line entity needed.
-          const seg1 = this.first.segmentIndex;
-          const seg2 = this.second.segmentIndex;
+          const seg1 = this.firstPick.segmentIndex;
+          const seg2 = this.secondPick.segmentIndex;
           const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
           const isFirstLower = seg1 < seg2;
           const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
@@ -304,12 +304,12 @@ export class Chamfer extends ChamferFilletBase {
           const upperChamfer = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? firstChamferPoint : secondChamferPoint;
           newPoints.splice(cornerIdx, 1, lowerChamfer.clone(), upperChamfer.clone());
         }
-        stateChanges.push(new UpdateState(this.first.entity, { points: newPoints }));
+        stateChanges.push(new UpdateState(this.firstPick.entity, { points: newPoints }));
       } else {
         // Line + Polyline or Polyline + Line: consume the line into the polyline.
-        const [poly, line] = firstIsPolyline ? [this.first, this.second] : [this.second, this.first];
-        const polyChamferPoint = poly === this.first ? firstChamferPoint : secondChamferPoint;
-        const lineChamferPoint = line === this.first ? firstChamferPoint : secondChamferPoint;
+        const [poly, line] = firstIsPolyline ? [this.firstPick, this.secondPick] : [this.secondPick, this.firstPick];
+        const polyChamferPoint = poly === this.firstPick ? firstChamferPoint : secondChamferPoint;
+        const lineChamferPoint = line === this.firstPick ? firstChamferPoint : secondChamferPoint;
         const polySegIdx = poly.segmentIndex;
         const keepStart = poly.keepStart(this.intersectionPoint);
         let newPoints;

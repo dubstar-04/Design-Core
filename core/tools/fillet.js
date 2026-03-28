@@ -69,9 +69,9 @@ export class Fillet extends ChamferFilletBase {
           DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOFILLET}`);
           continue;
         }
-        this.first.entity = firstEntity;
-        this.first.clickPoint = input1.selectedPoint;
-        if (!this.first.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
+        this.firstPick.entity = firstEntity;
+        this.firstPick.clickPoint = input1.selectedPoint;
+        if (!this.firstPick.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
 
         // Prompt for second object
         const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -92,20 +92,20 @@ export class Fillet extends ChamferFilletBase {
           // If both selections are the same polyline, segments must be consecutive
           // or they must be the open-end segments of an open polyline.
           if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
-            const isConsecutive = firstEntity.areConsecutiveSegments(this.first.segmentIndex, secondCorner.segmentIndex);
+            const isConsecutive = firstEntity.areConsecutiveSegments(this.firstPick.segmentIndex, secondCorner.segmentIndex);
             const lastIdx = firstEntity.points.length - 1;
             const isOpenEnds = !firstEntity.flags.hasFlag(1) &&
-              ((this.first.segmentIndex === 1 && secondCorner.segmentIndex === lastIdx) ||
-               (secondCorner.segmentIndex === 1 && this.first.segmentIndex === lastIdx));
+              ((this.firstPick.segmentIndex === 1 && secondCorner.segmentIndex === lastIdx) ||
+               (secondCorner.segmentIndex === 1 && this.firstPick.segmentIndex === lastIdx));
             if (!isConsecutive && !isOpenEnds) {
               DesignCore.Core.notify(Strings.Message.NONCONSECUTIVESEGMENTS);
               continue;
             }
           }
-          this.second.entity = candidate;
-          this.second.clickPoint = input2.selectedPoint;
-          this.second.segment = secondCorner.segment;
-          this.second.segmentIndex = secondCorner.segmentIndex;
+          this.secondPick.entity = candidate;
+          this.secondPick.clickPoint = input2.selectedPoint;
+          this.secondPick.segment = secondCorner.segment;
+          this.secondPick.segmentIndex = secondCorner.segmentIndex;
           break;
         }
 
@@ -129,7 +129,7 @@ export class Fillet extends ChamferFilletBase {
    * Perform the fillet
    */
   action() {
-    if (!this.first.entity || !this.second.entity) return;
+    if (!this.firstPick.entity || !this.secondPick.entity) return;
     if (!this.resolveCornerGeometry(Strings.Message.NOFILLET)) return;
 
     // radius = 0: trim/extend both lines to the sharp intersection with no arc
@@ -144,8 +144,8 @@ export class Fillet extends ChamferFilletBase {
     }
 
     // Angle between the two clicked-side direction vectors (i.e. the opening angle of the chosen corner)
-    const firstUnit = this.first.clickUnit(this.intersectionPoint);
-    const secondUnit = this.second.clickUnit(this.intersectionPoint);
+    const firstUnit = this.firstPick.clickUnit(this.intersectionPoint);
+    const secondUnit = this.secondPick.clickUnit(this.intersectionPoint);
     const cosAngle = Math.min(1, Math.max(-1, firstUnit.dot(secondUnit)));
     const cornerAngle = Math.acos(cosAngle);
 
@@ -168,14 +168,14 @@ export class Fillet extends ChamferFilletBase {
     );
 
     // Tangent points where the fillet arc meets each line (foot of perpendicular from centre to line)
-    const firstTangentPoint = arcCentre.perpendicular(this.first.lineStart, this.first.lineEnd);
-    const secondTangentPoint = arcCentre.perpendicular(this.second.lineStart, this.second.lineEnd);
+    const firstTangentPoint = arcCentre.perpendicular(this.firstPick.lineStart, this.firstPick.lineEnd);
+    const secondTangentPoint = arcCentre.perpendicular(this.secondPick.lineStart, this.secondPick.lineEnd);
 
     // Verify the tangent points are reachable — same direction as the kept end from the
     // intersection and not farther than the kept end (which would flip the line direction).
     if (trimMode) {
-      const firstKeptDir = this.first.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
-      const secondKeptDir = this.second.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
+      const firstKeptDir = this.firstPick.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
+      const secondKeptDir = this.secondPick.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
       const firstTangentDot = firstTangentPoint.subtract(this.intersectionPoint).dot(firstKeptDir);
       const secondTangentDot = secondTangentPoint.subtract(this.intersectionPoint).dot(secondKeptDir);
       if (firstTangentDot < 0 || firstTangentDot > firstKeptDir.dot(firstKeptDir) ||
@@ -198,8 +198,8 @@ export class Fillet extends ChamferFilletBase {
       direction: arcDirection,
     });
 
-    const firstIsPolyline = this.first.entity instanceof BasePolyline;
-    const secondIsPolyline = this.second.entity instanceof BasePolyline;
+    const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
+    const secondIsPolyline = this.secondPick.entity instanceof BasePolyline;
 
     if (!trimMode) {
       DesignCore.Scene.commit([new AddState(arc)]);
@@ -209,7 +209,7 @@ export class Fillet extends ChamferFilletBase {
     if (!firstIsPolyline && !secondIsPolyline) {
       const stateChanges = this.#trimLineAndLine(firstTangentPoint, secondTangentPoint, arc);
       DesignCore.Scene.commit(stateChanges);
-    } else if (firstIsPolyline && secondIsPolyline && this.first.entity === this.second.entity) {
+    } else if (firstIsPolyline && secondIsPolyline && this.firstPick.entity === this.secondPick.entity) {
       const stateChanges = this.#trimPolyAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre, arc);
       DesignCore.Scene.commit(stateChanges);
     } else {
@@ -228,8 +228,8 @@ export class Fillet extends ChamferFilletBase {
   #trimLineAndLine(firstTangentPoint, secondTangentPoint, arc) {
     return [
       new AddState(arc),
-      new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd(this.intersectionPoint), firstTangentPoint] }),
-      new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd(this.intersectionPoint), secondTangentPoint] }),
+      new UpdateState(this.firstPick.entity, { points: [this.firstPick.lineKeptEnd(this.intersectionPoint), firstTangentPoint] }),
+      new UpdateState(this.secondPick.entity, { points: [this.secondPick.lineKeptEnd(this.intersectionPoint), secondTangentPoint] }),
     ];
   }
 
@@ -244,19 +244,19 @@ export class Fillet extends ChamferFilletBase {
    * @return {Array}
    */
   #trimPolyAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre, arc) {
-    const closeSegIdx = this.first.entity.points.length;
+    const closeSegIdx = this.firstPick.entity.points.length;
     const lastIdx = closeSegIdx - 1;
-    const segDiff = Math.abs(this.first.segmentIndex - this.second.segmentIndex);
-    const isOpenEnds = !this.first.entity.flags.hasFlag(1) && segDiff !== 1 && (
-      (this.first.segmentIndex === 1 && this.second.segmentIndex === lastIdx) ||
-      (this.first.segmentIndex === lastIdx && this.second.segmentIndex === 1)
+    const segDiff = Math.abs(this.firstPick.segmentIndex - this.secondPick.segmentIndex);
+    const isOpenEnds = !this.firstPick.entity.flags.hasFlag(1) && segDiff !== 1 && (
+      (this.firstPick.segmentIndex === 1 && this.secondPick.segmentIndex === lastIdx) ||
+      (this.firstPick.segmentIndex === lastIdx && this.secondPick.segmentIndex === 1)
     );
-    const newPoints = this.first.entity.points.map((p) => p.clone());
+    const newPoints = this.firstPick.entity.points.map((p) => p.clone());
     const stateChanges = [];
 
     if (isOpenEnds) {
       stateChanges.push(new AddState(arc));
-      if (this.first.segmentIndex === 1) {
+      if (this.firstPick.segmentIndex === 1) {
         newPoints[0] = firstTangentPoint.clone();
         newPoints[lastIdx] = secondTangentPoint.clone();
       } else {
@@ -264,8 +264,8 @@ export class Fillet extends ChamferFilletBase {
         newPoints[lastIdx] = firstTangentPoint.clone();
       }
     } else {
-      const seg1 = this.first.segmentIndex;
-      const seg2 = this.second.segmentIndex;
+      const seg1 = this.firstPick.segmentIndex;
+      const seg2 = this.secondPick.segmentIndex;
       const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
       const isFirstLower = seg1 < seg2;
       const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
@@ -281,7 +281,7 @@ export class Fillet extends ChamferFilletBase {
       newPoints.splice(cornerIdx, 1, arcStartPoint, upperTangent.clone());
     }
 
-    stateChanges.push(new UpdateState(this.first.entity, { points: newPoints }));
+    stateChanges.push(new UpdateState(this.firstPick.entity, { points: newPoints }));
     return stateChanges;
   }
 
@@ -295,10 +295,10 @@ export class Fillet extends ChamferFilletBase {
    * @return {Array}
    */
   #trimLineAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre) {
-    const firstIsPolyline = this.first.entity instanceof BasePolyline;
-    const [poly, line] = firstIsPolyline ? [this.first, this.second] : [this.second, this.first];
-    const lineTangentPoint = line === this.first ? firstTangentPoint : secondTangentPoint;
-    const polyTangentPoint = poly === this.first ? firstTangentPoint : secondTangentPoint;
+    const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
+    const [poly, line] = firstIsPolyline ? [this.firstPick, this.secondPick] : [this.secondPick, this.firstPick];
+    const lineTangentPoint = line === this.firstPick ? firstTangentPoint : secondTangentPoint;
+    const polyTangentPoint = poly === this.firstPick ? firstTangentPoint : secondTangentPoint;
     const polyToLineDir = firstIsPolyline ? arcDirection : -arcDirection;
 
     const startAngle = arcCentre.angle(polyTangentPoint);

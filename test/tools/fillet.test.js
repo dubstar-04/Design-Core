@@ -61,10 +61,10 @@ test('Fillet.action notifies when entity type is not supported', () => {
   const notifySpy = jest.spyOn(core, 'notify');
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0); // Circle
-  fillet.second.entity = core.scene.entities.get(1); // Line
-  fillet.first.clickPoint = new Point(0, 0);
-  fillet.second.clickPoint = new Point(5, 0);
+  fillet.firstPick.entity = core.scene.entities.get(0); // Circle
+  fillet.secondPick.entity = core.scene.entities.get(1); // Line
+  fillet.firstPick.clickPoint = new Point(0, 0);
+  fillet.secondPick.clickPoint = new Point(5, 0);
   fillet.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOFILLET));
@@ -80,10 +80,10 @@ test('Fillet.action notifies for parallel lines', () => {
   const notifySpy = jest.spyOn(core, 'notify');
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(5, 0);
-  fillet.second.clickPoint = new Point(5, 5);
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(5, 0);
+  fillet.secondPick.clickPoint = new Point(5, 5);
   fillet.action();
 
   expect(notifySpy).toHaveBeenCalledWith(Strings.Error.PARALLELLINES);
@@ -104,10 +104,10 @@ test('Fillet.action radius=0 trimMode=true trims both lines to intersection', ()
   core.scene.headers.trimMode = true;
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(4, 0);
-  fillet.second.clickPoint = new Point(10, -6);
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(4, 0);
+  fillet.secondPick.clickPoint = new Point(10, -6);
   fillet.action();
 
   const line1 = core.scene.entities.get(0);
@@ -135,10 +135,10 @@ test('Fillet.action radius=0 trimMode=false makes no changes', () => {
   core.scene.headers.trimMode = false;
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(4, 0);
-  fillet.second.clickPoint = new Point(10, -6);
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(4, 0);
+  fillet.secondPick.clickPoint = new Point(10, -6);
   fillet.action();
 
   // Entities unchanged — no new entities, same points
@@ -159,10 +159,10 @@ test('Fillet.action radius>0 trimMode=true adds arc and trims lines', () => {
   core.scene.headers.trimMode = true;
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(-5, 0); // on the horizontal line, left of intersection
-  fillet.second.clickPoint = new Point(0, 5); // on the vertical line, above intersection
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(-5, 0); // on the horizontal line, left of intersection
+  fillet.secondPick.clickPoint = new Point(0, 5); // on the vertical line, above intersection
   fillet.action();
 
   // An arc should have been added — scene now has 3 entities
@@ -196,10 +196,10 @@ test('Fillet.action radius>0 trimMode=false adds arc only, lines unchanged', () 
   core.scene.headers.trimMode = false;
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(-5, 0);
-  fillet.second.clickPoint = new Point(0, 5);
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(-5, 0);
+  fillet.secondPick.clickPoint = new Point(0, 5);
   fillet.action();
 
   // Arc added, but lines not trimmed
@@ -225,10 +225,10 @@ test('Fillet.action notifies when radius is too large for the segments', () => {
   const notifySpy = jest.spyOn(core, 'notify');
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(-2, 0);
-  fillet.second.clickPoint = new Point(0, 2);
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(-2, 0);
+  fillet.secondPick.clickPoint = new Point(0, 2);
   fillet.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.RADIUSTOOLARGE));
@@ -247,10 +247,10 @@ test('Fillet.action arc centre is at correct position for 90° corner', () => {
   core.scene.headers.trimMode = false;
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(-5, 0);
-  fillet.second.clickPoint = new Point(0, 5);
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(-5, 0);
+  fillet.secondPick.clickPoint = new Point(0, 5);
   fillet.action();
 
   const arc = core.scene.entities.get(2);
@@ -278,10 +278,10 @@ test('Fillet.action selects correct corner when lines form a cross', () => {
   core.scene.headers.trimMode = false;
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(5, 0); // right side of horizontal
-  fillet.second.clickPoint = new Point(0, 5); // top of vertical
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(5, 0); // right side of horizontal
+  fillet.secondPick.clickPoint = new Point(0, 5); // top of vertical
   fillet.action();
 
   const arc = core.scene.entities.get(2);
@@ -302,10 +302,10 @@ test('Fillet.action notifies when second entity type is not supported', () => {
   const notifySpy = jest.spyOn(core, 'notify');
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0); // Line
-  fillet.second.entity = core.scene.entities.get(1); // Circle
-  fillet.first.clickPoint = new Point(5, 0);
-  fillet.second.clickPoint = new Point(0, 0);
+  fillet.firstPick.entity = core.scene.entities.get(0); // Line
+  fillet.secondPick.entity = core.scene.entities.get(1); // Circle
+  fillet.firstPick.clickPoint = new Point(5, 0);
+  fillet.secondPick.clickPoint = new Point(0, 0);
   fillet.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOFILLET));
@@ -327,10 +327,10 @@ test('Fillet.action notifies when click coincides with intersection', () => {
   const notifySpy = jest.spyOn(core, 'notify');
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(0, 0); // exactly at the intersection
-  fillet.second.clickPoint = new Point(0, 5);
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(0, 0); // exactly at the intersection
+  fillet.secondPick.clickPoint = new Point(0, 5);
   fillet.action();
 
   expect(notifySpy).toHaveBeenCalledWith(Strings.Error.SELECTION);
@@ -351,10 +351,10 @@ test('Fillet.action radius=0 notifies and makes no changes when click coincides 
   const notifySpy = jest.spyOn(core, 'notify');
 
   const fillet = new Fillet();
-  fillet.first.entity = core.scene.entities.get(0);
-  fillet.second.entity = core.scene.entities.get(1);
-  fillet.first.clickPoint = new Point(0, 0); // exactly at the intersection
-  fillet.second.clickPoint = new Point(0, 5);
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(0, 0); // exactly at the intersection
+  fillet.secondPick.clickPoint = new Point(0, 5);
   fillet.action();
 
   expect(notifySpy).toHaveBeenCalledWith(Strings.Error.SELECTION);
@@ -476,14 +476,14 @@ test('Fillet.action radius>0 trimMode=true Line first + Lwpolyline second keepSt
   const polyClickPoint = new Point(-15, 0);
 
   const fillet = new Fillet();
-  fillet.first.entity = lineEntity;
-  fillet.first.segment = lineEntity;
-  fillet.first.segmentIndex = null;
-  fillet.first.clickPoint = new Point(0, 5);
-  fillet.second.entity = polyEntity;
-  fillet.second.segment = polyEntity.getClosestSegment(polyClickPoint);
-  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  fillet.second.clickPoint = polyClickPoint;
+  fillet.firstPick.entity = lineEntity;
+  fillet.firstPick.segment = lineEntity;
+  fillet.firstPick.segmentIndex = null;
+  fillet.firstPick.clickPoint = new Point(0, 5);
+  fillet.secondPick.entity = polyEntity;
+  fillet.secondPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.secondPick.clickPoint = polyClickPoint;
   fillet.action();
 
   // Line is consumed into the polyline; no separate Arc entity
@@ -517,14 +517,14 @@ test('Fillet.action radius>0 trimMode=true Lwpolyline first + Line second keepSt
   const polyClickPoint = new Point(-15, 0);
 
   const fillet = new Fillet();
-  fillet.first.entity = polyEntity;
-  fillet.first.segment = polyEntity.getClosestSegment(polyClickPoint);
-  fillet.first.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  fillet.first.clickPoint = polyClickPoint;
-  fillet.second.entity = lineEntity;
-  fillet.second.segment = lineEntity;
-  fillet.second.segmentIndex = null;
-  fillet.second.clickPoint = new Point(0, 5);
+  fillet.firstPick.entity = polyEntity;
+  fillet.firstPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.firstPick.clickPoint = polyClickPoint;
+  fillet.secondPick.entity = lineEntity;
+  fillet.secondPick.segment = lineEntity;
+  fillet.secondPick.segmentIndex = null;
+  fillet.secondPick.clickPoint = new Point(0, 5);
   fillet.action();
 
   // Line is consumed; no separate Arc entity
@@ -558,14 +558,14 @@ test('Fillet.action radius>0 trimMode=true Line + Lwpolyline keepEnd: keeps end 
   const polyClickPoint = new Point(8, 0);
 
   const fillet = new Fillet();
-  fillet.first.entity = lineEntity;
-  fillet.first.segment = lineEntity;
-  fillet.first.segmentIndex = null;
-  fillet.first.clickPoint = new Point(0, 5);
-  fillet.second.entity = polyEntity;
-  fillet.second.segment = polyEntity.getClosestSegment(polyClickPoint);
-  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  fillet.second.clickPoint = polyClickPoint;
+  fillet.firstPick.entity = lineEntity;
+  fillet.firstPick.segment = lineEntity;
+  fillet.firstPick.segmentIndex = null;
+  fillet.firstPick.clickPoint = new Point(0, 5);
+  fillet.secondPick.entity = polyEntity;
+  fillet.secondPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.secondPick.clickPoint = polyClickPoint;
   fillet.action();
 
   // Line consumed; end portion kept; no separate Arc entity
@@ -599,14 +599,14 @@ test('Fillet.action radius=0 trimMode=true Line + Lwpolyline keepStart: line con
   const polyClickPoint = new Point(-15, 0);
 
   const fillet = new Fillet();
-  fillet.first.entity = lineEntity;
-  fillet.first.segment = lineEntity;
-  fillet.first.segmentIndex = null;
-  fillet.first.clickPoint = new Point(0, 5);
-  fillet.second.entity = polyEntity;
-  fillet.second.segment = polyEntity.getClosestSegment(polyClickPoint);
-  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  fillet.second.clickPoint = polyClickPoint;
+  fillet.firstPick.entity = lineEntity;
+  fillet.firstPick.segment = lineEntity;
+  fillet.firstPick.segmentIndex = null;
+  fillet.firstPick.clickPoint = new Point(0, 5);
+  fillet.secondPick.entity = polyEntity;
+  fillet.secondPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.secondPick.clickPoint = polyClickPoint;
   fillet.action();
 
   // Line removed; polyline updated with sharp corner; no arc entity
@@ -636,14 +636,14 @@ test('Fillet.action radius>0 trimMode=true same Lwpolyline consecutive segments:
   const polyEntity = core.scene.entities.get(0);
 
   const fillet = new Fillet();
-  fillet.first.entity = polyEntity;
-  fillet.second.entity = polyEntity;
-  fillet.first.segment = polyEntity.getClosestSegment(new Point(-5, 0));
-  fillet.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-5, 0));
-  fillet.first.clickPoint = new Point(-5, 0);
-  fillet.second.segment = polyEntity.getClosestSegment(new Point(0, 5));
-  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
-  fillet.second.clickPoint = new Point(0, 5);
+  fillet.firstPick.entity = polyEntity;
+  fillet.secondPick.entity = polyEntity;
+  fillet.firstPick.segment = polyEntity.getClosestSegment(new Point(-5, 0));
+  fillet.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-5, 0));
+  fillet.firstPick.clickPoint = new Point(-5, 0);
+  fillet.secondPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.secondPick.clickPoint = new Point(0, 5);
   fillet.action();
 
   // Arc is embedded as a bulge — no separate Arc entity
@@ -678,14 +678,14 @@ test('Fillet.action radius>0 trimMode=true same Lwpolyline open ends: separate A
   const polyEntity = core.scene.entities.get(0);
 
   const fillet = new Fillet();
-  fillet.first.entity = polyEntity;
-  fillet.second.entity = polyEntity;
-  fillet.first.segment = polyEntity.getClosestSegment(new Point(-3, 0)); // segment 1 (index 1)
-  fillet.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-3, 0));
-  fillet.first.clickPoint = new Point(-3, 0);
-  fillet.second.segment = polyEntity.getClosestSegment(new Point(1, 3)); // segment 3 (last, index 3)
-  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(1, 3));
-  fillet.second.clickPoint = new Point(1, 3);
+  fillet.firstPick.entity = polyEntity;
+  fillet.secondPick.entity = polyEntity;
+  fillet.firstPick.segment = polyEntity.getClosestSegment(new Point(-3, 0)); // segment 1 (index 1)
+  fillet.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-3, 0));
+  fillet.firstPick.clickPoint = new Point(-3, 0);
+  fillet.secondPick.segment = polyEntity.getClosestSegment(new Point(1, 3)); // segment 3 (last, index 3)
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(1, 3));
+  fillet.secondPick.clickPoint = new Point(1, 3);
   fillet.action();
 
   // Separate Arc entity fills the gap between the trimmed open ends
@@ -720,14 +720,14 @@ test('Fillet.action radius>0 trimMode=true closed Lwpolyline seg3+closing-seg: c
   core.scene.headers.trimMode = true;
 
   const fillet = new Fillet();
-  fillet.first.entity = polyEntity;
-  fillet.second.entity = polyEntity;
-  fillet.first.segment = polyEntity.getClosestSegment(new Point(5, 10));
-  fillet.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 10));
-  fillet.first.clickPoint = new Point(5, 10);
-  fillet.second.segment = polyEntity.getClosestSegment(new Point(0, 5));
-  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
-  fillet.second.clickPoint = new Point(0, 5);
+  fillet.firstPick.entity = polyEntity;
+  fillet.secondPick.entity = polyEntity;
+  fillet.firstPick.segment = polyEntity.getClosestSegment(new Point(5, 10));
+  fillet.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 10));
+  fillet.firstPick.clickPoint = new Point(5, 10);
+  fillet.secondPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.secondPick.clickPoint = new Point(0, 5);
   fillet.action();
 
   // Corner-splice: no extra Arc entity, arc embedded as bulge
@@ -752,14 +752,14 @@ test('Fillet.action radius>0 trimMode=true closed Lwpolyline closing-wrap (seg4+
   core.scene.headers.trimMode = true;
 
   const fillet = new Fillet();
-  fillet.first.entity = polyEntity;
-  fillet.second.entity = polyEntity;
-  fillet.first.segment = polyEntity.getClosestSegment(new Point(0, 5));
-  fillet.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
-  fillet.first.clickPoint = new Point(0, 5);
-  fillet.second.segment = polyEntity.getClosestSegment(new Point(5, 0));
-  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
-  fillet.second.clickPoint = new Point(5, 0);
+  fillet.firstPick.entity = polyEntity;
+  fillet.secondPick.entity = polyEntity;
+  fillet.firstPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.firstPick.clickPoint = new Point(0, 5);
+  fillet.secondPick.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  fillet.secondPick.clickPoint = new Point(5, 0);
   fillet.action();
 
   // Must take corner-splice path: no extra Arc entity
@@ -784,14 +784,14 @@ test('Fillet.action radius>0 trimMode=false closed Lwpolyline closing-wrap: stan
   core.scene.headers.trimMode = false;
 
   const fillet = new Fillet();
-  fillet.first.entity = polyEntity;
-  fillet.second.entity = polyEntity;
-  fillet.first.segment = polyEntity.getClosestSegment(new Point(0, 5));
-  fillet.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
-  fillet.first.clickPoint = new Point(0, 5);
-  fillet.second.segment = polyEntity.getClosestSegment(new Point(5, 0));
-  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
-  fillet.second.clickPoint = new Point(5, 0);
+  fillet.firstPick.entity = polyEntity;
+  fillet.secondPick.entity = polyEntity;
+  fillet.firstPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.firstPick.clickPoint = new Point(0, 5);
+  fillet.secondPick.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  fillet.secondPick.clickPoint = new Point(5, 0);
   fillet.action();
 
   // trimMode=false: polyline unchanged, arc added
@@ -813,14 +813,14 @@ test('Fillet.action radius>0 trimMode=false Line + Lwpolyline: standalone arc ad
   const polyClickPoint = new Point(-15, 0);
 
   const fillet = new Fillet();
-  fillet.first.entity = lineEntity;
-  fillet.first.segment = lineEntity;
-  fillet.first.segmentIndex = null;
-  fillet.first.clickPoint = new Point(0, 5);
-  fillet.second.entity = polyEntity;
-  fillet.second.segment = polyEntity.getClosestSegment(polyClickPoint);
-  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  fillet.second.clickPoint = polyClickPoint;
+  fillet.firstPick.entity = lineEntity;
+  fillet.firstPick.segment = lineEntity;
+  fillet.firstPick.segmentIndex = null;
+  fillet.firstPick.clickPoint = new Point(0, 5);
+  fillet.secondPick.entity = polyEntity;
+  fillet.secondPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  fillet.secondPick.clickPoint = polyClickPoint;
   fillet.action();
 
   // Arc added as standalone entity; original line and polyline untouched

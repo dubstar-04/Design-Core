@@ -16,10 +16,10 @@ test('ChamferFilletBase.resolveCornerGeometry returns false and notifies when fi
 
   const notifySpy = jest.spyOn(core, 'notify');
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0); // Circle
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(0, 0);
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0); // Circle
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(0, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
 
   expect(chamfer.resolveCornerGeometry('test-msg')).toBe(false);
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining('test-msg'));
@@ -33,10 +33,10 @@ test('ChamferFilletBase.resolveCornerGeometry returns false and notifies when se
 
   const notifySpy = jest.spyOn(core, 'notify');
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1); // Circle
-  chamfer.first.clickPoint = new Point(5, 0);
-  chamfer.second.clickPoint = new Point(0, 0);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1); // Circle
+  chamfer.firstPick.clickPoint = new Point(5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 0);
 
   expect(chamfer.resolveCornerGeometry('test-msg')).toBe(false);
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining('test-msg'));
@@ -50,10 +50,10 @@ test('ChamferFilletBase.resolveCornerGeometry returns false and notifies for par
 
   const notifySpy = jest.spyOn(core, 'notify');
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(5, 0);
-  chamfer.second.clickPoint = new Point(5, 2);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(5, 0);
+  chamfer.secondPick.clickPoint = new Point(5, 2);
 
   expect(chamfer.resolveCornerGeometry('test-msg')).toBe(false);
   expect(notifySpy).toHaveBeenCalledWith(Strings.Error.PARALLELLINES);
@@ -67,22 +67,22 @@ test('ChamferFilletBase.resolveCornerGeometry returns true and computes intersec
   core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = core.scene.entities.get(0);
-  chamfer.second.entity = core.scene.entities.get(1);
-  chamfer.first.clickPoint = new Point(-5, 0);
-  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
 
   expect(chamfer.resolveCornerGeometry('test-msg')).toBe(true);
   expect(chamfer.intersectionPoint.x).toBeCloseTo(0);
   expect(chamfer.intersectionPoint.y).toBeCloseTo(0);
   // Click on line1 is to the left of intersection → clickUnit points left
-  expect(chamfer.first.clickUnit(chamfer.intersectionPoint).x).toBeCloseTo(-1);
-  expect(chamfer.first.clickUnit(chamfer.intersectionPoint).y).toBeCloseTo(0);
-  expect(chamfer.first.lineKeptEnd(chamfer.intersectionPoint)).toBe(chamfer.first.entity.points[0]); // (-10,0)
+  expect(chamfer.firstPick.clickUnit(chamfer.intersectionPoint).x).toBeCloseTo(-1);
+  expect(chamfer.firstPick.clickUnit(chamfer.intersectionPoint).y).toBeCloseTo(0);
+  expect(chamfer.firstPick.lineKeptEnd(chamfer.intersectionPoint)).toBe(chamfer.firstPick.entity.points[0]); // (-10,0)
   // Click on line2 is above intersection → clickUnit points up
-  expect(chamfer.second.clickUnit(chamfer.intersectionPoint).x).toBeCloseTo(0);
-  expect(chamfer.second.clickUnit(chamfer.intersectionPoint).y).toBeCloseTo(1);
-  expect(chamfer.second.lineKeptEnd(chamfer.intersectionPoint)).toBe(chamfer.second.entity.points[1]); // (0,10)
+  expect(chamfer.secondPick.clickUnit(chamfer.intersectionPoint).x).toBeCloseTo(0);
+  expect(chamfer.secondPick.clickUnit(chamfer.intersectionPoint).y).toBeCloseTo(1);
+  expect(chamfer.secondPick.lineKeptEnd(chamfer.intersectionPoint)).toBe(chamfer.secondPick.entity.points[1]); // (0,10)
 });
 
 test('ChamferFilletBase.resolveCornerGeometry uses polyline activeSeg for first entity', () => {
@@ -97,12 +97,12 @@ test('ChamferFilletBase.resolveCornerGeometry uses polyline activeSeg for first 
   const polyClickPoint = new Point(-5, 0);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.first.clickPoint = polyClickPoint;
-  chamfer.first.segment = polyEntity.getClosestSegment(polyClickPoint);
-  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
-  chamfer.second.entity = lineEntity;
-  chamfer.second.clickPoint = new Point(5, 2);
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.firstPick.clickPoint = polyClickPoint;
+  chamfer.firstPick.segment = polyEntity.getClosestSegment(polyClickPoint);
+  chamfer.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(polyClickPoint);
+  chamfer.secondPick.entity = lineEntity;
+  chamfer.secondPick.clickPoint = new Point(5, 2);
 
   expect(chamfer.resolveCornerGeometry('test-msg')).toBe(true);
   expect(chamfer.intersectionPoint.x).toBeCloseTo(5);
@@ -121,14 +121,14 @@ test('ChamferFilletBase.applySharpTrim trims two Lines to the intersection point
   const lineB = core.scene.entities.get(1);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = lineA;
-  chamfer.first.lineStart = lineA.points[0]; // (0,0)
-  chamfer.first.lineEnd = lineA.points[1]; // (8,0)
-  chamfer.first.clickPoint = new Point(3, 2); // projects to (3,0) → lineKeptEnd = (0,0)
-  chamfer.second.entity = lineB;
-  chamfer.second.lineStart = lineB.points[0]; // (10,-10)
-  chamfer.second.lineEnd = lineB.points[1]; // (10,-2)
-  chamfer.second.clickPoint = new Point(8, -7); // projects to (10,-7) → lineKeptEnd = (10,-10)
+  chamfer.firstPick.entity = lineA;
+  chamfer.firstPick.lineStart = lineA.points[0]; // (0,0)
+  chamfer.firstPick.lineEnd = lineA.points[1]; // (8,0)
+  chamfer.firstPick.clickPoint = new Point(3, 2); // projects to (3,0) → lineKeptEnd = (0,0)
+  chamfer.secondPick.entity = lineB;
+  chamfer.secondPick.lineStart = lineB.points[0]; // (10,-10)
+  chamfer.secondPick.lineEnd = lineB.points[1]; // (10,-2)
+  chamfer.secondPick.clickPoint = new Point(8, -7); // projects to (10,-7) → lineKeptEnd = (10,-10)
   chamfer.intersectionPoint = new Point(10, 0);
 
   const stateChanges = chamfer.applySharpTrim();
@@ -156,10 +156,10 @@ test('ChamferFilletBase.applySharpTrim poly+poly consecutive segments: replaces 
   const polyEntity = core.scene.entities.get(0);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
-  chamfer.first.segmentIndex = 1;
-  chamfer.second.segmentIndex = 2;
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.firstPick.segmentIndex = 1;
+  chamfer.secondPick.segmentIndex = 2;
   chamfer.intersectionPoint = new Point(0, 0);
 
   const stateChanges = chamfer.applySharpTrim();
@@ -180,10 +180,10 @@ test('ChamferFilletBase.applySharpTrim poly+poly open ends: moves both endpoints
   const polyEntity = core.scene.entities.get(0);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
-  chamfer.first.segmentIndex = 1; // open start
-  chamfer.second.segmentIndex = 3; // open end (lastIdx = 3)
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.firstPick.segmentIndex = 1; // open start
+  chamfer.secondPick.segmentIndex = 3; // open end (lastIdx = 3)
   chamfer.intersectionPoint = new Point(3, 2);
 
   const stateChanges = chamfer.applySharpTrim();
@@ -216,10 +216,10 @@ test('ChamferFilletBase.applySharpTrim poly+poly closed polyline seg1+lastIdx: c
   polyEntity.flags.setFlagValue(1); // mark as closed
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
-  chamfer.first.segmentIndex = 1;
-  chamfer.second.segmentIndex = polyEntity.points.length - 1; // lastIdx
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.firstPick.segmentIndex = 1;
+  chamfer.secondPick.segmentIndex = polyEntity.points.length - 1; // lastIdx
   chamfer.intersectionPoint = new Point(0, 0);
 
   const stateChanges = chamfer.applySharpTrim();
@@ -244,10 +244,10 @@ test('ChamferFilletBase.applySharpTrim closed poly last-regular-seg + closing-se
   polyEntity.flags.setFlagValue(1);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
-  chamfer.first.segmentIndex = 3;
-  chamfer.second.segmentIndex = 4; // closing segment (points.length)
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.firstPick.segmentIndex = 3;
+  chamfer.secondPick.segmentIndex = 4; // closing segment (points.length)
   chamfer.intersectionPoint = new Point(0, 10);
 
   const stateChanges = chamfer.applySharpTrim();
@@ -272,10 +272,10 @@ test('ChamferFilletBase.applySharpTrim closed poly closing-seg + seg-1: replaces
   polyEntity.flags.setFlagValue(1);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.second.entity = polyEntity;
-  chamfer.first.segmentIndex = 4; // closing segment
-  chamfer.second.segmentIndex = 1;
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.firstPick.segmentIndex = 4; // closing segment
+  chamfer.secondPick.segmentIndex = 1;
   chamfer.intersectionPoint = new Point(0, 0);
 
   const stateChanges = chamfer.applySharpTrim();
@@ -306,15 +306,15 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepStart: line co
   const polyEntity = core.scene.entities.get(1);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = lineEntity;
-  chamfer.first.lineStart = lineEntity.points[0]; // (0,0)
-  chamfer.first.lineEnd = lineEntity.points[1]; // (0,10)
-  chamfer.first.clickPoint = new Point(-1, 5); // projects to (0,5) → lineKeptEnd = (0,10)
-  chamfer.second.entity = polyEntity;
-  chamfer.second.segmentIndex = 2;
-  chamfer.second.lineStart = new Point(-10, 0); // polyEntity.points[1]
-  chamfer.second.lineEnd = new Point(0, 0); // polyEntity.points[2]
-  chamfer.second.clickPoint = new Point(-5, 2); // projects to (-5,0) → clickDir toward start
+  chamfer.firstPick.entity = lineEntity;
+  chamfer.firstPick.lineStart = lineEntity.points[0]; // (0,0)
+  chamfer.firstPick.lineEnd = lineEntity.points[1]; // (0,10)
+  chamfer.firstPick.clickPoint = new Point(-1, 5); // projects to (0,5) → lineKeptEnd = (0,10)
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.secondPick.segmentIndex = 2;
+  chamfer.secondPick.lineStart = new Point(-10, 0); // polyEntity.points[1]
+  chamfer.secondPick.lineEnd = new Point(0, 0); // polyEntity.points[2]
+  chamfer.secondPick.clickPoint = new Point(-5, 2); // projects to (-5,0) → clickDir toward start
   chamfer.intersectionPoint = new Point(0, 0);
 
 
@@ -344,15 +344,15 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepEnd: line cons
   const polyEntity = core.scene.entities.get(1);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = lineEntity;
-  chamfer.first.lineStart = lineEntity.points[0]; // (0,0)
-  chamfer.first.lineEnd = lineEntity.points[1]; // (0,10)
-  chamfer.first.clickPoint = new Point(-1, 5); // projects to (0,5) → lineKeptEnd = (0,10)
-  chamfer.second.entity = polyEntity;
-  chamfer.second.segmentIndex = 3;
-  chamfer.second.lineStart = new Point(0, 0); // polyEntity.points[2]
-  chamfer.second.lineEnd = new Point(10, 0); // polyEntity.points[3]
-  chamfer.second.clickPoint = new Point(6, 2); // projects to (6,0) → clickDir toward end
+  chamfer.firstPick.entity = lineEntity;
+  chamfer.firstPick.lineStart = lineEntity.points[0]; // (0,0)
+  chamfer.firstPick.lineEnd = lineEntity.points[1]; // (0,10)
+  chamfer.firstPick.clickPoint = new Point(-1, 5); // projects to (0,5) → lineKeptEnd = (0,10)
+  chamfer.secondPick.entity = polyEntity;
+  chamfer.secondPick.segmentIndex = 3;
+  chamfer.secondPick.lineStart = new Point(0, 0); // polyEntity.points[2]
+  chamfer.secondPick.lineEnd = new Point(10, 0); // polyEntity.points[3]
+  chamfer.secondPick.clickPoint = new Point(6, 2); // projects to (6,0) → clickDir toward end
   chamfer.intersectionPoint = new Point(0, 0);
 
 
@@ -374,7 +374,7 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepEnd: line cons
 
 test('ChamferFilletBase.applySharpTrim first=Poly second=Line: poly/line ordering assigned correctly', () => {
   // Identical geometry to the keepStart test but with first=Poly and second=Line.
-  // firstIsPolyline=true → [poly, line] = [this.first, this.second].
+  // firstIsPolyline=true → [poly, line] = [this.firstPick, this.secondPick].
   // Result should be the same: Poly becomes [(-20,0),(-10,0),(0,0),(0,10)]; Line removed.
   core.scene.clear();
   core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
@@ -383,15 +383,15 @@ test('ChamferFilletBase.applySharpTrim first=Poly second=Line: poly/line orderin
   const lineEntity = core.scene.entities.get(1);
 
   const chamfer = new Chamfer();
-  chamfer.first.entity = polyEntity;
-  chamfer.first.segmentIndex = 2;
-  chamfer.first.lineStart = new Point(-10, 0); // polyEntity.points[1]
-  chamfer.first.lineEnd = new Point(0, 0); // polyEntity.points[2]
-  chamfer.first.clickPoint = new Point(-5, 2); // projects to (-5,0) → clickDir toward start
-  chamfer.second.entity = lineEntity;
-  chamfer.second.lineStart = lineEntity.points[0]; // (0,0)
-  chamfer.second.lineEnd = lineEntity.points[1]; // (0,10)
-  chamfer.second.clickPoint = new Point(-1, 5); // projects to (0,5) → lineKeptEnd = (0,10)
+  chamfer.firstPick.entity = polyEntity;
+  chamfer.firstPick.segmentIndex = 2;
+  chamfer.firstPick.lineStart = new Point(-10, 0); // polyEntity.points[1]
+  chamfer.firstPick.lineEnd = new Point(0, 0); // polyEntity.points[2]
+  chamfer.firstPick.clickPoint = new Point(-5, 2); // projects to (-5,0) → clickDir toward start
+  chamfer.secondPick.entity = lineEntity;
+  chamfer.secondPick.lineStart = lineEntity.points[0]; // (0,0)
+  chamfer.secondPick.lineEnd = lineEntity.points[1]; // (0,10)
+  chamfer.secondPick.clickPoint = new Point(-1, 5); // projects to (0,5) → lineKeptEnd = (0,10)
   chamfer.intersectionPoint = new Point(0, 0);
 
 
