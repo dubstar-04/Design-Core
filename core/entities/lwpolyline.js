@@ -1,5 +1,6 @@
 import { Logging } from '../lib/logging.js';
 import { BasePolyline } from './basePolyline.js';
+import { Polyline } from './polyline.js';
 
 /**
  * LWPolyline Entity Class
@@ -21,6 +22,7 @@ export class Lwpolyline extends BasePolyline {
         }
       }
     }
+    return new Polyline(data);
   }
 
   /**
