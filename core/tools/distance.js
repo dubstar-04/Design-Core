@@ -35,10 +35,12 @@ export class Distance extends Tool {
     try {
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
       const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
       const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+      if (pt2 === undefined) return;
       this.points.push(pt2);
 
       DesignCore.Scene.inputManager.executeCommand();
