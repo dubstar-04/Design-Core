@@ -1,9 +1,9 @@
 import { Strings } from '../lib/strings.js';
 import { ChamferFilletBase } from './chamferFilletBase.js';
 import { CornerEntity } from './cornerEntity.js';
+import { Intersection } from '../lib/intersect.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
-import { Constants } from '../lib/constants.js';
 import { Point } from '../entities/point.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
@@ -210,15 +210,15 @@ export class Chamfer extends ChamferFilletBase {
       const chamferDir = candidate1.dot(secondUnit) >= 0 ? candidate1 : firstUnit.rotate(origin, -rotAngle);
 
       // Intersect chamfer ray from firstChamferPoint with the infinite line2
-      const chamferCross = chamferDir.cross(this.secondPick.direction);
-      if (Math.abs(chamferCross) < Constants.Tolerance.EPSILON) {
+      secondChamferPoint = Intersection.intersectRayRay(
+          firstChamferPoint, firstChamferPoint.add(chamferDir),
+          this.secondPick.lineStart, this.secondPick.lineEnd,
+      );
+      if (!secondChamferPoint) {
         // Chamfer direction is parallel to line2 — no intersection
         DesignCore.Core.notify(Strings.Error.PARALLELLINES);
         return;
       }
-      const diff = this.secondPick.lineStart.subtract(firstChamferPoint);
-      const t = diff.cross(this.secondPick.direction) / chamferCross;
-      secondChamferPoint = firstChamferPoint.add(chamferDir.scale(t));
     }
 
     // Verify both chamfer endpoints lie on the correct side of the intersection and

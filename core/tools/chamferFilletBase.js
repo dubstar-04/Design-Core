@@ -4,6 +4,7 @@ import { Constants } from '../lib/constants.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { RemoveState, UpdateState } from '../lib/stateManager.js';
 import { CornerEntity } from './cornerEntity.js';
+import { Intersection } from '../lib/intersect.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -43,16 +44,15 @@ export class ChamferFilletBase extends Tool {
       return false;
     }
 
-    const directionCross = this.firstPick.direction.cross(this.secondPick.direction);
+    this.intersectionPoint = Intersection.intersectRayRay(
+        this.firstPick.lineStart, this.firstPick.lineEnd,
+        this.secondPick.lineStart, this.secondPick.lineEnd,
+    );
 
-    if (Math.abs(directionCross) < Constants.Tolerance.EPSILON) {
+    if (!this.intersectionPoint) {
       DesignCore.Core.notify(Strings.Error.PARALLELLINES);
       return false;
     }
-
-    const startDiff = this.secondPick.lineStart.subtract(this.firstPick.lineStart);
-    const intersectParam = startDiff.cross(this.secondPick.direction) / directionCross;
-    this.intersectionPoint = this.firstPick.lineStart.lerp(this.firstPick.lineEnd, intersectParam);
 
     if (this.firstPick.clickDistance(this.intersectionPoint) < Constants.Tolerance.EPSILON ||
         this.secondPick.clickDistance(this.intersectionPoint) < Constants.Tolerance.EPSILON) {
