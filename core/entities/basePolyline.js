@@ -118,6 +118,7 @@ export class BasePolyline extends Entity {
             if (this.inputMode === this.modes.ARC) {
               this.points.at(-1).bulge = this.getBulgeFromSegment(pt1);
             }
+            // Set flags to indicate closed shape
             this.flags.addValue(1);
             DesignCore.Scene.inputManager.executeCommand(this, index);
             return;
