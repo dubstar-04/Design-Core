@@ -62,14 +62,44 @@ export class Circle extends Entity {
       if (pt1 === undefined) return;
       this.points.push(pt1);
 
-      const op2 = new PromptOptions(Strings.Input.RADIUS, [Input.Type.POINT, Input.Type.NUMBER]);
-      const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
-      if (pt2 === undefined) return;
-      if (Input.getType(pt2) === Input.Type.POINT) {
-        this.points.push(pt2);
-      } else if (Input.getType(pt2) === Input.Type.NUMBER) {
-        this.setRadius(pt2);
+      const op2 = new PromptOptions(Strings.Input.RADIUS, [Input.Type.POINT, Input.Type.NUMBER], ['Diameter']);
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (pt2 === undefined) return;
+
+        if (Input.getType(pt2) === Input.Type.POINT) {
+          if (pt1.distance(pt2) <= 0) {
+            DesignCore.Core.notify(`${this.type} - ${Strings.Error.NONZERO}`);
+            continue;
+          }
+          this.points.push(pt2);
+          break;
+        } else if (Input.getType(pt2) === Input.Type.NUMBER) {
+          if (pt2 <= 0) {
+            DesignCore.Core.notify(`${this.type} - ${Strings.Error.NONZERO}`);
+            continue;
+          }
+          this.setRadius(pt2);
+          break;
+        } else if (Input.getType(pt2) === Input.Type.STRING && pt2 === 'Diameter') {
+          const op3 = new PromptOptions(Strings.Input.DIAMETER, [Input.Type.NUMBER]);
+          // eslint-disable-next-line no-constant-condition
+          while (true) {
+            const diameter = await DesignCore.Scene.inputManager.requestInput(op3);
+            if (diameter === undefined) return;
+            if (diameter <= 0) {
+              DesignCore.Core.notify(`${this.type} - ${Strings.Error.NONZERO}`);
+              continue;
+            }
+            this.setRadius(diameter / 2);
+            break;
+          }
+          break;
+        }
       }
+
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
