@@ -199,6 +199,36 @@ test('ChamferFilletBase.applySharpTrim poly+poly open ends: moves both endpoints
   expect(poly.points[2].y).toBeCloseTo(4);
 });
 
+test('ChamferFilletBase.applySharpTrim poly+poly closed polyline seg1+lastIdx: corner-splice path, not open-ends', () => {
+  // Closed 4-vertex polyline: [(-10,0),(0,0),(0,10),(close)].
+  // flags bit 1 set → polyline is closed.
+  // segmentIndex 1 and lastIdx 3 would look like open-ends by index alone, but the
+  // closed-polyline guard must send this to the corner-splice path instead.
+  // The shared corner is at index min(1,3)=1, so corner vertex (0,0) is replaced with
+  // the intersection point (0,0) — a no-op on coordinates but proves the splice path ran.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1); // mark as closed
+
+  const chamfer = new Chamfer();
+  chamfer.first.entity = polyEntity;
+  chamfer.second.entity = polyEntity;
+  chamfer.first.segmentIndex = 1;
+  chamfer.second.segmentIndex = polyEntity.points.length - 1; // lastIdx
+  chamfer.intersectionPoint = new Point(0, 0);
+
+  const stateChanges = chamfer.applySharpTrim();
+  DesignCore.Scene.commit(stateChanges);
+
+  // Corner-splice: replaces vertex at cornerIdx=1 with intersectionPoint — point count unchanged
+  const poly = core.scene.entities.get(0);
+  expect(poly.points.length).toBe(3);
+  // endpoints NOT moved (open-ends path would have moved points[0] and points[lastIdx])
+  expect(poly.points[0].x).toBeCloseTo(-10);
+  expect(poly.points[0].y).toBeCloseTo(0);
+});
+
 // ─── applySharpTrim: Line + Poly ─────────────────────────────────────────────
 
 test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepStart: line consumed, poly start portion kept', () => {

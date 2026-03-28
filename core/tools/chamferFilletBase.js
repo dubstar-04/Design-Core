@@ -77,8 +77,11 @@ export class ChamferFilletBase extends Tool {
       ];
     } else if (firstIsPolyline && secondIsPolyline && this.first.entity === this.second.entity) {
       const lastIdx = this.first.entity.points.length - 1;
-      const isOpenEnds = (this.first.segmentIndex === 1 && this.second.segmentIndex === lastIdx) ||
-                         (this.first.segmentIndex === lastIdx && this.second.segmentIndex === 1);
+      const segDiff = Math.abs(this.first.segmentIndex - this.second.segmentIndex);
+      const isOpenEnds = !this.first.entity.flags.hasFlag(1) && segDiff !== 1 && (
+        (this.first.segmentIndex === 1 && this.second.segmentIndex === lastIdx) ||
+        (this.first.segmentIndex === lastIdx && this.second.segmentIndex === 1)
+      );
       const newPoints = this.first.entity.points.map((p) => p.clone());
       if (isOpenEnds) {
         newPoints[0] = intersectionPoint.clone();
