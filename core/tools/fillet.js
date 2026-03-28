@@ -243,9 +243,10 @@ export class Fillet extends ChamferFilletBase {
    * @return {Array}
    */
   #trimPolyAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre, arc) {
-    const lastIdx = this.first.entity.points.length - 1;
+    const closeSegIdx = this.first.entity.points.length;
+    const lastIdx = closeSegIdx - 1;
     const segDiff = Math.abs(this.first.segmentIndex - this.second.segmentIndex);
-    const isOpenEnds = segDiff !== 1 && (
+    const isOpenEnds = !this.first.entity.flags.hasFlag(1) && segDiff !== 1 && (
       (this.first.segmentIndex === 1 && this.second.segmentIndex === lastIdx) ||
       (this.first.segmentIndex === lastIdx && this.second.segmentIndex === 1)
     );
@@ -262,11 +263,14 @@ export class Fillet extends ChamferFilletBase {
         newPoints[lastIdx] = firstTangentPoint.clone();
       }
     } else {
-      const isFirstLower = this.first.segmentIndex < this.second.segmentIndex;
-      const cornerIdx = Math.min(this.first.segmentIndex, this.second.segmentIndex);
-      const lowerTangent = isFirstLower ? firstTangentPoint : secondTangentPoint;
-      const upperTangent = isFirstLower ? secondTangentPoint : firstTangentPoint;
-      const polyArcDir = isFirstLower ? arcDirection : -arcDirection;
+      const seg1 = this.first.segmentIndex;
+      const seg2 = this.second.segmentIndex;
+      const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
+      const isFirstLower = seg1 < seg2;
+      const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
+      const lowerTangent = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? secondTangentPoint : firstTangentPoint;
+      const upperTangent = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? firstTangentPoint : secondTangentPoint;
+      const polyArcDir = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? -arcDirection : arcDirection;
       const startAngle = arcCentre.angle(lowerTangent);
       const endAngle = arcCentre.angle(upperTangent);
       const includedAngle = ((endAngle - startAngle) * polyArcDir + 4 * Math.PI) % (2 * Math.PI);

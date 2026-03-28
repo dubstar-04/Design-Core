@@ -804,6 +804,140 @@ test('Chamfer.action dist>0 trimMode=true same Lwpolyline open ends: separate ch
   expect(poly.points[3].y).toBeCloseTo(2);
 });
 
+test('Chamfer.action dist>0 trimMode=true closed Lwpolyline seg3+closing-seg: corner-splice at shared vertex', () => {
+  // Square: [(0,0),(10,0),(10,10),(0,10)], closed (flag 1).
+  // Closing segment (idx=4) goes (0,10)→(0,0); seg 3 goes (10,10)→(0,10).
+  // Corner at (0,10) — chamfer dist=2 trims to (2,10) on seg3 and (0,8) on closing seg.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = true;
+
+  const chamfer = new Chamfer();
+  chamfer.first.entity = polyEntity;
+  chamfer.second.entity = polyEntity;
+  // Click on segment 3 near (5,10) and on closing segment near (0,5)
+  chamfer.first.segment = polyEntity.getClosestSegment(new Point(5, 10));
+  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 10));
+  chamfer.first.clickPoint = new Point(5, 10);
+  chamfer.second.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  chamfer.second.clickPoint = new Point(0, 5);
+  chamfer.action();
+
+  // Corner-splice: no extra entity, just the modified polyline
+  expect(core.scene.entities.count()).toBe(1);
+  const poly = core.scene.entities.get(0);
+  // Shared vertex (0,10) at index 3 replaced by two chamfer points → total 5 points
+  expect(poly.points.length).toBe(5);
+  // Other vertices unchanged
+  expect(poly.points[0].x).toBeCloseTo(0);
+  expect(poly.points[0].y).toBeCloseTo(0);
+  expect(poly.points[1].x).toBeCloseTo(10);
+  expect(poly.points[1].y).toBeCloseTo(0);
+});
+
+test('Chamfer.action dist>0 trimMode=true closed Lwpolyline closing-wrap (seg4+seg1): NOT treated as open-ends', () => {
+  // Same square, closed. Corner at (0,0) shared by closing seg (idx=4) and seg 1.
+  // Bug: old code had no closed-poly guard, so closing-wrap was treated as open-ends.
+  // Fix: closed poly must NOT enter the open-ends path → corner-splice at index 0.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = true;
+
+  const chamfer = new Chamfer();
+  chamfer.first.entity = polyEntity;
+  chamfer.second.entity = polyEntity;
+  // closing segment near (0,5), seg 1 near (5,0)
+  chamfer.first.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  chamfer.first.clickPoint = new Point(0, 5);
+  chamfer.second.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  chamfer.second.clickPoint = new Point(5, 0);
+  chamfer.action();
+
+  // Must take corner-splice path (not open-ends): no extra chamfer Line entity
+  expect(core.scene.entities.count()).toBe(1);
+  const poly = core.scene.entities.get(0);
+  // Shared vertex (0,0) at index 0 replaced by two chamfer points → total 5 points
+  expect(poly.points.length).toBe(5);
+  // Endpoints must NOT have been moved to the intersection (open-ends symptom)
+  // The first two new points should be the chamfer points, not (0,0)/(0,0)
+  const allAtOrigin = poly.points[0].x === 0 && poly.points[0].y === 0
+    && poly.points[1].x === 0 && poly.points[1].y === 0;
+  expect(allAtOrigin).toBe(false);
+});
+
+test('Chamfer.action dist>0 trimMode=false closed Lwpolyline closing-wrap: standalone chamfer Line only', () => {
+  // Same square, closed, trimMode=false. No polyline mutation; only chamfer Line added.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = false;
+
+  const chamfer = new Chamfer();
+  chamfer.first.entity = polyEntity;
+  chamfer.second.entity = polyEntity;
+  chamfer.first.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  chamfer.first.clickPoint = new Point(0, 5);
+  chamfer.second.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  chamfer.second.clickPoint = new Point(5, 0);
+  chamfer.action();
+
+  // trimMode=false: polyline unchanged, chamfer Line added
+  expect(core.scene.entities.count()).toBe(2);
+  expect(core.scene.entities.get(0).points.length).toBe(4); // polyline unchanged
+  expect(core.scene.entities.get(1).type).toBe('Line');
+});
+
+test('Chamfer.action dist>0 trimMode=true open Lwpolyline seg1+lastIdx still takes open-ends path', () => {
+  // Open 4-point polyline (no flags). Seg 1 and seg 3 (lastIdx=3) → open-ends path still fires.
+  // Regression guard: the closed-poly fix must not break the open-poly open-ends case.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-5, 0), new Point(0, 0), new Point(1, 0), new Point(1, 5)] });
+  const polyEntity = core.scene.entities.get(0);
+  // No flags set — open polyline
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = true;
+
+  const chamfer = new Chamfer();
+  chamfer.first.entity = polyEntity;
+  chamfer.second.entity = polyEntity;
+  chamfer.first.segment = polyEntity.getClosestSegment(new Point(-3, 0));
+  chamfer.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(-3, 0));
+  chamfer.first.clickPoint = new Point(-3, 0);
+  chamfer.second.segment = polyEntity.getClosestSegment(new Point(1, 3));
+  chamfer.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(1, 3));
+  chamfer.second.clickPoint = new Point(1, 3);
+  chamfer.action();
+
+  // Open-ends path: separate chamfer Line entity added
+  expect(core.scene.entities.count()).toBe(2);
+  expect(core.scene.entities.get(1).type).toBe('Line');
+});
+
 test('Chamfer.action dist>0 trimMode=false Line + Lwpolyline: standalone chamfer Line added, entities unchanged', () => {
   core.scene.clear();
   core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });

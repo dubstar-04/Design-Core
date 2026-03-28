@@ -707,6 +707,99 @@ test('Fillet.action radius>0 trimMode=true same Lwpolyline open ends: separate A
   expect(poly.points[3].y).toBeCloseTo(2);
 });
 
+test('Fillet.action radius>0 trimMode=true closed Lwpolyline seg3+closing-seg: corner-splice at shared vertex', () => {
+  // Square: [(0,0),(10,0),(10,10),(0,10)], closed (flag 1).
+  // Closing segment (idx=4) goes (0,10)→(0,0); seg 3 goes (10,10)→(0,10).
+  // Corner at (0,10) — radius=2 replaces the shared vertex with arc bulge points.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const fillet = new Fillet();
+  fillet.first.entity = polyEntity;
+  fillet.second.entity = polyEntity;
+  fillet.first.segment = polyEntity.getClosestSegment(new Point(5, 10));
+  fillet.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 10));
+  fillet.first.clickPoint = new Point(5, 10);
+  fillet.second.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.second.clickPoint = new Point(0, 5);
+  fillet.action();
+
+  // Corner-splice: no extra Arc entity, arc embedded as bulge
+  expect(core.scene.entities.count()).toBe(1);
+  const poly = core.scene.entities.get(0);
+  // Shared vertex (0,10) replaced by two tangent points → total 5 points
+  expect(poly.points.length).toBe(5);
+  // One of the new points should carry a non-zero bulge
+  const hasBulge = poly.points.some((p) => p.bulge !== 0);
+  expect(hasBulge).toBe(true);
+});
+
+test('Fillet.action radius>0 trimMode=true closed Lwpolyline closing-wrap (seg4+seg1): NOT treated as open-ends', () => {
+  // Corner at (0,0) shared by closing seg (idx=4) and seg 1.
+  // Bug: without the closed-poly guard, this was treated as open-ends → wrong path.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const fillet = new Fillet();
+  fillet.first.entity = polyEntity;
+  fillet.second.entity = polyEntity;
+  fillet.first.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.first.clickPoint = new Point(0, 5);
+  fillet.second.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  fillet.second.clickPoint = new Point(5, 0);
+  fillet.action();
+
+  // Must take corner-splice path: no extra Arc entity
+  expect(core.scene.entities.count()).toBe(1);
+  const poly = core.scene.entities.get(0);
+  // Shared vertex (0,0) replaced by two tangent points → total 5 points
+  expect(poly.points.length).toBe(5);
+  // Endpoints must NOT have been moved to the intersection (open-ends symptom)
+  const allAtOrigin = poly.points[0].x === 0 && poly.points[0].y === 0
+    && poly.points[poly.points.length - 1].x === 0 && poly.points[poly.points.length - 1].y === 0;
+  expect(allAtOrigin).toBe(false);
+});
+
+test('Fillet.action radius>0 trimMode=false closed Lwpolyline closing-wrap: standalone Arc only', () => {
+  // trimMode=false: no polyline mutation; only Arc entity added.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = false;
+
+  const fillet = new Fillet();
+  fillet.first.entity = polyEntity;
+  fillet.second.entity = polyEntity;
+  fillet.first.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.first.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.first.clickPoint = new Point(0, 5);
+  fillet.second.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  fillet.second.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  fillet.second.clickPoint = new Point(5, 0);
+  fillet.action();
+
+  // trimMode=false: polyline unchanged, arc added
+  expect(core.scene.entities.count()).toBe(2);
+  expect(core.scene.entities.get(0).points.length).toBe(4); // polyline unchanged
+  expect(core.scene.entities.get(1).type).toBe('Arc');
+});
+
 test('Fillet.action radius>0 trimMode=false Line + Lwpolyline: standalone arc added, entities unchanged', () => {
   core.scene.clear();
   core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });

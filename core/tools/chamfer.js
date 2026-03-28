@@ -271,9 +271,10 @@ export class Chamfer extends ChamferFilletBase {
         stateChanges.push(new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd, firstChamferPoint] }));
         stateChanges.push(new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd, secondChamferPoint] }));
       } else if (firstIsPolyline && secondIsPolyline && this.first.entity === this.second.entity) {
-        const lastIdx = this.first.entity.points.length - 1;
+        const closeSegIdx = this.first.entity.points.length;
+        const lastIdx = closeSegIdx - 1;
         const segDiff = Math.abs(this.first.segmentIndex - this.second.segmentIndex);
-        const isOpenEnds = segDiff !== 1 && (
+        const isOpenEnds = !this.first.entity.flags.hasFlag(1) && segDiff !== 1 && (
           (this.first.segmentIndex === 1 && this.second.segmentIndex === lastIdx) ||
           (this.first.segmentIndex === lastIdx && this.second.segmentIndex === 1)
         );
@@ -291,10 +292,13 @@ export class Chamfer extends ChamferFilletBase {
         } else {
           // Consecutive segments: replace the shared corner vertex with the two chamfer points
           // as a straight polyline segment — no separate chamfer Line entity needed.
-          const isFirstLower = this.first.segmentIndex < this.second.segmentIndex;
-          const cornerIdx = Math.min(this.first.segmentIndex, this.second.segmentIndex);
-          const lowerChamfer = isFirstLower ? firstChamferPoint : secondChamferPoint;
-          const upperChamfer = isFirstLower ? secondChamferPoint : firstChamferPoint;
+          const seg1 = this.first.segmentIndex;
+          const seg2 = this.second.segmentIndex;
+          const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
+          const isFirstLower = seg1 < seg2;
+          const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
+          const lowerChamfer = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? secondChamferPoint : firstChamferPoint;
+          const upperChamfer = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? firstChamferPoint : secondChamferPoint;
           newPoints.splice(cornerIdx, 1, lowerChamfer.clone(), upperChamfer.clone());
         }
         stateChanges.push(new UpdateState(this.first.entity, { points: newPoints }));
