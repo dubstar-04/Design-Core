@@ -436,3 +436,20 @@ test('Test BasePolyline.toPolylinePoints', () => {
   expect(polylinePoints[2].y).toBe(50);
   expect(polylinePoints[2].bulge).toBe(0);
 });
+
+test('Polyline.execute handles Close option', async () => {
+  const pt1 = new Point(0, 0);
+  const pt2 = new Point(10, 0);
+  const pt3 = new Point(10, 10);
+
+  await withMockInput(DesignCore.Scene, [pt1, pt2, pt3, 'Close'], async () => {
+    const polyline = new Polyline({});
+    await polyline.execute();
+
+    expect(polyline.points.length).toBe(3);
+    expect(polyline.points[0]).toBe(pt1);
+    expect(polyline.points[1]).toBe(pt2);
+    expect(polyline.points[2]).toBe(pt3);
+    expect(polyline.flags.hasFlag(1)).toBe(true);
+  }, { extraMethods: { actionCommand: () => 0 } });
+});
