@@ -42,7 +42,7 @@ export class BasePolyline extends Entity {
     });
 
     Object.defineProperty(this, 'flags', {
-      value: new Flags(),
+      value: data?.flags instanceof Flags ? data.flags : new Flags(),
       writable: true,
     });
 
@@ -86,9 +86,12 @@ export class BasePolyline extends Entity {
 
       let index;
       while (true) {
-        let options;
+        const options = [];
         if (this.points.length >= 2) {
-          options = this.inputMode === this.modes.LINE ? [this.modes.ARC] : [this.modes.LINE];
+          options.push(this.inputMode === this.modes.LINE ? this.modes.ARC : this.modes.LINE);
+        }
+        if (this.points.length >= 3) {
+          options.push('Close');
         }
 
         const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC], options);
@@ -110,6 +113,14 @@ export class BasePolyline extends Entity {
           }
           if (pt2 === this.modes.LINE) {
             this.inputMode = this.modes.LINE;
+          }
+          if (pt2 === 'Close') {
+            if (this.inputMode === this.modes.ARC) {
+              this.points.at(-1).bulge = this.getBulgeFromSegment(pt1);
+            }
+            this.flags.addValue(1);
+            DesignCore.Scene.inputManager.executeCommand(this, index);
+            return;
           }
         }
       }
