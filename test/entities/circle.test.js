@@ -191,3 +191,39 @@ test('Test Circle.trim does not modify circle', () => {
 
   expect(trimWithTwoPoints[1].entity).toEqual(circle);
 });
+
+test('Circle.execute creates circle from diameter input', async () => {
+  const center = new Point(0, 0);
+
+  await withMockInput(DesignCore.Scene, [center, 'Diameter', 20], async () => {
+    const circle = new Circle({});
+    await circle.execute();
+
+    expect(circle.points[0]).toBe(center);
+    expect(circle.getRadius()).toBeCloseTo(10);
+  });
+});
+
+test('Circle.execute re-prompts on zero or negative radius', async () => {
+  const center = new Point(0, 0);
+
+  // 0 and -5 are rejected; 10 is accepted
+  await withMockInput(DesignCore.Scene, [center, 0, -5, 10], async () => {
+    const circle = new Circle({});
+    await circle.execute();
+
+    expect(circle.getRadius()).toBeCloseTo(10);
+  });
+});
+
+test('Circle.execute re-prompts on zero or negative diameter', async () => {
+  const center = new Point(0, 0);
+
+  // 'Diameter', then 0 and -20 rejected, then 20 accepted (radius = 10)
+  await withMockInput(DesignCore.Scene, [center, 'Diameter', 0, -20, 20], async () => {
+    const circle = new Circle({});
+    await circle.execute();
+
+    expect(circle.getRadius()).toBeCloseTo(10);
+  });
+});
