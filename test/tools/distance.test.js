@@ -26,5 +26,5 @@ test('Test distance.action', () => {
   distance.action();
 
   expect(output).not.toBeUndefined();
-  expect(output).toBe('Length: 10.0 &#916;X: 0.0 &#916;Y: 10.0');
+  expect(output).toBe('Length: 10.0 Angle: 90.0\u00B0 \u0394X: 0.0 \u0394Y: 10.0');
 });
