@@ -3,6 +3,7 @@ import { ChamferFilletBase } from './chamferFilletBase.js';
 import { CornerEntity } from './cornerEntity.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Constants } from '../lib/constants.js';
 import { Point } from '../entities/point.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
@@ -147,7 +148,7 @@ export class Fillet extends ChamferFilletBase {
     const cornerAngle = Math.acos(cosAngle);
 
     // Collinear or antiparallel lines cannot be filleted
-    if (cornerAngle < 1e-10 || cornerAngle > Math.PI - 1e-10) {
+    if (cornerAngle < Constants.Tolerance.EPSILON || cornerAngle > Math.PI - Constants.Tolerance.EPSILON) {
       DesignCore.Core.notify(Strings.Error.PARALLELLINES);
       return;
     }

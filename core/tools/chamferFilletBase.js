@@ -1,5 +1,6 @@
 import { Tool } from './tool.js';
 import { Strings } from '../lib/strings.js';
+import { Constants } from '../lib/constants.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { RemoveState, UpdateState } from '../lib/stateManager.js';
 import { CornerEntity } from './cornerEntity.js';
@@ -44,7 +45,7 @@ export class ChamferFilletBase extends Tool {
 
     const directionCross = this.first.direction.cross(this.second.direction);
 
-    if (Math.abs(directionCross) < 1e-10) {
+    if (Math.abs(directionCross) < Constants.Tolerance.EPSILON) {
       DesignCore.Core.notify(Strings.Error.PARALLELLINES);
       return false;
     }

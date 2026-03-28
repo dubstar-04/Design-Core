@@ -1,6 +1,7 @@
 import { Point } from '../entities/point.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
+import { Constants } from '../lib/constants.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -84,7 +85,7 @@ export class CornerEntity {
   resolveGeometry(intersectionPoint) {
     const clickOnLine = this.clickPoint.perpendicular(this.lineStart, this.lineEnd);
     this.clickDistance = clickOnLine.distance(intersectionPoint);
-    if (this.clickDistance < 1e-10) return false;
+    if (this.clickDistance < Constants.Tolerance.EPSILON) return false;
     this.clickDir = clickOnLine.subtract(intersectionPoint);
     this.lineKeptEnd = this.clickDir.dot(this.lineStart.subtract(intersectionPoint)) >= this.clickDir.dot(this.lineEnd.subtract(intersectionPoint)) ? this.lineStart : this.lineEnd;
     this.clickUnit = new Point(this.clickDir.x / this.clickDistance, this.clickDir.y / this.clickDistance);
