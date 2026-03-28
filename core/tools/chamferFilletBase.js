@@ -106,12 +106,16 @@ export class ChamferFilletBase extends Tool {
       const keepStart = poly.keepStart(this.intersectionPoint);
       let newPoints;
       if (keepStart) {
+        // Keep the polyline points up to (not including) the selected segment start,
+        // trim to the intersection and append the kept end of the line.
         newPoints = [
           ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
           this.intersectionPoint.clone(),
           line.lineKeptEnd(this.intersectionPoint).clone(),
         ];
       } else {
+        // Keep the polyline points from the selected segment start onwards,
+        // prepending the kept end of the line and the intersection.
         newPoints = [
           line.lineKeptEnd(this.intersectionPoint).clone(),
           this.intersectionPoint.clone(),
