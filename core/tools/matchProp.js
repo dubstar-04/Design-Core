@@ -46,11 +46,13 @@ export class MatchProp extends Tool {
         DesignCore.Scene.selectionManager.reset();
         const sourceSelection = new PromptOptions(Strings.Input.SOURCE, [Input.Type.SINGLESELECTION], []);
         const input = await DesignCore.Scene.inputManager.requestInput(sourceSelection);
+        if (input === undefined) return;
         this.sourceIndex = input.selectedItemIndex;
       }
 
       const destinationSelection = new PromptOptions(Strings.Input.DESTINATIONSET, [Input.Type.SELECTIONSET]);
       const destInput = await DesignCore.Scene.inputManager.requestInput(destinationSelection);
+      if (destInput === undefined) return;
       this.destinationSetIndices = destInput.selectionSet;
 
       DesignCore.Scene.inputManager.executeCommand();
