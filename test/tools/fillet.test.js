@@ -338,6 +338,32 @@ test('Fillet.action notifies when click coincides with intersection', () => {
   notifySpy.mockRestore();
 });
 
+test('Fillet.action radius=0 notifies and makes no changes when click coincides with intersection', () => {
+  // Click at exactly the intersection point — clickDistance = 0.
+  // The guard must fire before applySharpTrim() runs.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.filletRadius = 0;
+  core.scene.headers.trimMode = true;
+
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  const fillet = new Fillet();
+  fillet.first.entity = core.scene.entities.get(0);
+  fillet.second.entity = core.scene.entities.get(1);
+  fillet.first.clickPoint = new Point(0, 0); // exactly at the intersection
+  fillet.second.clickPoint = new Point(0, 5);
+  fillet.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.SELECTION);
+  // lines must be unchanged — applySharpTrim must not have run
+  expect(core.scene.entities.get(0).points[1].x).toBeCloseTo(0);
+  expect(core.scene.entities.get(0).points[1].y).toBeCloseTo(0);
+  notifySpy.mockRestore();
+});
+
 // ─── execute: option branches ─────────────────────────────────────────────────
 
 test('Fillet.execute sets filletRadius when Radius option is selected', async () => {
