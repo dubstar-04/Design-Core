@@ -44,10 +44,12 @@ export class Copy extends Tool {
 
       const op2 = new PromptOptions(Strings.Input.BASEPOINT, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op2);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
       const op3 = new PromptOptions(Strings.Input.DESTINATION, [Input.Type.POINT, Input.Type.DYNAMIC]);
       const pt2 = await DesignCore.Scene.inputManager.requestInput(op3);
+      if (pt2 === undefined) return;
       this.points.push(pt2);
 
       DesignCore.Scene.inputManager.executeCommand();
