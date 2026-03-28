@@ -60,10 +60,13 @@ export class Distance extends Tool {
    * Perform the command
    */
   action() {
+    const dx = this.points[1].x - this.points[0].x;
+    const dy = this.points[1].y - this.points[0].y;
     const length = this.points[0].distance(this.points[1]).toFixed(1);
-    const x = (this.points[1].x - this.points[0].x).toFixed(1);
-    const y = (this.points[1].y - this.points[0].y).toFixed(1);
-    const di = (`${Strings.Strings.LENGTH}: ${length} &#916;X: ${x} &#916;Y: ${y}`);
+    const angle = (Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1);
+    const x = dx.toFixed(1);
+    const y = dy.toFixed(1);
+    const di = (`${Strings.Strings.LENGTH}: ${length} Angle: ${angle}${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: ${x} ${Strings.Symbol.DELTA}Y: ${y}`);
     DesignCore.Core.notify(di);
   }
 }
