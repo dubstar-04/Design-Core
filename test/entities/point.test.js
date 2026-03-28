@@ -147,6 +147,12 @@ test('Test Point.normalise', () => {
   const pt4 = new Point(7, -24);
   const r4 = pt4.normalise();
   expect(Math.sqrt(r4.x ** 2 + r4.y ** 2)).toBeCloseTo(1);
+
+  // Zero vector: returns (0, 0) rather than NaN
+  const pt5 = new Point(0, 0);
+  const r5 = pt5.normalise();
+  expect(r5.x).toBe(0);
+  expect(r5.y).toBe(0);
 });
 
 test('Test Point.scale', () => {

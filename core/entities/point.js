@@ -1,4 +1,5 @@
 import { Utils } from '../lib/utils.js';
+import { Constants } from '../lib/constants.js';
 
 /** Point Entity Class */
 export class Point {
@@ -122,6 +123,7 @@ export class Point {
    */
   normalise() {
     const length = Math.sqrt(this.x ** 2 + this.y ** 2);
+    if (length < Constants.Tolerance.EPSILON) return new Point(0, 0);
     return new Point(this.x / length, this.y / length);
   }
 
