@@ -67,9 +67,7 @@ export class Circle extends Entity {
       if (pt2 === undefined) return;
       if (Input.getType(pt2) === Input.Type.POINT) {
         this.points.push(pt2);
-      }
-
-      if (Input.getType(pt2) === Input.Type.NUMBER) {
+      } else if (Input.getType(pt2) === Input.Type.NUMBER) {
         this.setRadius(pt2);
       }
       DesignCore.Scene.inputManager.executeCommand(this);
