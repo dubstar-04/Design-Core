@@ -4,6 +4,7 @@ import { Strings } from './strings.js';
 import { InputManager } from './inputManager.js';
 import { BoundingBox } from './boundingBox.js';
 import { EntityManager } from './entityManager.js';
+import { Headers } from './headers.js';
 
 import { DesignCore } from '../designCore.js';
 import { BlockManager } from '../tables/blockManager.js';
@@ -14,8 +15,6 @@ import { AddState, StateManager, UpdateState } from './stateManager.js';
  * Holds all entity instances
  */
 export class Scene {
-  /** Create a scene */
-
   /** Create a Scene */
   constructor() {
     // initialise the scene variables
@@ -31,8 +30,7 @@ export class Scene {
 
     this.stateManager = new StateManager();
 
-    // store the version of dxf that is currently being used
-    this.dxfVersion = 'R2018';
+    this.headers = new Headers();
   }
 
   /**

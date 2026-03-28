@@ -1,4 +1,5 @@
 import { Utils } from '../lib/utils.js';
+import { Constants } from '../lib/constants.js';
 
 /** Point Entity Class */
 export class Point {
@@ -113,6 +114,26 @@ export class Point {
     const x = centre.x + (this.x - centre.x) * Math.cos(angle) - (this.y - centre.y) * Math.sin(angle);
     const y = centre.y + (this.x - centre.x) * Math.sin(angle) + (this.y - centre.y) * Math.cos(angle);
     return new Point(x, y, this.bulge, this.sequence);
+  }
+
+  /**
+   * Return a new unit vector in the same direction as this.
+   * (Divides each component by the vector's magnitude.)
+   * @return {Point}
+   */
+  normalise() {
+    const length = Math.sqrt(this.x ** 2 + this.y ** 2);
+    if (length < Constants.Tolerance.EPSILON) return new Point(0, 0);
+    return new Point(this.x / length, this.y / length);
+  }
+
+  /**
+   * Return a new point scaled by a scalar factor.
+   * @param  {number} scalar
+   * @return {Point}
+   */
+  scale(scalar) {
+    return new Point(this.x * scalar, this.y * scalar);
   }
 
   /**

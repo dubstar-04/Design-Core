@@ -62,6 +62,68 @@ test('Test BasePolyline.getClosestSegment', () => {
   expect(segment2).toBeInstanceOf(Arc);
 });
 
+// ─── closing segment (closed polylines) ──────────────────────────────────────
+
+test('BasePolyline.getClosestSegmentIndex returns closing-segment index for closed polyline', () => {
+  // Square: P0=(0,0) P1=(10,0) P2=(10,10) P3=(0,10), closed flag set.
+  // Closing segment is P3→P0. A point near the left edge (0,5) is closest to that segment.
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+  const poly = new BasePolyline({ points });
+  poly.flags.setFlagValue(1);
+
+  const closestIdx = poly.getClosestSegmentIndex(new Point(0, 5));
+  // Closing segment index = points.length = 4
+  expect(closestIdx).toBe(4);
+});
+
+test('BasePolyline.getClosestSegment returns closing segment as a Line for closed polyline', () => {
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+  const poly = new BasePolyline({ points });
+  poly.flags.setFlagValue(1);
+
+  const seg = poly.getClosestSegment(new Point(0, 5));
+  expect(seg).toBeInstanceOf(Line);
+  // The segment spans P3=(0,10) → P0=(0,0)
+  expect(seg.points[0].x).toBeCloseTo(0);
+  expect(seg.points[0].y).toBeCloseTo(10);
+  expect(seg.points[1].x).toBeCloseTo(0);
+  expect(seg.points[1].y).toBeCloseTo(0);
+});
+
+test('BasePolyline.areConsecutiveSegments returns false for non-adjacent segments on a closed polyline', () => {
+  // 4-point closed poly: segments 1 and 3 are NOT adjacent (bug: old code returned true).
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+  const poly = new BasePolyline({ points });
+  poly.flags.setFlagValue(1);
+
+  expect(poly.areConsecutiveSegments(1, 3)).toBe(false);
+});
+
+test('BasePolyline.areConsecutiveSegments returns true for closing segment and its neighbours', () => {
+  // 4-point closed poly, N=4 (closing segment index).
+  // Seg N-1=3 ends at P3, closing seg starts at P3 → consecutive (diff=1).
+  // Closing seg ends at P0, seg 1 starts at P0 → consecutive (wrap case).
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+  const poly = new BasePolyline({ points });
+  poly.flags.setFlagValue(1);
+
+  expect(poly.areConsecutiveSegments(3, 4)).toBe(true); // diff = 1
+  expect(poly.areConsecutiveSegments(4, 1)).toBe(true); // wrap
+  expect(poly.areConsecutiveSegments(1, 4)).toBe(true); // wrap (order reversed)
+});
+
+test('BasePolyline.closestPointOnSegment handles closing-segment index correctly', () => {
+  // 4-point square, closing segment = P3=(0,10)→P0=(0,0).  Index = 4.
+  // Closest point on that segment to (0, 5) should be (0, 5).
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+  const poly = new BasePolyline({ points });
+  poly.flags.setFlagValue(1);
+
+  const closest = poly.closestPointOnSegment(new Point(0, 5), 4);
+  expect(closest.x).toBeCloseTo(0);
+  expect(closest.y).toBeCloseTo(5);
+});
+
 
 test('Test BasePolyline.closestPoint', () => {
   const points = [new Point(100, 100), new Point(200, 100, -1), new Point(200, 50)];

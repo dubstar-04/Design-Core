@@ -1,5 +1,6 @@
 
 import { Logging } from './logging.js';
+import { Constants } from './constants.js';
 
 /** Utils Class */
 export class Utils {
@@ -27,7 +28,7 @@ export class Utils {
    * @return {number} rounded number
    */
   static round(number) {
-    return Number(Number(number).toFixed(5));
+    return Number(Number(number).toFixed(Constants.Precision.DECIMALPLACES));
   }
 
   /**

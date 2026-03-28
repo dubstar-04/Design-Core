@@ -1,5 +1,6 @@
 import { Point } from '../entities/point.js';
 import { Utils } from './utils.js';
+import { Constants } from './constants.js';
 
 /** Intersection Class */
 export class Intersection {
@@ -71,6 +72,25 @@ export class Intersection {
       this.appendPoint(point);
     });
   };
+
+  /**
+   * Find the intersection of two infinite lines, each defined by two points.
+   * Returns the intersection point, or null if the lines are parallel
+   * (cross product of direction vectors below epsilon).
+   * @param {Point} p1 - start of first line segment
+   * @param {Point} p2 - end of first line segment
+   * @param {Point} p3 - start of second line segment
+   * @param {Point} p4 - end of second line segment
+   * @return {Point|null}
+   */
+  static intersectRayRay(p1, p2, p3, p4) {
+    const dir1 = p2.subtract(p1);
+    const dir2 = p4.subtract(p3);
+    const cross = dir1.cross(dir2);
+    if (Math.abs(cross) < Constants.Tolerance.EPSILON) return null;
+    const t = p3.subtract(p1).cross(dir2) / cross;
+    return p1.add(dir1.scale(t));
+  }
 
   /**
    * Find intersections between two polylines.

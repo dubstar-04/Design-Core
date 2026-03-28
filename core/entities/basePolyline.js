@@ -250,20 +250,22 @@ export class BasePolyline extends Entity {
   }
 
   /**
-   * Get the segment closest to point P
+   * Get the index and segment object for the segment closest to point P
    * @param {Point} P
-   * @return {Line|Arc|null} - closest segment
+   * @return {Object}
    */
-  getClosestSegment(P) {
+  #getClosestSegmentData(P) {
+    let closestIndex = -1;
     let closestSegment = null;
     let minDistance = Infinity;
 
-    for (let i = 1; i < this.points.length; i++) {
+    const segmentCount = this.flags.hasFlag(1) ? this.points.length : this.points.length - 1;
+    for (let i = 1; i <= segmentCount; i++) {
       const A = this.points[i - 1];
-      const B = this.points[i];
+      const B = this.points[i % this.points.length];
 
-      let candidateSegment;
       let closestPoint;
+      let candidateSegment;
       if (A.bulge !== 0) {
         const center = A.bulgeCentrePoint(B);
         const direction = A.bulge > 0 ? 1 : -1;
@@ -278,12 +280,51 @@ export class BasePolyline extends Entity {
         const dist = P.distance(closestPoint);
         if (dist < minDistance) {
           minDistance = dist;
+          closestIndex = i;
           closestSegment = candidateSegment;
         }
       }
     }
 
-    return closestSegment;
+    return { index: closestIndex, segment: closestSegment };
+  }
+
+  /**
+   * Get the 1-based index of the segment closest to point P
+   * @param {Point} P
+   * @return {number} - 1-based segment index, or -1 if no segments
+   */
+  getClosestSegmentIndex(P) {
+    return this.#getClosestSegmentData(P).index;
+  }
+
+  /**
+   * Get the segment closest to point P
+   * @param {Point} P
+   * @return {Line|Arc|null} - closest segment
+   */
+  getClosestSegment(P) {
+    return this.#getClosestSegmentData(P).segment;
+  }
+
+  /**
+   * Determine if two segments (by 1-based index) are consecutive in this polyline
+   * @param {number} segIndex1
+   * @param {number} segIndex2
+   * @return {boolean}
+   */
+  areConsecutiveSegments(segIndex1, segIndex2) {
+    const diff = Math.abs(segIndex1 - segIndex2);
+    if (diff === 1) return true;
+    // Closed polyline: closing segment (index = points.length) and segment 1 are consecutive
+    if (this.flags.hasFlag(1)) {
+      const closeIdx = this.points.length;
+      if ((segIndex1 === closeIdx && segIndex2 === 1) ||
+          (segIndex2 === closeIdx && segIndex1 === 1)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -349,7 +390,7 @@ export class BasePolyline extends Entity {
    */
   closestPointOnSegment(point, segmentIndex) {
     const A = this.points[segmentIndex - 1];
-    const B = this.points[segmentIndex];
+    const B = this.points[segmentIndex % this.points.length];
 
     if (A.bulge !== 0) {
       const center = A.bulgeCentrePoint(B);
@@ -375,7 +416,7 @@ export class BasePolyline extends Entity {
    */
   positionOnSegment(point, segmentIndex) {
     const A = this.points[segmentIndex - 1];
-    const B = this.points[segmentIndex];
+    const B = this.points[segmentIndex % this.points.length];
 
     if (A.bulge !== 0) {
       const center = A.bulgeCentrePoint(B);

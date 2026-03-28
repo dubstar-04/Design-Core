@@ -128,6 +128,9 @@ export class DXF {
         DesignCore.Core.dxfVersion = versionNumber;
       }
     }
+
+    // Load drawing-level header variables into Scene.headers
+    DesignCore.Scene.headers.load(header);
   }
 
 

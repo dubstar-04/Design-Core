@@ -11,19 +11,9 @@ export class DXFWriter {
    * @param {DXFFile} file
    */
   writeHeaders(file) {
-    // write headers
     file.writeGroupCode('0', 'SECTION');
     file.writeGroupCode('2', 'HEADER');
-    file.writeGroupCode('9', '$ACADVER');
-    file.writeGroupCode('1', file.version);
-    file.writeGroupCode('9', '$TEXTSTYLE');
-    file.writeGroupCode('7', DesignCore.StyleManager.getCstyle());
-    file.writeGroupCode('9', '$CLAYER');
-    file.writeGroupCode('8', DesignCore.LayerManager.getCstyle());
-    file.writeGroupCode('9', '$DIMSTYLE');
-    file.writeGroupCode('2', DesignCore.DimStyleManager.getCstyle());
-    file.writeGroupCode('9', '$HANDSEED', DXFFile.Version.R2000);
-    file.writeGroupCode('5', DesignCore.HandleManager.handseed, DXFFile.Version.R2000);
+    DesignCore.Scene.headers.dxf(file);
     file.writeGroupCode('0', 'ENDSEC');
   }
 
@@ -110,7 +100,7 @@ export class DXFWriter {
    */
   write(version) {
     if (version === undefined) {
-      version = DesignCore.Core.dxfVersion;
+      version = DesignCore.Scene.headers.dxfVersion;
     }
     const file = new DXFFile(version);
 

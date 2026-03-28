@@ -32,6 +32,7 @@ const createCoreMock = (options = {}) => {
     dictionaryManager: options.dictionaryManager || { dxf: jest.fn() },
     scene: {
       dxf: jest.fn(),
+      headers: { dxf: jest.fn(), dxfVersion: options.dxfVersion || 'R2018' },
       entities: {
         count: jest.fn(() => entities.length),
         get: jest.fn((index) => entities[index]),
@@ -72,11 +73,7 @@ describe('DXFWriter', () => {
     writer.writeHeaders(file);
 
     expect(file.contents).toContain('0\nSECTION\n2\nHEADER\n');
-    expect(file.contents).toContain('9\n$ACADVER\n1\nAC1032\n');
-    expect(file.contents).toContain('9\n$TEXTSTYLE\n7\nStandard\n');
-    expect(file.contents).toContain('9\n$CLAYER\n8\nLayer0\n');
-    expect(file.contents).toContain('9\n$DIMSTYLE\n2\nISO-25\n');
-    // expect(file.contents).toContain('9\n$HANDSEED\n5\n3F\n');
+    expect(core.scene.headers.dxf).toHaveBeenCalledWith(file);
     expect(file.contents).toContain('0\nENDSEC\n');
   });
 
