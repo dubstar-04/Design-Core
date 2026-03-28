@@ -48,9 +48,14 @@ export class Copy extends Tool {
       this.points.push(pt1);
 
       const op3 = new PromptOptions(Strings.Input.DESTINATION, [Input.Type.POINT, Input.Type.DYNAMIC]);
-      const pt2 = await DesignCore.Scene.inputManager.requestInput(op3);
-      if (pt2 === undefined) return;
-      this.points.push(pt2);
+      while (true) {
+        // Reset to just the base point
+        this.points = [this.points[0]];
+        const pt2 = await DesignCore.Scene.inputManager.requestInput(op3);
+        if (pt2 === undefined) break;
+        this.points[1] = pt2;
+        DesignCore.Scene.inputManager.actionCommand();
+      }
 
       DesignCore.Scene.inputManager.executeCommand();
     } catch (err) {
