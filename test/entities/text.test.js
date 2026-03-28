@@ -601,3 +601,30 @@ test('Text getRotation returns 0 if points[1] undefined', () => {
   t.points[1] = undefined;
   expect(t.getRotation()).toBe(0);
 });
+
+test('Text.execute re-prompts on zero or negative height', async () => {
+  const pt = new Point(0, 0);
+
+  // 0 and -5 are rejected; 5 is accepted
+  await withMockInput(DesignCore.Scene, [pt, 0, -5, 5, 0, 'Hello'], async () => {
+    const text = new Text({});
+    await text.execute();
+
+    expect(text.height).toBe(5);
+    expect(text.string).toBe('Hello');
+  });
+});
+
+test('Text.execute does not create entity for empty string', async () => {
+  const pt = new Point(0, 0);
+  let executeCommandCalled = false;
+
+  await withMockInput(DesignCore.Scene, [pt, 5, 0, ''], async () => {
+    const text = new Text({});
+    await text.execute();
+
+    expect(text.string).toBe('');
+  }, { extraMethods: { executeCommand: () => { executeCommandCalled = true; } } });
+
+  expect(executeCommandCalled).toBe(false);
+});
