@@ -72,13 +72,18 @@ export class ChamferFilletBase extends Tool {
   applySharpTrim() {
     const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
     const secondIsPolyline = this.secondPick.entity instanceof BasePolyline;
-    let stateChanges;
+
+    // Line + Line: trim both lines to the intersection point.
     if (!firstIsPolyline && !secondIsPolyline) {
-      stateChanges = [
+      return [
         new UpdateState(this.firstPick.entity, { points: [this.firstPick.lineKeptEnd(this.intersectionPoint), this.intersectionPoint] }),
         new UpdateState(this.secondPick.entity, { points: [this.secondPick.lineKeptEnd(this.intersectionPoint), this.intersectionPoint] }),
       ];
-    } else if (firstIsPolyline && secondIsPolyline && this.firstPick.entity === this.secondPick.entity) {
+    }
+
+    // Polyline + Polyline (same entity): replace the shared corner vertex (or open endpoints)
+    // with the intersection point.
+    if (firstIsPolyline && secondIsPolyline && this.firstPick.entity === this.secondPick.entity) {
       const lastIdx = this.firstPick.entity.points.length - 1;
       const segDiff = Math.abs(this.firstPick.segmentIndex - this.secondPick.segmentIndex);
       const isOpenEnds = !this.firstPick.entity.flags.hasFlag(1) && segDiff !== 1 && (
@@ -99,34 +104,35 @@ export class ChamferFilletBase extends Tool {
         const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
         newPoints.splice(cornerIdx, 1, this.intersectionPoint.clone());
       }
-      stateChanges = [new UpdateState(this.firstPick.entity, { points: newPoints })];
+      return [new UpdateState(this.firstPick.entity, { points: newPoints })];
+    }
+
+    // Line + Polyline (or Polyline + Line): consume the line into the polyline.
+    const poly = firstIsPolyline ? this.firstPick : this.secondPick;
+    const line = firstIsPolyline ? this.secondPick : this.firstPick;
+    const polySegIdx = poly.segmentIndex;
+    const keepStart = poly.keepStart(this.intersectionPoint);
+    let newPoints;
+    if (keepStart) {
+      // Keep the polyline points up to (not including) the selected segment start,
+      // trim to the intersection and append the kept end of the line.
+      newPoints = [
+        ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
+        this.intersectionPoint.clone(),
+        line.lineKeptEnd(this.intersectionPoint).clone(),
+      ];
     } else {
-      const [poly, line] = firstIsPolyline ? [this.firstPick, this.secondPick] : [this.secondPick, this.firstPick];
-      const polySegIdx = poly.segmentIndex;
-      const keepStart = poly.keepStart(this.intersectionPoint);
-      let newPoints;
-      if (keepStart) {
-        // Keep the polyline points up to (not including) the selected segment start,
-        // trim to the intersection and append the kept end of the line.
-        newPoints = [
-          ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
-          this.intersectionPoint.clone(),
-          line.lineKeptEnd(this.intersectionPoint).clone(),
-        ];
-      } else {
-        // Keep the polyline points from the selected segment start onwards,
-        // prepending the kept end of the line and the intersection.
-        newPoints = [
-          line.lineKeptEnd(this.intersectionPoint).clone(),
-          this.intersectionPoint.clone(),
-          ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),
-        ];
-      }
-      stateChanges = [
-        new RemoveState(line.entity),
-        new UpdateState(poly.entity, { points: newPoints }),
+      // Keep the polyline points from the selected segment start onwards,
+      // prepending the kept end of the line and the intersection.
+      newPoints = [
+        line.lineKeptEnd(this.intersectionPoint).clone(),
+        this.intersectionPoint.clone(),
+        ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),
       ];
     }
-    return stateChanges;
+    return [
+      new RemoveState(line.entity),
+      new UpdateState(poly.entity, { points: newPoints }),
+    ];
   }
 }
