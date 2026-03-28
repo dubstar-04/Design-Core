@@ -66,11 +66,11 @@ export class Chamfer extends ChamferFilletBase {
             if (len < 0) {
               DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
             } else {
-              DesignCore.Scene.headers.chamferDistanceA = len;
+              DesignCore.Scene.headers.chamferLength = len;
               const aop = new PromptOptions(Strings.Input.ANGLE, [Input.Type.NUMBER]);
               const ang = await DesignCore.Scene.inputManager.requestInput(aop);
               if (ang === undefined) return;
-              if (ang < 0 || ang >= 180) {
+              if (ang <= 0 || ang >= 180) {
                 DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
               } else {
                 DesignCore.Scene.headers.chamferAngle = ang;
@@ -179,9 +179,10 @@ export class Chamfer extends ChamferFilletBase {
       firstChamferPoint = this.intersectionPoint.add(firstUnit.scale(distA));
       secondChamferPoint = this.intersectionPoint.add(secondUnit.scale(distB));
     } else {
-      // Angle method: measure distA along line1, then project using chamferAngle to find
+      // Angle method: measure chamferLength along line1, then project using chamferAngle to find
       // where the chamfer line meets line2.
       // chamferAngle is stored in degrees (as entered by the user).
+      const chamferLength = DesignCore.Scene.headers.chamferLength;
       const alpha = DesignCore.Scene.headers.chamferAngle * (Math.PI / 180);
 
       if (alpha <= 0 || alpha >= Math.PI) {
@@ -189,7 +190,7 @@ export class Chamfer extends ChamferFilletBase {
         return;
       }
 
-      firstChamferPoint = this.intersectionPoint.add(firstUnit.scale(distA));
+      firstChamferPoint = this.intersectionPoint.add(firstUnit.scale(chamferLength));
 
       // Rotate firstUnit by ±(π - alpha) to get the chamfer direction from
       // firstChamferPoint. Choose the rotation that points toward line2 (positive
@@ -319,9 +320,9 @@ export class Chamfer extends ChamferFilletBase {
     const trimMode = DesignCore.Scene.headers.trimMode;
     const chamferMode = DesignCore.Scene.headers.chamferMode;
     if (chamferMode) {
-      const distA = DesignCore.Scene.headers.chamferDistanceA;
+      const length = DesignCore.Scene.headers.chamferLength;
       const angle = DesignCore.Scene.headers.chamferAngle;
-      DesignCore.Core.notify(`Current settings: Mode = ${trimMode ? 'TRIM' : 'NOTRIM'}, Method = ANGLE, Length = ${distA}, Angle = ${angle}`);
+      DesignCore.Core.notify(`Current settings: Mode = ${trimMode ? 'TRIM' : 'NOTRIM'}, Method = ANGLE, Length = ${length}, Angle = ${angle}`);
     } else {
       const distA = DesignCore.Scene.headers.chamferDistanceA;
       const distB = DesignCore.Scene.headers.chamferDistanceB;
