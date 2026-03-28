@@ -89,6 +89,9 @@ export class Copy extends Tool {
    * Perform the command
    */
   action() {
+    // points[1] is cleared before each destination prompt
+    // executeCommand() calls action() - guard on missing points and duplication
+    if (!this.points[1]) return;
     const delta = this.points[1].subtract(this.points[0]);
     const stateChanges = [];
 
