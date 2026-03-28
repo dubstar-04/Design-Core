@@ -107,9 +107,9 @@ test('BasePolyline.areConsecutiveSegments returns true for closing segment and i
   const poly = new BasePolyline({ points });
   poly.flags.setFlagValue(1);
 
-  expect(poly.areConsecutiveSegments(3, 4)).toBe(true);  // diff = 1
-  expect(poly.areConsecutiveSegments(4, 1)).toBe(true);  // wrap
-  expect(poly.areConsecutiveSegments(1, 4)).toBe(true);  // wrap (order reversed)
+  expect(poly.areConsecutiveSegments(3, 4)).toBe(true); // diff = 1
+  expect(poly.areConsecutiveSegments(4, 1)).toBe(true); // wrap
+  expect(poly.areConsecutiveSegments(1, 4)).toBe(true); // wrap (order reversed)
 });
 
 test('BasePolyline.closestPointOnSegment handles closing-segment index correctly', () => {

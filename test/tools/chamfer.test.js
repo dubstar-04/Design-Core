@@ -875,8 +875,8 @@ test('Chamfer.action dist>0 trimMode=true closed Lwpolyline closing-wrap (seg4+s
   expect(poly.points.length).toBe(5);
   // Endpoints must NOT have been moved to the intersection (open-ends symptom)
   // The first two new points should be the chamfer points, not (0,0)/(0,0)
-  const allAtOrigin = poly.points[0].x === 0 && poly.points[0].y === 0
-    && poly.points[1].x === 0 && poly.points[1].y === 0;
+  const allAtOrigin = poly.points[0].x === 0 && poly.points[0].y === 0 &&
+    poly.points[1].x === 0 && poly.points[1].y === 0;
   expect(allAtOrigin).toBe(false);
 });
 

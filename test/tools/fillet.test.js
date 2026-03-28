@@ -768,8 +768,8 @@ test('Fillet.action radius>0 trimMode=true closed Lwpolyline closing-wrap (seg4+
   // Shared vertex (0,0) replaced by two tangent points → total 5 points
   expect(poly.points.length).toBe(5);
   // Endpoints must NOT have been moved to the intersection (open-ends symptom)
-  const allAtOrigin = poly.points[0].x === 0 && poly.points[0].y === 0
-    && poly.points[poly.points.length - 1].x === 0 && poly.points[poly.points.length - 1].y === 0;
+  const allAtOrigin = poly.points[0].x === 0 && poly.points[0].y === 0 &&
+    poly.points[poly.points.length - 1].x === 0 && poly.points[poly.points.length - 1].y === 0;
   expect(allAtOrigin).toBe(false);
 });
 
