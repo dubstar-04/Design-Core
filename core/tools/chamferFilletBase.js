@@ -90,7 +90,11 @@ export class ChamferFilletBase extends Tool {
         newPoints[0] = intersectionPoint.clone();
         newPoints[lastIdx] = intersectionPoint.clone();
       } else {
-        const cornerIdx = Math.min(this.first.segmentIndex, this.second.segmentIndex);
+        const closeSegIdx = this.first.entity.points.length;
+        const seg1 = this.first.segmentIndex;
+        const seg2 = this.second.segmentIndex;
+        const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
+        const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
         newPoints.splice(cornerIdx, 1, intersectionPoint.clone());
       }
       stateChanges = [new UpdateState(this.first.entity, { points: newPoints })];

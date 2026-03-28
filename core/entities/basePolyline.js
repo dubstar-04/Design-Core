@@ -259,9 +259,10 @@ export class BasePolyline extends Entity {
     let closestSegment = null;
     let minDistance = Infinity;
 
-    for (let i = 1; i < this.points.length; i++) {
+    const segmentCount = this.flags.hasFlag(1) ? this.points.length : this.points.length - 1;
+    for (let i = 1; i <= segmentCount; i++) {
       const A = this.points[i - 1];
-      const B = this.points[i];
+      const B = this.points[i % this.points.length];
 
       let closestPoint;
       let candidateSegment;
@@ -315,11 +316,11 @@ export class BasePolyline extends Entity {
   areConsecutiveSegments(segIndex1, segIndex2) {
     const diff = Math.abs(segIndex1 - segIndex2);
     if (diff === 1) return true;
-    // Closed polyline: last segment and first segment are consecutive
+    // Closed polyline: closing segment (index = points.length) and segment 1 are consecutive
     if (this.flags.hasFlag(1)) {
-      const lastIndex = this.points.length - 1;
-      if ((segIndex1 === 1 && segIndex2 === lastIndex) ||
-          (segIndex2 === 1 && segIndex1 === lastIndex)) {
+      const closeIdx = this.points.length;
+      if ((segIndex1 === closeIdx && segIndex2 === 1) ||
+          (segIndex2 === closeIdx && segIndex1 === 1)) {
         return true;
       }
     }
@@ -389,7 +390,7 @@ export class BasePolyline extends Entity {
    */
   closestPointOnSegment(point, segmentIndex) {
     const A = this.points[segmentIndex - 1];
-    const B = this.points[segmentIndex];
+    const B = this.points[segmentIndex % this.points.length];
 
     if (A.bulge !== 0) {
       const center = A.bulgeCentrePoint(B);
@@ -415,7 +416,7 @@ export class BasePolyline extends Entity {
    */
   positionOnSegment(point, segmentIndex) {
     const A = this.points[segmentIndex - 1];
-    const B = this.points[segmentIndex];
+    const B = this.points[segmentIndex % this.points.length];
 
     if (A.bulge !== 0) {
       const center = A.bulgeCentrePoint(B);

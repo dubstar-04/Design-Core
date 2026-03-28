@@ -229,6 +229,66 @@ test('ChamferFilletBase.applySharpTrim poly+poly closed polyline seg1+lastIdx: c
   expect(poly.points[0].y).toBeCloseTo(0);
 });
 
+test('ChamferFilletBase.applySharpTrim closed poly last-regular-seg + closing-seg: replaces last vertex', () => {
+  // Square: [( 0,0),(10,0),(10,10),(0,10)], closed.
+  // Segments: 1=(0,0)→(10,0), 2=(10,0)→(10,10), 3=(10,10)→(0,10), 4(closing)=(0,10)→(0,0).
+  // Corner at (0,10) shared by seg 3 and seg 4. segDiff=1 → corner-splice path.
+  // cornerIdx = min(3,4) = 3 → replaces points[3]=(0,10) with intersectionPoint (0,10).
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  const chamfer = new Chamfer();
+  chamfer.first.entity = polyEntity;
+  chamfer.second.entity = polyEntity;
+  chamfer.first.segmentIndex = 3;
+  chamfer.second.segmentIndex = 4; // closing segment (points.length)
+  chamfer.intersectionPoint = new Point(0, 10);
+
+  const stateChanges = chamfer.applySharpTrim();
+  DesignCore.Scene.commit(stateChanges);
+
+  const poly = core.scene.entities.get(0);
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[3].x).toBeCloseTo(0);
+  expect(poly.points[3].y).toBeCloseTo(10);
+  // Other vertices not affected
+  expect(poly.points[0].x).toBeCloseTo(0);
+  expect(poly.points[0].y).toBeCloseTo(0);
+});
+
+test('ChamferFilletBase.applySharpTrim closed poly closing-seg + seg-1: replaces first vertex (index 0)', () => {
+  // Same square. Corner at (0,0) shared by closing seg 4 and seg 1.
+  // segDiff = |4-1| = 3 (not 1), closing-wrap detected → cornerIdx = 0.
+  // Replaces points[0]=(0,0) with intersectionPoint (0,0).
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  const chamfer = new Chamfer();
+  chamfer.first.entity = polyEntity;
+  chamfer.second.entity = polyEntity;
+  chamfer.first.segmentIndex = 4; // closing segment
+  chamfer.second.segmentIndex = 1;
+  chamfer.intersectionPoint = new Point(0, 0);
+
+  const stateChanges = chamfer.applySharpTrim();
+  DesignCore.Scene.commit(stateChanges);
+
+  const poly = core.scene.entities.get(0);
+  expect(poly.points.length).toBe(4);
+  expect(poly.points[0].x).toBeCloseTo(0);
+  expect(poly.points[0].y).toBeCloseTo(0);
+  // Other vertices not affected
+  expect(poly.points[1].x).toBeCloseTo(10);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  // endpoints not moved (open-ends path must not fire)
+  expect(poly.points[3].x).toBeCloseTo(0);
+  expect(poly.points[3].y).toBeCloseTo(10);
+});
+
 // ─── applySharpTrim: Line + Poly ─────────────────────────────────────────────
 
 test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepStart: line consumed, poly start portion kept', () => {
