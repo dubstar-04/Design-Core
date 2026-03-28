@@ -85,6 +85,7 @@ export class Strings {
     END: 'Specify end point',
     POINT: 'Specify a point',
     DIMENSION: 'Specify dimension position',
+    CLOSE: 'Close',
     NEXTPOINT: 'Specify next point',
     RADIUS: 'Specify radius',
     DIAMETER: 'Specify diameter',
