@@ -1,7 +1,5 @@
-import { Point } from '../entities/point.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
-import { Constants } from '../lib/constants.js';
 
 import { DesignCore } from '../designCore.js';
 
