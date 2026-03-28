@@ -72,12 +72,11 @@ export class ChamferFilletBase extends Tool {
   applySharpTrim() {
     const firstIsPolyline = this.first.entity instanceof BasePolyline;
     const secondIsPolyline = this.second.entity instanceof BasePolyline;
-    const { intersectionPoint } = this;
     let stateChanges;
     if (!firstIsPolyline && !secondIsPolyline) {
       stateChanges = [
-        new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd(intersectionPoint), intersectionPoint] }),
-        new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd(intersectionPoint), intersectionPoint] }),
+        new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd(this.intersectionPoint), this.intersectionPoint] }),
+        new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd(this.intersectionPoint), this.intersectionPoint] }),
       ];
     } else if (firstIsPolyline && secondIsPolyline && this.first.entity === this.second.entity) {
       const lastIdx = this.first.entity.points.length - 1;
@@ -90,32 +89,32 @@ export class ChamferFilletBase extends Tool {
       const newPoints = this.first.entity.points.map((p) => p.clone());
 
       if (isOpenEnds) {
-        newPoints[0] = intersectionPoint.clone();
-        newPoints[lastIdx] = intersectionPoint.clone();
+        newPoints[0] = this.intersectionPoint.clone();
+        newPoints[lastIdx] = this.intersectionPoint.clone();
       } else {
         const closeSegIdx = this.first.entity.points.length;
         const seg1 = this.first.segmentIndex;
         const seg2 = this.second.segmentIndex;
         const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
         const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
-        newPoints.splice(cornerIdx, 1, intersectionPoint.clone());
+        newPoints.splice(cornerIdx, 1, this.intersectionPoint.clone());
       }
       stateChanges = [new UpdateState(this.first.entity, { points: newPoints })];
     } else {
       const [poly, line] = firstIsPolyline ? [this.first, this.second] : [this.second, this.first];
       const polySegIdx = poly.segmentIndex;
-      const keepStart = poly.keepStart(intersectionPoint);
+      const keepStart = poly.keepStart(this.intersectionPoint);
       let newPoints;
       if (keepStart) {
         newPoints = [
           ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
-          intersectionPoint.clone(),
-          line.lineKeptEnd(intersectionPoint).clone(),
+          this.intersectionPoint.clone(),
+          line.lineKeptEnd(this.intersectionPoint).clone(),
         ];
       } else {
         newPoints = [
-          line.lineKeptEnd(intersectionPoint).clone(),
-          intersectionPoint.clone(),
+          line.lineKeptEnd(this.intersectionPoint).clone(),
+          this.intersectionPoint.clone(),
           ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),
         ];
       }
