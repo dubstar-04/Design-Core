@@ -62,37 +62,31 @@ test('CornerEntity.resolveEndpoints returns false and leaves endpoints null for 
   expect(corner.lineEnd).toBeNull();
 });
 
-// ─── resolveSegment ───────────────────────────────────────────────────────────
+// ─── setEntity ────────────────────────────────────────────────────────────────
 
-test('CornerEntity.resolveSegment returns true without changes for a plain Line entity', () => {
+test('CornerEntity.setEntity returns true and clears segment for a plain Line entity', () => {
   core.scene.clear();
   core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   const line = core.scene.entities.get(0);
 
   const corner = new CornerEntity();
-  corner.entity = line;
-  corner.clickPoint = new Point(5, 0);
-
-  expect(corner.resolveSegment('error')).toBe(true);
+  expect(corner.setPick(line, new Point(5, 0), 'error')).toBe(true);
   expect(corner.segment).toBeNull();
   expect(corner.segmentIndex).toBeNull();
 });
 
-test('CornerEntity.resolveSegment sets segment and segmentIndex for a polyline straight segment', () => {
+test('CornerEntity.setEntity sets segment and segmentIndex for a polyline straight segment', () => {
   core.scene.clear();
   core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
   const poly = core.scene.entities.get(0);
 
   const corner = new CornerEntity();
-  corner.entity = poly;
-  corner.clickPoint = new Point(5, 0); // near first (horizontal) segment
-
-  expect(corner.resolveSegment('error')).toBe(true);
+  expect(corner.setPick(poly, new Point(5, 0), 'error')).toBe(true); // near first (horizontal) segment
   expect(corner.segment).toBeInstanceOf(Line);
   expect(corner.segmentIndex).toBe(1);
 });
 
-test('CornerEntity.resolveSegment notifies and returns false for a polyline arc segment', () => {
+test('CornerEntity.setEntity notifies and returns false for a polyline arc segment', () => {
   core.scene.clear();
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -102,12 +96,8 @@ test('CornerEntity.resolveSegment notifies and returns false for a polyline arc 
   core.scene.addItem('Lwpolyline', { points: [arcStart, new Point(10, 0)] });
   const poly = core.scene.entities.get(0);
 
-  const corner = new CornerEntity();
-  corner.entity = poly;
-  corner.clickPoint = new Point(5, 2);
-
   const errorMsg = 'arc segment error';
-  expect(corner.resolveSegment(errorMsg)).toBe(false);
+  expect(new CornerEntity().setPick(poly, new Point(5, 2), errorMsg)).toBe(false);
   expect(notifySpy).toHaveBeenCalledWith(errorMsg);
   notifySpy.mockRestore();
 });

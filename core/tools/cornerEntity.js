@@ -49,14 +49,23 @@ export class CornerEntity {
   }
 
   /**
-   * Resolve the entity to its closest straight segment.
-   * Populates segment and segmentIndex for polyline entities.
-   * Returns false and notifies the user if the closest segment is an arc.
+   * Set the entity and click point, then resolve the polyline segment.
+   * For polylines, populates segment and segmentIndex from the closest segment.
+   * For plain Lines, segment and segmentIndex are cleared to null.
+   * Returns false and notifies the user if the closest polyline segment is an arc.
+   * @param {object} entity - the selected entity
+   * @param {Point} clickPoint - the point where the user clicked
    * @param {string} arcSegmentErrorMsg - notification string shown when the segment is an arc
    * @return {boolean}
    */
-  resolveSegment(arcSegmentErrorMsg) {
-    if (!(this.entity instanceof BasePolyline)) return true;
+  setPick(entity, clickPoint, arcSegmentErrorMsg) {
+    this.entity = entity;
+    this.clickPoint = clickPoint;
+    if (!(this.entity instanceof BasePolyline)) {
+      this.segment = null;
+      this.segmentIndex = null;
+      return true;
+    }
     const index = this.entity.getClosestSegmentIndex(this.clickPoint);
     const segment = this.entity.getClosestSegment(this.clickPoint);
     if (!(segment instanceof Line)) {

@@ -1,6 +1,5 @@
 import { Strings } from '../lib/strings.js';
 import { ChamferFilletBase } from './chamferFilletBase.js';
-import { CornerEntity } from './cornerEntity.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Constants } from '../lib/constants.js';
@@ -68,9 +67,7 @@ export class Fillet extends ChamferFilletBase {
           DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOFILLET}`);
           continue;
         }
-        this.firstPick.entity = firstEntity;
-        this.firstPick.clickPoint = input1.selectedPoint;
-        if (!this.firstPick.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
+        if (!this.firstPick.setPick(firstEntity, input1.selectedPoint, `${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
 
         // Prompt for second object
         const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -84,27 +81,20 @@ export class Fillet extends ChamferFilletBase {
             DesignCore.Core.notify(`${candidate.type} ${Strings.Message.NOFILLET}`);
             continue;
           }
-          const secondCorner = new CornerEntity();
-          secondCorner.entity = candidate;
-          secondCorner.clickPoint = input2.selectedPoint;
-          if (!secondCorner.resolveSegment(`${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
+          if (!this.secondPick.setPick(candidate, input2.selectedPoint, `${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
           // If both selections are the same polyline, segments must be consecutive
           // or they must be the open-end segments of an open polyline.
           if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
-            const isConsecutive = firstEntity.areConsecutiveSegments(this.firstPick.segmentIndex, secondCorner.segmentIndex);
+            const isConsecutive = firstEntity.areConsecutiveSegments(this.firstPick.segmentIndex, this.secondPick.segmentIndex);
             const lastIdx = firstEntity.points.length - 1;
             const isOpenEnds = !firstEntity.flags.hasFlag(1) &&
-              ((this.firstPick.segmentIndex === 1 && secondCorner.segmentIndex === lastIdx) ||
-               (secondCorner.segmentIndex === 1 && this.firstPick.segmentIndex === lastIdx));
+              ((this.firstPick.segmentIndex === 1 && this.secondPick.segmentIndex === lastIdx) ||
+               (this.secondPick.segmentIndex === 1 && this.firstPick.segmentIndex === lastIdx));
             if (!isConsecutive && !isOpenEnds) {
               DesignCore.Core.notify(Strings.Message.NONCONSECUTIVESEGMENTS);
               continue;
             }
           }
-          this.secondPick.entity = candidate;
-          this.secondPick.clickPoint = input2.selectedPoint;
-          this.secondPick.segment = secondCorner.segment;
-          this.secondPick.segmentIndex = secondCorner.segmentIndex;
           break;
         }
 
