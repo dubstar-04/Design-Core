@@ -308,6 +308,8 @@ export class Fillet extends ChamferFilletBase {
     const keepStart = poly.keepStart(this.intersectionPoint);
     let newPoints;
     if (keepStart) {
+      // Keep the polyline points up to (not including) the selected segment start,
+      // then the arc start (with bulge), the line tangent point, and the kept end of the line.
       newPoints = [
         ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
         arcStartPoint,
@@ -315,6 +317,8 @@ export class Fillet extends ChamferFilletBase {
         line.lineKeptEnd(this.intersectionPoint).clone(),
       ];
     } else {
+      // Keep the polyline points from the selected segment start onwards,
+      // prepending the kept end of the line, the reversed arc start (with negated bulge), and the poly tangent point.
       const revArcStartPoint = lineTangentPoint.clone();
       revArcStartPoint.bulge = -bulge;
       newPoints = [
