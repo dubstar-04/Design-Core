@@ -13,7 +13,7 @@ export class Style {
     this.type = this.constructor.name;
     this.name = '';
     this.font = 'Arial'; // TODO: how to set the font to one that's available. See style.js also.
-    this.textHeight = 2.5;
+    this.textHeight = 0;
     this.widthFactor = 1;
     this.obliqueAngle = 0;
     this.lastTextHeight = this.textHeight;
@@ -29,7 +29,7 @@ export class Style {
     // DXF Groupcode 4 - big font
     this.bigFont = Property.loadValue([data?.bigFont, data?.[4]]);
     // DXF Groupcode 40 - Text height
-    this.textHeight = Property.loadValue([data?.textHeight, data?.[40]], 2.5);
+    this.textHeight = Property.loadValue([data?.textHeight, data?.[40]], 0);
     // DXF Groupcode 41 - width factor
     this.widthFactor = Property.loadValue([data?.widthFactor, data?.[41]], 1);
     // DXF Groupcode 42 - Last text height
