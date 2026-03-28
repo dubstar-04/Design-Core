@@ -205,14 +205,9 @@ export class Chamfer extends ChamferFilletBase {
       // firstChamferPoint. Choose the rotation that points toward line2 (positive
       // dot product with secondUnit).
       const rotAngle = Math.PI - alpha;
-      const candidate1 = new Point(
-          firstUnit.x * Math.cos(rotAngle) - firstUnit.y * Math.sin(rotAngle),
-          firstUnit.x * Math.sin(rotAngle) + firstUnit.y * Math.cos(rotAngle),
-      );
-      const chamferDir = candidate1.dot(secondUnit) >= 0 ? candidate1 : new Point(
-          firstUnit.x * Math.cos(-rotAngle) - firstUnit.y * Math.sin(-rotAngle),
-          firstUnit.x * Math.sin(-rotAngle) + firstUnit.y * Math.cos(-rotAngle),
-      );
+      const origin = new Point(0, 0);
+      const candidate1 = firstUnit.rotate(origin, rotAngle);
+      const chamferDir = candidate1.dot(secondUnit) >= 0 ? candidate1 : firstUnit.rotate(origin, -rotAngle);
 
       // Intersect chamfer ray from firstChamferPoint with the infinite line2
       const chamferCross = chamferDir.cross(this.secondPick.direction);
