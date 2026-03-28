@@ -37,7 +37,8 @@ export class Erase extends Tool {
       const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
 
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-        await DesignCore.Scene.inputManager.requestInput(op);
+        const result = await DesignCore.Scene.inputManager.requestInput(op);
+        if (result === undefined) return;
       }
 
       DesignCore.Scene.inputManager.executeCommand();
