@@ -57,7 +57,7 @@ export class Circle extends Entity {
    */
   async execute() {
     try {
-      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const op = new PromptOptions(Strings.Input.CENTER, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
       if (pt1 === undefined) return;
       this.points.push(pt1);
