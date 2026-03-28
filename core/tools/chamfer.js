@@ -178,6 +178,8 @@ export class Chamfer extends ChamferFilletBase {
     }
 
     // Compute the two chamfer endpoints on each line
+    const firstUnit = this.first.clickUnit(this.intersectionPoint);
+    const secondUnit = this.second.clickUnit(this.intersectionPoint);
     let firstChamferPoint;
     let secondChamferPoint;
 
@@ -185,12 +187,12 @@ export class Chamfer extends ChamferFilletBase {
       // Distance method: measure distA along line1 and distB along line2 from intersection
       const distB = DesignCore.Scene.headers.chamferDistanceB;
       firstChamferPoint = new Point(
-          this.intersectionPoint.x + this.first.clickUnit.x * distA,
-          this.intersectionPoint.y + this.first.clickUnit.y * distA,
+          this.intersectionPoint.x + firstUnit.x * distA,
+          this.intersectionPoint.y + firstUnit.y * distA,
       );
       secondChamferPoint = new Point(
-          this.intersectionPoint.x + this.second.clickUnit.x * distB,
-          this.intersectionPoint.y + this.second.clickUnit.y * distB,
+          this.intersectionPoint.x + secondUnit.x * distB,
+          this.intersectionPoint.y + secondUnit.y * distB,
       );
     } else {
       // Angle method: measure distA along line1, then project using chamferAngle to find
@@ -204,21 +206,21 @@ export class Chamfer extends ChamferFilletBase {
       }
 
       firstChamferPoint = new Point(
-          this.intersectionPoint.x + this.first.clickUnit.x * distA,
-          this.intersectionPoint.y + this.first.clickUnit.y * distA,
+          this.intersectionPoint.x + firstUnit.x * distA,
+          this.intersectionPoint.y + firstUnit.y * distA,
       );
 
-      // Rotate this.first.clickUnit by ±(π - alpha) to get the chamfer direction from
+      // Rotate firstUnit by ±(π - alpha) to get the chamfer direction from
       // firstChamferPoint. Choose the rotation that points toward line2 (positive
-      // dot product with secondClickUnit).
+      // dot product with secondUnit).
       const rotAngle = Math.PI - alpha;
       const candidate1 = new Point(
-          this.first.clickUnit.x * Math.cos(rotAngle) - this.first.clickUnit.y * Math.sin(rotAngle),
-          this.first.clickUnit.x * Math.sin(rotAngle) + this.first.clickUnit.y * Math.cos(rotAngle),
+          firstUnit.x * Math.cos(rotAngle) - firstUnit.y * Math.sin(rotAngle),
+          firstUnit.x * Math.sin(rotAngle) + firstUnit.y * Math.cos(rotAngle),
       );
-      const chamferDir = candidate1.dot(this.second.clickUnit) >= 0 ? candidate1 : new Point(
-          this.first.clickUnit.x * Math.cos(-rotAngle) - this.first.clickUnit.y * Math.sin(-rotAngle),
-          this.first.clickUnit.x * Math.sin(-rotAngle) + this.first.clickUnit.y * Math.cos(-rotAngle),
+      const chamferDir = candidate1.dot(secondUnit) >= 0 ? candidate1 : new Point(
+          firstUnit.x * Math.cos(-rotAngle) - firstUnit.y * Math.sin(-rotAngle),
+          firstUnit.x * Math.sin(-rotAngle) + firstUnit.y * Math.cos(-rotAngle),
       );
 
       // Intersect chamfer ray from firstChamferPoint with the infinite line2
@@ -240,8 +242,8 @@ export class Chamfer extends ChamferFilletBase {
     // not beyond the kept endpoints.  Uses the same dot-product approach as Fillet so
     // that segments are treated as infinite lines (extensions are allowed).
     if (trimMode) {
-      const firstKeptDir = this.first.lineKeptEnd.subtract(this.intersectionPoint);
-      const secondKeptDir = this.second.lineKeptEnd.subtract(this.intersectionPoint);
+      const firstKeptDir = this.first.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
+      const secondKeptDir = this.second.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
       const firstChamferDot = firstChamferPoint.subtract(this.intersectionPoint).dot(firstKeptDir);
       const secondChamferDot = secondChamferPoint.subtract(this.intersectionPoint).dot(secondKeptDir);
       if (firstChamferDot < 0 || firstChamferDot > firstKeptDir.dot(firstKeptDir) ||
@@ -269,8 +271,8 @@ export class Chamfer extends ChamferFilletBase {
     if (trimMode) {
       if (!firstIsPolyline && !secondIsPolyline) {
         // Line + Line: trim both lines
-        stateChanges.push(new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd, firstChamferPoint] }));
-        stateChanges.push(new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd, secondChamferPoint] }));
+        stateChanges.push(new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd(this.intersectionPoint), firstChamferPoint] }));
+        stateChanges.push(new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd(this.intersectionPoint), secondChamferPoint] }));
       } else if (firstIsPolyline && secondIsPolyline && this.first.entity === this.second.entity) {
         const closeSegIdx = this.first.entity.points.length;
         const lastIdx = closeSegIdx - 1;
@@ -317,12 +319,12 @@ export class Chamfer extends ChamferFilletBase {
             ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
             polyChamferPoint.clone(),
             lineChamferPoint.clone(),
-            line.lineKeptEnd.clone(),
+            line.lineKeptEnd(this.intersectionPoint).clone(),
           ];
         } else {
           // Keep end portion: line end, then chamfer, then points[polySegIdx..end]
           newPoints = [
-            line.lineKeptEnd.clone(),
+            line.lineKeptEnd(this.intersectionPoint).clone(),
             lineChamferPoint.clone(),
             polyChamferPoint.clone(),
             ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),

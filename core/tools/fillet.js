@@ -144,7 +144,9 @@ export class Fillet extends ChamferFilletBase {
     }
 
     // Angle between the two clicked-side direction vectors (i.e. the opening angle of the chosen corner)
-    const cosAngle = Math.min(1, Math.max(-1, this.first.clickUnit.dot(this.second.clickUnit)));
+    const firstUnit = this.first.clickUnit(this.intersectionPoint);
+    const secondUnit = this.second.clickUnit(this.intersectionPoint);
+    const cosAngle = Math.min(1, Math.max(-1, firstUnit.dot(secondUnit)));
     const cornerAngle = Math.acos(cosAngle);
 
     // Collinear or antiparallel lines cannot be filleted
@@ -154,9 +156,7 @@ export class Fillet extends ChamferFilletBase {
     }
 
     // Bisector unit vector: points into the chosen corner toward the fillet centre
-    const bisectorSum = this.first.clickUnit.add(this.second.clickUnit);
-    const bisectorLength = Math.sqrt(bisectorSum.x ** 2 + bisectorSum.y ** 2);
-    const bisectorUnit = new Point(bisectorSum.x / bisectorLength, bisectorSum.y / bisectorLength);
+    const bisectorUnit = firstUnit.add(secondUnit).normalise();
 
     // Distance from the intersection point to the fillet centre along the bisector
     const intersectToCentreDistance = filletRadius / Math.sin(cornerAngle / 2);
@@ -174,8 +174,8 @@ export class Fillet extends ChamferFilletBase {
     // Verify the tangent points are reachable — same direction as the kept end from the
     // intersection and not farther than the kept end (which would flip the line direction).
     if (trimMode) {
-      const firstKeptDir = this.first.lineKeptEnd.subtract(this.intersectionPoint);
-      const secondKeptDir = this.second.lineKeptEnd.subtract(this.intersectionPoint);
+      const firstKeptDir = this.first.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
+      const secondKeptDir = this.second.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
       const firstTangentDot = firstTangentPoint.subtract(this.intersectionPoint).dot(firstKeptDir);
       const secondTangentDot = secondTangentPoint.subtract(this.intersectionPoint).dot(secondKeptDir);
       if (firstTangentDot < 0 || firstTangentDot > firstKeptDir.dot(firstKeptDir) ||
@@ -228,8 +228,8 @@ export class Fillet extends ChamferFilletBase {
   #trimLineAndLine(firstTangentPoint, secondTangentPoint, arc) {
     return [
       new AddState(arc),
-      new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd, firstTangentPoint] }),
-      new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd, secondTangentPoint] }),
+      new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd(this.intersectionPoint), firstTangentPoint] }),
+      new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd(this.intersectionPoint), secondTangentPoint] }),
     ];
   }
 
@@ -316,13 +316,13 @@ export class Fillet extends ChamferFilletBase {
         ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
         arcStartPoint,
         lineTangentPoint.clone(),
-        line.lineKeptEnd.clone(),
+        line.lineKeptEnd(this.intersectionPoint).clone(),
       ];
     } else {
       const revArcStartPoint = lineTangentPoint.clone();
       revArcStartPoint.bulge = -bulge;
       newPoints = [
-        line.lineKeptEnd.clone(),
+        line.lineKeptEnd(this.intersectionPoint).clone(),
         revArcStartPoint,
         polyTangentPoint.clone(),
         ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),

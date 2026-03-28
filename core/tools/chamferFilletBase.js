@@ -54,8 +54,8 @@ export class ChamferFilletBase extends Tool {
     const intersectParam = startDiff.cross(this.second.direction) / directionCross;
     this.intersectionPoint = this.first.lineStart.lerp(this.first.lineEnd, intersectParam);
 
-    if (!this.first.resolveGeometry(this.intersectionPoint) ||
-        !this.second.resolveGeometry(this.intersectionPoint)) {
+    if (this.first.clickDistance(this.intersectionPoint) < Constants.Tolerance.EPSILON ||
+        this.second.clickDistance(this.intersectionPoint) < Constants.Tolerance.EPSILON) {
       DesignCore.Core.notify(Strings.Error.SELECTION);
       return false;
     }
@@ -76,8 +76,8 @@ export class ChamferFilletBase extends Tool {
     let stateChanges;
     if (!firstIsPolyline && !secondIsPolyline) {
       stateChanges = [
-        new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd, intersectionPoint] }),
-        new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd, intersectionPoint] }),
+        new UpdateState(this.first.entity, { points: [this.first.lineKeptEnd(intersectionPoint), intersectionPoint] }),
+        new UpdateState(this.second.entity, { points: [this.second.lineKeptEnd(intersectionPoint), intersectionPoint] }),
       ];
     } else if (firstIsPolyline && secondIsPolyline && this.first.entity === this.second.entity) {
       const lastIdx = this.first.entity.points.length - 1;
@@ -86,7 +86,9 @@ export class ChamferFilletBase extends Tool {
         (this.first.segmentIndex === 1 && this.second.segmentIndex === lastIdx) ||
         (this.first.segmentIndex === lastIdx && this.second.segmentIndex === 1)
       );
+
       const newPoints = this.first.entity.points.map((p) => p.clone());
+
       if (isOpenEnds) {
         newPoints[0] = intersectionPoint.clone();
         newPoints[lastIdx] = intersectionPoint.clone();
@@ -108,11 +110,11 @@ export class ChamferFilletBase extends Tool {
         newPoints = [
           ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
           intersectionPoint.clone(),
-          line.lineKeptEnd.clone(),
+          line.lineKeptEnd(intersectionPoint).clone(),
         ];
       } else {
         newPoints = [
-          line.lineKeptEnd.clone(),
+          line.lineKeptEnd(intersectionPoint).clone(),
           intersectionPoint.clone(),
           ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),
         ];

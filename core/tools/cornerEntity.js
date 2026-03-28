@@ -21,10 +21,6 @@ export class CornerEntity {
     // Geometry set by resolveCornerGeometry() before action()
     this.lineStart = null;
     this.lineEnd = null;
-    this.clickDir = null;
-    this.clickDistance = null;
-    this.clickUnit = null;
-    this.lineKeptEnd = null;
   }
   /**
    * The direction vector of the line segment (lineEnd − lineStart).
@@ -75,21 +71,50 @@ export class CornerEntity {
   }
 
   /**
-   * Compute click-side geometry relative to the corner intersection point.
-   * Populates clickDistance, clickDir, clickUnit, and lineKeptEnd.
-   * Requires lineStart and lineEnd to be set first.
-   * Returns false when the click projects to the intersection point (zero-distance — ambiguous corner).
-   * @param {Point} intersectionPoint - the virtual intersection of the two lines
-   * @return {boolean}
+   * The perpendicular foot of clickPoint onto the line defined by lineStart/lineEnd.
+   * @return {Point}
    */
-  resolveGeometry(intersectionPoint) {
-    const clickOnLine = this.clickPoint.perpendicular(this.lineStart, this.lineEnd);
-    this.clickDistance = clickOnLine.distance(intersectionPoint);
-    if (this.clickDistance < Constants.Tolerance.EPSILON) return false;
-    this.clickDir = clickOnLine.subtract(intersectionPoint);
-    this.lineKeptEnd = this.clickDir.dot(this.lineStart.subtract(intersectionPoint)) >= this.clickDir.dot(this.lineEnd.subtract(intersectionPoint)) ? this.lineStart : this.lineEnd;
-    this.clickUnit = new Point(this.clickDir.x / this.clickDistance, this.clickDir.y / this.clickDistance);
-    return true;
+  get #clickOnLine() {
+    return this.clickPoint.perpendicular(this.lineStart, this.lineEnd);
+  }
+
+  /**
+   * Distance from the perpendicular foot to the intersection point.
+   * A value below Constants.Tolerance.EPSILON indicates an ambiguous corner.
+   * @param {Point} intersectionPoint - the corner intersection point
+   * @return {number}
+   */
+  clickDistance(intersectionPoint) {
+    return this.#clickOnLine.distance(intersectionPoint);
+  }
+
+  /**
+   * Vector from the intersection point toward the perpendicular foot (i.e. toward the click side).
+   * @param {Point} intersectionPoint - the corner intersection point
+   * @return {Point}
+   */
+  clickDir(intersectionPoint) {
+    return this.#clickOnLine.subtract(intersectionPoint);
+  }
+
+  /**
+   * Unit vector in the clickDir direction.
+   * @param {Point} intersectionPoint - the corner intersection point
+   * @return {Point}
+   */
+  clickUnit(intersectionPoint) {
+    return this.clickDir(intersectionPoint).normalise();
+  }
+
+  /**
+   * The line endpoint on the same side of the intersection as the click.
+   * @param {Point} intersectionPoint - the corner intersection point
+   * @return {Point}
+   */
+  lineKeptEnd(intersectionPoint) {
+    const dir = this.clickDir(intersectionPoint);
+    return dir.dot(this.lineStart.subtract(intersectionPoint)) >= dir.dot(this.lineEnd.subtract(intersectionPoint)) ?
+      this.lineStart : this.lineEnd;
   }
 
   /**
@@ -100,6 +125,7 @@ export class CornerEntity {
   keepStart(intersectionPoint) {
     const segStart = this.entity.points[this.segmentIndex - 1];
     const segEnd = this.entity.points[this.segmentIndex];
-    return this.clickDir.dot(segStart.subtract(intersectionPoint)) >= this.clickDir.dot(segEnd.subtract(intersectionPoint));
+    const dir = this.clickDir(intersectionPoint);
+    return dir.dot(segStart.subtract(intersectionPoint)) >= dir.dot(segEnd.subtract(intersectionPoint));
   }
 }
