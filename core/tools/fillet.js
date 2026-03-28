@@ -4,7 +4,6 @@ import { CornerEntity } from './cornerEntity.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Constants } from '../lib/constants.js';
-import { Point } from '../entities/point.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
