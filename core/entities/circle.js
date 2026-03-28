@@ -64,7 +64,6 @@ export class Circle extends Entity {
 
       const op2 = new PromptOptions(Strings.Input.RADIUS, [Input.Type.POINT, Input.Type.NUMBER], ['Diameter']);
 
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
         if (pt2 === undefined) return;
@@ -85,7 +84,6 @@ export class Circle extends Entity {
           break;
         } else if (Input.getType(pt2) === Input.Type.STRING && pt2 === 'Diameter') {
           const op3 = new PromptOptions(Strings.Input.DIAMETER, [Input.Type.NUMBER]);
-          // eslint-disable-next-line no-constant-condition
           while (true) {
             const diameter = await DesignCore.Scene.inputManager.requestInput(op3);
             if (diameter === undefined) return;

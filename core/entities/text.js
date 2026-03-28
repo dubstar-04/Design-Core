@@ -182,7 +182,6 @@ export class Text extends Entity {
       // Get the font size when the style has a variable height (textHeight === 0)
       if (!style?.textHeight) {
         const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
-        // eslint-disable-next-line no-constant-condition
         while (true) {
           const height = await DesignCore.Scene.inputManager.requestInput(op2);
           if (height === undefined) return;

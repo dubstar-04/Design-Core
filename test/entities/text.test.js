@@ -624,7 +624,9 @@ test('Text.execute does not create entity for empty string', async () => {
     await text.execute();
 
     expect(text.string).toBe('');
-  }, { extraMethods: { executeCommand: () => { executeCommandCalled = true; } } });
+  }, { extraMethods: { executeCommand: () => {
+    executeCommandCalled = true;
+  } } });
 
   expect(executeCommandCalled).toBe(false);
 });
