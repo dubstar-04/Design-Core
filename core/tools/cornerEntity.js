@@ -124,7 +124,7 @@ export class CornerEntity {
    */
   keepStart(intersectionPoint) {
     const segStart = this.entity.points[this.segmentIndex - 1];
-    const segEnd = this.entity.points[this.segmentIndex];
+    const segEnd = this.entity.points[this.segmentIndex % this.entity.points.length];
     const dir = this.clickDir(intersectionPoint);
     return dir.dot(segStart.subtract(intersectionPoint)) >= dir.dot(segEnd.subtract(intersectionPoint));
   }

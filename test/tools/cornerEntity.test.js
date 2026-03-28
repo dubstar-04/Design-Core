@@ -189,3 +189,23 @@ test('CornerEntity.keepStart returns false when segment end is on the click side
 
   expect(corner.keepStart(new Point(0, 0))).toBe(false);
 });
+
+test('CornerEntity.keepStart handles closing segment of closed polyline (segmentIndex === points.length)', () => {
+  // Closed polyline: (0,0)→(10,0)→(10,10), closing segment is index 3 (back to (0,0))
+  // segmentIndex === points.length wraps segEnd to points[0] = (0,0)
+  // lineStart=(10,10), lineEnd=(0,0), click at (9,9), intersection=(10,0)
+  // clickOnLine=(10,9.something...) but we just need keepStart not to throw
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
+  const poly = core.scene.entities.get(0);
+
+  const corner = new CornerEntity();
+  corner.entity = poly;
+  corner.segmentIndex = poly.points.length; // closing segment
+  corner.lineStart = new Point(10, 10);
+  corner.lineEnd = new Point(0, 0);
+  corner.clickPoint = new Point(9, 9);
+
+  // Should not throw; segEnd wraps to points[0] = (0,0)
+  expect(() => corner.keepStart(new Point(10, 0))).not.toThrow();
+});
