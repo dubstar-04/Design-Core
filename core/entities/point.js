@@ -116,6 +116,16 @@ export class Point {
   }
 
   /**
+   * Return a new unit vector in the same direction as this.
+   * (Divides each component by the vector's magnitude.)
+   * @return {Point}
+   */
+  normalise() {
+    const length = Math.sqrt(this.x ** 2 + this.y ** 2);
+    return new Point(this.x / length, this.y / length);
+  }
+
+  /**
    * Return new point with minimum values for x and y from this and that
    * @param  {Point} that
    * @return {Point}
