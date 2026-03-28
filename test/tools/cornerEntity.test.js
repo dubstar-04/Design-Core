@@ -112,9 +112,9 @@ test('CornerEntity.resolveSegment notifies and returns false for a polyline arc 
   notifySpy.mockRestore();
 });
 
-// ─── resolveGeometry ─────────────────────────────────────────────────────────
+// ─── click-side geometry getters ─────────────────────────────────────────────
 
-test('CornerEntity.resolveGeometry populates all click-side geometry fields', () => {
+test('CornerEntity click-side geometry methods return correct values', () => {
   // Horizontal line (0,0)→(10,0), intersection at (5,0), click at (3,2)
   // clickOnLine = perpendicular foot of (3,2) on the line = (3,0)
   // clickDir = (3,0)−(5,0) = (−2,0)
@@ -124,45 +124,41 @@ test('CornerEntity.resolveGeometry populates all click-side geometry fields', ()
   corner.lineStart = new Point(0, 0);
   corner.lineEnd = new Point(10, 0);
   corner.clickPoint = new Point(3, 2);
+  const ip = new Point(5, 0);
 
-  corner.resolveGeometry(new Point(5, 0));
-
-  expect(corner.clickDistance).toBeCloseTo(2);
-  expect(corner.clickDir.x).toBeCloseTo(-2);
-  expect(corner.clickDir.y).toBeCloseTo(0);
-  expect(corner.clickUnit.x).toBeCloseTo(-1);
-  expect(corner.clickUnit.y).toBeCloseTo(0);
-  expect(corner.lineKeptEnd).toBe(corner.lineStart);
+  expect(corner.clickDistance(ip)).toBeCloseTo(2);
+  expect(corner.clickDir(ip).x).toBeCloseTo(-2);
+  expect(corner.clickDir(ip).y).toBeCloseTo(0);
+  expect(corner.clickUnit(ip).x).toBeCloseTo(-1);
+  expect(corner.clickUnit(ip).y).toBeCloseTo(0);
+  expect(corner.lineKeptEnd(ip)).toBe(corner.lineStart);
 });
 
-test('CornerEntity.resolveGeometry returns false when click projects to intersection point', () => {
-  // clickOnLine = (5,0) = intersectionPoint → clickDistance = 0 → division by zero guard
+test('CornerEntity.clickDistance is near zero when click projects exactly to intersection', () => {
+  // clickOnLine = (5,0) = intersectionPoint → clickDistance = 0 → ambiguous corner
   const corner = new CornerEntity();
   corner.lineStart = new Point(0, 0);
   corner.lineEnd = new Point(10, 0);
-  corner.clickPoint = new Point(5, 0); // exactly on the line at the intersection
+  corner.clickPoint = new Point(5, 0);
 
-  expect(corner.resolveGeometry(new Point(5, 0))).toBe(false);
-  expect(corner.clickUnit).toBeNull();
+  expect(corner.clickDistance(new Point(5, 0))).toBeCloseTo(0);
 });
 
-test('CornerEntity.resolveGeometry selects lineEnd as kept end when click is past intersection', () => {
+test('CornerEntity.lineKeptEnd is lineEnd when click is past intersection', () => {
   // Click at (8,1): clickOnLine = (8,0), clickDir from (5,0) = (3,0) → points toward end
   const corner = new CornerEntity();
   corner.lineStart = new Point(0, 0);
   corner.lineEnd = new Point(10, 0);
   corner.clickPoint = new Point(8, 1);
 
-  corner.resolveGeometry(new Point(5, 0));
-
-  expect(corner.lineKeptEnd).toBe(corner.lineEnd);
+  expect(corner.lineKeptEnd(new Point(5, 0))).toBe(corner.lineEnd);
 });
 
 // ─── keepStart ───────────────────────────────────────────────────────────────
 
 test('CornerEntity.keepStart returns true when segment start is on the click side', () => {
-  // Polyline: (0,0)→(10,0)→(10,10), segmentIndex=1, intersection=(10,0)
-  // clickDir=(−1,0): dot with segStart−int=(−10,0) = 10, dot with segEnd−int=(0,0) = 0 → true
+  // Polyline: (0,0)→(10,0)→(10,10), click at (3,2), intersection=(10,0)
+  // clickOnLine=(3,0), clickDir=(−7,0) → points toward start side
   core.scene.clear();
   core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
   const poly = core.scene.entities.get(0);
@@ -170,14 +166,16 @@ test('CornerEntity.keepStart returns true when segment start is on the click sid
   const corner = new CornerEntity();
   corner.entity = poly;
   corner.segmentIndex = 1;
-  corner.clickDir = new Point(-1, 0);
+  corner.lineStart = new Point(0, 0);
+  corner.lineEnd = new Point(10, 0);
+  corner.clickPoint = new Point(3, 2);
 
   expect(corner.keepStart(new Point(10, 0))).toBe(true);
 });
 
 test('CornerEntity.keepStart returns false when segment end is on the click side', () => {
-  // Same polyline, segmentIndex=1, intersection=(0,0)
-  // clickDir=(1,0): dot with segStart−int=(0,0) = 0, dot with segEnd−int=(10,0) = 10 → false
+  // Same polyline, click at (8,2), intersection=(0,0)
+  // clickOnLine=(8,0), clickDir=(8,0) → points toward end side
   core.scene.clear();
   core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
   const poly = core.scene.entities.get(0);
@@ -185,7 +183,9 @@ test('CornerEntity.keepStart returns false when segment end is on the click side
   const corner = new CornerEntity();
   corner.entity = poly;
   corner.segmentIndex = 1;
-  corner.clickDir = new Point(1, 0);
+  corner.lineStart = new Point(0, 0);
+  corner.lineEnd = new Point(10, 0);
+  corner.clickPoint = new Point(8, 2);
 
   expect(corner.keepStart(new Point(0, 0))).toBe(false);
 });

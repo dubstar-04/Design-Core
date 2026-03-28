@@ -76,13 +76,13 @@ test('ChamferFilletBase.resolveCornerGeometry returns true and computes intersec
   expect(chamfer.intersectionPoint.x).toBeCloseTo(0);
   expect(chamfer.intersectionPoint.y).toBeCloseTo(0);
   // Click on line1 is to the left of intersection → clickUnit points left
-  expect(chamfer.first.clickUnit.x).toBeCloseTo(-1);
-  expect(chamfer.first.clickUnit.y).toBeCloseTo(0);
-  expect(chamfer.first.lineKeptEnd).toBe(chamfer.first.entity.points[0]); // (-10,0)
+  expect(chamfer.first.clickUnit(chamfer.intersectionPoint).x).toBeCloseTo(-1);
+  expect(chamfer.first.clickUnit(chamfer.intersectionPoint).y).toBeCloseTo(0);
+  expect(chamfer.first.lineKeptEnd(chamfer.intersectionPoint)).toBe(chamfer.first.entity.points[0]); // (-10,0)
   // Click on line2 is above intersection → clickUnit points up
-  expect(chamfer.second.clickUnit.x).toBeCloseTo(0);
-  expect(chamfer.second.clickUnit.y).toBeCloseTo(1);
-  expect(chamfer.second.lineKeptEnd).toBe(chamfer.second.entity.points[1]); // (0,10)
+  expect(chamfer.second.clickUnit(chamfer.intersectionPoint).x).toBeCloseTo(0);
+  expect(chamfer.second.clickUnit(chamfer.intersectionPoint).y).toBeCloseTo(1);
+  expect(chamfer.second.lineKeptEnd(chamfer.intersectionPoint)).toBe(chamfer.second.entity.points[1]); // (0,10)
 });
 
 test('ChamferFilletBase.resolveCornerGeometry uses polyline activeSeg for first entity', () => {
@@ -122,9 +122,13 @@ test('ChamferFilletBase.applySharpTrim trims two Lines to the intersection point
 
   const chamfer = new Chamfer();
   chamfer.first.entity = lineA;
+  chamfer.first.lineStart = lineA.points[0]; // (0,0)
+  chamfer.first.lineEnd = lineA.points[1]; // (8,0)
+  chamfer.first.clickPoint = new Point(3, 2); // projects to (3,0) → lineKeptEnd = (0,0)
   chamfer.second.entity = lineB;
-  chamfer.first.lineKeptEnd = lineA.points[0]; // (0,0) — far end
-  chamfer.second.lineKeptEnd = lineB.points[0]; // (10,-10) — far end
+  chamfer.second.lineStart = lineB.points[0]; // (10,-10)
+  chamfer.second.lineEnd = lineB.points[1]; // (10,-2)
+  chamfer.second.clickPoint = new Point(8, -7); // projects to (10,-7) → lineKeptEnd = (10,-10)
   chamfer.intersectionPoint = new Point(10, 0);
 
   const stateChanges = chamfer.applySharpTrim();
@@ -293,7 +297,7 @@ test('ChamferFilletBase.applySharpTrim closed poly closing-seg + seg-1: replaces
 
 test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepStart: line consumed, poly start portion kept', () => {
   // Line: (0,0)→(0,10); Poly: [(-20,0),(-10,0),(0,0),(10,0)].
-  // second=Poly, segmentIndex=2 (segment (-10,0)→(0,0)), clickDir=(-1,0) → keepStart.
+  // second=Poly, segmentIndex=2 (segment (-10,0)→(0,0)), click left of intersection → keepStart.
   // Result: Poly becomes [(-20,0),(-10,0),(0,0),(0,10)]; Line removed.
   core.scene.clear();
   core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
@@ -303,11 +307,16 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepStart: line co
 
   const chamfer = new Chamfer();
   chamfer.first.entity = lineEntity;
-  chamfer.first.lineKeptEnd = new Point(0, 10);
+  chamfer.first.lineStart = lineEntity.points[0]; // (0,0)
+  chamfer.first.lineEnd = lineEntity.points[1]; // (0,10)
+  chamfer.first.clickPoint = new Point(-1, 5); // projects to (0,5) → lineKeptEnd = (0,10)
   chamfer.second.entity = polyEntity;
   chamfer.second.segmentIndex = 2;
-  chamfer.second.clickDir = new Point(-1, 0);
+  chamfer.second.lineStart = new Point(-10, 0); // polyEntity.points[1]
+  chamfer.second.lineEnd = new Point(0, 0); // polyEntity.points[2]
+  chamfer.second.clickPoint = new Point(-5, 2); // projects to (-5,0) → clickDir toward start
   chamfer.intersectionPoint = new Point(0, 0);
+
 
   const stateChanges = chamfer.applySharpTrim();
   DesignCore.Scene.commit(stateChanges);
@@ -326,7 +335,7 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepStart: line co
 });
 
 test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepEnd: line consumed, poly end portion kept', () => {
-  // Same setup, but segmentIndex=3. clickDir=(1,0) points toward (10,0) → keepEnd.
+  // Same setup, but segmentIndex=3. click right of intersection → keepEnd.
   // Result: Poly becomes [(0,10),(0,0),(10,0)]; Line removed.
   core.scene.clear();
   core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
@@ -336,11 +345,16 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepEnd: line cons
 
   const chamfer = new Chamfer();
   chamfer.first.entity = lineEntity;
-  chamfer.first.lineKeptEnd = new Point(0, 10);
+  chamfer.first.lineStart = lineEntity.points[0]; // (0,0)
+  chamfer.first.lineEnd = lineEntity.points[1]; // (0,10)
+  chamfer.first.clickPoint = new Point(-1, 5); // projects to (0,5) → lineKeptEnd = (0,10)
   chamfer.second.entity = polyEntity;
   chamfer.second.segmentIndex = 3;
-  chamfer.second.clickDir = new Point(1, 0);
+  chamfer.second.lineStart = new Point(0, 0); // polyEntity.points[2]
+  chamfer.second.lineEnd = new Point(10, 0); // polyEntity.points[3]
+  chamfer.second.clickPoint = new Point(6, 2); // projects to (6,0) → clickDir toward end
   chamfer.intersectionPoint = new Point(0, 0);
+
 
   const stateChanges = chamfer.applySharpTrim();
   DesignCore.Scene.commit(stateChanges);
@@ -371,10 +385,15 @@ test('ChamferFilletBase.applySharpTrim first=Poly second=Line: poly/line orderin
   const chamfer = new Chamfer();
   chamfer.first.entity = polyEntity;
   chamfer.first.segmentIndex = 2;
-  chamfer.first.clickDir = new Point(-1, 0);
+  chamfer.first.lineStart = new Point(-10, 0); // polyEntity.points[1]
+  chamfer.first.lineEnd = new Point(0, 0); // polyEntity.points[2]
+  chamfer.first.clickPoint = new Point(-5, 2); // projects to (-5,0) → clickDir toward start
   chamfer.second.entity = lineEntity;
-  chamfer.second.lineKeptEnd = new Point(0, 10);
+  chamfer.second.lineStart = lineEntity.points[0]; // (0,0)
+  chamfer.second.lineEnd = lineEntity.points[1]; // (0,10)
+  chamfer.second.clickPoint = new Point(-1, 5); // projects to (0,5) → lineKeptEnd = (0,10)
   chamfer.intersectionPoint = new Point(0, 0);
+
 
   const stateChanges = chamfer.applySharpTrim();
   DesignCore.Scene.commit(stateChanges);
