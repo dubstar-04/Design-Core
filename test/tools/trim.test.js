@@ -268,7 +268,7 @@ test('Test Trim.action polyline - trim end segment', () => {
   for (let i = 0; i < core.scene.entities.count(); i++) {
     const entity = core.scene.entities.get(i);
     if (entity.type === 'Line') boundary = entity;
-    if (entity.type === 'Lwpolyline') trimmed = entity;
+    if (entity.type === 'Polyline') trimmed = entity;
   }
 
   // Boundary line unchanged
@@ -308,7 +308,7 @@ test('Test Trim.action polyline - trim start segment', () => {
   // Find trimmed polyline by type
   let trimmed;
   for (let i = 0; i < core.scene.entities.count(); i++) {
-    if (core.scene.entities.get(i).type === 'Lwpolyline') {
+    if (core.scene.entities.get(i).type === 'Polyline') {
       trimmed = core.scene.entities.get(i);
     }
   }
@@ -349,7 +349,7 @@ test('Test Trim.action polyline - trim middle segment', () => {
   const polylines = [];
   for (let i = 0; i < core.scene.entities.count(); i++) {
     const entity = core.scene.entities.get(i);
-    if (entity.type === 'Lwpolyline') {
+    if (entity.type === 'Polyline') {
       polylines.push(entity);
     }
   }
@@ -397,7 +397,7 @@ test('Test Trim.action polyline - trim bulged arc segment', () => {
   // Find the trimmed polyline
   let trimmed;
   for (let i = 0; i < core.scene.entities.count(); i++) {
-    if (core.scene.entities.get(i).type === 'Lwpolyline') {
+    if (core.scene.entities.get(i).type === 'Polyline') {
       trimmed = core.scene.entities.get(i);
     }
   }
