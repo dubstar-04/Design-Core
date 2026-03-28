@@ -324,7 +324,7 @@ test('Chamfer.action notifies when click coincides with intersection', () => {
   chamfer.second.clickPoint = new Point(0, 5);
   chamfer.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOCHAMFER));
+  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.SELECTION);
   expect(core.scene.entities.count()).toBe(2);
   notifySpy.mockRestore();
 });

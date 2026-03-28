@@ -77,14 +77,18 @@ export class CornerEntity {
    * Compute click-side geometry relative to the corner intersection point.
    * Populates clickDistance, clickDir, clickUnit, and lineKeptEnd.
    * Requires lineStart and lineEnd to be set first.
+   * Returns false when the click projects to the intersection point (zero-distance — ambiguous corner).
    * @param {Point} intersectionPoint - the virtual intersection of the two lines
+   * @return {boolean}
    */
   resolveGeometry(intersectionPoint) {
     const clickOnLine = this.clickPoint.perpendicular(this.lineStart, this.lineEnd);
     this.clickDistance = clickOnLine.distance(intersectionPoint);
+    if (this.clickDistance < 1e-10) return false;
     this.clickDir = clickOnLine.subtract(intersectionPoint);
     this.lineKeptEnd = this.clickDir.dot(this.lineStart.subtract(intersectionPoint)) >= this.clickDir.dot(this.lineEnd.subtract(intersectionPoint)) ? this.lineStart : this.lineEnd;
     this.clickUnit = new Point(this.clickDir.x / this.clickDistance, this.clickDir.y / this.clickDistance);
+    return true;
   }
 
   /**

@@ -163,11 +163,6 @@ export class Chamfer extends ChamferFilletBase {
     if (!this.first.entity || !this.second.entity) return;
     if (!this.resolveCornerGeometry(Strings.Message.NOCHAMFER)) return;
 
-    if (this.first.clickDistance < 1e-10 || this.second.clickDistance < 1e-10) {
-      DesignCore.Core.notify(`Selected corner ${Strings.Message.NOCHAMFER}`);
-      return;
-    }
-
     const trimMode = DesignCore.Scene.headers.trimMode;
     const chamferMode = DesignCore.Scene.headers.chamferMode;
     const distA = DesignCore.Scene.headers.chamferDistanceA;

@@ -135,6 +135,17 @@ test('CornerEntity.resolveGeometry populates all click-side geometry fields', ()
   expect(corner.lineKeptEnd).toBe(corner.lineStart);
 });
 
+test('CornerEntity.resolveGeometry returns false when click projects to intersection point', () => {
+  // clickOnLine = (5,0) = intersectionPoint → clickDistance = 0 → division by zero guard
+  const corner = new CornerEntity();
+  corner.lineStart = new Point(0, 0);
+  corner.lineEnd = new Point(10, 0);
+  corner.clickPoint = new Point(5, 0); // exactly on the line at the intersection
+
+  expect(corner.resolveGeometry(new Point(5, 0))).toBe(false);
+  expect(corner.clickUnit).toBeNull();
+});
+
 test('CornerEntity.resolveGeometry selects lineEnd as kept end when click is past intersection', () => {
   // Click at (8,1): clickOnLine = (8,0), clickDir from (5,0) = (3,0) → points toward end
   const corner = new CornerEntity();

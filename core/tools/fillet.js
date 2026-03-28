@@ -131,11 +131,6 @@ export class Fillet extends ChamferFilletBase {
     if (!this.first.entity || !this.second.entity) return;
     if (!this.resolveCornerGeometry(Strings.Message.NOFILLET)) return;
 
-    if (this.first.clickDistance < 1e-10 || this.second.clickDistance < 1e-10) {
-      DesignCore.Core.notify(`${Strings.Error.SELECTION}`);
-      return;
-    }
-
     // radius = 0: trim/extend both lines to the sharp intersection with no arc
     const filletRadius = DesignCore.Scene.headers.filletRadius;
     const trimMode = DesignCore.Scene.headers.trimMode;

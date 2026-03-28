@@ -53,8 +53,11 @@ export class ChamferFilletBase extends Tool {
     const intersectParam = startDiff.cross(this.second.direction) / directionCross;
     this.intersectionPoint = this.first.lineStart.lerp(this.first.lineEnd, intersectParam);
 
-    this.first.resolveGeometry(this.intersectionPoint);
-    this.second.resolveGeometry(this.intersectionPoint);
+    if (!this.first.resolveGeometry(this.intersectionPoint) ||
+        !this.second.resolveGeometry(this.intersectionPoint)) {
+      DesignCore.Core.notify(Strings.Error.SELECTION);
+      return false;
+    }
 
     return true;
   }
