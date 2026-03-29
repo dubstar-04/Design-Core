@@ -260,8 +260,7 @@ test('Chamfer.action notifies when distance is too large for the segments', () =
   chamfer.firstPick.clickPoint = new Point(-2, 0);
   chamfer.secondPick.clickPoint = new Point(0, 2);
   chamfer.action();
-
-  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.DISTANCETOOLARGE));
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.MAXVALUE));
   expect(core.scene.entities.count()).toBe(2);
   notifySpy.mockRestore();
 });
@@ -276,7 +275,7 @@ test('Chamfer.action angle method 45° on perpendicular lines matches distance m
   core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
   core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
-  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferLength = 2;
   core.scene.headers.chamferAngle = 45; // degrees
   core.scene.headers.chamferMode = true;
   core.scene.headers.trimMode = true;
@@ -336,7 +335,7 @@ test('Chamfer.action angle method notifies INVALIDNUMBER when angle is zero', ()
   core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
   core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
-  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferLength = 2;
   core.scene.headers.chamferAngle = 0; // alpha = 0 * π/180 = 0, fails alpha <= 0 guard
   core.scene.headers.chamferMode = true;
   core.scene.headers.trimMode = true;
@@ -365,7 +364,7 @@ test('Chamfer.action angle method notifies PARALLELLINES when chamfer direction 
   core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
   core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
-  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferLength = 2;
   core.scene.headers.chamferAngle = 90; // degrees
   core.scene.headers.chamferMode = true;
   core.scene.headers.trimMode = true;
@@ -463,8 +462,8 @@ test('Chamfer.execute notifies INVALIDNUMBER for negative second distance', asyn
   notifySpy.mockRestore();
 });
 
-test('Chamfer.execute sets chamferDistanceA and chamferAngle via Angle option', async () => {
-  core.scene.headers.chamferDistanceA = 0;
+test('Chamfer.execute sets chamferLength and chamferAngle via Angle option', async () => {
+  core.scene.headers.chamferLength = 0;
   core.scene.headers.chamferAngle = 0;
 
   await withMockInput(
@@ -476,7 +475,7 @@ test('Chamfer.execute sets chamferDistanceA and chamferAngle via Angle option', 
       },
   );
 
-  expect(core.scene.headers.chamferDistanceA).toBe(3);
+  expect(core.scene.headers.chamferLength).toBe(3);
   expect(core.scene.headers.chamferAngle).toBe(60);
 });
 

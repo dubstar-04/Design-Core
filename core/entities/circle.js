@@ -57,21 +57,47 @@ export class Circle extends Entity {
    */
   async execute() {
     try {
-      const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+      const op = new PromptOptions(Strings.Input.CENTER, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
       if (pt1 === undefined) return;
       this.points.push(pt1);
 
-      const op2 = new PromptOptions(Strings.Input.RADIUS, [Input.Type.POINT, Input.Type.NUMBER]);
-      const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
-      if (pt2 === undefined) return;
-      if (Input.getType(pt2) === Input.Type.POINT) {
-        this.points.push(pt2);
+      const op2 = new PromptOptions(Strings.Input.RADIUS, [Input.Type.POINT, Input.Type.NUMBER], ['Diameter']);
+
+      while (true) {
+        const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (pt2 === undefined) return;
+
+        if (Input.getType(pt2) === Input.Type.POINT) {
+          if (pt1.distance(pt2) <= 0) {
+            DesignCore.Core.notify(`${this.type} - ${Strings.Error.NONZERO}`);
+            continue;
+          }
+          this.points.push(pt2);
+          break;
+        } else if (Input.getType(pt2) === Input.Type.NUMBER) {
+          if (pt2 <= 0) {
+            DesignCore.Core.notify(`${this.type} - ${Strings.Error.NONZERO}`);
+            continue;
+          }
+          this.setRadius(pt2);
+          break;
+        } else if (Input.getType(pt2) === Input.Type.STRING && pt2 === 'Diameter') {
+          const op3 = new PromptOptions(Strings.Input.DIAMETER, [Input.Type.NUMBER]);
+          while (true) {
+            const diameter = await DesignCore.Scene.inputManager.requestInput(op3);
+            if (diameter === undefined) return;
+            if (diameter <= 0) {
+              DesignCore.Core.notify(`${this.type} - ${Strings.Error.NONZERO}`);
+              continue;
+            }
+            this.setRadius(diameter / 2);
+            break;
+          }
+          break;
+        }
       }
 
-      if (Input.getType(pt2) === Input.Type.NUMBER) {
-        this.setRadius(pt2);
-      }
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);

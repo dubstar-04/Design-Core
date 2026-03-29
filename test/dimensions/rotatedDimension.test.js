@@ -11,8 +11,14 @@ new Core();
 // Test cases for user input
 const scenarios = [
 
-  { desc: 'Rotated dimension from point selection',
-    input: [new Point(), new Point(10, 0), new Point(5, 5)],
+  { desc: 'Rotated dimension from point selection (angle 0)',
+    input: [0, new Point(), new Point(10, 0), new Point(5, 5)],
+    selectedItems: [],
+    expectedDimType: 0,
+    dimensionValue: 10,
+  },
+  { desc: 'Rotated dimension from point selection (angle 90)',
+    input: [90, new Point(), new Point(0, 10), new Point(5, 5)],
     selectedItems: [],
     expectedDimType: 0,
     dimensionValue: 10,
@@ -59,6 +65,7 @@ describe('RotatedDimension.getPointsFromSelection', () => {
       pt1: new Point(0, 0),
       pt2: new Point(10, 0),
       textPos: new Point(5, 5),
+      angle: 0,
       expected: {
         text: { x: 5, y: 5 },
         arrow: { x: 10, y: 5 },
@@ -69,6 +76,7 @@ describe('RotatedDimension.getPointsFromSelection', () => {
       pt1: new Point(0, 0),
       pt2: new Point(0, 10),
       textPos: new Point(5, 5),
+      angle: 90,
       expected: {
         text: { x: 5, y: 5 },
         arrow: { x: 5, y: 10 },
@@ -79,6 +87,7 @@ describe('RotatedDimension.getPointsFromSelection', () => {
       pt1: new Point(0, 0),
       pt2: new Point(10, 10),
       textPos: new Point(5, 0),
+      angle: 90,
       expected: {
         text: { x: 5, y: 0 },
         arrow: { x: 5, y: 10 },
@@ -86,9 +95,9 @@ describe('RotatedDimension.getPointsFromSelection', () => {
     },
   ];
 
-  test.each(scenarios)('returns correct sequenced points for $desc', ({ pt1, pt2, textPos, expected }) => {
+  test.each(scenarios)('returns correct sequenced points for $desc', ({ pt1, pt2, textPos, angle, expected }) => {
     const line = new Line({ points: [pt1, pt2] });
-    const result = RotatedDimension.getPointsFromSelection([line], textPos);
+    const result = RotatedDimension.getPointsFromSelection([line], textPos, angle);
     expect(result).toHaveLength(4);
     expect(result[0].sequence).toBe(13);
     expect(result[1].sequence).toBe(14);

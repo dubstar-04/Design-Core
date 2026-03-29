@@ -57,6 +57,8 @@ export class Trim extends Tool {
         DesignCore.Scene.selectionManager.removeLastSelection();
         DesignCore.Scene.inputManager.actionCommand();
       }
+
+      DesignCore.Scene.inputManager.executeCommand();
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }

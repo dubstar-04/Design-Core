@@ -59,10 +59,19 @@ export class Line extends Entity {
       if (pt1 === undefined) return;
       this.points.push(pt1);
 
-      const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC]);
       while (true) {
+        const canClose = this.points.length >= 3;
+        const options = canClose ? ['Close'] : [];
+        const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC], options);
         const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
         if (pt2 === undefined) break;
+
+        if (Input.getType(pt2) === Input.Type.STRING && pt2 === 'Close') {
+          this.points.push(pt1);
+          DesignCore.Scene.inputManager.executeCommand(this);
+          return;
+        }
+
         this.points.push(pt2);
         DesignCore.Scene.inputManager.actionCommand(this);
       }

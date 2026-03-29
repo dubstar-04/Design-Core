@@ -19,9 +19,11 @@ export class Strings {
     SELECTION: 'Invalid Selection',
     PARALLELLINES: 'Parallel Lines',
     RADIUSTOOLARGE: 'Radius too large',
-    DISTANCETOOLARGE: 'Distance too large',
     INVALIDCLIPBOARD: 'Invalid Clipboard Data',
     INVALIDBOUNDARY: 'Invalid Boundary Item',
+    NONZERO: 'Value must be positive and nonzero',
+    MINVALUE: 'Value is too small',
+    MAXVALUE: 'Value is too large',
   };
 
   // Warning Strings
@@ -73,6 +75,7 @@ export class Strings {
     DIAMETER: '\u00D8',
     DEGREE: '\u00B0',
     RADIUS: 'R',
+    DELTA: '\u0394',
   };
 
   // Input Strings
@@ -84,8 +87,10 @@ export class Strings {
     END: 'Specify end point',
     POINT: 'Specify a point',
     DIMENSION: 'Specify dimension position',
+    CLOSE: 'Close',
     NEXTPOINT: 'Specify next point',
     RADIUS: 'Specify radius',
+    DIAMETER: 'Specify diameter',
     POSITION: 'Specify position',
     HEIGHT: 'Specify height',
     STRING: 'Specify text',

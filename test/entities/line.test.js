@@ -173,3 +173,20 @@ test('Test Line.extend returns empty array when provided with empty intersection
   expect(line.extend([])).toEqual([]);
   expect(line.extend()).toEqual([]);
 });
+
+test('Line.execute handles Close option', async () => {
+  const pt1 = new Point(0, 0);
+  const pt2 = new Point(10, 0);
+  const pt3 = new Point(10, 10);
+
+  await withMockInput(DesignCore.Scene, [pt1, pt2, pt3, 'Close'], async () => {
+    const line = new Line({});
+    await line.execute();
+
+    expect(line.points.length).toBe(4);
+    expect(line.points[0]).toBe(pt1);
+    expect(line.points[1]).toBe(pt2);
+    expect(line.points[2]).toBe(pt3);
+    expect(line.points[3]).toBe(pt1);
+  }, { extraMethods: { actionCommand: () => {} } });
+});

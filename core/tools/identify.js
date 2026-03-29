@@ -35,6 +35,7 @@ export class Identify extends Tool {
     try {
       const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
       DesignCore.Scene.inputManager.executeCommand();

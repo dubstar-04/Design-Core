@@ -179,12 +179,19 @@ export class Text extends Entity {
       this.backwards = style.backwards;
       this.upsideDown = style.upsideDown;
 
-      // Get the font size when standard style is used
-      if (this.styleName.toUpperCase() === 'STANDARD') {
+      // Get the font size when the style has a variable height (textHeight === 0)
+      if (!style?.textHeight) {
         const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
-        const height = await DesignCore.Scene.inputManager.requestInput(op2);
-        if (height === undefined) return;
-        this.height = height;
+        while (true) {
+          const height = await DesignCore.Scene.inputManager.requestInput(op2);
+          if (height === undefined) return;
+          if (height <= 0) {
+            DesignCore.Core.notify(`${this.type} - ${Strings.Error.NONZERO}`);
+            continue;
+          }
+          this.height = height;
+          break;
+        }
       }
 
       const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
@@ -195,6 +202,10 @@ export class Text extends Entity {
       const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
       const string = await DesignCore.Scene.inputManager.requestInput(op4);
       if (string === undefined) return;
+      if (String(string).trim().length === 0) {
+        DesignCore.Scene.inputManager.reset();
+        return;
+      }
       this.string = String(string);
 
       DesignCore.Scene.inputManager.executeCommand(this);

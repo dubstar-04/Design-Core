@@ -1,4 +1,4 @@
-import { BasePolyline } from '../../core/entities/basePolyline';
+import { BasePolyline } from '../../core/entities/basePolyline.js';
 import { Point } from '../../core/entities/point';
 import { Polyline } from '../../core/entities/polyline.js';
 import { Line } from '../../core/entities/line.js';
@@ -435,4 +435,71 @@ test('Test BasePolyline.toPolylinePoints', () => {
   expect(polylinePoints[2].x).toBe(200);
   expect(polylinePoints[2].y).toBe(50);
   expect(polylinePoints[2].bulge).toBe(0);
+});
+
+test('Polyline.execute handles Close option', async () => {
+  const pt1 = new Point(0, 0);
+  const pt2 = new Point(10, 0);
+  const pt3 = new Point(10, 10);
+
+  await withMockInput(DesignCore.Scene, [pt1, pt2, pt3, 'Close'], async () => {
+    const polyline = new Polyline({});
+    await polyline.execute();
+
+    expect(polyline.points.length).toBe(3);
+    expect(polyline.points[0]).toBe(pt1);
+    expect(polyline.points[1]).toBe(pt2);
+    expect(polyline.points[2]).toBe(pt3);
+    expect(polyline.flags.hasFlag(1)).toBe(true);
+  }, { extraMethods: { actionCommand: () => 0 } });
+});
+
+// ─── Polyline interactive options: Undo, Close, Arc, Line ───────────────
+
+test('Polyline.execute supports Undo in line mode', async () => {
+  const inputs = [new Point(0, 0), new Point(10, 0), new Point(20, 0), 'Undo', new Point(10, 10), 'Close'];
+  await withMockInput(DesignCore.Scene, inputs, async () => {
+    const polyline = new BasePolyline({});
+    await polyline.execute();
+    expect(polyline.points.length).toBe(3);
+    expect(polyline.points[0]).toEqual(inputs[0]);
+    expect(polyline.points[1]).toEqual(inputs[1]);
+    expect(polyline.points[2]).toEqual(inputs[4]);
+    expect(polyline.flags.hasFlag(1)).toBe(true); // closed
+  }, { extraMethods: { actionCommand: () => {} } });
+});
+
+test('Polyline.execute supports Undo in arc mode', async () => {
+  const inputs = [new Point(0, 0), new Point(10, 0), 'Arc', new Point(10, 10), new Point(20, 20), 'Undo', 'Line', new Point(10, 20), 'Close'];
+  await withMockInput(DesignCore.Scene, inputs, async () => {
+    const polyline = new BasePolyline({});
+    await polyline.execute();
+    expect(polyline.points.length).toBe(4);
+    expect(polyline.points[0]).toEqual(inputs[0]);
+    expect(polyline.points[1]).toEqual(inputs[1]);
+    expect(polyline.points[2]).toEqual(inputs[3]);
+    expect(polyline.points[3]).toEqual(inputs[7]);
+    expect(polyline.flags.hasFlag(1)).toBe(true); // closed
+    // After undo in arc mode
+    expect(polyline.points[2].bulge).toBeCloseTo(0);
+    expect(polyline.points[3].bulge).toBeCloseTo(0);
+    // console.log(polyline.points);
+  }, { extraMethods: { actionCommand: () => {} } });
+});
+
+test('Polyline.execute supports Arc/Line mode switching', async () => {
+  const inputs = [new Point(0, 0), new Point(10, 0), 'Arc', new Point(10, 10), 'Line', new Point(20, 10), 'Close'];
+  await withMockInput(DesignCore.Scene, inputs, async () => {
+    const polyline = new BasePolyline({});
+    await polyline.execute();
+    expect(polyline.points.length).toBe(4);
+    expect(polyline.points[0]).toEqual(inputs[0]);
+    expect(polyline.points[1]).toEqual(inputs[1]);
+    expect(polyline.points[2]).toEqual(inputs[3]);
+    expect(polyline.points[3]).toEqual(inputs[5]);
+    expect(polyline.flags.hasFlag(1)).toBe(true); // closed
+    // Arc segment bulge should be set, line segment bulge should be 0
+    expect(polyline.points[1].bulge).not.toBe(0);
+    expect(polyline.points[2].bulge).toBe(0);
+  }, { extraMethods: { actionCommand: () => {} } });
 });

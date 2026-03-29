@@ -42,7 +42,7 @@ export class BasePolyline extends Entity {
     });
 
     Object.defineProperty(this, 'flags', {
-      value: new Flags(),
+      value: data?.flags instanceof Flags ? data.flags : new Flags(),
       writable: true,
     });
 
@@ -86,9 +86,15 @@ export class BasePolyline extends Entity {
 
       let index;
       while (true) {
-        let options;
+        const options = [];
         if (this.points.length >= 2) {
-          options = this.inputMode === this.modes.LINE ? [this.modes.ARC] : [this.modes.LINE];
+          options.push(this.inputMode === this.modes.LINE ? this.modes.ARC : this.modes.LINE);
+        }
+        if (this.points.length >= 3) {
+          options.push('Close');
+        }
+        if (this.points.length > 1) {
+          options.push('Undo');
         }
 
         const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC], options);
@@ -105,10 +111,29 @@ export class BasePolyline extends Entity {
           index = DesignCore.Scene.inputManager.actionCommand(this, index);
         } else if (Input.getType(pt2) === Input.Type.STRING) {
           // options are converted to input in the prompt options class
-          if (pt2 === this.modes.ARC) {
+          if (pt2 === 'Undo') {
+            this.points.pop();
+            // Always reset bulge to 0 after undo
+            if (this.points.length > 0) {
+              this.points.at(-1).bulge = 0;
+            }
+            // Keep the scene entity in sync with the updated points
+            if (index !== undefined) {
+              index = DesignCore.Scene.inputManager.actionCommand(this, index);
+            }
+            continue;
+          } else if (pt2 === 'Close') {
+            // Only set bulge if in arc mode and at least two points
+            if (this.inputMode === this.modes.ARC && this.points.length > 1) {
+              this.points.at(-1).bulge = this.getBulgeFromSegment(pt1);
+            }
+            // Set flags to indicate closed shape
+            this.flags.addValue(1);
+            DesignCore.Scene.inputManager.executeCommand(this, index);
+            return;
+          } else if (pt2 === this.modes.ARC) {
             this.inputMode = this.modes.ARC;
-          }
-          if (pt2 === this.modes.LINE) {
+          } else if (pt2 === this.modes.LINE) {
             this.inputMode = this.modes.LINE;
           }
         }

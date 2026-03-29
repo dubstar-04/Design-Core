@@ -40,6 +40,7 @@ export class Zoom extends Tool {
     try {
       const op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT], [this.modes.ALL, this.modes.EXTENTS, this.modes.WINDOW, this.modes.OBJECT]);
       const input = await DesignCore.Scene.inputManager.requestInput(op);
+      if (input === undefined) return;
 
       if (Object.values(this.modes).includes(input)) {
         // input matches one of the mode values
@@ -53,11 +54,13 @@ export class Zoom extends Tool {
         } else {
           const p1op = new PromptOptions(Strings.Input.POINT, [Input.Type.POINT]);
           const pt1 = await DesignCore.Scene.inputManager.requestInput(p1op);
+          if (pt1 === undefined) return;
           this.points.push(pt1);
         }
 
         const p2op = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
         const pt2 = await DesignCore.Scene.inputManager.requestInput(p2op);
+        if (pt2 === undefined) return;
         this.points.push(pt2);
       }
 
@@ -66,7 +69,8 @@ export class Zoom extends Tool {
         const op = new PromptOptions(Strings.Input.SELECTIONSET, [Input.Type.SELECTIONSET]);
 
         if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-          await DesignCore.Scene.inputManager.requestInput(op);
+          const sel = await DesignCore.Scene.inputManager.requestInput(op);
+          if (sel === undefined) return;
         }
       }
 

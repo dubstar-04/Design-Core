@@ -45,6 +45,10 @@ export class RotatedDimension extends BaseLinearDimension {
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
       this.dimType.setDimType(0); // Rotated dimension
 
+      const opAngle = new PromptOptions(Strings.Input.ROTATION, [Input.Type.NUMBER]);
+      const angleValue = await DesignCore.Scene.inputManager.requestInput(opAngle);
+      this.linearDimAngle = Number(angleValue) || 0;
+
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt13 = await DesignCore.Scene.inputManager.requestInput(op);
       pt13.sequence = 13;
@@ -61,7 +65,7 @@ export class RotatedDimension extends BaseLinearDimension {
       this.points.push(pt11);
 
       const tempLine = new Line({ points: [pt13, pt14] });
-      this.points = RotatedDimension.getPointsFromSelection([tempLine], pt11);
+      this.points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.linearDimAngle);
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -73,9 +77,10 @@ export class RotatedDimension extends BaseLinearDimension {
      * Get sequenced points from user selection
      * @param {any} items
      * @param {Point} textPos
+     * @param {number} angle - rotation angle in degrees (default 0 = horizontal)
      * @return {Array} array of points
      */
-  static getPointsFromSelection(items, textPos) {
+  static getPointsFromSelection(items, textPos, angle = 0) {
     const points = [];
     const item = items[0];
 
@@ -94,24 +99,35 @@ export class RotatedDimension extends BaseLinearDimension {
     Pt11.sequence = 11;
     points.push(Pt11);
 
-    // generate the x and y delta values
-    const dx = Pt14.x - Pt13.x;
-    const dy = Pt14.y - Pt13.y;
-
-    // Get the primary axis (x or y)
-    const iX = ((Math.abs(Pt11.x - Pt13.x) + Math.abs(Pt14.x - Pt11.x)) - Math.abs(dx));
-    const iY = ((Math.abs(Pt11.y - Pt13.y) + Math.abs(Pt14.y - Pt11.y)) - Math.abs(dy));
-
-    if (iX >= iY && dy !== 0) {
-      Pt10.x = Pt11.x;
-      Pt10.y = Pt14.y;
-    } else if (iX < iY && dx !== 0) {
-      Pt10.x = Pt14.x;
-      Pt10.y = Pt11.y;
-    }
+    // Project Pt14 onto the dimension line through Pt11 at the rotation angle
+    // to find the arrow definition point Pt10
+    const angleRad = angle * (Math.PI / 180);
+    const dimLineDir = Pt11.project(angleRad, 1);
+    const projected = Pt14.perpendicular(Pt11, dimLineDir);
+    Pt10.x = projected.x;
+    Pt10.y = projected.y;
 
     points.push(Pt10);
     return points;
+  }
+
+  /**
+   * Preview the entity during creation
+   */
+  preview() {
+    if (this.points.length === 1) {
+      const mousePoint = DesignCore.Mouse.pointOnScene();
+      const points = [this.points.at(0), mousePoint];
+      DesignCore.Scene.tempEntities.create('Line', { points: points });
+    }
+
+    if (this.points.length > 1) {
+      const pt11 = DesignCore.Mouse.pointOnScene();
+      pt11.sequence = 11;
+      const tempLine = new Line({ points: [this.points[0], this.points[1]] });
+      const points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.linearDimAngle);
+      DesignCore.Scene.tempEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
+    }
   }
 
   /**

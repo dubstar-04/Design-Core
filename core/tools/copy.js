@@ -44,11 +44,18 @@ export class Copy extends Tool {
 
       const op2 = new PromptOptions(Strings.Input.BASEPOINT, [Input.Type.POINT]);
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op2);
+      if (pt1 === undefined) return;
       this.points.push(pt1);
 
       const op3 = new PromptOptions(Strings.Input.DESTINATION, [Input.Type.POINT, Input.Type.DYNAMIC]);
-      const pt2 = await DesignCore.Scene.inputManager.requestInput(op3);
-      this.points.push(pt2);
+      while (true) {
+        // Reset to just the base point
+        this.points = [this.points[0]];
+        const pt2 = await DesignCore.Scene.inputManager.requestInput(op3);
+        if (pt2 === undefined) break;
+        this.points[1] = pt2;
+        DesignCore.Scene.inputManager.actionCommand();
+      }
 
       DesignCore.Scene.inputManager.executeCommand();
     } catch (err) {
@@ -82,6 +89,9 @@ export class Copy extends Tool {
    * Perform the command
    */
   action() {
+    // points[1] is cleared before each destination prompt
+    // executeCommand() calls action() - guard on missing points and duplication
+    if (!this.points[1]) return;
     const delta = this.points[1].subtract(this.points[0]);
     const stateChanges = [];
 
