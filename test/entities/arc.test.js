@@ -373,3 +373,113 @@ test('Arc.trim returns remove + add states when trimming between two intersectio
   expect(changes[1].entity.points[2].y).toBe(0);
 });
 
+test('Arc.getRadius returns the arc radius', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
+  expect(arc.getRadius()).toBe(10);
+});
+
+test('Arc constructor loads from DXF group codes', () => {
+  const arc = new Arc({ points: [new Point(100, 100)], 40: 50, 50: 0, 51: 90 });
+  expect(arc.radius).toBe(50);
+  expect(arc.points[1].x).toBeCloseTo(150);
+  expect(arc.points[1].y).toBeCloseTo(100);
+  expect(arc.points[2].x).toBeCloseTo(100);
+  expect(arc.points[2].y).toBeCloseTo(150);
+});
+
+test('Arc constructor loads direction from data', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: -1 });
+  expect(arc.direction).toBe(-1);
+});
+
+test('Arc.toPolylinePoints handles a full circle (360 degrees)', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 0)], direction: 1 });
+  const pts = arc.toPolylinePoints();
+  expect(pts).toHaveLength(3);
+  expect(pts[0].bulge).toBe(1);
+  expect(pts[1].bulge).toBe(1);
+  expect(pts[2].x).toBeCloseTo(pts[0].x);
+  expect(pts[2].y).toBeCloseTo(pts[0].y);
+});
+
+test('Arc.preview does not throw with 1, 2 or 3 points', () => {
+  const origCreate = DesignCore.Scene.tempEntities.create;
+  const origMouse = DesignCore.Mouse.pointOnScene;
+  DesignCore.Scene.tempEntities.create = () => {};
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
+
+  const arc1 = new Arc({});
+  arc1.points = [new Point(0, 0)];
+  expect(() => arc1.preview()).not.toThrow();
+
+  const arc2 = new Arc({});
+  arc2.points = [new Point(0, 0), new Point(10, 0)];
+  expect(() => arc2.preview()).not.toThrow();
+
+  const arc3 = new Arc({});
+  arc3.points = [new Point(0, 0), new Point(10, 0), new Point(0, 10)];
+  expect(() => arc3.preview()).not.toThrow();
+
+  DesignCore.Scene.tempEntities.create = origCreate;
+  DesignCore.Mouse.pointOnScene = origMouse;
+});
+
+test('Arc.draw does not throw (ccw and cw)', () => {
+  const ctx = { arc: jest.fn(), stroke: jest.fn() };
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
+  expect(() => arc.draw(ctx, 1)).not.toThrow();
+  expect(ctx.arc).toHaveBeenCalledTimes(1);
+  expect(ctx.stroke).toHaveBeenCalledTimes(1);
+
+  const ctx2 = { arc: jest.fn(), stroke: jest.fn() };
+  const arcCw = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: -1 });
+  expect(() => arcCw.draw(ctx2, 1)).not.toThrow();
+});
+
+test('Arc.snaps returns end, centre and nearest snap points', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
+
+  DesignCore.Settings.endsnap = true;
+  DesignCore.Settings.centresnap = true;
+  DesignCore.Settings.nearestsnap = false;
+  const snaps = arc.snaps(new Point(5, 5), 10);
+  expect(snaps.length).toBe(3); // start, end, centre
+
+  // nearestsnap: closestPoint returns [pnt, distance] (no third element),
+  // so closest[2] === true is never satisfied and no snap is pushed
+  DesignCore.Settings.endsnap = false;
+  DesignCore.Settings.centresnap = false;
+  DesignCore.Settings.nearestsnap = true;
+  const nearSnaps = arc.snaps(new Point(10, 0), 100);
+  expect(nearSnaps.length).toBe(0);
+});
+
+test('Arc.execute handles negative angle (clockwise)', async () => {
+  const input1 = new Point(0, 0);
+  const input2 = new Point(10, 0);
+  const input3 = -90; // degrees — clockwise
+  await withMockInput(DesignCore.Scene, [input1, input2, input3], async () => {
+    const arc = new Arc({});
+    await arc.execute();
+    expect(arc.points.length).toBe(3);
+    expect(arc.direction).toBe(-1);
+  });
+});
+
+test('Arc.execute notifies on angle > 360', async () => {
+  const notifySpy = jest.spyOn(DesignCore.Core, 'notify').mockImplementation(() => {});
+  await withMockInput(DesignCore.Scene, [new Point(0, 0), new Point(10, 0), 361, 90], async () => {
+    const arc = new Arc({});
+    await arc.execute();
+    expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
+  });
+  notifySpy.mockRestore();
+});
+
+test('Arc.trim returns empty when only intersection is at an endpoint', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
+  // intersection exactly at the start point — filtered out, nothing to trim
+  const changes = arc.trim([new Point(10, 0)]);
+  expect(changes).toEqual([]);
+});
+
