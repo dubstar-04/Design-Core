@@ -19,10 +19,11 @@ export class Strings {
     SELECTION: 'Invalid Selection',
     PARALLELLINES: 'Parallel Lines',
     RADIUSTOOLARGE: 'Radius too large',
-    NONZERO: 'Value must be positive and nonzero',
-    DISTANCETOOLARGE: 'Distance too large',
     INVALIDCLIPBOARD: 'Invalid Clipboard Data',
     INVALIDBOUNDARY: 'Invalid Boundary Item',
+    NONZERO: 'Value must be positive and nonzero',
+    MINVALUE: 'Value is too small',
+    MAXVALUE: 'Value is too large',
   };
 
   // Warning Strings
