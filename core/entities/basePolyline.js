@@ -117,6 +117,10 @@ export class BasePolyline extends Entity {
             if (this.points.length > 0) {
               this.points.at(-1).bulge = 0;
             }
+            // Keep the scene entity in sync with the updated points
+            if (index !== undefined) {
+              index = DesignCore.Scene.inputManager.actionCommand(this, index);
+            }
             continue;
           } else if (pt2 === 'Close') {
             // Only set bulge if in arc mode and at least two points
