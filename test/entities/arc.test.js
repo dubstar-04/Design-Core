@@ -65,9 +65,7 @@ describe('Arc.execute input validation and notifications', () => {
       const arc = new Arc({});
       await arc.execute();
       // Should not notify any errors
-      expect(notifySpy).not.toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
-      expect(notifySpy).not.toHaveBeenCalledWith(Strings.Error.MINVALUE);
-      expect(notifySpy).not.toHaveBeenCalledWith(Strings.Error.INVALIDPOINT);
+      expect(notifySpy).not.toHaveBeenCalled();
     });
   });
 });
