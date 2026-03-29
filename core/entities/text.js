@@ -202,7 +202,10 @@ export class Text extends Entity {
       const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
       const string = await DesignCore.Scene.inputManager.requestInput(op4);
       if (string === undefined) return;
-      if (String(string).trim().length === 0) return;
+      if (String(string).trim().length === 0) {
+        DesignCore.Scene.inputManager.reset();
+        return;
+      }
       this.string = String(string);
 
       DesignCore.Scene.inputManager.executeCommand(this);
