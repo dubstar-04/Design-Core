@@ -93,6 +93,9 @@ export class BasePolyline extends Entity {
         if (this.points.length >= 3) {
           options.push('Close');
         }
+        if (this.points.length > 1) {
+          options.push('Undo');
+        }
 
         const op2 = new PromptOptions(Strings.Input.NEXTPOINT, [Input.Type.POINT, Input.Type.DYNAMIC], options);
         const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
@@ -108,20 +111,26 @@ export class BasePolyline extends Entity {
           index = DesignCore.Scene.inputManager.actionCommand(this, index);
         } else if (Input.getType(pt2) === Input.Type.STRING) {
           // options are converted to input in the prompt options class
-          if (pt2 === this.modes.ARC) {
-            this.inputMode = this.modes.ARC;
-          }
-          if (pt2 === this.modes.LINE) {
-            this.inputMode = this.modes.LINE;
-          }
-          if (pt2 === 'Close') {
-            if (this.inputMode === this.modes.ARC) {
+          if (pt2 === 'Undo') {
+            this.points.pop();
+            // If in arc mode, clear bulge on new last point
+            if (this.inputMode === this.modes.ARC && this.points.length > 0) {
+              this.points.at(-1).bulge = 0;
+            }
+            continue;
+          } else if (pt2 === 'Close') {
+            // Only set bulge if in arc mode and at least two points
+            if (this.inputMode === this.modes.ARC && this.points.length > 1) {
               this.points.at(-1).bulge = this.getBulgeFromSegment(pt1);
             }
             // Set flags to indicate closed shape
             this.flags.addValue(1);
             DesignCore.Scene.inputManager.executeCommand(this, index);
             return;
+          } else if (pt2 === this.modes.ARC) {
+            this.inputMode = this.modes.ARC;
+          } else if (pt2 === this.modes.LINE) {
+            this.inputMode = this.modes.LINE;
           }
         }
       }
