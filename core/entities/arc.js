@@ -103,7 +103,7 @@ export class Arc extends Entity {
           const center = this.points[0];
           const start = this.points[1];
           if (pt2.isSame?.(center) || pt2.isSame?.(start)) {
-            DesignCore.Core.notify(Strings.Error.INVALIDPOINT);
+            DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDPOINT}`);
             continue;
           }
           this.points.push(pt2);
@@ -122,7 +122,7 @@ export class Arc extends Entity {
           // Must be a valid angle in (0, 360]
           const angleValue = Number(pt2);
           if (!Number.isFinite(angleValue) || Math.abs(angleValue) <= 0 || Math.abs(angleValue) > 360) {
-            DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
+            DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDNUMBER}`);
             continue;
           }
           const basePoint = this.points.at(0);
