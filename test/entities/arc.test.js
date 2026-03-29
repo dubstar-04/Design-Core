@@ -1,3 +1,83 @@
+import { Strings } from '../../core/lib/strings.js';
+
+describe('Arc.execute input validation and notifications', () => {
+  let notifySpy;
+  beforeEach(() => {
+    notifySpy = jest.spyOn(DesignCore.Core, 'notify').mockImplementation(() => {});
+  });
+  afterEach(() => {
+    notifySpy.mockRestore();
+  });
+
+  test('Notifies when arc angle is too small (point input)', async () => {
+    // Three points nearly colinear (angle ~0)
+    const input1 = new Point(0, 0);
+    const input2 = new Point(10, 0);
+    const input3 = new Point(20, 0.0001); // Very small angle
+    await withMockInput(DesignCore.Scene, [input1, input2, input3, new Point(10, 10)], async () => {
+      const arc = new Arc({});
+      await arc.execute();
+      expect(notifySpy).toHaveBeenCalledWith(
+        expect.stringContaining(Strings.Error.INVALIDNUMBER)
+      );
+      expect(notifySpy).toHaveBeenCalledWith(
+        expect.stringContaining(Strings.Error.MINVALUE)
+      );
+    });
+  });
+
+  test('Notifies when arc angle is too small (angle input)', async () => {
+    const input1 = new Point(0, 0);
+    const input2 = new Point(10, 0);
+    const input3 = 0.5; // degrees, too small
+    await withMockInput(DesignCore.Scene, [input1, input2, input3, 90], async () => {
+      const arc = new Arc({});
+      await arc.execute();
+      expect(notifySpy).toHaveBeenCalledWith(
+        expect.stringContaining(Strings.Error.INVALIDNUMBER)
+      );
+      expect(notifySpy).toHaveBeenCalledWith(
+        expect.stringContaining(Strings.Error.MINVALUE)
+      );
+    });
+  });
+
+  test('Notifies on invalid number input', async () => {
+    const input1 = new Point(0, 0);
+    const input2 = new Point(10, 0);
+    const input3 = 'not-a-number';
+    await withMockInput(DesignCore.Scene, [input1, input2, input3, 90], async () => {
+      const arc = new Arc({});
+      await arc.execute();
+      expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+    });
+  });
+
+  test('Notifies on invalid point input (duplicate)', async () => {
+    const input1 = new Point(0, 0);
+    const input2 = new Point(10, 0);
+    const input3 = new Point(0, 0); // Same as center
+    await withMockInput(DesignCore.Scene, [input1, input2, input3, new Point(10, 10)], async () => {
+      const arc = new Arc({});
+      await arc.execute();
+      expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDPOINT);
+    });
+  });
+
+  test('Accepts valid input and does not notify errors', async () => {
+    const input1 = new Point(0, 0);
+    const input2 = new Point(10, 0);
+    const input3 = new Point(10, 10);
+    await withMockInput(DesignCore.Scene, [input1, input2, input3], async () => {
+      const arc = new Arc({});
+      await arc.execute();
+      // Should not notify any errors
+      expect(notifySpy).not.toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+      expect(notifySpy).not.toHaveBeenCalledWith(Strings.Error.MINVALUE);
+      expect(notifySpy).not.toHaveBeenCalledWith(Strings.Error.INVALIDPOINT);
+    });
+  });
+});
 import { Core } from '../../core/core/core.js';
 import { Arc } from '../../core/entities/arc.js';
 import { Point } from '../../core/entities/point.js';
