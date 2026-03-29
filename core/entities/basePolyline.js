@@ -113,8 +113,8 @@ export class BasePolyline extends Entity {
           // options are converted to input in the prompt options class
           if (pt2 === 'Undo') {
             this.points.pop();
-            // If in arc mode, clear bulge on new last point
-            if (this.inputMode === this.modes.ARC && this.points.length > 0) {
+            // Always reset bulge to 0 after undo
+            if (this.points.length > 0) {
               this.points.at(-1).bulge = 0;
             }
             continue;
