@@ -113,7 +113,7 @@ export class Arc extends Entity {
             // Check total angle > 1 degree
             if (Math.abs(this.totalAngle) <= 1) {
               this.points.pop(); // Remove invalid end point
-              DesignCore.Core.notify(`${Strings.Error.INVALIDNUMBER}: ${Strings.Error.MINVALUE}`);
+              DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDNUMBER}: ${Strings.Error.MINVALUE}`);
               continue;
             }
           }
@@ -135,12 +135,12 @@ export class Arc extends Entity {
           // Check total angle > 1 degree
           if (Math.abs(this.totalAngle) <= 1) {
             this.points.pop(); // Remove invalid end point
-            DesignCore.Core.notify(`${Strings.Error.INVALIDNUMBER}: ${Strings.Error.MINVALUE}`);
+            DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDNUMBER}: ${Strings.Error.MINVALUE}`);
             continue;
           }
           break;
         } else {
-          DesignCore.Core.notify(Strings.Error.INPUT);
+          DesignCore.Core.notify(`${this.type} - ${Strings.Error.INPUT}`);
         }
       }
 
