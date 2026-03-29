@@ -1,7 +1,9 @@
+import { jest } from '@jest/globals';
 import { Circle } from '../../core/entities/circle.js';
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
+import { Strings } from '../../core/lib/strings.js';
 
 import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
@@ -226,4 +228,107 @@ test('Circle.execute re-prompts on zero or negative diameter', async () => {
 
     expect(circle.getRadius()).toBeCloseTo(10);
   });
+});
+
+test('Circle.register returns command object', () => {
+  expect(Circle.register()).toEqual({ command: 'Circle', shortcut: 'C', type: 'Entity' });
+});
+
+test('Circle constructor loads radius from DXF group code 40', () => {
+  const circle = new Circle({ points: [new Point(0, 0)], 40: 50 });
+  expect(circle.getRadius()).toBeCloseTo(50);
+  expect(circle.points[1].x).toBeCloseTo(50);
+  expect(circle.points[1].y).toBeCloseTo(0);
+});
+
+test('Circle.execute creates circle from numeric radius input', async () => {
+  const center = new Point(0, 0);
+  await withMockInput(DesignCore.Scene, [center, 25], async () => {
+    const circle = new Circle({});
+    await circle.execute();
+    expect(circle.getRadius()).toBeCloseTo(25);
+  });
+});
+
+test('Circle.execute re-prompts on zero-distance point input', async () => {
+  const notifySpy = jest.spyOn(DesignCore.Core, 'notify').mockImplementation(() => {});
+  const center = new Point(0, 0);
+  await withMockInput(DesignCore.Scene, [center, new Point(0, 0), new Point(10, 0)], async () => {
+    const circle = new Circle({});
+    await circle.execute();
+    expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.NONZERO));
+    expect(circle.getRadius()).toBeCloseTo(10);
+  });
+  notifySpy.mockRestore();
+});
+
+test('Circle.preview does not throw with 0 or 1 points', () => {
+  const origCreate = DesignCore.Scene.tempEntities.create;
+  const origMouse = DesignCore.Mouse.pointOnScene;
+  const calls = [];
+  DesignCore.Scene.tempEntities.create = (type, obj) => calls.push([type, obj]);
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
+
+  const circle0 = new Circle({});
+  expect(() => circle0.preview()).not.toThrow();
+  expect(calls.length).toBe(0);
+
+  const circle1 = new Circle({});
+  circle1.points = [new Point(0, 0)];
+  expect(() => circle1.preview()).not.toThrow();
+  expect(calls.some(([type]) => type === 'Circle')).toBe(true);
+
+  DesignCore.Scene.tempEntities.create = origCreate;
+  DesignCore.Mouse.pointOnScene = origMouse;
+});
+
+test('Circle.draw does not throw', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  const ctx = { arc: jest.fn(), stroke: jest.fn() };
+  expect(() => circle.draw(ctx, 1)).not.toThrow();
+  expect(ctx.arc).toHaveBeenCalledTimes(1);
+  expect(ctx.stroke).toHaveBeenCalledTimes(1);
+});
+
+test('Circle.snaps returns centre snap', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  DesignCore.Settings.centresnap = true;
+  DesignCore.Settings.quadrantsnap = false;
+  DesignCore.Settings.nearestsnap = false;
+  const snaps = circle.snaps(new Point(5, 0), 100);
+  expect(snaps).toHaveLength(1);
+  expect(snaps[0].x).toBe(0);
+  expect(snaps[0].y).toBe(0);
+});
+
+test('Circle.snaps returns four quadrant snaps', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  DesignCore.Settings.centresnap = false;
+  DesignCore.Settings.quadrantsnap = true;
+  DesignCore.Settings.nearestsnap = false;
+  const snaps = circle.snaps(new Point(5, 0), 100);
+  expect(snaps).toHaveLength(4);
+  expect(snaps.some((p) => p.x === 10 && p.y === 0)).toBe(true);   // 0°
+  expect(snaps.some((p) => p.x === 0 && p.y === 10)).toBe(true);   // 90°
+  expect(snaps.some((p) => p.x === -10 && p.y === 0)).toBe(true);  // 180°
+  expect(snaps.some((p) => p.x === 0 && p.y === -10)).toBe(true);  // 270°
+});
+
+test('Circle.snaps nearest snap fires when close enough', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  DesignCore.Settings.centresnap = false;
+  DesignCore.Settings.quadrantsnap = false;
+  DesignCore.Settings.nearestsnap = true;
+  // Mouse on the circle surface with large delta
+  const snaps = circle.snaps(new Point(10, 0), 1000);
+  expect(snaps.length).toBeGreaterThanOrEqual(1);
+});
+
+test('Circle.snaps nearest snap does not fire when too far', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  DesignCore.Settings.centresnap = false;
+  DesignCore.Settings.quadrantsnap = false;
+  DesignCore.Settings.nearestsnap = true;
+  const snaps = circle.snaps(new Point(100, 100), 1);
+  expect(snaps.length).toBe(0);
 });
