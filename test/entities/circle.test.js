@@ -308,10 +308,10 @@ test('Circle.snaps returns four quadrant snaps', () => {
   DesignCore.Settings.nearestsnap = false;
   const snaps = circle.snaps(new Point(5, 0), 100);
   expect(snaps).toHaveLength(4);
-  expect(snaps.some((p) => p.x === 10 && p.y === 0)).toBe(true);   // 0°
-  expect(snaps.some((p) => p.x === 0 && p.y === 10)).toBe(true);   // 90°
-  expect(snaps.some((p) => p.x === -10 && p.y === 0)).toBe(true);  // 180°
-  expect(snaps.some((p) => p.x === 0 && p.y === -10)).toBe(true);  // 270°
+  expect(snaps.some((p) => p.x === 10 && p.y === 0)).toBe(true);// 0°
+  expect(snaps.some((p) => p.x === 0 && p.y === 10)).toBe(true);// 90°
+  expect(snaps.some((p) => p.x === -10 && p.y === 0)).toBe(true);// 180°
+  expect(snaps.some((p) => p.x === 0 && p.y === -10)).toBe(true);// 270°
 });
 
 test('Circle.snaps nearest snap fires when close enough', () => {
