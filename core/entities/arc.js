@@ -92,18 +92,56 @@ export class Arc extends Entity {
       if (pt1 === undefined) return;
       this.points.push(pt1);
 
-      const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT, Input.Type.NUMBER]);
-      const pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
-      if (pt2 === undefined) return;
+      let pt2;
+      while (true) {
+        const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT, Input.Type.NUMBER]);
+        pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (pt2 === undefined) return;
 
-      if (Input.getType(pt2) === Input.Type.POINT) {
-        this.points.push(pt2);
-      } else if (Input.getType(pt2) === Input.Type.NUMBER) {
-        const basePoint = this.points.at(0);
-        const startPoint = this.points.at(1);
-        const angle = Utils.degrees2radians(pt2);
-        const point = startPoint.rotate(basePoint, angle);
-        this.points.push(point);
+        if (Input.getType(pt2) === Input.Type.POINT) {
+          // Must not be same as center or start
+          const center = this.points[0];
+          const start = this.points[1];
+          if (pt2.isSame?.(center) || pt2.isSame?.(start)) {
+            DesignCore.Core.notify(Strings.Error.INVALIDPOINT);
+            continue;
+          }
+          this.points.push(pt2);
+          // Infer arc direction using cross product if we have 3 points
+          if (this.points.length === 3) {
+            this.direction = Arc.#inferDirection(this.points[0], this.points[1], this.points[2]);
+            // Check total angle > 1 degree
+            if (Math.abs(this.totalAngle) <= 1) {
+              this.points.pop(); // Remove invalid end point
+              DesignCore.Core.notify(`${Strings.Error.INVALIDNUMBER}: ${Strings.Error.MINVALUE}`);
+              continue;
+            }
+          }
+          break;
+        } else if (Input.getType(pt2) === Input.Type.NUMBER) {
+          // Must be a valid angle in (0, 360]
+          const angleValue = Number(pt2);
+          if (!Number.isFinite(angleValue) || Math.abs(angleValue) <= 0 || Math.abs(angleValue) > 360) {
+            DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
+            continue;
+          }
+          const basePoint = this.points.at(0);
+          const startPoint = this.points.at(1);
+          const angle = Utils.degrees2radians(angleValue);
+          const point = startPoint.rotate(basePoint, angle);
+          this.points.push(point);
+          // Set direction based on sign of angle
+          this.direction = angle >= 0 ? 1 : -1;
+          // Check total angle > 1 degree
+          if (Math.abs(this.totalAngle) <= 1) {
+            this.points.pop(); // Remove invalid end point
+            DesignCore.Core.notify(`${Strings.Error.INVALIDNUMBER}: ${Strings.Error.MINVALUE}`);
+            continue;
+          }
+          break;
+        } else {
+          DesignCore.Core.notify(Strings.Error.INPUT);
+        }
       }
 
       DesignCore.Scene.inputManager.executeCommand(this);
@@ -125,8 +163,38 @@ export class Arc extends Entity {
     if (this.points.length >= 2) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.tempEntities.create(this.type, { points: points });
+
+      // Infer direction for preview, so it matches what will be created
+      let direction = 1;
+      if (points.length === 3) {
+        direction = Arc.#inferDirection(points[0], points[1], points[2]);
+      }
+
+      DesignCore.Scene.tempEntities.create(this.type, { points: points, direction: direction });
     }
+  }
+
+  /**
+   * Infer arc direction from three points using cross product
+   * @param {Point} center
+   * @param {Point} start
+   * @param {Point} end
+   * @return {number} 1 for ccw, -1 for cw
+   */
+  static #inferDirection(center, start, end) {
+    // All points must be defined and distinct
+    if (!center || !start || !end) {
+      return 1; // Default to counterclockwise
+    }
+    if (center.isSame?.(start) || center.isSame?.(end) || start.isSame?.(end)) {
+      return 1;
+    }
+
+    const v1 = start.subtract(center);
+    const v2 = end.subtract(center);
+    const cross = v1.cross(v2);
+    const direction = cross > 0 ? 1 : -1;
+    return direction;
   }
 
   /**
