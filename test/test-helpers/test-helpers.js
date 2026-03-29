@@ -41,6 +41,7 @@ export async function withMockInput(scene, inputs, testFn, options = {}) {
       }
     },
     executeCommand: () => {},
+    reset: () => {},
     ...extraMethods,
   };
 
