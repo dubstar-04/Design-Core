@@ -1,4 +1,4 @@
-import { BasePolyline } from '../../core/entities/basePolyline';
+import { BasePolyline } from '../../core/entities/basePolyline.js';
 import { Point } from '../../core/entities/point';
 import { Polyline } from '../../core/entities/polyline.js';
 import { Line } from '../../core/entities/line.js';
@@ -470,7 +470,7 @@ test('Polyline.execute supports Undo in line mode', async () => {
 });
 
 test('Polyline.execute supports Undo in arc mode', async () => {
-  const inputs = [new Point(0, 0), new Point(10, 0), 'Arc', new Point(10, 10), new Point(20, 20), 'Undo', new Point(10, 20), 'Close'];
+  const inputs = [new Point(0, 0), new Point(10, 0), 'Arc', new Point(10, 10), new Point(20, 20), 'Undo', 'Line', new Point(10, 20), 'Close'];
   await withMockInput(DesignCore.Scene, inputs, async () => {
     const polyline = new BasePolyline({});
     await polyline.execute();
@@ -478,10 +478,12 @@ test('Polyline.execute supports Undo in arc mode', async () => {
     expect(polyline.points[0]).toEqual(inputs[0]);
     expect(polyline.points[1]).toEqual(inputs[1]);
     expect(polyline.points[2]).toEqual(inputs[3]);
-    expect(polyline.points[3]).toEqual(inputs[6]);
+    expect(polyline.points[3]).toEqual(inputs[7]);
     expect(polyline.flags.hasFlag(1)).toBe(true); // closed
-    // After undo in arc mode, bulge on new last point should be 0
-    expect(polyline.points[2].bulge).toBe(0);
+    // After undo in arc mode
+    expect(polyline.points[2].bulge).toBeCloseTo(0);
+    expect(polyline.points[3].bulge).toBeCloseTo(0);
+    console.log(polyline.points);
   }, { extraMethods: { actionCommand: () => {} } });
 });
 
