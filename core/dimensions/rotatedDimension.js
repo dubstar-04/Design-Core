@@ -45,6 +45,10 @@ export class RotatedDimension extends BaseLinearDimension {
       this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
       this.dimType.setDimType(0); // Rotated dimension
 
+      const opAngle = new PromptOptions(Strings.Input.ROTATION, [Input.Type.NUMBER]);
+      const angleValue = await DesignCore.Scene.inputManager.requestInput(opAngle);
+      this.linearDimAngle = Number(angleValue) || 0;
+
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt13 = await DesignCore.Scene.inputManager.requestInput(op);
       pt13.sequence = 13;
@@ -61,7 +65,7 @@ export class RotatedDimension extends BaseLinearDimension {
       this.points.push(pt11);
 
       const tempLine = new Line({ points: [pt13, pt14] });
-      this.points = RotatedDimension.getPointsFromSelection([tempLine], pt11);
+      this.points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.linearDimAngle);
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
