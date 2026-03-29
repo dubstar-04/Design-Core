@@ -46,22 +46,26 @@ export class Rotate extends Tool {
 
       const op2 = new PromptOptions(Strings.Input.BASEPOINT, [Input.Type.POINT]);
       const input1 = await DesignCore.Scene.inputManager.requestInput(op2);
+      if (input1 === undefined) return;
       this.points.push(input1);
 
       while (this.points.length < 2) {
         const op3 = new PromptOptions(Strings.Input.ROTATION, [Input.Type.POINT, Input.Type.NUMBER], ['Reference']);
         const input2 = await DesignCore.Scene.inputManager.requestInput(op3);
+        if (input2 === undefined) return;
 
         if (Input.getType(input2) === Input.Type.STRING) {
           // set the base angle to null to prevent the preview
           this.baseAngle = null;
           const op4 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
           const refBase = await DesignCore.Scene.inputManager.requestInput(op4);
+          if (refBase === undefined) return;
           // set the base point to the reference start point
           this.basePoint = refBase;
 
           const op5 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
           const refEnd = await DesignCore.Scene.inputManager.requestInput(op5);
+          if (refEnd === undefined) return;
           // set the base angle to the reference
           this.baseAngle = refBase.angle(refEnd);
           // set the base point to null
