@@ -483,7 +483,7 @@ test('Polyline.execute supports Undo in arc mode', async () => {
     // After undo in arc mode
     expect(polyline.points[2].bulge).toBeCloseTo(0);
     expect(polyline.points[3].bulge).toBeCloseTo(0);
-    console.log(polyline.points);
+    // console.log(polyline.points);
   }, { extraMethods: { actionCommand: () => {} } });
 });
 
