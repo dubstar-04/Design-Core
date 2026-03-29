@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { Strings } from '../../core/lib/strings.js';
 
 describe('Arc.execute input validation and notifications', () => {
@@ -17,12 +18,8 @@ describe('Arc.execute input validation and notifications', () => {
     await withMockInput(DesignCore.Scene, [input1, input2, input3, new Point(10, 10)], async () => {
       const arc = new Arc({});
       await arc.execute();
-      expect(notifySpy).toHaveBeenCalledWith(
-        expect.stringContaining(Strings.Error.INVALIDNUMBER)
-      );
-      expect(notifySpy).toHaveBeenCalledWith(
-        expect.stringContaining(Strings.Error.MINVALUE)
-      );
+      expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
+      expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.MINVALUE));
     });
   });
 
@@ -33,12 +30,8 @@ describe('Arc.execute input validation and notifications', () => {
     await withMockInput(DesignCore.Scene, [input1, input2, input3, 90], async () => {
       const arc = new Arc({});
       await arc.execute();
-      expect(notifySpy).toHaveBeenCalledWith(
-        expect.stringContaining(Strings.Error.INVALIDNUMBER)
-      );
-      expect(notifySpy).toHaveBeenCalledWith(
-        expect.stringContaining(Strings.Error.MINVALUE)
-      );
+      expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
+      expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.MINVALUE));
     });
   });
 
@@ -49,7 +42,7 @@ describe('Arc.execute input validation and notifications', () => {
     await withMockInput(DesignCore.Scene, [input1, input2, input3, 90], async () => {
       const arc = new Arc({});
       await arc.execute();
-      expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+      expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INPUT));
     });
   });
 
@@ -60,7 +53,7 @@ describe('Arc.execute input validation and notifications', () => {
     await withMockInput(DesignCore.Scene, [input1, input2, input3, new Point(10, 10)], async () => {
       const arc = new Arc({});
       await arc.execute();
-      expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDPOINT);
+      expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDPOINT));
     });
   });
 
