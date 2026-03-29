@@ -77,6 +77,7 @@ export class RotatedDimension extends BaseLinearDimension {
      * Get sequenced points from user selection
      * @param {any} items
      * @param {Point} textPos
+     * @param {number} angle - rotation angle in degrees (default 0 = horizontal)
      * @return {Array} array of points
      */
   static getPointsFromSelection(items, textPos, angle = 0) {
