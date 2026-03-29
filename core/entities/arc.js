@@ -94,7 +94,7 @@ export class Arc extends Entity {
 
       let pt2;
       while (true) {
-        const op2 = new PromptOptions(Strings.Input.END, [Input.Type.POINT, Input.Type.NUMBER]);
+        const op2 = new PromptOptions(`${Strings.Input.END} ${Strings.Strings.OR} ${Strings.Input.ANGLE}`, [Input.Type.POINT, Input.Type.NUMBER]);
         pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
         if (pt2 === undefined) return;
 
