@@ -222,7 +222,7 @@ export class Chamfer extends ChamferFilletBase {
       const secondChamferDot = secondChamferPoint.subtract(this.intersectionPoint).dot(secondKeptDir);
       if (firstChamferDot < 0 || firstChamferDot > firstKeptDir.dot(firstKeptDir) ||
           secondChamferDot < 0 || secondChamferDot > secondKeptDir.dot(secondKeptDir)) {
-        DesignCore.Core.notify(Strings.Error.DISTANCETOOLARGE);
+        DesignCore.Core.notify(Strings.Error.MAXVALUE);
         return;
       }
     }
