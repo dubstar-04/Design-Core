@@ -79,7 +79,7 @@ export class RotatedDimension extends BaseLinearDimension {
      * @param {Point} textPos
      * @return {Array} array of points
      */
-  static getPointsFromSelection(items, textPos) {
+  static getPointsFromSelection(items, textPos, angle = 0) {
     const points = [];
     const item = items[0];
 
@@ -98,20 +98,18 @@ export class RotatedDimension extends BaseLinearDimension {
     Pt11.sequence = 11;
     points.push(Pt11);
 
-    // generate the x and y delta values
-    const dx = Pt14.x - Pt13.x;
-    const dy = Pt14.y - Pt13.y;
+    // Project Pt14 onto the dimension line through Pt11 at the rotation angle
+    // to find the arrow definition point Pt10
+    const angleRad = angle * (Math.PI / 180);
+    const dimLineDir = Pt11.project(angleRad, 1);
+    const projected = Pt14.perpendicular(Pt11, dimLineDir);
+    Pt10.x = projected.x;
+    Pt10.y = projected.y;
 
-    // Get the primary axis (x or y)
-    const iX = ((Math.abs(Pt11.x - Pt13.x) + Math.abs(Pt14.x - Pt11.x)) - Math.abs(dx));
-    const iY = ((Math.abs(Pt11.y - Pt13.y) + Math.abs(Pt14.y - Pt11.y)) - Math.abs(dy));
+    points.push(Pt10);
+    return points;
+  }
 
-    if (iX >= iY && dy !== 0) {
-      Pt10.x = Pt11.x;
-      Pt10.y = Pt14.y;
-    } else if (iX < iY && dx !== 0) {
-      Pt10.x = Pt14.x;
-      Pt10.y = Pt11.y;
     }
 
     points.push(Pt10);
