@@ -60,6 +60,9 @@ export class Mouse {
   positionString() {
     // return a string showing the position of the mouse on the canvas
     const str = `X: ${this.pointOnScene().x.toFixed(1)} Y: ${this.pointOnScene().y.toFixed(1)}`;
+    if (this.buttonOneDown || this.buttonTwoDown || this.buttonThreeDown) {
+      return '';
+    }
     return str;
   }
 
