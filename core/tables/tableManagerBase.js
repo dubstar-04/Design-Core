@@ -6,16 +6,46 @@ import { Logging } from '../lib/logging.js';
  * Table Manager Base Class
  */
 export class TableManagerBase {
+  // Cached Map<string, item> for O(1) lookups by name.
+  // Lazily built on first getItemByName() call and
+  // invalidated when items are added, deleted, or cleared.
+  #lookupMap = null;
+  #items = [];
+
+  /**
+   * Get the list of items
+   * @return {Array}
+   */
+  get items() {
+    return this.#items;
+  }
+
+  /**
+   * Set the list of items and invalidate the lookup cache
+   * @param {Array} value
+   */
+  set items(value) {
+    this.#items = value;
+    this.#invalidateLookup();
+  }
+
   /**
    * Create a Table Manager
    */
   constructor() {
-    this.items = [];
     this.handle = DesignCore.HandleManager.next();
     this.addStandardItems();
 
     // list of mandatory items that cannot be deleted
     this.indelibleItems = [];
+  }
+
+  /**
+   * Invalidate the lookup map cache.
+   * Must be called whenever the items array is mutated.
+   */
+  #invalidateLookup() {
+    this.#lookupMap = null;
   }
 
   /**
@@ -106,6 +136,8 @@ export class TableManagerBase {
       // Standard items already exist but should be overwritten by the incoming item
       this.items.splice(this.getItemIndex(newItemName), 1, newItem);
     }
+
+    this.#invalidateLookup();
     // DesignCore.Scene.saveRequired();
     return newItem;
   }
@@ -132,7 +164,9 @@ export class TableManagerBase {
     }
 
     // Delete The item
-    return this.items.splice(itemIndex, 1);
+    const deleted = this.items.splice(itemIndex, 1);
+    this.#invalidateLookup();
+    return deleted;
   }
 
 
@@ -190,32 +224,29 @@ export class TableManagerBase {
   }
 
   /**
-   * Get the item from an index
-   * @param {number} itemIndex
-   * @return {number}
-   */
-  getItemByIndex(itemIndex) {
-    return this.items[itemIndex];
-  }
-
-  /**
    * get a item matching itemname
    * @param {string} itemName
    * @return {Object}
    */
   getItemByName(itemName) {
-    for (let i = 0; i < this.itemCount(); i++) {
-      // console.log('block name:', this.items[i].name.toUpperCase());
-      if (this.items[i].name.toUpperCase() === itemName.toUpperCase()) {
-        return this.items[i];
+    if (!this.#lookupMap) {
+      this.#lookupMap = new Map();
+      for (let i = 0; i < this.items.length; i++) {
+        this.#lookupMap.set(this.items[i].name.toUpperCase(), this.items[i]);
       }
     }
 
-    // Log warning if item doesn't exist
-    // Consider nested blocks where block may not exist yet
-    const msg = 'Invalid Item Name';
-    const err = (`${this.constructor.name} - ${msg}: ${itemName}`);
-    Logging.instance.warn(`${err}`);
+    const item = this.#lookupMap.get(itemName.toUpperCase());
+
+    if (item === undefined) {
+      // Log warning if item doesn't exist
+      // Consider nested blocks where block may not exist yet
+      const msg = 'Invalid Item Name';
+      const err = (`${this.constructor.name} - ${msg}: ${itemName}`);
+      Logging.instance.warn(`${err}`);
+    }
+
+    return item;
   }
 
   /**
@@ -257,6 +288,7 @@ export class TableManagerBase {
     const newUniqueName = this.getUniqueName(newName);
     const currentItemName = this.items[itemIndex].name;
     this.items[itemIndex].name = newUniqueName;
+    this.#invalidateLookup();
 
     // update all scene items with the new item value
     this.updateSceneItem(currentItemName, newUniqueName);
