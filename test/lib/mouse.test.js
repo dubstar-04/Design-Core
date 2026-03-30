@@ -146,29 +146,39 @@ test('Test Mouse.mouseMoved updates position when button is held down', () => {
 
 test('Test Mouse.mouseMoved skips polar snap when a button is held down', () => {
   core.canvas.height = 600;
+  const prevPolar = DesignCore.Settings.polar;
   DesignCore.Settings.polar = true;
   const polarSpy = jest.spyOn(core.scene.inputManager.snapping, 'polarSnap');
-  mouse.lastClick = 0;
-  mouse.mouseDown(1);
-  mouse.mouseMoved(200, 300);
-  expect(polarSpy).not.toHaveBeenCalled();
-  mouse.mouseUp(1);
-  DesignCore.Settings.polar = false;
-  polarSpy.mockRestore();
+  try {
+    mouse.lastClick = 0;
+    mouse.mouseDown(1);
+    mouse.mouseMoved(200, 300);
+    expect(polarSpy).not.toHaveBeenCalled();
+    mouse.mouseUp(1);
+  } finally {
+    DesignCore.Settings.polar = prevPolar;
+    polarSpy.mockRestore();
+  }
 });
 
 test('Test Mouse.mouseMoved skips ortho snap when a button is held down', () => {
   core.canvas.height = 600;
+  const prevPolar = DesignCore.Settings.polar;
+  const prevOrtho = DesignCore.Settings.ortho;
   DesignCore.Settings.polar = false;
   DesignCore.Settings.ortho = true;
   const orthoSpy = jest.spyOn(core.scene.inputManager.snapping, 'orthoSnap');
-  mouse.lastClick = 0;
-  mouse.mouseDown(1);
-  mouse.mouseMoved(200, 300);
-  expect(orthoSpy).not.toHaveBeenCalled();
-  mouse.mouseUp(1);
-  DesignCore.Settings.ortho = false;
-  orthoSpy.mockRestore();
+  try {
+    mouse.lastClick = 0;
+    mouse.mouseDown(1);
+    mouse.mouseMoved(200, 300);
+    expect(orthoSpy).not.toHaveBeenCalled();
+    mouse.mouseUp(1);
+  } finally {
+    DesignCore.Settings.polar = prevPolar;
+    DesignCore.Settings.ortho = prevOrtho;
+    orthoSpy.mockRestore();
+  }
 });
 
 test('Test Mouse.setPosFromScenePoint', () => {
