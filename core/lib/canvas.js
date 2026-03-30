@@ -58,13 +58,14 @@ export class Canvas {
   mouseMoved() {
     if (DesignCore.Mouse.buttonTwoDown) {
       this.pan();
+      return;
     }
 
     DesignCore.Scene.inputManager.mouseMoved();
   }
 
   /**
-   * Handle mouse down
+   * Handle mouse downs
    * @param {number} button
    */
   mouseDown(button) {
