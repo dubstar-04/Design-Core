@@ -245,6 +245,10 @@ export class InputManager {
    * @return {boolean} true if an entity was highlighted
    */
   highlightEntityUnderMouse() {
+    if (DesignCore.Mouse.buttonOneDown || DesignCore.Mouse.buttonTwoDown || DesignCore.Mouse.buttonThreeDown) {
+      return false;
+    }
+
     if (this.activeCommand !== undefined &&
       !this.promptOption?.types.includes(Input.Type.SINGLESELECTION) &&
       !this.promptOption?.types.includes(Input.Type.SELECTIONSET)) {
