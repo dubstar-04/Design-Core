@@ -22,6 +22,33 @@ test('Test Patterns.getPattern cache is case-insensitive', () => {
   expect(upper).toBe(mixed);
 });
 
+test('Test Patterns.getPattern returns frozen pattern array and objects', () => {
+  const pattern = Patterns.getPattern('ANSI31');
+  expect(Object.isFrozen(pattern)).toBe(true);
+  pattern.forEach((patternLine) => {
+    expect(Object.isFrozen(patternLine)).toBe(true);
+    expect(Object.isFrozen(patternLine.dashes)).toBe(true);
+  });
+});
+
+test('Test Patterns.getPattern frozen cache is not corrupted by caller mutation attempts', () => {
+  const pattern = Patterns.getPattern('ANSI31');
+  const originalAngle = pattern[0].angle;
+  const originalDashLength = pattern[0].dashes.length;
+  const originalLength = pattern.length;
+
+  // In strict mode (ESM), mutating frozen objects throws TypeError
+  expect(() => { pattern[0].angle = 999; }).toThrow(TypeError);
+  expect(() => { pattern[0].dashes.push(999); }).toThrow(TypeError);
+  expect(() => { pattern.push(null); }).toThrow(TypeError);
+
+  // Cache is unaffected
+  const patternAgain = Patterns.getPattern('ANSI31');
+  expect(patternAgain[0].angle).toBe(originalAngle);
+  expect(patternAgain[0].dashes.length).toBe(originalDashLength);
+  expect(patternAgain.length).toBe(originalLength);
+});
+
 
 test('Test Patterns.getPatternLineCount', () => {
   expect(Patterns.getPatternLineCount('HONEY')).toBe(3);
