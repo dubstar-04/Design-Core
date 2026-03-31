@@ -429,49 +429,80 @@ export class Hatch extends Entity {
       this.scale = 1;
     }
 
+    if (!this.childEntities.length) return;
+
+    ctx.save();
+
+    // Start a new composite path for all boundary loops
+    try {
+      ctx.beginPath();
+    } catch { // Cairo
+      ctx.newPath();
+    }
+
+    // Trace all boundary paths as sub-paths in a single composite path
+    // Using even-odd fill rule, islands are automatically handled:
+    // areas enclosed by an odd number of boundaries are filled,
+    // areas enclosed by an even number are left empty
     for (let i = 0; i < this.childEntities.length; i++) {
       const shape = this.childEntities[i];
-      ctx.save();
-      shape.draw(ctx, scale, false);
-      // ctx.stroke();
+      if (!shape.points.length) continue;
 
-      // Hatch Island Support
-      // Hatch boundarys must be sorted, with internal shape points being clockside and external shape points being counter clockwise
-      // Looks like dxf code 92 states a shape is the outermost when value 16 is set.
-      // clip the current path
-      ctx.clip();
-      // Create a new path because the current path cannot be consumed by a clip
-      try {
-        ctx.beginPath();
-      } catch { // Cairo
-        ctx.newPath();
-      }
-      // Create a shape bigger than the hatch boundary to contain the hatch or fill
-      const bb = shape.boundingBox();
-      try {
-        ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-      } catch {// Cairo
-        ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-      }
-      // for islands create the pattern once all boundary paths are drawn (internal and external)
-      this.createPattern(ctx, scale, shape);
-      ctx.restore();
+      // Start a new sub-path for this boundary
+      ctx.moveTo(shape.points[0].x, shape.points[0].y);
+      // Trace the boundary path (without stroking)
+      shape.draw(ctx, scale, false);
+      // Close the sub-path
+      ctx.closePath();
     }
+
+    // Set even-odd fill rule for island support
+    try { // Cairo
+      ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
+    } catch {
+      // HTML Canvas uses the evenodd parameter in clip/fill calls
+    }
+
+    // Clip using even-odd rule
+    try { // HTML Canvas
+      ctx.clip('evenodd');
+    } catch { // Cairo - clip() takes no arguments, uses the fill rule set above
+      ctx.clip();
+    }
+
+    // Start a new path for the pattern/fill area
+    try {
+      ctx.beginPath();
+    } catch { // Cairo
+      ctx.newPath();
+    }
+
+    // Create an oversized rectangle covering all boundaries
+    const bb = this.boundingBox();
+    try {
+      ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+    } catch { // Cairo
+      ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+    }
+
+    // Draw the pattern/fill once over the composite clipped region
+    this.createPattern(ctx, scale);
+
+    ctx.restore();
   }
 
   /**
    * Draw the hatch pattern to the context
    * @param {Object} ctx
    * @param {number} scale
-   * @param {Polyline} shape
    */
-  createPattern(ctx, scale, shape) {
+  createPattern(ctx, scale) {
     if (!Patterns.patternExists(this.patternName) || this.solid) {
       ctx.fill();
       return;
     }
 
-    const boundingBox = shape.boundingBox();
+    const boundingBox = this.boundingBox();
     const centerPoint = boundingBox.centerPoint;
     const bbXLength = boundingBox.xLength;
     const bbYLength = boundingBox.yLength;
