@@ -8,6 +8,20 @@ test('Test Patterns.getPattern', () => {
   });
 });
 
+test('Test Patterns.getPattern returns cached result', () => {
+  const first = Patterns.getPattern('ANSI31');
+  const second = Patterns.getPattern('ANSI31');
+  expect(first).toBe(second);
+});
+
+test('Test Patterns.getPattern cache is case-insensitive', () => {
+  const upper = Patterns.getPattern('HONEY');
+  const lower = Patterns.getPattern('honey');
+  const mixed = Patterns.getPattern('Honey');
+  expect(upper).toBe(lower);
+  expect(upper).toBe(mixed);
+});
+
 
 test('Test Patterns.getPatternLineCount', () => {
   expect(Patterns.getPatternLineCount('HONEY')).toBe(3);
