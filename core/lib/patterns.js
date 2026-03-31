@@ -79,10 +79,13 @@ export class Patterns {
       const patternLines = patternString.pattern.split('\n');
 
       patternLines.forEach((line) => {
-        pattern.push(new PatternLine(line));
+        const patternLine = new PatternLine(line);
+        Object.freeze(patternLine.dashes);
+        Object.freeze(patternLine);
+        pattern.push(patternLine);
       });
 
-      Patterns.#patternCache.set(key, pattern);
+      Patterns.#patternCache.set(key, Object.freeze(pattern));
     }
 
     return Patterns.#patternCache.get(key);
