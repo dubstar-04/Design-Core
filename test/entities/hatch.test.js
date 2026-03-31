@@ -521,10 +521,14 @@ function makeMockCtx() {
     beginPath: () => {},
     setLineDash: () => {},
     lineWidth: 0,
-    moveTo: () => { moveCount++; },
+    moveTo: () => {
+      moveCount++;
+    },
     lineTo: () => {},
     stroke: () => {},
-    fill: () => { fillCalled = true; },
+    fill: () => {
+      fillCalled = true;
+    },
     getMoveCalls: () => moveCount,
     getFillCalled: () => fillCalled,
   };
