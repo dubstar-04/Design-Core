@@ -233,10 +233,11 @@ export class BasePolyline extends Entity {
    * @return {Array}
    */
   toPolylinePoints() {
+    const points = this.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence));
     if (this.flags.hasFlag(1)) {
-      return [...this.points, new Point(this.points[0].x, this.points[0].y)];
+      points.push(new Point(this.points[0].x, this.points[0].y));
     }
-    return this.points;
+    return points;
   }
 
   /**
