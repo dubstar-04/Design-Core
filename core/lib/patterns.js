@@ -62,24 +62,30 @@ export class PatternLine {
 
 /** Pattern Class */
 export class Patterns {
+  // Cache parsed PatternLine arrays — patterns are static and never change
+  static #patternCache = new Map();
+
   /**
          * Get Pattern
          * @param {string} name
-         * @return {string} pattern string for the pattern name
+         * @return {Array} array of PatternLine objects for the pattern name
          */
   static getPattern(name) {
-    // create empty pattern
-    const pattern = [];
-    // get the pattern string
-    const patternString = Patterns.hatch_patterns[name.toUpperCase()];
-    // split the pattern into separate lines
-    const patternLines = patternString.pattern.split('\n');
+    const key = name.toUpperCase();
 
-    patternLines.forEach((line) => {
-      pattern.push(new PatternLine(line));
-    });
+    if (!Patterns.#patternCache.has(key)) {
+      const pattern = [];
+      const patternString = Patterns.hatch_patterns[key];
+      const patternLines = patternString.pattern.split('\n');
 
-    return pattern;
+      patternLines.forEach((line) => {
+        pattern.push(new PatternLine(line));
+      });
+
+      Patterns.#patternCache.set(key, pattern);
+    }
+
+    return Patterns.#patternCache.get(key);
   }
 
   /**
