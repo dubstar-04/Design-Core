@@ -480,7 +480,7 @@ export class Hatch extends Entity {
     }
 
     // Draw the pattern/fill once over the composite clipped region
-    this.createPattern(ctx, scale);
+    this.createPattern(ctx, scale, bb);
 
     ctx.restore();
   }
@@ -489,14 +489,15 @@ export class Hatch extends Entity {
    * Draw the hatch pattern to the context
    * @param {Object} ctx
    * @param {number} scale
+   * @param {BoundingBox} boundingbox - bounding box of the hatch boundaries, used to size the pattern
    */
-  createPattern(ctx, scale) {
+  createPattern(ctx, scale, boundingbox) {
     if (!Patterns.patternExists(this.patternName) || this.solid) {
       ctx.fill();
       return;
     }
 
-    const boundingBox = this.boundingBox();
+    const boundingBox = boundingbox;
     const centerPoint = boundingBox.centerPoint;
     const bbXLength = boundingBox.xLength;
     const bbYLength = boundingBox.yLength;
