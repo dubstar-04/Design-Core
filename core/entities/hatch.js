@@ -456,18 +456,12 @@ export class Hatch extends Entity {
       ctx.closePath();
     }
 
-    // Set even-odd fill rule for island support
-    try { // Cairo
-      ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
-    } catch {
-      // HTML Canvas uses the evenodd parameter in clip/fill calls
-    }
-
     // Clip using even-odd rule
-    try { // HTML Canvas
-      ctx.clip('evenodd');
-    } catch { // Cairo - clip() takes no arguments, uses the fill rule set above
+    try { // Cairo - clip() takes no arguments, uses the fill rule set above
+      ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
       ctx.clip();
+    } catch { // HTML Canvas
+      ctx.clip('evenodd');
     }
 
     // Start a new path for the pattern/fill area
