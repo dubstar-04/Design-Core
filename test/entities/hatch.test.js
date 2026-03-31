@@ -492,7 +492,9 @@ test('Test Hatch.processSelection', () => {
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);
   expect(boundaryData.length).toEqual(1);
-  expect(boundaryData[0].points.length).toEqual(5);
+  // 2 lines + 2 arcs: each shared connection point is merged (not duplicated),
+  // so the result is 4 unique vertices, not 5
+  expect(boundaryData[0].points.length).toEqual(4);
 
   // Test a selection with invalid items
   selectedItems = [];
