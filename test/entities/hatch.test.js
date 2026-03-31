@@ -509,6 +509,10 @@ test('Test Hatch.processSelection', () => {
 });
 
 // Minimal mock canvas context that records moveTo calls and supports try/catch split
+/**
+ * Create a minimal mock canvas context
+ * @return {Object} mock context
+ */
 function makeMockCtx() {
   let moveCount = 0;
   let fillCalled = false;
