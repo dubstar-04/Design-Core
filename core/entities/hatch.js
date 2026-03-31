@@ -409,7 +409,7 @@ export class Hatch extends Entity {
    * @param {number} scale
    */
   draw(ctx, scale) {
-    // ensure the scale is value
+    // ensure the scale is valid
     if (this.scale < 0.01) {
       this.scale = 1;
     }
