@@ -438,6 +438,22 @@ test('Test BasePolyline.toPolylinePoints', () => {
   expect(polylinePoints[2].bulge).toBe(0);
 });
 
+test('Test BasePolyline.toPolylinePoints returns defensive copy for open polyline', () => {
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10)];
+  points[1].bulge = -1;
+  const polyline = new BasePolyline({ points: points });
+
+  const result = polyline.toPolylinePoints();
+  // Mutate the returned array and one of the returned points
+  result.reverse();
+  result[0].bulge = 99;
+
+  // Original this.points must be unaffected
+  expect(polyline.points.length).toBe(3);
+  expect(polyline.points[0].x).toBe(0);
+  expect(polyline.points[1].bulge).toBe(-1);
+});
+
 test('Test BasePolyline.toPolylinePoints closed polyline appends closure point', () => {
   // A triangle closed via the Close command (flag bit 1 set, no duplicate
   // point stored in this.points).
