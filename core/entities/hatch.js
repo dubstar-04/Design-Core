@@ -544,10 +544,20 @@ export class Hatch extends Entity {
 
       const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
 
-      // TODO: Optimise the size of the hatch to reduce drawing
-      const hatchSize = Math.max(bbXLength, bbYLength, dashLength) / this.scale;
-      const xIncrement = Math.abs(Math.ceil((hatchSize) / dashLength));
-      const yIncrement = Math.abs(Math.ceil((hatchSize) / patternLine.yDelta));
+      // Project the bounding box onto the pattern's rotated local axes
+      // to compute tight line counts instead of using the worst-case max dimension.
+      const halfW = bbXLength / (2 * this.scale);
+      const halfH = bbYLength / (2 * this.scale);
+      const sinR = Math.abs(Math.sin(rotation));
+      const cosR = Math.abs(Math.cos(rotation));
+
+      // Half-extent along the line direction (X in local frame)
+      const halfX = halfW * cosR + halfH * sinR;
+      // Half-extent perpendicular to lines (Y in local frame)
+      const halfY = halfW * sinR + halfH * cosR;
+
+      const xIncrement = Math.ceil(halfX / dashLength);
+      const yIncrement = Math.ceil(halfY / Math.abs(patternLine.yDelta));
 
       // Set transform once for all lines in this pattern line family
       ctx.save();
