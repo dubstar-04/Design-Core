@@ -38,9 +38,15 @@ test('Test Patterns.getPattern frozen cache is not corrupted by caller mutation 
   const originalLength = pattern.length;
 
   // In strict mode (ESM), mutating frozen objects throws TypeError
-  expect(() => { pattern[0].angle = 999; }).toThrow(TypeError);
-  expect(() => { pattern[0].dashes.push(999); }).toThrow(TypeError);
-  expect(() => { pattern.push(null); }).toThrow(TypeError);
+  expect(() => {
+    pattern[0].angle = 999;
+  }).toThrow(TypeError);
+  expect(() => {
+    pattern[0].dashes.push(999);
+  }).toThrow(TypeError);
+  expect(() => {
+    pattern.push(null);
+  }).toThrow(TypeError);
 
   // Cache is unaffected
   const patternAgain = Patterns.getPattern('ANSI31');
