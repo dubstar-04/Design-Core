@@ -576,10 +576,9 @@ export class Hatch extends Entity {
         file.writeGroupCode('20', shape.points[j].y); // Y
         file.writeGroupCode('42', shape.points[j].bulge);
       }
-    }
 
-    file.writeGroupCode('97', '0'); // Number of source boundary objects
-    // file.writeGroupCode('330', '25'); // Handle of source boundary objects
+      file.writeGroupCode('97', '0'); // Number of source boundary objects
+    }
     file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
     file.writeGroupCode('76', '1'); // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
 
