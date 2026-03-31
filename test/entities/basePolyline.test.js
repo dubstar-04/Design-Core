@@ -6,6 +6,7 @@ import { Arc } from '../../core/entities/arc.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
+import { Flags } from '../../core/properties/flags.js';
 
 import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
@@ -435,6 +436,24 @@ test('Test BasePolyline.toPolylinePoints', () => {
   expect(polylinePoints[2].x).toBe(200);
   expect(polylinePoints[2].y).toBe(50);
   expect(polylinePoints[2].bulge).toBe(0);
+});
+
+test('Test BasePolyline.toPolylinePoints closed polyline appends closure point', () => {
+  // A triangle closed via the Close command (flag bit 1 set, no duplicate
+  // point stored in this.points).
+  const points = [new Point(0, 0), new Point(10, 0), new Point(5, 10)];
+  const flags = new Flags();
+  flags.addValue(1); // closed flag
+  const polyline = new BasePolyline({ points: points, flags: flags });
+
+  const polylinePoints = polyline.toPolylinePoints();
+  // Should have 4 points: the 3 vertices plus the closure point
+  expect(polylinePoints.length).toBe(4);
+  // Closure point matches the first point
+  expect(polylinePoints[3].x).toBe(polylinePoints[0].x);
+  expect(polylinePoints[3].y).toBe(polylinePoints[0].y);
+  // The original this.points array is not mutated
+  expect(polyline.points.length).toBe(3);
 });
 
 test('Polyline.execute handles Close option', async () => {
