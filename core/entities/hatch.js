@@ -383,15 +383,30 @@ export class Hatch extends Entity {
             currentPoints.at(-1).bulge = startBulge * -1;
           }
 
-          iterationPoints.push(...currentPoints);
+          // Merge the shared connection point rather than pushing a duplicate.
+          // Arc.toPolylinePoints() stores the outgoing arc bulge on its start
+          // point; the previous entity left that slot with bulge=0 (destination
+          // only). Transfer the bulge and skip the duplicate so that:
+          //   - arc geometry is preserved exactly
+          //   - floating-point trig differences (e.g. Math.cos(3π/2) ≈ -1.8e-16
+          //     instead of 0) cannot produce a spurious near-zero segment
+          if (iterationPoints.length && currentPoints[0].isSame(iterationPoints.at(-1))) {
+            if (currentPoints[0].bulge !== 0) {
+              iterationPoints.at(-1).bulge = currentPoints[0].bulge;
+            }
+            iterationPoints.push(...currentPoints.slice(1));
+          } else {
+            iterationPoints.push(...currentPoints);
+          }
+
           // remove the index from selected items
           selectedItems = selectedItems.filter((index) => index !== selectedItems[i]);
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1))) {
             const shape = new Polyline();
-            // deduplicate points
-            const uniquePoints = iterationPoints.filter((point, index, self) => index === self.findIndex((p) => (p.x === point.x && p.y === point.y)));
-            shape.points.push(...uniquePoints);
+            // Drop the redundant closure point — the first point already records
+            // the same position; keeping it would create a zero-length segment
+            shape.points.push(...iterationPoints.slice(0, -1));
             selectedchildEntities.push(shape);
             iterationPoints = [];
             break;
