@@ -53,13 +53,13 @@ test('Test HandleManager.handseed setter', () => {
   expect(handle.next()).toBe('100');
 });
 
-test('Test HandleManager.handseed setter does not lower the counter below the set value', () => {
+test('Test HandleManager.handseed setter directly assigns counter, even below current value', () => {
   const handle = new HandleManager();
-  // Advance the counter then set handseed to a lower value — counter reflects the set value
+  // Advance the counter, then set handseed to a lower value.
+  // The setter performs a direct assignment with no lower-bound guard.
   handle.next(); // counter → 11
   handle.next(); // counter → 12
   handle.handseed = '5'; // parseInt('5', 16) = 5
-  // Counter is now 5 even though it was higher; handseed setter simply assigns
   expect(handle.counter).toBe(5);
 });
 
