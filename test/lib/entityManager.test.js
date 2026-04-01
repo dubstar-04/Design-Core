@@ -58,6 +58,40 @@ describe('EntityManager', () => {
     expect(mgr.get(0)).toBe(l2);
   });
 
+  test('remove releases the entity handle from HandleManager', () => {
+    const mgr = DesignCore.Scene.entities;
+    const line = new Line({ points: [new Point(0, 0), new Point(1, 0)] });
+    mgr.add(line);
+    const handle = line.handle;
+    expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(true);
+    mgr.remove(0);
+    expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(false);
+  });
+
+  test('remove then re-add (undo) does not produce a duplicate handle', () => {
+    const mgr = DesignCore.Scene.entities;
+    const line = new Line({ points: [new Point(0, 0), new Point(1, 0)] });
+    mgr.add(line);
+    const handle = line.handle;
+    const sizeAfterAdd = DesignCore.HandleManager.usedHandles.size;
+
+    mgr.remove(0);
+    // After remove the handle must be released
+    expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(false);
+    expect(DesignCore.HandleManager.usedHandles.size).toBe(sizeAfterAdd - 1);
+
+    // Re-add the same entity (simulates undo of a delete)
+    mgr.add(line);
+    expect(line.handle).toBe(handle);
+    expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(true);
+    // Size must return to what it was after the first add, not grow by one.
+    // If checkHandle silently re-inserted without the prior releaseHandle, the
+    // Set would still show size = sizeAfterAdd (Sets deduplicate), but the
+    // error log would fire. Tracking size across remove → re-add catches the
+    // case where releaseHandle was not called and size never shrank.
+    expect(DesignCore.HandleManager.usedHandles.size).toBe(sizeAfterAdd);
+  });
+
 
   test('indexOf - test correct index is returned', () => {
     const mgr = DesignCore.Scene.entities;

@@ -213,50 +213,49 @@ export class Intersection {
 
 
     let result;
-    const a = (a2.x - a1.x) * (a2.x - a1.x) +
-      (a2.y - a1.y) * (a2.y - a1.y);
-    const b = 2 * ((a2.x - a1.x) * (a1.x - c.x) +
-      (a2.y - a1.y) * (a1.y - c.y));
-    const cc = c.x * c.x + c.y * c.y + a1.x * a1.x + a1.y * a1.y -
-      2 * (c.x * a1.x + c.y * a1.y) - r * r;
-    const deter = b * b - 4 * a * cc;
+    const lineDir = a2.subtract(a1); // direction vector of the line segment
+    const centreToStart = a1.subtract(c); // vector from circle centre to line start
+    const quadA = lineDir.dot(lineDir); // squared length of the line segment
+    const quadB = 2 * lineDir.dot(centreToStart); // linear coefficient (projection term)
+    const quadC = centreToStart.dot(centreToStart) - r * r; // constant coefficient (signed distance²)
+    const discriminant = quadB * quadB - 4 * quadA * quadC;
 
-    if (deter < 0) {
+    if (discriminant < 0) {
       result = new Intersection(Intersection.Status.OUTSIDE);
-    } else if (deter == 0) {
+    } else if (discriminant === 0) {
       result = new Intersection(Intersection.Status.TANGENT);
-      const u = -b / (2 * a);
+      const u = -quadB / (2 * quadA);
       if (0 <= u && u <= 1 || extend) {
         result.appendPoint(a1.lerp(a2, u));
       }
     } else {
-      const e = Math.sqrt(deter);
-      const u1 = (-b + e) / (2 * a);
-      const u2 = (-b - e) / (2 * a);
+      const sqrtDiscriminant = Math.sqrt(discriminant); // square root of discriminant — half-spread between the two roots
+      const lineParam1 = (-quadB + sqrtDiscriminant) / (2 * quadA); // parametric t for first intersection (0 = line start, 1 = line end)
+      const lineParam2 = (-quadB - sqrtDiscriminant) / (2 * quadA); // parametric t for second intersection (0 = line start, 1 = line end)
 
-      if ((u1 < 0 || u1 > 1) && (u2 < 0 || u2 > 1)) {
-        if ((u1 < 0 && u2 < 0) || (u1 > 1 && u2 > 1)) {
+      if ((lineParam1 < 0 || lineParam1 > 1) && (lineParam2 < 0 || lineParam2 > 1)) {
+        if ((lineParam1 < 0 && lineParam2 < 0) || (lineParam1 > 1 && lineParam2 > 1)) {
           result = new Intersection(Intersection.Status.OUTSIDE);
           if (extend) {
-            result.appendPoint(a1.lerp(a2, u1));
-            result.appendPoint(a1.lerp(a2, u2));
+            result.appendPoint(a1.lerp(a2, lineParam1));
+            result.appendPoint(a1.lerp(a2, lineParam2));
           }
         } else {
           result = new Intersection(Intersection.Status.INSIDE);
           if (extend) {
-            result.appendPoint(a1.lerp(a2, u1));
-            result.appendPoint(a1.lerp(a2, u2));
+            result.appendPoint(a1.lerp(a2, lineParam1));
+            result.appendPoint(a1.lerp(a2, lineParam2));
           }
         }
       } else {
         result = new Intersection(Intersection.Status.INTERSECTION);
 
-        if (0 <= u1 && u1 <= 1 || extend) {
-          result.appendPoint(a1.lerp(a2, u1));
+        if (0 <= lineParam1 && lineParam1 <= 1 || extend) {
+          result.appendPoint(a1.lerp(a2, lineParam1));
         }
 
-        if (0 <= u2 && u2 <= 1 || extend) {
-          result.appendPoint(a1.lerp(a2, u2));
+        if (0 <= lineParam2 && lineParam2 <= 1 || extend) {
+          result.appendPoint(a1.lerp(a2, lineParam2));
         }
       }
     }
@@ -294,19 +293,19 @@ export class Intersection {
     } else {
       result = new Intersection(Intersection.Status.INTERSECTION);
 
-      const a = (r1 * r1 - r2 * r2 + cDist * cDist) / (2 * cDist);
-      const h = Math.sqrt(r1 * r1 - a * a);
-      const p = c1.lerp(c2, a / cDist);
-      const b = h / cDist;
+      // Distance from c1 to the radical axis along the line of centres
+      const axialDist = (r1 * r1 - r2 * r2 + cDist * cDist) / (2 * cDist);
+      // Half the length of the chord connecting the two intersection points
+      const halfChordLength = Math.sqrt(r1 * r1 - axialDist * axialDist);
+      // Point on the line of centres where the perpendicular bisector of the chord passes through
+      const chordMidpoint = c1.lerp(c2, axialDist / cDist);
+      // Normalised scale factor for the perpendicular offset
+      const perpScale = halfChordLength / cDist;
+      // Perpendicular offset vector from chordMidpoint to each intersection point
+      const perpOffset = new Point(-(c2.y - c1.y), c2.x - c1.x).scale(perpScale);
 
-      result.appendPoint(new Point(
-          p.x - b * (c2.y - c1.y),
-          p.y + b * (c2.x - c1.x),
-      ));
-      result.appendPoint(new Point(
-          p.x + b * (c2.y - c1.y),
-          p.y - b * (c2.x - c1.x),
-      ));
+      result.appendPoint(chordMidpoint.add(perpOffset));
+      result.appendPoint(chordMidpoint.subtract(perpOffset));
     }
 
     return result;
