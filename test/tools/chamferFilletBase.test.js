@@ -56,7 +56,7 @@ test('ChamferFilletBase.resolveCornerGeometry returns false and notifies for par
   chamfer.secondPick.clickPoint = new Point(5, 2);
 
   expect(chamfer.resolveCornerGeometry('test-msg')).toBe(false);
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.PARALLELLINES);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.PARALLELLINES));
   notifySpy.mockRestore();
 });
 

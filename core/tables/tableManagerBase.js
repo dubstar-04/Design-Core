@@ -158,7 +158,7 @@ export class TableManagerBase {
     // Can't delete indelible items (Standard Text Item, Layer 0)
     if (this.indelibleItems.some((item) => item.toUpperCase() === itemToDelete.toUpperCase())) {
       if (showWarning) {
-        DesignCore.Core.notify(`${itemToDelete} ${Strings.Message.CANNOTBEDELETED}`);
+        DesignCore.Core.notify(`${itemToDelete} - ${Strings.Message.CANNOTBEDELETED}`);
       }
       return;
     }
@@ -275,13 +275,13 @@ export class TableManagerBase {
 
     // Can't rename indelible items (Standard Text Item, Layer 0)
     if (this.indelibleItems.some((item) => item.toUpperCase() === itemToRename.toUpperCase())) {
-      DesignCore.Core.notify(`${itemToRename} ${Strings.Message.CANNOTBERENAMED}`);
+      DesignCore.Core.notify(`${itemToRename} - ${Strings.Message.CANNOTBERENAMED}`);
       return;
     }
 
     // Can't use the name of indelible items (Standard Text Item, Layer 0)
     if (this.indelibleItems.some((item) => item.toUpperCase() === newName.toUpperCase())) {
-      DesignCore.Core.notify(`${newName} ${Strings.Message.CANNOTBERENAMED}`);
+      DesignCore.Core.notify(`${newName} - ${Strings.Message.CANNOTBERENAMED}`);
       return;
     }
 

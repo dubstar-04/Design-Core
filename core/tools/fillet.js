@@ -45,7 +45,7 @@ export class Fillet extends ChamferFilletBase {
             const r = await DesignCore.Scene.inputManager.requestInput(rop);
             if (r === undefined) return;
             if (r < 0) {
-              DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
+              DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.INVALIDNUMBER}`);
             } else {
               DesignCore.Scene.headers.filletRadius = r;
             }
@@ -64,10 +64,10 @@ export class Fillet extends ChamferFilletBase {
         const firstEntity = DesignCore.Scene.entities.get(input1.selectedItemIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
         if (!(firstEntity instanceof Line) && !(firstEntity instanceof BasePolyline)) {
-          DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOFILLET}`);
+          DesignCore.Core.notify(`${this.type} - ${firstEntity.type} ${Strings.Message.NOFILLET}`);
           continue;
         }
-        if (!this.firstPick.setPick(firstEntity, input1.selectedPoint, `${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
+        if (!this.firstPick.setPick(firstEntity, input1.selectedPoint, `${Strings.Strings.ARC} - ${Strings.Message.NOFILLET}`)) continue;
 
         // Prompt for second object
         const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -78,10 +78,10 @@ export class Fillet extends ChamferFilletBase {
           const candidate = DesignCore.Scene.entities.get(input2.selectedItemIndex);
           DesignCore.Scene.selectionManager.removeLastSelection();
           if (!(candidate instanceof Line) && !(candidate instanceof BasePolyline)) {
-            DesignCore.Core.notify(`${candidate.type} ${Strings.Message.NOFILLET}`);
+            DesignCore.Core.notify(`${this.type} - ${candidate.type} ${Strings.Message.NOFILLET}`);
             continue;
           }
-          if (!this.secondPick.setPick(candidate, input2.selectedPoint, `${Strings.Strings.ARC} ${Strings.Message.NOFILLET}`)) continue;
+          if (!this.secondPick.setPick(candidate, input2.selectedPoint, `${Strings.Strings.ARC} - ${Strings.Message.NOFILLET}`)) continue;
           // If both selections are the same polyline, segments must be consecutive
           // or they must be the open-end segments of an open polyline.
           if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
@@ -91,7 +91,7 @@ export class Fillet extends ChamferFilletBase {
               ((this.firstPick.segmentIndex === 1 && this.secondPick.segmentIndex === lastIdx) ||
                (this.secondPick.segmentIndex === 1 && this.firstPick.segmentIndex === lastIdx));
             if (!isConsecutive && !isOpenEnds) {
-              DesignCore.Core.notify(Strings.Message.NONCONSECUTIVESEGMENTS);
+              DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Message.NONCONSECUTIVESEGMENTS}`);
               continue;
             }
           }
@@ -140,7 +140,7 @@ export class Fillet extends ChamferFilletBase {
 
     // Collinear or antiparallel lines cannot be filleted
     if (cornerAngle < Constants.Tolerance.EPSILON || cornerAngle > Math.PI - Constants.Tolerance.EPSILON) {
-      DesignCore.Core.notify(Strings.Error.PARALLELLINES);
+      DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
       return;
     }
 
@@ -166,7 +166,7 @@ export class Fillet extends ChamferFilletBase {
       const secondTangentDot = secondTangentPoint.subtract(this.intersectionPoint).dot(secondKeptDir);
       if (firstTangentDot < 0 || firstTangentDot > firstKeptDir.dot(firstKeptDir) ||
           secondTangentDot < 0 || secondTangentDot > secondKeptDir.dot(secondKeptDir)) {
-        DesignCore.Core.notify(`${this.type}: ${Strings.Error.RADIUSTOOLARGE}`);
+        DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.RADIUSTOOLARGE}`);
         return;
       }
     }

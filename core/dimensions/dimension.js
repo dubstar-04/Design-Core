@@ -141,7 +141,7 @@ export class Dimension extends BaseDimension {
               }
             }
           } else {
-            const msg = `${this.type} - Unsupported Type: ${selectedItem.type}`;
+            const msg = `${this.type} - ${Strings.Error.INVALIDTYPE}: ${selectedItem.type}`;
             DesignCore.Core.notify(msg);
             DesignCore.Scene.selectionManager.reset();
           }

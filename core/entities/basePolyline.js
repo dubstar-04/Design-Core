@@ -510,7 +510,7 @@ export class BasePolyline extends Entity {
 
     // Only allow extending line segments (not arcs)
     if (endSegmentBulge !== 0) {
-      DesignCore.Core.notify(`${this.type} ${Strings.Message.NOEXTEND}`);
+      DesignCore.Core.notify(`${this.type} - ${Strings.Message.NOEXTEND}`);
       return stateChanges;
     }
 

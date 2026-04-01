@@ -46,14 +46,14 @@ export class Chamfer extends ChamferFilletBase {
             const d1 = await DesignCore.Scene.inputManager.requestInput(dop1);
             if (d1 === undefined) return;
             if (d1 < 0) {
-              DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
+              DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDNUMBER}`);
             } else {
               DesignCore.Scene.headers.chamferDistanceA = d1;
               const dop2 = new PromptOptions('Specify second chamfer distance', [Input.Type.NUMBER]);
               const d2 = await DesignCore.Scene.inputManager.requestInput(dop2);
               if (d2 === undefined) return;
               if (d2 < 0) {
-                DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
+                DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDNUMBER}`);
               } else {
                 DesignCore.Scene.headers.chamferDistanceB = d2;
               }
@@ -64,14 +64,14 @@ export class Chamfer extends ChamferFilletBase {
             const len = await DesignCore.Scene.inputManager.requestInput(lop);
             if (len === undefined) return;
             if (len < 0) {
-              DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
+              DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDNUMBER}`);
             } else {
               DesignCore.Scene.headers.chamferLength = len;
               const aop = new PromptOptions(Strings.Input.ANGLE, [Input.Type.NUMBER]);
               const ang = await DesignCore.Scene.inputManager.requestInput(aop);
               if (ang === undefined) return;
               if (ang <= 0 || ang >= 180) {
-                DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
+                DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDNUMBER}`);
               } else {
                 DesignCore.Scene.headers.chamferAngle = ang;
               }
@@ -97,10 +97,10 @@ export class Chamfer extends ChamferFilletBase {
         const firstEntity = DesignCore.Scene.entities.get(input1.selectedItemIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
         if (!(firstEntity instanceof Line) && !(firstEntity instanceof BasePolyline)) {
-          DesignCore.Core.notify(`${firstEntity.type} ${Strings.Message.NOCHAMFER}`);
+          DesignCore.Core.notify(`${firstEntity.type} - ${Strings.Message.NOCHAMFER}`);
           continue;
         }
-        if (!this.firstPick.setPick(firstEntity, input1.selectedPoint, `${Strings.Strings.ARC} ${Strings.Message.NOCHAMFER}`)) continue;
+        if (!this.firstPick.setPick(firstEntity, input1.selectedPoint, `${Strings.Strings.ARC} - ${Strings.Message.NOCHAMFER}`)) continue;
 
         // Prompt for second object
         const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -111,10 +111,10 @@ export class Chamfer extends ChamferFilletBase {
           const candidate = DesignCore.Scene.entities.get(input2.selectedItemIndex);
           DesignCore.Scene.selectionManager.removeLastSelection();
           if (!(candidate instanceof Line) && !(candidate instanceof BasePolyline)) {
-            DesignCore.Core.notify(`${candidate.type} ${Strings.Message.NOCHAMFER}`);
+            DesignCore.Core.notify(`${this.type} - ${candidate.type} ${Strings.Message.NOCHAMFER}`);
             continue;
           }
-          if (!this.secondPick.setPick(candidate, input2.selectedPoint, `${Strings.Strings.ARC} ${Strings.Message.NOCHAMFER}`)) continue;
+          if (!this.secondPick.setPick(candidate, input2.selectedPoint, `${Strings.Strings.ARC} - ${Strings.Message.NOCHAMFER}`)) continue;
           // If both selections are the same polyline, segments must be consecutive
           // or they must be the open-end segments of an open polyline.
           if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
@@ -124,7 +124,7 @@ export class Chamfer extends ChamferFilletBase {
               ((this.firstPick.segmentIndex === 1 && this.secondPick.segmentIndex === lastIdx) ||
                (this.secondPick.segmentIndex === 1 && this.firstPick.segmentIndex === lastIdx));
             if (!isConsecutive && !isOpenEnds) {
-              DesignCore.Core.notify(Strings.Message.NONCONSECUTIVESEGMENTS);
+              DesignCore.Core.notify(`${this.type} - ${Strings.Message.NONCONSECUTIVESEGMENTS}`);
               continue;
             }
           }
@@ -186,7 +186,7 @@ export class Chamfer extends ChamferFilletBase {
       const alpha = DesignCore.Scene.headers.chamferAngle * (Math.PI / 180);
 
       if (alpha <= 0 || alpha >= Math.PI) {
-        DesignCore.Core.notify(Strings.Error.INVALIDNUMBER);
+        DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.INVALIDNUMBER}`);
         return;
       }
 
@@ -207,7 +207,7 @@ export class Chamfer extends ChamferFilletBase {
       );
       if (!secondChamferPoint) {
         // Chamfer direction is parallel to line2 — no intersection
-        DesignCore.Core.notify(Strings.Error.PARALLELLINES);
+        DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
         return;
       }
     }

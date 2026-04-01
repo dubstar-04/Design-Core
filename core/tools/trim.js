@@ -100,7 +100,7 @@ export class Trim extends Tool {
           DesignCore.Scene.commit(stateChanges);
         }
       } else {
-        DesignCore.Core.notify(`${this.selectedItem.type} ${Strings.Message.NOTRIM}`);
+        DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOTRIM}`);
       }
     }
 

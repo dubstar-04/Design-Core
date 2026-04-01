@@ -36,11 +36,11 @@ export class ChamferFilletBase extends Tool {
    */
   resolveCornerGeometry(noEntityMsg) {
     if (!this.firstPick.resolveEndpoints()) {
-      DesignCore.Core.notify(`${this.firstPick.entity.type} ${noEntityMsg}`);
+      DesignCore.Core.notify(`${this.type} - ${this.firstPick.entity.type} ${noEntityMsg}`);
       return false;
     }
     if (!this.secondPick.resolveEndpoints()) {
-      DesignCore.Core.notify(`${this.secondPick.entity.type} ${noEntityMsg}`);
+      DesignCore.Core.notify(`${this.type} - ${this.secondPick.entity.type} ${noEntityMsg}`);
       return false;
     }
 
@@ -50,13 +50,13 @@ export class ChamferFilletBase extends Tool {
     );
 
     if (!this.intersectionPoint) {
-      DesignCore.Core.notify(Strings.Error.PARALLELLINES);
+      DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
       return false;
     }
 
     if (this.firstPick.clickDistance(this.intersectionPoint) < Constants.Tolerance.EPSILON ||
         this.secondPick.clickDistance(this.intersectionPoint) < Constants.Tolerance.EPSILON) {
-      DesignCore.Core.notify(Strings.Error.SELECTION);
+      DesignCore.Core.notify(`${this.type} - ${Strings.Error.SELECTION}`);
       return false;
     }
 
