@@ -213,15 +213,14 @@ export class Intersection {
 
 
     let result;
-    const a = (a2.x - a1.x) * (a2.x - a1.x) +
-      (a2.y - a1.y) * (a2.y - a1.y);
-    const b = 2 * ((a2.x - a1.x) * (a1.x - c.x) +
-      (a2.y - a1.y) * (a1.y - c.y));
-    const cc = c.x * c.x + c.y * c.y + a1.x * a1.x + a1.y * a1.y -
-      2 * (c.x * a1.x + c.y * a1.y) - r * r;
-    const deter = b * b - 4 * a * cc;
+    const lineDir = a2.subtract(a1); // direction vector of the line segment
+    const centreToStart = a1.subtract(c); // vector from circle centre to line start
+    const quadA = lineDir.dot(lineDir); // squared length of the line segment
+    const quadB = 2 * lineDir.dot(centreToStart); // linear coefficient (projection term)
+    const quadC = centreToStart.dot(centreToStart) - r * r; // constant coefficient (signed distance²)
+    const discriminant = quadB * quadB - 4 * quadA * quadC;
 
-    if (deter < 0) {
+    if (discriminant < 0) {
       result = new Intersection(Intersection.Status.OUTSIDE);
     } else if (deter == 0) {
       result = new Intersection(Intersection.Status.TANGENT);
