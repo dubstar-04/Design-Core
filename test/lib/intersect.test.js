@@ -453,3 +453,74 @@ test('intersectPolylinePolyline - full circle vs diameter line, non-origin centr
     expect(dist).toBeCloseTo(r, 3);
   }
 });
+
+// ------------------------------------------------------------
+// intersectCircleCircle — covering the INTERSECTION and OUTSIDE
+// branches of #intersectCircleCircle, including the refactored
+// axialDist / halfChordLength / chordMidpoint / perpOffset logic.
+// ------------------------------------------------------------
+
+test('intersectSegmentSegment - arc vs arc, two intersecting circles, single shared point per arc pair', () => {
+  // Circle 1: centre (0,0), radius 5 — top CCW semicircle: (5,0) → (-5,0)
+  // Circle 2: centre (6,0), radius 5 — top CCW semicircle: (11,0) → (1,0)
+  // The two circles intersect at (3,4) and (3,-4).
+  // Both top arcs contain (3,4); neither contains (3,-4).
+  const result = Intersection.intersectSegmentSegment(
+      new Point(5, 0, 1), new Point(-5, 0),
+      new Point(11, 0, 1), new Point(1, 0),
+      false,
+  );
+  expect(result.status).toBe('Intersection');
+  expect(result.points.length).toBe(1);
+  expect(result.points[0].x).toBeCloseTo(3);
+  expect(result.points[0].y).toBeCloseTo(4);
+});
+
+test('intersectSegmentSegment - arc vs arc, circles outside each other', () => {
+  // Circle 1: centre (0,0), radius 5  — top arc: (5,0) → (-5,0)
+  // Circle 2: centre (20,0), radius 5 — top arc: (25,0) → (15,0)
+  // cDist (20) > rMax (10): OUTSIDE, no intersection points.
+  const result = Intersection.intersectSegmentSegment(
+      new Point(5, 0, 1), new Point(-5, 0),
+      new Point(25, 0, 1), new Point(15, 0),
+      false,
+  );
+  expect(result.status).toBe('Outside');
+  expect(result.points.length).toBe(0);
+});
+
+test('intersectPolylinePolyline - two full circles (two arcs each) intersecting at two points', () => {
+  // Circle 1: centre (0,0), radius 5.
+  // Circle 2: centre (6,0), radius 5.
+  // Intersection points: (3,4) and (3,-4).
+  // Each circle is represented as two CCW semicircular arc segments.
+  const circle1 = [new Point(5, 0, 1), new Point(-5, 0, 1), new Point(5, 0)];
+  const circle2 = [new Point(11, 0, 1), new Point(1, 0, 1), new Point(11, 0)];
+
+  const result = Intersection.intersectPolylinePolyline(circle1, circle2, false);
+  expect(result.status).toBe('Intersection');
+  expect(result.points.length).toBe(2);
+
+  // Both points must lie on both circles (radius 5 from each centre).
+  for (const pt of result.points) {
+    expect(Math.sqrt(pt.x ** 2 + pt.y ** 2)).toBeCloseTo(5);
+    expect(Math.sqrt((pt.x - 6) ** 2 + pt.y ** 2)).toBeCloseTo(5);
+  }
+
+  // Verify the specific coordinate values.
+  const ys = result.points.map((p) => p.y).sort((a, b) => a - b);
+  expect(ys[0]).toBeCloseTo(-4);
+  expect(ys[1]).toBeCloseTo(4);
+  result.points.forEach((p) => expect(p.x).toBeCloseTo(3));
+});
+
+test('intersectPolylinePolyline - two full circles outside each other, no intersection', () => {
+  // Circle 1: centre (0,0), radius 5.
+  // Circle 2: centre (20,0), radius 5. cDist=20 > rMax=10.
+  const circle1 = [new Point(5, 0, 1), new Point(-5, 0, 1), new Point(5, 0)];
+  const circle2 = [new Point(25, 0, 1), new Point(15, 0, 1), new Point(25, 0)];
+
+  const result = Intersection.intersectPolylinePolyline(circle1, circle2, false);
+  expect(result.status).toBe('None');
+  expect(result.points.length).toBe(0);
+});
