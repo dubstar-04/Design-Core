@@ -3,6 +3,7 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 
 import { BasePolyline } from '../../core/entities/basePolyline.js';
+import { BoundingBox } from '../../core/lib/boundingBox.js';
 import { Circle } from '../../core/entities/circle.js';
 import { Line } from '../../core/entities/line.js';
 import { Polyline } from '../../core/entities/polyline.js';
@@ -492,7 +493,9 @@ test('Test Hatch.processSelection', () => {
   hatch = new Hatch();
   boundaryData = hatch.processSelection(selectedItems);
   expect(boundaryData.length).toEqual(1);
-  expect(boundaryData[0].points.length).toEqual(5);
+  // 2 lines + 2 arcs: each shared connection point is merged (not duplicated),
+  // so the result is 4 unique vertices, not 5
+  expect(boundaryData[0].points.length).toEqual(4);
 
   // Test a selection with invalid items
   selectedItems = [];
@@ -503,4 +506,101 @@ test('Test Hatch.processSelection', () => {
   boundaryData = hatch.processSelection(selectedItems);
   expect(boundaryData.length).toEqual(1);
   expect(boundaryData[0].points.length).toEqual(2);
+});
+
+// Minimal mock canvas context that records moveTo calls and supports try/catch split
+/**
+ * Create a minimal mock canvas context
+ * @return {Object} mock context
+ */
+function makeMockCtx() {
+  let moveCount = 0;
+  let fillCalled = false;
+  return {
+    save: () => {},
+    restore: () => {},
+    translate: () => {},
+    scale: () => {},
+    rotate: () => {},
+    beginPath: () => {},
+    setLineDash: () => {},
+    lineWidth: 0,
+    moveTo: () => {
+      moveCount++;
+    },
+    lineTo: () => {},
+    stroke: () => {},
+    fill: () => {
+      fillCalled = true;
+    },
+    getMoveCalls: () => moveCount,
+    getFillCalled: () => fillCalled,
+  };
+}
+
+test('Test Hatch.createPattern solid fill calls ctx.fill', () => {
+  const solidHatch = new Hatch({ patternName: 'SOLID' });
+  solidHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0)] })];
+
+  const ctx = makeMockCtx();
+  solidHatch.createPattern(ctx, 1, solidHatch.boundingBox());
+
+  expect(ctx.getFillCalled()).toBe(true);
+  expect(ctx.getMoveCalls()).toBe(0);
+});
+
+test('Test Hatch.createPattern unknown pattern calls ctx.fill', () => {
+  const unknownHatch = new Hatch({ patternName: 'ANSI31' });
+  unknownHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0)] })];
+  // Override pattern to a nonexistent name without going through setPatternName
+  unknownHatch.pattern = 'NOTAPATTERN';
+
+  const ctx = makeMockCtx();
+  unknownHatch.createPattern(ctx, 1, unknownHatch.boundingBox());
+
+  expect(ctx.getFillCalled()).toBe(true);
+  expect(ctx.getMoveCalls()).toBe(0);
+});
+
+test('Test Hatch.createPattern tight bound line count - square boundary', () => {
+  // ANSI31: angle=45, yDelta=3.175, no dashes (dashLength = bbXLength/2)
+  // 100x100 square: halfW=halfH=50, sin45=cos45=√2/2
+  // halfY = 50*(√2/2) + 50*(√2/2) ≈ 70.71
+  // yIncrement = ceil(70.71 / 3.175) = 23 → loop i=-23..22 = 46 lines
+  const squareBB = new BoundingBox(new Point(0, 100), new Point(100, 0));
+  const squareHatch = new Hatch({ patternName: 'ANSI31' });
+  const ctx = makeMockCtx();
+  squareHatch.createPattern(ctx, 1, squareBB);
+  expect(ctx.getMoveCalls()).toBe(46);
+});
+
+test('Test Hatch.createPattern tight bound line count - flat boundary', () => {
+  // ANSI31: angle=45, yDelta=3.175, no dashes
+  // 100x10 flat box: halfW=50, halfH=5, sin45=cos45=√2/2
+  // halfY = (50+5)*(√2/2) ≈ 38.89
+  // yIncrement = ceil(38.89 / 3.175) = 13 → loop i=-13..12 = 26 lines
+  const flatBB = new BoundingBox(new Point(0, 10), new Point(100, 0));
+  const flatHatch = new Hatch({ patternName: 'ANSI31' });
+  const ctx = makeMockCtx();
+  flatHatch.createPattern(ctx, 1, flatBB);
+  expect(ctx.getMoveCalls()).toBe(26);
+});
+
+test('Test Hatch.createPattern tight bound produces fewer lines for flat boundary', () => {
+  // A flat boundary (100x10) should produce fewer lines than a square (100x100).
+  // This verifies that the tight projection avoids over-generating lines for
+  // non-square shapes, unlike the old Math.max(bbX, bbY) approach.
+  const squareBB = new BoundingBox(new Point(0, 100), new Point(100, 0));
+  const flatBB = new BoundingBox(new Point(0, 10), new Point(100, 0));
+
+  const squareHatch = new Hatch({ patternName: 'ANSI31' });
+  const flatHatch = new Hatch({ patternName: 'ANSI31' });
+
+  const squareCtx = makeMockCtx();
+  squareHatch.createPattern(squareCtx, 1, squareBB);
+
+  const flatCtx = makeMockCtx();
+  flatHatch.createPattern(flatCtx, 1, flatBB);
+
+  expect(flatCtx.getMoveCalls()).toBeLessThan(squareCtx.getMoveCalls());
 });

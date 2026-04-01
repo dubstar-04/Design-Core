@@ -383,15 +383,30 @@ export class Hatch extends Entity {
             currentPoints.at(-1).bulge = startBulge * -1;
           }
 
-          iterationPoints.push(...currentPoints);
+          // Merge the shared connection point rather than pushing a duplicate.
+          // Arc.toPolylinePoints() stores the outgoing arc bulge on its start
+          // point; the previous entity left that slot with bulge=0 (destination
+          // only). Transfer the bulge and skip the duplicate so that:
+          //   - arc geometry is preserved exactly
+          //   - floating-point trig differences (e.g. Math.cos(3π/2) ≈ -1.8e-16
+          //     instead of 0) cannot produce a spurious near-zero segment
+          if (iterationPoints.length && currentPoints[0].isSame(iterationPoints.at(-1))) {
+            if (currentPoints[0].bulge !== 0) {
+              iterationPoints.at(-1).bulge = currentPoints[0].bulge;
+            }
+            iterationPoints.push(...currentPoints.slice(1));
+          } else {
+            iterationPoints.push(...currentPoints);
+          }
+
           // remove the index from selected items
           selectedItems = selectedItems.filter((index) => index !== selectedItems[i]);
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1))) {
             const shape = new Polyline();
-            // deduplicate points
-            const uniquePoints = iterationPoints.filter((point, index, self) => index === self.findIndex((p) => (p.x === point.x && p.y === point.y)));
-            shape.points.push(...uniquePoints);
+            // Drop the redundant closure point — the first point already records
+            // the same position; keeping it would create a zero-length segment
+            shape.points.push(...iterationPoints.slice(0, -1));
             selectedchildEntities.push(shape);
             iterationPoints = [];
             break;
@@ -409,54 +424,80 @@ export class Hatch extends Entity {
    * @param {number} scale
    */
   draw(ctx, scale) {
-    // ensure the scale is value
+    // ensure the scale is valid
     if (this.scale < 0.01) {
       this.scale = 1;
     }
 
+    if (!this.childEntities.length) return;
+
+    ctx.save();
+
+    // Start a new composite path for all boundary loops
+    try {
+      ctx.beginPath();
+    } catch { // Cairo
+      ctx.newPath();
+    }
+
+    // Trace all boundary paths as sub-paths in a single composite path
+    // Using even-odd fill rule, islands are automatically handled:
+    // areas enclosed by an odd number of boundaries are filled,
+    // areas enclosed by an even number are left empty
     for (let i = 0; i < this.childEntities.length; i++) {
       const shape = this.childEntities[i];
-      ctx.save();
-      shape.draw(ctx, scale, false);
-      // ctx.stroke();
+      if (!shape.points.length) continue;
 
-      // Hatch Island Support
-      // Hatch boundarys must be sorted, with internal shape points being clockside and external shape points being counter clockwise
-      // Looks like dxf code 92 states a shape is the outermost when value 16 is set.
-      // clip the current path
-      ctx.clip();
-      // Create a new path because the current path cannot be consumed by a clip
-      try {
-        ctx.beginPath();
-      } catch { // Cairo
-        ctx.newPath();
-      }
-      // Create a shape bigger than the hatch boundary to contain the hatch or fill
-      const bb = shape.boundingBox();
-      try {
-        ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-      } catch {// Cairo
-        ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-      }
-      // for islands create the pattern once all boundary paths are drawn (internal and external)
-      this.createPattern(ctx, scale, shape);
-      ctx.restore();
+      // Start a new sub-path for this boundary
+      ctx.moveTo(shape.points[0].x, shape.points[0].y);
+      // Trace the boundary path (without stroking)
+      shape.draw(ctx, scale, false);
+      // Close the sub-path
+      ctx.closePath();
     }
+
+    // Clip using even-odd rule
+    try { // Cairo - clip() takes no arguments, uses the fill rule set above
+      ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
+      ctx.clip();
+    } catch { // HTML Canvas
+      ctx.clip('evenodd');
+    }
+
+    // Start a new path for the pattern/fill area
+    try {
+      ctx.beginPath();
+    } catch { // Cairo
+      ctx.newPath();
+    }
+
+    // Create an oversized rectangle covering all boundaries
+    const bb = this.boundingBox();
+    try {
+      ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+    } catch { // Cairo
+      ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+    }
+
+    // Draw the pattern/fill once over the composite clipped region
+    this.createPattern(ctx, scale, bb);
+
+    ctx.restore();
   }
 
   /**
    * Draw the hatch pattern to the context
    * @param {Object} ctx
    * @param {number} scale
-   * @param {Polyline} shape
+   * @param {BoundingBox} boundingbox - bounding box of the hatch boundaries, used to size the pattern
    */
-  createPattern(ctx, scale, shape) {
+  createPattern(ctx, scale, boundingbox) {
     if (!Patterns.patternExists(this.patternName) || this.solid) {
       ctx.fill();
       return;
     }
 
-    const boundingBox = shape.boundingBox();
+    const boundingBox = boundingbox;
     const centerPoint = boundingBox.centerPoint;
     const bbXLength = boundingBox.xLength;
     const bbYLength = boundingBox.yLength;
@@ -503,10 +544,20 @@ export class Hatch extends Entity {
 
       const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
 
-      // TODO: Optimise the size of the hatch to reduce drawing
-      const hatchSize = Math.max(bbXLength, bbYLength, dashLength) / this.scale;
-      const xIncrement = Math.abs(Math.ceil((hatchSize) / dashLength));
-      const yIncrement = Math.abs(Math.ceil((hatchSize) / patternLine.yDelta));
+      // Project the bounding box onto the pattern's rotated local axes
+      // to compute tight line counts instead of using the worst-case max dimension.
+      const halfW = bbXLength / (2 * this.scale);
+      const halfH = bbYLength / (2 * this.scale);
+      const sinR = Math.abs(Math.sin(rotation));
+      const cosR = Math.abs(Math.cos(rotation));
+
+      // Half-extent along the line direction (X in local frame)
+      const halfX = halfW * cosR + halfH * sinR;
+      // Half-extent perpendicular to lines (Y in local frame)
+      const halfY = halfW * sinR + halfH * cosR;
+
+      const xIncrement = Math.ceil(halfX / dashLength);
+      const yIncrement = Math.ceil(halfY / Math.abs(patternLine.yDelta));
 
       // Set transform once for all lines in this pattern line family
       ctx.save();
@@ -576,10 +627,9 @@ export class Hatch extends Entity {
         file.writeGroupCode('20', shape.points[j].y); // Y
         file.writeGroupCode('42', shape.points[j].bulge);
       }
-    }
 
-    file.writeGroupCode('97', '0'); // Number of source boundary objects
-    // file.writeGroupCode('330', '25'); // Handle of source boundary objects
+      file.writeGroupCode('97', '0'); // Number of source boundary objects
+    }
     file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
     file.writeGroupCode('76', '1'); // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
 

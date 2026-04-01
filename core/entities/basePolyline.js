@@ -223,11 +223,21 @@ export class BasePolyline extends Entity {
   }
 
   /**
-   * Return a list of points representing a polyline version of this entity
+   * Return a list of points representing a polyline version of this entity.
+   * For closed polylines (flag bit 1 set), appends a copy of the first point
+   * at the end so that callers (e.g. hatch boundary detection, intersection
+   * tests) can treat the sequence as a simple open chain where the first and
+   * last point are equal — the same convention used by Circle.toPolylinePoints().
+   * The closure point carries bulge = 0 because it is just the destination;
+   * the actual closing-segment bulge lives on the last stored point.
    * @return {Array}
    */
   toPolylinePoints() {
-    return this.points;
+    const points = this.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence));
+    if (this.flags.hasFlag(1)) {
+      points.push(new Point(this.points[0].x, this.points[0].y));
+    }
+    return points;
   }
 
   /**
