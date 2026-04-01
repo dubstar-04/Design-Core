@@ -357,13 +357,14 @@ test('Test Intersection.intersectRayRay()', () => {
 // a1² + c² - 2·a1·c is used with an off-origin circle centre.
 // ------------------------------------------------------------
 
-test('intersectSegmentSegment - arc vs line, non-origin centre, two intersections', () => {
+test('intersectSegmentSegment - arc vs line, non-origin centre, two circle intersections but one on arc', () => {
   // Circle centred at (1000, 1000), radius 50.
   // Top point: (1000, 1050), bottom: (1000, 950).
   // Left semicircle arc: top → bottom with bulge=1 (CCW).
   // Horizontal line through centre: (950, 1000) → (1050, 1000).
-  // The line is a chord spanning the full diameter; the left half
-  // intersects once at (950, 1000) and the right half at (1050, 1000).
+  // The full circle intersects the line at (950,1000) and (1050,1000),
+  // but only (950,1000) lies on the left semicircle arc — the arc filter
+  // removes the right-side point, leaving one result.
   const leftArcStart = new Point(1000, 1050, 1);
   const leftArcEnd = new Point(1000, 950);
 
