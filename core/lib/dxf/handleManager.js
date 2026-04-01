@@ -75,6 +75,17 @@ export class HandleManager {
   }
 
   /**
+   * Release a handle back to the pool.
+   * Call this when an entity is removed so the handle is no longer
+   * considered in-use and can be safely re-registered on undo.
+   * @param {string} handle - hex string
+   */
+  releaseHandle(handle) {
+    if (handle === undefined || handle === null) return;
+    this.usedHandles.delete(String(handle).toUpperCase());
+  }
+
+  /**
    * Format a handle value
    * A handle is an arbitrary but unique hex value as string up to 16 hexadecimal digits (8 bytes).
    * @param {number} value

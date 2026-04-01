@@ -51,6 +51,12 @@ export class EntityManager {
    * @param {number} index
    */
   remove(index) {
+    if (this.#trackHandles) {
+      const entity = this.#entities[index];
+      if (entity?.handle !== undefined) {
+        DesignCore.HandleManager.releaseHandle(entity.handle);
+      }
+    }
     this.#entities.splice(index, 1);
   }
 
