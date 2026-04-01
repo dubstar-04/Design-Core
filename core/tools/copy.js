@@ -51,6 +51,11 @@ export class Copy extends Tool {
       while (true) {
         // Reset to just the base point
         this.points = [this.points[0]];
+
+        // Anchor inputPoint to the base point so DYNAMIC (distance) input always
+        // projects relative to it, not relative to the last copied position.
+        DesignCore.Scene.inputManager.inputPoint = this.points[0];
+
         const pt2 = await DesignCore.Scene.inputManager.requestInput(op3);
         if (pt2 === undefined) break;
         this.points[1] = pt2;
