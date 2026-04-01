@@ -99,6 +99,8 @@ export class Trim extends Tool {
         if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
         }
+      } else {
+        DesignCore.Core.notify(`${this.selectedItem.type} ${Strings.Message.NOTRIM}`);
       }
     }
 
