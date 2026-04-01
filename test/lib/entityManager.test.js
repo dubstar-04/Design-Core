@@ -58,6 +58,33 @@ describe('EntityManager', () => {
     expect(mgr.get(0)).toBe(l2);
   });
 
+  test('remove releases the entity handle from HandleManager', () => {
+    const mgr = DesignCore.Scene.entities;
+    const line = new Line({ points: [new Point(0, 0), new Point(1, 0)] });
+    mgr.add(line);
+    const handle = line.handle;
+    expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(true);
+    mgr.remove(0);
+    expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(false);
+  });
+
+  test('remove then re-add (undo) does not produce a duplicate handle', () => {
+    const mgr = DesignCore.Scene.entities;
+    const line = new Line({ points: [new Point(0, 0), new Point(1, 0)] });
+    mgr.add(line);
+    const handle = line.handle;
+    mgr.remove(0);
+    // After remove the handle must be released
+    expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(false);
+    // Re-add the same entity (simulates undo of a delete)
+    mgr.add(line);
+    // Handle should be re-registered exactly once
+    expect(line.handle).toBe(handle);
+    expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(true);
+    // Only one registration — no duplication
+    expect([...DesignCore.HandleManager.usedHandles].filter((h) => h === handle).length).toBe(1);
+  });
+
 
   test('indexOf - test correct index is returned', () => {
     const mgr = DesignCore.Scene.entities;
