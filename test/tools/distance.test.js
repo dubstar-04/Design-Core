@@ -1,5 +1,4 @@
 import { Core } from '../../core/core/core.js';
-import { DesignCore } from '../../core/designCore.js';
 import { Point } from '../../core/entities/point.js';
 import { Distance } from '../../core/tools/distance.js';
 import { Strings } from '../../core/lib/strings.js';
@@ -26,9 +25,7 @@ test('Distance.action vertical line: correct length, angle, and deltas', () => {
   distance.points.push(new Point(0, 10));
   distance.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(
-      `${Strings.Strings.LENGTH}: 10.0 Angle: 90.0${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: 0.0 ${Strings.Symbol.DELTA}Y: 10.0`,
-  );
+  expect(notifySpy).toHaveBeenCalledWith(`${Strings.Strings.LENGTH}: 10.0 Angle: 90.0${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: 0.0 ${Strings.Symbol.DELTA}Y: 10.0`);
   notifySpy.mockRestore();
 });
 
@@ -40,9 +37,7 @@ test('Distance.action horizontal line: correct length, angle, and deltas', () =>
   distance.points.push(new Point(10, 0));
   distance.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(
-      `${Strings.Strings.LENGTH}: 10.0 Angle: 0.0${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: 10.0 ${Strings.Symbol.DELTA}Y: 0.0`,
-  );
+  expect(notifySpy).toHaveBeenCalledWith(`${Strings.Strings.LENGTH}: 10.0 Angle: 0.0${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: 10.0 ${Strings.Symbol.DELTA}Y: 0.0`);
   notifySpy.mockRestore();
 });
 
@@ -55,9 +50,7 @@ test('Distance.action diagonal 3-4-5 triangle: correct length and angle', () => 
   distance.action();
 
   // length = 5, angle = atan2(4,3) ≈ 53.1°
-  expect(notifySpy).toHaveBeenCalledWith(
-      `${Strings.Strings.LENGTH}: 5.0 Angle: 53.1${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: 3.0 ${Strings.Symbol.DELTA}Y: 4.0`,
-  );
+  expect(notifySpy).toHaveBeenCalledWith(`${Strings.Strings.LENGTH}: 5.0 Angle: 53.1${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: 3.0 ${Strings.Symbol.DELTA}Y: 4.0`);
   notifySpy.mockRestore();
 });
 
@@ -70,9 +63,7 @@ test('Distance.action reversed horizontal line: negative delta and 180° angle',
   distance.action();
 
   // angle = atan2(0, -10) = 180°
-  expect(notifySpy).toHaveBeenCalledWith(
-      `${Strings.Strings.LENGTH}: 10.0 Angle: 180.0${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: -10.0 ${Strings.Symbol.DELTA}Y: 0.0`,
-  );
+  expect(notifySpy).toHaveBeenCalledWith(`${Strings.Strings.LENGTH}: 10.0 Angle: 180.0${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: -10.0 ${Strings.Symbol.DELTA}Y: 0.0`);
   notifySpy.mockRestore();
 });
 
@@ -85,9 +76,7 @@ test('Distance.action non-origin start point: deltas computed from actual coordi
   distance.action();
 
   // dx=0, dy=5, length=5, angle=90°
-  expect(notifySpy).toHaveBeenCalledWith(
-      `${Strings.Strings.LENGTH}: 5.0 Angle: 90.0${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: 0.0 ${Strings.Symbol.DELTA}Y: 5.0`,
-  );
+  expect(notifySpy).toHaveBeenCalledWith(`${Strings.Strings.LENGTH}: 5.0 Angle: 90.0${Strings.Symbol.DEGREE} ${Strings.Symbol.DELTA}X: 0.0 ${Strings.Symbol.DELTA}Y: 5.0`);
   notifySpy.mockRestore();
 });
 
