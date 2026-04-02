@@ -32,6 +32,9 @@ export class Headers {
   // $CHAMMODE (group code 70) - false = distances, true = angle
   #chamferMode = false;
 
+  // $OFFSETDIST (group code 40)
+  #offsetDistance = 1;
+
   // $ACADVER (group code 1)
   #dxfVersion = 'R2018';
 
@@ -130,6 +133,18 @@ export class Headers {
   set chamferMode(value) {
     if (typeof value !== 'boolean') throw new Error(`Invalid chamferMode: ${value}`);
     this.#chamferMode = value;
+  }
+
+  /** @type {number} Offset distance ($OFFSETDIST) */
+  get offsetDistance() {
+    return this.#offsetDistance;
+  }
+
+  /** @param {number} value */
+  set offsetDistance(value) {
+    const num = parseFloat(value);
+    if (!isFinite(num)) throw new Error(`Invalid offsetDistance: ${value}`);
+    this.#offsetDistance = num;
   }
 
   /** @type {string} DXF version key ($ACADVER) */
