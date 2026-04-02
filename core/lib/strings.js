@@ -107,5 +107,8 @@ export class Strings {
     MIRRORFIRST: 'Specify first point of mirror line',
     MIRRORSECOND: 'Specify second point of mirror line',
     ERASESOURCE: 'Erase source objects?',
+    SCALEFACTOR: 'Specify scale factor',
+    REFERENCELENGTH: 'Specify reference length',
+    NEWLENGTH: 'Specify new length',
   };
 };
