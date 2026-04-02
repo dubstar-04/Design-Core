@@ -181,6 +181,49 @@ test('Test Point.scale', () => {
   expect(r4.y).toBeCloseTo(-6);
 });
 
+test('Test Point.scaleFrom', () => {
+  const base = new Point();
+
+  // Scale by 2 from origin
+  const pt1 = new Point(5, 0);
+  const r1 = pt1.scaleFrom(base, 2);
+  expect(r1.x).toBeCloseTo(10);
+  expect(r1.y).toBeCloseTo(0);
+
+  // Scale by 0.5 from origin
+  const pt2 = new Point(0, 10);
+  const r2 = pt2.scaleFrom(base, 0.5);
+  expect(r2.x).toBeCloseTo(0);
+  expect(r2.y).toBeCloseTo(5);
+
+  // Scale by 1 leaves point unchanged
+  const pt3 = new Point(3, 7);
+  const r3 = pt3.scaleFrom(base, 1);
+  expect(r3.x).toBeCloseTo(3);
+  expect(r3.y).toBeCloseTo(7);
+
+  // Scale from an offset base point
+  const offsetBase = new Point(10, 10);
+  const pt4 = new Point(20, 10);
+  const r4 = pt4.scaleFrom(offsetBase, 2);
+  expect(r4.x).toBeCloseTo(30);
+  expect(r4.y).toBeCloseTo(10);
+
+  // Scale by 0 collapses point onto base
+  const pt5 = new Point(5, 5);
+  const r5 = pt5.scaleFrom(offsetBase, 0);
+  expect(r5.x).toBeCloseTo(10);
+  expect(r5.y).toBeCloseTo(10);
+
+  // Preserves bulge and sequence
+  const pt6 = new Point(4, 0, 0.5, 10);
+  const r6 = pt6.scaleFrom(base, 2);
+  expect(r6.x).toBeCloseTo(8);
+  expect(r6.y).toBeCloseTo(0);
+  expect(r6.bulge).toBe(0.5);
+  expect(r6.sequence).toBe(10);
+});
+
 test('Test Point.min', () => {
   const pt1 = new Point(10, 10);
 
