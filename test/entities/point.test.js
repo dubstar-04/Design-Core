@@ -100,6 +100,52 @@ test('Test Point.cross', () => {
   expect(pt1.cross(pt3)).toBe(0);
 });
 
+test('Test Point.mirror', () => {
+  // Mirror across the X axis (y=0 line: from (0,0) to (1,0))
+  const xAxisPt1 = new Point(0, 0);
+  const xAxisPt2 = new Point(1, 0);
+  const pt1 = new Point(3, 4);
+  const r1 = pt1.mirror(xAxisPt1, xAxisPt2);
+  expect(r1.x).toBeCloseTo(3);
+  expect(r1.y).toBeCloseTo(-4);
+
+  // Mirror across the Y axis (x=0 line: from (0,0) to (0,1))
+  const yAxisPt1 = new Point(0, 0);
+  const yAxisPt2 = new Point(0, 1);
+  const pt2 = new Point(5, 3);
+  const r2 = pt2.mirror(yAxisPt1, yAxisPt2);
+  expect(r2.x).toBeCloseTo(-5);
+  expect(r2.y).toBeCloseTo(3);
+
+  // Mirror across a diagonal line y=x (from (0,0) to (1,1))
+  const diagPt1 = new Point(0, 0);
+  const diagPt2 = new Point(1, 1);
+  const pt3 = new Point(3, 0);
+  const r3 = pt3.mirror(diagPt1, diagPt2);
+  expect(r3.x).toBeCloseTo(0);
+  expect(r3.y).toBeCloseTo(3);
+
+  // A point on the mirror line is unchanged
+  const pt4 = new Point(2, 0);
+  const r4 = pt4.mirror(xAxisPt1, xAxisPt2);
+  expect(r4.x).toBeCloseTo(2);
+  expect(r4.y).toBeCloseTo(0);
+
+  // Mirror across an offset vertical line (x=5)
+  const vPt1 = new Point(5, 0);
+  const vPt2 = new Point(5, 1);
+  const pt5 = new Point(3, 2);
+  const r5 = pt5.mirror(vPt1, vPt2);
+  expect(r5.x).toBeCloseTo(7);
+  expect(r5.y).toBeCloseTo(2);
+
+  // Bulge is negated (arc direction reverses)
+  const pt6 = new Point(3, 4, 0.5, 10);
+  const r6 = pt6.mirror(xAxisPt1, xAxisPt2);
+  expect(r6.bulge).toBeCloseTo(-0.5);
+  expect(r6.sequence).toBe(10);
+});
+
 test('Test Point.rotate', () => {
   const centre = new Point();
 
