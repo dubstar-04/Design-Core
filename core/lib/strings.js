@@ -49,6 +49,7 @@ export class Strings {
     NOFILLET: 'cannot be filleted',
     NOCHAMFER: 'cannot be chamfered',
     NONCONSECUTIVESEGMENTS: 'segments must be consecutive',
+    NOTIMPLEMENTED: 'Not Implemented',
   };
 
   // Strings

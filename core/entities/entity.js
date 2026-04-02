@@ -212,7 +212,7 @@ export class Entity {
    */
   extend(points) {
     // extend function to be overridden by implementation
-    DesignCore.Core.notify(`${this.type} ${Strings.Message.NOEXTEND}`);
+    DesignCore.Core.notify(`${this.type} - ${Strings.Message.NOEXTEND}`);
     return [];
   }
 
@@ -223,7 +223,7 @@ export class Entity {
    */
   trim(points) {
     // trim function to be overridden by implementation
-    DesignCore.Core.notify(`${this.type} ${Strings.Message.NOTRIM}`);
+    DesignCore.Core.notify(`${this.type} - ${Strings.Message.NOTRIM}`);
     return [];
   }
 

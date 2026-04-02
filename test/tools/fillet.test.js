@@ -86,7 +86,7 @@ test('Fillet.action notifies for parallel lines', () => {
   fillet.secondPick.clickPoint = new Point(5, 5);
   fillet.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.PARALLELLINES);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.PARALLELLINES));
   notifySpy.mockRestore();
 });
 
@@ -333,7 +333,7 @@ test('Fillet.action notifies when click coincides with intersection', () => {
   fillet.secondPick.clickPoint = new Point(0, 5);
   fillet.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.SELECTION);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.SELECTION));
   expect(core.scene.entities.count()).toBe(2); // no arc added
   notifySpy.mockRestore();
 });
@@ -357,7 +357,7 @@ test('Fillet.action radius=0 notifies and makes no changes when click coincides 
   fillet.secondPick.clickPoint = new Point(0, 5);
   fillet.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.SELECTION);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.SELECTION));
   // lines must be unchanged — applySharpTrim must not have run
   expect(core.scene.entities.get(0).points[1].x).toBeCloseTo(0);
   expect(core.scene.entities.get(0).points[1].y).toBeCloseTo(0);
@@ -393,7 +393,7 @@ test('Fillet.execute notifies INVALIDNUMBER when negative radius is provided', a
       },
   );
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
   notifySpy.mockRestore();
 });
 

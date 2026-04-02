@@ -85,6 +85,6 @@ export class Purge extends Tool {
       purgedCount += (intialLTypeCount - finalLTypeCount);
     }
 
-    DesignCore.Core.notify(`${this.type} ${this.option}: ${purgedCount} ${Strings.Strings.ITEMS} ${Strings.Strings.REMOVED}`);
+    DesignCore.Core.notify(`${this.type} - ${this.option}: ${purgedCount} ${Strings.Strings.ITEMS} ${Strings.Strings.REMOVED}`);
   }
 }

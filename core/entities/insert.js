@@ -1,4 +1,5 @@
 import { Entity } from './entity.js';
+import { Strings } from '../lib/strings.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { Block } from '../tables/block.js';
 import { BoundingBox } from '../lib/boundingBox.js';
@@ -123,7 +124,7 @@ export class Insert extends Entity {
    * executes the workflow, requesting input required to create an entity
    */
   async execute() {
-    DesignCore.Core.notify(`${this.type} - Not Implemented`);
+    DesignCore.Core.notify(`${this.type} - ${Strings.Message.NOTIMPLEMENTED}`);
     DesignCore.Scene.inputManager.reset();
   }
 

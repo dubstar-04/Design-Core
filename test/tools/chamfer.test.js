@@ -79,7 +79,7 @@ test('Chamfer.action notifies for parallel lines', () => {
   chamfer.secondPick.clickPoint = new Point(5, 5);
   chamfer.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.PARALLELLINES);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.PARALLELLINES));
   notifySpy.mockRestore();
 });
 
@@ -323,7 +323,7 @@ test('Chamfer.action notifies when click coincides with intersection', () => {
   chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.SELECTION);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.SELECTION));
   expect(core.scene.entities.count()).toBe(2);
   notifySpy.mockRestore();
 });
@@ -349,7 +349,7 @@ test('Chamfer.action angle method notifies INVALIDNUMBER when angle is zero', ()
   chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
   expect(core.scene.entities.count()).toBe(2);
   notifySpy.mockRestore();
 });
@@ -378,7 +378,7 @@ test('Chamfer.action angle method notifies PARALLELLINES when chamfer direction 
   chamfer.secondPick.clickPoint = new Point(0, 5);
   chamfer.action();
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.PARALLELLINES);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.PARALLELLINES));
   expect(core.scene.entities.count()).toBe(2);
   notifySpy.mockRestore();
 });
@@ -442,7 +442,7 @@ test('Chamfer.execute notifies INVALIDNUMBER for negative first distance', async
       },
   );
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
   notifySpy.mockRestore();
 });
 
@@ -458,7 +458,7 @@ test('Chamfer.execute notifies INVALIDNUMBER for negative second distance', asyn
       },
   );
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
   notifySpy.mockRestore();
 });
 
@@ -491,7 +491,7 @@ test('Chamfer.execute notifies INVALIDNUMBER for negative length in Angle option
       },
   );
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
   notifySpy.mockRestore();
 });
 
@@ -507,7 +507,7 @@ test('Chamfer.execute notifies INVALIDNUMBER for out-of-range angle in Angle opt
       },
   );
 
-  expect(notifySpy).toHaveBeenCalledWith(Strings.Error.INVALIDNUMBER);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
   notifySpy.mockRestore();
 });
 

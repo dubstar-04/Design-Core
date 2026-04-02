@@ -2,6 +2,7 @@ import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { Trim } from '../../core/tools/trim.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
+import { Strings } from '../../core/lib/strings.js';
 import { expect, jest } from '@jest/globals';
 import { withMockInput } from '../test-helpers/test-helpers.js';
 
@@ -416,4 +417,122 @@ test('Test Trim.action polyline - trim bulged arc segment', () => {
   expect(trimmed.points[1].x).toBeCloseTo(50, 5);
   expect(trimmed.points[1].y).toBeCloseTo(-50, 5);
   expect(trimmed.points[1].bulge).toBe(0);
+});
+
+test('Trim.register returns correct metadata', () => {
+  const reg = Trim.register();
+  expect(reg.command).toBe('Trim');
+  expect(reg.shortcut).toBe('TR');
+  expect(reg.type).toBe('Tool');
+});
+
+test('Trim.preview does not throw', () => {
+  const trim = new Trim();
+  expect(() => trim.preview()).not.toThrow();
+});
+
+test('Trim.execute returns early when boundary input is undefined', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+
+  await withMockInput(core.scene, [undefined], async () => {
+    const trim = new Trim();
+    await trim.execute();
+    expect(trim.selectedBoundaryItems).toHaveLength(0);
+  });
+});
+
+test('Trim.execute exits selection loop when selection input is undefined', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  core.scene.addItem('Circle', { points: [new Point(), new Point(5, 0)] });
+  // preselect first item as boundary
+  core.scene.selectionManager.selectionSet.selectionSet.push(0);
+
+  const executeCommandSpy = jest.fn();
+  await withMockInput(core.scene, [undefined], async () => {
+    const trim = new Trim();
+    await trim.execute();
+    expect(trim.selectedBoundaryItems).toHaveLength(1);
+    expect(executeCommandSpy).toHaveBeenCalled();
+  }, { extraMethods: { executeCommand: () => executeCommandSpy() } });
+});
+
+test('Trim.execute calls actionCommand once per trim selection', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] });
+  core.scene.addItem('Circle', { points: [new Point(-5, 0), new Point(0, 0)] });
+  core.scene.addItem('Circle', { points: [new Point(-5, 0), new Point(0, 0)] });
+  // preselect line as boundary
+  core.scene.selectionManager.selectionSet.selectionSet.push(0);
+
+  const actionSpy = jest.fn();
+  await withMockInput(
+      core.scene,
+      [new SingleSelection(1, new Point()), new SingleSelection(2, new Point()), undefined],
+      async () => {
+        const trim = new Trim();
+        await trim.execute();
+        expect(actionSpy).toHaveBeenCalledTimes(2);
+      },
+      { extraMethods: { actionCommand: () => actionSpy() } },
+  );
+});
+
+test('Trim.action does nothing when selectedItem is null', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  const trim = new Trim();
+  trim.selectedItem = null;
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  expect(() => trim.action()).not.toThrow();
+});
+
+test('Trim.action does nothing when selectedBoundaryItems is empty', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  const trim = new Trim();
+  trim.selectedItem = core.scene.entities.get(0);
+  trim.selectedBoundaryItems = [];
+
+  expect(() => trim.action()).not.toThrow();
+  expect(trim.selectedItem).toBeNull();
+});
+
+test('Trim.action notifies when no intersection found (parallel lines)', () => {
+  core.scene.clear();
+  // Two parallel vertical lines - no intersection
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 100)] });
+  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(10, 100)] });
+
+  const trim = new Trim();
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
+  trim.selectedItem = core.scene.entities.get(1);
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  trim.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOTRIM));
+  expect(trim.selectedItem).toBeNull();
+  notifySpy.mockRestore();
+});
+
+test('Trim.action notifies when boundary item equals selected item', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 0)] });
+  const entity = core.scene.entities.get(0);
+
+  const trim = new Trim();
+  trim.selectedBoundaryItems = [entity];
+  trim.selectedItem = entity;
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  trim.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOTRIM));
+  notifySpy.mockRestore();
 });

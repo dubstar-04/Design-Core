@@ -2,6 +2,8 @@ import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Point } from '../../core/entities/point.js';
 import { Zoom } from '../../core/tools/zoom.js';
+import { expect, jest } from '@jest/globals';
+import { withMockInput } from '../test-helpers/test-helpers.js';
 
 const core = new Core();
 
@@ -257,4 +259,246 @@ test('Test Zoom.action - Object mode', () => {
   expect(finalScale).toBeGreaterThan(0);
 });
 
+// ─── constructor / mode defaults ──────────────────────────────────────────────
 
+test('Zoom constructor defaults mode to Window', () => {
+  const zoom = new Zoom();
+  expect(zoom.mode).toBe('Window');
+});
+
+test('Zoom.modes contains All, Extents, Window, Object', () => {
+  const zoom = new Zoom();
+  expect(zoom.modes.ALL).toBe('All');
+  expect(zoom.modes.EXTENTS).toBe('Extents');
+  expect(zoom.modes.WINDOW).toBe('Window');
+  expect(zoom.modes.OBJECT).toBe('Object');
+});
+
+// ─── action: Extents mode ─────────────────────────────────────────────────────
+
+test('Zoom.action - Extents mode calls zoomExtents', () => {
+  core.canvas.width = 800;
+  core.canvas.height = 600;
+  core.canvas.matrix.scale(1, 1);
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(10, 10), new Point(50, 50)] });
+
+  const initialScale = core.canvas.getScale();
+
+  const zoom = new Zoom();
+  zoom.mode = 'Extents';
+  zoom.action();
+
+  const finalScale = core.canvas.getScale();
+  expect(finalScale).not.toBe(initialScale);
+  expect(finalScale).toBeGreaterThan(0);
+});
+
+// ─── action: Object mode with empty selection ─────────────────────────────────
+
+test('Zoom.action - Object mode with empty selection does not zoom', () => {
+  core.canvas.width = 800;
+  core.canvas.height = 600;
+  core.canvas.matrix.scale(1, 1);
+  core.scene.selectionManager.reset();
+
+  const initialScale = core.canvas.getScale();
+
+  const zoom = new Zoom();
+  zoom.mode = 'Object';
+  zoom.action();
+
+  // Selection is empty — should return early without changing scale
+  expect(core.canvas.getScale()).toBe(initialScale);
+});
+
+// ─── execute ──────────────────────────────────────────────────────────────────
+
+test('Zoom.execute returns early when first input is undefined', async () => {
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      [],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).not.toHaveBeenCalled();
+});
+
+test('Zoom.execute Window mode: first input is a Point, collects second point, calls executeCommand', async () => {
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      [new Point(0, 0), new Point(100, 100)],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).toHaveBeenCalled();
+});
+
+test('Zoom.execute Window mode: returns early when second point is undefined', async () => {
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      [new Point(0, 0)],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).not.toHaveBeenCalled();
+});
+
+test('Zoom.execute Window mode: string input prompts for first point then second, calls executeCommand', async () => {
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      ['Window', new Point(0, 0), new Point(100, 100)],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).toHaveBeenCalled();
+});
+
+test('Zoom.execute Window mode: returns early when prompted first point is undefined', async () => {
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      ['Window'],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).not.toHaveBeenCalled();
+});
+
+test('Zoom.execute Window mode: returns early when prompted second point is undefined after string branch', async () => {
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      ['Window', new Point(0, 0)],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).not.toHaveBeenCalled();
+});
+
+test('Zoom.execute All mode: calls executeCommand without extra point prompts', async () => {
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      ['All'],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).toHaveBeenCalled();
+});
+
+test('Zoom.execute Extents mode: calls executeCommand without extra point prompts', async () => {
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      ['Extents'],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).toHaveBeenCalled();
+});
+
+test('Zoom.execute Object mode: with existing selection calls executeCommand without prompting', async () => {
+  core.scene.clear();
+  const idx = core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 10)] });
+  core.scene.selectionManager.reset();
+  core.scene.selectionManager.addToSelectionSet(idx);
+
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      ['Object'],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).toHaveBeenCalled();
+  core.scene.selectionManager.reset();
+});
+
+test('Zoom.execute Object mode: without selection prompts for selection set, returns early when undefined', async () => {
+  core.scene.selectionManager.reset();
+
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      ['Object'],
+      async () => {
+        const zoom = new Zoom();
+        await zoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(executeCommandSpy).not.toHaveBeenCalled();
+});
+
+test('Zoom.execute stores collected window points for action', async () => {
+  let capturedZoom;
+  const executeCommandSpy = jest.fn();
+
+  await withMockInput(
+      core.scene,
+      [new Point(5, 10), new Point(50, 80)],
+      async () => {
+        capturedZoom = new Zoom();
+        await capturedZoom.execute();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+
+  expect(capturedZoom.points).toHaveLength(2);
+  expect(capturedZoom.points[0].x).toBe(5);
+  expect(capturedZoom.points[0].y).toBe(10);
+  expect(capturedZoom.points[1].x).toBe(50);
+  expect(capturedZoom.points[1].y).toBe(80);
+});

@@ -99,6 +99,8 @@ export class Extend extends Tool {
         if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
         }
+      } else {
+        DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOEXTEND}`);
       }
     }
 
