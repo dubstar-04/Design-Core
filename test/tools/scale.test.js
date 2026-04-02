@@ -4,6 +4,163 @@ import { Scale } from '../../core/tools/scale.js';
 
 const core = new Core();
 
+const inputScenarios = [
+  {
+    desc: 'numeric factor 2 from origin',
+    points: [new Point(10, 0), new Point(20, 0)],
+    inputs: [new Point(0, 0), 2],
+    result: [new Point(20, 0), new Point(40, 0)],
+  },
+  {
+    desc: 'numeric factor 0.5 from origin',
+    points: [new Point(10, 0), new Point(20, 0)],
+    inputs: [new Point(0, 0), 0.5],
+    result: [new Point(5, 0), new Point(10, 0)],
+  },
+  {
+    desc: 'point input uses distance from base as scale factor',
+    points: [new Point(1, 0), new Point(2, 0)],
+    inputs: [new Point(0, 0), new Point(3, 4)], // distance = 5 → factor = 5
+    result: [new Point(5, 0), new Point(10, 0)],
+  },
+  {
+    desc: 'reference workflow with numeric ref and new length',
+    points: [new Point(10, 0), new Point(20, 0)],
+    inputs: [new Point(0, 0), 'Reference', 10, 30], // factor = 30/10 = 3
+    result: [new Point(30, 0), new Point(60, 0)],
+  },
+  {
+    desc: 'reference workflow with point-based ref length',
+    points: [new Point(5, 0), new Point(10, 0)],
+    inputs: [new Point(0, 0), 'Reference', new Point(0, 0), new Point(10, 0), 20], // ref=10, new=20 → factor=2
+    result: [new Point(10, 0), new Point(20, 0)],
+  },
+];
+
+test.each(inputScenarios)('Scale.execute handles $desc', async (scenario) => {
+  const { points, inputs, result } = scenario;
+
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        return inputs[callCount++];
+      }
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const scale = new Scale();
+  await scale.execute();
+
+  scale.action();
+
+  const line = core.scene.entities.get(0);
+  expect(line.points[0].x).toBeCloseTo(result[0].x);
+  expect(line.points[0].y).toBeCloseTo(result[0].y);
+  expect(line.points[1].x).toBeCloseTo(result[1].x);
+  expect(line.points[1].y).toBeCloseTo(result[1].y);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Scale.execute - cancel at base point does not scale', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const origInputManager = core.scene.inputManager;
+  core.scene.inputManager = {
+    requestInput: async () => undefined,
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const scale = new Scale();
+  await scale.execute();
+
+  const line = core.scene.entities.get(0);
+  expect(line.points[0].x).toBeCloseTo(10);
+  expect(line.points[1].x).toBeCloseTo(20);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Scale.execute - cancel at factor prompt does not scale', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  const inputs = [new Point(0, 0)]; // provides base point, then undefined on factor
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        return inputs[callCount++];
+      }
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const scale = new Scale();
+  await scale.execute();
+
+  const line = core.scene.entities.get(0);
+  expect(line.points[0].x).toBeCloseTo(10);
+  expect(line.points[1].x).toBeCloseTo(20);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Scale.execute - entity count unchanged after execute', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addItem('Circle', { points: [new Point(5, 0), new Point(10, 0)] });
+
+  const entityCount = core.scene.entities.count();
+
+  for (let i = 0; i < entityCount; i++) {
+    core.scene.selectionManager.addToSelectionSet(i);
+  }
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  const inputs = [new Point(0, 0), 3];
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        return inputs[callCount++];
+      }
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const scale = new Scale();
+  await scale.execute();
+  scale.action();
+
+  expect(core.scene.entities.count()).toBe(entityCount);
+
+  core.scene.inputManager = origInputManager;
+});
+
 test('Test Scale.action - scale by factor 2 from origin', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
@@ -98,7 +255,68 @@ test('Test Scale.action - entity count unchanged (in-place update)', () => {
   expect(core.scene.entities.count()).toBe(entityCount);
 });
 
-test('Test Scale.getScaledPoints', () => {
+test('Test Scale.action - scale factor 1 leaves points unchanged', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(10, 20), new Point(30, 40)] });
+
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const scale = new Scale();
+  scale.points.push(new Point(0, 0));
+  scale.scaleFactor = 1;
+
+  scale.action();
+
+  const line = core.scene.entities.get(0);
+  expect(line.points[0].x).toBeCloseTo(10);
+  expect(line.points[0].y).toBeCloseTo(20);
+  expect(line.points[1].x).toBeCloseTo(30);
+  expect(line.points[1].y).toBeCloseTo(40);
+});
+
+test('Test Scale.action - scale 2D point (non-axis-aligned)', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(5, 5), new Point(10, 10)] });
+
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const scale = new Scale();
+  scale.points.push(new Point(0, 0));
+  scale.scaleFactor = 2;
+
+  scale.action();
+
+  const line = core.scene.entities.get(0);
+  expect(line.points[0].x).toBeCloseTo(10);
+  expect(line.points[0].y).toBeCloseTo(10);
+  expect(line.points[1].x).toBeCloseTo(20);
+  expect(line.points[1].y).toBeCloseTo(20);
+});
+
+test('Test Scale.action - empty selection does not throw', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  // deliberately do not add anything to the selection set
+
+  const scale = new Scale();
+  scale.points.push(new Point(0, 0));
+  scale.scaleFactor = 2;
+
+  expect(() => scale.action()).not.toThrow();
+
+  // Entity should be unmodified
+  const line = core.scene.entities.get(0);
+  expect(line.points[0].x).toBeCloseTo(5);
+  expect(line.points[1].x).toBeCloseTo(10);
+});
+
+test('Test Scale.getScaledPoints - from origin', () => {
   const scale = new Scale();
   const base = new Point(0, 0);
 
@@ -109,4 +327,32 @@ test('Test Scale.getScaledPoints', () => {
   expect(result[0].y).toBeCloseTo(0);
   expect(result[1].x).toBeCloseTo(0);
   expect(result[1].y).toBeCloseTo(10);
+});
+
+test('Test Scale.getScaledPoints - from offset base', () => {
+  const scale = new Scale();
+  const base = new Point(10, 10);
+
+  const points = [new Point(20, 10), new Point(10, 20)];
+  const result = scale.getScaledPoints(points, base, 3);
+
+  // (20-10)*3 + 10 = 40, (10-10)*3 + 10 = 10
+  expect(result[0].x).toBeCloseTo(40);
+  expect(result[0].y).toBeCloseTo(10);
+  // (10-10)*3 + 10 = 10, (20-10)*3 + 10 = 40
+  expect(result[1].x).toBeCloseTo(10);
+  expect(result[1].y).toBeCloseTo(40);
+});
+
+test('Test Scale.getScaledPoints - preserves bulge and sequence', () => {
+  const scale = new Scale();
+  const base = new Point(0, 0);
+
+  const points = [new Point(5, 0, 0.5, 1), new Point(10, 0, -0.25, 2)];
+  const result = scale.getScaledPoints(points, base, 2);
+
+  expect(result[0].bulge).toBe(0.5);
+  expect(result[0].sequence).toBe(1);
+  expect(result[1].bulge).toBe(-0.25);
+  expect(result[1].sequence).toBe(2);
 });
