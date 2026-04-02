@@ -26,6 +26,7 @@ import { RotatedDimension } from '../dimensions/rotatedDimension.js';
 import { MatchProp } from '../tools/matchProp.js';
 import { Move } from '../tools/move.js';
 import { Copy } from '../tools/copy.js';
+import { Mirror } from '../tools/mirror.js';
 import { Rotate } from '../tools/rotate.js';
 import { Erase } from '../tools/erase.js';
 import { Explode } from '../tools/explode.js';
@@ -78,6 +79,7 @@ const classes = {
   MatchProp,
   Move,
   Copy,
+  Mirror,
   Rotate,
   Erase,
   Explode,
