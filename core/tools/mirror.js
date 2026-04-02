@@ -83,6 +83,9 @@ export class Mirror extends Tool {
           const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
           const originalItem = DesignCore.Scene.entities.get(entityIndex);
           item.setProperty('points', this.getMirroredPoints(originalItem.points, pt1, pt2));
+          if (originalItem.direction !== undefined) {
+            item.setProperty('direction', -originalItem.direction);
+          }
         }
       }
     }
@@ -103,12 +106,15 @@ export class Mirror extends Tool {
 
       if (this.eraseSource) {
         // Replace the original with its mirrored version
-        const stateChange = new UpdateState(item, { points: mirroredPoints });
+        const updates = { points: mirroredPoints };
+        if (item.direction !== undefined) updates.direction = -item.direction;
+        const stateChange = new UpdateState(item, updates);
         stateChanges.push(stateChange);
       } else {
         // Keep the original and add a mirrored copy
         const copyOfItem = Utils.cloneObject(item);
         copyOfItem.setProperty('points', mirroredPoints);
+        if (copyOfItem.direction !== undefined) copyOfItem.setProperty('direction', -copyOfItem.direction);
         const stateChange = new AddState(copyOfItem);
         stateChanges.push(stateChange);
       }
