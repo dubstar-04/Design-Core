@@ -116,6 +116,18 @@ export class Point {
   }
 
   /**
+   * Return new point scaled from base by a scalar factor
+   * @param  {Point} base
+   * @param  {number} factor
+   * @return {Point}
+   */
+  scaleFrom(base, factor) {
+    const x = base.x + (this.x - base.x) * factor;
+    const y = base.y + (this.y - base.y) * factor;
+    return new Point(x, y, this.bulge, this.sequence);
+  }
+
+  /**
    * Return new point rotated about centre by angle in radians
    * @param  {Point} centre
    * @param  {number} angle - in radians
