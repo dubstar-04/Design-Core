@@ -105,6 +105,17 @@ export class Point {
   };
 
   /**
+   * Return new point mirrored across the line defined by pt1 and pt2
+   * @param  {Point} pt1 - first point on the mirror line
+   * @param  {Point} pt2 - second point on the mirror line
+   * @return {Point}
+   */
+  mirror(pt1, pt2) {
+    const perp = this.perpendicular(pt1, pt2);
+    return new Point(2 * perp.x - this.x, 2 * perp.y - this.y, -this.bulge, this.sequence);
+  }
+
+  /**
    * Return new point rotated about centre by angle in radians
    * @param  {Point} centre
    * @param  {number} angle - in radians
