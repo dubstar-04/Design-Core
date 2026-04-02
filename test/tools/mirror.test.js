@@ -4,6 +4,186 @@ import { Mirror } from '../../core/tools/mirror.js';
 
 const core = new Core();
 
+const inputScenarios = [
+  {
+    desc: 'mirror across X axis keeping source',
+    points: [new Point(0, 5), new Point(10, 5)],
+    inputs: [new Point(0, 0), new Point(1, 0), 'No'],
+    expectedCount: 2,
+    checkIndex: 1,
+    expectedX: 0,
+    expectedY: -5,
+  },
+  {
+    desc: 'mirror across X axis erasing source',
+    points: [new Point(0, 5), new Point(10, 5)],
+    inputs: [new Point(0, 0), new Point(1, 0), 'Yes'],
+    expectedCount: 1,
+    checkIndex: 0,
+    expectedX: 0,
+    expectedY: -5,
+  },
+  {
+    desc: 'mirror across Y axis keeping source',
+    points: [new Point(5, 0), new Point(5, 10)],
+    inputs: [new Point(0, 0), new Point(0, 1), 'No'],
+    expectedCount: 2,
+    checkIndex: 1,
+    expectedX: -5,
+    expectedY: 0,
+  },
+];
+
+test.each(inputScenarios)('Mirror.execute handles $desc', async (scenario) => {
+  const { points, inputs, expectedCount, checkIndex, expectedX, expectedY } = scenario;
+
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        return inputs[callCount++];
+      }
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const mirror = new Mirror();
+  await mirror.execute();
+  mirror.action();
+
+  expect(core.scene.entities.count()).toBe(expectedCount);
+
+  const entity = core.scene.entities.get(checkIndex);
+  expect(entity.points[0].x).toBeCloseTo(expectedX);
+  expect(entity.points[0].y).toBeCloseTo(expectedY);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Mirror.execute - cancel at first point does not mirror', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const origInputManager = core.scene.inputManager;
+  core.scene.inputManager = {
+    requestInput: async () => undefined,
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const mirror = new Mirror();
+  await mirror.execute();
+
+  expect(core.scene.entities.count()).toBe(1);
+  expect(core.scene.entities.get(0).points[0].y).toBeCloseTo(5);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Mirror.execute - cancel at second point does not mirror', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  const inputs = [new Point(0, 0)]; // provides pt1, then undefined on pt2
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        return inputs[callCount++];
+      }
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const mirror = new Mirror();
+  await mirror.execute();
+
+  expect(core.scene.entities.count()).toBe(1);
+  expect(core.scene.entities.get(0).points[0].y).toBeCloseTo(5);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Mirror.execute - cancel at erase prompt does not mirror', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  const inputs = [new Point(0, 0), new Point(1, 0)]; // pt1 + pt2, then undefined on erase
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        return inputs[callCount++];
+      }
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const mirror = new Mirror();
+  await mirror.execute();
+
+  expect(core.scene.entities.count()).toBe(1);
+  expect(core.scene.entities.get(0).points[0].y).toBeCloseTo(5);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Mirror.execute - entity count unchanged when keeping source', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.addItem('Circle', { points: [new Point(0, 5), new Point(10, 5)] });
+
+  const entityCount = core.scene.entities.count();
+
+  for (let i = 0; i < entityCount; i++) {
+    core.scene.selectionManager.addToSelectionSet(i);
+  }
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  const inputs = [new Point(0, 0), new Point(1, 0), 'No'];
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        return inputs[callCount++];
+      }
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const mirror = new Mirror();
+  await mirror.execute();
+  mirror.action();
+
+  expect(core.scene.entities.count()).toBe(entityCount * 2);
+
+  core.scene.inputManager = origInputManager;
+});
+
 test('Test Mirror.action - keep source (default)', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
