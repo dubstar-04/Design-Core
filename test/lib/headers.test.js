@@ -17,6 +17,7 @@ test('Headers defaults', () => {
   expect(h.chamferDistanceB).toBe(0);
   expect(h.chamferLength).toBe(0);
   expect(h.chamferAngle).toBe(0);
+  expect(h.offsetDistance).toBe(1);
   expect(h.dxfVersion).toBe('R2018');
 });
 
@@ -116,6 +117,25 @@ test('Headers chamfer properties throw on negative values', () => {
   }).toThrow();
 });
 
+// ─── offsetDistance ────────────────────────────────────────────────────────────
+
+test('Headers.offsetDistance accepts valid values', () => {
+  const h = new Headers();
+  h.offsetDistance = 5;
+  expect(h.offsetDistance).toBe(5);
+  h.offsetDistance = -1; // negative means Through mode
+  expect(h.offsetDistance).toBe(-1);
+  h.offsetDistance = '3.5';
+  expect(h.offsetDistance).toBe(3.5);
+});
+
+test('Headers.offsetDistance throws on non-numeric value', () => {
+  const h = new Headers();
+  expect(() => {
+    h.offsetDistance = 'abc';
+  }).toThrow();
+});
+
 // ─── dxfVersion ───────────────────────────────────────────────────────────────
 
 test('Headers.dxfVersion accepts valid version keys', () => {
@@ -153,7 +173,6 @@ test('Headers.load updates values from parsed DXF header object', () => {
     $CHAMFERB: { 40: '2' },
     $CHAMFERC: { 40: '3' },
     $CHAMFERD: { 40: '45' },
-    $TRIMMODE: { 70: '0' },
     $ACADVER: { 1: 'AC1009' },
   });
   expect(h.filletRadius).toBe(7);
@@ -162,7 +181,6 @@ test('Headers.load updates values from parsed DXF header object', () => {
   expect(h.chamferDistanceB).toBe(2);
   expect(h.chamferLength).toBe(3);
   expect(h.chamferAngle).toBe(45);
-  expect(h.trimMode).toBe(false);
   expect(h.dxfVersion).toBe('R12');
 });
 
@@ -179,13 +197,6 @@ test('Headers.load preserves defaults when called with undefined', () => {
   const h = new Headers();
   h.load(undefined);
   expect(h.filletRadius).toBe(0);
-  expect(h.trimMode).toBe(true);
-});
-
-test('Headers.load TRIMMODE=1 sets trimMode to true', () => {
-  const h = new Headers();
-  h.trimMode = false;
-  h.load({ $TRIMMODE: { 70: '1' } });
   expect(h.trimMode).toBe(true);
 });
 
@@ -209,27 +220,14 @@ test('Headers.dxf writes all expected header variables', () => {
   expect(file.contents).toContain('9\n$ACADVER\n');
   expect(file.contents).toContain('9\n$FILLETRAD\n');
   expect(file.contents).toContain('40\n3\n');
-  expect(file.contents).toContain('9\n$TRIMMODE\n');
-  expect(file.contents).toContain('70\n0\n'); // trimMode=false
   expect(file.contents).toContain('9\n$TEXTSIZE\n');
   expect(file.contents).toContain('40\n5\n');
   expect(file.contents).toContain('9\n$CHAMFERA\n');
   expect(file.contents).toContain('9\n$CHAMFERB\n');
   expect(file.contents).toContain('9\n$CHAMFERC\n');
   expect(file.contents).toContain('9\n$CHAMFERD\n');
-});
-
-test('Headers.dxf writes TRIMMODE=1 when trimMode is true', () => {
-  const h = new Headers();
-  h.trimMode = true;
-
-  DesignCore.Core.styleManager = { getCstyle: jest.fn(() => 'Standard') };
-  DesignCore.Core.layerManager = { getCstyle: jest.fn(() => 'Layer0') };
-  DesignCore.Core.dimStyleManager = { getCstyle: jest.fn(() => 'ISO-25') };
-  DesignCore.Core.handleManager = { handseed: '1' };
-
-  const file = new DXFFile('R12');
-  h.dxf(file);
-
-  expect(file.contents).toContain('70\n1\n');
+  // $TRIMMODE, $CHAMMODE, $OFFSETDIST are system variables not written to file by AutoCAD
+  expect(file.contents).not.toContain('9\n$TRIMMODE\n');
+  expect(file.contents).not.toContain('9\n$CHAMMODE\n');
+  expect(file.contents).not.toContain('9\n$OFFSETDIST\n');
 });
