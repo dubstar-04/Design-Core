@@ -104,5 +104,8 @@ export class Strings {
     SELECTIONSET: 'Select Items',
     SOURCE: 'Select source object',
     DESTINATIONSET: 'Select destination object(s)',
+    MIRRORFIRST: 'Specify first point of mirror line',
+    MIRRORSECOND: 'Specify second point of mirror line',
+    ERASESOURCE: 'Erase source objects?',
   };
 };
