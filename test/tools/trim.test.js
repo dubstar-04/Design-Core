@@ -471,14 +471,14 @@ test('Trim.execute calls actionCommand once per trim selection', async () => {
 
   const actionSpy = jest.fn();
   await withMockInput(
-    core.scene,
-    [new SingleSelection(1, new Point()), new SingleSelection(2, new Point()), undefined],
-    async () => {
-      const trim = new Trim();
-      await trim.execute();
-      expect(actionSpy).toHaveBeenCalledTimes(2);
-    },
-    { extraMethods: { actionCommand: () => actionSpy() } },
+      core.scene,
+      [new SingleSelection(1, new Point()), new SingleSelection(2, new Point()), undefined],
+      async () => {
+        const trim = new Trim();
+        await trim.execute();
+        expect(actionSpy).toHaveBeenCalledTimes(2);
+      },
+      { extraMethods: { actionCommand: () => actionSpy() } },
   );
 });
 
