@@ -172,11 +172,15 @@ export class Headers {
     this.chamferLength = parseFloat(Property.loadValue([header?.['$CHAMFERC']?.['40']], this.chamferLength));
     this.chamferAngle = parseFloat(Property.loadValue([header?.['$CHAMFERD']?.['40']], this.chamferAngle));
 
-    const trimModeRaw = Property.loadValue([header?.['$TRIMMODE']?.['70']]);
-    if (trimModeRaw !== undefined) this.trimMode = parseInt(trimModeRaw) !== 0;
+    // $TRIMMODE, $CHAMMODE, and $OFFSETDIST are system variables not written to file by AutoCAD.
+    // These are commented out but retained in case files from other applications include them.
+    // const trimModeRaw = Property.loadValue([header?.['$TRIMMODE']?.['70']]);
+    // if (trimModeRaw !== undefined) this.trimMode = parseInt(trimModeRaw) !== 0;
 
-    const chamferModeRaw = Property.loadValue([header?.['$CHAMMODE']?.['70']]);
-    if (chamferModeRaw !== undefined) this.chamferMode = parseInt(chamferModeRaw) !== 0;
+    // const chamferModeRaw = Property.loadValue([header?.['$CHAMMODE']?.['70']]);
+    // if (chamferModeRaw !== undefined) this.chamferMode = parseInt(chamferModeRaw) !== 0;
+
+    // this.offsetDistance = parseFloat(Property.loadValue([header?.['$OFFSETDIST']?.['40']], this.offsetDistance));
 
     const acadVer = Property.loadValue([header?.['$ACADVER']?.['1']]);
     if (acadVer !== undefined) this.dxfVersion = acadVer;
@@ -204,8 +208,9 @@ export class Headers {
     file.writeGroupCode('40', this.textSize);
     file.writeGroupCode('9', '$FILLETRAD');
     file.writeGroupCode('40', this.filletRadius);
-    file.writeGroupCode('9', '$TRIMMODE');
-    file.writeGroupCode('70', this.trimMode ? 1 : 0);
+    // $TRIMMODE is a system variable and is not written to file by AutoCAD
+    // file.writeGroupCode('9', '$TRIMMODE');
+    // file.writeGroupCode('70', this.trimMode ? 1 : 0);
     file.writeGroupCode('9', '$CHAMFERA');
     file.writeGroupCode('40', this.chamferDistanceA);
     file.writeGroupCode('9', '$CHAMFERB');
@@ -214,7 +219,11 @@ export class Headers {
     file.writeGroupCode('40', this.chamferLength);
     file.writeGroupCode('9', '$CHAMFERD');
     file.writeGroupCode('40', this.chamferAngle);
-    file.writeGroupCode('9', '$CHAMMODE');
-    file.writeGroupCode('70', this.chamferMode ? 1 : 0);
+    // $CHAMMODE is a system variable and is not written to file by AutoCAD
+    // file.writeGroupCode('9', '$CHAMMODE');
+    // file.writeGroupCode('70', this.chamferMode ? 1 : 0);
+    // $OFFSETDIST is a system variable and is not written to file by AutoCAD
+    // file.writeGroupCode('9', '$OFFSETDIST');
+    // file.writeGroupCode('40', this.offsetDistance);
   }
 }
