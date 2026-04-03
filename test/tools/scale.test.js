@@ -510,9 +510,9 @@ test('Scale.preview - reference mode uses referenceLength to compute factor', ()
   core.scene.selectionManager.addToSelectionSet(0);
 
   const scale = new Scale();
-  scale.points.push(new Point(0, 0));   // base at origin
-  scale.referencePoint = null;          // reference collection done — preview active
-  scale.referenceLength = 10;           // established reference length
+  scale.points.push(new Point(0, 0)); // base at origin
+  scale.referencePoint = null; // reference collection done — preview active
+  scale.referenceLength = 10; // established reference length
 
   // The default mouse scene position will give some distance from (0,0).
   // We can't control the mouse, so just verify the factor applied is
