@@ -325,3 +325,128 @@ test('Test Mirror.getMirroredPoints', () => {
   expect(result[1].x).toBeCloseTo(-2);
   expect(result[1].y).toBeCloseTo(-7);
 });
+
+test('Mirror.execute - requests selection set when none pre-selected', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  // Intentionally do NOT add to selection set — triggers the SELECTIONSET prompt
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  core.scene.inputManager = {
+    requestInput: async () => {
+      callCount++;
+      if (callCount === 1) {
+        // SELECTIONSET prompt: populate the selection manually and return
+        core.scene.selectionManager.addToSelectionSet(0);
+        return;
+      }
+      if (callCount === 2) return new Point(0, 0); // pt1
+      if (callCount === 3) return new Point(1, 0); // pt2
+      if (callCount === 4) return 'No'; // keep source
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const mirror = new Mirror();
+  await mirror.execute();
+  mirror.action();
+
+  expect(core.scene.entities.count()).toBe(2);
+  expect(core.scene.entities.get(1).points[0].y).toBeCloseTo(-5);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Mirror.preview - no points set, adds no temp entities', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const mirror = new Mirror();
+  // No points pushed — guard condition should prevent any work
+  mirror.preview();
+
+  expect(core.scene.tempEntities.count()).toBe(0);
+});
+
+test('Mirror.preview - one point set, draws temp mirror line using mouse position', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const mirror = new Mirror();
+  mirror.points.push(new Point(3, 3)); // pt1 distinct from default mouse (0,0) scene position
+  mirror.preview();
+
+  // Temp mirror line should have been created
+  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+});
+
+test('Mirror.preview - two distinct points, draws mirror line and mirrors selected items', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const mirror = new Mirror();
+  mirror.points.push(new Point(0, 0)); // pt1
+  mirror.points.push(new Point(1, 0)); // pt2 — mirror across X axis
+  mirror.preview();
+
+  // Temp mirror line should exist
+  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+
+  // The selectedItems copy should have its points mirrored (y negated)
+  const previewItem = core.scene.selectionManager.selectedItems[0];
+  expect(previewItem.points[0].y).toBeCloseTo(-5);
+});
+
+test('Mirror.preview - identical points, draws line but skips mirroring selected items', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const mirror = new Mirror();
+  mirror.points.push(new Point(5, 5)); // pt1
+  mirror.points.push(new Point(5, 5)); // pt2 — same as pt1, zero-length mirror line
+  mirror.preview();
+
+  // Temp line is still drawn
+  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+
+  // Selected item points should be unchanged (mirroring skipped)
+  const previewItem = core.scene.selectionManager.selectedItems[0];
+  expect(previewItem.points[0].y).toBeCloseTo(5);
+});
+
+test('Mirror.preview - reverses direction for entities with a direction property', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  // Arc with CCW direction
+  core.scene.addItem('Arc', { points: [new Point(0, 5), new Point(10, 5), new Point(5, 10)], direction: 1 });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const mirror = new Mirror();
+  mirror.points.push(new Point(0, 0)); // pt1
+  mirror.points.push(new Point(1, 0)); // pt2 — mirror across X axis
+  mirror.preview();
+
+  // Original entity direction is unchanged
+  expect(core.scene.entities.get(0).direction).toBe(1);
+
+  // Preview copy has direction reversed
+  const previewItem = core.scene.selectionManager.selectedItems[0];
+  expect(previewItem.direction).toBe(-1);
+});
