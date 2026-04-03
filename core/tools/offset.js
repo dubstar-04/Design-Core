@@ -46,48 +46,37 @@ export class Offset extends Tool {
       const distanceInput = await DesignCore.Scene.inputManager.requestInput(op);
       if (distanceInput === undefined) return;
 
-      if (Input.getType(distanceInput) === Input.Type.STRING && distanceInput === 'Through') {
+      const throughMode = Input.getType(distanceInput) === Input.Type.STRING && distanceInput === 'Through';
+
+      if (throughMode) {
         DesignCore.Scene.headers.offsetDistance = -1;
-        // Through mode: select entity, then specify a through point
-        const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
-        while (true) {
-          const selection = await DesignCore.Scene.inputManager.requestInput(op2);
-          if (selection === undefined) break;
-          this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
-
-          const op3 = new PromptOptions(Strings.Input.THROUGHPOINT, [Input.Type.POINT]);
-          const throughPoint = await DesignCore.Scene.inputManager.requestInput(op3);
-          if (throughPoint === undefined) break;
-
-          this.offsetDistance = this.getThroughDistance(this.selectedItem, throughPoint);
-          this.points = [throughPoint];
-          DesignCore.Scene.inputManager.actionCommand();
-        }
       } else {
-        // Distance mode
         this.offsetDistance = distanceInput;
-
         if (this.offsetDistance <= 0) {
           DesignCore.Core.notify(`${this.type} - ${Strings.Error.NONZERO}`);
           return;
         }
-
         DesignCore.Scene.headers.offsetDistance = this.offsetDistance;
+      }
 
-        // Select entity and side point (repeating)
-        const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
-        while (true) {
-          const selection = await DesignCore.Scene.inputManager.requestInput(op2);
-          if (selection === undefined) break;
-          this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+      const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
+      const op3 = new PromptOptions(throughMode ? Strings.Input.THROUGHPOINT : Strings.Input.SIDE, [Input.Type.POINT]);
 
-          const op3 = new PromptOptions(Strings.Input.SIDE, [Input.Type.POINT]);
-          const sidePoint = await DesignCore.Scene.inputManager.requestInput(op3);
-          if (sidePoint === undefined) break;
+      while (true) {
+        const selection = await DesignCore.Scene.inputManager.requestInput(op2);
+        if (selection === undefined) break;
+        this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+        DesignCore.Scene.selectionManager.removeLastSelection();
 
-          this.points = [sidePoint];
-          DesignCore.Scene.inputManager.actionCommand();
+        const point = await DesignCore.Scene.inputManager.requestInput(op3);
+        if (point === undefined) break;
+
+        if (throughMode) {
+          this.offsetDistance = this.getThroughDistance(this.selectedItem, point);
         }
+        this.points = [point];
+        DesignCore.Scene.inputManager.actionCommand();
+        this.selectedItem = null;
       }
 
       DesignCore.Scene.inputManager.executeCommand();
