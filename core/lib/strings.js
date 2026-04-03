@@ -24,6 +24,7 @@ export class Strings {
     NONZERO: 'Value must be positive and nonzero',
     MINVALUE: 'Value is too small',
     MAXVALUE: 'Value is too large',
+    ZEROLENGTH: 'Cannot define a zero length line',
   };
 
   // Warning Strings
