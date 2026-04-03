@@ -16,7 +16,6 @@ export class Offset extends Tool {
   /** Create an Offset command */
   constructor() {
     super();
-    this.offsetDistance = 0;
     this.selectedItem = null;
   }
 
@@ -39,9 +38,6 @@ export class Offset extends Tool {
   async execute() {
     try {
       // Initialise from the last used offset distance stored in headers
-      const storedDistance = DesignCore.Scene.headers.offsetDistance;
-      if (storedDistance > 0) this.offsetDistance = storedDistance;
-
       const op = new PromptOptions(Strings.Input.DISTANCE, [Input.Type.NUMBER], ['Through']);
       const distanceInput = await DesignCore.Scene.inputManager.requestInput(op);
       if (distanceInput === undefined) return;
@@ -51,12 +47,12 @@ export class Offset extends Tool {
       if (throughMode) {
         DesignCore.Scene.headers.offsetDistance = -1;
       } else {
-        this.offsetDistance = distanceInput;
-        if (this.offsetDistance <= 0) {
+        const distance = distanceInput;
+        if (distance <= 0) {
           DesignCore.Core.notify(`${this.type} - ${Strings.Error.NONZERO}`);
           return;
         }
-        DesignCore.Scene.headers.offsetDistance = this.offsetDistance;
+        DesignCore.Scene.headers.offsetDistance = distance;
       }
 
       const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
@@ -72,7 +68,7 @@ export class Offset extends Tool {
         if (point === undefined) break;
 
         if (throughMode) {
-          this.offsetDistance = this.getThroughDistance(this.selectedItem, point);
+          DesignCore.Scene.headers.offsetDistance = this.getThroughDistance(this.selectedItem, point);
         }
         this.points = [point];
         DesignCore.Scene.inputManager.actionCommand();
@@ -89,9 +85,10 @@ export class Offset extends Tool {
    * Preview the command during execution
    */
   preview() {
-    if (this.selectedItem && this.offsetDistance > 0) {
+    const offsetDistance = DesignCore.Scene.headers.offsetDistance;
+    if (this.selectedItem && offsetDistance > 0) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
-      const offsetPoints = this.getOffsetPoints(this.selectedItem, mousePoint, this.offsetDistance);
+      const offsetPoints = this.getOffsetPoints(this.selectedItem, mousePoint, offsetDistance);
 
       if (offsetPoints) {
         const data = { points: offsetPoints };
@@ -111,11 +108,12 @@ export class Offset extends Tool {
    * Perform the command
    */
   action() {
-    if (!this.selectedItem || this.offsetDistance <= 0) return;
+    const offsetDistance = DesignCore.Scene.headers.offsetDistance;
+    if (!this.selectedItem || offsetDistance <= 0) return;
 
     const sidePoint = this.points[0];
     const entity = this.selectedItem;
-    const offsetPoints = this.getOffsetPoints(entity, sidePoint, this.offsetDistance);
+    const offsetPoints = this.getOffsetPoints(entity, sidePoint, offsetDistance);
 
     if (!offsetPoints) {
       Logging.instance.warn(`${this.type}: ${entity.type} ${Strings.Message.CANNOTBEACTIONED}`);
