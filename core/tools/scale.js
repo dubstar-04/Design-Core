@@ -28,7 +28,7 @@ export class Scale extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = { command: 'Scale', shortcut: 'SC', type: 'Tool' };
+    const command = { command: 'Scale', shortcut: 'SC' }; // , type: 'Tool' };
     return command;
   }
 

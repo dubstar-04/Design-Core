@@ -27,7 +27,7 @@ export class Mirror extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = { command: 'Mirror', shortcut: 'MI', type: 'Tool' };
+    const command = { command: 'Mirror', shortcut: 'MI' }; // , type: 'Tool' };
     return command;
   }
 
