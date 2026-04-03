@@ -120,7 +120,7 @@ test('Mirror.execute - cancel at second point does not mirror', async () => {
   core.scene.inputManager = origInputManager;
 });
 
-test('Mirror.execute - cancel at erase prompt does not mirror', async () => {
+test('Mirror.execute - undefined erase prompt defaults to keeping source', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
@@ -142,9 +142,12 @@ test('Mirror.execute - cancel at erase prompt does not mirror', async () => {
 
   const mirror = new Mirror();
   await mirror.execute();
+  mirror.action();
 
-  expect(core.scene.entities.count()).toBe(1);
-  expect(core.scene.entities.get(0).points[0].y).toBeCloseTo(5);
+  // eraseSource defaults to false — original kept and mirrored copy added
+  expect(mirror.eraseSource).toBe(false);
+  expect(core.scene.entities.count()).toBe(2);
+  expect(core.scene.entities.get(1).points[0].y).toBeCloseTo(-5);
 
   core.scene.inputManager = origInputManager;
 });

@@ -55,7 +55,6 @@ export class Mirror extends Tool {
 
       const op4 = new PromptOptions(Strings.Input.ERASESOURCE, [], ['Yes', 'No']);
       const eraseInput = await DesignCore.Scene.inputManager.requestInput(op4);
-      if (eraseInput === undefined) return;
       this.eraseSource = (eraseInput === 'Yes');
 
       DesignCore.Scene.inputManager.executeCommand();
