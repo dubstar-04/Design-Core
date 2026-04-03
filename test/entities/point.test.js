@@ -144,6 +144,15 @@ test('Test Point.mirror', () => {
   const r6 = pt6.mirror(xAxisPt1, xAxisPt2);
   expect(r6.bulge).toBeCloseTo(-0.5);
   expect(r6.sequence).toBe(10);
+
+  // Degenerate mirror line (pt1 === pt2) returns a clone of the point unchanged
+  const ptDegen = new Point(7, 8, 0.25, 3);
+  const samePt = new Point(5, 5);
+  const rDegen = ptDegen.mirror(samePt, samePt);
+  expect(rDegen.x).toBeCloseTo(7);
+  expect(rDegen.y).toBeCloseTo(8);
+  expect(rDegen.bulge).toBeCloseTo(0.25);
+  expect(rDegen.sequence).toBe(3);
 });
 
 test('Test Point.rotate', () => {

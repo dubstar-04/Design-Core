@@ -111,6 +111,7 @@ export class Point {
    * @return {Point}
    */
   mirror(pt1, pt2) {
+    if (pt1.isSame(pt2)) return this.clone();
     const perp = this.perpendicular(pt1, pt2);
     return new Point(2 * perp.x - this.x, 2 * perp.y - this.y, -this.bulge, this.sequence);
   }
@@ -243,6 +244,7 @@ export class Point {
     const ABy = Pt2.y - Pt1.y;
 
     const magAB2 = ABx * ABx + ABy * ABy;
+    if (magAB2 === 0) return new Point(Pt1.x, Pt1.y);
     const ABdotAP = ABx * APx + ABy * APy;
     const t = ABdotAP / magAB2;
 
