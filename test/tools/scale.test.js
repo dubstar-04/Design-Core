@@ -356,3 +356,147 @@ test('Test Scale.getScaledPoints - preserves bulge and sequence', () => {
   expect(result[1].bulge).toBe(-0.25);
   expect(result[1].sequence).toBe(2);
 });
+
+test('Scale.execute - requests selection set when none pre-selected', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  // Intentionally do NOT add to selection set — triggers the SELECTIONSET prompt
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  core.scene.inputManager = {
+    requestInput: async () => {
+      callCount++;
+      if (callCount === 1) {
+        // SELECTIONSET prompt: populate the selection manually and return
+        core.scene.selectionManager.addToSelectionSet(0);
+        return;
+      }
+      if (callCount === 2) return new Point(0, 0); // base point
+      if (callCount === 3) return 2; // scale factor
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const scale = new Scale();
+  await scale.execute();
+  scale.action();
+
+  const line = core.scene.entities.get(0);
+  expect(line.points[0].x).toBeCloseTo(20);
+  expect(line.points[1].x).toBeCloseTo(40);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Scale.execute - reference with zero length returns without scaling', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  // base point, then 'Reference', then ref length = 0
+  const inputs = [new Point(0, 0), 'Reference', 0];
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) {
+        return inputs[callCount++];
+      }
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  const scale = new Scale();
+  await scale.execute();
+  // action() should not be called — execute returned early, scaleFactor unchanged (1)
+  scale.action();
+
+  // Entity should be unchanged (scaleFactor stayed at 1 but no second point pushed,
+  // so points array only has base — action uses scaleFactor=1)
+  const line = core.scene.entities.get(0);
+  expect(line.points[0].x).toBeCloseTo(10);
+  expect(line.points[1].x).toBeCloseTo(20);
+
+  core.scene.inputManager = origInputManager;
+});
+
+test('Scale.preview - no points set, adds no temp entities', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const scale = new Scale();
+  // No points — guard condition prevents any work
+  scale.preview();
+
+  expect(core.scene.tempEntities.count()).toBe(0);
+});
+
+test('Scale.preview - referencePoint set, suppresses preview', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const scale = new Scale();
+  scale.points.push(new Point(0, 0));
+  scale.referencePoint = new Point(0, 0); // non-null blocks preview
+
+  scale.preview();
+
+  expect(core.scene.tempEntities.count()).toBe(0);
+});
+
+test('Scale.preview - mouse on base point (distance 0), draws line but skips scaling', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const scale = new Scale();
+  // Push base point identical to default mouse scene position (0,0)
+  scale.points.push(new Point(0, 0));
+  scale.referencePoint = null;
+
+  scale.preview();
+
+  // Temp line is still created
+  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+
+  // Selected item points should be unchanged (scaling skipped)
+  const previewItem = core.scene.selectionManager.selectedItems[0];
+  expect(previewItem.points[0].x).toBeCloseTo(5);
+});
+
+test('Scale.preview - one point set, draws temp line and scales selected items', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(1, 0), new Point(2, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const scale = new Scale();
+  // Base point away from the default mouse scene position so distance > 0
+  scale.points.push(new Point(100, 100));
+  scale.referencePoint = null;
+
+  scale.preview();
+
+  // Temp line should be created
+  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+
+  // Preview item should have been scaled (x differs from original 1.0)
+  const previewItem = core.scene.selectionManager.selectedItems[0];
+  expect(previewItem.points[0].x).not.toBeCloseTo(1);
+});
