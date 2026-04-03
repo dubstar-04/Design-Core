@@ -105,6 +105,30 @@ export class Point {
   };
 
   /**
+   * Return new point mirrored across the line defined by pt1 and pt2
+   * @param  {Point} pt1 - first point on the mirror line
+   * @param  {Point} pt2 - second point on the mirror line
+   * @return {Point}
+   */
+  mirror(pt1, pt2) {
+    if (pt1.isSame(pt2)) return this.clone();
+    const perp = this.perpendicular(pt1, pt2);
+    return new Point(2 * perp.x - this.x, 2 * perp.y - this.y, -this.bulge, this.sequence);
+  }
+
+  /**
+   * Return new point scaled from base by a scalar factor
+   * @param  {Point} base
+   * @param  {number} factor
+   * @return {Point}
+   */
+  scaleFrom(base, factor) {
+    const x = base.x + (this.x - base.x) * factor;
+    const y = base.y + (this.y - base.y) * factor;
+    return new Point(x, y, this.bulge, this.sequence);
+  }
+
+  /**
    * Return new point rotated about centre by angle in radians
    * @param  {Point} centre
    * @param  {number} angle - in radians
@@ -220,6 +244,7 @@ export class Point {
     const ABy = Pt2.y - Pt1.y;
 
     const magAB2 = ABx * ABx + ABy * ABy;
+    if (magAB2 === 0) return new Point(Pt1.x, Pt1.y);
     const ABdotAP = ABx * APx + ABy * APy;
     const t = ABdotAP / magAB2;
 

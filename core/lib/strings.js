@@ -24,6 +24,7 @@ export class Strings {
     NONZERO: 'Value must be positive and nonzero',
     MINVALUE: 'Value is too small',
     MAXVALUE: 'Value is too large',
+    ZEROLENGTH: 'Cannot define a zero length line',
   };
 
   // Warning Strings
@@ -104,5 +105,11 @@ export class Strings {
     SELECTIONSET: 'Select Items',
     SOURCE: 'Select source object',
     DESTINATIONSET: 'Select destination object(s)',
+    MIRRORFIRST: 'Specify first point of mirror line',
+    MIRRORSECOND: 'Specify second point of mirror line',
+    ERASESOURCE: 'Erase source objects?',
+    SCALEFACTOR: 'Specify scale factor',
+    REFERENCELENGTH: 'Specify reference length',
+    NEWLENGTH: 'Specify new length',
   };
 };
