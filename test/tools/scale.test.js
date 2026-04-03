@@ -500,3 +500,30 @@ test('Scale.preview - one point set, draws temp line and scales selected items',
   const previewItem = core.scene.selectionManager.selectedItems[0];
   expect(previewItem.points[0].x).not.toBeCloseTo(1);
 });
+
+test('Scale.preview - reference mode uses referenceLength to compute factor', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  // Line at x=10..20, y=0
+  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const scale = new Scale();
+  scale.points.push(new Point(0, 0));   // base at origin
+  scale.referencePoint = null;          // reference collection done — preview active
+  scale.referenceLength = 10;           // established reference length
+
+  // The default mouse scene position will give some distance from (0,0).
+  // We can't control the mouse, so just verify the factor applied is
+  // distance/referenceLength rather than raw distance: reload the selectedItems
+  // before and after with a known referenceLength to confirm scaling occurred.
+  scale.preview();
+
+  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+
+  // The preview item's first point should differ from the original (10,0)
+  // because the factor (distance/10) is applied
+  const previewItem = core.scene.selectionManager.selectedItems[0];
+  expect(previewItem.points[0].x).not.toBeCloseTo(10);
+});

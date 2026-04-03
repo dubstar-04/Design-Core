@@ -17,6 +17,7 @@ export class Scale extends Tool {
     super();
     this.scaleFactor = 1;
     this.referencePoint = null;
+    this.referenceLength = null;
   }
 
   /**
@@ -78,6 +79,7 @@ export class Scale extends Tool {
 
           if (referenceLength === 0) return;
 
+          this.referenceLength = referenceLength;
           const op6 = new PromptOptions(Strings.Input.NEWLENGTH, [Input.Type.POINT, Input.Type.NUMBER]);
           const newInput = await DesignCore.Scene.inputManager.requestInput(op6);
           if (newInput === undefined) return;
@@ -124,11 +126,13 @@ export class Scale extends Tool {
       const distance = base.distance(mousePoint);
       if (distance === 0) return;
 
+      const factor = this.referenceLength !== null ? distance / this.referenceLength : distance;
+
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
         const item = DesignCore.Scene.selectionManager.selectedItems[i];
         const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
         const originalItem = DesignCore.Scene.entities.get(entityIndex);
-        item.setProperty('points', this.getScaledPoints(originalItem.points, base, distance));
+        item.setProperty('points', this.getScaledPoints(originalItem.points, base, factor));
       }
     }
   }
