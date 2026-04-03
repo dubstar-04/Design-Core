@@ -252,35 +252,39 @@ export class Offset extends Tool {
 
     const segCount = isClosed ? n : n - 1;
 
-    // Determine offset sign from the closest segment to sidePoint
+    // Determine offset sign from the closest segment to sidePoint.
+    // Use the actual distance to the segment (not the infinite-line perpendicular)
+    // so that sidePoints projecting beyond a segment endpoint pick the correct segment.
     let sign = 1;
     let minDist = Infinity;
     for (let i = 0; i < segCount; i++) {
       const A = points[i];
       const B = points[(i + 1) % n];
       if (A.bulge === 0) {
-        const dir = B.subtract(A);
-        const len = Math.sqrt(dir.x * dir.x + dir.y * dir.y);
-        if (len > 0) {
+        const closestPt = sidePoint.closestPointOnLine(A, B);
+        if (closestPt === null) continue;
+        const dist = sidePoint.distance(closestPt);
+        if (dist < minDist) {
+          minDist = dist;
+          const dir = B.subtract(A);
           const cross = dir.cross(sidePoint.subtract(A));
-          const dist = Math.abs(cross) / len;
-          if (dist < minDist) {
-            minDist = dist;
-            sign = cross >= 0 ? 1 : -1;
-          }
+          sign = cross >= 0 ? 1 : -1;
         }
       } else {
         const center = A.bulgeCentrePoint(B);
         const currentRadius = center.distance(A);
         const arcDir = A.bulge > 0 ? 1 : -1;
-        const distToCenter = center.distance(sidePoint);
-        const dist = Math.abs(distToCenter - currentRadius);
+        const closestPt = sidePoint.closestPointOnArc(A, B, center, arcDir);
+        if (closestPt === null) continue;
+        const dist = sidePoint.distance(closestPt);
         if (dist < minDist) {
           minDist = dist;
-          // CCW arc: left of travel = outward; CW arc: left of travel = inward
-          sign = arcDir > 0
-            ? (distToCenter >= currentRadius ? 1 : -1)
-            : (distToCenter >= currentRadius ? -1 : 1);
+          const distToCenter = center.distance(sidePoint);
+          // For CCW arc (arcDir>0): left of travel = toward center (smaller radius)
+          // For CW arc (arcDir<0): left of travel = away from center (larger radius)
+          sign = arcDir > 0 ?
+            (distToCenter < currentRadius ? 1 : -1) :
+            (distToCenter >= currentRadius ? 1 : -1);
         }
       }
     }
@@ -305,7 +309,7 @@ export class Offset extends Tool {
         const center = A.bulgeCentrePoint(B);
         const currentRadius = center.distance(A);
         const arcDir = A.bulge > 0 ? 1 : -1;
-        const newRadius = currentRadius + arcDir * distance * sign;
+        const newRadius = currentRadius - arcDir * distance * sign;
         if (newRadius <= 0) return null;
         const startAngle = Math.atan2(A.y - center.y, A.x - center.x);
         const endAngle = Math.atan2(B.y - center.y, B.x - center.x);
