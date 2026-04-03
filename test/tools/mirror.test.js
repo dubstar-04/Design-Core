@@ -326,6 +326,26 @@ test('Test Mirror.getMirroredPoints', () => {
   expect(result[1].y).toBeCloseTo(-7);
 });
 
+test('Mirror.action - zero-length mirror line does not modify entities', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const mirror = new Mirror();
+  mirror.points.push(new Point(3, 3)); // pt1 === pt2 — degenerate mirror line
+  mirror.points.push(new Point(3, 3));
+  mirror.eraseSource = false;
+
+  mirror.action();
+
+  // No new entity should have been added
+  expect(core.scene.entities.count()).toBe(1);
+  // Original entity is unchanged
+  expect(core.scene.entities.get(0).points[0].y).toBeCloseTo(5);
+});
+
 test('Mirror.execute - requests selection set when none pre-selected', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();

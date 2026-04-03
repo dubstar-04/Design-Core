@@ -97,6 +97,12 @@ export class Mirror extends Tool {
   action() {
     const pt1 = this.points[0];
     const pt2 = this.points[1];
+
+    if (pt1.isSame(pt2)) {
+      DesignCore.Core.notify(`${this.type} - ${Strings.Error.ZEROLENGTH}`);
+      return;
+    }
+
     const stateChanges = [];
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
