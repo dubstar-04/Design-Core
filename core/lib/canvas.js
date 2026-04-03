@@ -247,7 +247,7 @@ export class Canvas {
     // Paint the scene background
     try {// HTML
       // this.clear()
-      context.fillStyle = DesignCore.Settings.canvasbackgroundcolour;
+      context.fillStyle = Colours.rgbToString(DesignCore.Settings.canvasbackgroundcolour);
       context.fillRect(origin.x, origin.y, width / this.getScale(), height / this.getScale());
       // context.globalAlpha = this.cvs.alpha
     } catch { // Cairo
