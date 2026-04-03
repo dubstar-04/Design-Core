@@ -96,7 +96,7 @@ export class Scale extends Tool {
           this.scaleFactor = input;
           this.points.push(basePoint);
         } else if (Input.getType(input) === Input.Type.POINT) {
-          // Scale factor determined by ratio of distances from base point
+          // Scale factor is the distance from the base point to the input point
           const distance = basePoint.distance(input);
           this.scaleFactor = distance;
           this.points.push(input);
