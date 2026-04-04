@@ -60,6 +60,42 @@ test('ChamferFilletBase.resolveCornerGeometry returns false and notifies for par
   notifySpy.mockRestore();
 });
 
+test('ChamferFilletBase.resolveCornerGeometry returns false for collinear overlapping lines', () => {
+  core.scene.clear();
+  // Two segments on the same line that overlap
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(15, 0)] });
+
+  const notifySpy = jest.spyOn(core, 'notify');
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(3, 0);
+  chamfer.secondPick.clickPoint = new Point(12, 0);
+
+  expect(chamfer.resolveCornerGeometry('test-msg')).toBe(false);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.PARALLELLINES));
+  notifySpy.mockRestore();
+});
+
+test('ChamferFilletBase.resolveCornerGeometry returns false for collinear endpoint-sharing lines', () => {
+  core.scene.clear();
+  // Two collinear segments sharing an endpoint (180° angle)
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+
+  const notifySpy = jest.spyOn(core, 'notify');
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(2, 0);
+  chamfer.secondPick.clickPoint = new Point(8, 0);
+
+  expect(chamfer.resolveCornerGeometry('test-msg')).toBe(false);
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.PARALLELLINES));
+  notifySpy.mockRestore();
+});
+
 test('ChamferFilletBase.resolveCornerGeometry returns true and computes intersection for L-corner', () => {
   // Horizontal (-10,0)→(0,0) and vertical (0,0)→(0,10); infinite lines meet at (0,0)
   core.scene.clear();
