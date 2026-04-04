@@ -174,6 +174,16 @@ export class Circle extends Entity {
   }
 
   /**
+   * Set entity points from a polyline point representation
+   * @param {Array} points
+   */
+  fromPolylinePoints(points) {
+    const center = points[0].bulgeCentrePoint(points[1]);
+    const radius = center.distance(points[0]);
+    this.points = [center, center.project(0, radius)];
+  }
+
+  /**
    * Trim the entity
    * @param {Array} intersections
    * @return {Array} - array of state changes
