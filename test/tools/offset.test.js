@@ -170,6 +170,8 @@ test('Offset.execute - cancel at side point does not offset', async () => {
   await offset.execute();
 
   expect(core.scene.entities.count()).toBe(1);
+  // selectedItem must be cleared so a stale action() call cannot create an unintended entity
+  expect(offset.selectedItem).toBeNull();
 
   core.scene.inputManager = origInputManager;
 });

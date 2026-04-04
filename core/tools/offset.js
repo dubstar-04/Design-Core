@@ -69,7 +69,10 @@ export class Offset extends Tool {
         DesignCore.Scene.selectionManager.removeLastSelection();
 
         const point = await DesignCore.Scene.inputManager.requestInput(op3);
-        if (point === undefined) break;
+        if (point === undefined) {
+          this.selectedItem = null;
+          break;
+        }
 
         if (throughMode) {
           DesignCore.Scene.headers.offsetDistance = this.getThroughDistance(this.selectedItem, point);
@@ -79,7 +82,7 @@ export class Offset extends Tool {
         this.selectedItem = null;
       }
 
-      DesignCore.Scene.inputManager.executeCommand();
+      DesignCore.Scene.inputManager.reset();
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
