@@ -516,8 +516,8 @@ test('Test Offset.getOffsetPolylinePoints - closed rectangle offset outward', ()
   const offset = new Offset();
   // Closed rectangle: (0,0) → (10,0) → (10,10) → (0,10), closed
   const entity = makePolyline(
-    [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)],
-    true,
+      [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)],
+      true,
   );
 
   // sidePoint outside the left edge
@@ -593,7 +593,9 @@ test('Offset.execute - Through mode offsets entity to the through point distance
     requestInput: async () => {
       if (callCount < inputs.length) return inputs[callCount++];
     },
-    actionCommand: () => { offset.action(); },
+    actionCommand: () => {
+      offset.action();
+    },
     executeCommand: () => {},
     reset: () => {},
   };
