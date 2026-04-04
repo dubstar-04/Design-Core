@@ -143,6 +143,7 @@ export class Offset extends Tool {
    * @return {Array|null} offset points or null if unsupported
    */
   getOffsetPoints(entity, sidePoint, distance) {
+    // TODO: can this be refactored to use only polylines?
     switch (entity.type) {
       case 'Line':
         return this.getOffsetLinePoints(entity, sidePoint, distance);
@@ -288,12 +289,11 @@ export class Offset extends Tool {
       if (A.bulge === 0) {
         const dir = B.subtract(A);
         const normal = new Point(-dir.y, dir.x).normalise();
-        const ox = normal.x * distance * sign;
-        const oy = normal.y * distance * sign;
+        const offset = normal.scale(distance * sign);
         offsetSegs.push({
           type: 'line',
-          A: new Point(A.x + ox, A.y + oy),
-          B: new Point(B.x + ox, B.y + oy),
+          A: A.add(offset),
+          B: B.add(offset),
           bulge: 0,
         });
       } else {
