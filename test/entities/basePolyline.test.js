@@ -551,7 +551,16 @@ test('BasePolyline constructor auto-closes when last point matches first', () =>
   expect(polyline.flags.hasFlag(1)).toBe(true);
 });
 
-test('BasePolyline constructor does not auto-close when fewer than 3 unique points', () => {
+test('BasePolyline constructor does not auto-close when fewer than 3 unique points remain after pop', () => {
+  // [A, B, A] — only 2 unique points after removing the duplicate; must not auto-close
+  const points = [new Point(0, 0), new Point(10, 0), new Point(0, 0)];
+  const polyline = new BasePolyline({ points });
+
+  expect(polyline.points.length).toBe(3);
+  expect(polyline.flags.hasFlag(1)).toBe(false);
+});
+
+test('BasePolyline constructor does not auto-close with only 2 identical points', () => {
   // Only 2 unique points — not enough to form a closed polygon
   const points = [new Point(0, 0), new Point(0, 0)];
   const polyline = new BasePolyline({ points });
