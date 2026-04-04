@@ -33,7 +33,7 @@ export class Headers {
   #chamferMode = false;
 
   // $OFFSETDIST (group code 40)
-  #offsetDistance = 1;
+  #offsetDistance = 0;
 
   // $ACADVER (group code 1)
   #dxfVersion = 'R2018';
