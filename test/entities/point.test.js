@@ -179,6 +179,14 @@ test('Test Point.rotate', () => {
   expect(result3.y).toBeCloseTo(30, 5);
 });
 
+test('Test Point.length', () => {
+  expect(new Point(3, 4).length()).toBe(5);
+  expect(new Point(5, 0).length()).toBe(5);
+  expect(new Point(0, -7).length()).toBe(7);
+  expect(new Point(0, 0).length()).toBe(0);
+  expect(new Point(1, 1).length()).toBeCloseTo(Math.SQRT2);
+});
+
 test('Test Point.normalise', () => {
   // Axis-aligned vector: (5, 0) → (1, 0)
   const pt1 = new Point(5, 0);

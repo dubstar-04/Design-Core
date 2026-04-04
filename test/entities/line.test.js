@@ -190,3 +190,14 @@ test('Line.execute handles Close option', async () => {
     expect(line.points[3]).toBe(pt1);
   }, { extraMethods: { actionCommand: () => {} } });
 });
+
+test('Line.fromPolylinePoints round-trip preserves points exactly', () => {
+  const line = new Line({ points: [new Point(3, 7), new Point(15, -4)] });
+  const polyPts = line.toPolylinePoints();
+  const rebuilt = new Line({});
+  rebuilt.fromPolylinePoints(polyPts);
+  expect(rebuilt.points[0].x).toBe(3);
+  expect(rebuilt.points[0].y).toBe(7);
+  expect(rebuilt.points[1].x).toBe(15);
+  expect(rebuilt.points[1].y).toBe(-4);
+});

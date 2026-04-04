@@ -81,7 +81,7 @@ test('Test intersectSegmentSegment - line line', () => {
   const result1 = Intersection.intersectSegmentSegment(
       new Point(), new Point(0, 10),
       new Point(1, 5), new Point(5, 5),
-      true,
+      false, true,
   );
   expect(result1.status).toBe('Perpendicular');
   expect(result1.points.length).toBe(1);
@@ -313,40 +313,54 @@ test('Test intersectPolylinePolyline - polyline arc with extend', () => {
   expect(result2.points.length).toBeGreaterThanOrEqual(1);
 });
 
-test('Test Intersection.intersectRayRay()', () => {
+test('Test intersectSegmentSegment - both segments extended (ray-ray equivalent)', () => {
   // Perpendicular lines meeting at origin
-  const p1 = Intersection.intersectRayRay(
+  const r1 = Intersection.intersectSegmentSegment(
       new Point(-5, 0), new Point(5, 0),
       new Point(0, -5), new Point(0, 5),
+      true, true,
   );
-  expect(p1).not.toBeNull();
-  expect(p1.x).toBeCloseTo(0);
-  expect(p1.y).toBeCloseTo(0);
+  expect(r1.points.length).toBe(1);
+  expect(r1.points[0].x).toBeCloseTo(0);
+  expect(r1.points[0].y).toBeCloseTo(0);
 
   // Non-perpendicular: lines y=1 and x=1 meeting at (1, 1)
-  const p2 = Intersection.intersectRayRay(
+  const r2 = Intersection.intersectSegmentSegment(
       new Point(0, 1), new Point(10, 1),
       new Point(1, 0), new Point(1, 10),
+      true, true,
   );
-  expect(p2).not.toBeNull();
-  expect(p2.x).toBeCloseTo(1);
-  expect(p2.y).toBeCloseTo(1);
+  expect(r2.points.length).toBe(1);
+  expect(r2.points[0].x).toBeCloseTo(1);
+  expect(r2.points[0].y).toBeCloseTo(1);
 
   // 45-degree lines crossing at (5, 5)
-  const p3 = Intersection.intersectRayRay(
+  const r3 = Intersection.intersectSegmentSegment(
       new Point(0, 0), new Point(10, 10),
       new Point(10, 0), new Point(0, 10),
+      true, true,
   );
-  expect(p3).not.toBeNull();
-  expect(p3.x).toBeCloseTo(5);
-  expect(p3.y).toBeCloseTo(5);
+  expect(r3.points.length).toBe(1);
+  expect(r3.points[0].x).toBeCloseTo(5);
+  expect(r3.points[0].y).toBeCloseTo(5);
 
-  // Parallel lines — should return null
-  const p4 = Intersection.intersectRayRay(
+  // Parallel lines — should return no points
+  const r4 = Intersection.intersectSegmentSegment(
       new Point(0, 0), new Point(10, 0),
       new Point(0, 1), new Point(10, 1),
+      true, true,
   );
-  expect(p4).toBeNull();
+  expect(r4.points.length).toBe(0);
+
+  // Disjoint segments that only intersect when both extended
+  const r5 = Intersection.intersectSegmentSegment(
+      new Point(0, 0), new Point(2, 0),
+      new Point(5, -2), new Point(5, -1),
+      true, true,
+  );
+  expect(r5.points.length).toBe(1);
+  expect(r5.points[0].x).toBeCloseTo(5);
+  expect(r5.points[0].y).toBeCloseTo(0);
 });
 
 // ------------------------------------------------------------

@@ -219,7 +219,7 @@ export class Dimension extends BaseDimension {
             const lineTwoSlope = (line2.end.y - line2.start.y) / (line2.end.x - line2.start.x);
 
             if (Utils.round(lineOneSlope) !== Utils.round(lineTwoSlope)) {
-              const intersect = Intersection.intersectSegmentSegment(line1.start, line1.end, line2.start, line2.end, true);
+              const intersect = Intersection.intersectSegmentSegment(line1.start, line1.end, line2.start, line2.end, false, true);
               if (intersect.points.length >= 1) {
               // add line to selection
                 this.selectedItems.push(selectedItem2);

@@ -848,7 +848,7 @@ describe('Intersection with extend flag', () => {
     const result2 = Intersection.intersectSegmentSegment(
         new Point(10, -10), new Point(10, 10),
         new Point(0, 0), new Point(5, 0),
-        true,
+        false, true,
     );
     expect(result2.status).toBe('Perpendicular');
     expect(result2.points[0].x).toBeCloseTo(10);

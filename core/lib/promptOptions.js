@@ -9,11 +9,13 @@ export class PromptOptions {
    * @param {string} promptMessage
    * @param {Array} types
    * @param {Array} options
+   * @param {any} defaultValue
    */
-  constructor(promptMessage = 'error', types = [], options = []) {
+  constructor(promptMessage = 'error', types = [], options = [], defaultValue = undefined) {
     this.promptMessage = promptMessage;
     this.types = types;
     this.options = options;
+    this.defaultValue = defaultValue;
     this.resolve = undefined;
     this.reject = undefined;
   }
@@ -110,6 +112,9 @@ export class PromptOptions {
       // Add \u0332 after the first letter of each option to include underscore
       const optionsWithShortcut = this.options.map((option) => this.getOptionWithShortcut(option));
       msg = `${this.promptMessage} ${Strings.Strings.OR} [${optionsWithShortcut}]`;
+    }
+    if (this.defaultValue !== undefined) {
+      msg = `${msg} <${this.defaultValue}>`;
     }
     return msg;
   }

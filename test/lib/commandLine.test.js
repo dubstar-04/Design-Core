@@ -1,6 +1,7 @@
 import { Core } from '../../core/core/core.js';
 import { Input, PromptOptions } from '../../core/lib/inputManager.js';
 import { Strings } from '../../core/lib/strings.js';
+import { expect, jest } from '@jest/globals';
 
 const core = new Core();
 const commandline = core.commandLine; // new CommandLine();
@@ -16,24 +17,7 @@ test('Test Commandline.setPrompt', () => {
   const testText = 'TestTest';
   commandline.setPrompt(testText);
   expect(commandline.prompt).toBe(`${testText}:`);
-
-  // test setPrompt with default - command should be set to default value
-  const testTextWithDefault = 'TestTest <default>';
-  commandline.setPrompt(testTextWithDefault);
-  expect(commandline.prompt).toBe(`${testTextWithDefault}:`);
-  expect(commandline.command).toBe('default');
-});
-
-test('Test Commandline.parseCommandDefault', () => {
-  const commandDefault = ['<default>'];
-  const defaultValue = commandline.parseCommandDefault(commandDefault);
-  expect(defaultValue).toBe(`default`);
-
-  // only a single default is valid
-  commandDefault.push('<second value>');
-  expect(() => {
-    commandline.parseCommandDefault(commandDefault);
-  }).toThrow();
+  expect(commandline.command).toBe('');
 });
 
 test('Test Commandline.update', () => {
@@ -213,6 +197,159 @@ test('Test CommandLine.addToCommandHistory', () => {
 
   expect(commandline.lastCommand.length).toBe(10);
   commandline.lastCommand = [];
+});
+
+test('Test CommandLine.setUpdateFunction registers callback and triggers it', () => {
+  const callback = jest.fn();
+  commandline.setUpdateFunction(callback);
+  expect(callback).toHaveBeenCalled();
+  commandline.setUpdateFunction(undefined);
+});
+
+test('Test CommandLine.escapePressed delegates to inputManager.onEscapePressed', () => {
+  const inputManager = core.scene.inputManager;
+  const spy = jest.spyOn(inputManager, 'onEscapePressed').mockImplementation(() => {});
+  commandline.escapePressed();
+  expect(spy).toHaveBeenCalled();
+  spy.mockRestore();
+});
+
+test('Test CommandLine.deletePressed delegates to inputManager.onCommand with Erase', () => {
+  const inputManager = core.scene.inputManager;
+  const spy = jest.spyOn(inputManager, 'onCommand').mockImplementation(() => {});
+  commandline.deletePressed();
+  expect(spy).toHaveBeenCalledWith('Erase');
+  spy.mockRestore();
+});
+
+test('Test CommandLine.enterPressed with empty command calls onEnterPressed', () => {
+  const inputManager = core.scene.inputManager;
+  commandline.resetPrompt();
+  const spy = jest.spyOn(inputManager, 'onEnterPressed').mockImplementation(() => {});
+  commandline.enterPressed();
+  expect(spy).toHaveBeenCalled();
+  spy.mockRestore();
+});
+
+test('Test CommandLine.enterPressed with command calls onCommand with parsed value', () => {
+  const inputManager = core.scene.inputManager;
+  commandline.resetPrompt();
+  commandline.handleKeys('42');
+  const spy = jest.spyOn(inputManager, 'onCommand').mockImplementation(() => {});
+  commandline.enterPressed();
+  expect(spy).toHaveBeenCalledWith(42);
+  spy.mockRestore();
+  commandline.resetPrompt();
+});
+
+test('Test CommandLine.handleKeys routes Backspace to backPressed', () => {
+  commandline.handleKeys('123');
+  commandline.handleKeys('Backspace');
+  expect(commandline.command).toBe('12');
+  commandline.resetPrompt();
+});
+
+test('Test CommandLine.handleKeys routes Enter to enterPressed', () => {
+  const spy = jest.spyOn(commandline, 'enterPressed').mockImplementation(() => {});
+  commandline.handleKeys('Enter');
+  expect(spy).toHaveBeenCalled();
+  spy.mockRestore();
+});
+
+test('Test CommandLine.handleKeys routes Escape to escapePressed', () => {
+  const spy = jest.spyOn(commandline, 'escapePressed').mockImplementation(() => {});
+  commandline.handleKeys('Escape');
+  expect(spy).toHaveBeenCalled();
+  spy.mockRestore();
+});
+
+test('Test CommandLine.handleKeys routes Space to spacePressed', () => {
+  const spy = jest.spyOn(commandline, 'spacePressed').mockImplementation(() => {});
+  commandline.handleKeys('Space');
+  expect(spy).toHaveBeenCalled();
+  spy.mockRestore();
+});
+
+test('Test CommandLine.handleKeys routes Delete to deletePressed', () => {
+  const spy = jest.spyOn(commandline, 'deletePressed').mockImplementation(() => {});
+  commandline.handleKeys('Delete');
+  expect(spy).toHaveBeenCalled();
+  spy.mockRestore();
+});
+
+test('Test CommandLine.handleKeys routes Up-Arrow to previousCommand up', () => {
+  const spy = jest.spyOn(commandline, 'previousCommand').mockImplementation(() => {});
+  commandline.handleKeys('Up-Arrow');
+  expect(spy).toHaveBeenCalledWith('up');
+  spy.mockRestore();
+});
+
+test('Test CommandLine.handleKeys routes Down-Arrow to previousCommand down', () => {
+  const spy = jest.spyOn(commandline, 'previousCommand').mockImplementation(() => {});
+  commandline.handleKeys('Down-Arrow');
+  expect(spy).toHaveBeenCalledWith('down');
+  spy.mockRestore();
+});
+
+test('Test CommandLine.handleKeys with undefined key does not change command', () => {
+  commandline.resetPrompt();
+  commandline.handleKeys(undefined);
+  expect(commandline.command).toBe('');
+});
+
+test('Test CommandLine.previousCommand cycles up through history', () => {
+  commandline.lastCommand = ['Circle', 'Line', 'Rect'];
+  commandline.lastCommandPosition = -1;
+
+  commandline.previousCommand('up');
+  expect(commandline.command).toBe('Circle');
+  expect(commandline.lastCommandPosition).toBe(0);
+
+  commandline.previousCommand('up');
+  expect(commandline.command).toBe('Line');
+  expect(commandline.lastCommandPosition).toBe(1);
+
+  commandline.previousCommand('up');
+  expect(commandline.command).toBe('Rect');
+  expect(commandline.lastCommandPosition).toBe(2);
+
+  // At end of history - stays at last entry
+  commandline.previousCommand('up');
+  expect(commandline.command).toBe('Rect');
+  expect(commandline.lastCommandPosition).toBe(2);
+
+  commandline.lastCommand = [];
+  commandline.resetPrompt();
+});
+
+test('Test CommandLine.previousCommand cycles down through history', () => {
+  commandline.lastCommand = ['Circle', 'Line', 'Rect'];
+  commandline.lastCommandPosition = 2;
+  commandline.command = 'Rect';
+
+  commandline.previousCommand('down');
+  expect(commandline.command).toBe('Line');
+  expect(commandline.lastCommandPosition).toBe(1);
+
+  commandline.previousCommand('down');
+  expect(commandline.command).toBe('Circle');
+  expect(commandline.lastCommandPosition).toBe(0);
+
+  // At position 0 going down resets the prompt
+  commandline.previousCommand('down');
+  expect(commandline.command).toBe('');
+  expect(commandline.lastCommandPosition).toBe(-1);
+
+  commandline.lastCommand = [];
+});
+
+test('Test CommandLine.previousCommand up with empty history is a no-op', () => {
+  commandline.lastCommand = [];
+  commandline.lastCommandPosition = -1;
+  commandline.command = '';
+  commandline.previousCommand('up');
+  expect(commandline.command).toBe('');
+  expect(commandline.lastCommandPosition).toBe(-1);
 });
 
 test('Test CommandLine.addToCommandHistory', () => {

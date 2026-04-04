@@ -272,7 +272,7 @@ export class ArcAlignedText extends Entity {
 
       // Get the font size when standard style is used
       if (this.styleName.toUpperCase() === 'STANDARD') {
-        const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
+        const op2 = new PromptOptions(Strings.Input.HEIGHT, [Input.Type.NUMBER], [], this.height);
         const height = await DesignCore.Scene.inputManager.requestInput(op2);
         if (height === undefined) return;
         this.height = height;

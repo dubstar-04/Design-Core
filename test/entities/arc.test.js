@@ -481,3 +481,27 @@ test('Arc.trim returns empty when only intersection is at an endpoint', () => {
   expect(changes).toEqual([]);
 });
 
+test('Arc.fromPolylinePoints round-trip preserves centre, radius and angles', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
+  arc.radius = 10;
+  const polyPts = arc.toPolylinePoints();
+  const rebuilt = new Arc({});
+  rebuilt.fromPolylinePoints(polyPts);
+  expect(rebuilt.points[0].x).toBeCloseTo(0, 10);
+  expect(rebuilt.points[0].y).toBeCloseTo(0, 10);
+  expect(rebuilt.radius).toBeCloseTo(10, 10);
+  expect(rebuilt.startAngle()).toBeCloseTo(arc.startAngle(), 10);
+  expect(rebuilt.endAngle()).toBeCloseTo(arc.endAngle(), 10);
+});
+
+test('Arc.fromPolylinePoints precision drift is negligible', () => {
+  const arc = new Arc({ points: [new Point(50, 50), new Point(50, 50).project(0.7, 30), new Point(50, 50).project(2.1, 30)] });
+  arc.radius = 30;
+  const polyPts = arc.toPolylinePoints();
+  const rebuilt = new Arc({});
+  rebuilt.fromPolylinePoints(polyPts);
+  const centerDrift = Math.hypot(rebuilt.points[0].x - arc.points[0].x, rebuilt.points[0].y - arc.points[0].y);
+  expect(centerDrift).toBeLessThan(1e-10);
+  expect(Math.abs(rebuilt.radius - arc.radius)).toBeLessThan(1e-10);
+});
+

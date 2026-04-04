@@ -27,7 +27,7 @@ export class Mirror extends Tool {
    * type = type to group command in toolbars (omitted if not shown)
    */
   static register() {
-    const command = { command: 'Mirror', shortcut: 'MI', type: 'Tool' };
+    const command = { command: 'Mirror', shortcut: 'MI' }; // , type: 'Tool' };
     return command;
   }
 
@@ -53,7 +53,7 @@ export class Mirror extends Tool {
       if (pt2 === undefined) return;
       this.points.push(pt2);
 
-      const op4 = new PromptOptions(Strings.Input.ERASESOURCE, [], ['Yes', 'No']);
+      const op4 = new PromptOptions(Strings.Input.ERASESOURCE, [], ['Yes', 'No'], 'N');
       const eraseInput = await DesignCore.Scene.inputManager.requestInput(op4);
       this.eraseSource = (eraseInput === 'Yes');
 

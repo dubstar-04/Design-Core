@@ -131,6 +131,14 @@ export class Line extends Entity {
   }
 
   /**
+   * Set entity points from a polyline point representation
+   * @param {Array} points
+   */
+  fromPolylinePoints(points) {
+    this.points = [new Point(points[0].x, points[0].y), new Point(points[1].x, points[1].y)];
+  }
+
+  /**
    * Trim the entity
    * @param {Array} intersections
    * @return {Array} - array of state changes

@@ -538,3 +538,91 @@ test('Polyline.execute supports Arc/Line mode switching', async () => {
     expect(polyline.points[2].bulge).toBe(0);
   }, { extraMethods: { actionCommand: () => {} } });
 });
+
+// ─── Auto-close when first and last point are the same ───────────────────────
+
+test('BasePolyline constructor auto-closes when last point matches first', () => {
+  // Simulate a polyline loaded with a redundant closing point (e.g. from DXF data)
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 0)];
+  const polyline = new BasePolyline({ points });
+
+  // Duplicate point should be removed and the closed flag set
+  expect(polyline.points.length).toBe(3);
+  expect(polyline.flags.hasFlag(1)).toBe(true);
+});
+
+test('BasePolyline constructor does not auto-close when fewer than 3 unique points remain after pop', () => {
+  // [A, B, A] — only 2 unique points after removing the duplicate; must not auto-close
+  const points = [new Point(0, 0), new Point(10, 0), new Point(0, 0)];
+  const polyline = new BasePolyline({ points });
+
+  expect(polyline.points.length).toBe(3);
+  expect(polyline.flags.hasFlag(1)).toBe(false);
+});
+
+test('BasePolyline constructor does not auto-close with only 2 identical points', () => {
+  // Only 2 unique points — not enough to form a closed polygon
+  const points = [new Point(0, 0), new Point(0, 0)];
+  const polyline = new BasePolyline({ points });
+
+  expect(polyline.points.length).toBe(2);
+  expect(polyline.flags.hasFlag(1)).toBe(false);
+});
+
+test('Polyline.execute auto-closes when start point is re-entered', async () => {
+  const pt1 = new Point(0, 0);
+  const pt2 = new Point(10, 0);
+  const pt3 = new Point(10, 10);
+  const pt4 = new Point(0, 0); // same as pt1
+
+  // Track how many times actionCommand is called with data that has the closed flag set
+  let autoClosedCount = 0;
+  const mockActionCommand = (entity) => {
+    // The constructor will have auto-closed the entity when pt4 == pt1
+    if (entity.points.length === 4 && entity.points.at(-1).isSame(pt1)) {
+      // simulate what the constructor does: a new entity created from this data would auto-close
+      const rebuilt = new BasePolyline({ points: [...entity.points] });
+      if (rebuilt.flags.hasFlag(1)) autoClosedCount++;
+    }
+    return 0;
+  };
+
+  await withMockInput(DesignCore.Scene, [pt1, pt2, pt3, pt4], async () => {
+    const polyline = new BasePolyline({});
+    await polyline.execute();
+    // execute does not exit early — the duplicate point is on the instance
+    expect(polyline.points.length).toBe(4);
+    // The scene entity (rebuilt in actionCommand) would be auto-closed
+    expect(autoClosedCount).toBe(1);
+  }, { extraMethods: { actionCommand: mockActionCommand } });
+});
+
+test('BasePolyline.fromPolylinePoints round-trip preserves open polyline', () => {
+  const poly = new BasePolyline({ points: [new Point(0, 0, 0.5), new Point(10, 0), new Point(10, 10)] });
+  const polyPts = poly.toPolylinePoints();
+  const rebuilt = new BasePolyline({});
+  rebuilt.fromPolylinePoints(polyPts);
+  expect(rebuilt.points.length).toBe(3);
+  expect(rebuilt.points[0].x).toBe(0);
+  expect(rebuilt.points[0].y).toBe(0);
+  expect(rebuilt.points[0].bulge).toBe(0.5);
+  expect(rebuilt.points[2].x).toBe(10);
+  expect(rebuilt.points[2].y).toBe(10);
+});
+
+test('BasePolyline.fromPolylinePoints round-trip strips closure point for closed polyline', () => {
+  const flags = new Flags();
+  flags.addValue(1);
+  const poly = new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)], flags: flags });
+  const polyPts = poly.toPolylinePoints();
+  // toPolylinePoints appends a closure copy of the first point
+  expect(polyPts.length).toBe(5);
+  const flags2 = new Flags();
+  flags2.addValue(1);
+  const rebuilt = new BasePolyline({ flags: flags2 });
+  rebuilt.fromPolylinePoints(polyPts);
+  expect(rebuilt.points.length).toBe(4);
+  expect(rebuilt.points[0].x).toBe(0);
+  expect(rebuilt.points[3].x).toBe(0);
+  expect(rebuilt.points[3].y).toBe(10);
+});

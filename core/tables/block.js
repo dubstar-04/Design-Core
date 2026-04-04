@@ -84,10 +84,8 @@ export class Block extends Entity {
   async execute() {
     try {
       // set a name
-      const name = `Block-${DesignCore.Scene.blockManager.itemCount()}`;
-      const nameOp = new PromptOptions(`${Strings.Input.NAME} <${name}>`, [
-        Input.Type.STRING,
-      ]);
+      const defaultName = `Block-${DesignCore.Scene.blockManager.itemCount()}`;
+      const nameOp = new PromptOptions(Strings.Input.NAME, [Input.Type.STRING], [], defaultName);
       const selectedName = await DesignCore.Scene.inputManager.requestInput(nameOp);
 
       // get the insertion point

@@ -1,6 +1,6 @@
 import { Point } from '../entities/point.js';
-import { Utils } from './utils.js';
 import { Constants } from './constants.js';
+import { Utils } from './utils.js';
 
 /** Intersection Class */
 export class Intersection {
@@ -74,25 +74,6 @@ export class Intersection {
   };
 
   /**
-   * Find the intersection of two infinite lines, each defined by two points.
-   * Returns the intersection point, or null if the lines are parallel
-   * (cross product of direction vectors below epsilon).
-   * @param {Point} p1 - start of first line segment
-   * @param {Point} p2 - end of first line segment
-   * @param {Point} p3 - start of second line segment
-   * @param {Point} p4 - end of second line segment
-   * @return {Point|null}
-   */
-  static intersectRayRay(p1, p2, p3, p4) {
-    const dir1 = p2.subtract(p1);
-    const dir2 = p4.subtract(p3);
-    const cross = dir1.cross(dir2);
-    if (Math.abs(cross) < Constants.Tolerance.EPSILON) return null;
-    const t = p3.subtract(p1).cross(dir2) / cross;
-    return p1.add(dir1.scale(t));
-  }
-
-  /**
    * Find intersections between two polylines.
    * Aggregates all segment-level results and collapses the status to a binary
    * outcome: {@link Intersection.Status.NONE} or {@link Intersection.Status.INTERSECTION}.
@@ -112,7 +93,7 @@ export class Intersection {
         const inter = this.intersectSegmentSegment(
             points1[i], points1[i + 1],
             points2[j], points2[j + 1],
-            extend,
+            false, extend,
         );
         result.appendPoints(inter.points);
         // COINCIDENT (identical concentric circles) produces no discrete points,
@@ -131,20 +112,21 @@ export class Intersection {
    * Find intersections between two polyline segments.
    * Returns the full granular status (CROSSING, PERPENDICULAR, TOUCHING, ENDPOINT,
    * OVERLAPPING, TANGENT, etc.) needed by geometric operations such as trim and extend.
-   * @param {Point} b1 - boundary segment start point
-   * @param {Point} b2 - boundary segment end point
-   * @param {Point} b3 - selected segment start point
-   * @param {Point} b4 - selected segment end point
-   * @param {boolean} extend - extend the selected segment
+   * @param {Point} b1 - segment one start point
+   * @param {Point} b2 - segment one end point
+   * @param {Point} b3 - segment two start point
+   * @param {Point} b4 - segment two end point
+   * @param {boolean} extendSegOne - extend segment one to infinite form
+   * @param {boolean} extendSegTwo - extend segment two to infinite form
    * @return {Intersection}
    */
-  static intersectSegmentSegment(b1, b2, b3, b4, extend) {
+  static intersectSegmentSegment(b1, b2, b3, b4, extendSegOne, extendSegTwo) {
     const seg1IsArc = b1.bulge !== 0 && b1.bulge !== undefined;
     const seg2IsArc = b3.bulge !== 0 && b3.bulge !== undefined;
 
     // line vs line
     if (!seg1IsArc && !seg2IsArc) {
-      return this.#intersectLineLine({ start: b1, end: b2 }, { start: b3, end: b4 }, extend);
+      return this.#intersectLineLine({ start: b1, end: b2 }, { start: b3, end: b4 }, extendSegOne, extendSegTwo);
     }
 
     const arc1 = seg1IsArc ? this.#buildArc(b1, b2) : null;
@@ -155,17 +137,17 @@ export class Intersection {
 
     if (seg1IsArc && seg2IsArc) {
       // arc vs arc
-      const inter = this.#intersectCircleCircle(arc1, arc2);
+      const inter = this.intersectCircleCircle(arc1, arc2);
       candidatePoints = inter.points;
       innerStatus = inter.status;
     } else if (seg1IsArc) {
-      // arc(boundary) vs line(selected)
-      const inter = this.#intersectCircleLine(arc1, { start: b3, end: b4 }, extend);
+      // arc(seg1) vs line(seg2)
+      const inter = this.intersectCircleLine(arc1, { start: b3, end: b4 }, extendSegTwo);
       candidatePoints = inter.points;
       innerStatus = inter.status;
     } else {
-      // line(boundary) vs arc(selected)
-      const inter = this.#intersectCircleLine(arc2, { start: b1, end: b2 }, false);
+      // line(seg1) vs arc(seg2)
+      const inter = this.intersectCircleLine(arc2, { start: b1, end: b2 }, extendSegOne);
       candidatePoints = inter.points;
       innerStatus = inter.status;
     }
@@ -176,13 +158,13 @@ export class Intersection {
       const pt = candidatePoints[i];
       let valid = true;
 
-      // boundary arc filter - always applied
-      if (seg1IsArc && !pt.isOnArc(arc1.startPoint, arc1.endPoint, arc1.centre, arc1.direction)) {
+      // seg1 arc filter - skipped when extending seg1
+      if (seg1IsArc && !extendSegOne && !pt.isOnArc(arc1.startPoint, arc1.endPoint, arc1.centre, arc1.direction)) {
         valid = false;
       }
 
-      // selected arc filter - skipped when extending
-      if (valid && seg2IsArc && !extend) {
+      // seg2 arc filter - skipped when extending seg2
+      if (valid && seg2IsArc && !extendSegTwo) {
         if (!pt.isOnArc(arc2.startPoint, arc2.endPoint, arc2.centre, arc2.direction)) {
           valid = false;
         }
@@ -204,7 +186,7 @@ export class Intersection {
    * @param {boolean} extend - extend the line as a ray
    * @return {Intersect}
    */
-  static #intersectCircleLine(circle, line, extend) {
+  static intersectCircleLine(circle, line, extend) {
     const c = circle.centre;
     const r = circle.radius;
     const a1 = line.start;
@@ -270,7 +252,7 @@ export class Intersection {
    * @param {boolean} extend  - unused
    * @return {Intersect}
    */
-  static #intersectCircleCircle(circle1, circle2, extend) {
+  static intersectCircleCircle(circle1, circle2, extend) {
     const c1 = circle1.centre;
     const r1 = circle1.radius;
     const c2 = circle2.centre;
@@ -331,15 +313,17 @@ export class Intersection {
    * Find intersections between two lines
    * @param {Line} line1
    * @param {Line} line2
-   * @param {boolean} extend
+   * @param {boolean} extendSegOne
+   * @param {boolean} extendSegTwo
    * @return {Intersection}
    */
-  static #intersectLineLine(line1, line2, extend) {
+  static #intersectLineLine(line1, line2, extendSegOne, extendSegTwo) {
     const aStart = line1.start;
     const aEnd = line1.end;
     const bStart = line2.start;
     const bEnd = line2.end;
-    extend = extend || false;
+    extendSegOne = extendSegOne || false;
+    extendSegTwo = extendSegTwo || false;
 
     let result;
 
@@ -405,20 +389,23 @@ export class Intersection {
     const line2Dir = bEnd.subtract(bStart);
     const startDiff = aStart.subtract(bStart);
 
-    // Zero cross product means the lines are parallel
+    // Normalise the cross product to |sin(angle)| so the tolerance is scale-independent
     const directionCross = line1Dir.cross(line2Dir);
+    const line1Len = line1Dir.length();
+    const line2Len = line2Dir.length();
+    const isParallel = Math.abs(directionCross) / (line1Len * line2Len) < Constants.Tolerance.EPSILON;
 
-    if (directionCross !== 0) {
+    if (!isParallel) {
       // Lines are not parallel
       // lerp parameters: 0 = segment start, 1 = segment end
       const line1Lerp = line2Dir.cross(startDiff) / directionCross;
       const line2Lerp = line1Dir.cross(startDiff) / directionCross;
 
       // If both lerp values are between 0 and 1, the intersection is within the line segments
-      // When extend is true, line1 (boundary) must contain the intersection (line1Lerp in [0,1])
-      // but line2 (selected) can extend beyond its endpoints (line2Lerp unconstrained)
-      const isWithinSegments = (0 <= line1Lerp && line1Lerp <= 1) && (0 <= line2Lerp && line2Lerp <= 1);
-      const isExtended = (0 <= line1Lerp && line1Lerp <= 1) && extend;
+      const line1InRange = 0 <= line1Lerp && line1Lerp <= 1;
+      const line2InRange = 0 <= line2Lerp && line2Lerp <= 1;
+      const isWithinSegments = line1InRange && line2InRange;
+      const isExtended = (line1InRange || extendSegOne) && (line2InRange || extendSegTwo);
 
       if (isWithinSegments || isExtended) {
         const isPerpendicular = Utils.round(line1Dir.dot(line2Dir)) === 0;
@@ -429,7 +416,10 @@ export class Intersection {
       }
     } else {
       // Lines are parallel or coincident
-      if (line2Dir.cross(startDiff) === 0 || line1Dir.cross(startDiff) === 0) {
+      const startDiffLen = startDiff.length();
+      const isCollinear = startDiffLen < Constants.Tolerance.EPSILON ||
+          Math.abs(line2Dir.cross(startDiff)) / (line2Len * startDiffLen) < Constants.Tolerance.EPSILON;
+      if (isCollinear) {
         // Lines are collinear — check whether the segments actually overlap
         // Project all four endpoints onto the shared direction axis
         const len2 = line1Dir.x * line1Dir.x + line1Dir.y * line1Dir.y;

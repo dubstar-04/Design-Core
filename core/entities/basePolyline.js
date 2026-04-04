@@ -71,6 +71,13 @@ export class BasePolyline extends Entity {
     // 128 = The linetype pattern is generated continuously around the vertices of this polyline
 
     this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[70]], 0));
+
+    // If the first and last points are the same the polyline should be considered closed.
+    // Require at least 4 points so that after removing the duplicate endpoint at least 3 remain.
+    if (this.points.length >= 4 && this.points[0].isSame(this.points.at(-1))) {
+      this.points.pop();
+      this.flags.addValue(1);
+    }
   }
 
   /**
@@ -238,6 +245,18 @@ export class BasePolyline extends Entity {
       points.push(new Point(this.points[0].x, this.points[0].y));
     }
     return points;
+  }
+
+  /**
+   * Set entity points from a polyline point representation
+   * @param {Array} points
+   */
+  fromPolylinePoints(points) {
+    const pts = points.map((p) => new Point(p.x, p.y, p.bulge));
+    if (this.flags.hasFlag(1) && pts.length >= 2 && pts[0].isSame(pts.at(-1))) {
+      pts.pop();
+    }
+    this.points = pts;
   }
 
   /**

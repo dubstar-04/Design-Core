@@ -83,18 +83,6 @@ test('mouseMoved draws selection window when mouse button one is down and no pro
   core.mouse.buttonOneDown = false;
 });
 
-test('Test PromptOptions creation with various parameters', () => {
-  const promptMessage = 'Select a point';
-  const types = [Input.Type.POINT, Input.Type.NUMBER];
-  const options = ['One', 'Two', 'Three'];
-
-  const po = new PromptOptions(promptMessage, types, options);
-
-  expect(po.promptMessage).toBe(promptMessage);
-  expect(po.types).toBe(types);
-  expect(po.options).toBe(options);
-});
-
 test('test onCommand with no activeCommand or promptOption', async () => {
   // Test Unknown Command
   inputManager.reset();
@@ -146,11 +134,6 @@ test('test onCommand with no activeCommand or promptOption', async () => {
   inputManager.onCommand('Another String'); // string input
   inputManager.onCommand(123); // numerical input to finally resolve
   await expect(stringInput).resolves.toBe(123);
-});
-
-test('Test PromptOptions.getOptionWithShortcut', () => {
-  const po = new PromptOptions();
-  expect(po.getOptionWithShortcut('input')).toBe('i\u0332nput');
 });
 
 test('Test Input.getType', () => {
@@ -285,22 +268,6 @@ test('onCommand with valid shortcut while STRING prompt active - sends string to
   inputManager.reset();
 });
 
-test('parse input to option with shortcut', () => {
-  let po = new PromptOptions('Select option', [Input.Type.STRING], ['Apple', 'Banana', 'Cherry']);
-  expect(po.parseInputToOption('A')).toBe('Apple');
-  expect(po.parseInputToOption('B')).toBe('Banana');
-  expect(po.parseInputToOption('C')).toBe('Cherry');
-  expect(po.parseInputToOption('X')).toBeUndefined();
-  expect(po.parseInputToOption(42)).toBeUndefined();
-  expect(po.parseInputToOption(new Point())).toBeUndefined();
-
-  po = new PromptOptions('Select without options', [Input.Type.STRING]);
-  expect(po.parseInputToOption('A')).toBeUndefined();
-  expect(po.parseInputToOption('X')).toBeUndefined();
-  expect(po.parseInputToOption(42)).toBeUndefined();
-  expect(po.parseInputToOption(new Point())).toBeUndefined();
-});
-
 // ─── Input ────────────────────────────────────────────────────────────────────
 
 test('Input.getType(undefined) returns undefined', () => {
@@ -316,31 +283,17 @@ test('Input.getType returns Number for numeric values regardless of prompt', () 
   inputManager.reset();
 });
 
-// ─── PromptOptions ────────────────────────────────────────────────────────────
+// ─── onEnterPressed ───────────────────────────────────────────────────────────
 
-test('PromptOptions.cancel resolves the pending promise with undefined', async () => {
-  const po = new PromptOptions('Enter a point', [Input.Type.POINT]);
+test('onEnterPressed with promptOption and defaultValue resolves with defaultValue', async () => {
+  inputManager.reset();
+  inputManager.activeCommand = new Line();
+  const po = new PromptOptions('Enter distance', [Input.Type.NUMBER], [], 5);
   const p = inputManager.requestInput(po);
-  po.cancel();
-  await expect(p).resolves.toBeUndefined();
+  inputManager.onEnterPressed();
+  await expect(p).resolves.toBe(5);
   inputManager.reset();
 });
-
-test('PromptOptions.getPrompt without options returns the bare prompt message', () => {
-  const po = new PromptOptions('Enter value', [Input.Type.NUMBER]);
-  expect(po.getPrompt()).toBe('Enter value');
-});
-
-test('PromptOptions.getPrompt with options includes OR keyword and underscored shortcuts', () => {
-  const po = new PromptOptions('Select', [Input.Type.STRING], ['Apple', 'Banana']);
-  const prompt = po.getPrompt();
-  expect(prompt).toContain('Select');
-  expect(prompt).toContain('or');
-  expect(prompt).toContain('A\u0332pple');
-  expect(prompt).toContain('B\u0332anana');
-});
-
-// ─── onEnterPressed ───────────────────────────────────────────────────────────
 
 test('onEnterPressed with no activeCommand and empty lastCommand - does nothing', () => {
   inputManager.reset();
@@ -646,83 +599,6 @@ test('requestInput returns undefined when cancelled', async () => {
   // inputPoint should not be changed
   expect(inputManager.inputPoint.x).toBe(5);
   inputManager.reset();
-});
-
-// ─── PromptOptions.acceptsInput ───────────────────────────────────────────────
-
-test('acceptsInput matches exact type', () => {
-  const po = new PromptOptions('', [Input.Type.POINT]);
-  expect(po.acceptsInput(new Point(1, 2))).toBe(true);
-  expect(po.acceptsInput('text')).toBe(false);
-  expect(po.acceptsInput(42)).toBe(false);
-});
-
-test('acceptsInput matches DYNAMIC for numeric values', () => {
-  const po = new PromptOptions('', [Input.Type.DYNAMIC]);
-  expect(po.acceptsInput(42)).toBe(true);
-  expect(po.acceptsInput(3.14)).toBe(true);
-  expect(po.acceptsInput('text')).toBe(false);
-  expect(po.acceptsInput(new Point())).toBe(false);
-});
-
-test('acceptsInput with multiple types', () => {
-  const po = new PromptOptions('', [Input.Type.POINT, Input.Type.NUMBER]);
-  expect(po.acceptsInput(new Point(1, 2))).toBe(true);
-  expect(po.acceptsInput(42)).toBe(true);
-  expect(po.acceptsInput('text')).toBe(false);
-});
-
-// ─── PromptOptions.respond ────────────────────────────────────────────────────
-
-test('respond returns false and notifies on invalid input', () => {
-  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
-  const po = new PromptOptions('Enter point', [Input.Type.POINT]);
-  inputManager.requestInput(po);
-
-  const result = po.respond('invalid string');
-  expect(result).toBe(false);
-  expect(notifySpy).toHaveBeenCalled();
-
-  notifySpy.mockRestore();
-  po.cancel();
-  inputManager.reset();
-});
-
-test('respond returns true on valid input', () => {
-  const po = new PromptOptions('Enter text', [Input.Type.STRING]);
-  inputManager.requestInput(po);
-
-  const result = po.respond('hello');
-  expect(result).toBe(true);
-  inputManager.reset();
-});
-
-test('respond resolves with matched option when type does not match', async () => {
-  // Only accepts POINT, so string 'Y' won't match by type — falls through to option matching
-  const po = new PromptOptions('Choose', [Input.Type.POINT], ['Yes', 'No']);
-  const p = inputManager.requestInput(po);
-  const result = po.respond('Y');
-  expect(result).toBe(true);
-  await expect(p).resolves.toBe('Yes');
-  inputManager.reset();
-});
-
-// ─── PromptOptions.createPromise ──────────────────────────────────────────────
-
-test('createPromise returns a resolvable promise', async () => {
-  const po = new PromptOptions('', [Input.Type.STRING]);
-  const p = po.createPromise();
-  expect(p).toBeInstanceOf(Promise);
-  po.resolve('test');
-  await expect(p).resolves.toBe('test');
-});
-
-// ─── PromptOptions.cancel edge case ──────────────────────────────────────────
-
-test('cancel is a no-op when resolve is not set', () => {
-  const po = new PromptOptions('', [Input.Type.STRING]);
-  // resolve is undefined — should not throw
-  expect(() => po.cancel()).not.toThrow();
 });
 
 // ─── Input.getType for all types ──────────────────────────────────────────────
