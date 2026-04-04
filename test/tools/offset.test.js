@@ -554,6 +554,68 @@ test('Test Offset.getOffsetPolylinePoints - arc segment (bulge) offset outward g
   expect(newRadius).toBeCloseTo(6);
 });
 
+// ─── preselection ───────────────────────────────────────────────────────────
+
+test('Offset.execute - single preselection skips entity selection prompt', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  // Preselect the entity
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  // Only distance and side-point inputs — no selection prompt should be requested
+  const inputs = [5, new Point(5, 5)];
+  const offset = new Offset();
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) return inputs[callCount++];
+    },
+    actionCommand: () => {
+      offset.action();
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  await offset.execute();
+
+  expect(core.scene.entities.count()).toBe(2);
+  core.scene.inputManager = origInputManager;
+});
+
+test('Offset.execute - multi-preselection clears selection and prompts', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  // Preselect two entities
+  core.scene.selectionManager.addToSelectionSet(0);
+  core.scene.selectionManager.addToSelectionSet(1);
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  // After clearing, distance + selection + side-point
+  const inputs = [5, { selectedItemIndex: 0 }, new Point(5, 5)];
+  const offset = new Offset();
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) return inputs[callCount++];
+    },
+    actionCommand: () => {
+      offset.action();
+    },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  await offset.execute();
+
+  expect(core.scene.entities.count()).toBe(3);
+  core.scene.inputManager = origInputManager;
+});
+
 // ─── execute edge cases ───────────────────────────────────────────────────────
 
 test('Offset.execute - distance <= 0 notifies and does not offset', async () => {

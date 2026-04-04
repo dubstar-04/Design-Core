@@ -63,10 +63,17 @@ export class Offset extends Tool {
       const op3 = new PromptOptions(throughMode ? Strings.Input.THROUGHPOINT : Strings.Input.SIDE, [Input.Type.POINT]);
 
       while (true) {
-        const selection = await DesignCore.Scene.inputManager.requestInput(op2);
-        if (selection === undefined) break;
-        this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
-        DesignCore.Scene.selectionManager.removeLastSelection();
+        const preselected = DesignCore.Scene.selectionManager.selectionSet.selectionSet;
+        if (preselected.length === 1) {
+          this.selectedItem = DesignCore.Scene.entities.get(preselected[0]);
+          DesignCore.Scene.selectionManager.reset();
+        } else {
+          DesignCore.Scene.selectionManager.reset();
+          const selection = await DesignCore.Scene.inputManager.requestInput(op2);
+          if (selection === undefined) break;
+          this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+          DesignCore.Scene.selectionManager.removeLastSelection();
+        }
 
         const point = await DesignCore.Scene.inputManager.requestInput(op3);
         if (point === undefined) {
