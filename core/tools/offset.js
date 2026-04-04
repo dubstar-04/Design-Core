@@ -5,6 +5,7 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Point } from '../entities/point.js';
 import { AddState } from '../lib/stateManager.js';
+import { Intersection } from '../lib/intersect.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -315,7 +316,8 @@ export class Offset extends Tool {
     // At each junction between consecutive offset segments, compute the meeting point
     const findJunction = (seg, nextSeg) => {
       if (seg.type === 'line' && nextSeg.type === 'line') {
-        return this.lineLineIntersect(seg.A, seg.B, nextSeg.A, nextSeg.B);
+        return Intersection.intersectRayRay(seg.A, seg.B, nextSeg.A, nextSeg.B) ??
+          new Point((seg.B.x + nextSeg.A.x) / 2, (seg.B.y + nextSeg.A.y) / 2);
       }
       // Mixed or arc-arc: use the midpoint between the two endpoints
       return new Point((seg.B.x + nextSeg.A.x) / 2, (seg.B.y + nextSeg.A.y) / 2);
@@ -338,25 +340,6 @@ export class Offset extends Tool {
     }
 
     return newPoints;
-  }
-
-  /**
-   * Find the intersection of two infinite lines defined by A,B and C,D
-   * @param {Point} A
-   * @param {Point} B
-   * @param {Point} C
-   * @param {Point} D
-   * @return {Point}
-   */
-  lineLineIntersect(A, B, C, D) {
-    const d1 = B.subtract(A);
-    const d2 = D.subtract(C);
-    const det = d1.cross(d2);
-    if (Math.abs(det) < 1e-10) {
-      return new Point((B.x + C.x) / 2, (B.y + C.y) / 2);
-    }
-    const t = C.subtract(A).cross(d2) / det;
-    return new Point(A.x + t * d1.x, A.y + t * d1.y);
   }
 
   /**
