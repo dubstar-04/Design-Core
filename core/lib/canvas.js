@@ -342,7 +342,7 @@ export class Canvas {
     }
 
     // ACI 7: white on dark background, black on light background
-    if (colour?.r === 254 && colour?.g === 254 && colour?.b === 254) {
+    if (this.paintState !== this.paintStates.SELECTED && this.#isAci7(item, block)) {
       const bg = DesignCore.Settings.canvasbackgroundcolour;
       colour = (bg.r + bg.g + bg.b) / 3 < 128 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
     }
@@ -359,6 +359,28 @@ export class Canvas {
       context.setDash(lineType.getPattern(scale), 1);
       context.setLineWidth(lineWidth);
     }
+  }
+
+  /**
+   * Resolve whether the effective draw colour for an item is ACI 7.
+   * Follows ByLayer and ByBlock indirection.
+   * @param {entity} item
+   * @param {entity} block - enclosing insert/dimension, or undefined
+   * @return {boolean}
+   */
+  #isAci7(item, block) {
+    if (item.entityColour.byBlock && block) {
+      if (block.entityColour.byLayer) {
+        const layer = DesignCore.LayerManager.getItemByName(block.layer);
+        return layer?.layerColour?.aci === 7;
+      }
+      return block.entityColour.aci === 7;
+    }
+    if (item.entityColour.byLayer) {
+      const layer = DesignCore.LayerManager.getItemByName(item.layer);
+      return layer?.layerColour?.aci === 7;
+    }
+    return item.entityColour.aci === 7;
   }
 
   /**

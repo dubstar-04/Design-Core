@@ -178,7 +178,15 @@ const aci7MockEntity = {
   getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
   getLineType: () => ({ getPattern: () => [] }),
   lineWidth: 1,
-  entityColour: { aci: 7 },
+  entityColour: { aci: 7, byLayer: false, byBlock: false },
+};
+
+// An entity with a user-set true colour that happens to be {254,254,254} but is NOT ACI 7
+const nearWhiteMockEntity = {
+  getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+  getLineType: () => ({ getPattern: () => [] }),
+  lineWidth: 1,
+  entityColour: { aci: 3, byLayer: false, byBlock: false },
 };
 
 test('Test Canvas.setContext ACI 7 is white on dark background', () => {
@@ -197,4 +205,13 @@ test('Test Canvas.setContext ACI 7 is black on light background', () => {
   canvas.paintState = canvas.paintStates.ENTITIES;
   canvas.setContext(aci7MockEntity, context);
   expect(context.strokeStyle).toBe('rgb(0, 0, 0)');
+});
+
+test('Test Canvas.setContext non-ACI-7 near-white colour is not recoloured', () => {
+  core.activate();
+  const context = createMockContext();
+  core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+  canvas.paintState = canvas.paintStates.ENTITIES;
+  canvas.setContext(nearWhiteMockEntity, context);
+  expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
 });
