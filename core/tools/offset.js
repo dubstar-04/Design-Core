@@ -323,33 +323,38 @@ export class Offset extends Tool {
       }
     }
 
-    // At each junction between consecutive offset segments, compute the meeting point
-    const findJunction = (seg, nextSeg) => {
-      if (seg.type === 'line' && nextSeg.type === 'line') {
-        return Intersection.intersectRayRay(seg.A, seg.B, nextSeg.A, nextSeg.B) ??
-          new Point((seg.B.x + nextSeg.A.x) / 2, (seg.B.y + nextSeg.A.y) / 2);
-      }
-      // Mixed or arc-arc: use the midpoint between the two endpoints
-      return new Point((seg.B.x + nextSeg.A.x) / 2, (seg.B.y + nextSeg.A.y) / 2);
-    };
-
     const newPoints = [];
     if (!isClosed) {
       newPoints.push(new Point(offsetSegs[0].A.x, offsetSegs[0].A.y, offsetSegs[0].bulge));
       for (let i = 0; i < segCount - 1; i++) {
-        const junction = findJunction(offsetSegs[i], offsetSegs[i + 1]);
+        const junction = this.findJunction(offsetSegs[i], offsetSegs[i + 1]);
         newPoints.push(new Point(junction.x, junction.y, offsetSegs[i + 1].bulge));
       }
       newPoints.push(new Point(offsetSegs[segCount - 1].B.x, offsetSegs[segCount - 1].B.y, 0));
     } else {
       for (let i = 0; i < segCount; i++) {
         const nextSeg = offsetSegs[(i + 1) % segCount];
-        const junction = findJunction(offsetSegs[i], nextSeg);
+        const junction = this.findJunction(offsetSegs[i], nextSeg);
         newPoints.push(new Point(junction.x, junction.y, nextSeg.bulge));
       }
     }
 
     return newPoints;
+  }
+
+  /**
+   * Find the junction point between two consecutive offset segments
+   * @param {Object} seg
+   * @param {Object} nextSeg
+   * @return {Point}
+   */
+  findJunction(seg, nextSeg) {
+    if (seg.type === 'line' && nextSeg.type === 'line') {
+      return Intersection.intersectRayRay(seg.A, seg.B, nextSeg.A, nextSeg.B) ??
+        new Point((seg.B.x + nextSeg.A.x) / 2, (seg.B.y + nextSeg.A.y) / 2);
+    }
+    // Mixed or arc-arc: use the midpoint between the two endpoints
+    return new Point((seg.B.x + nextSeg.A.x) / 2, (seg.B.y + nextSeg.A.y) / 2);
   }
 
   /**

@@ -554,6 +554,46 @@ test('Test Offset.getOffsetPolylinePoints - arc segment (bulge) offset outward g
   expect(newRadius).toBeCloseTo(6);
 });
 
+// ─── findJunction ─────────────────────────────────────────────────────────────
+
+test('Offset.findJunction - line/line returns intersection point', () => {
+  const offset = new Offset();
+  // Two offset line segments that would meet at (5, 2)
+  const seg = { type: 'line', A: new Point(0, 2), B: new Point(10, 2), bulge: 0 };
+  const nextSeg = { type: 'line', A: new Point(5, 0), B: new Point(5, 10), bulge: 0 };
+  const result = offset.findJunction(seg, nextSeg);
+  expect(result.x).toBeCloseTo(5);
+  expect(result.y).toBeCloseTo(2);
+});
+
+test('Offset.findJunction - parallel line/line falls back to midpoint', () => {
+  const offset = new Offset();
+  // Parallel lines — no intersection, midpoint between seg.B and nextSeg.A
+  const seg = { type: 'line', A: new Point(0, 1), B: new Point(4, 1), bulge: 0 };
+  const nextSeg = { type: 'line', A: new Point(6, 1), B: new Point(10, 1), bulge: 0 };
+  const result = offset.findJunction(seg, nextSeg);
+  expect(result.x).toBeCloseTo(5);
+  expect(result.y).toBeCloseTo(1);
+});
+
+test('Offset.findJunction - arc/line falls back to midpoint', () => {
+  const offset = new Offset();
+  const seg = { type: 'arc', A: new Point(0, 2), B: new Point(4, 2), bulge: 1 };
+  const nextSeg = { type: 'line', A: new Point(6, 2), B: new Point(10, 2), bulge: 0 };
+  const result = offset.findJunction(seg, nextSeg);
+  expect(result.x).toBeCloseTo(5);
+  expect(result.y).toBeCloseTo(2);
+});
+
+test('Offset.findJunction - arc/arc falls back to midpoint', () => {
+  const offset = new Offset();
+  const seg = { type: 'arc', A: new Point(0, 2), B: new Point(4, 2), bulge: 1 };
+  const nextSeg = { type: 'arc', A: new Point(6, 4), B: new Point(10, 4), bulge: 1 };
+  const result = offset.findJunction(seg, nextSeg);
+  expect(result.x).toBeCloseTo(5);
+  expect(result.y).toBeCloseTo(3);
+});
+
 // ─── preselection ───────────────────────────────────────────────────────────
 
 test('Offset.execute - single preselection skips entity selection prompt', async () => {
