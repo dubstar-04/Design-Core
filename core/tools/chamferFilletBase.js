@@ -49,6 +49,28 @@ export class ChamferFilletBase extends Tool {
         this.secondPick.lineStart, this.secondPick.lineEnd,
         true, true,
     );
+
+    // Reject parallel, collinear, or overlapping segments — no unique corner exists.
+    const status = result.status;
+    if (status === Intersection.Status.PARALLEL ||
+        status === Intersection.Status.OVERLAPPING ||
+        status === Intersection.Status.COINCIDENT) {
+      DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
+      return false;
+    }
+
+    // Guard against near-parallel directions that pass the status check but
+    // produce an unreliable intersection point far from both segments.
+    const dir1 = this.firstPick.lineEnd.subtract(this.firstPick.lineStart);
+    const dir2 = this.secondPick.lineEnd.subtract(this.secondPick.lineStart);
+    const cross = dir1.cross(dir2);
+    const len1 = dir1.length();
+    const len2 = dir2.length();
+    if (len1 === 0 || len2 === 0 || Math.abs(cross) / (len1 * len2) < Constants.Tolerance.EPSILON) {
+      DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
+      return false;
+    }
+
     this.intersectionPoint = result.points[0] || null;
 
     if (!this.intersectionPoint) {
