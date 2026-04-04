@@ -349,3 +349,12 @@ test('Test Canvas.getSceneOffset visible area shrinks when zoomed in', () => {
   const widthAfter = after.xmax - after.xmin;
   expect(widthAfter).toBeLessThan(widthBefore);
 });
+
+test('Test Canvas.setContext non-ACI-7 near-white colour is not recoloured', () => {
+  core.activate();
+  const context = createMockContext();
+  core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+  canvas.paintState = canvas.paintStates.ENTITIES;
+  canvas.setContext(nearWhiteMockEntity, context);
+  expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
+});
