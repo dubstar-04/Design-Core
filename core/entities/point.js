@@ -141,14 +141,22 @@ export class Point {
   }
 
   /**
+   * Return the length (magnitude) of this vector.
+   * @return {number}
+   */
+  length() {
+    return Math.sqrt(this.x ** 2 + this.y ** 2);
+  }
+
+  /**
    * Return a new unit vector in the same direction as this.
    * (Divides each component by the vector's magnitude.)
    * @return {Point}
    */
   normalise() {
-    const length = Math.sqrt(this.x ** 2 + this.y ** 2);
-    if (length < Constants.Tolerance.EPSILON) return new Point(0, 0);
-    return new Point(this.x / length, this.y / length);
+    const len = this.length();
+    if (len < Constants.Tolerance.EPSILON) return new Point(0, 0);
+    return new Point(this.x / len, this.y / len);
   }
 
   /**
