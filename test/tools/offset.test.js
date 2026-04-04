@@ -557,8 +557,8 @@ test('Test Offset.getOffsetPolylinePoints - arc segment (bulge) offset outward g
 test('Offset.findJunction - line/line returns intersection point', () => {
   const offset = new Offset();
   // Two offset line segments that would meet at (5, 2)
-  const seg = { type: 'line', A: new Point(0, 2), B: new Point(10, 2), bulge: 0 };
-  const nextSeg = { type: 'line', A: new Point(5, 0), B: new Point(5, 10), bulge: 0 };
+  const seg = { A: new Point(0, 2), B: new Point(10, 2), bulge: 0 };
+  const nextSeg = { A: new Point(5, 0), B: new Point(5, 10), bulge: 0 };
   const result = offset.findJunction(seg, nextSeg);
   expect(result.x).toBeCloseTo(5);
   expect(result.y).toBeCloseTo(2);
@@ -567,28 +567,59 @@ test('Offset.findJunction - line/line returns intersection point', () => {
 test('Offset.findJunction - parallel line/line falls back to midpoint', () => {
   const offset = new Offset();
   // Parallel lines — no intersection, midpoint between seg.B and nextSeg.A
-  const seg = { type: 'line', A: new Point(0, 1), B: new Point(4, 1), bulge: 0 };
-  const nextSeg = { type: 'line', A: new Point(6, 1), B: new Point(10, 1), bulge: 0 };
+  const seg = { A: new Point(0, 1), B: new Point(4, 1), bulge: 0 };
+  const nextSeg = { A: new Point(6, 1), B: new Point(10, 1), bulge: 0 };
   const result = offset.findJunction(seg, nextSeg);
   expect(result.x).toBeCloseTo(5);
   expect(result.y).toBeCloseTo(1);
 });
 
-test('Offset.findJunction - arc/line falls back to midpoint', () => {
+test('Offset.findJunction - arc/line returns circle-line intersection', () => {
   const offset = new Offset();
-  const seg = { type: 'arc', A: new Point(0, 2), B: new Point(4, 2), bulge: 1 };
-  const nextSeg = { type: 'line', A: new Point(6, 2), B: new Point(10, 2), bulge: 0 };
+  // Arc: A=(-5,0) B=(5,0) bulge=1 → center (0,0), radius 5 via bulgeCentrePoint
+  // Line: vertical at x=3 → circle intersects at (3,4) and (3,-4)
+  const seg = { A: new Point(-5, 0), B: new Point(5, 0), bulge: 1 };
+  const nextSeg = { A: new Point(3, 5), B: new Point(3, 10), bulge: 0 };
   const result = offset.findJunction(seg, nextSeg);
-  expect(result.x).toBeCloseTo(5);
-  expect(result.y).toBeCloseTo(2);
+  // midpoint of seg.B(5,0) and nextSeg.A(3,5) = (4,2.5) → closest intersection is (3,4)
+  expect(result.x).toBeCloseTo(3);
+  expect(result.y).toBeCloseTo(4);
 });
 
-test('Offset.findJunction - arc/arc falls back to midpoint', () => {
+test('Offset.findJunction - line/arc returns line-circle intersection', () => {
   const offset = new Offset();
-  const seg = { type: 'arc', A: new Point(0, 2), B: new Point(4, 2), bulge: 1 };
-  const nextSeg = { type: 'arc', A: new Point(6, 4), B: new Point(10, 4), bulge: 1 };
+  // Line: y=0. Arc: A=(10,3) B=(0,3) bulge=1 → center (5,3), radius 5 via bulgeCentrePoint
+  // Circle intersects y=0 at x=1 and x=9
+  const seg = { A: new Point(0, 0), B: new Point(6, 0), bulge: 0 };
+  const nextSeg = { A: new Point(10, 3), B: new Point(0, 3), bulge: 1 };
   const result = offset.findJunction(seg, nextSeg);
-  expect(result.x).toBeCloseTo(5);
+  // midpoint of seg.B(6,0) and nextSeg.A(10,3) = (8,1.5) → closest intersection is (9,0)
+  expect(result.x).toBeCloseTo(9);
+  expect(result.y).toBeCloseTo(0);
+});
+
+test('Offset.findJunction - arc/arc returns circle-circle intersection', () => {
+  const offset = new Offset();
+  // Circle 1: A=(-4,0) B=(4,0) bulge=1 → center (0,0), radius 4 via bulgeCentrePoint
+  // Circle 2: A=(0,4) B=(6,4) bulge=1 → center (3,4), radius 3 via bulgeCentrePoint
+  // Intersections: (0,4) and (96/25, 28/25)
+  const seg = { A: new Point(-4, 0), B: new Point(4, 0), bulge: 1 };
+  const nextSeg = { A: new Point(0, 4), B: new Point(6, 4), bulge: 1 };
+  const result = offset.findJunction(seg, nextSeg);
+  // midpoint of seg.B(4,0) and nextSeg.A(0,4) = (2,2) → closest is (96/25, 28/25) ≈ (3.84, 1.12)
+  expect(result.x).toBeCloseTo(3.84);
+  expect(result.y).toBeCloseTo(1.12);
+});
+
+test('Offset.findJunction - non-intersecting arc/arc falls back to midpoint', () => {
+  const offset = new Offset();
+  // Two circles too far apart to intersect
+  // A=(0,2) B=(4,2) bulge=1 → center (2,2), radius 2 via bulgeCentrePoint
+  // A=(16,4) B=(20,4) bulge=1 → center (18,4), radius 2 via bulgeCentrePoint
+  const seg = { A: new Point(0, 2), B: new Point(4, 2), bulge: 1 };
+  const nextSeg = { A: new Point(16, 4), B: new Point(20, 4), bulge: 1 };
+  const result = offset.findJunction(seg, nextSeg);
+  expect(result.x).toBeCloseTo(10);
   expect(result.y).toBeCloseTo(3);
 });
 
