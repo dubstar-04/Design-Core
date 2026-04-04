@@ -173,3 +173,28 @@ test('Test Canvas.zoomExtents with no entities', () => {
   emptyCanvas.zoomExtents();
   expect(emptyCanvas.getScale()).toBe(scaleBefore);
 });
+
+const aci7MockEntity = {
+  getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+  getLineType: () => ({ getPattern: () => [] }),
+  lineWidth: 1,
+  entityColour: { aci: 7 },
+};
+
+test('Test Canvas.setContext ACI 7 is white on dark background', () => {
+  core.activate();
+  const context = createMockContext();
+  core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+  canvas.paintState = canvas.paintStates.ENTITIES;
+  canvas.setContext(aci7MockEntity, context);
+  expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+});
+
+test('Test Canvas.setContext ACI 7 is black on light background', () => {
+  core.activate();
+  const context = createMockContext();
+  core.settings.canvasbackgroundcolour = { r: 246, g: 245, b: 244 };
+  canvas.paintState = canvas.paintStates.ENTITIES;
+  canvas.setContext(aci7MockEntity, context);
+  expect(context.strokeStyle).toBe('rgb(0, 0, 0)');
+});
