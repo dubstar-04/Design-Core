@@ -119,7 +119,7 @@ test('Test Zoom.preview - Window mode with one point', () => {
   // Verify it's a polyline
   const tempItem = DesignCore.Scene.tempEntities.get(DesignCore.Scene.tempEntities.count() - 1);
   expect(tempItem.type).toBe('Polyline');
-  expect(tempItem.points.length).toBe(5); // Rectangle has 5 points (closed)
+  expect(tempItem.points.length).toBe(4); // Rectangle has 4 points (closed flag set)
 });
 
 test('Test Zoom.preview - Window mode with no points (should not preview)', () => {
