@@ -248,6 +248,18 @@ export class BasePolyline extends Entity {
   }
 
   /**
+   * Set entity points from a polyline point representation
+   * @param {Array} points
+   */
+  fromPolylinePoints(points) {
+    const pts = points.map((p) => new Point(p.x, p.y, p.bulge));
+    if (this.flags.hasFlag(1) && pts.length >= 2 && pts[0].isSame(pts.at(-1))) {
+      pts.pop();
+    }
+    this.points = pts;
+  }
+
+  /**
    * Get snap points
    * @param {Point} mousePoint
    * @param {number} delta
