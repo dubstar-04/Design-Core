@@ -173,3 +173,56 @@ test('Test Canvas.zoomExtents with no entities', () => {
   emptyCanvas.zoomExtents();
   expect(emptyCanvas.getScale()).toBe(scaleBefore);
 });
+
+describe('Test Canvas cursor states', () => {
+  let cursorState;
+
+  beforeEach(() => {
+    core.activate();
+    canvas.matrix = new Matrix();
+    cursorState = canvas.cursorStates.DEFAULT;
+    canvas.setCursorCallbackFunction((state) => { cursorState = state; });
+  });
+
+  afterEach(() => {
+    canvas.setCursorCallbackFunction(undefined);
+  });
+
+  test('initial cursorState is DEFAULT', () => {
+    expect(canvas.cursorState).toBe(canvas.cursorStates.DEFAULT);
+  });
+
+  test('middle mouseDown sets cursor to PAN', () => {
+    canvas.mouseDown(1);
+    expect(cursorState).toBe(canvas.cursorStates.PAN);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.PAN);
+  });
+
+  test('middle mouseUp resets cursor to DEFAULT', () => {
+    canvas.mouseDown(1);
+    canvas.mouseUp(1);
+    expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.DEFAULT);
+  });
+
+  test('wheel sets cursor to ZOOM', () => {
+    canvas.wheel(1);
+    expect(cursorState).toBe(canvas.cursorStates.ZOOM);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM);
+  });
+
+  test('left and right mouseDown do not change cursor', () => {
+    canvas.mouseDown(0);
+    expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
+    canvas.mouseDown(2);
+    expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
+  });
+
+  test('callback is not fired when cursor state does not change', () => {
+    let callCount = 0;
+    canvas.setCursorCallbackFunction(() => { callCount++; });
+    canvas.mouseDown(1); // PAN
+    canvas.mouseDown(1); // already PAN — no-op
+    expect(callCount).toBe(1);
+  });
+});

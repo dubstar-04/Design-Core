@@ -6,6 +6,8 @@ import { DesignCore } from '../designCore.js';
 
 /** Canvas Class */
 export class Canvas {
+  #zoomCursorTimeout;
+
   /** Create Canvas */
   constructor() {
     this.cvs = null;
@@ -30,8 +32,17 @@ export class Canvas {
       AUXILLARY: 'AUXILLARY',
     };
 
+    this.cursorStates = {
+      DEFAULT: 'DEFAULT',
+      PAN: 'PAN',
+      ZOOM: 'ZOOM',
+    };
+
+    this.cursorState = this.cursorStates.DEFAULT;
+
     // function to call external pain command for the ui
     this.externalPaintCallbackFunction;
+    this.externalCursorCallbackFunction;
   }
 
   /**
@@ -50,6 +61,25 @@ export class Canvas {
   setExternalPaintCallbackFunction(callback) {
     // set the callback
     this.externalPaintCallbackFunction = callback;
+  }
+
+  /**
+   * Set external cursor callback
+   * Called when the cursor state changes
+   * @param {Function} callback
+   */
+  setCursorCallbackFunction(callback) {
+    this.externalCursorCallbackFunction = callback;
+  }
+
+  /**
+   * Update the cursor state and notify the UI
+   * @param {string} state - one of this.cursorStates
+   */
+  #setCursor(state) {
+    if (this.cursorState === state) return;
+    this.cursorState = state;
+    this.externalCursorCallbackFunction?.(state);
   }
 
   /**
@@ -73,8 +103,7 @@ export class Canvas {
       case 0: // left button
         break;
       case 1: // middle button
-        // TODO: Re-enable cursor styles
-        // ev.target.style.cursor = "move";
+        this.#setCursor(this.cursorStates.PAN);
         break;
       case 2: // right button
         break;
@@ -93,8 +122,7 @@ export class Canvas {
       case 1: // middle button
         this.lastDelta = new Point();
         this.requestPaint();
-        // TODO: Re-enable cursor styles
-        // ev.target.style.cursor = "crosshair";
+        this.#setCursor(this.cursorStates.DEFAULT);
         break;
       case 2: // right button
         break;
@@ -141,7 +169,10 @@ export class Canvas {
   wheel(delta) {
     const scale = Math.pow(1 + Math.abs(delta), delta > 0 ? 1 : -1);
     if (scale < 1 && this.getScale() > this.minScaleFactor || scale > 1 && this.getScale() < this.maxScaleFactor) {
+      this.#setCursor(this.cursorStates.ZOOM);
       this.zoom(scale);
+      clearTimeout(this.#zoomCursorTimeout);
+      this.#zoomCursorTimeout = setTimeout(() => this.#setCursor(this.cursorStates.DEFAULT), 300);
     }
   };
 
