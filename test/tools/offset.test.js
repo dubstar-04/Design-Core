@@ -1,16 +1,12 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { Offset } from '../../core/tools/offset.js';
+import { Line } from '../../core/entities/line.js';
+import { Arc } from '../../core/entities/arc.js';
+import { Circle } from '../../core/entities/circle.js';
 import { expect, jest } from '@jest/globals';
 
 const core = new Core();
-
-// Helper to build a lightweight polyline entity without going through core scene
-const makePolyline = (points, closed = false) => ({
-  type: 'Polyline',
-  points,
-  flags: { hasFlag: (n) => n === 1 ? closed : false },
-});
 
 const inputScenarios = [
   {
@@ -358,24 +354,29 @@ test('Test Offset.action - unsupported entity type does not create new entity', 
   expect(core.scene.entities.count()).toBe(1);
 });
 
-test('Test Offset.getOffsetLinePoints - diagonal line', () => {
+test('Test Offset.getOffsetPoints - diagonal line via polyline path', () => {
   const offset = new Offset();
 
-  const entity = { type: 'Line', points: [new Point(0, 0), new Point(10, 10)] };
+  const entity = new Line({ points: [new Point(0, 0), new Point(10, 10)] });
   const sidePoint = new Point(0, 10); // above-left
-  const result = offset.getOffsetLinePoints(entity, sidePoint, 5);
+  const result = offset.getOffsetPoints(entity, sidePoint, 5);
+
+  expect(result).not.toBeNull();
+  // Reconstruct and check the offset line
+  const rebuilt = new Line({});
+  rebuilt.fromPolylinePoints(result);
 
   // For a 45° line, the normal offset of 5 should shift by ~3.535 in each axis
   const expected = 5 / Math.sqrt(2);
-  expect(result[0].x).toBeCloseTo(-expected);
-  expect(result[0].y).toBeCloseTo(expected);
-  expect(result[1].x).toBeCloseTo(10 - expected);
-  expect(result[1].y).toBeCloseTo(10 + expected);
+  expect(rebuilt.points[0].x).toBeCloseTo(-expected);
+  expect(rebuilt.points[0].y).toBeCloseTo(expected);
+  expect(rebuilt.points[1].x).toBeCloseTo(10 - expected);
+  expect(rebuilt.points[1].y).toBeCloseTo(10 + expected);
 });
 
 test('Test Offset.getThroughDistance - line', () => {
   const offset = new Offset();
-  const entity = { type: 'Line', points: [new Point(0, 0), new Point(10, 0)] };
+  const entity = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
 
   const throughPoint = new Point(5, 7);
   const result = offset.getThroughDistance(entity, throughPoint);
@@ -384,7 +385,7 @@ test('Test Offset.getThroughDistance - line', () => {
 
 test('Test Offset.getThroughDistance - circle', () => {
   const offset = new Offset();
-  const entity = { type: 'Circle', points: [new Point(0, 0), new Point(10, 0)] };
+  const entity = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
 
   const throughPoint = new Point(15, 0);
   const result = offset.getThroughDistance(entity, throughPoint);
@@ -396,7 +397,7 @@ test('Test Offset.getThroughDistance - circle', () => {
 test('Test Offset.getThroughDistance - arc uses same radial distance as circle', () => {
   const offset = new Offset();
   // Arc: center (0,0), radius 10
-  const entity = { type: 'Arc', points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] };
+  const entity = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
 
   // Point inside the arc radius
   const throughPoint = new Point(4, 0);
@@ -416,9 +417,9 @@ test('Test Offset.getThroughDistance - polyline uses closestPoint distance', () 
   expect(result).toBeCloseTo(3);
 });
 
-test('Test Offset.getThroughDistance - unknown type returns 0', () => {
+test('Test Offset.getThroughDistance - unsupported entity returns 0', () => {
   const offset = new Offset();
-  const entity = { type: 'Unknown', points: [] };
+  const entity = { points: [] };
   expect(offset.getThroughDistance(entity, new Point(5, 5))).toBe(0);
 });
 
@@ -451,26 +452,27 @@ test('Test Offset.action - returns early when offsetDistance is 0', () => {
   expect(core.scene.entities.count()).toBe(1);
 });
 
-// ─── getOffsetArcPoints ───────────────────────────────────────────────────────
+// ─── getOffsetPoints - arc ────────────────────────────────────────────────────
 
-test('Test Offset.getOffsetArcPoints - inward offset shrinks radius', () => {
+test('Test Offset.getOffsetPoints - arc inward offset shrinks radius', () => {
   const offset = new Offset();
-  const entity = { type: 'Arc', points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] };
+  const entity = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
 
   // sidePoint inside the arc (between center and circumference)
-  const result = offset.getOffsetArcPoints(entity, new Point(5, 0), 3);
+  const result = offset.getOffsetPoints(entity, new Point(5, 0), 3);
 
   expect(result).not.toBeNull();
-  const newRadius = result[0].distance(result[1]);
-  expect(newRadius).toBeCloseTo(7);
+  const rebuilt = new Arc({});
+  rebuilt.fromPolylinePoints(result);
+  expect(rebuilt.radius).toBeCloseTo(7);
 });
 
-test('Test Offset.getOffsetArcPoints - returns null when inward offset collapses radius', () => {
+test('Test Offset.getOffsetPoints - arc returns null when inward offset collapses radius', () => {
   const offset = new Offset();
-  const entity = { type: 'Arc', points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] };
+  const entity = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
 
   // distance (15) > radius (10) when going inward
-  const result = offset.getOffsetArcPoints(entity, new Point(5, 0), 15);
+  const result = offset.getOffsetPoints(entity, new Point(5, 0), 15);
 
   expect(result).toBeNull();
 });
@@ -479,17 +481,16 @@ test('Test Offset.getOffsetArcPoints - returns null when inward offset collapses
 
 test('Test Offset.getOffsetPolylinePoints - returns null for fewer than 2 points', () => {
   const offset = new Offset();
-  const entity = makePolyline([new Point(0, 0)]);
-  expect(offset.getOffsetPolylinePoints(entity, new Point(0, 5), 1)).toBeNull();
+  expect(offset.getOffsetPolylinePoints([new Point(0, 0)], false, new Point(0, 5), 1)).toBeNull();
 });
 
 test('Test Offset.getOffsetPolylinePoints - open L-shape offset produces 3 points', () => {
   const offset = new Offset();
   // L-shape: (0,0) → (10,0) → (10,10)
-  const entity = makePolyline([new Point(0, 0), new Point(10, 0), new Point(10, 10)]);
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10)];
 
   // sidePoint above the bottom segment → offset upward/left
-  const result = offset.getOffsetPolylinePoints(entity, new Point(5, 2), 1);
+  const result = offset.getOffsetPolylinePoints(points, false, new Point(5, 2), 1);
 
   expect(result).not.toBeNull();
   expect(result.length).toBe(3);
@@ -503,10 +504,10 @@ test('Test Offset.getOffsetPolylinePoints - open L-shape offset produces 3 point
 
 test('Test Offset.getOffsetPolylinePoints - open polyline offset to other side', () => {
   const offset = new Offset();
-  const entity = makePolyline([new Point(0, 0), new Point(10, 0), new Point(10, 10)]);
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10)];
 
   // sidePoint below the bottom segment → offset downward/right
-  const result = offset.getOffsetPolylinePoints(entity, new Point(5, -2), 1);
+  const result = offset.getOffsetPolylinePoints(points, false, new Point(5, -2), 1);
 
   expect(result).not.toBeNull();
   expect(result.length).toBe(3);
@@ -517,13 +518,10 @@ test('Test Offset.getOffsetPolylinePoints - open polyline offset to other side',
 test('Test Offset.getOffsetPolylinePoints - closed rectangle offset outward', () => {
   const offset = new Offset();
   // Closed rectangle: (0,0) → (10,0) → (10,10) → (0,10), closed
-  const entity = makePolyline(
-      [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)],
-      true,
-  );
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
 
   // sidePoint outside the left edge
-  const result = offset.getOffsetPolylinePoints(entity, new Point(-5, 5), 1);
+  const result = offset.getOffsetPolylinePoints(points, true, new Point(-5, 5), 1);
 
   expect(result).not.toBeNull();
   expect(result.length).toBe(4); // closed: junction per segment, same count as point count
@@ -542,10 +540,10 @@ test('Test Offset.getOffsetPolylinePoints - arc segment (bulge) offset outward g
   // center=(5,0), radius=5
   const start = new Point(0, 0, -1); // bulge=-1 → CW, arc goes upward
   const end = new Point(10, 0);
-  const entity = makePolyline([start, end]);
+  const points = [start, end];
 
   // sidePoint above the arc (outside), offset outward by 1 → new radius = 6
-  const result = offset.getOffsetPolylinePoints(entity, new Point(5, 10), 1);
+  const result = offset.getOffsetPolylinePoints(points, false, new Point(5, 10), 1);
 
   expect(result).not.toBeNull();
   expect(result.length).toBe(2);

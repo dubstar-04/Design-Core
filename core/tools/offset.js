@@ -105,15 +105,9 @@ export class Offset extends Tool {
       const offsetPoints = this.getOffsetPoints(this.selectedItem, mousePoint, offsetDistance);
 
       if (offsetPoints) {
-        const data = { points: offsetPoints };
-
-        if (this.selectedItem.type === 'Arc') {
-          data.direction = this.selectedItem.direction;
-        } else if (this.selectedItem.type === 'Polyline') {
-          data.flags = this.selectedItem.flags;
-        }
-
-        DesignCore.Scene.tempEntities.create(this.selectedItem.type, data);
+        const previewEntity = Utils.cloneObject(this.selectedItem);
+        previewEntity.fromPolylinePoints(offsetPoints);
+        DesignCore.Scene.tempEntities.add(previewEntity);
       }
     }
   }
@@ -135,120 +129,40 @@ export class Offset extends Tool {
     }
 
     const offsetEntity = Utils.cloneObject(entity);
-    offsetEntity.setProperty('points', offsetPoints);
-
-    if (entity.type === 'Arc') {
-      offsetEntity.radius = entity.points[0].distance(offsetPoints[1]);
-    }
+    offsetEntity.fromPolylinePoints(offsetPoints);
 
     const stateChange = new AddState(offsetEntity);
     DesignCore.Scene.commit([stateChange]);
   }
 
   /**
-   * Get offset points for an entity
+   * Get offset points for an entity in polyline point format
    * @param {Object} entity
    * @param {Point} sidePoint
    * @param {number} distance
-   * @return {Array|null} offset points or null if unsupported
+   * @return {Array|null} offset polyline points or null if unsupported
    */
   getOffsetPoints(entity, sidePoint, distance) {
-    // TODO: can this be refactored to use only polylines?
-    switch (entity.type) {
-      case 'Line':
-        return this.getOffsetLinePoints(entity, sidePoint, distance);
-      case 'Circle':
-        return this.getOffsetCirclePoints(entity, sidePoint, distance);
-      case 'Arc':
-        return this.getOffsetArcPoints(entity, sidePoint, distance);
-      case 'Polyline':
-        return this.getOffsetPolylinePoints(entity, sidePoint, distance);
-      default:
-        return null;
-    }
+    if (typeof entity.toPolylinePoints !== 'function') return null;
+
+    const polyPts = entity.toPolylinePoints();
+    if (!polyPts || polyPts.length < 2) return null;
+
+    const isClosed = polyPts.length >= 3 && polyPts[0].isSame(polyPts.at(-1));
+    const points = isClosed ? polyPts.slice(0, -1) : polyPts;
+
+    return this.getOffsetPolylinePoints(points, isClosed, sidePoint, distance);
   }
 
   /**
-   * Get offset points for a line entity
-   * @param {Object} entity
-   * @param {Point} sidePoint
-   * @param {number} distance
-   * @return {Array} offset line points
-   */
-  getOffsetLinePoints(entity, sidePoint, distance) {
-    const p1 = entity.points[0];
-    const p2 = entity.points[1];
-
-    // Line direction and perpendicular normal
-    const direction = p2.subtract(p1);
-    const normal = new Point(-direction.y, direction.x).normalise();
-
-    // Determine which side using cross product
-    const toSide = sidePoint.subtract(p1);
-    const sign = direction.cross(toSide) >= 0 ? 1 : -1;
-
-    const offset = normal.scale(distance * sign);
-    return [p1.add(offset), p2.add(offset)];
-  }
-
-  /**
-   * Get offset points for a circle entity
-   * @param {Object} entity
-   * @param {Point} sidePoint
-   * @param {number} distance
-   * @return {Array|null} offset circle points or null if radius would be non-positive
-   */
-  getOffsetCirclePoints(entity, sidePoint, distance) {
-    const center = entity.points[0];
-    const currentRadius = center.distance(entity.points[1]);
-
-    // Outside: grow, Inside: shrink
-    const distFromCenter = center.distance(sidePoint);
-    const newRadius = distFromCenter >= currentRadius ?
-      currentRadius + distance :
-      currentRadius - distance;
-
-    if (newRadius <= 0) return null;
-
-    const angle = center.angle(entity.points[1]);
-    return [center, center.project(angle, newRadius)];
-  }
-
-  /**
-   * Get offset points for an arc entity
-   * @param {Object} entity
-   * @param {Point} sidePoint
-   * @param {number} distance
-   * @return {Array|null} offset arc points or null if radius would be non-positive
-   */
-  getOffsetArcPoints(entity, sidePoint, distance) {
-    const center = entity.points[0];
-    const currentRadius = center.distance(entity.points[1]);
-
-    const distFromCenter = center.distance(sidePoint);
-    const newRadius = distFromCenter >= currentRadius ?
-      currentRadius + distance :
-      currentRadius - distance;
-
-    if (newRadius <= 0) return null;
-
-    // Preserve start and end angles
-    const startAngle = center.angle(entity.points[1]);
-    const endAngle = center.angle(entity.points[2]);
-
-    return [center, center.project(startAngle, newRadius), center.project(endAngle, newRadius)];
-  }
-
-  /**
-   * Get offset points for a polyline entity
-   * @param {Object} entity
+   * Get offset points for polyline points
+   * @param {Array} points
+   * @param {boolean} isClosed
    * @param {Point} sidePoint
    * @param {number} distance
    * @return {Array|null} offset points or null if unsupported
    */
-  getOffsetPolylinePoints(entity, sidePoint, distance) {
-    const points = entity.points;
-    const isClosed = entity.flags.hasFlag(1);
+  getOffsetPolylinePoints(points, isClosed, sidePoint, distance) {
     const n = points.length;
     if (n < 2) return null;
 
@@ -364,23 +278,34 @@ export class Offset extends Tool {
    * @return {number} distance
    */
   getThroughDistance(entity, throughPoint) {
-    switch (entity.type) {
-      case 'Line': {
-        const closest = throughPoint.perpendicular(entity.points[0], entity.points[1]);
-        return throughPoint.distance(closest);
+    if (typeof entity.toPolylinePoints !== 'function') return 0;
+
+    const polyPts = entity.toPolylinePoints();
+    if (!polyPts || polyPts.length < 2) return 0;
+
+    const isClosed = polyPts.length >= 3 && polyPts[0].isSame(polyPts.at(-1));
+    const points = isClosed ? polyPts.slice(0, -1) : polyPts;
+    const n = points.length;
+    const segCount = isClosed ? n : n - 1;
+
+    let minDist = Infinity;
+
+    for (let i = 0; i < segCount; i++) {
+      const A = points[i];
+      const B = points[(i + 1) % n];
+
+      if (A.bulge === 0) {
+        const closest = throughPoint.perpendicular(A, B);
+        const dist = throughPoint.distance(closest);
+        if (dist < minDist) minDist = dist;
+      } else {
+        const center = A.bulgeCentrePoint(B);
+        const radius = center.distance(A);
+        const dist = Math.abs(center.distance(throughPoint) - radius);
+        if (dist < minDist) minDist = dist;
       }
-      case 'Circle':
-      case 'Arc': {
-        const center = entity.points[0];
-        const currentRadius = center.distance(entity.points[1]);
-        return Math.abs(center.distance(throughPoint) - currentRadius);
-      }
-      case 'Polyline': {
-        const closest = entity.closestPoint(throughPoint);
-        return closest[1];
-      }
-      default:
-        return 0;
     }
+
+    return minDist === Infinity ? 0 : minDist;
   }
 }
