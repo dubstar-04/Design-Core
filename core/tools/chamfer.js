@@ -201,10 +201,12 @@ export class Chamfer extends ChamferFilletBase {
       const chamferDir = candidate1.dot(secondUnit) >= 0 ? candidate1 : firstUnit.rotate(origin, -rotAngle);
 
       // Intersect chamfer ray from firstChamferPoint with the infinite line2
-      secondChamferPoint = Intersection.intersectRayRay(
+      const chamferResult = Intersection.intersectSegmentSegment(
           firstChamferPoint, firstChamferPoint.add(chamferDir),
           this.secondPick.lineStart, this.secondPick.lineEnd,
+          true, true,
       );
+      secondChamferPoint = chamferResult.points[0] || null;
       if (!secondChamferPoint) {
         // Chamfer direction is parallel to line2 — no intersection
         DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);

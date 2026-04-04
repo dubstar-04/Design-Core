@@ -44,10 +44,12 @@ export class ChamferFilletBase extends Tool {
       return false;
     }
 
-    this.intersectionPoint = Intersection.intersectRayRay(
+    const result = Intersection.intersectSegmentSegment(
         this.firstPick.lineStart, this.firstPick.lineEnd,
         this.secondPick.lineStart, this.secondPick.lineEnd,
+        true, true,
     );
+    this.intersectionPoint = result.points[0] || null;
 
     if (!this.intersectionPoint) {
       DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);

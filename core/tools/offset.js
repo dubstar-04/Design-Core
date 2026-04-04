@@ -233,6 +233,8 @@ export class Offset extends Tool {
           A: new Point(center.x + newRadius * Math.cos(startAngle), center.y + newRadius * Math.sin(startAngle)),
           B: new Point(center.x + newRadius * Math.cos(endAngle), center.y + newRadius * Math.sin(endAngle)),
           bulge: A.bulge,
+          center,
+          radius: newRadius,
         });
       }
     }
@@ -263,12 +265,20 @@ export class Offset extends Tool {
    * @return {Point}
    */
   findJunction(seg, nextSeg) {
-    if (seg.type === 'line' && nextSeg.type === 'line') {
-      return Intersection.intersectRayRay(seg.A, seg.B, nextSeg.A, nextSeg.B) ??
-        new Point((seg.B.x + nextSeg.A.x) / 2, (seg.B.y + nextSeg.A.y) / 2);
-    }
-    // Mixed or arc-arc: use the midpoint between the two endpoints
-    return new Point((seg.B.x + nextSeg.A.x) / 2, (seg.B.y + nextSeg.A.y) / 2);
+    const midpoint = new Point((seg.B.x + nextSeg.A.x) / 2, (seg.B.y + nextSeg.A.y) / 2);
+
+    const segA = new Point(seg.A.x, seg.A.y, seg.bulge);
+    const segB = new Point(seg.B.x, seg.B.y);
+    const nextA = new Point(nextSeg.A.x, nextSeg.A.y, nextSeg.bulge);
+    const nextB = new Point(nextSeg.B.x, nextSeg.B.y);
+
+    const result = Intersection.intersectSegmentSegment(segA, segB, nextA, nextB, true, true);
+    const candidates = result.points;
+
+    if (candidates.length === 0) return midpoint;
+    if (candidates.length === 1) return candidates[0];
+
+    return candidates[0].distance(midpoint) <= candidates[1].distance(midpoint) ? candidates[0] : candidates[1];
   }
 
   /**
