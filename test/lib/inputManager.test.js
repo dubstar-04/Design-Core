@@ -93,6 +93,10 @@ test('Test PromptOptions creation with various parameters', () => {
   expect(po.promptMessage).toBe(promptMessage);
   expect(po.types).toBe(types);
   expect(po.options).toBe(options);
+  expect(po.defaultValue).toBeUndefined();
+
+  const poWithDefault = new PromptOptions(promptMessage, types, options, 42);
+  expect(poWithDefault.defaultValue).toBe(42);
 });
 
 test('test onCommand with no activeCommand or promptOption', async () => {
@@ -338,6 +342,38 @@ test('PromptOptions.getPrompt with options includes OR keyword and underscored s
   expect(prompt).toContain('or');
   expect(prompt).toContain('A\u0332pple');
   expect(prompt).toContain('B\u0332anana');
+});
+
+test('PromptOptions constructor sets defaultValue', () => {
+  const po = new PromptOptions('Enter distance', [Input.Type.NUMBER], [], 5);
+  expect(po.defaultValue).toBe(5);
+});
+
+test('PromptOptions constructor defaultValue is undefined when not provided', () => {
+  const po = new PromptOptions('Enter value', [Input.Type.NUMBER]);
+  expect(po.defaultValue).toBeUndefined();
+});
+
+test('PromptOptions.getPrompt with defaultValue appends <value>', () => {
+  const po = new PromptOptions('Enter distance', [Input.Type.NUMBER], [], 10);
+  expect(po.getPrompt()).toBe('Enter distance <10>');
+});
+
+test('PromptOptions.getPrompt with options and defaultValue appends <value> after options', () => {
+  const po = new PromptOptions('Select', [Input.Type.STRING], ['Apple', 'Banana'], 'Apple');
+  const prompt = po.getPrompt();
+  expect(prompt).toContain('A\u0332pple');
+  expect(prompt).toMatch(/<Apple>$/);
+});
+
+test('onEnterPressed with promptOption and defaultValue resolves with defaultValue', async () => {
+  inputManager.reset();
+  inputManager.activeCommand = new Line();
+  const po = new PromptOptions('Enter distance', [Input.Type.NUMBER], [], 5);
+  const p = inputManager.requestInput(po);
+  inputManager.onEnterPressed();
+  await expect(p).resolves.toBe(5);
+  inputManager.reset();
 });
 
 // ─── onEnterPressed ───────────────────────────────────────────────────────────
