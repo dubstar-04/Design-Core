@@ -38,7 +38,10 @@ export class Offset extends Tool {
   async execute() {
     try {
       // Initialise from the last used offset distance stored in headers
-      const op = new PromptOptions(Strings.Input.DISTANCE, [Input.Type.NUMBER], ['Through']);
+      const storedDistance = DesignCore.Scene.headers.offsetDistance;
+      const defaultValue = storedDistance > 0 ? storedDistance : undefined;
+
+      const op = new PromptOptions(Strings.Input.DISTANCE, [Input.Type.NUMBER], ['Through'], defaultValue);
       const distanceInput = await DesignCore.Scene.inputManager.requestInput(op);
       if (distanceInput === undefined) return;
 

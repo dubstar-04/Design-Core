@@ -181,7 +181,7 @@ export class Text extends Entity {
 
       // Get the font size when the style has a variable height (textHeight === 0)
       if (!style?.textHeight) {
-        const op2 = new PromptOptions(`${Strings.Input.HEIGHT} <${this.height}>`, [Input.Type.NUMBER]);
+        const op2 = new PromptOptions(Strings.Input.HEIGHT, [Input.Type.NUMBER], [], this.height);
         while (true) {
           const height = await DesignCore.Scene.inputManager.requestInput(op2);
           if (height === undefined) return;
@@ -194,7 +194,7 @@ export class Text extends Entity {
         }
       }
 
-      const op3 = new PromptOptions(`${Strings.Input.ROTATION} <0>`, [Input.Type.NUMBER]);
+      const op3 = new PromptOptions(Strings.Input.ROTATION, [Input.Type.NUMBER], [], 0);
       const rotation = await DesignCore.Scene.inputManager.requestInput(op3);
       if (rotation === undefined) return;
       this.setRotation(rotation);
