@@ -158,6 +158,8 @@ export class InputManager {
       if (this.promptOption?.types.includes(Input.Type.SELECTIONSET) && DesignCore.Scene.selectionManager.selectionSet.accepted !== true) {
         DesignCore.Scene.selectionManager.selectionSet.accepted = true;
         this.promptOption.respond(DesignCore.Scene.selectionManager.selectionSet);
+      } else if (this.promptOption?.defaultValue !== undefined) {
+        this.promptOption.respond(this.promptOption.defaultValue);
       } else {
         this.reset();
       }
