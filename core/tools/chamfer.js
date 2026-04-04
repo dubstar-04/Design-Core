@@ -206,6 +206,15 @@ export class Chamfer extends ChamferFilletBase {
           this.secondPick.lineStart, this.secondPick.lineEnd,
           true, true,
       );
+
+      const chamferStatus = chamferResult.status;
+      if (chamferStatus === Intersection.Status.PARALLEL ||
+          chamferStatus === Intersection.Status.OVERLAPPING ||
+          chamferStatus === Intersection.Status.COINCIDENT) {
+        DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
+        return;
+      }
+
       secondChamferPoint = chamferResult.points[0] || null;
       if (!secondChamferPoint) {
         // Chamfer direction is parallel to line2 — no intersection
