@@ -596,3 +596,33 @@ test('Polyline.execute auto-closes when start point is re-entered', async () => 
     expect(autoClosedCount).toBe(1);
   }, { extraMethods: { actionCommand: mockActionCommand } });
 });
+
+test('BasePolyline.fromPolylinePoints round-trip preserves open polyline', () => {
+  const poly = new BasePolyline({ points: [new Point(0, 0, 0.5), new Point(10, 0), new Point(10, 10)] });
+  const polyPts = poly.toPolylinePoints();
+  const rebuilt = new BasePolyline({});
+  rebuilt.fromPolylinePoints(polyPts);
+  expect(rebuilt.points.length).toBe(3);
+  expect(rebuilt.points[0].x).toBe(0);
+  expect(rebuilt.points[0].y).toBe(0);
+  expect(rebuilt.points[0].bulge).toBe(0.5);
+  expect(rebuilt.points[2].x).toBe(10);
+  expect(rebuilt.points[2].y).toBe(10);
+});
+
+test('BasePolyline.fromPolylinePoints round-trip strips closure point for closed polyline', () => {
+  const flags = new Flags();
+  flags.addValue(1);
+  const poly = new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)], flags: flags });
+  const polyPts = poly.toPolylinePoints();
+  // toPolylinePoints appends a closure copy of the first point
+  expect(polyPts.length).toBe(5);
+  const flags2 = new Flags();
+  flags2.addValue(1);
+  const rebuilt = new BasePolyline({ flags: flags2 });
+  rebuilt.fromPolylinePoints(polyPts);
+  expect(rebuilt.points.length).toBe(4);
+  expect(rebuilt.points[0].x).toBe(0);
+  expect(rebuilt.points[3].x).toBe(0);
+  expect(rebuilt.points[3].y).toBe(10);
+});
