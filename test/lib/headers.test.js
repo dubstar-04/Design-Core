@@ -17,7 +17,7 @@ test('Headers defaults', () => {
   expect(h.chamferDistanceB).toBe(0);
   expect(h.chamferLength).toBe(0);
   expect(h.chamferAngle).toBe(0);
-  expect(h.offsetDistance).toBe(1);
+  expect(h.offsetDistance).toBe(0);
   expect(h.dxfVersion).toBe('R2018');
 });
 
