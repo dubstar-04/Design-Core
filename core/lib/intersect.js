@@ -1,6 +1,5 @@
 import { Point } from '../entities/point.js';
 import { Utils } from './utils.js';
-import { Constants } from './constants.js';
 
 /** Intersection Class */
 export class Intersection {
@@ -313,7 +312,8 @@ export class Intersection {
    * Find intersections between two lines
    * @param {Line} line1
    * @param {Line} line2
-   * @param {boolean} extend
+   * @param {boolean} extendSegOne
+   * @param {boolean} extendSegTwo
    * @return {Intersection}
    */
   static #intersectLineLine(line1, line2, extendSegOne, extendSegTwo) {
