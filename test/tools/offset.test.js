@@ -207,7 +207,7 @@ test('Test Offset.action - offset line perpendicular', () => {
 
   const offset = new Offset();
   offset.selectedItem = core.scene.entities.get(0);
-  offset.offsetDistance = 5;
+  core.scene.headers.offsetDistance = 5;
   offset.points = [new Point(5, 5)]; // side point above line
 
   offset.action();
@@ -229,7 +229,7 @@ test('Test Offset.action - offset vertical line', () => {
 
   const offset = new Offset();
   offset.selectedItem = core.scene.entities.get(0);
-  offset.offsetDistance = 3;
+  core.scene.headers.offsetDistance = 3;
   offset.points = [new Point(5, 5)]; // side point to the right
 
   offset.action();
@@ -249,7 +249,7 @@ test('Test Offset.action - offset circle outward', () => {
 
   const offset = new Offset();
   offset.selectedItem = core.scene.entities.get(0);
-  offset.offsetDistance = 5;
+  core.scene.headers.offsetDistance = 5;
   offset.points = [new Point(20, 0)]; // outside the circle
 
   offset.action();
@@ -272,7 +272,7 @@ test('Test Offset.action - offset circle inward', () => {
 
   const offset = new Offset();
   offset.selectedItem = core.scene.entities.get(0);
-  offset.offsetDistance = 3;
+  core.scene.headers.offsetDistance = 3;
   offset.points = [new Point(5, 0)]; // inside the circle
 
   offset.action();
@@ -291,7 +291,7 @@ test('Test Offset.action - offset circle inward returns null when radius would b
 
   const offset = new Offset();
   offset.selectedItem = core.scene.entities.get(0);
-  offset.offsetDistance = 15; // larger than radius
+  core.scene.headers.offsetDistance = 15; // larger than radius
   offset.points = [new Point(5, 0)]; // inside
 
   offset.action();
@@ -312,7 +312,7 @@ test('Test Offset.action - offset arc outward preserves angles', () => {
 
   const offset = new Offset();
   offset.selectedItem = core.scene.entities.get(0);
-  offset.offsetDistance = 5;
+  core.scene.headers.offsetDistance = 5;
   offset.points = [new Point(20, 0)]; // outside
 
   offset.action();
@@ -339,7 +339,7 @@ test('Test Offset.action - unsupported entity type does not create new entity', 
 
   const offset = new Offset();
   offset.selectedItem = core.scene.entities.get(0);
-  offset.offsetDistance = 5;
+  core.scene.headers.offsetDistance = 5;
   offset.points = [new Point(20, 20)];
 
   offset.action();
