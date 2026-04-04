@@ -71,6 +71,12 @@ export class BasePolyline extends Entity {
     // 128 = The linetype pattern is generated continuously around the vertices of this polyline
 
     this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[70]], 0));
+
+    // If the first and last points are the same the polyline should be considered closed
+    if (this.points.length >= 3 && this.points[0].isSame(this.points.at(-1))) {
+      this.points.pop();
+      this.flags.addValue(1);
+    }
   }
 
   /**
