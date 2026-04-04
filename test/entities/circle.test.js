@@ -332,3 +332,23 @@ test('Circle.snaps nearest snap does not fire when too far', () => {
   const snaps = circle.snaps(new Point(100, 100), 1);
   expect(snaps.length).toBe(0);
 });
+
+test('Circle.fromPolylinePoints round-trip preserves centre and radius', () => {
+  const circle = new Circle({ points: [new Point(5, 10), new Point(5, 10).project(0, 8)] });
+  const polyPts = circle.toPolylinePoints();
+  const rebuilt = new Circle({});
+  rebuilt.fromPolylinePoints(polyPts);
+  expect(rebuilt.points[0].x).toBeCloseTo(5, 10);
+  expect(rebuilt.points[0].y).toBeCloseTo(10, 10);
+  expect(rebuilt.radius).toBeCloseTo(8, 10);
+});
+
+test('Circle.fromPolylinePoints precision drift is negligible', () => {
+  const circle = new Circle({ points: [new Point(123.456, -789.012), new Point(123.456, -789.012).project(1.234, 56.789)] });
+  const polyPts = circle.toPolylinePoints();
+  const rebuilt = new Circle({});
+  rebuilt.fromPolylinePoints(polyPts);
+  const drift = Math.hypot(rebuilt.points[0].x - circle.points[0].x, rebuilt.points[0].y - circle.points[0].y);
+  expect(drift).toBeLessThan(1e-10);
+  expect(Math.abs(rebuilt.radius - circle.radius)).toBeLessThan(1e-10);
+});
