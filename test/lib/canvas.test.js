@@ -348,6 +348,7 @@ test('Test Canvas.getSceneOffset visible area shrinks when zoomed in', () => {
   const after = canvas.getSceneOffset();
   const widthAfter = after.xmax - after.xmin;
   expect(widthAfter).toBeLessThan(widthBefore);
+<<<<<<< HEAD
 });
 
   afterEach(() => {
@@ -374,4 +375,6 @@ test('Test Canvas.getSceneOffset visible area shrinks when zoomed in', () => {
     canvas.setContext(nearWhiteMockEntity, context);
     expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
   });
+=======
+>>>>>>> dff207c (Update canvas.test.js)
 });
