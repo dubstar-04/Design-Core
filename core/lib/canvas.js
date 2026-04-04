@@ -341,6 +341,12 @@ export class Canvas {
       }
     }
 
+    // ACI 7: white on dark background, black on light background
+    if (colour?.r === 254 && colour?.g === 254 && colour?.b === 254) {
+      const bg = DesignCore.Settings.canvasbackgroundcolour;
+      colour = (bg.r + bg.g + bg.b) / 3 < 128 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
+    }
+
     try { // HTML Canvas
       context.strokeStyle = Colours.rgbToString(colour);
       context.fillStyle = Colours.rgbToString(colour);
