@@ -350,11 +350,28 @@ test('Test Canvas.getSceneOffset visible area shrinks when zoomed in', () => {
   expect(widthAfter).toBeLessThan(widthBefore);
 });
 
-test('Test Canvas.setContext non-ACI-7 near-white colour is not recoloured', () => {
-  core.activate();
-  const context = createMockContext();
-  core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-  canvas.paintState = canvas.paintStates.ENTITIES;
-  canvas.setContext(nearWhiteMockEntity, context);
-  expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
+  afterEach(() => {
+    core.settings.canvasbackgroundcolour = originalBackground;
+  });
+
+  test('ACI 7 is white on dark background', () => {
+    const context = createMockContext();
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    canvas.setContext(aci7MockEntity, context);
+    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+  });
+
+  test('ACI 7 is black on light background', () => {
+    const context = createMockContext();
+    core.settings.canvasbackgroundcolour = { r: 246, g: 245, b: 244 };
+    canvas.setContext(aci7MockEntity, context);
+    expect(context.strokeStyle).toBe('rgb(0, 0, 0)');
+  });
+
+  test('non-ACI-7 near-white colour is not recoloured', () => {
+    const context = createMockContext();
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    canvas.setContext(nearWhiteMockEntity, context);
+    expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
+  });
 });
