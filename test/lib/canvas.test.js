@@ -222,4 +222,130 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
     canvas.setContext(nearWhiteMockEntity, context);
     expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
   });
+
+  test('ACI 7 via ByLayer resolves white on dark background', () => {
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    const context = createMockContext();
+    const byLayerEntity = {
+      getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+      getLineType: () => ({ getPattern: () => [] }),
+      lineWidth: 1,
+      entityColour: { aci: 256, byLayer: true, byBlock: false },
+      layer: '0',
+    };
+    canvas.setContext(byLayerEntity, context);
+    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+  });
+
+  test('ACI 7 is not recoloured in SELECTED state', () => {
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    const context = createMockContext();
+    canvas.paintState = canvas.paintStates.SELECTED;
+    canvas.setContext(aci7MockEntity, context);
+    const sel = core.settings.selecteditemscolour;
+    expect(context.strokeStyle).toBe(`rgb(${sel.r}, ${sel.g}, ${sel.b})`);
+  });
+});
+
+describe('Test Canvas.setContext paint states', () => {
+  const redEntity = {
+    getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
+    getLineType: () => ({ getPattern: () => [] }),
+    lineWidth: 10,
+    entityColour: { aci: 1, byLayer: false, byBlock: false },
+  };
+
+  beforeEach(() => {
+    core.activate();
+    canvas.matrix = new Matrix();
+  });
+
+  test('ENTITIES state uses entity colour and normal lineWidth', () => {
+    const context = createMockContext();
+    canvas.paintState = canvas.paintStates.ENTITIES;
+    canvas.setContext(redEntity, context);
+    expect(context.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(context.fillStyle).toBe('rgb(255, 0, 0)');
+    expect(context.lineWidth).toBe(10 / canvas.getScale());
+  });
+
+  test('SELECTED state overrides colour with selecteditemscolour and doubles lineWidth', () => {
+    const context = createMockContext();
+    canvas.paintState = canvas.paintStates.SELECTED;
+    canvas.setContext(redEntity, context);
+    const sel = core.settings.selecteditemscolour;
+    expect(context.strokeStyle).toBe(`rgb(${sel.r}, ${sel.g}, ${sel.b})`);
+    expect(context.lineWidth).toBe(10 * 2 / canvas.getScale());
+  });
+
+  test('TEMPORARY state keeps entity colour and doubles lineWidth', () => {
+    const context = createMockContext();
+    canvas.paintState = canvas.paintStates.TEMPORARY;
+    canvas.setContext(redEntity, context);
+    expect(context.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(context.lineWidth).toBe(10 * 2 / canvas.getScale());
+  });
+});
+
+describe('Test Canvas.zoom', () => {
+  beforeEach(() => {
+    canvas.matrix = new Matrix();
+  });
+
+  test('zoom increases scale', () => {
+    canvas.zoom(2);
+    expect(canvas.getScale()).toBeGreaterThan(1);
+  });
+
+  test('zoom decreases scale', () => {
+    canvas.zoom(0.5);
+    expect(canvas.getScale()).toBeLessThan(1);
+  });
+});
+
+test('Test Canvas.doubleClick left and right buttons do not throw', () => {
+  expect(() => canvas.doubleClick(0)).not.toThrow();
+  expect(() => canvas.doubleClick(2)).not.toThrow();
+});
+
+test('Test Canvas.doubleClick middle button triggers zoomExtents', () => {
+  const testCore = new Core();
+  testCore.activate();
+  testCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(500, 500)] });
+  testCore.canvas.width = 800;
+  testCore.canvas.height = 600;
+  testCore.canvas.matrix = new Matrix();
+  testCore.canvas.doubleClick(1);
+  expect(testCore.canvas.getScale()).not.toBe(1);
+});
+
+test('Test Canvas.zoomToWindow with inverted coordinate order', () => {
+  core.activate();
+  canvas.matrix = new Matrix();
+  canvas.width = 800;
+  canvas.height = 600;
+  // pt1 > pt2 — Math.min/max should handle this the same as normal order
+  canvas.zoomToWindow(new Point(100, 100), new Point(0, 0));
+  expect(canvas.getScale()).toBeGreaterThan(1);
+});
+
+test('Test Canvas.paint resets paintState to undefined after painting', () => {
+  core.activate();
+  canvas.matrix = new Matrix();
+  canvas.flipped = true;
+  canvas.paint(createMockContext(), 800, 600);
+  expect(canvas.paintState).toBeUndefined();
+});
+
+test('Test Canvas.getSceneOffset visible area shrinks when zoomed in', () => {
+  core.activate();
+  canvas.matrix = new Matrix();
+  canvas.width = 800;
+  canvas.height = 600;
+  const before = canvas.getSceneOffset();
+  const widthBefore = before.xmax - before.xmin;
+  canvas.zoom(2);
+  const after = canvas.getSceneOffset();
+  const widthAfter = after.xmax - after.xmin;
+  expect(widthAfter).toBeLessThan(widthBefore);
 });
