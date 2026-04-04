@@ -1,4 +1,5 @@
 import { Point } from '../entities/point.js';
+import { Constants } from './constants.js';
 import { Utils } from './utils.js';
 
 /** Intersection Class */
@@ -388,10 +389,13 @@ export class Intersection {
     const line2Dir = bEnd.subtract(bStart);
     const startDiff = aStart.subtract(bStart);
 
-    // Zero cross product means the lines are parallel
+    // Normalise the cross product to |sin(angle)| so the tolerance is scale-independent
     const directionCross = line1Dir.cross(line2Dir);
+    const line1Len = line1Dir.length();
+    const line2Len = line2Dir.length();
+    const isParallel = Math.abs(directionCross) / (line1Len * line2Len) < Constants.Tolerance.EPSILON;
 
-    if (directionCross !== 0) {
+    if (!isParallel) {
       // Lines are not parallel
       // lerp parameters: 0 = segment start, 1 = segment end
       const line1Lerp = line2Dir.cross(startDiff) / directionCross;
@@ -412,7 +416,10 @@ export class Intersection {
       }
     } else {
       // Lines are parallel or coincident
-      if (line2Dir.cross(startDiff) === 0 || line1Dir.cross(startDiff) === 0) {
+      const startDiffLen = startDiff.length();
+      const isCollinear = startDiffLen < Constants.Tolerance.EPSILON ||
+          Math.abs(line2Dir.cross(startDiff)) / (line2Len * startDiffLen) < Constants.Tolerance.EPSILON;
+      if (isCollinear) {
         // Lines are collinear — check whether the segments actually overlap
         // Project all four endpoints onto the shared direction axis
         const len2 = line1Dir.x * line1Dir.x + line1Dir.y * line1Dir.y;
