@@ -137,8 +137,8 @@ test('test onCommand with no activeCommand or promptOption', async () => {
 });
 
 test('Test Input.getType', () => {
-  expect(Input.getType(100)).toBe('Number');
-  expect(Input.getType('text')).toBe('String');
+  expect(Input.getType(100)).toBe(Input.Type.NUMBER);
+  expect(Input.getType('text')).toBe(Input.Type.STRING);
 });
 
 test('Test tool switching - click circle then rectangle', () => {
@@ -277,8 +277,7 @@ test('Input.getType(undefined) returns undefined', () => {
 test('Input.getType returns Number for numeric values regardless of prompt', () => {
   const po = new PromptOptions('Enter distance', [Input.Type.DYNAMIC]);
   inputManager.requestInput(po);
-  // getType is now pure — always returns constructor.name
-  expect(Input.getType(42)).toBe('Number');
+  expect(Input.getType(42)).toBe(Input.Type.NUMBER);
   po.cancel();
   inputManager.reset();
 });
@@ -604,11 +603,11 @@ test('requestInput returns undefined when cancelled', async () => {
 // ─── Input.getType for all types ──────────────────────────────────────────────
 
 test('Input.getType returns correct type for Point', () => {
-  expect(Input.getType(new Point(1, 2))).toBe('Point');
+  expect(Input.getType(new Point(1, 2))).toBe(Input.Type.POINT);
 });
 
 test('Input.getType returns correct type for SingleSelection', () => {
-  expect(Input.getType(new SingleSelection(0, new Point()))).toBe('SingleSelection');
+  expect(Input.getType(new SingleSelection(0, new Point()))).toBe(Input.Type.SINGLESELECTION);
 });
 
 // ─── handlePromptInput ────────────────────────────────────────────────────────
