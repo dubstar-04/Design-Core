@@ -197,13 +197,13 @@ describe('Test Canvas cursor states', () => {
     expect(canvas.cursorState).toBe(canvas.cursorStates.DEFAULT);
   });
 
-  test('middle mouseDown sets cursor to PAN after delay', () => {
+  test('middle mouseDown sets cursor to GRABBING after delay', () => {
     jest.useFakeTimers();
     canvas.mouseDown(1);
     expect(canvas.cursorState).toBe(canvas.cursorStates.DEFAULT); // not yet
     jest.advanceTimersByTime(250);
-    expect(cursorState).toBe(canvas.cursorStates.PAN);
-    expect(canvas.cursorState).toBe(canvas.cursorStates.PAN);
+    expect(cursorState).toBe(canvas.cursorStates.GRABBING);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.GRABBING);
     jest.useRealTimers();
   });
 
@@ -227,7 +227,7 @@ describe('Test Canvas cursor states', () => {
   test('middle mouseUp restores cursor to SELECTION when selection was active', () => {
     jest.useFakeTimers();
     canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]); // cursor = SELECTION
-    canvas.mouseDown(1); // PAN (delayed)
+    canvas.mouseDown(1); // GRABBING (delayed)
     jest.advanceTimersByTime(250);
     canvas.mouseUp(1); // should restore to SELECTION, not DEFAULT
     expect(cursorState).toBe(canvas.cursorStates.SELECTION);
@@ -239,10 +239,10 @@ describe('Test Canvas cursor states', () => {
     jest.useFakeTimers();
     const scaleBefore = canvas.getScale();
     core.mouse.mouseDown(1); // start pan — sets buttonTwoDown
-    jest.advanceTimersByTime(250); // let PAN cursor set
+    jest.advanceTimersByTime(250); // let GRABBING cursor set
     canvas.wheel(1); // should be blocked
     expect(canvas.getScale()).toBe(scaleBefore);
-    expect(canvas.cursorState).toBe(canvas.cursorStates.PAN);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.GRABBING);
     core.mouse.mouseUp(1);
     jest.useRealTimers();
   });
@@ -261,11 +261,28 @@ describe('Test Canvas cursor states', () => {
       callCount++;
     });
     canvas.mouseDown(1);
-    jest.advanceTimersByTime(250); // cursor becomes PAN — callCount = 1
+    jest.advanceTimersByTime(250); // cursor becomes GRABBING — callCount = 1
     canvas.mouseDown(1);
-    jest.advanceTimersByTime(250); // already PAN — no-op
+    jest.advanceTimersByTime(250); // already GRABBING — no-op
     expect(callCount).toBe(1);
     jest.useRealTimers();
+  });
+
+  test('setCursorForInputTypes uses cursor hint when provided', () => {
+    canvas.setCursorForInputTypes([Input.Type.MOUSEDOWN], canvas.cursorStates.GRAB);
+    expect(cursorState).toBe(canvas.cursorStates.GRAB);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.GRAB);
+  });
+
+  test('setCursorForInputTypes MOUSEDOWN with GRAB hint sets GRAB cursor', () => {
+    canvas.setCursorForInputTypes([Input.Type.MOUSEDOWN], canvas.cursorStates.GRAB);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.GRAB);
+  });
+
+  test('setCursorForInputTypes MOUSEUP with GRABBING hint sets GRABBING cursor', () => {
+    canvas.setCursorForInputTypes([Input.Type.MOUSEUP], canvas.cursorStates.GRABBING);
+    expect(cursorState).toBe(canvas.cursorStates.GRABBING);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.GRABBING);
   });
 
   test('setCursorForInputTypes sets SELECTION for SelectionSet', () => {
