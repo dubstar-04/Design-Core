@@ -64,8 +64,9 @@ export class Canvas {
 
   /**
    * Set external cursor callback
-   * Called when the cursor state changes
-   * @param {Function} callback
+   * Called when the cursor state changes.
+   * Pass undefined or null to unregister the callback.
+   * @param {Function|undefined|null} callback
    */
   setCursorCallbackFunction(callback) {
     this.externalCursorCallbackFunction = callback;
