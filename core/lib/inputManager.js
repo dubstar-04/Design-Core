@@ -39,6 +39,7 @@ export class InputManager {
 
     this.promptOption = undefined;
     DesignCore.Scene.reset();
+    DesignCore.Canvas.setCursorForInputTypes([]);
   }
 
   /**
@@ -62,6 +63,7 @@ export class InputManager {
     });
 
     this.snapping.active = promptOption.types.includes(Input.Type.POINT);
+    DesignCore.Canvas.setCursorForInputTypes(promptOption.types);
 
     return promptOption.createPromise().then((input) => {
       if (input === undefined) return undefined;
