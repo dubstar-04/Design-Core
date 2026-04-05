@@ -1,6 +1,7 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { Matrix } from '../../core/lib/matrix.js';
+import { Input } from '../../core/lib/input.js';
 import { jest } from '@jest/globals';
 
 const core = new Core();
@@ -210,7 +211,7 @@ describe('Test Canvas cursor states', () => {
   });
 
   test('middle mouseUp restores cursor to SELECTION when selection was active', () => {
-    canvas.setCursorForInputTypes(['SelectionSet']); // cursor = SELECTION
+    canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]); // cursor = SELECTION
     canvas.mouseDown(1); // PAN
     canvas.mouseUp(1); // should restore to SELECTION, not DEFAULT
     expect(cursorState).toBe(canvas.cursorStates.SELECTION);
@@ -219,7 +220,7 @@ describe('Test Canvas cursor states', () => {
 
   test('wheel restores cursor to SELECTION (not DEFAULT) when selection was active', () => {
     jest.useFakeTimers();
-    canvas.setCursorForInputTypes(['SelectionSet']); // cursor = SELECTION
+    canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]); // cursor = SELECTION
     canvas.wheel(1); // cursor = ZOOM_IN
     expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM_IN);
     jest.advanceTimersByTime(300);
@@ -258,24 +259,24 @@ describe('Test Canvas cursor states', () => {
   });
 
   test('setCursorForInputTypes sets SELECTION for SelectionSet', () => {
-    canvas.setCursorForInputTypes(['SelectionSet']);
+    canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]);
     expect(cursorState).toBe(canvas.cursorStates.SELECTION);
     expect(canvas.cursorState).toBe(canvas.cursorStates.SELECTION);
   });
 
   test('setCursorForInputTypes sets SELECTION for SingleSelection', () => {
-    canvas.setCursorForInputTypes(['SingleSelection']);
+    canvas.setCursorForInputTypes([Input.Type.SINGLESELECTION]);
     expect(cursorState).toBe(canvas.cursorStates.SELECTION);
   });
 
   test('setCursorForInputTypes sets DEFAULT for Point input', () => {
-    canvas.setCursorForInputTypes(['SelectionSet']); // set to SELECTION first
-    canvas.setCursorForInputTypes(['Point']);
+    canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]); // set to SELECTION first
+    canvas.setCursorForInputTypes([Input.Type.POINT]);
     expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
   });
 
   test('setCursorForInputTypes resets to DEFAULT for empty types', () => {
-    canvas.setCursorForInputTypes(['SelectionSet']);
+    canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]);
     canvas.setCursorForInputTypes([]);
     expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
   });

@@ -1,6 +1,7 @@
 import { Matrix } from './matrix.js';
 import { Colours } from './colours.js';
 import { Point } from '../entities/point.js';
+import { Input } from './input.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -92,7 +93,7 @@ export class Canvas {
    * @param {Array} types - array of Input.Type values
    */
   setCursorForInputTypes(types) {
-    const isSelection = types.some((t) => t === 'SelectionSet' || t === 'SingleSelection');
+    const isSelection = types.some((t) => t === Input.Type.SELECTIONSET || t === Input.Type.SINGLESELECTION);
     this.#baseCursorState = isSelection ? this.cursorStates.SELECTION : this.cursorStates.DEFAULT;
     this.#setCursor(this.#baseCursorState);
   }
