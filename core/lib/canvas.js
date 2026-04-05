@@ -7,6 +7,7 @@ import { DesignCore } from '../designCore.js';
 /** Canvas Class */
 export class Canvas {
   #zoomCursorTimeout;
+  #baseCursorState = 'DEFAULT';
 
   /** Create Canvas */
   constructor() {
@@ -35,10 +36,13 @@ export class Canvas {
     this.cursorStates = {
       DEFAULT: 'DEFAULT',
       PAN: 'PAN',
-      ZOOM: 'ZOOM',
+      ZOOM_IN: 'ZOOM_IN',
+      ZOOM_OUT: 'ZOOM_OUT',
+      SELECTION: 'SELECTION',
     };
 
     this.cursorState = this.cursorStates.DEFAULT;
+    this.#baseCursorState = this.cursorStates.DEFAULT;
 
     // function to call external pain command for the ui
     this.externalPaintCallbackFunction;
@@ -83,6 +87,17 @@ export class Canvas {
   }
 
   /**
+   * Set the cursor based on the input types requested by a command prompt.
+   * SELECTIONSET or SINGLESELECTION → SELECTION cursor; everything else → DEFAULT.
+   * @param {Array} types - array of Input.Type values
+   */
+  setCursorForInputTypes(types) {
+    const isSelection = types.some((t) => t === 'SelectionSet' || t === 'SingleSelection');
+    this.#baseCursorState = isSelection ? this.cursorStates.SELECTION : this.cursorStates.DEFAULT;
+    this.#setCursor(this.#baseCursorState);
+  }
+
+  /**
    * Handle mouse movement
    */
   mouseMoved() {
@@ -122,7 +137,7 @@ export class Canvas {
       case 1: // middle button
         this.lastDelta = new Point();
         this.requestPaint();
-        this.#setCursor(this.cursorStates.DEFAULT);
+        this.#setCursor(this.#baseCursorState);
         break;
       case 2: // right button
         break;
@@ -169,10 +184,10 @@ export class Canvas {
   wheel(delta) {
     const scale = Math.pow(1 + Math.abs(delta), delta > 0 ? 1 : -1);
     if (scale < 1 && this.getScale() > this.minScaleFactor || scale > 1 && this.getScale() < this.maxScaleFactor) {
-      this.#setCursor(this.cursorStates.ZOOM);
+      this.#setCursor(delta > 0 ? this.cursorStates.ZOOM_IN : this.cursorStates.ZOOM_OUT);
       this.zoom(scale);
       clearTimeout(this.#zoomCursorTimeout);
-      this.#zoomCursorTimeout = setTimeout(() => this.#setCursor(this.cursorStates.DEFAULT), 300);
+      this.#zoomCursorTimeout = setTimeout(() => this.#setCursor(this.#baseCursorState), 300);
     }
   };
 
