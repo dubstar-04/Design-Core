@@ -372,15 +372,15 @@ export class Canvas {
     if (item.entityColour.byBlock && block) {
       if (block.entityColour.byLayer) {
         const layer = DesignCore.LayerManager.getItemByName(block.layer);
-        return layer?.layerColour?.aci === 7;
+        return layer?.layerColour?.aci === 7 && !layer?.layerColour?.isTrueColour;
       }
-      return block.entityColour.aci === 7;
+      return block.entityColour.aci === 7 && !block.entityColour.isTrueColour;
     }
     if (item.entityColour.byLayer) {
       const layer = DesignCore.LayerManager.getItemByName(item.layer);
-      return layer?.layerColour?.aci === 7;
+      return layer?.layerColour?.aci === 7 && !layer?.layerColour?.isTrueColour;
     }
-    return item.entityColour.aci === 7;
+    return item.entityColour.aci === 7 && !item.entityColour.isTrueColour;
   }
 
   /**

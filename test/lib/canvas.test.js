@@ -189,6 +189,14 @@ const nearWhiteMockEntity = {
   entityColour: { aci: 3, byLayer: false, byBlock: false },
 };
 
+// An entity with a true colour whose aci fell back to 7 (non-ACI-table colour)
+const trueColourFallbackAci7MockEntity = {
+  getDrawColour: () => ({ r: 200, g: 100, b: 50 }),
+  getLineType: () => ({ getPattern: () => [] }),
+  lineWidth: 1,
+  entityColour: { aci: 7, isTrueColour: true, byLayer: false, byBlock: false },
+};
+
 describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   let originalBackground;
 
@@ -221,6 +229,13 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     canvas.setContext(nearWhiteMockEntity, context);
     expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
+  });
+
+  test('true colour with fallback aci=7 is not recoloured', () => {
+    const context = createMockContext();
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    canvas.setContext(trueColourFallbackAci7MockEntity, context);
+    expect(context.strokeStyle).toBe('rgb(200, 100, 50)');
   });
 
   test('ACI 7 via ByLayer resolves white on dark background', () => {
@@ -348,33 +363,4 @@ test('Test Canvas.getSceneOffset visible area shrinks when zoomed in', () => {
   const after = canvas.getSceneOffset();
   const widthAfter = after.xmax - after.xmin;
   expect(widthAfter).toBeLessThan(widthBefore);
-<<<<<<< HEAD
-});
-
-  afterEach(() => {
-    core.settings.canvasbackgroundcolour = originalBackground;
-  });
-
-  test('ACI 7 is white on dark background', () => {
-    const context = createMockContext();
-    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-    canvas.setContext(aci7MockEntity, context);
-    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
-  });
-
-  test('ACI 7 is black on light background', () => {
-    const context = createMockContext();
-    core.settings.canvasbackgroundcolour = { r: 246, g: 245, b: 244 };
-    canvas.setContext(aci7MockEntity, context);
-    expect(context.strokeStyle).toBe('rgb(0, 0, 0)');
-  });
-
-  test('non-ACI-7 near-white colour is not recoloured', () => {
-    const context = createMockContext();
-    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-    canvas.setContext(nearWhiteMockEntity, context);
-    expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
-  });
-=======
->>>>>>> dff207c (Update canvas.test.js)
 });
