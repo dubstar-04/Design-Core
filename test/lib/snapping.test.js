@@ -10,6 +10,14 @@ const snapping = new Snapping();
 // Add a valid item to scene
 core.scene.addItem('Line', { points: [new Point(10, 10), new Point(100, 10)] });
 
+afterEach(() => {
+  // Reset all mouse button states so tests don't affect each other via
+  // Canvas.mouseMoved() / InputManager.mouseMoved() behaviour
+  core.mouse.buttonOneDown = false;
+  core.mouse.buttonTwoDown = false;
+  core.mouse.buttonThreeDown = false;
+});
+
 
 test('Test Snapping.getSnapPoint', () => {
   // set the mouse position
