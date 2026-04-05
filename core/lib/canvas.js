@@ -183,6 +183,7 @@ export class Canvas {
    * @param {number} delta
    */
   wheel(delta) {
+    if (DesignCore.Mouse.buttonTwoDown) return;
     const scale = Math.pow(1 + Math.abs(delta), delta > 0 ? 1 : -1);
     if (scale < 1 && this.getScale() > this.minScaleFactor || scale > 1 && this.getScale() < this.maxScaleFactor) {
       this.#setCursor(delta > 0 ? this.cursorStates.ZOOM_IN : this.cursorStates.ZOOM_OUT);

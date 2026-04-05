@@ -241,6 +241,15 @@ describe('Test Canvas cursor states', () => {
     expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM_OUT);
   });
 
+  test('wheel is ignored while panning (middle button down)', () => {
+    const scaleBefore = canvas.getScale();
+    core.mouse.mouseDown(1); // start pan — sets buttonTwoDown
+    canvas.wheel(1);         // should be blocked
+    expect(canvas.getScale()).toBe(scaleBefore);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.PAN);
+    core.mouse.mouseUp(1);
+  });
+
   test('left and right mouseDown do not change cursor', () => {
     canvas.mouseDown(0);
     expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
