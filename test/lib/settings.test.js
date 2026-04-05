@@ -17,3 +17,20 @@ test('Test Settings.getSetting', () => {
   expect(settings.getSetting('endsnap')).toBe(false);
   expect(settings.getSetting('canvasbackgroundcolour')).toEqual({ 'r': 130, 'g': 130, 'b': 130 });
 });
+
+test('polar and ortho are mutually exclusive', () => {
+  settings.setSetting('polar', false);
+  settings.setSetting('ortho', false);
+
+  settings.setSetting('polar', true);
+  expect(settings.polar).toBe(true);
+  expect(settings.ortho).toBe(false);
+
+  settings.setSetting('ortho', true);
+  expect(settings.ortho).toBe(true);
+  expect(settings.polar).toBe(false);
+
+  settings.setSetting('ortho', false);
+  expect(settings.ortho).toBe(false);
+  expect(settings.polar).toBe(false);
+});
