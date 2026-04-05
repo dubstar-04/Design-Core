@@ -1,11 +1,15 @@
 import { Matrix } from './matrix.js';
 import { Colours } from './colours.js';
 import { Point } from '../entities/point.js';
+import { Input } from './input.js';
 
 import { DesignCore } from '../designCore.js';
 
 /** Canvas Class */
 export class Canvas {
+  #panCursorTimeout;
+  #baseCursorState = 'DEFAULT';
+
   /** Create Canvas */
   constructor() {
     this.cvs = null;
@@ -30,8 +34,14 @@ export class Canvas {
       AUXILLARY: 'AUXILLARY',
     };
 
+    this.cursorStates = Input.Cursor;
+
+    this.cursorState = Input.Cursor.DEFAULT;
+    this.#baseCursorState = Input.Cursor.DEFAULT;
+
     // function to call external pain command for the ui
     this.externalPaintCallbackFunction;
+    this.externalCursorCallbackFunction;
   }
 
   /**
@@ -50,6 +60,41 @@ export class Canvas {
   setExternalPaintCallbackFunction(callback) {
     // set the callback
     this.externalPaintCallbackFunction = callback;
+  }
+
+  /**
+   * Set external cursor callback
+   * Called when the cursor state changes.
+   * Pass undefined or null to unregister the callback.
+   * @param {Function|undefined|null} callback
+   */
+  setCursorCallbackFunction(callback) {
+    this.externalCursorCallbackFunction = callback;
+  }
+
+  /**
+   * Update the cursor state and notify the UI
+   * @param {string} state - one of this.cursorStates
+   */
+  #setCursor(state) {
+    if (this.cursorState === state) return;
+    this.cursorState = state;
+    this.externalCursorCallbackFunction?.(state);
+  }
+
+  /**
+   * Set the cursor based on the input types requested by a command prompt.
+   * If a cursorHint is provided it is used directly; otherwise the cursor is
+   * derived from the cursor property of each type (first non-null wins),
+   * falling back to DEFAULT.
+   * @param {Array} types - array of Input.Type values
+   * @param {string|null} cursorHint - optional override from PromptOptions.cursor
+   */
+  setCursorForInputTypes(types, cursorHint = null) {
+    this.#baseCursorState = cursorHint ??
+      types.map((t) => t.cursor).find(Boolean) ??
+      Input.Cursor.DEFAULT;
+    this.#setCursor(this.#baseCursorState);
   }
 
   /**
@@ -73,8 +118,8 @@ export class Canvas {
       case 0: // left button
         break;
       case 1: // middle button
-        // TODO: Re-enable cursor styles
-        // ev.target.style.cursor = "move";
+        clearTimeout(this.#panCursorTimeout);
+        this.#panCursorTimeout = setTimeout(() => this.#setCursor(Input.Cursor.GRABBING), 250);
         break;
       case 2: // right button
         break;
@@ -89,12 +134,13 @@ export class Canvas {
    */
   mouseUp(button) {
     switch (button) {
-      case 0: // left buttonbreak;
+      case 0: // left button
+        break;
       case 1: // middle button
+        clearTimeout(this.#panCursorTimeout);
         this.lastDelta = new Point();
         this.requestPaint();
-        // TODO: Re-enable cursor styles
-        // ev.target.style.cursor = "crosshair";
+        this.#setCursor(this.#baseCursorState);
         break;
       case 2: // right button
         break;
@@ -139,6 +185,7 @@ export class Canvas {
    * @param {number} delta
    */
   wheel(delta) {
+    if (DesignCore.Mouse.buttonTwoDown) return;
     const scale = Math.pow(1 + Math.abs(delta), delta > 0 ? 1 : -1);
     if (scale < 1 && this.getScale() > this.minScaleFactor || scale > 1 && this.getScale() < this.maxScaleFactor) {
       this.zoom(scale);
