@@ -13,27 +13,34 @@ export class Input {
     SELECTION: 'SELECTION',
   };
 
+  /**
+   * Input type definitions.
+   * Each entry describes an accepted input type:
+   *   value  — matches value.constructor.name for runtime type detection via getType()
+   *   cursor — the cursor state to apply when this type is requested (null = DEFAULT)
+   */
   static Type = {
-    POINT: 'Point',
-    SELECTIONSET: 'SelectionSet',
-    SINGLESELECTION: 'SingleSelection',
-    NUMBER: 'Number',
-    STRING: 'String',
-    DYNAMIC: 'Dynamic',
-    MOUSEDOWN: 'MouseDown',
-    MOUSEUP: 'MouseUp',
+    POINT: { value: 'Point', cursor: null },
+    SELECTIONSET: { value: 'SelectionSet', cursor: Input.CursorState.SELECTION },
+    SINGLESELECTION: { value: 'SingleSelection', cursor: Input.CursorState.SELECTION },
+    NUMBER: { value: 'Number', cursor: null },
+    STRING: { value: 'String', cursor: null },
+    DYNAMIC: { value: 'Dynamic', cursor: null },
+    MOUSEDOWN: { value: 'MouseDown', cursor: null },
+    MOUSEUP: { value: 'MouseUp', cursor: null },
   };
 
   /**
    * Return the Input.Type for value
    * @param {any} value
-   * @return {string|undefined}
+   * @return {Object|undefined}
    */
   static getType(value) {
     if (value === undefined) {
       return undefined;
     }
 
-    return value.constructor.name;
+    const name = value.constructor.name;
+    return Object.values(Input.Type).find((t) => t.value === name);
   }
 }
