@@ -99,7 +99,7 @@ class TrackingLine {
     const start = from.add(dir.scale(tMin));
     const end = from.add(dir.scale(tMax));
 
-    const lineColour = DesignCore.Settings.snapcolour;
+    const lineColour = DesignCore.Settings.polarsnapcolour;
     const dashSize = 4 / scale;
 
     ctx.save();
