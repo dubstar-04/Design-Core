@@ -87,6 +87,16 @@ export class Canvas {
   }
 
   /**
+   * Set the cursor state directly.
+   * Also updates the base state so middle-button pan restores to this state.
+   * @param {string} state - one of this.cursorStates
+   */
+  setCursor(state) {
+    this.#baseCursorState = state;
+    this.#setCursor(state);
+  }
+
+  /**
    * Set the cursor based on the input types requested by a command prompt.
    * SELECTIONSET or SINGLESELECTION → SELECTION cursor; everything else → DEFAULT.
    * @param {Array} types - array of Input.Type values
