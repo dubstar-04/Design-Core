@@ -6,7 +6,7 @@ export class MouseUp {}
 
 /** Input Class */
 export class Input {
-  static CursorState = {
+  static Cursor = {
     DEFAULT: 'DEFAULT',
     GRAB: 'GRAB',
     GRABBING: 'GRABBING',
@@ -21,8 +21,8 @@ export class Input {
    */
   static Type = {
     POINT: { value: 'Point', cursor: null },
-    SELECTIONSET: { value: 'SelectionSet', cursor: Input.CursorState.SELECTION },
-    SINGLESELECTION: { value: 'SingleSelection', cursor: Input.CursorState.SELECTION },
+    SELECTIONSET: { value: 'SelectionSet', cursor: Input.Cursor.SELECTION },
+    SINGLESELECTION: { value: 'SingleSelection', cursor: Input.Cursor.SELECTION },
     NUMBER: { value: 'Number', cursor: null },
     STRING: { value: 'String', cursor: null },
     DYNAMIC: { value: 'Dynamic', cursor: null },

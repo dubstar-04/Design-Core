@@ -34,10 +34,10 @@ export class Canvas {
       AUXILLARY: 'AUXILLARY',
     };
 
-    this.cursorStates = Input.CursorState;
+    this.cursorStates = Input.Cursor;
 
-    this.cursorState = Input.CursorState.DEFAULT;
-    this.#baseCursorState = Input.CursorState.DEFAULT;
+    this.cursorState = Input.Cursor.DEFAULT;
+    this.#baseCursorState = Input.Cursor.DEFAULT;
 
     // function to call external pain command for the ui
     this.externalPaintCallbackFunction;
@@ -91,7 +91,7 @@ export class Canvas {
   setCursorForInputTypes(types, cursorHint = null) {
     this.#baseCursorState = cursorHint ??
       types.map((t) => t.cursor).find(Boolean) ??
-      Input.CursorState.DEFAULT;
+      Input.Cursor.DEFAULT;
     this.#setCursor(this.#baseCursorState);
   }
 
@@ -117,7 +117,7 @@ export class Canvas {
         break;
       case 1: // middle button
         clearTimeout(this.#panCursorTimeout);
-        this.#panCursorTimeout = setTimeout(() => this.#setCursor(Input.CursorState.GRABBING), 250);
+        this.#panCursorTimeout = setTimeout(() => this.#setCursor(Input.Cursor.GRABBING), 250);
         break;
       case 2: // right button
         break;
