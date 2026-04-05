@@ -11,11 +11,12 @@ export class PromptOptions {
    * @param {Array} options
    * @param {any} defaultValue
    */
-  constructor(promptMessage = 'error', types = [], options = [], defaultValue = undefined) {
+  constructor(promptMessage = 'error', types = [], options = [], defaultValue = undefined, cursor = null) {
     this.promptMessage = promptMessage;
     this.types = types;
     this.options = options;
     this.defaultValue = defaultValue;
+    this.cursor = cursor;
     this.resolve = undefined;
     this.reject = undefined;
   }
