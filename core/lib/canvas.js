@@ -84,8 +84,9 @@ export class Canvas {
 
   /**
    * Set the cursor based on the input types requested by a command prompt.
-   * If a cursorHint is provided it is used directly; otherwise SELECTIONSET or
-   * SINGLESELECTION types infer the SELECTION cursor, everything else → DEFAULT.
+   * If a cursorHint is provided it is used directly; otherwise the cursor is
+   * derived from the cursor property of each type (first non-null wins),
+   * falling back to DEFAULT.
    * @param {Array} types - array of Input.Type values
    * @param {string|null} cursorHint - optional override from PromptOptions.cursor
    */
