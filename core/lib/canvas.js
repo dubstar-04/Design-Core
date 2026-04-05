@@ -132,7 +132,8 @@ export class Canvas {
    */
   mouseUp(button) {
     switch (button) {
-      case 0: // left buttonbreak;
+      case 0: // left button
+        break;
       case 1: // middle button
         clearTimeout(this.#panCursorTimeout);
         this.lastDelta = new Point();
