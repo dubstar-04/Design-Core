@@ -37,6 +37,93 @@ class SnapPoint {
   }
 }
 
+/** TrackingLine Class - dotted tracking line for polar/ortho snap */
+class TrackingLine {
+  /**
+   * Create TrackingLine
+   * @param {Point} inputPoint - the previous input point (line passes through this)
+   * @param {Point} snapPoint - the current snapped mouse point (direction reference)
+   */
+  constructor(inputPoint, snapPoint) {
+    this.inputPoint = inputPoint;
+    this.snapPoint = snapPoint;
+  }
+
+  /**
+   * Draw the tracking line, extended to the visible canvas edges
+   * @param {Object} ctx - context
+   * @param {number} scale
+   */
+  draw(ctx, scale) {
+    const from = this.inputPoint;
+    const dir = this.snapPoint.subtract(from);
+
+    if (dir.x === 0 && dir.y === 0) {
+      return;
+    }
+
+    // Compute visible canvas bounds in scene space
+    const w = DesignCore.Canvas.width;
+    const h = DesignCore.Canvas.height;
+    const corner0 = DesignCore.Mouse.transformToScene(new Point(0, 0));
+    const corner1 = DesignCore.Mouse.transformToScene(new Point(w, h));
+    const boundsMin = corner0.min(corner1);
+    const boundsMax = corner0.max(corner1);
+
+    // Clip the infinite line (through 'from' in direction dir) to canvas bounds
+    let tMin = -Infinity;
+    let tMax = Infinity;
+
+    if (dir.x !== 0) {
+      const tx1 = (boundsMin.x - from.x) / dir.x;
+      const tx2 = (boundsMax.x - from.x) / dir.x;
+      tMin = Math.max(tMin, Math.min(tx1, tx2));
+      tMax = Math.min(tMax, Math.max(tx1, tx2));
+    } else if (from.x < boundsMin.x || from.x > boundsMax.x) {
+      return;
+    }
+
+    if (dir.y !== 0) {
+      const ty1 = (boundsMin.y - from.y) / dir.y;
+      const ty2 = (boundsMax.y - from.y) / dir.y;
+      tMin = Math.max(tMin, Math.min(ty1, ty2));
+      tMax = Math.min(tMax, Math.max(ty1, ty2));
+    } else if (from.y < boundsMin.y || from.y > boundsMax.y) {
+      return;
+    }
+
+    if (tMax < tMin) {
+      return;
+    }
+
+    const start = from.add(dir.scale(tMin));
+    const end = from.add(dir.scale(tMax));
+
+    const lineColour = DesignCore.Settings.snapcolour;
+    const dashSize = 4 / scale;
+
+    ctx.save();
+
+    try { // HTML Canvas
+      ctx.beginPath();
+      ctx.strokeStyle = Colours.rgbToString(lineColour);
+      ctx.lineWidth = 1 / scale;
+      ctx.setLineDash([dashSize, dashSize]);
+    } catch { // Cairo
+      const rgbColour = Colours.rgbToScaledRGB(lineColour);
+      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+      ctx.setLineWidth(1 / scale);
+      ctx.setDash([dashSize, dashSize], 0);
+    }
+
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+}
+
 /** Snapping Class */
 export class Snapping {
   /** Create snapping */
@@ -70,6 +157,15 @@ export class Snapping {
 
     // Move the mouse to the closest snap point so if the mouse if clicked the snap point is used.
     DesignCore.Mouse.setPosFromScenePoint(snapPoint);
+  }
+
+  /**
+   * Add a tracking line for polar/ortho snap to the scene
+   * @param {Point} inputPoint - previous input point the line passes through
+   * @param {Point} snapPoint - current snapped mouse position (defines direction)
+   */
+  addTrackingLine(inputPoint, snapPoint) {
+    DesignCore.Scene.auxiliaryEntities.add(new TrackingLine(inputPoint, snapPoint));
   }
 
   /**
@@ -140,13 +236,13 @@ export class Snapping {
     }
 
     let snapPoint;
-    const x = DesignCore.Mouse.pointOnScene().x - previousPoint.x;
-    const y = DesignCore.Mouse.pointOnScene().y - previousPoint.y;
+    const mousePoint = DesignCore.Mouse.pointOnScene();
+    const delta = mousePoint.subtract(previousPoint);
 
-    if (Math.abs(x) > Math.abs(y)) {
-      snapPoint = new Point(DesignCore.Mouse.pointOnScene().x, previousPoint.y);
+    if (Math.abs(delta.x) > Math.abs(delta.y)) {
+      snapPoint = new Point(mousePoint.x, previousPoint.y);
     } else {
-      snapPoint = new Point(previousPoint.x, DesignCore.Mouse.pointOnScene().y);
+      snapPoint = new Point(previousPoint.x, mousePoint.y);
     }
     return snapPoint;
   }
