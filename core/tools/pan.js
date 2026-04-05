@@ -29,10 +29,14 @@ export class Pan extends Tool {
   async execute() {
     try {
       while (DesignCore.Scene.inputManager.activeCommand) {
-        const down = await DesignCore.Scene.inputManager.requestInput(new PromptOptions('', [Input.Type.MOUSEDOWN]));
+        const down = await DesignCore.Scene.inputManager.requestInput(
+          new PromptOptions('', [Input.Type.MOUSEDOWN], [], undefined, DesignCore.Canvas.cursorStates.GRAB),
+        );
         if (down === undefined) return;
         this.panning = true;
-        const up = await DesignCore.Scene.inputManager.requestInput(new PromptOptions('', [Input.Type.MOUSEUP]));
+        const up = await DesignCore.Scene.inputManager.requestInput(
+          new PromptOptions('', [Input.Type.MOUSEUP], [], undefined, DesignCore.Canvas.cursorStates.GRABBING),
+        );
         this.panning = false;
         if (up === undefined) return;
       }
