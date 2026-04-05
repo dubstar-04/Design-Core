@@ -8,6 +8,7 @@ import { DesignCore } from '../designCore.js';
 /** Canvas Class */
 export class Canvas {
   #zoomCursorTimeout;
+  #panCursorTimeout;
   #baseCursorState = 'DEFAULT';
 
   /** Create Canvas */
@@ -119,7 +120,8 @@ export class Canvas {
       case 0: // left button
         break;
       case 1: // middle button
-        this.#setCursor(this.cursorStates.PAN);
+        clearTimeout(this.#panCursorTimeout);
+        this.#panCursorTimeout = setTimeout(() => this.#setCursor(this.cursorStates.PAN), 250);
         break;
       case 2: // right button
         break;
@@ -136,6 +138,7 @@ export class Canvas {
     switch (button) {
       case 0: // left buttonbreak;
       case 1: // middle button
+        clearTimeout(this.#panCursorTimeout);
         this.lastDelta = new Point();
         this.requestPaint();
         this.#setCursor(this.#baseCursorState);

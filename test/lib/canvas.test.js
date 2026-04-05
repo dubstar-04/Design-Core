@@ -197,25 +197,42 @@ describe('Test Canvas cursor states', () => {
     expect(canvas.cursorState).toBe(canvas.cursorStates.DEFAULT);
   });
 
-  test('middle mouseDown sets cursor to PAN', () => {
+  test('middle mouseDown sets cursor to PAN after delay', () => {
+    jest.useFakeTimers();
     canvas.mouseDown(1);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.DEFAULT); // not yet
+    jest.advanceTimersByTime(250);
     expect(cursorState).toBe(canvas.cursorStates.PAN);
     expect(canvas.cursorState).toBe(canvas.cursorStates.PAN);
+    jest.useRealTimers();
   });
 
-  test('middle mouseUp restores cursor to base state (DEFAULT when idle)', () => {
+  test('double-click on middle button does not flicker cursor to PAN', () => {
     canvas.mouseDown(1);
-    canvas.mouseUp(1);
-    expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
+    canvas.mouseUp(1); // cancel pending PAN timeout
+    // cursor should never have changed to PAN
     expect(canvas.cursorState).toBe(canvas.cursorStates.DEFAULT);
   });
 
+  test('middle mouseUp restores cursor to base state (DEFAULT when idle)', () => {
+    jest.useFakeTimers();
+    canvas.mouseDown(1);
+    jest.advanceTimersByTime(250); // let PAN cursor set
+    canvas.mouseUp(1);
+    expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.DEFAULT);
+    jest.useRealTimers();
+  });
+
   test('middle mouseUp restores cursor to SELECTION when selection was active', () => {
+    jest.useFakeTimers();
     canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]); // cursor = SELECTION
-    canvas.mouseDown(1); // PAN
+    canvas.mouseDown(1); // PAN (delayed)
+    jest.advanceTimersByTime(250);
     canvas.mouseUp(1); // should restore to SELECTION, not DEFAULT
     expect(cursorState).toBe(canvas.cursorStates.SELECTION);
     expect(canvas.cursorState).toBe(canvas.cursorStates.SELECTION);
+    jest.useRealTimers();
   });
 
   test('wheel restores cursor to SELECTION (not DEFAULT) when selection was active', () => {
@@ -242,12 +259,15 @@ describe('Test Canvas cursor states', () => {
   });
 
   test('wheel is ignored while panning (middle button down)', () => {
+    jest.useFakeTimers();
     const scaleBefore = canvas.getScale();
     core.mouse.mouseDown(1); // start pan — sets buttonTwoDown
+    jest.advanceTimersByTime(250); // let PAN cursor set
     canvas.wheel(1);         // should be blocked
     expect(canvas.getScale()).toBe(scaleBefore);
     expect(canvas.cursorState).toBe(canvas.cursorStates.PAN);
     core.mouse.mouseUp(1);
+    jest.useRealTimers();
   });
 
   test('left and right mouseDown do not change cursor', () => {
@@ -258,13 +278,17 @@ describe('Test Canvas cursor states', () => {
   });
 
   test('callback is not fired when cursor state does not change', () => {
+    jest.useFakeTimers();
     let callCount = 0;
     canvas.setCursorCallbackFunction(() => {
       callCount++;
     });
-    canvas.mouseDown(1); // PAN
-    canvas.mouseDown(1); // already PAN — no-op
+    canvas.mouseDown(1);
+    jest.advanceTimersByTime(250); // cursor becomes PAN — callCount = 1
+    canvas.mouseDown(1);
+    jest.advanceTimersByTime(250); // already PAN — no-op
     expect(callCount).toBe(1);
+    jest.useRealTimers();
   });
 
   test('setCursorForInputTypes sets SELECTION for SelectionSet', () => {
