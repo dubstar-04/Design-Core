@@ -183,7 +183,7 @@ const aci7MockEntity = {
   entityColour: { aci: 7, byLayer: false, byBlock: false },
 };
 
-// An entity with a user-set true colour that happens to be {254,254,254} but is NOT ACI 7
+// An entity with ACI 3 whose draw colour happens to be near-white — NOT ACI 7, should not be recoloured
 const nearWhiteMockEntity = {
   getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
   getLineType: () => ({ getPattern: () => [] }),
