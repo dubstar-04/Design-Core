@@ -36,7 +36,8 @@ export class Canvas {
 
     this.cursorStates = {
       DEFAULT: 'DEFAULT',
-      PAN: 'PAN',
+      GRAB: 'GRAB',
+      GRABBING: 'GRABBING',
       SELECTION: 'SELECTION',
     };
 
@@ -118,7 +119,7 @@ export class Canvas {
         break;
       case 1: // middle button
         clearTimeout(this.#panCursorTimeout);
-        this.#panCursorTimeout = setTimeout(() => this.#setCursor(this.cursorStates.PAN), 250);
+        this.#panCursorTimeout = setTimeout(() => this.#setCursor(this.cursorStates.GRABBING), 250);
         break;
       case 2: // right button
         break;
