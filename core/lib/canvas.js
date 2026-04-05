@@ -416,18 +416,17 @@ export class Canvas {
    * @return {boolean}
    */
   #isAci7(item, block) {
+    let colour;
     if (item.entityColour.byBlock && block) {
-      if (block.entityColour.byLayer) {
-        const layer = DesignCore.LayerManager.getItemByName(block.layer);
-        return layer?.layerColour?.aci === 7 && !layer?.layerColour?.isTrueColour;
-      }
-      return block.entityColour.aci === 7 && !block.entityColour.isTrueColour;
+      colour = block.entityColour.byLayer ?
+        DesignCore.LayerManager.getItemByName(block.layer)?.layerColour :
+        block.entityColour;
+    } else if (item.entityColour.byLayer) {
+      colour = DesignCore.LayerManager.getItemByName(item.layer)?.layerColour;
+    } else {
+      colour = item.entityColour;
     }
-    if (item.entityColour.byLayer) {
-      const layer = DesignCore.LayerManager.getItemByName(item.layer);
-      return layer?.layerColour?.aci === 7 && !layer?.layerColour?.isTrueColour;
-    }
-    return item.entityColour.aci === 7 && !item.entityColour.isTrueColour;
+    return colour?.aci === 7 && !colour?.isTrueColour;
   }
 
   /**
