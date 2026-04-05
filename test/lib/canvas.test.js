@@ -1,6 +1,7 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { Matrix } from '../../core/lib/matrix.js';
+import { jest } from '@jest/globals';
 
 const core = new Core();
 const canvas = core.canvas;
@@ -180,8 +181,11 @@ describe('Test Canvas cursor states', () => {
   beforeEach(() => {
     core.activate();
     canvas.matrix = new Matrix();
+    canvas.setCursorForInputTypes([]); // reset to DEFAULT
     cursorState = canvas.cursorStates.DEFAULT;
-    canvas.setCursorCallbackFunction((state) => { cursorState = state; });
+    canvas.setCursorCallbackFunction((state) => {
+      cursorState = state;
+    });
   });
 
   afterEach(() => {
@@ -198,17 +202,42 @@ describe('Test Canvas cursor states', () => {
     expect(canvas.cursorState).toBe(canvas.cursorStates.PAN);
   });
 
-  test('middle mouseUp resets cursor to DEFAULT', () => {
+  test('middle mouseUp restores cursor to base state (DEFAULT when idle)', () => {
     canvas.mouseDown(1);
     canvas.mouseUp(1);
     expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
     expect(canvas.cursorState).toBe(canvas.cursorStates.DEFAULT);
   });
 
-  test('wheel sets cursor to ZOOM', () => {
+  test('middle mouseUp restores cursor to SELECTION when selection was active', () => {
+    canvas.setCursorForInputTypes(['SelectionSet']); // cursor = SELECTION
+    canvas.mouseDown(1); // PAN
+    canvas.mouseUp(1); // should restore to SELECTION, not DEFAULT
+    expect(cursorState).toBe(canvas.cursorStates.SELECTION);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.SELECTION);
+  });
+
+  test('wheel restores cursor to SELECTION (not DEFAULT) when selection was active', () => {
+    jest.useFakeTimers();
+    canvas.setCursorForInputTypes(['SelectionSet']); // cursor = SELECTION
+    canvas.wheel(1); // cursor = ZOOM_IN
+    expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM_IN);
+    jest.advanceTimersByTime(300);
+    expect(cursorState).toBe(canvas.cursorStates.SELECTION);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.SELECTION);
+    jest.useRealTimers();
+  });
+
+  test('wheel in sets cursor to ZOOM_IN', () => {
     canvas.wheel(1);
-    expect(cursorState).toBe(canvas.cursorStates.ZOOM);
-    expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM);
+    expect(cursorState).toBe(canvas.cursorStates.ZOOM_IN);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM_IN);
+  });
+
+  test('wheel out sets cursor to ZOOM_OUT', () => {
+    canvas.wheel(-1);
+    expect(cursorState).toBe(canvas.cursorStates.ZOOM_OUT);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM_OUT);
   });
 
   test('left and right mouseDown do not change cursor', () => {
@@ -220,9 +249,34 @@ describe('Test Canvas cursor states', () => {
 
   test('callback is not fired when cursor state does not change', () => {
     let callCount = 0;
-    canvas.setCursorCallbackFunction(() => { callCount++; });
+    canvas.setCursorCallbackFunction(() => {
+      callCount++;
+    });
     canvas.mouseDown(1); // PAN
     canvas.mouseDown(1); // already PAN — no-op
     expect(callCount).toBe(1);
+  });
+
+  test('setCursorForInputTypes sets SELECTION for SelectionSet', () => {
+    canvas.setCursorForInputTypes(['SelectionSet']);
+    expect(cursorState).toBe(canvas.cursorStates.SELECTION);
+    expect(canvas.cursorState).toBe(canvas.cursorStates.SELECTION);
+  });
+
+  test('setCursorForInputTypes sets SELECTION for SingleSelection', () => {
+    canvas.setCursorForInputTypes(['SingleSelection']);
+    expect(cursorState).toBe(canvas.cursorStates.SELECTION);
+  });
+
+  test('setCursorForInputTypes sets DEFAULT for Point input', () => {
+    canvas.setCursorForInputTypes(['SelectionSet']); // set to SELECTION first
+    canvas.setCursorForInputTypes(['Point']);
+    expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
+  });
+
+  test('setCursorForInputTypes resets to DEFAULT for empty types', () => {
+    canvas.setCursorForInputTypes(['SelectionSet']);
+    canvas.setCursorForInputTypes([]);
+    expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
   });
 });
