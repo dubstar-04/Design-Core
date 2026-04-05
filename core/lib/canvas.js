@@ -7,7 +7,6 @@ import { DesignCore } from '../designCore.js';
 
 /** Canvas Class */
 export class Canvas {
-  #zoomCursorTimeout;
   #panCursorTimeout;
   #baseCursorState = 'DEFAULT';
 
@@ -38,8 +37,6 @@ export class Canvas {
     this.cursorStates = {
       DEFAULT: 'DEFAULT',
       PAN: 'PAN',
-      ZOOM_IN: 'ZOOM_IN',
-      ZOOM_OUT: 'ZOOM_OUT',
       SELECTION: 'SELECTION',
     };
 
@@ -189,10 +186,7 @@ export class Canvas {
     if (DesignCore.Mouse.buttonTwoDown) return;
     const scale = Math.pow(1 + Math.abs(delta), delta > 0 ? 1 : -1);
     if (scale < 1 && this.getScale() > this.minScaleFactor || scale > 1 && this.getScale() < this.maxScaleFactor) {
-      this.#setCursor(delta > 0 ? this.cursorStates.ZOOM_IN : this.cursorStates.ZOOM_OUT);
       this.zoom(scale);
-      clearTimeout(this.#zoomCursorTimeout);
-      this.#zoomCursorTimeout = setTimeout(() => this.#setCursor(this.#baseCursorState), 300);
     }
   };
 

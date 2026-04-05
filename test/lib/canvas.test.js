@@ -235,35 +235,12 @@ describe('Test Canvas cursor states', () => {
     jest.useRealTimers();
   });
 
-  test('wheel restores cursor to SELECTION (not DEFAULT) when selection was active', () => {
-    jest.useFakeTimers();
-    canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]); // cursor = SELECTION
-    canvas.wheel(1); // cursor = ZOOM_IN
-    expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM_IN);
-    jest.advanceTimersByTime(300);
-    expect(cursorState).toBe(canvas.cursorStates.SELECTION);
-    expect(canvas.cursorState).toBe(canvas.cursorStates.SELECTION);
-    jest.useRealTimers();
-  });
-
-  test('wheel in sets cursor to ZOOM_IN', () => {
-    canvas.wheel(1);
-    expect(cursorState).toBe(canvas.cursorStates.ZOOM_IN);
-    expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM_IN);
-  });
-
-  test('wheel out sets cursor to ZOOM_OUT', () => {
-    canvas.wheel(-1);
-    expect(cursorState).toBe(canvas.cursorStates.ZOOM_OUT);
-    expect(canvas.cursorState).toBe(canvas.cursorStates.ZOOM_OUT);
-  });
-
   test('wheel is ignored while panning (middle button down)', () => {
     jest.useFakeTimers();
     const scaleBefore = canvas.getScale();
     core.mouse.mouseDown(1); // start pan — sets buttonTwoDown
     jest.advanceTimersByTime(250); // let PAN cursor set
-    canvas.wheel(1);         // should be blocked
+    canvas.wheel(1); // should be blocked
     expect(canvas.getScale()).toBe(scaleBefore);
     expect(canvas.cursorState).toBe(canvas.cursorStates.PAN);
     core.mouse.mouseUp(1);
