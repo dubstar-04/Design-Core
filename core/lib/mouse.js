@@ -81,27 +81,6 @@ export class Mouse {
     // move the origin down to the bottom and invert the y position
     this.y = -y + DesignCore.Canvas.height;
 
-    // only snap to points if no mouse buttons are down
-    // this allows the user to move the mouse without snapping while panning or window selecting.
-    if (!this.buttonOneDown && !this.buttonTwoDown && !this.buttonThreeDown) {
-      const inputPoint = DesignCore.Scene.inputManager.inputPoint;
-      if (inputPoint !== null) {
-        if (DesignCore.Settings.polar) {
-        // if polar is enabled - get the closest points
-          const polarSnap = DesignCore.Scene.inputManager.snapping.polarSnap(inputPoint);
-          if (polarSnap) {
-            this.setPosFromScenePoint(polarSnap);
-          }
-        } else if (DesignCore.Settings.ortho) {
-        // if ortho is enabled - get the nearest ortho point
-          const orthoSnap = DesignCore.Scene.inputManager.snapping.orthoSnap(inputPoint);
-          if (orthoSnap) {
-            this.setPosFromScenePoint(orthoSnap);
-          }
-        }
-      }
-    }
-
     DesignCore.Canvas.mouseMoved();
   }
 

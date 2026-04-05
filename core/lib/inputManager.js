@@ -234,22 +234,21 @@ export class InputManager {
       }
     }
 
-    // Draw polar/ortho tracking line when snap is active, a previous point exists, and no mouse buttons are down
+    // Apply polar/ortho snap and draw the tracking line when snap is active, a previous point exists, and no mouse buttons are down
     if (this.snapping.active &&
       this.inputPoint !== null &&
       !DesignCore.Mouse.buttonOneDown &&
       !DesignCore.Mouse.buttonTwoDown &&
       !DesignCore.Mouse.buttonThreeDown) {
+      let trackPoint;
       if (DesignCore.Settings.polar) {
-        const trackPoint = this.snapping.polarSnap(this.inputPoint);
-        if (trackPoint) {
-          this.snapping.addTrackingLine(this.inputPoint, trackPoint);
-        }
+        trackPoint = this.snapping.polarSnap(this.inputPoint);
       } else if (DesignCore.Settings.ortho) {
-        const trackPoint = this.snapping.orthoSnap(this.inputPoint);
-        if (trackPoint) {
-          this.snapping.addTrackingLine(this.inputPoint, trackPoint);
-        }
+        trackPoint = this.snapping.orthoSnap(this.inputPoint);
+      }
+      if (trackPoint) {
+        DesignCore.Mouse.setPosFromScenePoint(trackPoint);
+        this.snapping.addTrackingLine(this.inputPoint, trackPoint);
       }
     }
 
