@@ -176,6 +176,294 @@ test('Test Canvas.zoomExtents with no entities', () => {
   expect(emptyCanvas.getScale()).toBe(scaleBefore);
 });
 
+const aci7MockEntity = {
+  getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+  getLineType: () => ({ getPattern: () => [] }),
+  lineWidth: 1,
+  entityColour: { aci: 7, byLayer: false, byBlock: false },
+};
+
+// An entity with ACI 3 whose draw colour happens to be near-white — NOT ACI 7, should not be recoloured
+const nearWhiteMockEntity = {
+  getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+  getLineType: () => ({ getPattern: () => [] }),
+  lineWidth: 1,
+  entityColour: { aci: 3, byLayer: false, byBlock: false },
+};
+
+// An entity with a true colour whose aci fell back to 7 (non-ACI-table colour)
+const trueColourFallbackAci7MockEntity = {
+  getDrawColour: () => ({ r: 200, g: 100, b: 50 }),
+  getLineType: () => ({ getPattern: () => [] }),
+  lineWidth: 1,
+  entityColour: { aci: 7, isTrueColour: true, byLayer: false, byBlock: false },
+};
+
+describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
+  let originalBackground;
+
+  beforeEach(() => {
+    core.activate();
+    originalBackground = core.settings.canvasbackgroundcolour;
+    canvas.paintState = canvas.paintStates.ENTITIES;
+  });
+
+  afterEach(() => {
+    core.settings.canvasbackgroundcolour = originalBackground;
+  });
+
+  test('ACI 7 is white on dark background', () => {
+    const context = createMockContext();
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    canvas.setContext(aci7MockEntity, context);
+    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+  });
+
+  test('ACI 7 is black on light background', () => {
+    const context = createMockContext();
+    core.settings.canvasbackgroundcolour = { r: 246, g: 245, b: 244 };
+    canvas.setContext(aci7MockEntity, context);
+    expect(context.strokeStyle).toBe('rgb(0, 0, 0)');
+  });
+
+  test('non-ACI-7 near-white colour is not recoloured', () => {
+    const context = createMockContext();
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    canvas.setContext(nearWhiteMockEntity, context);
+    expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
+  });
+
+  test('true colour with fallback aci=7 is not recoloured', () => {
+    const context = createMockContext();
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    canvas.setContext(trueColourFallbackAci7MockEntity, context);
+    expect(context.strokeStyle).toBe('rgb(200, 100, 50)');
+  });
+
+  test('ACI 7 via ByLayer resolves white on dark background', () => {
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    const context = createMockContext();
+    const byLayerEntity = {
+      getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+      getLineType: () => ({ getPattern: () => [] }),
+      lineWidth: 1,
+      entityColour: { aci: 256, byLayer: true, byBlock: false },
+      layer: '0',
+    };
+    canvas.setContext(byLayerEntity, context);
+    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+  });
+
+  test('ACI 7 via ByBlock (direct) resolves white on dark background', () => {
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    const context = createMockContext();
+    const byBlockItem = {
+      getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+      getLineType: () => ({ getPattern: () => [] }),
+      lineWidth: 1,
+      entityColour: { aci: 0, byLayer: false, byBlock: true },
+    };
+    const block = {
+      getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+      entityColour: { aci: 7, byLayer: false, byBlock: false },
+    };
+    canvas.setContext(byBlockItem, context, block);
+    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+  });
+
+  test('ACI 7 via ByBlock → ByLayer resolves white on dark background', () => {
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    const context = createMockContext();
+    const byBlockItem = {
+      getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+      getLineType: () => ({ getPattern: () => [] }),
+      lineWidth: 1,
+      entityColour: { aci: 0, byLayer: false, byBlock: true },
+    };
+    const block = {
+      getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
+      entityColour: { aci: 256, byLayer: true, byBlock: false },
+      layer: '0',
+    };
+    canvas.setContext(byBlockItem, context, block);
+    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+  });
+
+  test('ACI 7 is not recoloured in SELECTED state', () => {
+    core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    const context = createMockContext();
+    canvas.paintState = canvas.paintStates.SELECTED;
+    canvas.setContext(aci7MockEntity, context);
+    const sel = core.settings.selecteditemscolour;
+    expect(context.strokeStyle).toBe(`rgb(${sel.r}, ${sel.g}, ${sel.b})`);
+  });
+});
+
+describe('Test Canvas.setContext ByBlock colour', () => {
+  beforeEach(() => {
+    core.activate();
+    canvas.paintState = canvas.paintStates.ENTITIES;
+  });
+
+  const byBlockItem = {
+    getDrawColour: () => ({ r: 0, g: 0, b: 0 }),
+    getLineType: () => ({ getPattern: () => [] }),
+    lineWidth: 1,
+    entityColour: { aci: 0, byLayer: false, byBlock: true },
+  };
+  const block = {
+    getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
+    entityColour: { aci: 1, byLayer: false, byBlock: false },
+  };
+
+  test('ByBlock item inherits draw colour from block', () => {
+    const context = createMockContext();
+    canvas.setContext(byBlockItem, context, block);
+    expect(context.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(context.fillStyle).toBe('rgb(255, 0, 0)');
+  });
+
+  test('ByBlock colour is not applied in SELECTED state', () => {
+    const context = createMockContext();
+    canvas.paintState = canvas.paintStates.SELECTED;
+    canvas.setContext(byBlockItem, context, block);
+    const sel = core.settings.selecteditemscolour;
+    expect(context.strokeStyle).toBe(`rgb(${sel.r}, ${sel.g}, ${sel.b})`);
+  });
+
+  test('non-ByBlock item with block keeps its own colour', () => {
+    const context = createMockContext();
+    const directItem = {
+      getDrawColour: () => ({ r: 0, g: 255, b: 0 }),
+      getLineType: () => ({ getPattern: () => [] }),
+      lineWidth: 1,
+      entityColour: { aci: 2, byLayer: false, byBlock: false },
+    };
+    canvas.setContext(directItem, context, block);
+    expect(context.strokeStyle).toBe('rgb(0, 255, 0)');
+  });
+});
+
+describe('Test Canvas.setContext paint states', () => {
+  const redEntity = {
+    getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
+    getLineType: () => ({ getPattern: () => [] }),
+    lineWidth: 10,
+    entityColour: { aci: 1, byLayer: false, byBlock: false },
+  };
+
+  beforeEach(() => {
+    core.activate();
+    canvas.matrix = new Matrix();
+  });
+
+  test('ENTITIES state uses entity colour and normal lineWidth', () => {
+    const context = createMockContext();
+    canvas.paintState = canvas.paintStates.ENTITIES;
+    canvas.setContext(redEntity, context);
+    expect(context.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(context.fillStyle).toBe('rgb(255, 0, 0)');
+    expect(context.lineWidth).toBe(10 / canvas.getScale());
+  });
+
+  test('SELECTED state overrides colour with selecteditemscolour and doubles lineWidth', () => {
+    const context = createMockContext();
+    canvas.paintState = canvas.paintStates.SELECTED;
+    canvas.setContext(redEntity, context);
+    const sel = core.settings.selecteditemscolour;
+    expect(context.strokeStyle).toBe(`rgb(${sel.r}, ${sel.g}, ${sel.b})`);
+    expect(context.lineWidth).toBe(10 * 2 / canvas.getScale());
+  });
+
+  test('TEMPORARY state keeps entity colour and doubles lineWidth', () => {
+    const context = createMockContext();
+    canvas.paintState = canvas.paintStates.TEMPORARY;
+    canvas.setContext(redEntity, context);
+    expect(context.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(context.lineWidth).toBe(10 * 2 / canvas.getScale());
+  });
+
+  test('setContext applies line type dash pattern to context', () => {
+    const context = createMockContext();
+    let appliedPattern = null;
+    context.setLineDash = (pattern) => {
+      appliedPattern = pattern;
+    };
+    const dashedEntity = {
+      getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
+      getLineType: () => ({ getPattern: () => [5, 5] }),
+      lineWidth: 1,
+      entityColour: { aci: 1, byLayer: false, byBlock: false },
+    };
+    canvas.paintState = canvas.paintStates.ENTITIES;
+    canvas.setContext(dashedEntity, context);
+    expect(appliedPattern).toEqual([5, 5]);
+  });
+});
+
+describe('Test Canvas.zoom', () => {
+  beforeEach(() => {
+    canvas.matrix = new Matrix();
+  });
+
+  test('zoom increases scale', () => {
+    canvas.zoom(2);
+    expect(canvas.getScale()).toBeGreaterThan(1);
+  });
+
+  test('zoom decreases scale', () => {
+    canvas.zoom(0.5);
+    expect(canvas.getScale()).toBeLessThan(1);
+  });
+});
+
+test('Test Canvas.doubleClick left and right buttons do not throw', () => {
+  expect(() => canvas.doubleClick(0)).not.toThrow();
+  expect(() => canvas.doubleClick(2)).not.toThrow();
+});
+
+test('Test Canvas.doubleClick middle button triggers zoomExtents', () => {
+  const testCore = new Core();
+  testCore.activate();
+  testCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(500, 500)] });
+  testCore.canvas.width = 800;
+  testCore.canvas.height = 600;
+  testCore.canvas.matrix = new Matrix();
+  testCore.canvas.doubleClick(1);
+  expect(testCore.canvas.getScale()).not.toBe(1);
+});
+
+test('Test Canvas.zoomToWindow with inverted coordinate order', () => {
+  core.activate();
+  canvas.matrix = new Matrix();
+  canvas.width = 800;
+  canvas.height = 600;
+  // pt1 > pt2 — Math.min/max should handle this the same as normal order
+  canvas.zoomToWindow(new Point(100, 100), new Point(0, 0));
+  expect(canvas.getScale()).toBeGreaterThan(1);
+});
+
+test('Test Canvas.paint resets paintState to undefined after painting', () => {
+  core.activate();
+  canvas.matrix = new Matrix();
+  canvas.flipped = true;
+  canvas.paint(createMockContext(), 800, 600);
+  expect(canvas.paintState).toBeUndefined();
+});
+
+test('Test Canvas.getSceneOffset visible area shrinks when zoomed in', () => {
+  core.activate();
+  canvas.matrix = new Matrix();
+  canvas.width = 800;
+  canvas.height = 600;
+  const before = canvas.getSceneOffset();
+  const widthBefore = before.xmax - before.xmin;
+  canvas.zoom(2);
+  const after = canvas.getSceneOffset();
+  const widthAfter = after.xmax - after.xmin;
+  expect(widthAfter).toBeLessThan(widthBefore);
+});
+
 describe('Test Canvas cursor states', () => {
   let cursorState;
 
@@ -306,5 +594,23 @@ describe('Test Canvas cursor states', () => {
     canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]);
     canvas.setCursorForInputTypes([]);
     expect(cursorState).toBe(canvas.cursorStates.DEFAULT);
+  });
+
+  test('setCursorCallbackFunction can be unregistered with undefined', () => {
+    canvas.setCursorForInputTypes([]); // ensure DEFAULT
+    let called = false;
+    canvas.setCursorCallbackFunction(() => {
+      called = true;
+    });
+    canvas.setCursorForInputTypes([Input.Type.SELECTIONSET]); // fires callback
+    expect(called).toBe(true);
+    called = false;
+    canvas.setCursorCallbackFunction(undefined);
+    canvas.setCursorForInputTypes([]); // state changes but callback cleared
+    expect(called).toBe(false);
+  });
+
+  test('mouseMoved does not throw when not panning', () => {
+    expect(() => canvas.mouseMoved()).not.toThrow();
   });
 });
