@@ -89,12 +89,9 @@ export class Canvas {
    * @param {string|null} cursorHint - optional override from PromptOptions.cursor
    */
   setCursorForInputTypes(types, cursorHint = null) {
-    if (cursorHint !== null) {
-      this.#baseCursorState = cursorHint;
-    } else {
-      const isSelection = types.some((t) => t === Input.Type.SELECTIONSET || t === Input.Type.SINGLESELECTION);
-      this.#baseCursorState = isSelection ? Input.CursorState.SELECTION : Input.CursorState.DEFAULT;
-    }
+    this.#baseCursorState = cursorHint ??
+      types.map((t) => t.cursor).find(Boolean) ??
+      Input.CursorState.DEFAULT;
     this.#setCursor(this.#baseCursorState);
   }
 
