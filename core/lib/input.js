@@ -6,6 +6,13 @@ export class MouseUp {}
 
 /** Input Class */
 export class Input {
+  static CursorState = {
+    DEFAULT: 'DEFAULT',
+    GRAB: 'GRAB',
+    GRABBING: 'GRABBING',
+    SELECTION: 'SELECTION',
+  };
+
   static Type = {
     POINT: 'Point',
     SELECTIONSET: 'SelectionSet',

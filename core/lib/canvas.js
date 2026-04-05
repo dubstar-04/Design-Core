@@ -34,15 +34,10 @@ export class Canvas {
       AUXILLARY: 'AUXILLARY',
     };
 
-    this.cursorStates = {
-      DEFAULT: 'DEFAULT',
-      GRAB: 'GRAB',
-      GRABBING: 'GRABBING',
-      SELECTION: 'SELECTION',
-    };
+    this.cursorStates = Input.CursorState;
 
-    this.cursorState = this.cursorStates.DEFAULT;
-    this.#baseCursorState = this.cursorStates.DEFAULT;
+    this.cursorState = Input.CursorState.DEFAULT;
+    this.#baseCursorState = Input.CursorState.DEFAULT;
 
     // function to call external pain command for the ui
     this.externalPaintCallbackFunction;
@@ -98,7 +93,7 @@ export class Canvas {
       this.#baseCursorState = cursorHint;
     } else {
       const isSelection = types.some((t) => t === Input.Type.SELECTIONSET || t === Input.Type.SINGLESELECTION);
-      this.#baseCursorState = isSelection ? this.cursorStates.SELECTION : this.cursorStates.DEFAULT;
+      this.#baseCursorState = isSelection ? Input.CursorState.SELECTION : Input.CursorState.DEFAULT;
     }
     this.#setCursor(this.#baseCursorState);
   }
@@ -125,7 +120,7 @@ export class Canvas {
         break;
       case 1: // middle button
         clearTimeout(this.#panCursorTimeout);
-        this.#panCursorTimeout = setTimeout(() => this.#setCursor(this.cursorStates.GRABBING), 250);
+        this.#panCursorTimeout = setTimeout(() => this.#setCursor(Input.CursorState.GRABBING), 250);
         break;
       case 2: // right button
         break;
