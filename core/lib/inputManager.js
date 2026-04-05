@@ -234,8 +234,12 @@ export class InputManager {
       }
     }
 
-    // Apply polar/ortho snap and draw the tracking line when snap is active, a previous point exists, and no mouse buttons are down
-    if (this.snapping.active &&
+    const snapped = this.snapping.snap();
+
+    // Apply polar/ortho snap and draw the tracking line only when no entity snap is active,
+    // a previous point exists, and no mouse buttons are down
+    if (!snapped &&
+      this.snapping.active &&
       this.inputPoint !== null &&
       !DesignCore.Mouse.buttonOneDown &&
       !DesignCore.Mouse.buttonTwoDown &&
@@ -252,7 +256,6 @@ export class InputManager {
       }
     }
 
-    const snapped = this.snapping.active && this.snapping.snap();
     const selecting = !snapped && this.highlightEntityUnderMouse();
 
     // preview active commands when items are not being selected
