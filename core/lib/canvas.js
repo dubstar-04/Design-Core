@@ -87,23 +87,19 @@ export class Canvas {
   }
 
   /**
-   * Set the cursor state directly.
-   * Also updates the base state so middle-button pan restores to this state.
-   * @param {string} state - one of this.cursorStates
-   */
-  setCursor(state) {
-    this.#baseCursorState = state;
-    this.#setCursor(state);
-  }
-
-  /**
    * Set the cursor based on the input types requested by a command prompt.
-   * SELECTIONSET or SINGLESELECTION → SELECTION cursor; everything else → DEFAULT.
+   * If a cursorHint is provided it is used directly; otherwise SELECTIONSET or
+   * SINGLESELECTION types infer the SELECTION cursor, everything else → DEFAULT.
    * @param {Array} types - array of Input.Type values
+   * @param {string|null} cursorHint - optional override from PromptOptions.cursor
    */
-  setCursorForInputTypes(types) {
-    const isSelection = types.some((t) => t === Input.Type.SELECTIONSET || t === Input.Type.SINGLESELECTION);
-    this.#baseCursorState = isSelection ? this.cursorStates.SELECTION : this.cursorStates.DEFAULT;
+  setCursorForInputTypes(types, cursorHint = null) {
+    if (cursorHint !== null) {
+      this.#baseCursorState = cursorHint;
+    } else {
+      const isSelection = types.some((t) => t === Input.Type.SELECTIONSET || t === Input.Type.SINGLESELECTION);
+      this.#baseCursorState = isSelection ? this.cursorStates.SELECTION : this.cursorStates.DEFAULT;
+    }
     this.#setCursor(this.#baseCursorState);
   }
 
