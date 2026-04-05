@@ -20,7 +20,7 @@ export class InputManager {
 
     // save the last point input
     // this is needed for snapping, polar, ortho etc.
-    this.inputPoint = new Point();
+    this.inputPoint = null;
 
     this.snapping = new Snapping();
   }
@@ -30,6 +30,7 @@ export class InputManager {
    */
   reset() {
     this.snapping.active = false;
+    this.inputPoint = null;
     DesignCore.CommandLine.resetPrompt();
     this.activeCommand = undefined;
 
@@ -233,7 +234,28 @@ export class InputManager {
       }
     }
 
-    const snapped = this.snapping.active && this.snapping.snap();
+    const snapped = this.snapping.snap();
+
+    // Apply polar/ortho snap and draw the tracking line only when no entity snap is active,
+    // a previous point exists, and no mouse buttons are down
+    if (!snapped &&
+      this.snapping.active &&
+      this.inputPoint !== null &&
+      !DesignCore.Mouse.buttonOneDown &&
+      !DesignCore.Mouse.buttonTwoDown &&
+      !DesignCore.Mouse.buttonThreeDown) {
+      let trackPoint;
+      if (DesignCore.Settings.polar) {
+        trackPoint = this.snapping.polarSnap(this.inputPoint);
+      } else if (DesignCore.Settings.ortho) {
+        trackPoint = this.snapping.orthoSnap(this.inputPoint);
+      }
+      if (trackPoint) {
+        DesignCore.Mouse.setPosFromScenePoint(trackPoint);
+        this.snapping.addTrackingLine(this.inputPoint, trackPoint);
+      }
+    }
+
     const selecting = !snapped && this.highlightEntityUnderMouse();
 
     // preview active commands when items are not being selected

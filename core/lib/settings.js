@@ -37,6 +37,12 @@ export class Settings {
     // TODO: Check setting is valid
     this[setting] = value;
 
+    // polar and ortho are mutually exclusive — enabling one disables the other
+    if (value === true) {
+      if (setting === 'polar') this.ortho = false;
+      else if (setting === 'ortho') this.polar = false;
+    }
+
     if (DesignCore.instance) {
       DesignCore.Canvas.requestPaint();
     }

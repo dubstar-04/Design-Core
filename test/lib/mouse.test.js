@@ -215,3 +215,114 @@ test('Test Mouse.wheel delegates to canvas', () => {
   mouse.wheel(1);
   expect(core.canvas.getScale()).not.toBe(scaleBefore);
 });
+
+// ─── isDoubleClick ────────────────────────────────────────────────────────────
+
+test('Test Mouse.isDoubleClick - slow second click is not a double click', () => {
+  const doubleClickThreshold = 250;
+  mouse.lastClick = 0;
+  mouse.isDoubleClick(0); // first click
+  // advance lastClick far enough back to exceed the threshold
+  mouse.lastClick = new Date().getTime() - doubleClickThreshold - 1;
+  expect(mouse.isDoubleClick(0)).toBe(false);
+});
+
+test('Test Mouse.isDoubleClick - updates lastButton', () => {
+  mouse.lastClick = 0;
+  mouse.lastButton = 0;
+  mouse.isDoubleClick(2);
+  expect(mouse.lastButton).toBe(2);
+});
+
+// ─── doubleClick ──────────────────────────────────────────────────────────────
+
+test('Test Mouse.doubleClick delegates to Canvas.doubleClick', () => {
+  const spy = jest.spyOn(core.canvas, 'doubleClick').mockImplementation(() => {});
+  mouse.doubleClick(0);
+  expect(spy).toHaveBeenCalledWith(0);
+  spy.mockRestore();
+});
+
+test('Test Mouse.mouseDown triggers doubleClick on rapid second click', () => {
+  const spy = jest.spyOn(mouse, 'doubleClick').mockImplementation(() => {});
+  mouse.lastClick = 0;
+  mouse.mouseDown(0); // first click
+  mouse.mouseUp(0);
+  mouse.mouseDown(0); // immediate second click — should be double click
+  expect(spy).toHaveBeenCalledWith(0);
+  spy.mockRestore();
+  mouse.mouseUp(0);
+});
+
+// ─── mouseDown / mouseUp – unhandled button ───────────────────────────────────
+
+test('Test Mouse.mouseDown with unhandled button does not change state', () => {
+  mouse.buttonOneDown = false;
+  mouse.buttonTwoDown = false;
+  mouse.buttonThreeDown = false;
+  mouse.lastClick = 0;
+  mouse.mouseDown(99);
+  expect(mouse.buttonOneDown).toBe(false);
+  expect(mouse.buttonTwoDown).toBe(false);
+  expect(mouse.buttonThreeDown).toBe(false);
+});
+
+test('Test Mouse.mouseUp with unhandled button does not change state', () => {
+  mouse.buttonOneDown = true;
+  mouse.buttonTwoDown = true;
+  mouse.buttonThreeDown = true;
+  mouse.mouseUp(99);
+  expect(mouse.buttonOneDown).toBe(true);
+  expect(mouse.buttonTwoDown).toBe(true);
+  expect(mouse.buttonThreeDown).toBe(true);
+  // restore
+  mouse.buttonOneDown = false;
+  mouse.buttonTwoDown = false;
+  mouse.buttonThreeDown = false;
+});
+
+// ─── mouseUp – delegates to Canvas ───────────────────────────────────────────
+
+test('Test Mouse.mouseUp delegates to Canvas.mouseUp', () => {
+  mouse.lastClick = 0;
+  mouse.mouseDown(0);
+  const spy = jest.spyOn(core.canvas, 'mouseUp').mockImplementation(() => {});
+  mouse.mouseUp(0);
+  expect(spy).toHaveBeenCalledWith(0);
+  spy.mockRestore();
+});
+
+// ─── mouseMoved – delegates to Canvas ────────────────────────────────────────
+
+test('Test Mouse.mouseMoved delegates to Canvas.mouseMoved', () => {
+  const spy = jest.spyOn(core.canvas, 'mouseMoved').mockImplementation(() => {});
+  mouse.mouseMoved(10, 20);
+  expect(spy).toHaveBeenCalled();
+  spy.mockRestore();
+});
+
+// ─── positionString – correct coordinate values ───────────────────────────────
+
+test('Test Mouse.positionString reports current scene coordinates', () => {
+  mouse.buttonOneDown = false;
+  mouse.buttonTwoDown = false;
+  mouse.buttonThreeDown = false;
+  const scenePoint = mouse.pointOnScene();
+  const str = mouse.positionString();
+  expect(str).toContain(`X: ${scenePoint.x.toFixed(1)}`);
+  expect(str).toContain(`Y: ${scenePoint.y.toFixed(1)}`);
+});
+
+// ─── setPosFromScenePoint – x/y updated directly ─────────────────────────────
+
+test('Test Mouse.setPosFromScenePoint sets x and y from scene coordinates', () => {
+  core.canvas.height = 600;
+
+  const scenePoint = new Point(123, 456);
+  mouse.setPosFromScenePoint(scenePoint);
+
+  // The canvas point is what transformToCanvas returns
+  const expected = mouse.transformToCanvas(scenePoint);
+  expect(mouse.x).toBeCloseTo(expected.x, 5);
+  expect(mouse.y).toBeCloseTo(expected.y, 5);
+});
