@@ -365,6 +365,8 @@ test('Test Canvas.getSceneOffset visible area shrinks when zoomed in', () => {
   const after = canvas.getSceneOffset();
   const widthAfter = after.xmax - after.xmin;
   expect(widthAfter).toBeLessThan(widthBefore);
+});
+
 describe('Test Canvas cursor states', () => {
   let cursorState;
 
