@@ -269,48 +269,38 @@ export class BasePolyline extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (DesignCore.Settings.endsnap) {
-      // End points for each segment
-      for (let i = 0; i < this.points.length; i++) {
-        snaps.push(new SnapPoint(this.points[i], SnapPoint.Type.END));
+    // End points for each segment
+    for (let i = 0; i < this.points.length; i++) {
+      snaps.push(new SnapPoint(this.points[i], SnapPoint.Type.END));
+    }
+
+    for (let i = 1; i < this.points.length; i++) {
+      if (this.points[i - 1].bulge === 0) {
+        snaps.push(new SnapPoint(this.points[i - 1].midPoint(this.points[i]), SnapPoint.Type.MID));
       }
     }
 
-    if (DesignCore.Settings.midsnap) {
-      for (let i = 1; i < this.points.length; i++) {
-        if (this.points[i - 1].bulge === 0) {
-          snaps.push(new SnapPoint(this.points[i - 1].midPoint(this.points[i]), SnapPoint.Type.MID));
-        }
+    for (let i = 1; i < this.points.length; i++) {
+      if (this.points[i - 1].bulge !== 0) {
+        snaps.push(new SnapPoint(this.points[i - 1].bulgeCentrePoint(this.points[i]), SnapPoint.Type.CENTRE));
       }
     }
 
-    if (DesignCore.Settings.centresnap) {
-      for (let i = 1; i < this.points.length; i++) {
-        if (this.points[i - 1].bulge !== 0) {
-          snaps.push(new SnapPoint(this.points[i - 1].bulgeCentrePoint(this.points[i]), SnapPoint.Type.CENTRE));
-        }
-      }
-    }
-
-    if (DesignCore.Settings.nearestsnap) {
+    if (mousePoint) {
       const closest = this.closestPoint(mousePoint);
-
       // Crude way to snap to the closest point or a node
       if (closest[1] < delta / 10) {
         snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
       }
     }
 
-    if (DesignCore.Settings.perpsnap) {
-      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
-
-      if (fromPoint !== null) {
-        for (let i = 1; i < this.points.length; i++) {
-          if (this.points[i - 1].bulge === 0) {
-            const foot = fromPoint.perpendicular(this.points[i - 1], this.points[i]);
-            if (foot.isOnLine(this.points[i - 1], this.points[i])) {
-              snaps.push(new SnapPoint(foot, SnapPoint.Type.PERPENDICULAR));
-            }
+    const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+    if (fromPoint !== null) {
+      for (let i = 1; i < this.points.length; i++) {
+        if (this.points[i - 1].bulge === 0) {
+          const foot = fromPoint.perpendicular(this.points[i - 1], this.points[i]);
+          if (foot.isOnLine(this.points[i - 1], this.points[i])) {
+            snaps.push(new SnapPoint(foot, SnapPoint.Type.PERPENDICULAR));
           }
         }
       }
