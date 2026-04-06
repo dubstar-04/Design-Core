@@ -7,8 +7,7 @@ export class Settings {
     this.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     this.gridcolour = { r: 119, g: 118, b: 123 };
     this.selecteditemscolour = { r: 0, g: 255, b: 0 };
-    this.snapcolour = { r: 55, g: 180, b: 75 };
-    this.polarsnapcolour = { r: 55, g: 180, b: 75 };
+    this.snaptrackingcolour = { r: 55, g: 180, b: 75 };
     // selectionWindow and crossingWindow colours
     this.selectionWindow = { r: 0, g: 255, b: 0 };
     this.crossingWindow = { r: 0, g: 0, b: 255 };
