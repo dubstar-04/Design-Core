@@ -24,7 +24,7 @@ export class Settings {
     this.quadrantsnap = false;
     this.tangentsnap = false;
     this.nodesnap = false;
-    this.perpsnap = false;
+    this.perpendicularsnap = false;
     this.polarangle = 45;
     this.polar = true;
     this.ortho = false;
