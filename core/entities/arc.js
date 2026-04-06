@@ -419,6 +419,28 @@ export class Arc extends Entity {
         snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
       }
     }
+
+    if (DesignCore.Settings.tangentsnap) {
+      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+
+      if (fromPoint !== null) {
+        const C = this.points[0];
+        const d = C.distance(fromPoint);
+
+        if (d > this.radius) {
+          const phi = Math.atan2(fromPoint.y - C.y, fromPoint.x - C.x);
+          const alpha = Math.acos(this.radius / d);
+
+          for (const sign of [1, -1]) {
+            const candidate = new Point(
+                C.x + this.radius * Math.cos(phi + sign * alpha),
+                C.y + this.radius * Math.sin(phi + sign * alpha),
+            );
+            if (candidate.isOnArc(this.points[1], this.points[2], C, this.direction)) {
+              snaps.push(new SnapPoint(candidate, SnapPoint.Type.TANGENT));
+            }
+          }
+        }
       }
     }
 
