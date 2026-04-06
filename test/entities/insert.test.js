@@ -90,3 +90,11 @@ AcDbBlockReference
   newInsert.dxf(file);
   expect(file.contents).toEqual(dxfString);
 });
+
+test('Insert.snaps returns a node snap at points[0]', () => {
+  const nodeInsert = new Insert({ points: [new Point(5, 10)] });
+  const nodeSnaps = nodeInsert.snaps(new Point(0, 0), 100).filter((s) => s.type === 'node');
+  expect(nodeSnaps.length).toBe(1);
+  expect(nodeSnaps[0].snapPoint.x).toBe(5);
+  expect(nodeSnaps[0].snapPoint.y).toBe(10);
+});
