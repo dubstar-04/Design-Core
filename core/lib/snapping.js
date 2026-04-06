@@ -20,8 +20,9 @@ class SnapPoint {
    * Create SnapPoint
    * @param {Point} snapPoint
    */
-  constructor(snapPoint) {
+  constructor(snapPoint, type = SnapPoint.Type.END) {
     this.snapPoint = snapPoint;
+    this.type = type;
   }
 
   /**
