@@ -8,6 +8,7 @@ import { DesignCore } from '../designCore.js';
 /** SnapPoint Class */
 export class SnapPoint {
   static Type = Object.freeze({
+    NONE: 'none',
     END: 'end',
     MID: 'mid',
     CENTRE: 'centre',
