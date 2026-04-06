@@ -10,6 +10,7 @@ import { Utils } from '../lib/utils.js';
 
 import { DesignCore } from '../designCore.js';
 import { AddState, RemoveState } from '../lib/stateManager.js';
+import { SnapPoint } from '../lib/snapping.js';
 
 /**
  * Circle Entity Class
@@ -247,8 +248,7 @@ export class Circle extends Entity {
     const snaps = [];
 
     if (DesignCore.Settings.centresnap) {
-      const centre = new Point(this.points[0].x, this.points[0].y);
-      snaps.push(centre);
+      snaps.push(new SnapPoint(new Point(this.points[0].x, this.points[0].y), SnapPoint.Type.CENTRE));
     }
 
     if (DesignCore.Settings.quadrantsnap) {
@@ -257,7 +257,12 @@ export class Circle extends Entity {
       const angle180 = new Point(this.points[0].x - this.radius, this.points[0].y);
       const angle270 = new Point(this.points[0].x, this.points[0].y - this.radius);
 
-      snaps.push(angle0, angle90, angle180, angle270);
+      snaps.push(
+          new SnapPoint(angle0, SnapPoint.Type.QUADRANT),
+          new SnapPoint(angle90, SnapPoint.Type.QUADRANT),
+          new SnapPoint(angle180, SnapPoint.Type.QUADRANT),
+          new SnapPoint(angle270, SnapPoint.Type.QUADRANT),
+      );
     }
 
     if (DesignCore.Settings.nearestsnap) {
@@ -265,7 +270,9 @@ export class Circle extends Entity {
 
       // Crude way to snap to the closest point or a node
       if (closest[1] < delta / 10) {
-        snaps.push(closest[0]);
+        snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
+      }
+    }
       }
     }
 
