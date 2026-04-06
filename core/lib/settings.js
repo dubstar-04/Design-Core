@@ -6,7 +6,7 @@ export class Settings {
   constructor() {
     this.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     this.selecteditemscolour = { r: 0, g: 255, b: 0 };
-    this.snapcolour = { r: 255, g: 0, b: 0 };
+    this.snapcolour = { r: 55, g: 180, b: 75 };
     this.gridcolour = { r: 119, g: 118, b: 123 };
     this.helpergeometrycolour = { r: 0, g: 195, b: 255 };
     this.polarsnapcolour = { r: 55, g: 180, b: 75 };
