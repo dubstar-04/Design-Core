@@ -299,9 +299,11 @@ STANDARD
 test('Test ArcText.snaps', () => {
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
   const point = new Point(100, 100);
+  DesignCore.Settings.centresnap = false;
+  DesignCore.Settings.nodesnap = true;
   const snaps = arcText.snaps(point, 1);
-  expect(snaps[0].x).toBeCloseTo(-2.39222);
-  expect(snaps[0].y).toBeCloseTo(101.22173);
+  expect(snaps[0].snapPoint.x).toBeCloseTo(-2.39222);
+  expect(snaps[0].snapPoint.y).toBeCloseTo(101.22173);
 });
 
 test('Test ArcText.closestPoint', () => {
