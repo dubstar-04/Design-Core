@@ -196,7 +196,9 @@ class TrackingLine {
 export class Snapping {
   /** Create snapping */
   constructor() {
+    // active is true when snapping is active (e.g. during a command)
     this.active = false;
+    // snapOverride can be set to a SnapPoint.Type to only snap to that type
     this.snapOverride = null;
   }
 
