@@ -9,6 +9,7 @@ import { Property } from '../properties/property.js';
 import { Logging } from '../lib/logging.js';
 
 import { DesignCore } from '../designCore.js';
+import { SnapPoint } from '../lib/snapping.js';
 
 
 /**
@@ -209,6 +210,11 @@ export class Insert extends Entity {
    */
   snaps(mousePoint, delta) {
     const snaps = [];
+
+    if (DesignCore.Settings.nodesnap) {
+      snaps.push(new SnapPoint(this.points[0].clone(), SnapPoint.Type.NODE));
+    }
+
     const blockSnaps = this.block.snaps(mousePoint, delta);
 
     for (let snap = 0; snap < blockSnaps.length; snap++) {
