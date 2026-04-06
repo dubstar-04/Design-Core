@@ -48,8 +48,45 @@ export class SnapPoint {
       ctx.setLineWidth(lineWidth);
     }
 
-    ctx.arc(this.snapPoint.x, this.snapPoint.y, radius / scale, 0, 6.283);
-    ctx.fill();
+    switch (this.type) {
+      case SnapPoint.Type.END: // square
+        ctx.moveTo(x - size, y - size);
+        ctx.lineTo(x + size, y - size);
+        ctx.lineTo(x + size, y + size);
+        ctx.lineTo(x - size, y + size);
+        ctx.closePath();
+        break;
+      case SnapPoint.Type.MID: // triangle
+        ctx.moveTo(x, y + size);
+        ctx.lineTo(x - size, y - size);
+        ctx.lineTo(x + size, y - size);
+        ctx.closePath();
+        break;
+      case SnapPoint.Type.QUADRANT: // diamond
+        ctx.moveTo(x, y - size);
+        ctx.lineTo(x + size, y);
+        ctx.lineTo(x, y + size);
+        ctx.lineTo(x - size, y);
+        ctx.closePath();
+        break;
+      case SnapPoint.Type.NEAREST: // hourglass (X with horizontal lines at top and bottom)
+        ctx.moveTo(x - size, y - size);
+        ctx.lineTo(x + size, y - size);
+        ctx.lineTo(x - size, y + size);
+        ctx.lineTo(x + size, y + size);
+        ctx.closePath();
+        break;
+      case SnapPoint.Type.TANGENT: // circle with a horizontal line over the top
+        ctx.arc(x, y, size, 0, 6.283);
+        ctx.moveTo(x - size, y + size * 1.5);
+        ctx.lineTo(x + size, y + size * 1.5);
+        break;
+      default: // CENTRE - circle
+        ctx.arc(x, y, size, 0, 6.283);
+        break;
+    }
+
+    ctx.stroke();
   }
 }
 
