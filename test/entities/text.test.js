@@ -534,11 +534,9 @@ test('Text getBoundingRect returns correct object', () => {
 test('Text snaps returns all snap points', () => {
   const t = new Text({ points: [new Point(1, 2)] });
   t.boundingRect = { width: 10, height: 10 };
-  DesignCore.Settings.nodesnap = true;
   const snaps = t.snaps(new Point(0, 0), 1);
   expect(snaps.length).toBe(1);
   expect(snaps[0].type).toBe('node');
-  DesignCore.Settings.nodesnap = false;
 });
 
 test('Text closestPoint returns correct distance', () => {
