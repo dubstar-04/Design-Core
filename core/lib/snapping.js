@@ -32,14 +32,20 @@ export class SnapPoint {
    */
   draw(ctx, scale) {
     const snapColour = DesignCore.Settings.snapcolour;
-    const radius = 4;
+    const size = 6 / scale;
+    const x = this.snapPoint.x;
+    const y = this.snapPoint.y;
+    const lineWidth = 2.5 / scale;
 
     try { // HTML Canvas
-      ctx.fillStyle = Colours.rgbToString(snapColour);
+      ctx.strokeStyle = Colours.rgbToString(snapColour);
+      ctx.lineWidth = lineWidth;
+      ctx.setLineDash([]);
       ctx.beginPath();
     } catch { // Cairo
       const rgbColour = Colours.rgbToScaledRGB(snapColour);
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+      ctx.setLineWidth(lineWidth);
     }
 
     ctx.arc(this.snapPoint.x, this.snapPoint.y, radius / scale, 0, 6.283);
