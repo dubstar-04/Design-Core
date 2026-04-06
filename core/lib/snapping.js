@@ -203,6 +203,14 @@ export class Snapping {
   }
 
   /**
+   * Reset snapping state
+   */
+  reset() {
+    this.active = false;
+    this.snapOverride = null;
+  }
+
+  /**
    * Get snap point and draw to the scene
    * @return {Point} or undefined
    */
