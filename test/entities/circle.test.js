@@ -342,3 +342,39 @@ test('Circle.fromPolylinePoints precision drift is negligible', () => {
   expect(drift).toBeLessThan(1e-10);
   expect(Math.abs(rebuilt.radius - circle.radius)).toBeLessThan(1e-10);
 });
+
+test('Circle.snaps returns two tangent snaps from outside', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  // fromPoint=(20,0): distanceToCenter=20 > radius=10
+  // tangentHalfAngle = acos(10/20) = π/3; both tangent points at (5, ±8.66) are on the full circle
+  DesignCore.Scene.inputManager.inputPoint = new Point(20, 0);
+  const snaps = circle.snaps(new Point(5, 0), 100);
+  const tangentSnaps = snaps.filter((s) => s.type === 'tangent');
+  expect(tangentSnaps.length).toBe(2);
+  expect(tangentSnaps.some((s) => s.snapPoint.x > 4.9 && s.snapPoint.y > 8.5)).toBe(true);
+  expect(tangentSnaps.some((s) => s.snapPoint.x > 4.9 && s.snapPoint.y < -8.5)).toBe(true);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+test('Circle.snaps returns no tangent when fromPoint is inside the circle', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  DesignCore.Scene.inputManager.inputPoint = new Point(1, 1); // distanceToCenter ≈ 1.41 < radius 10
+  const snaps = circle.snaps(new Point(5, 0), 100);
+  expect(snaps.filter((s) => s.type === 'tangent').length).toBe(0);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+test('Circle.snaps returns perpendicular snap from outside', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  // fromPoint=(20,0): angleFromCentreToInput=0; perpendicularPoint=(10,0)
+  DesignCore.Scene.inputManager.inputPoint = new Point(20, 0);
+  const snaps = circle.snaps(new Point(5, 0), 100);
+  const perpSnaps = snaps.filter((s) => s.type === 'perpendicular');
+  expect(perpSnaps.length).toBe(1);
+  expect(perpSnaps[0].snapPoint.x).toBeCloseTo(10);
+  expect(perpSnaps[0].snapPoint.y).toBeCloseTo(0);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
