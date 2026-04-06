@@ -273,6 +273,27 @@ export class Circle extends Entity {
         snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
       }
     }
+
+    if (DesignCore.Settings.tangentsnap) {
+      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+
+      if (fromPoint !== null) {
+        const C = this.points[0];
+        const d = C.distance(fromPoint);
+
+        if (d > this.radius) {
+          const phi = Math.atan2(fromPoint.y - C.y, fromPoint.x - C.x);
+          const alpha = Math.acos(this.radius / d);
+
+          snaps.push(new SnapPoint(
+              new Point(C.x + this.radius * Math.cos(phi + alpha), C.y + this.radius * Math.sin(phi + alpha)),
+              SnapPoint.Type.TANGENT,
+          ));
+          snaps.push(new SnapPoint(
+              new Point(C.x + this.radius * Math.cos(phi - alpha), C.y + this.radius * Math.sin(phi - alpha)),
+              SnapPoint.Type.TANGENT,
+          ));
+        }
       }
     }
 
