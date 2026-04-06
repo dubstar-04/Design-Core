@@ -7,6 +7,15 @@ import { DesignCore } from '../designCore.js';
 
 /** SnapPoint Class */
 class SnapPoint {
+  static Type = Object.freeze({
+    END: 'end',
+    MID: 'mid',
+    CENTRE: 'centre',
+    QUADRANT: 'quadrant',
+    NEAREST: 'nearest',
+    TANGENT: 'tangent',
+  });
+
   /**
    * Create SnapPoint
    * @param {Point} snapPoint
