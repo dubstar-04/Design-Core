@@ -198,3 +198,202 @@ test('Test Snapping.orthoSnap', () => {
   core.mouse.mouseMoved(100, -20);
   expect(snapping.orthoSnap(new Point(0, 0))).toBeUndefined();
 });
+
+// ─── Context mock helpers ────────────────────────────────────────────────────
+
+function makeSnapCtx() {
+  return {
+    strokeStyle: '',
+    lineWidth: 0,
+    setLineDash: jest.fn(),
+    beginPath: jest.fn(),
+    moveTo: jest.fn(),
+    lineTo: jest.fn(),
+    closePath: jest.fn(),
+    arc: jest.fn(),
+    stroke: jest.fn(),
+  };
+}
+
+function makeTrackingCtx() {
+  return {
+    save: jest.fn(),
+    restore: jest.fn(),
+    beginPath: jest.fn(),
+    strokeStyle: '',
+    lineWidth: 0,
+    setLineDash: jest.fn(),
+    moveTo: jest.fn(),
+    lineTo: jest.fn(),
+    stroke: jest.fn(),
+  };
+}
+
+// ─── Snapping.reset ──────────────────────────────────────────────────────────
+
+test('Test Snapping.reset', () => {
+  snapping.active = true;
+  snapping.snapOverride = SnapPoint.Type.END;
+  snapping.reset();
+  expect(snapping.active).toBe(false);
+  expect(snapping.snapOverride).toBeNull();
+});
+
+// ─── Snapping.setSnapOverride ────────────────────────────────────────────────
+
+test('Test Snapping.setSnapOverride valid type', () => {
+  snapping.setSnapOverride(SnapPoint.Type.END);
+  expect(snapping.snapOverride).toBe(SnapPoint.Type.END);
+});
+
+test('Test Snapping.setSnapOverride null clears override', () => {
+  snapping.setSnapOverride(SnapPoint.Type.END);
+  snapping.setSnapOverride(null);
+  expect(snapping.snapOverride).toBeNull();
+});
+
+test('Test Snapping.setSnapOverride NONE type', () => {
+  snapping.setSnapOverride(SnapPoint.Type.NONE);
+  expect(snapping.snapOverride).toBe(SnapPoint.Type.NONE);
+  snapping.setSnapOverride(null);
+});
+
+test('Test Snapping.setSnapOverride invalid type throws', () => {
+  expect(() => snapping.setSnapOverride('invalid')).toThrow('Invalid snap override type: invalid');
+});
+
+// ─── Snapping.getSnapPoint with snap override ────────────────────────────────
+
+test('Test Snapping.getSnapPoint with END override returns end snap', () => {
+  snapping.setSnapOverride(SnapPoint.Type.END);
+  core.mouse.mouseMoved(8, 8);
+  const result = snapping.getSnapPoint();
+  expect(result).toBeDefined();
+  expect(result.type).toBe(SnapPoint.Type.END);
+  snapping.setSnapOverride(null);
+});
+
+test('Test Snapping.getSnapPoint with NONE override suppresses all snaps', () => {
+  snapping.setSnapOverride(SnapPoint.Type.NONE);
+  core.mouse.mouseMoved(8, 8);
+  const result = snapping.getSnapPoint();
+  expect(result).toBeUndefined();
+  snapping.setSnapOverride(null);
+});
+
+test('Test Snapping.getSnapPoint with non-matching override returns undefined', () => {
+  // Mouse near end of line at (10,10); mid-point is at (55,10), well outside aperture
+  snapping.setSnapOverride(SnapPoint.Type.MID);
+  core.mouse.mouseMoved(8, 8);
+  const result = snapping.getSnapPoint();
+  expect(result).toBeUndefined();
+  snapping.setSnapOverride(null);
+});
+
+// ─── SnapPoint.draw – all snap types ────────────────────────────────────────
+
+test('Test SnapPoint.draw END type draws closed polygon without arc', () => {
+  const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.END);
+  const ctx = makeSnapCtx();
+  sp.draw(ctx, 1);
+  expect(ctx.beginPath).toHaveBeenCalled();
+  expect(ctx.closePath).toHaveBeenCalled();
+  expect(ctx.stroke).toHaveBeenCalled();
+  expect(ctx.arc).not.toHaveBeenCalled();
+});
+
+test('Test SnapPoint.draw MID type draws closed polygon without arc', () => {
+  const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.MID);
+  const ctx = makeSnapCtx();
+  sp.draw(ctx, 1);
+  expect(ctx.beginPath).toHaveBeenCalled();
+  expect(ctx.closePath).toHaveBeenCalled();
+  expect(ctx.stroke).toHaveBeenCalled();
+  expect(ctx.arc).not.toHaveBeenCalled();
+});
+
+test('Test SnapPoint.draw QUADRANT type draws closed polygon without arc', () => {
+  const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.QUADRANT);
+  const ctx = makeSnapCtx();
+  sp.draw(ctx, 1);
+  expect(ctx.beginPath).toHaveBeenCalled();
+  expect(ctx.closePath).toHaveBeenCalled();
+  expect(ctx.stroke).toHaveBeenCalled();
+  expect(ctx.arc).not.toHaveBeenCalled();
+});
+
+test('Test SnapPoint.draw NEAREST type draws closed polygon without arc', () => {
+  const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.NEAREST);
+  const ctx = makeSnapCtx();
+  sp.draw(ctx, 1);
+  expect(ctx.beginPath).toHaveBeenCalled();
+  expect(ctx.closePath).toHaveBeenCalled();
+  expect(ctx.stroke).toHaveBeenCalled();
+  expect(ctx.arc).not.toHaveBeenCalled();
+});
+
+test('Test SnapPoint.draw TANGENT type draws arc with tangent line', () => {
+  const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.TANGENT);
+  const ctx = makeSnapCtx();
+  sp.draw(ctx, 1);
+  expect(ctx.beginPath).toHaveBeenCalled();
+  expect(ctx.arc).toHaveBeenCalledWith(5, 5, expect.any(Number), 0, 6.283);
+  expect(ctx.stroke).toHaveBeenCalled();
+  expect(ctx.closePath).not.toHaveBeenCalled();
+});
+
+test('Test SnapPoint.draw NODE type draws arc with X inside', () => {
+  const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.NODE);
+  const ctx = makeSnapCtx();
+  sp.draw(ctx, 1);
+  expect(ctx.beginPath).toHaveBeenCalled();
+  expect(ctx.arc).toHaveBeenCalledWith(5, 5, expect.any(Number), 0, 6.283);
+  expect(ctx.stroke).toHaveBeenCalled();
+  expect(ctx.closePath).not.toHaveBeenCalled();
+});
+
+test('Test SnapPoint.draw PERPENDICULAR type draws L-shape without arc', () => {
+  const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.PERPENDICULAR);
+  const ctx = makeSnapCtx();
+  sp.draw(ctx, 1);
+  expect(ctx.beginPath).toHaveBeenCalled();
+  expect(ctx.stroke).toHaveBeenCalled();
+  expect(ctx.closePath).not.toHaveBeenCalled();
+  expect(ctx.arc).not.toHaveBeenCalled();
+});
+
+// ─── TrackingLine.draw – out-of-bounds cases ─────────────────────────────────
+
+test('Test TrackingLine.draw vertical line outside x bounds', () => {
+  DesignCore.Scene.auxiliaryEntities.clear();
+  // dir.x === 0 and from.x = 2 > boundsMax.x = 1 → draw returns early
+  snapping.addTrackingLine(new Point(2, -0.5), new Point(2, 0.5));
+  const trackingLine = DesignCore.Scene.auxiliaryEntities.get(0);
+  const ctx = makeTrackingCtx();
+  trackingLine.draw(ctx, 1);
+  expect(ctx.moveTo).not.toHaveBeenCalled();
+  expect(ctx.stroke).not.toHaveBeenCalled();
+});
+
+test('Test TrackingLine.draw horizontal line outside y bounds', () => {
+  DesignCore.Scene.auxiliaryEntities.clear();
+  // dir.y === 0 and from.y = -5 < boundsMin.y = -1 → draw returns early
+  snapping.addTrackingLine(new Point(0.5, -5), new Point(0.8, -5));
+  const trackingLine = DesignCore.Scene.auxiliaryEntities.get(0);
+  const ctx = makeTrackingCtx();
+  trackingLine.draw(ctx, 1);
+  expect(ctx.moveTo).not.toHaveBeenCalled();
+  expect(ctx.stroke).not.toHaveBeenCalled();
+});
+
+test('Test TrackingLine.draw line does not intersect canvas bounds', () => {
+  DesignCore.Scene.auxiliaryEntities.clear();
+  // from = (2, -0.5), dir = (1, 1): x-clamp gives t ∈ [-2, -1], y-clamp gives t ∈ [-0.5, 0.5]
+  // tMax (-1) < tMin (-0.5) → draw returns early
+  snapping.addTrackingLine(new Point(2, -0.5), new Point(3, 0.5));
+  const trackingLine = DesignCore.Scene.auxiliaryEntities.get(0);
+  const ctx = makeTrackingCtx();
+  trackingLine.draw(ctx, 1);
+  expect(ctx.moveTo).not.toHaveBeenCalled();
+  expect(ctx.stroke).not.toHaveBeenCalled();
+});
