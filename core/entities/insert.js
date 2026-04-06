@@ -218,12 +218,12 @@ export class Insert extends Entity {
     const blockSnaps = this.block.snaps(mousePoint, delta);
 
     for (let snap = 0; snap < blockSnaps.length; snap++) {
-      const snapPoint = blockSnaps[snap];
+      const sp = blockSnaps[snap];
       // offset the item snap point by the block insert location
-      const rotatedPoint = snapPoint.add(this.points[0]);
+      const rotatedPoint = sp.snapPoint.add(this.points[0]);
       // rotate the snap point to match the item positions
       const adjustedPoint = rotatedPoint.rotate(this.points[0], Utils.degrees2radians(this.rotation));
-      snaps.push(adjustedPoint);
+      snaps.push(new SnapPoint(adjustedPoint, sp.type));
     }
 
     return snaps;
