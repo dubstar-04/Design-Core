@@ -19,13 +19,15 @@ rotatedInsert.block.addItem(line);
 test('Test Insert.snaps', () => {
   const point = new Point(100, 100);
   const snaps = insert.snaps(point, 1);
-  expect(snaps[0].snapPoint.x).toBeCloseTo(101);
-  expect(snaps[0].snapPoint.y).toBeCloseTo(102);
+  const endSnaps = snaps.filter((s) => s.type === 'end');
+  expect(endSnaps[0].snapPoint.x).toBeCloseTo(101);
+  expect(endSnaps[0].snapPoint.y).toBeCloseTo(102);
 
   // Test snaps for a rotated block
   const rotatedSnaps = rotatedInsert.snaps(point);
-  expect(rotatedSnaps[0].snapPoint.x).toBeCloseTo(-0.7071);
-  expect(rotatedSnaps[0].snapPoint.y).toBeCloseTo(143.5426);
+  const rotatedEndSnaps = rotatedSnaps.filter((s) => s.type === 'end');
+  expect(rotatedEndSnaps[0].snapPoint.x).toBeCloseTo(-0.7071);
+  expect(rotatedEndSnaps[0].snapPoint.y).toBeCloseTo(143.5426);
 });
 
 test('Test Insert.closestPoint', () => {
