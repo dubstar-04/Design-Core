@@ -292,45 +292,35 @@ test('Circle.draw does not throw', () => {
 
 test('Circle.snaps returns centre snap', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  DesignCore.Settings.centresnap = true;
-  DesignCore.Settings.quadrantsnap = false;
-  DesignCore.Settings.nearestsnap = false;
   const snaps = circle.snaps(new Point(5, 0), 100);
-  expect(snaps).toHaveLength(1);
-  expect(snaps[0].snapPoint.x).toBe(0);
-  expect(snaps[0].snapPoint.y).toBe(0);
+  const centreSnaps = snaps.filter((s) => s.type === 'centre');
+  expect(centreSnaps).toHaveLength(1);
+  expect(centreSnaps[0].snapPoint.x).toBe(0);
+  expect(centreSnaps[0].snapPoint.y).toBe(0);
 });
 
 test('Circle.snaps returns four quadrant snaps', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  DesignCore.Settings.centresnap = false;
-  DesignCore.Settings.quadrantsnap = true;
-  DesignCore.Settings.nearestsnap = false;
   const snaps = circle.snaps(new Point(5, 0), 100);
-  expect(snaps).toHaveLength(4);
-  expect(snaps.some((p) => p.snapPoint.x === 10 && p.snapPoint.y === 0)).toBe(true);// 0°
-  expect(snaps.some((p) => p.snapPoint.x === 0 && p.snapPoint.y === 10)).toBe(true);// 90°
-  expect(snaps.some((p) => p.snapPoint.x === -10 && p.snapPoint.y === 0)).toBe(true);// 180°
-  expect(snaps.some((p) => p.snapPoint.x === 0 && p.snapPoint.y === -10)).toBe(true);// 270°
+  const quadrantSnaps = snaps.filter((s) => s.type === 'quadrant');
+  expect(quadrantSnaps).toHaveLength(4);
+  expect(quadrantSnaps.some((p) => p.snapPoint.x === 10 && p.snapPoint.y === 0)).toBe(true);// 0°
+  expect(quadrantSnaps.some((p) => p.snapPoint.x === 0 && p.snapPoint.y === 10)).toBe(true);// 90°
+  expect(quadrantSnaps.some((p) => p.snapPoint.x === -10 && p.snapPoint.y === 0)).toBe(true);// 180°
+  expect(quadrantSnaps.some((p) => p.snapPoint.x === 0 && p.snapPoint.y === -10)).toBe(true);// 270°
 });
 
 test('Circle.snaps nearest snap fires when close enough', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  DesignCore.Settings.centresnap = false;
-  DesignCore.Settings.quadrantsnap = false;
-  DesignCore.Settings.nearestsnap = true;
   // Mouse on the circle surface with large delta
   const snaps = circle.snaps(new Point(10, 0), 1000);
-  expect(snaps.length).toBeGreaterThanOrEqual(1);
+  expect(snaps.filter((s) => s.type === 'nearest').length).toBeGreaterThanOrEqual(1);
 });
 
 test('Circle.snaps nearest snap does not fire when too far', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  DesignCore.Settings.centresnap = false;
-  DesignCore.Settings.quadrantsnap = false;
-  DesignCore.Settings.nearestsnap = true;
   const snaps = circle.snaps(new Point(100, 100), 1);
-  expect(snaps.length).toBe(0);
+  expect(snaps.filter((s) => s.type === 'nearest').length).toBe(0);
 });
 
 test('Circle.fromPolylinePoints round-trip preserves centre and radius', () => {
