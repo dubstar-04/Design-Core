@@ -296,32 +296,24 @@ export class Line extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (DesignCore.Settings.endsnap) {
-      snaps.push(new SnapPoint(new Point(this.points[0].x, this.points[0].y), SnapPoint.Type.END));
-      snaps.push(new SnapPoint(new Point(this.points[1].x, this.points[1].y), SnapPoint.Type.END));
-    }
+    snaps.push(new SnapPoint(new Point(this.points[0].x, this.points[0].y), SnapPoint.Type.END));
+    snaps.push(new SnapPoint(new Point(this.points[1].x, this.points[1].y), SnapPoint.Type.END));
 
-    if (DesignCore.Settings.midsnap) {
-      snaps.push(new SnapPoint(this.midPoint(), SnapPoint.Type.MID));
-    }
+    snaps.push(new SnapPoint(this.midPoint(), SnapPoint.Type.MID));
 
-    if (DesignCore.Settings.nearestsnap) {
+    if (mousePoint) {
       const closest = this.closestPoint(mousePoint);
-
       // Crude way to snap to the closest point or a node
       if (closest[1] < delta / 10) {
         snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
       }
     }
 
-    if (DesignCore.Settings.perpsnap) {
-      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
-
-      if (fromPoint !== null) {
-        const foot = fromPoint.perpendicular(this.points[0], this.points[1]);
-        if (foot.isOnLine(this.points[0], this.points[1])) {
-          snaps.push(new SnapPoint(foot, SnapPoint.Type.PERPENDICULAR));
-        }
+    const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+    if (fromPoint !== null) {
+      const foot = fromPoint.perpendicular(this.points[0], this.points[1]);
+      if (foot.isOnLine(this.points[0], this.points[1])) {
+        snaps.push(new SnapPoint(foot, SnapPoint.Type.PERPENDICULAR));
       }
     }
 
