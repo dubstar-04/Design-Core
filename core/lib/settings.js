@@ -23,6 +23,7 @@ export class Settings {
     this.nearestsnap = false;
     this.quadrantsnap = false;
     this.tangentsnap = false;
+    this.nodesnap = false;
     this.polarangle = 45;
     this.polar = true;
     this.ortho = false;

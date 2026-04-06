@@ -14,6 +14,7 @@ export class SnapPoint {
     QUADRANT: 'quadrant',
     NEAREST: 'nearest',
     TANGENT: 'tangent',
+    NODE: 'node',
   });
 
   /**
@@ -81,6 +82,13 @@ export class SnapPoint {
         ctx.arc(x, y, size, 0, 6.283);
         ctx.moveTo(x - size, y + size * 1.5);
         ctx.lineTo(x + size, y + size * 1.5);
+        break;
+      case SnapPoint.Type.NODE: // circle with an X inside
+        ctx.arc(x, y, size, 0, 6.283);
+        ctx.moveTo(x - size * 0.7, y - size * 0.7);
+        ctx.lineTo(x + size * 0.7, y + size * 0.7);
+        ctx.moveTo(x + size * 0.7, y - size * 0.7);
+        ctx.lineTo(x - size * 0.7, y + size * 0.7);
         break;
       default: // CENTRE - circle
         ctx.arc(x, y, size, 0, 6.283);
