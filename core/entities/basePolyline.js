@@ -13,6 +13,7 @@ import { Property } from '../properties/property.js';
 import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
+import { SnapPoint } from '../lib/snapping.js';
 
 /**
  * Base Polyline Entity Class
@@ -271,14 +272,14 @@ export class BasePolyline extends Entity {
     if (DesignCore.Settings.endsnap) {
       // End points for each segment
       for (let i = 0; i < this.points.length; i++) {
-        snaps.push(this.points[i]);
+        snaps.push(new SnapPoint(this.points[i], SnapPoint.Type.END));
       }
     }
 
     if (DesignCore.Settings.midsnap) {
       for (let i = 1; i < this.points.length; i++) {
         if (this.points[i - 1].bulge === 0) {
-          snaps.push(this.points[i - 1].midPoint(this.points[i]));
+          snaps.push(new SnapPoint(this.points[i - 1].midPoint(this.points[i]), SnapPoint.Type.MID));
         }
       }
     }
@@ -286,7 +287,7 @@ export class BasePolyline extends Entity {
     if (DesignCore.Settings.centresnap) {
       for (let i = 1; i < this.points.length; i++) {
         if (this.points[i - 1].bulge !== 0) {
-          snaps.push(this.points[i - 1].bulgeCentrePoint(this.points[i]));
+          snaps.push(new SnapPoint(this.points[i - 1].bulgeCentrePoint(this.points[i]), SnapPoint.Type.CENTRE));
         }
       }
     }
@@ -296,7 +297,7 @@ export class BasePolyline extends Entity {
 
       // Crude way to snap to the closest point or a node
       if (closest[1] < delta / 10) {
-        snaps.push(closest[0]);
+        snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
       }
     }
 
