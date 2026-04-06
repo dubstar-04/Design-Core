@@ -297,6 +297,24 @@ export class Circle extends Entity {
       }
     }
 
+    if (DesignCore.Settings.perpsnap) {
+      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+
+      if (fromPoint !== null) {
+        const C = this.points[0];
+        const d = C.distance(fromPoint);
+
+        if (d > 0) {
+          // Point on circle closest to fromPoint (along the fromPoint→centre line)
+          const phi = Math.atan2(fromPoint.y - C.y, fromPoint.x - C.x);
+          snaps.push(new SnapPoint(
+              new Point(C.x + this.radius * Math.cos(phi), C.y + this.radius * Math.sin(phi)),
+              SnapPoint.Type.PERPENDICULAR,
+          ));
+        }
+      }
+    }
+
     return snaps;
   }
 
