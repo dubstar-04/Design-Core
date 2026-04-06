@@ -296,8 +296,8 @@ export class Line extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    snaps.push(new SnapPoint(new Point(this.points[0].x, this.points[0].y), SnapPoint.Type.END));
-    snaps.push(new SnapPoint(new Point(this.points[1].x, this.points[1].y), SnapPoint.Type.END));
+    snaps.push(new SnapPoint(this.points[0], SnapPoint.Type.END));
+    snaps.push(new SnapPoint(this.points[1], SnapPoint.Type.END));
 
     snaps.push(new SnapPoint(this.midPoint(), SnapPoint.Type.MID));
 

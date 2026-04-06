@@ -211,7 +211,7 @@ export class Insert extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    snaps.push(new SnapPoint(this.points[0].clone(), SnapPoint.Type.NODE));
+    snaps.push(new SnapPoint(this.points[0], SnapPoint.Type.NODE));
 
     const blockSnaps = this.block.snaps(mousePoint, delta);
 

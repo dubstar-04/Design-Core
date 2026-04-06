@@ -249,7 +249,7 @@ export class Circle extends Entity {
 
     const centre = this.points[0]; // circle centre point
 
-    snaps.push(new SnapPoint(centre.clone(), SnapPoint.Type.CENTRE));
+    snaps.push(new SnapPoint(centre, SnapPoint.Type.CENTRE));
 
     snaps.push(
         new SnapPoint(new Point(centre.x + this.radius, centre.y), SnapPoint.Type.QUADRANT), // 0°
