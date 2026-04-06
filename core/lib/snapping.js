@@ -209,7 +209,7 @@ export class Snapping {
     DesignCore.Scene.auxiliaryEntities.add(snapPoint);
 
     // Move the mouse to the closest snap point so if the mouse if clicked the snap point is used.
-    DesignCore.Mouse.setPosFromScenePoint(snapPoint);
+    DesignCore.Mouse.setPosFromScenePoint(snapPoint.snapPoint);
   }
 
   /**
@@ -239,7 +239,7 @@ export class Snapping {
       const itemSnaps = DesignCore.Scene.entities.get(i).snaps(DesignCore.Mouse.pointOnScene(), delta); // get an array of snap point from the item
       if (itemSnaps) {
         for (let j = 0; j < itemSnaps.length; j++) {
-          const length = itemSnaps[j].distance(DesignCore.Mouse.pointOnScene());
+          const length = itemSnaps[j].snapPoint.distance(DesignCore.Mouse.pointOnScene());
           if (length < delta) {
             delta = length;
             snapPoint = itemSnaps[j];
