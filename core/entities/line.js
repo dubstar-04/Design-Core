@@ -314,6 +314,17 @@ export class Line extends Entity {
       }
     }
 
+    if (DesignCore.Settings.perpsnap) {
+      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+
+      if (fromPoint !== null) {
+        const foot = fromPoint.perpendicular(this.points[0], this.points[1]);
+        if (foot.isOnLine(this.points[0], this.points[1])) {
+          snaps.push(new SnapPoint(foot, SnapPoint.Type.PERPENDICULAR));
+        }
+      }
+    }
+
     return snaps;
   }
 
