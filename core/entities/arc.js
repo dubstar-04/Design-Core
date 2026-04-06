@@ -393,71 +393,52 @@ export class Arc extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (DesignCore.Settings.endsnap) {
-      // Speed this up by generating the proper start and end points when the arc is initialised
-      const startPoint = new Point(
-          this.points[0].x + (this.radius * Math.cos(this.startAngle())),
-          this.points[0].y + (this.radius * Math.sin(this.startAngle())),
-      );
-      const endPoint = new Point(
-          this.points[0].x + (this.radius * Math.cos(this.endAngle())),
-          this.points[0].y + (this.radius * Math.sin(this.endAngle())),
-      );
+    const centre = this.points[0]; // arc centre point
+    const arcStartPoint = this.points[1]; // arc start point on circumference
+    const arcEndPoint = this.points[2]; // arc end point on circumference
 
-      snaps.push(new SnapPoint(startPoint, SnapPoint.Type.END), new SnapPoint(endPoint, SnapPoint.Type.END));
-    }
+    snaps.push(new SnapPoint(centre, SnapPoint.Type.CENTRE));
+    snaps.push(new SnapPoint(arcStartPoint, SnapPoint.Type.END));
+    snaps.push(new SnapPoint(arcEndPoint, SnapPoint.Type.END));
 
-    if (DesignCore.Settings.centresnap) {
-      snaps.push(new SnapPoint(this.points[0], SnapPoint.Type.CENTRE));
-    }
-
-    if (DesignCore.Settings.nearestsnap) {
-      const closest = this.closestPoint(mousePoint);
-
-      // Crude way to snap to the closest point or a node
-      if (closest[2] === true && closest[1] < delta / 10) {
-        snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
+    if (mousePoint) {
+      const [nearestPoint, nearestDistance, isOnArc] = this.closestPoint(mousePoint);
+      // Crude way to snap to the closest point on the arc
+      if (isOnArc === true && nearestDistance < delta / 10) {
+        snaps.push(new SnapPoint(nearestPoint, SnapPoint.Type.NEAREST));
       }
     }
 
-    if (DesignCore.Settings.tangentsnap) {
-      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+    // Calculate potential tangent snap
+    const fromPoint = DesignCore.Scene.inputManager.inputPoint; // last confirmed input point (line start)
+    if (fromPoint !== null) {
+      const distanceToCenter = centre.distance(fromPoint); // distance from the input point to the arc centre
 
-      if (fromPoint !== null) {
-        const C = this.points[0];
-        const d = C.distance(fromPoint);
+      // Tangent: only possible when fromPoint is outside the arc radius
+      if (distanceToCenter > this.radius) {
+        const angleToCenter = Math.atan2(fromPoint.y - centre.y, fromPoint.x - centre.x); // angle from centre to fromPoint
+        const tangentHalfAngle = Math.acos(this.radius / distanceToCenter); // half-angle between the two tangent directions
 
-        if (d > this.radius) {
-          const phi = Math.atan2(fromPoint.y - C.y, fromPoint.x - C.x);
-          const alpha = Math.acos(this.radius / d);
-
-          for (const sign of [1, -1]) {
-            const candidate = new Point(
-                C.x + this.radius * Math.cos(phi + sign * alpha),
-                C.y + this.radius * Math.sin(phi + sign * alpha),
-            );
-            if (candidate.isOnArc(this.points[1], this.points[2], C, this.direction)) {
-              snaps.push(new SnapPoint(candidate, SnapPoint.Type.TANGENT));
-            }
+        for (const sign of [1, -1]) {
+          const tangentPoint = new Point(
+              centre.x + this.radius * Math.cos(angleToCenter + sign * tangentHalfAngle),
+              centre.y + this.radius * Math.sin(angleToCenter + sign * tangentHalfAngle),
+          );
+          if (tangentPoint.isOnArc(this.points[1], this.points[2], centre, this.direction)) {
+            snaps.push(new SnapPoint(tangentPoint, SnapPoint.Type.TANGENT));
           }
         }
       }
-    }
 
-    if (DesignCore.Settings.perpsnap) {
-      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
-
-      if (fromPoint !== null) {
-        const C = this.points[0];
-        const d = C.distance(fromPoint);
-
-        if (d > 0) {
-          // Point on arc closest to fromPoint (along the fromPoint→centre line)
-          const phi = Math.atan2(fromPoint.y - C.y, fromPoint.x - C.x);
-          const candidate = new Point(C.x + this.radius * Math.cos(phi), C.y + this.radius * Math.sin(phi));
-          if (candidate.isOnArc(this.points[1], this.points[2], C, this.direction)) {
-            snaps.push(new SnapPoint(candidate, SnapPoint.Type.PERPENDICULAR));
-          }
+      // Perpendicular: point on the arc that lies on the line from fromPoint through the centre
+      if (distanceToCenter > 0) {
+        const angleFromCentreToInput = Math.atan2(fromPoint.y - centre.y, fromPoint.x - centre.x);
+        const perpendicularPoint = new Point(
+            centre.x + this.radius * Math.cos(angleFromCentreToInput),
+            centre.y + this.radius * Math.sin(angleFromCentreToInput),
+        );
+        if (perpendicularPoint.isOnArc(this.points[1], this.points[2], centre, this.direction)) {
+          snaps.push(new SnapPoint(perpendicularPoint, SnapPoint.Type.PERPENDICULAR));
         }
       }
     }
