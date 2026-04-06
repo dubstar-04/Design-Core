@@ -266,7 +266,8 @@ export class Snapping {
    */
   getSnapPoint() {
     let snapPoint;
-    let delta = 25 / DesignCore.Canvas.getScale(); // find a more suitable starting value
+    const snapAperture = 25; // capture radius in pixels (screen space)
+    let delta = snapAperture / DesignCore.Canvas.getScale(); // convert to scene space
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
       const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).layer);
