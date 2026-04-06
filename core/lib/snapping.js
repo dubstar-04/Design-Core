@@ -126,6 +126,7 @@ class TrackingLine {
   draw(ctx, scale) {
     const from = this.inputPoint;
     const dir = this.snapPoint.subtract(from);
+    const lineWidth = 2 / scale;
 
     if (dir.x === 0 && dir.y === 0) {
       return;
@@ -176,12 +177,12 @@ class TrackingLine {
     try { // HTML Canvas
       ctx.beginPath();
       ctx.strokeStyle = Colours.rgbToString(lineColour);
-      ctx.lineWidth = 1 / scale;
+      ctx.lineWidth = lineWidth;
       ctx.setLineDash([dashSize, dashSize]);
     } catch { // Cairo
       const rgbColour = Colours.rgbToScaledRGB(lineColour);
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-      ctx.setLineWidth(1 / scale);
+      ctx.setLineWidth(lineWidth);
       ctx.setDash([dashSize, dashSize], 0);
     }
 
