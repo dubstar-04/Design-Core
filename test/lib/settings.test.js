@@ -41,7 +41,7 @@ test('Settings constructor - colour defaults', () => {
   const fresh = new (settings.constructor)();
   expect(fresh.canvasbackgroundcolour).toEqual({ r: 30, g: 30, b: 30 });
   expect(fresh.selecteditemscolour).toEqual({ r: 0, g: 255, b: 0 });
-  expect(fresh.snapcolour).toEqual({ r: 255, g: 0, b: 0 });
+  expect(fresh.snapcolour).toEqual({ r: 55, g: 180, b: 75 });
   expect(fresh.gridcolour).toEqual({ r: 119, g: 118, b: 123 });
   expect(fresh.helpergeometrycolour).toEqual({ r: 0, g: 195, b: 255 });
   expect(fresh.polarsnapcolour).toEqual({ r: 55, g: 180, b: 75 });
