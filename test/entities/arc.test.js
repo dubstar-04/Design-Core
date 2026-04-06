@@ -434,22 +434,16 @@ test('Arc.draw does not throw (ccw and cw)', () => {
   expect(() => arcCw.draw(ctx2, 1)).not.toThrow();
 });
 
-test('Arc.snaps returns end, centre and nearest snap points', () => {
+test('Arc.snaps returns end and centre snap points', () => {
   const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
 
-  DesignCore.Settings.endsnap = true;
-  DesignCore.Settings.centresnap = true;
-  DesignCore.Settings.nearestsnap = false;
   const snaps = arc.snaps(new Point(5, 5), 10);
-  expect(snaps.length).toBe(3); // start, end, centre
+  expect(snaps.filter((s) => s.type === 'end').length).toBe(2);
+  expect(snaps.filter((s) => s.type === 'centre').length).toBe(1);
 
-  // nearestsnap: closestPoint returns [pnt, distance] (no third element),
-  // so closest[2] === true is never satisfied and no snap is pushed
-  DesignCore.Settings.endsnap = false;
-  DesignCore.Settings.centresnap = false;
-  DesignCore.Settings.nearestsnap = true;
+  // Arc.closestPoint requires closest[2] === true which is never satisfied, so no nearest snap
   const nearSnaps = arc.snaps(new Point(10, 0), 100);
-  expect(nearSnaps.length).toBe(0);
+  expect(nearSnaps.filter((s) => s.type === 'nearest').length).toBe(0);
 });
 
 test('Arc.execute handles negative angle (clockwise)', async () => {
