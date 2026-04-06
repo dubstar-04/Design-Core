@@ -201,6 +201,7 @@ test('Test Snapping.orthoSnap', () => {
 
 // ─── Context mock helpers ────────────────────────────────────────────────────
 
+/** @return {object} mock HTML canvas context for SnapPoint.draw tests */
 function makeSnapCtx() {
   return {
     strokeStyle: '',
@@ -215,6 +216,7 @@ function makeSnapCtx() {
   };
 }
 
+/** @return {object} mock HTML canvas context for TrackingLine.draw tests */
 function makeTrackingCtx() {
   return {
     save: jest.fn(),
