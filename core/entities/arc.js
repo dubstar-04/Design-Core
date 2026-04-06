@@ -444,6 +444,24 @@ export class Arc extends Entity {
       }
     }
 
+    if (DesignCore.Settings.perpsnap) {
+      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+
+      if (fromPoint !== null) {
+        const C = this.points[0];
+        const d = C.distance(fromPoint);
+
+        if (d > 0) {
+          // Point on arc closest to fromPoint (along the fromPoint→centre line)
+          const phi = Math.atan2(fromPoint.y - C.y, fromPoint.x - C.x);
+          const candidate = new Point(C.x + this.radius * Math.cos(phi), C.y + this.radius * Math.sin(phi));
+          if (candidate.isOnArc(this.points[1], this.points[2], C, this.direction)) {
+            snaps.push(new SnapPoint(candidate, SnapPoint.Type.PERPENDICULAR));
+          }
+        }
+      }
+    }
+
     return snaps;
   }
 
