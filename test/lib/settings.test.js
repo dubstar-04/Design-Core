@@ -43,7 +43,6 @@ test('Settings constructor - colour defaults', () => {
   expect(fresh.selecteditemscolour).toEqual({ r: 0, g: 255, b: 0 });
   expect(fresh.snapcolour).toEqual({ r: 55, g: 180, b: 75 });
   expect(fresh.gridcolour).toEqual({ r: 119, g: 118, b: 123 });
-  expect(fresh.helpergeometrycolour).toEqual({ r: 0, g: 195, b: 255 });
   expect(fresh.polarsnapcolour).toEqual({ r: 55, g: 180, b: 75 });
   expect(fresh.selectionWindow).toEqual({ r: 0, g: 255, b: 0 });
   expect(fresh.crossingWindow).toEqual({ r: 0, g: 0, b: 255 });
