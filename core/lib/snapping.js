@@ -206,7 +206,7 @@ export class Snapping {
    */
   addSnapPoint(snapPoint) {
     // show the snap point
-    DesignCore.Scene.auxiliaryEntities.add(new SnapPoint(snapPoint));
+    DesignCore.Scene.auxiliaryEntities.add(snapPoint);
 
     // Move the mouse to the closest snap point so if the mouse if clicked the snap point is used.
     DesignCore.Mouse.setPosFromScenePoint(snapPoint);
