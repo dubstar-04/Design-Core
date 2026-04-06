@@ -211,6 +211,18 @@ export class Snapping {
   }
 
   /**
+   * Set the snap override type
+   * @param {string|null} type - a SnapPoint.Type value, or null to clear the override
+   */
+  setSnapOverride(type) {
+    if (type !== null && !Object.values(SnapPoint.Type).includes(type)) {
+      throw new Error(`Invalid snap override type: ${type}`);
+    }
+    this.snapOverride = type;
+  }
+
+
+  /**
    * Get snap point and draw to the scene
    * @return {Point} or undefined
    */
