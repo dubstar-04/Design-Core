@@ -409,21 +409,17 @@ export class Arc extends Entity {
       }
     }
 
-    // Calculate potential tangent snap
     const fromPoint = DesignCore.Scene.inputManager.inputPoint; // last confirmed input point (line start)
     if (fromPoint !== null) {
       const distanceToCenter = centre.distance(fromPoint); // distance from the input point to the arc centre
+      const angleFromCentreToInput = centre.angle(fromPoint); // angle from centre toward fromPoint
 
       // Tangent: only possible when fromPoint is outside the arc radius
       if (distanceToCenter > this.radius) {
-        const angleToCenter = Math.atan2(fromPoint.y - centre.y, fromPoint.x - centre.x); // angle from centre to fromPoint
         const tangentHalfAngle = Math.acos(this.radius / distanceToCenter); // half-angle between the two tangent directions
 
         for (const sign of [1, -1]) {
-          const tangentPoint = new Point(
-              centre.x + this.radius * Math.cos(angleToCenter + sign * tangentHalfAngle),
-              centre.y + this.radius * Math.sin(angleToCenter + sign * tangentHalfAngle),
-          );
+          const tangentPoint = centre.project(angleFromCentreToInput + sign * tangentHalfAngle, this.radius);
           if (tangentPoint.isOnArc(this.points[1], this.points[2], centre, this.direction)) {
             snaps.push(new SnapPoint(tangentPoint, SnapPoint.Type.TANGENT));
           }
@@ -432,11 +428,7 @@ export class Arc extends Entity {
 
       // Perpendicular: point on the arc that lies on the line from fromPoint through the centre
       if (distanceToCenter > 0) {
-        const angleFromCentreToInput = Math.atan2(fromPoint.y - centre.y, fromPoint.x - centre.x);
-        const perpendicularPoint = new Point(
-            centre.x + this.radius * Math.cos(angleFromCentreToInput),
-            centre.y + this.radius * Math.sin(angleFromCentreToInput),
-        );
+        const perpendicularPoint = centre.project(angleFromCentreToInput, this.radius);
         if (perpendicularPoint.isOnArc(this.points[1], this.points[2], centre, this.direction)) {
           snaps.push(new SnapPoint(perpendicularPoint, SnapPoint.Type.PERPENDICULAR));
         }
