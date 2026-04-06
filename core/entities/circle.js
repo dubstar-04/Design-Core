@@ -247,71 +247,41 @@ export class Circle extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (DesignCore.Settings.centresnap) {
-      snaps.push(new SnapPoint(new Point(this.points[0].x, this.points[0].y), SnapPoint.Type.CENTRE));
-    }
+    const centre = this.points[0]; // circle centre point
 
-    if (DesignCore.Settings.quadrantsnap) {
-      const angle0 = new Point(this.points[0].x + this.radius, this.points[0].y);
-      const angle90 = new Point(this.points[0].x, this.points[0].y + this.radius);
-      const angle180 = new Point(this.points[0].x - this.radius, this.points[0].y);
-      const angle270 = new Point(this.points[0].x, this.points[0].y - this.radius);
+    snaps.push(new SnapPoint(centre.clone(), SnapPoint.Type.CENTRE));
 
-      snaps.push(
-          new SnapPoint(angle0, SnapPoint.Type.QUADRANT),
-          new SnapPoint(angle90, SnapPoint.Type.QUADRANT),
-          new SnapPoint(angle180, SnapPoint.Type.QUADRANT),
-          new SnapPoint(angle270, SnapPoint.Type.QUADRANT),
-      );
-    }
+    snaps.push(
+        new SnapPoint(new Point(centre.x + this.radius, centre.y), SnapPoint.Type.QUADRANT), // 0°
+        new SnapPoint(new Point(centre.x, centre.y + this.radius), SnapPoint.Type.QUADRANT), // 90°
+        new SnapPoint(new Point(centre.x - this.radius, centre.y), SnapPoint.Type.QUADRANT), // 180°
+        new SnapPoint(new Point(centre.x, centre.y - this.radius), SnapPoint.Type.QUADRANT), // 270°
+    );
 
-    if (DesignCore.Settings.nearestsnap) {
-      const closest = this.closestPoint(mousePoint);
-
-      // Crude way to snap to the closest point or a node
-      if (closest[1] < delta / 10) {
-        snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
+    if (mousePoint) {
+      const [nearestPoint, nearestDistance] = this.closestPoint(mousePoint);
+      // Crude way to snap to the closest point on the circle
+      if (nearestDistance < delta / 10) {
+        snaps.push(new SnapPoint(nearestPoint, SnapPoint.Type.NEAREST));
       }
     }
 
-    if (DesignCore.Settings.tangentsnap) {
-      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+    const fromPoint = DesignCore.Scene.inputManager.inputPoint; // last confirmed input point (line start)
+    if (fromPoint !== null) {
+      const distanceToCenter = centre.distance(fromPoint); // distance from the input point to the circle centre
+      const angleFromCentreToInput = centre.angle(fromPoint); // angle from centre toward fromPoint
 
-      if (fromPoint !== null) {
-        const C = this.points[0];
-        const d = C.distance(fromPoint);
+      // Tangent: only possible when fromPoint is outside the circle radius
+      if (distanceToCenter > this.radius) {
+        const tangentHalfAngle = Math.acos(this.radius / distanceToCenter); // half-angle between the two tangent directions
 
-        if (d > this.radius) {
-          const phi = Math.atan2(fromPoint.y - C.y, fromPoint.x - C.x);
-          const alpha = Math.acos(this.radius / d);
-
-          snaps.push(new SnapPoint(
-              new Point(C.x + this.radius * Math.cos(phi + alpha), C.y + this.radius * Math.sin(phi + alpha)),
-              SnapPoint.Type.TANGENT,
-          ));
-          snaps.push(new SnapPoint(
-              new Point(C.x + this.radius * Math.cos(phi - alpha), C.y + this.radius * Math.sin(phi - alpha)),
-              SnapPoint.Type.TANGENT,
-          ));
-        }
+        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput + tangentHalfAngle, this.radius), SnapPoint.Type.TANGENT));
+        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput - tangentHalfAngle, this.radius), SnapPoint.Type.TANGENT));
       }
-    }
 
-    if (DesignCore.Settings.perpsnap) {
-      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
-
-      if (fromPoint !== null) {
-        const C = this.points[0];
-        const d = C.distance(fromPoint);
-
-        if (d > 0) {
-          // Point on circle closest to fromPoint (along the fromPoint→centre line)
-          const phi = Math.atan2(fromPoint.y - C.y, fromPoint.x - C.x);
-          snaps.push(new SnapPoint(
-              new Point(C.x + this.radius * Math.cos(phi), C.y + this.radius * Math.sin(phi)),
-              SnapPoint.Type.PERPENDICULAR,
-          ));
-        }
+      // Perpendicular: point on the circle that lies on the line from fromPoint through the centre
+      if (distanceToCenter > 0) {
+        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput, this.radius), SnapPoint.Type.PERPENDICULAR));
       }
     }
 
