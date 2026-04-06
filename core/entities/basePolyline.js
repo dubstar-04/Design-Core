@@ -301,6 +301,21 @@ export class BasePolyline extends Entity {
       }
     }
 
+    if (DesignCore.Settings.perpsnap) {
+      const fromPoint = DesignCore.Scene.inputManager.inputPoint;
+
+      if (fromPoint !== null) {
+        for (let i = 1; i < this.points.length; i++) {
+          if (this.points[i - 1].bulge === 0) {
+            const foot = fromPoint.perpendicular(this.points[i - 1], this.points[i]);
+            if (foot.isOnLine(this.points[i - 1], this.points[i])) {
+              snaps.push(new SnapPoint(foot, SnapPoint.Type.PERPENDICULAR));
+            }
+          }
+        }
+      }
+    }
+
     return snaps;
   }
 
