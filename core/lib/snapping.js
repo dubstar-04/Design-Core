@@ -15,6 +15,7 @@ export class SnapPoint {
     NEAREST: 'nearest',
     TANGENT: 'tangent',
     NODE: 'node',
+    PERPENDICULAR: 'perpendicular',
   });
 
   /**
@@ -89,6 +90,11 @@ export class SnapPoint {
         ctx.lineTo(x + size * 0.7, y + size * 0.7);
         ctx.moveTo(x + size * 0.7, y - size * 0.7);
         ctx.lineTo(x - size * 0.7, y + size * 0.7);
+        break;
+      case SnapPoint.Type.PERPENDICULAR: // right-angle corner (L-shape)
+        ctx.moveTo(x - size, y + size);
+        ctx.lineTo(x - size, y - size);
+        ctx.lineTo(x + size, y - size);
         break;
       default: // CENTRE - circle
         ctx.arc(x, y, size, 0, 6.283);
