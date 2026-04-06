@@ -297,8 +297,8 @@ test('Circle.snaps returns centre snap', () => {
   DesignCore.Settings.nearestsnap = false;
   const snaps = circle.snaps(new Point(5, 0), 100);
   expect(snaps).toHaveLength(1);
-  expect(snaps[0].x).toBe(0);
-  expect(snaps[0].y).toBe(0);
+  expect(snaps[0].snapPoint.x).toBe(0);
+  expect(snaps[0].snapPoint.y).toBe(0);
 });
 
 test('Circle.snaps returns four quadrant snaps', () => {
@@ -308,10 +308,10 @@ test('Circle.snaps returns four quadrant snaps', () => {
   DesignCore.Settings.nearestsnap = false;
   const snaps = circle.snaps(new Point(5, 0), 100);
   expect(snaps).toHaveLength(4);
-  expect(snaps.some((p) => p.x === 10 && p.y === 0)).toBe(true);// 0°
-  expect(snaps.some((p) => p.x === 0 && p.y === 10)).toBe(true);// 90°
-  expect(snaps.some((p) => p.x === -10 && p.y === 0)).toBe(true);// 180°
-  expect(snaps.some((p) => p.x === 0 && p.y === -10)).toBe(true);// 270°
+  expect(snaps.some((p) => p.snapPoint.x === 10 && p.snapPoint.y === 0)).toBe(true);// 0°
+  expect(snaps.some((p) => p.snapPoint.x === 0 && p.snapPoint.y === 10)).toBe(true);// 90°
+  expect(snaps.some((p) => p.snapPoint.x === -10 && p.snapPoint.y === 0)).toBe(true);// 180°
+  expect(snaps.some((p) => p.snapPoint.x === 0 && p.snapPoint.y === -10)).toBe(true);// 270°
 });
 
 test('Circle.snaps nearest snap fires when close enough', () => {
