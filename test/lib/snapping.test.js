@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import { Core } from '../../core/core/core.js';
-import { Snapping } from '../../core/lib/snapping.js';
+import { Snapping, SnapPoint } from '../../core/lib/snapping.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 
@@ -24,16 +24,16 @@ test('Test Snapping.getSnapPoint', () => {
   core.mouse.mouseMoved(8, 8);
   // Get the snap point
   const snapPoint1 = snapping.getSnapPoint();
-  expect(snapPoint1.x).toBe(10);
-  expect(snapPoint1.y).toBe(10);
+  expect(snapPoint1.snapPoint.x).toBe(10);
+  expect(snapPoint1.snapPoint.y).toBe(10);
 
 
   // set the mouse position
   core.mouse.mouseMoved(101, 11);
   // Get the snap point
   const snapPoint2 = snapping.getSnapPoint();
-  expect(snapPoint2.x).toBe(100);
-  expect(snapPoint2.y).toBe(10);
+  expect(snapPoint2.snapPoint.x).toBe(100);
+  expect(snapPoint2.snapPoint.y).toBe(10);
 
   // set the mouse position
   core.mouse.mouseMoved(100, 100);
@@ -48,8 +48,8 @@ test('Test Snapping.snap active', () => {
   core.mouse.mouseMoved(8, 8);
   const result = snapping.snap();
   expect(result).toBeDefined();
-  expect(result.x).toBe(10);
-  expect(result.y).toBe(10);
+  expect(result.snapPoint.x).toBe(10);
+  expect(result.snapPoint.y).toBe(10);
   expect(DesignCore.Scene.auxiliaryEntities.count()).toBeGreaterThan(0);
 });
 
@@ -61,24 +61,29 @@ test('Test Snapping.snap inactive', () => {
 
 test('Test Snapping.addSnapPoint', () => {
   DesignCore.Scene.auxiliaryEntities.clear();
-  snapping.addSnapPoint(new Point(10, 10));
+  snapping.addSnapPoint(new SnapPoint(new Point(10, 10)));
   expect(DesignCore.Scene.auxiliaryEntities.count()).toBe(1);
 });
 
 test('Test SnapPoint.draw', () => {
   DesignCore.Scene.auxiliaryEntities.clear();
-  snapping.addSnapPoint(new Point(0.5, 0.5));
+  snapping.addSnapPoint(new SnapPoint(new Point(0.5, 0.5), SnapPoint.Type.CENTRE));
   const snapPointEntity = DesignCore.Scene.auxiliaryEntities.get(0);
   const ctx = {
-    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 0,
+    setLineDash: jest.fn(),
     beginPath: jest.fn(),
+    moveTo: jest.fn(),
+    lineTo: jest.fn(),
+    closePath: jest.fn(),
     arc: jest.fn(),
-    fill: jest.fn(),
+    stroke: jest.fn(),
   };
   snapPointEntity.draw(ctx, 1);
   expect(ctx.beginPath).toHaveBeenCalled();
   expect(ctx.arc).toHaveBeenCalledWith(0.5, 0.5, expect.any(Number), 0, 6.283);
-  expect(ctx.fill).toHaveBeenCalled();
+  expect(ctx.stroke).toHaveBeenCalled();
 });
 
 test('Test Snapping.addTrackingLine', () => {
