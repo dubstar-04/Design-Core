@@ -197,6 +197,7 @@ export class Snapping {
   /** Create snapping */
   constructor() {
     this.active = false;
+    this.snapOverride = null;
   }
 
   /**
