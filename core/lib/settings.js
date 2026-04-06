@@ -8,7 +8,6 @@ export class Settings {
     this.selecteditemscolour = { r: 0, g: 255, b: 0 };
     this.snapcolour = { r: 55, g: 180, b: 75 };
     this.gridcolour = { r: 119, g: 118, b: 123 };
-    this.helpergeometrycolour = { r: 0, g: 195, b: 255 };
     this.polarsnapcolour = { r: 55, g: 180, b: 75 };
     this.selectionWindow = { r: 0, g: 255, b: 0 };
     this.crossingWindow = { r: 0, g: 0, b: 255 };
