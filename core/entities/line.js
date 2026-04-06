@@ -9,6 +9,7 @@ import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { Utils } from '../lib/utils.js';
+import { SnapPoint } from '../lib/snapping.js';
 
 
 /**
@@ -296,13 +297,12 @@ export class Line extends Entity {
     const snaps = [];
 
     if (DesignCore.Settings.endsnap) {
-      const start = new Point(this.points[0].x, this.points[0].y);
-      const end = new Point(this.points[1].x, this.points[1].y);
-      snaps.push(start, end);
+      snaps.push(new SnapPoint(new Point(this.points[0].x, this.points[0].y), SnapPoint.Type.END));
+      snaps.push(new SnapPoint(new Point(this.points[1].x, this.points[1].y), SnapPoint.Type.END));
     }
 
     if (DesignCore.Settings.midsnap) {
-      snaps.push(this.midPoint());
+      snaps.push(new SnapPoint(this.midPoint(), SnapPoint.Type.MID));
     }
 
     if (DesignCore.Settings.nearestsnap) {
@@ -310,7 +310,7 @@ export class Line extends Entity {
 
       // Crude way to snap to the closest point or a node
       if (closest[1] < delta / 10) {
-        snaps.push(closest[0]);
+        snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
       }
     }
 
