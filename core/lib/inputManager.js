@@ -29,7 +29,7 @@ export class InputManager {
    * Reset the inputManager
    */
   reset() {
-    this.snapping.active = false;
+    this.snapping.reset();
     this.inputPoint = null;
     DesignCore.CommandLine.resetPrompt();
     this.activeCommand = undefined;
