@@ -509,9 +509,7 @@ export class Text extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (DesignCore.Settings.nodesnap) {
-      snaps.push(new SnapPoint(this.points[0].clone(), SnapPoint.Type.NODE));
-    }
+    snaps.push(new SnapPoint(this.points[0].clone(), SnapPoint.Type.NODE));
 
     return snaps;
   }
