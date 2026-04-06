@@ -567,18 +567,13 @@ export class ArcAlignedText extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (DesignCore.Settings.centresnap) {
-      snaps.push(new SnapPoint(this.points[0], SnapPoint.Type.CENTRE)); // arc center
-    }
+    snaps.push(new SnapPoint(this.points[0], SnapPoint.Type.CENTRE)); // arc center
 
-    if (DesignCore.Settings.nodesnap) {
-      const ArcAlignedCharacters = this.getArcAlignedCharacters();
-
-      for (const arcAlignedChar of ArcAlignedCharacters) {
-        // Don't snap to space characters
-        if (arcAlignedChar.character.trim() === '') continue;
-        snaps.push(new SnapPoint(arcAlignedChar.position, SnapPoint.Type.NODE));
-      }
+    const ArcAlignedCharacters = this.getArcAlignedCharacters();
+    for (const arcAlignedChar of ArcAlignedCharacters) {
+      // Don't snap to space characters
+      if (arcAlignedChar.character.trim() === '') continue;
+      snaps.push(new SnapPoint(arcAlignedChar.position, SnapPoint.Type.NODE));
     }
 
     return snaps;
