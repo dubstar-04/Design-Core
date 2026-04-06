@@ -452,7 +452,7 @@ export class Arc extends Entity {
 
     if (pnt !== null) {
       const distance = P.distance(pnt);
-      return [pnt, distance];
+      return [pnt, distance, true];
     }
 
     // closest point not on the arc
