@@ -199,7 +199,7 @@ export class Snapping {
   constructor() {
     // active is true when snapping is active (e.g. during a command)
     this.active = false;
-    // snapOverride can be set to a SnapPoint.Type to only snap to that type
+    // snapOverride: null = use settings; SnapPoint.Type.NONE = suppress all snaps; any other type = snap only to that type
     this.snapOverride = null;
   }
 
@@ -277,11 +277,12 @@ export class Snapping {
 
       const itemSnaps = DesignCore.Scene.entities.get(i).snaps(DesignCore.Mouse.pointOnScene(), delta); // get an array of snap point from the item
       if (itemSnaps) {
-        for (let j = 0; j < itemSnaps.length; j++) {
-          const length = itemSnaps[j].snapPoint.distance(DesignCore.Mouse.pointOnScene());
+        const filteredSnaps = this.snapOverride !== null ? itemSnaps.filter((s) => s.type === this.snapOverride) : itemSnaps.filter((s) => DesignCore.Settings[`${s.type}snap`]);
+        for (let j = 0; j < filteredSnaps.length; j++) {
+          const length = filteredSnaps[j].snapPoint.distance(DesignCore.Mouse.pointOnScene());
           if (length < delta) {
             delta = length;
-            snapPoint = itemSnaps[j];
+            snapPoint = filteredSnaps[j];
           }
         }
       }
