@@ -441,9 +441,9 @@ test('Arc.snaps returns end and centre snap points', () => {
   expect(snaps.filter((s) => s.type === 'end').length).toBe(2);
   expect(snaps.filter((s) => s.type === 'centre').length).toBe(1);
 
-  // Arc.closestPoint requires closest[2] === true which is never satisfied, so no nearest snap
+  // Arc.snaps nearest fires when mouse is on the arc surface
   const nearSnaps = arc.snaps(new Point(10, 0), 100);
-  expect(nearSnaps.filter((s) => s.type === 'nearest').length).toBe(0);
+  expect(nearSnaps.filter((s) => s.type === 'nearest').length).toBe(1);
 });
 
 test('Arc.execute handles negative angle (clockwise)', async () => {
@@ -497,5 +497,60 @@ test('Arc.fromPolylinePoints precision drift is negligible', () => {
   const centerDrift = Math.hypot(rebuilt.points[0].x - arc.points[0].x, rebuilt.points[0].y - arc.points[0].y);
   expect(centerDrift).toBeLessThan(1e-10);
   expect(Math.abs(rebuilt.radius - arc.radius)).toBeLessThan(1e-10);
+});
+
+test('Arc.snaps nearest does not fire when mouse is too far from arc', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
+  // Mouse far from arc surface; delta=1 so delta/10=0.1 — distance >> threshold
+  const snaps = arc.snaps(new Point(100, 100), 1);
+  expect(snaps.filter((s) => s.type === 'nearest').length).toBe(0);
+});
+
+test('Arc.snaps returns tangent snap when fromPoint is outside the arc', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  // fromPoint=(20,0): distanceToCenter=20 > radius=10
+  // tangentHalfAngle = acos(10/20) = π/3 (60°)
+  // tangentPoint at angle 0+60°=(5, 8.66) IS on CCW arc from 0° to 90°
+  // tangentPoint at angle 0-60°=(5,-8.66) is NOT on the arc
+  DesignCore.Scene.inputManager.inputPoint = new Point(20, 0);
+  const snaps = arc.snaps(new Point(5, 5), 100);
+  const tangentSnaps = snaps.filter((s) => s.type === 'tangent');
+  expect(tangentSnaps.length).toBe(1);
+  expect(tangentSnaps[0].snapPoint.x).toBeCloseTo(5);
+  expect(tangentSnaps[0].snapPoint.y).toBeCloseTo(8.6603, 3);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+test('Arc.snaps returns no tangent when fromPoint is inside the arc radius', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  DesignCore.Scene.inputManager.inputPoint = new Point(1, 1); // distanceToCenter ≈ 1.41 < radius 10
+  const snaps = arc.snaps(new Point(5, 5), 100);
+  expect(snaps.filter((s) => s.type === 'tangent').length).toBe(0);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+test('Arc.snaps returns perpendicular snap when radial point is on the arc', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  // fromPoint=(20,0): angleFromCentreToInput=0; perpendicularPoint=(10,0) IS on CCW arc
+  DesignCore.Scene.inputManager.inputPoint = new Point(20, 0);
+  const snaps = arc.snaps(new Point(5, 5), 100);
+  const perpSnaps = snaps.filter((s) => s.type === 'perpendicular');
+  expect(perpSnaps.length).toBe(1);
+  expect(perpSnaps[0].snapPoint.x).toBeCloseTo(10);
+  expect(perpSnaps[0].snapPoint.y).toBeCloseTo(0);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+test('Arc.snaps returns no perpendicular when radial point is not on the arc', () => {
+  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  // fromPoint=(0,-20): angleFromCentreToInput=-π/2; perpendicularPoint=(0,-10) NOT on CCW arc from 0° to 90°
+  DesignCore.Scene.inputManager.inputPoint = new Point(0, -20);
+  const snaps = arc.snaps(new Point(5, 5), 100);
+  expect(snaps.filter((s) => s.type === 'perpendicular').length).toBe(0);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
 });
 
