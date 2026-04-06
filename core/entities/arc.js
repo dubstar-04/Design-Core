@@ -10,6 +10,7 @@ import { AddState, RemoveState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
+import { SnapPoint } from '../lib/snapping.js';
 
 /**
  * Arc Entity Class
@@ -403,12 +404,11 @@ export class Arc extends Entity {
           this.points[0].y + (this.radius * Math.sin(this.endAngle())),
       );
 
-      snaps.push(startPoint, endPoint);
+      snaps.push(new SnapPoint(startPoint, SnapPoint.Type.END), new SnapPoint(endPoint, SnapPoint.Type.END));
     }
 
     if (DesignCore.Settings.centresnap) {
-      const centre = this.points[0];
-      snaps.push(centre);
+      snaps.push(new SnapPoint(this.points[0], SnapPoint.Type.CENTRE));
     }
 
     if (DesignCore.Settings.nearestsnap) {
@@ -416,7 +416,9 @@ export class Arc extends Entity {
 
       // Crude way to snap to the closest point or a node
       if (closest[2] === true && closest[1] < delta / 10) {
-        snaps.push(closest[0]);
+        snaps.push(new SnapPoint(closest[0], SnapPoint.Type.NEAREST));
+      }
+    }
       }
     }
 
