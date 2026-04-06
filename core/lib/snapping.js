@@ -19,6 +19,7 @@ export class SnapPoint {
   /**
    * Create SnapPoint
    * @param {Point} snapPoint
+   * @param {string} type - snap type from SnapPoint.Type
    */
   constructor(snapPoint, type = SnapPoint.Type.END) {
     this.snapPoint = snapPoint;
