@@ -10,6 +10,7 @@ import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
+import { SnapPoint } from '../lib/snapping.js';
 
 /**
  * Text Entity Class
@@ -506,14 +507,10 @@ export class Text extends Entity {
    * @return {Array} - array of snap points
    */
   snaps(mousePoint, delta) {
-    const frameCorners = this.getTextFrameCorners();
-    const mid = frameCorners[0].midPoint(frameCorners[2]);
-    const snaps = [...frameCorners, mid];
+    const snaps = [];
 
-    // add insertion point if not already in snaps
-    // this adds an extra snap point when alignment != 0.
-    if (!snaps.some((point) => point.isSame(this.points[0]))) {
-      snaps.push(this.points[0]);
+    if (DesignCore.Settings.nodesnap) {
+      snaps.push(new SnapPoint(this.points[0].clone(), SnapPoint.Type.NODE));
     }
 
     return snaps;
