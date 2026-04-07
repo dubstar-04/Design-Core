@@ -17,8 +17,3 @@
 - Radial Dimension
 - Diametric Dimension
 
-### Snapping
-- some snaps return point.clone
-- Check intial snap value 25?
-- snap color from accent?
-
