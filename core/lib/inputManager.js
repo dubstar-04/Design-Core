@@ -293,8 +293,7 @@ export class InputManager {
    * Handle single selection
    */
   singleSelect() {
-    this.inputPoint = DesignCore.Mouse.pointOnScene();
-    this.onLeftClick(this.inputPoint);
+    this.onLeftClick(DesignCore.Mouse.pointOnScene());
   }
 
   /**
