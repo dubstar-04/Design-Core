@@ -29,7 +29,7 @@ export class InputManager {
    * Reset the inputManager
    */
   reset() {
-    this.snapping.active = false;
+    this.snapping.reset();
     this.inputPoint = null;
     DesignCore.CommandLine.resetPrompt();
     this.activeCommand = undefined;
@@ -80,7 +80,7 @@ export class InputManager {
         this.inputPoint = input;
       }
 
-      this.snapping.active = false;
+      this.snapping.reset();
       return input;
     });
   }
@@ -213,7 +213,6 @@ export class InputManager {
       const selection = DesignCore.Scene.selectionManager.singleSelect(DesignCore.Mouse.pointOnScene());
       this.onSelection(selection);
     } else if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {
-      this.snapping.active = false;
       this.promptOption.respond(point);
     }
   }

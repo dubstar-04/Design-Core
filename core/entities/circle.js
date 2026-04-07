@@ -10,6 +10,7 @@ import { Utils } from '../lib/utils.js';
 
 import { DesignCore } from '../designCore.js';
 import { AddState, RemoveState } from '../lib/stateManager.js';
+import { SnapPoint } from '../lib/snapping.js';
 
 /**
  * Circle Entity Class
@@ -246,26 +247,41 @@ export class Circle extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (DesignCore.Settings.centresnap) {
-      const centre = new Point(this.points[0].x, this.points[0].y);
-      snaps.push(centre);
+    const centre = this.points[0]; // circle centre point
+
+    snaps.push(new SnapPoint(centre, SnapPoint.Type.CENTRE));
+
+    snaps.push(
+        new SnapPoint(new Point(centre.x + this.radius, centre.y), SnapPoint.Type.QUADRANT), // 0°
+        new SnapPoint(new Point(centre.x, centre.y + this.radius), SnapPoint.Type.QUADRANT), // 90°
+        new SnapPoint(new Point(centre.x - this.radius, centre.y), SnapPoint.Type.QUADRANT), // 180°
+        new SnapPoint(new Point(centre.x, centre.y - this.radius), SnapPoint.Type.QUADRANT), // 270°
+    );
+
+    if (mousePoint) {
+      const [nearestPoint, nearestDistance] = this.closestPoint(mousePoint);
+      // Crude way to snap to the closest point on the circle
+      if (nearestDistance < delta / 10) {
+        snaps.push(new SnapPoint(nearestPoint, SnapPoint.Type.NEAREST));
+      }
     }
 
-    if (DesignCore.Settings.quadrantsnap) {
-      const angle0 = new Point(this.points[0].x + this.radius, this.points[0].y);
-      const angle90 = new Point(this.points[0].x, this.points[0].y + this.radius);
-      const angle180 = new Point(this.points[0].x - this.radius, this.points[0].y);
-      const angle270 = new Point(this.points[0].x, this.points[0].y - this.radius);
+    const fromPoint = DesignCore.Scene.inputManager.inputPoint; // last confirmed input point (line start)
+    if (fromPoint !== null) {
+      const distanceToCenter = centre.distance(fromPoint); // distance from the input point to the circle centre
+      const angleFromCentreToInput = centre.angle(fromPoint); // angle from centre toward fromPoint
 
-      snaps.push(angle0, angle90, angle180, angle270);
-    }
+      // Tangent: only possible when fromPoint is outside the circle radius
+      if (distanceToCenter > this.radius) {
+        const tangentHalfAngle = Math.acos(this.radius / distanceToCenter); // half-angle between the two tangent directions
 
-    if (DesignCore.Settings.nearestsnap) {
-      const closest = this.closestPoint(mousePoint);
+        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput + tangentHalfAngle, this.radius), SnapPoint.Type.TANGENT));
+        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput - tangentHalfAngle, this.radius), SnapPoint.Type.TANGENT));
+      }
 
-      // Crude way to snap to the closest point or a node
-      if (closest[1] < delta / 10) {
-        snaps.push(closest[0]);
+      // Perpendicular: point on the circle that lies on the line from fromPoint through the centre
+      if (distanceToCenter > 0) {
+        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput, this.radius), SnapPoint.Type.PERPENDICULAR));
       }
     }
 

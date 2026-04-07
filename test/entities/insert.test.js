@@ -19,13 +19,15 @@ rotatedInsert.block.addItem(line);
 test('Test Insert.snaps', () => {
   const point = new Point(100, 100);
   const snaps = insert.snaps(point, 1);
-  expect(snaps[0].x).toBeCloseTo(101);
-  expect(snaps[0].y).toBeCloseTo(102);
+  const endSnaps = snaps.filter((s) => s.type === 'end');
+  expect(endSnaps[0].snapPoint.x).toBeCloseTo(101);
+  expect(endSnaps[0].snapPoint.y).toBeCloseTo(102);
 
   // Test snaps for a rotated block
   const rotatedSnaps = rotatedInsert.snaps(point);
-  expect(rotatedSnaps[0].x).toBeCloseTo(-0.7071);
-  expect(rotatedSnaps[0].y).toBeCloseTo(143.5426);
+  const rotatedEndSnaps = rotatedSnaps.filter((s) => s.type === 'end');
+  expect(rotatedEndSnaps[0].snapPoint.x).toBeCloseTo(-0.7071);
+  expect(rotatedEndSnaps[0].snapPoint.y).toBeCloseTo(143.5426);
 });
 
 test('Test Insert.closestPoint', () => {
@@ -87,4 +89,12 @@ AcDbBlockReference
   file = new File();
   newInsert.dxf(file);
   expect(file.contents).toEqual(dxfString);
+});
+
+test('Insert.snaps returns a node snap at points[0]', () => {
+  const nodeInsert = new Insert({ points: [new Point(5, 10)] });
+  const nodeSnaps = nodeInsert.snaps(new Point(0, 0), 100).filter((s) => s.type === 'node');
+  expect(nodeSnaps.length).toBe(1);
+  expect(nodeSnaps[0].snapPoint.x).toBe(5);
+  expect(nodeSnaps[0].snapPoint.y).toBe(10);
 });

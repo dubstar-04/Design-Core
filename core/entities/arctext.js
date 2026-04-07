@@ -11,6 +11,7 @@ import { Property } from '../properties/property.js';
 import { Text } from './text.js';
 
 import { DesignCore } from '../designCore.js';
+import { SnapPoint } from '../lib/snapping.js';
 
 /**
  * Arc Aligned Character Class
@@ -566,15 +567,14 @@ export class ArcAlignedText extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    const ArcAlignedCharacters = this.getArcAlignedCharacters();
+    snaps.push(new SnapPoint(this.points[0], SnapPoint.Type.CENTRE)); // arc center
 
+    const ArcAlignedCharacters = this.getArcAlignedCharacters();
     for (const arcAlignedChar of ArcAlignedCharacters) {
       // Don't snap to space characters
       if (arcAlignedChar.character.trim() === '') continue;
-      snaps.push(arcAlignedChar.position);
+      snaps.push(new SnapPoint(arcAlignedChar.position, SnapPoint.Type.NODE));
     }
-
-    snaps.push(this.points[0]); // arc center
 
     return snaps;
   }

@@ -6,13 +6,27 @@ import { Utils } from './utils.js';
 import { DesignCore } from '../designCore.js';
 
 /** SnapPoint Class */
-class SnapPoint {
+export class SnapPoint {
+  static Type = Object.freeze({
+    NONE: 'none',
+    END: 'end',
+    MID: 'mid',
+    CENTRE: 'centre',
+    QUADRANT: 'quadrant',
+    NEAREST: 'nearest',
+    TANGENT: 'tangent',
+    NODE: 'node',
+    PERPENDICULAR: 'perpendicular',
+  });
+
   /**
    * Create SnapPoint
    * @param {Point} snapPoint
+   * @param {string} type - snap type from SnapPoint.Type
    */
-  constructor(snapPoint) {
+  constructor(snapPoint, type = SnapPoint.Type.END) {
     this.snapPoint = snapPoint;
+    this.type = type;
   }
 
   /**
@@ -21,19 +35,74 @@ class SnapPoint {
    * @param {number} scale
    */
   draw(ctx, scale) {
-    const snapColour = DesignCore.Settings.snapcolour;
-    const radius = 4;
+    const snapColour = DesignCore.Settings.snaptrackingcolour;
+    const size = 6 / scale;
+    const x = this.snapPoint.x;
+    const y = this.snapPoint.y;
+    const lineWidth = 2.5 / scale;
 
     try { // HTML Canvas
-      ctx.fillStyle = Colours.rgbToString(snapColour);
+      ctx.strokeStyle = Colours.rgbToString(snapColour);
+      ctx.lineWidth = lineWidth;
+      ctx.setLineDash([]);
       ctx.beginPath();
     } catch { // Cairo
       const rgbColour = Colours.rgbToScaledRGB(snapColour);
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+      ctx.setLineWidth(lineWidth);
     }
 
-    ctx.arc(this.snapPoint.x, this.snapPoint.y, radius / scale, 0, 6.283);
-    ctx.fill();
+    switch (this.type) {
+      case SnapPoint.Type.END: // square
+        ctx.moveTo(x - size, y - size);
+        ctx.lineTo(x + size, y - size);
+        ctx.lineTo(x + size, y + size);
+        ctx.lineTo(x - size, y + size);
+        ctx.closePath();
+        break;
+      case SnapPoint.Type.MID: // triangle
+        ctx.moveTo(x, y + size);
+        ctx.lineTo(x - size, y - size);
+        ctx.lineTo(x + size, y - size);
+        ctx.closePath();
+        break;
+      case SnapPoint.Type.QUADRANT: // diamond
+        ctx.moveTo(x, y - size);
+        ctx.lineTo(x + size, y);
+        ctx.lineTo(x, y + size);
+        ctx.lineTo(x - size, y);
+        ctx.closePath();
+        break;
+      case SnapPoint.Type.NEAREST: // hourglass (X with horizontal lines at top and bottom)
+        ctx.moveTo(x - size, y - size);
+        ctx.lineTo(x + size, y - size);
+        ctx.lineTo(x - size, y + size);
+        ctx.lineTo(x + size, y + size);
+        ctx.closePath();
+        break;
+      case SnapPoint.Type.TANGENT: // circle with a horizontal line over the top
+        ctx.arc(x, y, size, 0, 6.283);
+        ctx.moveTo(x - size, y + size * 1.5);
+        ctx.lineTo(x + size, y + size * 1.5);
+        break;
+      case SnapPoint.Type.NODE: // circle with an X inside
+        ctx.arc(x, y, size, 0, 6.283);
+        ctx.moveTo(x - size * 0.7, y - size * 0.7);
+        ctx.lineTo(x + size * 0.7, y + size * 0.7);
+        ctx.moveTo(x + size * 0.7, y - size * 0.7);
+        ctx.lineTo(x - size * 0.7, y + size * 0.7);
+        break;
+      case SnapPoint.Type.PERPENDICULAR: // right-angle corner (L-shape)
+        ctx.moveTo(x - size, y + size);
+        ctx.lineTo(x - size, y - size);
+        ctx.lineTo(x + size, y - size);
+        break;
+      default: // CENTRE - circle
+        ctx.arc(x, y, size, 0, 6.283);
+        break;
+    }
+
+    ctx.stroke();
   }
 }
 
@@ -57,6 +126,7 @@ class TrackingLine {
   draw(ctx, scale) {
     const from = this.inputPoint;
     const dir = this.snapPoint.subtract(from);
+    const lineWidth = 2 / scale;
 
     if (dir.x === 0 && dir.y === 0) {
       return;
@@ -99,7 +169,7 @@ class TrackingLine {
     const start = from.add(dir.scale(tMin));
     const end = from.add(dir.scale(tMax));
 
-    const lineColour = DesignCore.Settings.polarsnapcolour;
+    const lineColour = DesignCore.Settings.snaptrackingcolour;
     const dashSize = 4 / scale;
 
     ctx.save();
@@ -107,12 +177,12 @@ class TrackingLine {
     try { // HTML Canvas
       ctx.beginPath();
       ctx.strokeStyle = Colours.rgbToString(lineColour);
-      ctx.lineWidth = 1 / scale;
+      ctx.lineWidth = lineWidth;
       ctx.setLineDash([dashSize, dashSize]);
     } catch { // Cairo
       const rgbColour = Colours.rgbToScaledRGB(lineColour);
       ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-      ctx.setLineWidth(1 / scale);
+      ctx.setLineWidth(lineWidth);
       ctx.setDash([dashSize, dashSize], 0);
     }
 
@@ -128,8 +198,31 @@ class TrackingLine {
 export class Snapping {
   /** Create snapping */
   constructor() {
+    // active is true when snapping is active (e.g. during a command)
     this.active = false;
+    // snapOverride: null = use settings; SnapPoint.Type.NONE = suppress all snaps; any other type = snap only to that type
+    this.snapOverride = null;
   }
+
+  /**
+   * Reset snapping state
+   */
+  reset() {
+    this.active = false;
+    this.snapOverride = null;
+  }
+
+  /**
+   * Set the snap override type
+   * @param {string|null} type - a SnapPoint.Type value, or null to clear the override
+   */
+  setSnapOverride(type) {
+    if (type !== null && !Object.values(SnapPoint.Type).includes(type)) {
+      throw new Error(`Invalid snap override type: ${type}`);
+    }
+    this.snapOverride = type;
+  }
+
 
   /**
    * Get snap point and draw to the scene
@@ -149,14 +242,14 @@ export class Snapping {
 
   /**
    * Draw the snap point
-   * @param {Point} snapPoint
+   * @param {SnapPoint} snapPoint
    */
   addSnapPoint(snapPoint) {
     // show the snap point
-    DesignCore.Scene.auxiliaryEntities.add(new SnapPoint(snapPoint));
+    DesignCore.Scene.auxiliaryEntities.add(snapPoint);
 
     // Move the mouse to the closest snap point so if the mouse if clicked the snap point is used.
-    DesignCore.Mouse.setPosFromScenePoint(snapPoint);
+    DesignCore.Mouse.setPosFromScenePoint(snapPoint.snapPoint);
   }
 
   /**
@@ -174,7 +267,8 @@ export class Snapping {
    */
   getSnapPoint() {
     let snapPoint;
-    let delta = 25 / DesignCore.Canvas.getScale(); // find a more suitable starting value
+    const snapAperture = 25; // capture radius in pixels (screen space)
+    let delta = snapAperture / DesignCore.Canvas.getScale(); // convert to scene space
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
       const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).layer);
@@ -185,11 +279,12 @@ export class Snapping {
 
       const itemSnaps = DesignCore.Scene.entities.get(i).snaps(DesignCore.Mouse.pointOnScene(), delta); // get an array of snap point from the item
       if (itemSnaps) {
-        for (let j = 0; j < itemSnaps.length; j++) {
-          const length = itemSnaps[j].distance(DesignCore.Mouse.pointOnScene());
+        const filteredSnaps = this.snapOverride !== null ? itemSnaps.filter((s) => s.type === this.snapOverride) : itemSnaps.filter((s) => DesignCore.Settings[`${s.type}snap`]);
+        for (let j = 0; j < filteredSnaps.length; j++) {
+          const length = filteredSnaps[j].snapPoint.distance(DesignCore.Mouse.pointOnScene());
           if (length < delta) {
             delta = length;
-            snapPoint = itemSnaps[j];
+            snapPoint = filteredSnaps[j];
           }
         }
       }

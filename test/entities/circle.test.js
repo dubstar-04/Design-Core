@@ -292,45 +292,35 @@ test('Circle.draw does not throw', () => {
 
 test('Circle.snaps returns centre snap', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  DesignCore.Settings.centresnap = true;
-  DesignCore.Settings.quadrantsnap = false;
-  DesignCore.Settings.nearestsnap = false;
   const snaps = circle.snaps(new Point(5, 0), 100);
-  expect(snaps).toHaveLength(1);
-  expect(snaps[0].x).toBe(0);
-  expect(snaps[0].y).toBe(0);
+  const centreSnaps = snaps.filter((s) => s.type === 'centre');
+  expect(centreSnaps).toHaveLength(1);
+  expect(centreSnaps[0].snapPoint.x).toBe(0);
+  expect(centreSnaps[0].snapPoint.y).toBe(0);
 });
 
 test('Circle.snaps returns four quadrant snaps', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  DesignCore.Settings.centresnap = false;
-  DesignCore.Settings.quadrantsnap = true;
-  DesignCore.Settings.nearestsnap = false;
   const snaps = circle.snaps(new Point(5, 0), 100);
-  expect(snaps).toHaveLength(4);
-  expect(snaps.some((p) => p.x === 10 && p.y === 0)).toBe(true);// 0°
-  expect(snaps.some((p) => p.x === 0 && p.y === 10)).toBe(true);// 90°
-  expect(snaps.some((p) => p.x === -10 && p.y === 0)).toBe(true);// 180°
-  expect(snaps.some((p) => p.x === 0 && p.y === -10)).toBe(true);// 270°
+  const quadrantSnaps = snaps.filter((s) => s.type === 'quadrant');
+  expect(quadrantSnaps).toHaveLength(4);
+  expect(quadrantSnaps.some((p) => p.snapPoint.x === 10 && p.snapPoint.y === 0)).toBe(true);// 0°
+  expect(quadrantSnaps.some((p) => p.snapPoint.x === 0 && p.snapPoint.y === 10)).toBe(true);// 90°
+  expect(quadrantSnaps.some((p) => p.snapPoint.x === -10 && p.snapPoint.y === 0)).toBe(true);// 180°
+  expect(quadrantSnaps.some((p) => p.snapPoint.x === 0 && p.snapPoint.y === -10)).toBe(true);// 270°
 });
 
 test('Circle.snaps nearest snap fires when close enough', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  DesignCore.Settings.centresnap = false;
-  DesignCore.Settings.quadrantsnap = false;
-  DesignCore.Settings.nearestsnap = true;
   // Mouse on the circle surface with large delta
   const snaps = circle.snaps(new Point(10, 0), 1000);
-  expect(snaps.length).toBeGreaterThanOrEqual(1);
+  expect(snaps.filter((s) => s.type === 'nearest').length).toBeGreaterThanOrEqual(1);
 });
 
 test('Circle.snaps nearest snap does not fire when too far', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  DesignCore.Settings.centresnap = false;
-  DesignCore.Settings.quadrantsnap = false;
-  DesignCore.Settings.nearestsnap = true;
   const snaps = circle.snaps(new Point(100, 100), 1);
-  expect(snaps.length).toBe(0);
+  expect(snaps.filter((s) => s.type === 'nearest').length).toBe(0);
 });
 
 test('Circle.fromPolylinePoints round-trip preserves centre and radius', () => {
@@ -351,4 +341,40 @@ test('Circle.fromPolylinePoints precision drift is negligible', () => {
   const drift = Math.hypot(rebuilt.points[0].x - circle.points[0].x, rebuilt.points[0].y - circle.points[0].y);
   expect(drift).toBeLessThan(1e-10);
   expect(Math.abs(rebuilt.radius - circle.radius)).toBeLessThan(1e-10);
+});
+
+test('Circle.snaps returns two tangent snaps from outside', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  // fromPoint=(20,0): distanceToCenter=20 > radius=10
+  // tangentHalfAngle = acos(10/20) = π/3; both tangent points at (5, ±8.66) are on the full circle
+  DesignCore.Scene.inputManager.inputPoint = new Point(20, 0);
+  const snaps = circle.snaps(new Point(5, 0), 100);
+  const tangentSnaps = snaps.filter((s) => s.type === 'tangent');
+  expect(tangentSnaps.length).toBe(2);
+  expect(tangentSnaps.some((s) => s.snapPoint.x > 4.9 && s.snapPoint.y > 8.5)).toBe(true);
+  expect(tangentSnaps.some((s) => s.snapPoint.x > 4.9 && s.snapPoint.y < -8.5)).toBe(true);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+test('Circle.snaps returns no tangent when fromPoint is inside the circle', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  DesignCore.Scene.inputManager.inputPoint = new Point(1, 1); // distanceToCenter ≈ 1.41 < radius 10
+  const snaps = circle.snaps(new Point(5, 0), 100);
+  expect(snaps.filter((s) => s.type === 'tangent').length).toBe(0);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+test('Circle.snaps returns perpendicular snap from outside', () => {
+  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  // fromPoint=(20,0): angleFromCentreToInput=0; perpendicularPoint=(10,0)
+  DesignCore.Scene.inputManager.inputPoint = new Point(20, 0);
+  const snaps = circle.snaps(new Point(5, 0), 100);
+  const perpSnaps = snaps.filter((s) => s.type === 'perpendicular');
+  expect(perpSnaps.length).toBe(1);
+  expect(perpSnaps[0].snapPoint.x).toBeCloseTo(10);
+  expect(perpSnaps[0].snapPoint.y).toBeCloseTo(0);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
 });

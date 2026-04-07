@@ -535,7 +535,8 @@ test('Text snaps returns all snap points', () => {
   const t = new Text({ points: [new Point(1, 2)] });
   t.boundingRect = { width: 10, height: 10 };
   const snaps = t.snaps(new Point(0, 0), 1);
-  expect(snaps.length).toBe(5);
+  expect(snaps.length).toBe(1);
+  expect(snaps[0].type).toBe('node');
 });
 
 test('Text closestPoint returns correct distance', () => {
@@ -629,4 +630,12 @@ test('Text.execute does not create entity for empty string', async () => {
   } } });
 
   expect(executeCommandCalled).toBe(false);
+});
+
+test('Text.snaps node snap position matches points[0]', () => {
+  const t = new Text({ points: [new Point(5, 10)] });
+  const nodeSnaps = t.snaps(new Point(0, 0), 100).filter((s) => s.type === 'node');
+  expect(nodeSnaps.length).toBe(1);
+  expect(nodeSnaps[0].snapPoint.x).toBe(5);
+  expect(nodeSnaps[0].snapPoint.y).toBe(10);
 });

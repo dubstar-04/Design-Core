@@ -300,8 +300,9 @@ test('Test ArcText.snaps', () => {
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
   const point = new Point(100, 100);
   const snaps = arcText.snaps(point, 1);
-  expect(snaps[0].x).toBeCloseTo(-2.39222);
-  expect(snaps[0].y).toBeCloseTo(101.22173);
+  const nodeSnaps = snaps.filter((s) => s.type === 'node');
+  expect(nodeSnaps[0].snapPoint.x).toBeCloseTo(-2.39222);
+  expect(nodeSnaps[0].snapPoint.y).toBeCloseTo(101.22173);
 });
 
 test('Test ArcText.closestPoint', () => {
@@ -326,4 +327,19 @@ test('Test ArcText.toPolylinePoints - returns correct points array', () => {
   expect(result.length).toBe(4);
   expect(result[0].x).toBeCloseTo(-2.39222);
   expect(result[0].y).toBeCloseTo(101.22173);
+});
+
+test('ArcText.snaps returns a centre snap at points[0]', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(3, 7)], string: 'Hi', radius: 50 });
+  const centreSnaps = arcText.snaps(new Point(0, 0), 100).filter((s) => s.type === 'centre');
+  expect(centreSnaps.length).toBe(1);
+  expect(centreSnaps[0].snapPoint.x).toBe(3);
+  expect(centreSnaps[0].snapPoint.y).toBe(7);
+});
+
+test('ArcText.snaps returns node snaps only for non-space characters', () => {
+  // 'A B' has 3 characters: 'A', ' ', 'B' — only 'A' and 'B' produce node snaps
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'A B', radius: 100 });
+  const nodeSnaps = arcText.snaps(new Point(0, 0), 100).filter((s) => s.type === 'node');
+  expect(nodeSnaps.length).toBe(2);
 });

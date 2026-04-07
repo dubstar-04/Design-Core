@@ -10,6 +10,7 @@ import { AddState, RemoveState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
+import { SnapPoint } from '../lib/snapping.js';
 
 /**
  * Arc Entity Class
@@ -392,31 +393,45 @@ export class Arc extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (DesignCore.Settings.endsnap) {
-      // Speed this up by generating the proper start and end points when the arc is initialised
-      const startPoint = new Point(
-          this.points[0].x + (this.radius * Math.cos(this.startAngle())),
-          this.points[0].y + (this.radius * Math.sin(this.startAngle())),
-      );
-      const endPoint = new Point(
-          this.points[0].x + (this.radius * Math.cos(this.endAngle())),
-          this.points[0].y + (this.radius * Math.sin(this.endAngle())),
-      );
+    const centre = this.points[0]; // arc centre point
+    const arcStartPoint = this.points[1]; // arc start point on circumference
+    const arcEndPoint = this.points[2]; // arc end point on circumference
 
-      snaps.push(startPoint, endPoint);
+    snaps.push(new SnapPoint(centre, SnapPoint.Type.CENTRE));
+    snaps.push(new SnapPoint(arcStartPoint, SnapPoint.Type.END));
+    snaps.push(new SnapPoint(arcEndPoint, SnapPoint.Type.END));
+
+    if (mousePoint) {
+      const [nearestPoint, nearestDistance, isOnArc] = this.closestPoint(mousePoint);
+      // Crude way to snap to the closest point on the arc
+      if (isOnArc === true && nearestDistance < delta / 10) {
+        snaps.push(new SnapPoint(nearestPoint, SnapPoint.Type.NEAREST));
+      }
     }
 
-    if (DesignCore.Settings.centresnap) {
-      const centre = this.points[0];
-      snaps.push(centre);
-    }
+    const fromPoint = DesignCore.Scene.inputManager.inputPoint; // last confirmed input point (line start)
+    if (fromPoint !== null) {
+      const distanceToCenter = centre.distance(fromPoint); // distance from the input point to the arc centre
+      const angleFromCentreToInput = centre.angle(fromPoint); // angle from centre toward fromPoint
 
-    if (DesignCore.Settings.nearestsnap) {
-      const closest = this.closestPoint(mousePoint);
+      // Tangent: only possible when fromPoint is outside the arc radius
+      if (distanceToCenter > this.radius) {
+        const tangentHalfAngle = Math.acos(this.radius / distanceToCenter); // half-angle between the two tangent directions
 
-      // Crude way to snap to the closest point or a node
-      if (closest[2] === true && closest[1] < delta / 10) {
-        snaps.push(closest[0]);
+        for (const sign of [1, -1]) {
+          const tangentPoint = centre.project(angleFromCentreToInput + sign * tangentHalfAngle, this.radius);
+          if (tangentPoint.isOnArc(this.points[1], this.points[2], centre, this.direction)) {
+            snaps.push(new SnapPoint(tangentPoint, SnapPoint.Type.TANGENT));
+          }
+        }
+      }
+
+      // Perpendicular: point on the arc that lies on the line from fromPoint through the centre
+      if (distanceToCenter > 0) {
+        const perpendicularPoint = centre.project(angleFromCentreToInput, this.radius);
+        if (perpendicularPoint.isOnArc(this.points[1], this.points[2], centre, this.direction)) {
+          snaps.push(new SnapPoint(perpendicularPoint, SnapPoint.Type.PERPENDICULAR));
+        }
       }
     }
 
@@ -437,7 +452,7 @@ export class Arc extends Entity {
 
     if (pnt !== null) {
       const distance = P.distance(pnt);
-      return [pnt, distance];
+      return [pnt, distance, true];
     }
 
     // closest point not on the arc

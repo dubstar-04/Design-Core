@@ -201,3 +201,56 @@ test('Line.fromPolylinePoints round-trip preserves points exactly', () => {
   expect(rebuilt.points[1].x).toBe(15);
   expect(rebuilt.points[1].y).toBe(-4);
 });
+
+test('Line.snaps returns two end snaps at both endpoints', () => {
+  const line = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+  const endSnaps = line.snaps(new Point(5, 0), 100).filter((s) => s.type === 'end');
+  expect(endSnaps.length).toBe(2);
+  expect(endSnaps.some((s) => s.snapPoint.x === 0 && s.snapPoint.y === 0)).toBe(true);
+  expect(endSnaps.some((s) => s.snapPoint.x === 10 && s.snapPoint.y === 0)).toBe(true);
+});
+
+test('Line.snaps returns mid snap at midpoint', () => {
+  const line = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+  const midSnaps = line.snaps(new Point(5, 0), 100).filter((s) => s.type === 'mid');
+  expect(midSnaps.length).toBe(1);
+  expect(midSnaps[0].snapPoint.x).toBe(5);
+  expect(midSnaps[0].snapPoint.y).toBe(0);
+});
+
+test('Line.snaps nearest fires when mouse is close to the line', () => {
+  const line = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+  // mouse at (5, 0.5): distance to line = 0.5; delta=10 so delta/10=1; 0.5 < 1 → fires
+  const snaps = line.snaps(new Point(5, 0.5), 10);
+  expect(snaps.filter((s) => s.type === 'nearest').length).toBe(1);
+});
+
+test('Line.snaps nearest does not fire when mouse is too far from the line', () => {
+  const line = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+  // mouse at (5, 20): distance to line = 20; delta=1 so delta/10=0.1; 20 > 0.1 → no fire
+  const snaps = line.snaps(new Point(5, 20), 1);
+  expect(snaps.filter((s) => s.type === 'nearest').length).toBe(0);
+});
+
+test('Line.snaps perpendicular fires when foot falls on the segment', () => {
+  const line = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  // fromPoint=(5,5): foot of perpendicular = (5,0), which IS on the segment
+  DesignCore.Scene.inputManager.inputPoint = new Point(5, 5);
+  const snaps = line.snaps(new Point(5, 0), 100);
+  const perpSnaps = snaps.filter((s) => s.type === 'perpendicular');
+  expect(perpSnaps.length).toBe(1);
+  expect(perpSnaps[0].snapPoint.x).toBeCloseTo(5);
+  expect(perpSnaps[0].snapPoint.y).toBeCloseTo(0);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+test('Line.snaps perpendicular does not fire when foot falls off the segment', () => {
+  const line = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+  const savedInputPoint = DesignCore.Scene.inputManager.inputPoint;
+  // fromPoint=(20,5): foot = (20,0), which is BEYOND the segment end at (10,0)
+  DesignCore.Scene.inputManager.inputPoint = new Point(20, 5);
+  const snaps = line.snaps(new Point(5, 0), 100);
+  expect(snaps.filter((s) => s.type === 'perpendicular').length).toBe(0);
+  DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
