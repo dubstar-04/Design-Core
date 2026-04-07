@@ -24,6 +24,9 @@ import { Logging } from '../lib/logging.js';
 
 import { DesignCore } from '../designCore.js';
 
+// re-export core components for external use
+export { Patterns } from '../lib/patterns.js';
+
 /** Class representing design core. This is the primary entry point */
 export class Core {
   /** Create a core object */
