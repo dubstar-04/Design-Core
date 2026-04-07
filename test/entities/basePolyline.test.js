@@ -626,3 +626,65 @@ test('BasePolyline.fromPolylinePoints round-trip strips closure point for closed
   expect(rebuilt.points[3].x).toBe(0);
   expect(rebuilt.points[3].y).toBe(10);
 });
+
+// ─── closestPoint: closed polyline closing segment ───────────────────────────
+
+test('BasePolyline.closestPoint finds closest point on closing segment of closed polyline', () => {
+  // Square: P0=(0,0), P1=(10,0), P2=(10,10), P3=(0,10), closed flag set.
+  // Closing segment is P3=(0,10) → P0=(0,0).
+  // A test point on the left edge (0, 5) must resolve to (0, 5) on the closing segment.
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+  const poly = new BasePolyline({ points });
+  poly.flags.setFlagValue(1);
+
+  const [closest, dist] = poly.closestPoint(new Point(0, 5));
+  expect(closest.x).toBeCloseTo(0);
+  expect(closest.y).toBeCloseTo(5);
+  expect(dist).toBeCloseTo(0);
+});
+
+test('BasePolyline.closestPoint closing segment is preferred over other segments', () => {
+  // The test point (-1, 5) is clearly nearest the closing segment (left edge),
+  // not the bottom, right, or top edges.
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+  const poly = new BasePolyline({ points });
+  poly.flags.setFlagValue(1);
+
+  const [closest, dist] = poly.closestPoint(new Point(-1, 5));
+  expect(closest.x).toBeCloseTo(0);
+  expect(closest.y).toBeCloseTo(5);
+  expect(dist).toBeCloseTo(1);
+});
+
+test('BasePolyline.closestPoint for open polyline does not include closing segment', () => {
+  // Same square shape but NO closed flag — the segment P3→P0 must not be considered.
+  // The test point (0, 5) is equidistant from the left edge and the top edge;
+  // without the closing segment the nearest point is on the top segment P2→P3 at (0, 10).
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+  const poly = new BasePolyline({ points });
+  // flag NOT set — open polyline
+
+  const [closest] = poly.closestPoint(new Point(-1, 5));
+  // Nearest on open polyline: left-most vertex is P3=(0,10) via segment P2→P3 or the
+  // end of the last segment — closest point on P2=(10,10)→P3=(0,10) to (-1,5)
+  // projects to (0. 10) because the foot falls outside the segment.
+  expect(closest.x).toBeCloseTo(0);
+  expect(closest.y).toBeCloseTo(10);
+});
+
+test('BasePolyline.closestPoint is consistent with getClosestSegmentIndex for closed polyline', () => {
+  // For a closed square, both methods should agree that the closing segment
+  // is nearest for a point on the left edge.
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+  const poly = new BasePolyline({ points });
+  poly.flags.setFlagValue(1);
+
+  const testPoint = new Point(-2, 5);
+  const [closest] = poly.closestPoint(testPoint);
+  const segIdx = poly.getClosestSegmentIndex(testPoint);
+
+  // Closing segment index == points.length == 4
+  expect(segIdx).toBe(points.length);
+  expect(closest.x).toBeCloseTo(0);
+  expect(closest.y).toBeCloseTo(5);
+});
