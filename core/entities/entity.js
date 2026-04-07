@@ -19,7 +19,7 @@ export class Entity {
    */
   constructor(data) {
     Object.defineProperty(this, 'type', {
-      value: this.constructor.name,
+      value: this.constructor.type ?? this.constructor.name,
       writable: true,
     });
 

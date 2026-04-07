@@ -13,6 +13,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Mirror extends Tool {
+  static type = 'Mirror';
+
   /** Create a Mirror command */
   constructor() {
     super();

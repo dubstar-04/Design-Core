@@ -3,6 +3,8 @@ import { Constants } from '../lib/constants.js';
 
 /** Point Entity Class */
 export class Point {
+  static type = 'Point';
+
   /**
    * Create a Point
    * @param  {number} x
@@ -11,7 +13,7 @@ export class Point {
    * @param  {number} sequence - dxf group code sequence reference
    */
   constructor(x, y, bulge = 0, sequence) {
-    this.type = this.constructor.name;
+    this.type = this.constructor.type ?? this.constructor.name;
     this.x = 0;
     this.y = 0;
     // sequence holds a reference to the dxf group code sequence the point represents

@@ -7,6 +7,8 @@ import { Point } from './point.js';
  * @extends BasePolyline
  */
 export class Polyline extends BasePolyline {
+  static type = 'Polyline';
+
   /**
    * Create a Polyline
    * @param {Array} data

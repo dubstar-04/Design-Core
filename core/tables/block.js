@@ -17,6 +17,8 @@ import { Utils } from '../lib/utils.js';
  * @extends Entity
  */
 export class Block extends Entity {
+  static type = 'Block';
+
   /**
    * Create a Block Entity
    * @param {Array} data

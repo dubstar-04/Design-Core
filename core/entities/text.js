@@ -17,6 +17,8 @@ import { SnapPoint } from '../lib/snapping.js';
  * @extends Entity
  */
 export class Text extends Entity {
+  static type = 'Text';
+
   /**
    * Create a Text Entity
    * @param {Array} data

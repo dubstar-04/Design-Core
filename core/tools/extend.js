@@ -11,6 +11,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Extend extends Tool {
+  static type = 'Extend';
+
   /** Create an Extend command */
   constructor() {
     super();

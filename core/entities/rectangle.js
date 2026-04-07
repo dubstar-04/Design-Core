@@ -12,6 +12,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Entity
  */
 export class Rectangle extends Entity {
+  static type = 'Rectangle';
+
   /**
    * Create a Rectangle
    * @param {Array} data

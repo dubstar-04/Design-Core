@@ -12,6 +12,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Zoom extends Tool {
+  static type = 'Zoom';
+
   /** Create a Zoom command */
   constructor() {
     super();

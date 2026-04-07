@@ -1,8 +1,12 @@
 /** Sentinel resolved when a MOUSEDOWN prompt completes */
-export class MouseDown {}
+export class MouseDown {
+  static type = 'MouseDown';
+}
 
 /** Sentinel resolved when a MOUSEUP prompt completes */
-export class MouseUp {}
+export class MouseUp {
+  static type = 'MouseUp';
+}
 
 /** Input Class */
 export class Input {
@@ -16,7 +20,7 @@ export class Input {
   /**
    * Input type definitions.
    * Each entry describes an accepted input type:
-   *   value  — matches value.constructor.name for runtime type detection via getType()
+   *   value  — matched against value.constructor.type (if defined) or value.constructor.name for runtime type detection via getType()
    *   cursor — the cursor state to apply when this type is requested (null = DEFAULT)
    */
   static Type = {
@@ -40,7 +44,7 @@ export class Input {
       return undefined;
     }
 
-    const name = value.constructor.name;
+    const name = value.constructor.type ?? value.constructor.name;
     return Object.values(Input.Type).find((t) => t.value === name);
   }
 }

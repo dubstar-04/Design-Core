@@ -12,6 +12,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class MatchProp extends Tool {
+  static type = 'MatchProp';
+
   /** Create a MatchProp command */
   constructor() {
     super();

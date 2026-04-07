@@ -14,6 +14,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Offset extends Tool {
+  static type = 'Offset';
+
   /** Create an Offset command */
   constructor() {
     super();

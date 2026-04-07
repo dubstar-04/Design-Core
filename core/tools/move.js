@@ -12,6 +12,8 @@ import { UpdateState } from '../lib/stateManager.js';
  * @extends Tool
  */
 export class Move extends Tool {
+  static type = 'Move';
+
   /** Create a Move command */
   constructor() {
     super();

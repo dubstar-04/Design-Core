@@ -13,6 +13,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Rotate extends Tool {
+  static type = 'Rotate';
+
   /** Create a Rotate command */
   constructor() {
     super();

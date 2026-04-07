@@ -7,6 +7,8 @@ import { BoundingBox } from '../lib/boundingBox.js';
  * @extends Entity
  */
 export class Solid extends Entity {
+  static type = 'Solid';
+
   /**
    * Create a Solid Entity
    * @param {Array} data

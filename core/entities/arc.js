@@ -17,6 +17,8 @@ import { SnapPoint } from '../lib/snapping.js';
  * @extends Entity
  * */
 export class Arc extends Entity {
+  static type = 'Arc';
+
   /**
    * Create an Arc Entity
    * @param {Array} data

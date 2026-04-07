@@ -5,7 +5,7 @@ export class Tool {
   /** Create a Tool command */
   constructor() {
     Object.defineProperty(this, 'type', {
-      value: this.constructor.name,
+      value: this.constructor.type ?? this.constructor.name,
       writable: true,
     });
 

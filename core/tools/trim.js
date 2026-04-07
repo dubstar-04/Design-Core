@@ -11,6 +11,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Trim extends Tool {
+  static type = 'Trim';
+
   /** Create a Trim command */
   constructor() {
     super();

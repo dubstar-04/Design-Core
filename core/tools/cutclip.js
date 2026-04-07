@@ -11,6 +11,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Cutclip extends Tool {
+  static type = 'Cutclip';
+
   /** Create a Cutclip command */
   constructor() {
     super();

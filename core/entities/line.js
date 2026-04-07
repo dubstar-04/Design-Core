@@ -17,6 +17,8 @@ import { SnapPoint } from '../lib/snapping.js';
  * @extends Entity
  */
 export class Line extends Entity {
+  static type = 'Line';
+
   /**
    * Create a Line Entity
    * @param {Array} data

@@ -17,6 +17,8 @@ import { SnapPoint } from '../lib/snapping.js';
  * @extends Entity
  */
 export class Insert extends Entity {
+  static type = 'Insert';
+
   /**
    * Create an Insert
    * Inserts are used to define the location of blocks

@@ -8,6 +8,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Pan extends Tool {
+  static type = 'Pan';
+
   /** Create a Pan command */
   constructor() {
     super();

@@ -5,6 +5,8 @@ import { DesignCore } from '../designCore.js';
 
 /** SingleSelection Class */
 export class SingleSelection {
+  static type = 'SingleSelection';
+
   /**
    * Create a SingleSelection
    * @param {number} index
@@ -18,6 +20,8 @@ export class SingleSelection {
 
 /** SelectionSet Class */
 export class SelectionSet {
+  static type = 'SelectionSet';
+
   /** Create SelectionSet */
   constructor() {
     this.accepted = false;
