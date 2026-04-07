@@ -257,9 +257,9 @@ export class Fillet extends ChamferFilletBase {
       const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
       const isFirstLower = seg1 < seg2;
       const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
-      const lowerTangent = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? secondTangentPoint : firstTangentPoint;
-      const upperTangent = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? firstTangentPoint : secondTangentPoint;
-      const polyArcDir = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? -arcDirection : arcDirection;
+      const lowerTangent = (isClosingWrap ? seg1 !== closeSegIdx : !isFirstLower) ? secondTangentPoint : firstTangentPoint;
+      const upperTangent = (isClosingWrap ? seg1 !== closeSegIdx : !isFirstLower) ? firstTangentPoint : secondTangentPoint;
+      const polyArcDir = (isClosingWrap ? seg1 !== closeSegIdx : !isFirstLower) ? -arcDirection : arcDirection;
       const startAngle = arcCentre.angle(lowerTangent);
       const endAngle = arcCentre.angle(upperTangent);
       const includedAngle = ((endAngle - startAngle) * polyArcDir + 4 * Math.PI) % (2 * Math.PI);
