@@ -20,7 +20,7 @@ export class Input {
   /**
    * Input type definitions.
    * Each entry describes an accepted input type:
-   *   value  — matches value.constructor.name for runtime type detection via getType()
+   *   value  — matched against value.constructor.type (if defined) or value.constructor.name for runtime type detection via getType()
    *   cursor — the cursor state to apply when this type is requested (null = DEFAULT)
    */
   static Type = {
