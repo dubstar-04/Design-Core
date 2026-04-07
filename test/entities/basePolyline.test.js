@@ -657,19 +657,18 @@ test('BasePolyline.closestPoint closing segment is preferred over other segments
 });
 
 test('BasePolyline.closestPoint for open polyline does not include closing segment', () => {
-  // Same square shape but NO closed flag — the segment P3→P0 must not be considered.
-  // The test point (0, 5) is equidistant from the left edge and the top edge;
-  // without the closing segment the nearest point is on the top segment P2→P3 at (0, 10).
+  // For point (-1, 1) on the open square:
+  //   – Nearest on seg P0→P1 (y=0): foot (-1,0) clips to (0,0), dist = √2 ≈ 1.41
+  //   – Nearest on seg P2→P3 (y=10): foot (-1,10) clips to (0,10), dist ≈ 9.06
+  //   – If the closing segment existed (x=0, y∈[0,10]): foot (0,1), dist = 1  ← closer!
+  // An open polyline must NOT check the closing segment, so it returns (0,0).
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
   const poly = new BasePolyline({ points });
   // flag NOT set — open polyline
 
-  const [closest] = poly.closestPoint(new Point(-1, 5));
-  // Nearest on open polyline: left-most vertex is P3=(0,10) via segment P2→P3 or the
-  // end of the last segment — closest point on P2=(10,10)→P3=(0,10) to (-1,5)
-  // projects to (0. 10) because the foot falls outside the segment.
+  const [closest] = poly.closestPoint(new Point(-1, 1));
   expect(closest.x).toBeCloseTo(0);
-  expect(closest.y).toBeCloseTo(10);
+  expect(closest.y).toBeCloseTo(0);
 });
 
 test('BasePolyline.closestPoint is consistent with getClosestSegmentIndex for closed polyline', () => {
