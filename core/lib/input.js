@@ -1,8 +1,12 @@
 /** Sentinel resolved when a MOUSEDOWN prompt completes */
-export class MouseDown {}
+export class MouseDown {
+  static type = 'MouseDown';
+}
 
 /** Sentinel resolved when a MOUSEUP prompt completes */
-export class MouseUp {}
+export class MouseUp {
+  static type = 'MouseUp';
+}
 
 /** Input Class */
 export class Input {
@@ -40,7 +44,7 @@ export class Input {
       return undefined;
     }
 
-    const name = value.constructor.name;
+    const name = value.constructor.type ?? value.constructor.name;
     return Object.values(Input.Type).find((t) => t.value === name);
   }
 }
