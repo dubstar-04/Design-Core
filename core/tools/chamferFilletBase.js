@@ -15,6 +15,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class ChamferFilletBase extends Tool {
+  static type = 'ChamferFilletBase';
+
   /** Create a ChamferFilletBase command */
   constructor() {
     super();

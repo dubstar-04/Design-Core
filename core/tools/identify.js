@@ -10,6 +10,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Identify extends Tool {
+  static type = 'Identify';
+
   /** Create an Identify command */
   constructor() {
     super();

@@ -13,6 +13,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Copy extends Tool {
+  static type = 'Copy';
+
   /** Create a Copy command */
   constructor() {
     super();

@@ -96,6 +96,8 @@ export class ArcAlignedCharacter {
  * @extends Entity
  */
 export class ArcAlignedText extends Entity {
+  static type = 'ArcAlignedText';
+
   /**
    * Create a Text Entity
    * @param {Array} data

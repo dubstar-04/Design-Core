@@ -17,6 +17,8 @@ import { SnapPoint } from '../lib/snapping.js';
  * @extends Entity
  */
 export class Circle extends Entity {
+  static type = 'Circle';
+
   /**
    * Create a Circle Entity
    * @param {Array} data

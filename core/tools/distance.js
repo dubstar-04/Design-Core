@@ -11,6 +11,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Distance extends Tool {
+  static type = 'Distance';
+
   /** Create a Distance command */
   constructor() {
     super();

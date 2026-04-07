@@ -12,6 +12,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Scale extends Tool {
+  static type = 'Scale';
+
   /** Create a Scale command */
   constructor() {
     super();

@@ -25,6 +25,8 @@ import { Property } from '../properties/property.js';
  * @extends Entity
  */
 export class Hatch extends Entity {
+  static type = 'Hatch';
+
   /**
    * Create a Hatch Entity
    * @param {Array} data

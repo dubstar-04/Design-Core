@@ -7,6 +7,8 @@ import { Polyline } from './polyline.js';
  * @extends BasePolyline
  */
 export class Lwpolyline extends BasePolyline {
+  static type = 'Lwpolyline';
+
   /**
    * Create an LW Polyline
    * @param {Array} data

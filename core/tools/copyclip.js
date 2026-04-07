@@ -10,6 +10,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Copyclip extends Tool {
+  static type = 'Copyclip';
+
   /** Create a Copyclip command */
   constructor() {
     super();

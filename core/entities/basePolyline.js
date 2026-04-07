@@ -20,6 +20,8 @@ import { SnapPoint } from '../lib/snapping.js';
  * @extends Entity
  */
 export class BasePolyline extends Entity {
+  static type = 'BasePolyline';
+
   /**
    * Create a Base Polyline
    * @param {Array} data

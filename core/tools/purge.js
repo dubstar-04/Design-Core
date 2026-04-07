@@ -10,6 +10,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Purge extends Tool {
+  static type = 'Purge';
+
   /** Create a Purge command */
   constructor() {
     super();

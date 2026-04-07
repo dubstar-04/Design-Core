@@ -10,6 +10,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Copybase extends Tool {
+  static type = 'Copybase';
+
   /** Create a Copybase command */
   constructor() {
     super();

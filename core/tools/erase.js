@@ -11,6 +11,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Erase extends Tool {
+  static type = 'Erase';
+
   /** Create an Erase command */
   constructor() {
     super();

@@ -13,6 +13,8 @@ import { DesignCore } from '../designCore.js';
  * @extends Tool
  */
 export class Pasteclip extends Tool {
+  static type = 'Pasteclip';
+
   /** Create a Pasteclip command */
   constructor() {
     super();
