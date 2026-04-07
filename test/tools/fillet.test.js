@@ -881,9 +881,11 @@ test('Fillet.action closing-wrap: lowerTangent is on closing segment (left edge)
   expect(poly.points[1].y).toBeCloseTo(0);
 });
 
-test('Fillet.action closing-wrap: arc bulge sign is negative (CW, fillet inside square)', () => {
-  // Same setup. The CW arc from (0,2) to (2,0) has a negative bulge.
-  // Before the fix the bulge was positive, placing the arc outside the square.
+test('Fillet.action closing-wrap: arc bulge sign is positive (CCW, fillet inside square)', () => {
+  // Same setup. The CCW arc from (0,2) to (2,0) sweeps through (≈0.59, ≈0.59)
+  // staying inside the square — a positive bulge value.
+  // Before the fix the lowerTangent/upperTangent were swapped, producing an arc
+  // that traversed the exterior of the square.
   core.scene.clear();
   core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
@@ -905,7 +907,7 @@ test('Fillet.action closing-wrap: arc bulge sign is negative (CW, fillet inside 
 
   const poly = core.scene.entities.get(0);
   // points[0] carries the bulge for the arc from lowerTangent to upperTangent
-  expect(poly.points[0].bulge).toBeLessThan(0);
+  expect(poly.points[0].bulge).toBeGreaterThan(0);
 });
 
 test('Fillet.action closing-wrap reversed pick order: arc bulge sign and tangent positions are correct', () => {
@@ -939,5 +941,5 @@ test('Fillet.action closing-wrap reversed pick order: arc bulge sign and tangent
   expect(poly.points[0].y).toBeCloseTo(2);
   expect(poly.points[1].x).toBeCloseTo(2);
   expect(poly.points[1].y).toBeCloseTo(0);
-  expect(poly.points[0].bulge).toBeLessThan(0);
+  expect(poly.points[0].bulge).toBeGreaterThan(0);
 });
