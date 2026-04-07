@@ -242,7 +242,7 @@ export class Snapping {
 
   /**
    * Draw the snap point
-   * @param {Point} snapPoint
+   * @param {SnapPoint} snapPoint
    */
   addSnapPoint(snapPoint) {
     // show the snap point
