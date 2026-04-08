@@ -184,6 +184,10 @@ export class Fillet extends ChamferFilletBase {
     const arc = DesignCore.CommandManager.createNew('Arc', {
       points: [arcCentre, firstTangentPoint, secondTangentPoint],
       direction: arcDirection,
+      layer: this.firstPick.entity.layer,
+      colour: this.firstPick.entity.colour,
+      lineWidth: this.firstPick.entity.lineWidth,
+      lineType: this.firstPick.entity.lineType,
     });
 
     const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;

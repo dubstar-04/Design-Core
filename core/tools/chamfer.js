@@ -242,6 +242,10 @@ export class Chamfer extends ChamferFilletBase {
 
     const chamferLine = DesignCore.CommandManager.createNew('Line', {
       points: [firstChamferPoint, secondChamferPoint],
+      layer: this.firstPick.entity.layer,
+      colour: this.firstPick.entity.colour,
+      lineWidth: this.firstPick.entity.lineWidth,
+      lineType: this.firstPick.entity.lineType,
     });
 
     const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
