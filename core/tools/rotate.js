@@ -73,6 +73,9 @@ export class Rotate extends Tool {
           this.baseAngle = refBase.angle(refEnd);
           // set the base point to null
           this.basePoint = null;
+          // restore inputPoint to the rotation center so the tracking line
+          // uses the correct origin for the final angle input
+          DesignCore.Scene.inputManager.inputPoint = this.points[0];
         } else if (Input.getType(input2) === Input.Type.NUMBER) {
           const basePoint = this.points.at(0);
           const angle = Utils.degrees2radians(input2);
