@@ -3,10 +3,11 @@ import { ChamferFilletBase } from './chamferFilletBase.js';
 import { Intersection } from '../lib/intersect.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Utils } from '../lib/utils.js';
 import { Point } from '../entities/point.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
-import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
+import { AddState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -163,7 +164,7 @@ export class Chamfer extends ChamferFilletBase {
     // distA = distB = 0: trim/extend both lines to the sharp intersection with no chamfer line
     if (!chamferMode && distA === 0 && DesignCore.Scene.headers.chamferDistanceB === 0) {
       if (trimMode) {
-        const stateChanges = this.applySharpTrim();
+        const stateChanges = this.applyCornerTrim(this.intersectionPoint, this.intersectionPoint, null);
         DesignCore.Scene.commit(stateChanges);
       }
       return;
@@ -242,87 +243,15 @@ export class Chamfer extends ChamferFilletBase {
 
     const chamferLine = DesignCore.CommandManager.createNew('Line', {
       points: [firstChamferPoint, secondChamferPoint],
+      ...Utils.cloneProperties(this.firstPick.entity),
     });
 
-    const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
-    const secondIsPolyline = this.secondPick.entity instanceof BasePolyline;
-
-    // The standalone chamfer Line entity is added when no polyline trimming is involved.
-    // For polyline trim cases the chamfer segment is encoded as a straight polyline segment,
-    // except for the open-ends case where the chamfer line fills the gap between the two
-    // open ends and is added separately there.
-    const stateChanges = (!trimMode || (!firstIsPolyline && !secondIsPolyline)) ?
-      [new AddState(chamferLine)] :
-      [];
-
-    if (trimMode) {
-      if (!firstIsPolyline && !secondIsPolyline) {
-        // Line + Line: trim both lines
-        stateChanges.push(new UpdateState(this.firstPick.entity, { points: [this.firstPick.lineKeptEnd(this.intersectionPoint), firstChamferPoint] }));
-        stateChanges.push(new UpdateState(this.secondPick.entity, { points: [this.secondPick.lineKeptEnd(this.intersectionPoint), secondChamferPoint] }));
-      } else if (firstIsPolyline && secondIsPolyline && this.firstPick.entity === this.secondPick.entity) {
-        const closeSegIdx = this.firstPick.entity.points.length;
-        const lastIdx = closeSegIdx - 1;
-        const segDiff = Math.abs(this.firstPick.segmentIndex - this.secondPick.segmentIndex);
-        const isOpenEnds = !this.firstPick.entity.flags.hasFlag(1) && segDiff !== 1 && (
-          (this.firstPick.segmentIndex === 1 && this.secondPick.segmentIndex === lastIdx) ||
-          (this.firstPick.segmentIndex === lastIdx && this.secondPick.segmentIndex === 1)
-        );
-        const newPoints = this.firstPick.entity.points.map((p) => p.clone());
-        if (isOpenEnds) {
-          // Open ends: trim both endpoints to their chamfer points; chamfer line fills the gap.
-          stateChanges.push(new AddState(chamferLine));
-          if (this.firstPick.segmentIndex === 1) {
-            newPoints[0] = firstChamferPoint.clone();
-            newPoints[lastIdx] = secondChamferPoint.clone();
-          } else {
-            newPoints[0] = secondChamferPoint.clone();
-            newPoints[lastIdx] = firstChamferPoint.clone();
-          }
-        } else {
-          // Consecutive segments: replace the shared corner vertex with the two chamfer points
-          // as a straight polyline segment — no separate chamfer Line entity needed.
-          const seg1 = this.firstPick.segmentIndex;
-          const seg2 = this.secondPick.segmentIndex;
-          const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
-          const isFirstLower = seg1 < seg2;
-          const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
-          const lowerChamfer = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? secondChamferPoint : firstChamferPoint;
-          const upperChamfer = (isClosingWrap ? seg1 === closeSegIdx : !isFirstLower) ? firstChamferPoint : secondChamferPoint;
-          newPoints.splice(cornerIdx, 1, lowerChamfer.clone(), upperChamfer.clone());
-        }
-        stateChanges.push(new UpdateState(this.firstPick.entity, { points: newPoints }));
-      } else {
-        // Line + Polyline or Polyline + Line: consume the line into the polyline.
-        const [poly, line] = firstIsPolyline ? [this.firstPick, this.secondPick] : [this.secondPick, this.firstPick];
-        const polyChamferPoint = poly === this.firstPick ? firstChamferPoint : secondChamferPoint;
-        const lineChamferPoint = line === this.firstPick ? firstChamferPoint : secondChamferPoint;
-        const polySegIdx = poly.segmentIndex;
-        const keepStart = poly.keepStart(this.intersectionPoint);
-        let newPoints;
-        if (keepStart) {
-          // Keep start portion: points[0..polySegIdx-1], then chamfer, then line end
-          newPoints = [
-            ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
-            polyChamferPoint.clone(),
-            lineChamferPoint.clone(),
-            line.lineKeptEnd(this.intersectionPoint).clone(),
-          ];
-        } else {
-          // Keep end portion: line end, then chamfer, then points[polySegIdx..end]
-          newPoints = [
-            line.lineKeptEnd(this.intersectionPoint).clone(),
-            lineChamferPoint.clone(),
-            polyChamferPoint.clone(),
-            ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),
-          ];
-        }
-
-        stateChanges.push(new RemoveState(line.entity));
-        stateChanges.push(new UpdateState(poly.entity, { points: newPoints }));
-      }
+    if (!trimMode) {
+      DesignCore.Scene.commit([new AddState(chamferLine)]);
+      return;
     }
 
+    const stateChanges = this.applyCornerTrim(firstChamferPoint, secondChamferPoint, chamferLine);
     DesignCore.Scene.commit(stateChanges);
   }
 

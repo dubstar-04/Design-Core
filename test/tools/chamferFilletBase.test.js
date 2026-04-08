@@ -167,7 +167,7 @@ test('ChamferFilletBase.applySharpTrim trims two Lines to the intersection point
   chamfer.secondPick.clickPoint = new Point(8, -7); // projects to (10,-7) → lineKeptEnd = (10,-10)
   chamfer.intersectionPoint = new Point(10, 0);
 
-  const stateChanges = chamfer.applySharpTrim();
+  const stateChanges = chamfer.applyCornerTrim(chamfer.intersectionPoint, chamfer.intersectionPoint, null);
   DesignCore.Scene.commit(stateChanges);
 
   const updatedA = core.scene.entities.get(0);
@@ -198,7 +198,7 @@ test('ChamferFilletBase.applySharpTrim poly+poly consecutive segments: replaces 
   chamfer.secondPick.segmentIndex = 2;
   chamfer.intersectionPoint = new Point(0, 0);
 
-  const stateChanges = chamfer.applySharpTrim();
+  const stateChanges = chamfer.applyCornerTrim(chamfer.intersectionPoint, chamfer.intersectionPoint, null);
   DesignCore.Scene.commit(stateChanges);
 
   const poly = core.scene.entities.get(0);
@@ -222,7 +222,7 @@ test('ChamferFilletBase.applySharpTrim poly+poly open ends: moves both endpoints
   chamfer.secondPick.segmentIndex = 3; // open end (lastIdx = 3)
   chamfer.intersectionPoint = new Point(3, 2);
 
-  const stateChanges = chamfer.applySharpTrim();
+  const stateChanges = chamfer.applyCornerTrim(chamfer.intersectionPoint, chamfer.intersectionPoint, null);
   DesignCore.Scene.commit(stateChanges);
 
   const poly = core.scene.entities.get(0);
@@ -258,7 +258,7 @@ test('ChamferFilletBase.applySharpTrim poly+poly closed polyline seg1+lastIdx: c
   chamfer.secondPick.segmentIndex = polyEntity.points.length - 1; // lastIdx
   chamfer.intersectionPoint = new Point(0, 0);
 
-  const stateChanges = chamfer.applySharpTrim();
+  const stateChanges = chamfer.applyCornerTrim(chamfer.intersectionPoint, chamfer.intersectionPoint, null);
   DesignCore.Scene.commit(stateChanges);
 
   // Corner-splice: replaces vertex at cornerIdx=1 with intersectionPoint — point count unchanged
@@ -286,7 +286,7 @@ test('ChamferFilletBase.applySharpTrim closed poly last-regular-seg + closing-se
   chamfer.secondPick.segmentIndex = 4; // closing segment (points.length)
   chamfer.intersectionPoint = new Point(0, 10);
 
-  const stateChanges = chamfer.applySharpTrim();
+  const stateChanges = chamfer.applyCornerTrim(chamfer.intersectionPoint, chamfer.intersectionPoint, null);
   DesignCore.Scene.commit(stateChanges);
 
   const poly = core.scene.entities.get(0);
@@ -314,7 +314,7 @@ test('ChamferFilletBase.applySharpTrim closed poly closing-seg + seg-1: replaces
   chamfer.secondPick.segmentIndex = 1;
   chamfer.intersectionPoint = new Point(0, 0);
 
-  const stateChanges = chamfer.applySharpTrim();
+  const stateChanges = chamfer.applyCornerTrim(chamfer.intersectionPoint, chamfer.intersectionPoint, null);
   DesignCore.Scene.commit(stateChanges);
 
   const poly = core.scene.entities.get(0);
@@ -354,7 +354,7 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepStart: line co
   chamfer.intersectionPoint = new Point(0, 0);
 
 
-  const stateChanges = chamfer.applySharpTrim();
+  const stateChanges = chamfer.applyCornerTrim(chamfer.intersectionPoint, chamfer.intersectionPoint, null);
   DesignCore.Scene.commit(stateChanges);
 
   expect(core.scene.entities.count()).toBe(1);
@@ -392,7 +392,7 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepEnd: line cons
   chamfer.intersectionPoint = new Point(0, 0);
 
 
-  const stateChanges = chamfer.applySharpTrim();
+  const stateChanges = chamfer.applyCornerTrim(chamfer.intersectionPoint, chamfer.intersectionPoint, null);
   DesignCore.Scene.commit(stateChanges);
 
   expect(core.scene.entities.count()).toBe(1);
@@ -431,7 +431,7 @@ test('ChamferFilletBase.applySharpTrim first=Poly second=Line: poly/line orderin
   chamfer.intersectionPoint = new Point(0, 0);
 
 
-  const stateChanges = chamfer.applySharpTrim();
+  const stateChanges = chamfer.applyCornerTrim(chamfer.intersectionPoint, chamfer.intersectionPoint, null);
   DesignCore.Scene.commit(stateChanges);
 
   expect(core.scene.entities.count()).toBe(1);

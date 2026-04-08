@@ -944,3 +944,29 @@ test('Fillet.action closing-wrap reversed pick order: arc bulge sign and tangent
   expect(poly.points[1].y).toBeCloseTo(0);
   expect(poly.points[0].bulge).toBeGreaterThan(0);
 });
+
+// ─── action: entity property inheritance ─────────────────────────────────────
+
+test('Fillet.action arc inherits layer, lineWidth, lineType from first entity', () => {
+  // Perpendicular L-corner at origin; first entity on a non-default layer.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)], layer: 'walls', lineWidth: 5, lineType: 'DASHED' });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = false;
+
+  const fillet = new Fillet();
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.secondPick.entity = core.scene.entities.get(1);
+  fillet.firstPick.clickPoint = new Point(-5, 0);
+  fillet.secondPick.clickPoint = new Point(0, 5);
+  fillet.action();
+
+  expect(core.scene.entities.count()).toBe(3);
+  const arc = core.scene.entities.get(2);
+  expect(arc.type).toBe('Arc');
+  expect(arc.layer).toBe('walls');
+  expect(arc.lineWidth).toBe(5);
+  expect(arc.lineType).toBe('DASHED');
+});

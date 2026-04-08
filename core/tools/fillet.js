@@ -3,9 +3,10 @@ import { ChamferFilletBase } from './chamferFilletBase.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Constants } from '../lib/constants.js';
+import { Utils } from '../lib/utils.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
-import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
+import { AddState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -128,7 +129,7 @@ export class Fillet extends ChamferFilletBase {
     const trimMode = DesignCore.Scene.headers.trimMode;
     if (filletRadius === 0) {
       if (trimMode) {
-        const stateChanges = this.applySharpTrim();
+        const stateChanges = this.applyCornerTrim(this.intersectionPoint, this.intersectionPoint, null);
         DesignCore.Scene.commit(stateChanges);
       }
       return;
@@ -184,147 +185,21 @@ export class Fillet extends ChamferFilletBase {
     const arc = DesignCore.CommandManager.createNew('Arc', {
       points: [arcCentre, firstTangentPoint, secondTangentPoint],
       direction: arcDirection,
+      ...Utils.cloneProperties(this.firstPick.entity),
     });
-
-    const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
-    const secondIsPolyline = this.secondPick.entity instanceof BasePolyline;
 
     if (!trimMode) {
       DesignCore.Scene.commit([new AddState(arc)]);
       return;
     }
 
-    if (!firstIsPolyline && !secondIsPolyline) {
-      const stateChanges = this.#trimLineAndLine(firstTangentPoint, secondTangentPoint, arc);
-      DesignCore.Scene.commit(stateChanges);
-    } else if (firstIsPolyline && secondIsPolyline && this.firstPick.entity === this.secondPick.entity) {
-      const stateChanges = this.#trimPolyAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre, arc);
-      DesignCore.Scene.commit(stateChanges);
-    } else {
-      const stateChanges = this.#trimLineAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre);
-      DesignCore.Scene.commit(stateChanges);
-    }
-  }
+    // Use arc.toPolylinePoints() to get the tangent points with bulge already computed
+    const arcPolyPoints = arc.toPolylinePoints();
+    const firstCornerPoint = arcPolyPoints[0]; // firstTangentPoint with bulge
+    const secondCornerPoint = arcPolyPoints[1]; // secondTangentPoint
 
-  /**
-   * Apply trim and arc for a Line + Line fillet.
-   * @param {Point} firstTangentPoint
-   * @param {Point} secondTangentPoint
-   * @param {Arc} arc
-   * @return {Array}
-   */
-  #trimLineAndLine(firstTangentPoint, secondTangentPoint, arc) {
-    return [
-      new AddState(arc),
-      new UpdateState(this.firstPick.entity, { points: [this.firstPick.lineKeptEnd(this.intersectionPoint), firstTangentPoint] }),
-      new UpdateState(this.secondPick.entity, { points: [this.secondPick.lineKeptEnd(this.intersectionPoint), secondTangentPoint] }),
-    ];
-  }
-
-  /**
-   * Apply trim and arc for a Polyline + Polyline (same entity) fillet.
-   * Handles both the open-ends case and the consecutive-segments case.
-   * @param {Point} firstTangentPoint
-   * @param {Point} secondTangentPoint
-   * @param {number} arcDirection
-   * @param {Point} arcCentre
-   * @param {Arc} arc
-   * @return {Array}
-   */
-  #trimPolyAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre, arc) {
-    const closeSegIdx = this.firstPick.entity.points.length;
-    const lastIdx = closeSegIdx - 1;
-    const segDiff = Math.abs(this.firstPick.segmentIndex - this.secondPick.segmentIndex);
-    const isOpenEnds = !this.firstPick.entity.flags.hasFlag(1) && segDiff !== 1 && (
-      (this.firstPick.segmentIndex === 1 && this.secondPick.segmentIndex === lastIdx) ||
-      (this.firstPick.segmentIndex === lastIdx && this.secondPick.segmentIndex === 1)
-    );
-    const newPoints = this.firstPick.entity.points.map((p) => p.clone());
-    const stateChanges = [];
-
-    if (isOpenEnds) {
-      stateChanges.push(new AddState(arc));
-      if (this.firstPick.segmentIndex === 1) {
-        newPoints[0] = firstTangentPoint.clone();
-        newPoints[lastIdx] = secondTangentPoint.clone();
-      } else {
-        newPoints[0] = secondTangentPoint.clone();
-        newPoints[lastIdx] = firstTangentPoint.clone();
-      }
-    } else {
-      const seg1 = this.firstPick.segmentIndex;
-      const seg2 = this.secondPick.segmentIndex;
-      const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
-      const isFirstLower = seg1 < seg2;
-      const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
-      const lowerTangent = (isClosingWrap ? seg1 !== closeSegIdx : !isFirstLower) ? secondTangentPoint : firstTangentPoint;
-      const upperTangent = (isClosingWrap ? seg1 !== closeSegIdx : !isFirstLower) ? firstTangentPoint : secondTangentPoint;
-      const polyArcDir = (isClosingWrap ? seg1 !== closeSegIdx : !isFirstLower) ? -arcDirection : arcDirection;
-      const startAngle = arcCentre.angle(lowerTangent);
-      const endAngle = arcCentre.angle(upperTangent);
-      const includedAngle = ((endAngle - startAngle) * polyArcDir + 4 * Math.PI) % (2 * Math.PI);
-      const bulge = polyArcDir * Math.tan(includedAngle / 4);
-      const arcStartPoint = lowerTangent.clone();
-      arcStartPoint.bulge = bulge;
-      newPoints.splice(cornerIdx, 1, arcStartPoint, upperTangent.clone());
-    }
-
-    stateChanges.push(new UpdateState(this.firstPick.entity, { points: newPoints }));
-    return stateChanges;
-  }
-
-  /**
-   * Apply trim and arc for a Line + Polyline (or Polyline + Line) fillet.
-   * The line is consumed into the polyline with the arc encoded as a bulge.
-   * @param {Point} firstTangentPoint
-   * @param {Point} secondTangentPoint
-   * @param {number} arcDirection
-   * @param {Point} arcCentre
-   * @return {Array}
-   */
-  #trimLineAndPoly(firstTangentPoint, secondTangentPoint, arcDirection, arcCentre) {
-    const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
-    const [poly, line] = firstIsPolyline ? [this.firstPick, this.secondPick] : [this.secondPick, this.firstPick];
-    const lineTangentPoint = line === this.firstPick ? firstTangentPoint : secondTangentPoint;
-    const polyTangentPoint = poly === this.firstPick ? firstTangentPoint : secondTangentPoint;
-    const polyToLineDir = firstIsPolyline ? arcDirection : -arcDirection;
-
-    const startAngle = arcCentre.angle(polyTangentPoint);
-    const endAngle = arcCentre.angle(lineTangentPoint);
-    const includedAngle = ((endAngle - startAngle) * polyToLineDir + 4 * Math.PI) % (2 * Math.PI);
-    const bulge = polyToLineDir * Math.tan(includedAngle / 4);
-    const arcStartPoint = polyTangentPoint.clone();
-    arcStartPoint.bulge = bulge;
-
-    const polySegIdx = poly.segmentIndex;
-    const keepStart = poly.keepStart(this.intersectionPoint);
-    let newPoints;
-    if (keepStart) {
-      // Keep the polyline points up to (not including) the selected segment start,
-      // then the arc start (with bulge), the line tangent point, and the kept end of the line.
-      newPoints = [
-        ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
-        arcStartPoint,
-        lineTangentPoint.clone(),
-        line.lineKeptEnd(this.intersectionPoint).clone(),
-      ];
-    } else {
-      // Keep the polyline points from the selected segment start onwards,
-      // prepending the kept end of the line, the reversed arc start (with negated bulge), and the poly tangent point.
-      const revArcStartPoint = lineTangentPoint.clone();
-      revArcStartPoint.bulge = -bulge;
-      newPoints = [
-        line.lineKeptEnd(this.intersectionPoint).clone(),
-        revArcStartPoint,
-        polyTangentPoint.clone(),
-        ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),
-      ];
-    }
-
-    return [
-      new RemoveState(line.entity),
-      new UpdateState(poly.entity, { points: newPoints }),
-    ];
+    const stateChanges = this.applyCornerTrim(firstCornerPoint, secondCornerPoint, arc);
+    DesignCore.Scene.commit(stateChanges);
   }
 
   /**

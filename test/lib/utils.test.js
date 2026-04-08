@@ -110,6 +110,24 @@ test('Test Utils.sortPointsOnArc mutates array ordered by angular position', () 
   expect(pts[4].y).toBe(0);
 });
 
+test('Test Utils.cloneProperties copies default properties from entity', () => {
+  const arc = new Arc({ layer: 'walls', lineWidth: 5, lineType: 'DASHED' });
+  const props = Utils.cloneProperties(arc);
+  expect(props.layer).toBe('walls');
+  expect(props.lineWidth).toBe(5);
+  expect(props.lineType).toBe('DASHED');
+  expect(Object.keys(props)).toEqual(expect.arrayContaining(['layer', 'colour', 'lineWidth', 'lineType']));
+});
+
+test('Test Utils.cloneProperties respects custom properties list', () => {
+  const arc = new Arc({ layer: 'walls', lineWidth: 5, lineType: 'DASHED' });
+  const props = Utils.cloneProperties(arc, ['layer', 'lineWidth']);
+  expect(props.layer).toBe('walls');
+  expect(props.lineWidth).toBe(5);
+  expect(props.lineType).toBeUndefined();
+  expect(props.colour).toBeUndefined();
+});
+
 test('Test Utils.areaOfTriangle', () => {
   expect(Utils.areaOfTriangle(new Point(0, 0), new Point(10, 0), new Point(0, 10))).toBe(50);
   expect(Utils.areaOfTriangle(new Point(-5, -5), new Point(5, -5), new Point(0, 5))).toBe(50);

@@ -872,11 +872,20 @@ test('Chamfer.action dist>0 trimMode=true closed Lwpolyline closing-wrap (seg4+s
   const poly = core.scene.entities.get(0);
   // Shared vertex (0,0) at index 0 replaced by two chamfer points → total 5 points
   expect(poly.points.length).toBe(5);
-  // Endpoints must NOT have been moved to the intersection (open-ends symptom)
-  // The first two new points should be the chamfer points, not (0,0)/(0,0)
-  const allAtOrigin = poly.points[0].x === 0 && poly.points[0].y === 0 &&
-    poly.points[1].x === 0 && poly.points[1].y === 0;
-  expect(allAtOrigin).toBe(false);
+  // Verify the actual chamfer point coordinates and traversal order.
+  // The closing segment (0,10)→(0,0) is chamfered at (0,2),
+  // seg 1 (0,0)→(10,0) is chamfered at (2,0).
+  // After splice: [(0,2), (2,0), (10,0), (10,10), (0,10)]
+  expect(poly.points[0].x).toBeCloseTo(0);
+  expect(poly.points[0].y).toBeCloseTo(2);
+  expect(poly.points[1].x).toBeCloseTo(2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  expect(poly.points[2].x).toBeCloseTo(10);
+  expect(poly.points[2].y).toBeCloseTo(0);
+  expect(poly.points[3].x).toBeCloseTo(10);
+  expect(poly.points[3].y).toBeCloseTo(10);
+  expect(poly.points[4].x).toBeCloseTo(0);
+  expect(poly.points[4].y).toBeCloseTo(10);
 });
 
 test('Chamfer.action dist>0 trimMode=false closed Lwpolyline closing-wrap: standalone chamfer Line only', () => {
@@ -967,4 +976,32 @@ test('Chamfer.action dist>0 trimMode=false Line + Lwpolyline: standalone chamfer
   expect(core.scene.entities.get(2).type).toBe('Line');
   expect(core.scene.entities.get(0).points.length).toBe(2);
   expect(core.scene.entities.get(1).points.length).toBe(4);
+});
+
+// ─── action: entity property inheritance ─────────────────────────────────────
+
+test('Chamfer.action chamfer line inherits layer, lineWidth, lineType from first entity', () => {
+  // Perpendicular L-corner at origin; first entity on a non-default layer.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)], layer: 'walls', lineWidth: 5, lineType: 'DASHED' });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = false;
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
+  chamfer.action();
+
+  expect(core.scene.entities.count()).toBe(3);
+  const chamferLine = core.scene.entities.get(2);
+  expect(chamferLine.type).toBe('Line');
+  expect(chamferLine.layer).toBe('walls');
+  expect(chamferLine.lineWidth).toBe(5);
+  expect(chamferLine.lineType).toBe('DASHED');
 });
