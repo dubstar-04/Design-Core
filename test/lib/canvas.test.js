@@ -36,8 +36,6 @@ test('Test Canvas constructor defaults', () => {
   expect(canvas.minScaleFactor).toBe(0.05);
   expect(canvas.maxScaleFactor).toBe(300);
   expect(canvas.flipped).toBe(false);
-  expect(canvas.panDelta).toBeDefined();
-  expect(canvas.lastDelta).toBeDefined();
 });
 
 test('Test Canvas.getScale', () => {
@@ -138,11 +136,11 @@ test('Test Canvas.paint flips only once', () => {
   expect(canvas.flipped).toBe(true);
 });
 
-test('Test Canvas.mouseUp resets pan state on middle button', () => {
-  canvas.lastDelta = new Point(50, 50);
+test('Test Canvas.mouseUp calls requestPaint on middle button', () => {
+  const paintSpy = jest.spyOn(canvas, 'requestPaint').mockImplementation(() => {});
   canvas.mouseUp(1);
-  expect(canvas.lastDelta.x).toBe(0);
-  expect(canvas.lastDelta.y).toBe(0);
+  expect(paintSpy).toHaveBeenCalled();
+  paintSpy.mockRestore();
 });
 
 test('Test Canvas.getSceneOffset returns extents', () => {
