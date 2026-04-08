@@ -9,6 +9,7 @@ import { DesignCore } from '../designCore.js';
 export class Canvas {
   #panCursorTimeout;
   #baseCursorState = 'DEFAULT';
+  #lastPanCanvasPoint = new Point();
 
   /** Create Canvas */
   constructor() {
@@ -114,8 +115,10 @@ export class Canvas {
   mouseDown(button) {
     switch (button) {
       case 0: // left button
+        this.#lastPanCanvasPoint = DesignCore.Mouse.pointOnCanvas();
         break;
       case 1: // middle button
+        this.#lastPanCanvasPoint = DesignCore.Mouse.pointOnCanvas();
         clearTimeout(this.#panCursorTimeout);
         this.#panCursorTimeout = setTimeout(() => this.#setCursor(Input.Cursor.GRABBING), 250);
         break;
@@ -168,8 +171,8 @@ export class Canvas {
   pan() {
     const current = DesignCore.Mouse.pointOnCanvas();
     const delta = DesignCore.Mouse.transformToScene(current)
-        .subtract(DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint));
-    DesignCore.Mouse.mouseDownCanvasPoint = current;
+        .subtract(DesignCore.Mouse.transformToScene(this.#lastPanCanvasPoint));
+    this.#lastPanCanvasPoint = current;
     this.matrix.translate(delta.x, delta.y);
     this.requestPaint();
   }
