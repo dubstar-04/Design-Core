@@ -401,17 +401,70 @@ describe('Test Canvas.setContext paint states', () => {
 
 describe('Test Canvas.zoom', () => {
   beforeEach(() => {
+    core.activate();
     canvas.matrix = new Matrix();
+    canvas.width = 800;
+    canvas.height = 600;
+    canvas.flipped = true;
   });
 
-  test('zoom increases scale', () => {
+  test('zoom(2) doubles the scale', () => {
+    const before = canvas.getScale();
     canvas.zoom(2);
-    expect(canvas.getScale()).toBeGreaterThan(1);
+    expect(canvas.getScale()).toBeCloseTo(before * 2, 10);
   });
 
-  test('zoom decreases scale', () => {
+  test('zoom(0.5) halves the scale', () => {
+    const before = canvas.getScale();
     canvas.zoom(0.5);
-    expect(canvas.getScale()).toBeLessThan(1);
+    expect(canvas.getScale()).toBeCloseTo(before * 0.5, 10);
+  });
+
+  test('zoom(1) leaves scale unchanged', () => {
+    const before = canvas.getScale();
+    canvas.zoom(1);
+    expect(canvas.getScale()).toBeCloseTo(before, 10);
+  });
+
+  test('zoom keeps the scene point under the cursor fixed (zoom-point invariant)', () => {
+    // Position mouse at canvas (400, 300) — centre of the 800×600 viewport
+    core.mouse.mouseMoved(400, 300);
+    const sceneBefore = core.mouse.pointOnScene();
+
+    canvas.zoom(2);
+
+    // The scene point that was under the cursor should not have moved
+    const sceneAfter = core.mouse.pointOnScene();
+    expect(sceneAfter.x).toBeCloseTo(sceneBefore.x, 4);
+    expect(sceneAfter.y).toBeCloseTo(sceneBefore.y, 4);
+  });
+
+  test('zoom-point invariant holds for an off-centre mouse position', () => {
+    core.mouse.mouseMoved(200, 150);
+    const sceneBefore = core.mouse.pointOnScene();
+
+    canvas.zoom(3);
+
+    const sceneAfter = core.mouse.pointOnScene();
+    expect(sceneAfter.x).toBeCloseTo(sceneBefore.x, 4);
+    expect(sceneAfter.y).toBeCloseTo(sceneBefore.y, 4);
+  });
+
+  test('zoom-point invariant holds when zooming out', () => {
+    core.mouse.mouseMoved(600, 450);
+    const sceneBefore = core.mouse.pointOnScene();
+
+    canvas.zoom(0.5);
+
+    const sceneAfter = core.mouse.pointOnScene();
+    expect(sceneAfter.x).toBeCloseTo(sceneBefore.x, 4);
+    expect(sceneAfter.y).toBeCloseTo(sceneBefore.y, 4);
+  });
+
+  test('successive zooms compound scale correctly', () => {
+    canvas.zoom(2);
+    canvas.zoom(3);
+    expect(canvas.getScale()).toBeCloseTo(6, 10);
   });
 });
 
