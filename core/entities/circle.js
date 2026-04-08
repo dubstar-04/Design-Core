@@ -11,6 +11,7 @@ import { Utils } from '../lib/utils.js';
 import { DesignCore } from '../designCore.js';
 import { AddState, RemoveState } from '../lib/stateManager.js';
 import { SnapPoint } from '../lib/snapping.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 /**
  * Circle Entity Class
@@ -113,8 +114,8 @@ export class Circle extends Entity {
   preview() {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
-      const points = [this.points.at(-1), mousePoint];
-      DesignCore.Scene.tempEntities.create(this.type, { points: points });
+      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([this.points.at(0), mousePoint]));
+      DesignCore.Scene.tempEntities.create(this.type, { points: [this.points.at(0), mousePoint] });
     }
   }
 
