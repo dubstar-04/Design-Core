@@ -138,9 +138,12 @@ test('Test Canvas.paint flips only once', () => {
 
 test('Test Canvas.mouseUp calls requestPaint on middle button', () => {
   const paintSpy = jest.spyOn(canvas, 'requestPaint').mockImplementation(() => {});
-  canvas.mouseUp(1);
-  expect(paintSpy).toHaveBeenCalled();
-  paintSpy.mockRestore();
+  try {
+    canvas.mouseUp(1);
+    expect(paintSpy).toHaveBeenCalled();
+  } finally {
+    paintSpy.mockRestore();
+  }
 });
 
 test('Test Canvas.getSceneOffset returns extents', () => {
