@@ -829,3 +829,118 @@ test('Fillet.action radius>0 trimMode=false Line + Lwpolyline: standalone arc ad
   expect(core.scene.entities.get(0).points.length).toBe(2);
   expect(core.scene.entities.get(1).points.length).toBe(4);
 });
+
+// ─── action: closed polyline closing-wrap arc direction (regression) ──────────
+//
+// Square: P0=(0,0), P1=(10,0), P2=(10,10), P3=(0,10), closed flag=1.
+// Closing segment (idx=4): P3=(0,10)→P0=(0,0) — i.e. the left edge, travelling downward.
+// Segment 1: P0=(0,0)→P1=(10,0) — i.e. the bottom edge, travelling rightward.
+// The shared corner is P0=(0,0).
+//
+// With radius 2 the fillet must sit inside the square (bottom-left interior corner).
+// The arc centre is at (2,2).
+//   – lowerTangent = (0,2)  on the closing segment (left edge, y=2)
+//   – upperTangent = (2,0)  on segment 1 (bottom edge, x=2)
+//   – bulge on lowerTangent must be POSITIVE (CCW arc from (0,2) to (2,0) through ≈(0.59,0.59))
+//     (BasePolyline convention: –ve bulge = CW, +ve bulge = CCW)
+//
+// Before the fix the lowerTangent/upperTangent assignment was inverted, producing
+// an arc that traversed the exterior of the square.
+
+test('Fillet.action closing-wrap: lowerTangent is on closing segment (left edge)', () => {
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  // firstPick = closing segment (idx=4, left edge), secondPick = segment 1 (bottom edge)
+  const fillet = new Fillet();
+  fillet.firstPick.entity = polyEntity;
+  fillet.secondPick.entity = polyEntity;
+  fillet.firstPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.firstPick.clickPoint = new Point(0, 5);
+  fillet.secondPick.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  fillet.secondPick.clickPoint = new Point(5, 0);
+  fillet.action();
+
+  expect(core.scene.entities.count()).toBe(1);
+  const poly = core.scene.entities.get(0);
+  expect(poly.points.length).toBe(5);
+
+  // After the splice at cornerIdx=0:
+  //   points[0] = lowerTangent (arcStartPoint), points[1] = upperTangent
+  // lowerTangent must be on the closing segment (left edge, x≈0)
+  expect(poly.points[0].x).toBeCloseTo(0);
+  expect(poly.points[0].y).toBeCloseTo(2);
+  // upperTangent must be on segment 1 (bottom edge, y≈0)
+  expect(poly.points[1].x).toBeCloseTo(2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+});
+
+test('Fillet.action closing-wrap: arc bulge sign is positive (CCW, fillet inside square)', () => {
+  // Same setup. The CCW arc from (0,2) to (2,0) sweeps through (≈0.59, ≈0.59)
+  // staying inside the square — a positive bulge value.
+  // Before the fix the lowerTangent/upperTangent were swapped, producing an arc
+  // that traversed the exterior of the square.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const fillet = new Fillet();
+  fillet.firstPick.entity = polyEntity;
+  fillet.secondPick.entity = polyEntity;
+  fillet.firstPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.firstPick.clickPoint = new Point(0, 5);
+  fillet.secondPick.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  fillet.secondPick.clickPoint = new Point(5, 0);
+  fillet.action();
+
+  const poly = core.scene.entities.get(0);
+  // points[0] carries the bulge for the arc from lowerTangent to upperTangent
+  expect(poly.points[0].bulge).toBeGreaterThan(0);
+});
+
+test('Fillet.action closing-wrap reversed pick order: arc bulge sign and tangent positions are correct', () => {
+  // Swap firstPick/secondPick — should produce the same geometry.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  const polyEntity = core.scene.entities.get(0);
+  polyEntity.flags.setFlagValue(1);
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  // firstPick = segment 1 (bottom edge), secondPick = closing segment (left edge, idx=4)
+  const fillet = new Fillet();
+  fillet.firstPick.entity = polyEntity;
+  fillet.secondPick.entity = polyEntity;
+  fillet.firstPick.segment = polyEntity.getClosestSegment(new Point(5, 0));
+  fillet.firstPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(5, 0));
+  fillet.firstPick.clickPoint = new Point(5, 0);
+  fillet.secondPick.segment = polyEntity.getClosestSegment(new Point(0, 5));
+  fillet.secondPick.segmentIndex = polyEntity.getClosestSegmentIndex(new Point(0, 5));
+  fillet.secondPick.clickPoint = new Point(0, 5);
+  fillet.action();
+
+  expect(core.scene.entities.count()).toBe(1);
+  const poly = core.scene.entities.get(0);
+  expect(poly.points.length).toBe(5);
+
+  // Regardless of pick order: lowerTangent at (0,2), upperTangent at (2,0), bulge > 0 (CCW)
+  expect(poly.points[0].x).toBeCloseTo(0);
+  expect(poly.points[0].y).toBeCloseTo(2);
+  expect(poly.points[1].x).toBeCloseTo(2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  expect(poly.points[0].bulge).toBeGreaterThan(0);
+});

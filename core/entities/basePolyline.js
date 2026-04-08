@@ -398,9 +398,10 @@ export class BasePolyline extends Entity {
     let distance = Infinity;
     let minPnt = P;
 
-    for (let i = 1; i < this.points.length; i++) {
+    const segmentCount = this.flags.hasFlag(1) ? this.points.length : this.points.length - 1;
+    for (let i = 1; i <= segmentCount; i++) {
       const A = this.points[i - 1];
-      const B = this.points[i];
+      const B = this.points[i % this.points.length];
 
       let pnt;
       if (A.bulge !== 0) {
