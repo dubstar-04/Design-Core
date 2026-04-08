@@ -14,6 +14,7 @@ import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { SnapPoint } from '../lib/snapping.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 /**
  * Base Polyline Entity Class
@@ -161,14 +162,16 @@ export class BasePolyline extends Entity {
 
     if (this.points.length >= 1) {
       const points = [...this.points, mousePoint];
-      DesignCore.Scene.tempEntities.create(this.type, { points: points });
-    }
-
-    if (this.inputMode === this.modes.ARC) {
-      const arcpoints = Utils.cloneObject(this.points);
-      arcpoints.at(-1).bulge = this.getBulgeFromSegment(mousePoint);
-      const points = [...arcpoints, mousePoint];
-      DesignCore.Scene.tempEntities.create(this.type, { points: points });
+      if (this.inputMode === this.modes.ARC) {
+        // Straight segment is not the final form — show as rubber-band indicator
+        DesignCore.Scene.auxiliaryEntities.add(new RubberBand(points));
+        // Arc segment is the final form — draw on the current layer
+        const arcpoints = Utils.cloneObject(this.points);
+        arcpoints.at(-1).bulge = this.getBulgeFromSegment(mousePoint);
+        DesignCore.Scene.tempEntities.create(this.type, { points: [...arcpoints, mousePoint] });
+      } else {
+        DesignCore.Scene.tempEntities.create(this.type, { points: points });
+      }
     }
   }
 
