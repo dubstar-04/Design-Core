@@ -11,6 +11,7 @@ import { AddState, RemoveState } from '../lib/stateManager.js';
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
 import { SnapPoint } from '../lib/snapping.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 /**
  * Arc Entity Class
@@ -159,8 +160,7 @@ export class Arc extends Entity {
   preview() {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
-      const points = [this.points.at(0), mousePoint];
-      DesignCore.Scene.tempEntities.create('Line', { points: points });
+      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([this.points.at(0), mousePoint]));
     }
 
     if (this.points.length >= 2) {
