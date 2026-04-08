@@ -7,6 +7,7 @@ import { Point } from '../entities/point.js';
 import { UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 /**
  * Rotate Command Class
@@ -95,10 +96,9 @@ export class Rotate extends Tool {
     const mousePoint = DesignCore.Mouse.pointOnScene();
 
     if (this.points.length >= 1 && this.baseAngle !== null || this.basePoint !== null) {
-      // Draw a line
+      // Draw a rubber-band line from center to mouse
       const center = this.basePoint === null ? this.points.at(0) : this.basePoint;
-      const points = [center, mousePoint];
-      DesignCore.Scene.tempEntities.create('Line', { points: points });
+      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([center, mousePoint]));
     }
 
     if (this.points.length >= 1) {
