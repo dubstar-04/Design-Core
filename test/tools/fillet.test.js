@@ -841,10 +841,11 @@ test('Fillet.action radius>0 trimMode=false Line + Lwpolyline: standalone arc ad
 // The arc centre is at (2,2).
 //   – lowerTangent = (0,2)  on the closing segment (left edge, y=2)
 //   – upperTangent = (2,0)  on segment 1 (bottom edge, x=2)
-//   – bulge on lowerTangent must be NEGATIVE (CW arc from (0,2) to (2,0))
+//   – bulge on lowerTangent must be POSITIVE (CCW arc from (0,2) to (2,0) through ≈(0.59,0.59))
+//     (BasePolyline convention: –ve bulge = CW, +ve bulge = CCW)
 //
 // Before the fix the lowerTangent/upperTangent assignment was inverted, producing
-// a CCW arc that protruded outside the square.
+// an arc that traversed the exterior of the square.
 
 test('Fillet.action closing-wrap: lowerTangent is on closing segment (left edge)', () => {
   core.scene.clear();
@@ -936,7 +937,7 @@ test('Fillet.action closing-wrap reversed pick order: arc bulge sign and tangent
   const poly = core.scene.entities.get(0);
   expect(poly.points.length).toBe(5);
 
-  // Regardless of pick order: lowerTangent at (0,2), upperTangent at (2,0), bulge < 0
+  // Regardless of pick order: lowerTangent at (0,2), upperTangent at (2,0), bulge > 0 (CCW)
   expect(poly.points[0].x).toBeCloseTo(0);
   expect(poly.points[0].y).toBeCloseTo(2);
   expect(poly.points[1].x).toBeCloseTo(2);
