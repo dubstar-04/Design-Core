@@ -395,7 +395,7 @@ test('Mirror.preview - no points set, adds no temp entities', () => {
   // No points pushed — guard condition should prevent any work
   mirror.preview();
 
-  expect(core.scene.tempEntities.count()).toBe(0);
+  expect(core.scene.auxiliaryEntities.count()).toBe(0);
 });
 
 test('Mirror.preview - one point set, draws temp mirror line using mouse position', () => {
@@ -409,8 +409,8 @@ test('Mirror.preview - one point set, draws temp mirror line using mouse positio
   mirror.points.push(new Point(3, 3)); // pt1 distinct from default mouse (0,0) scene position
   mirror.preview();
 
-  // Temp mirror line should have been created
-  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+  // Rubber-band mirror line should have been created
+  expect(core.scene.auxiliaryEntities.count()).toBeGreaterThanOrEqual(1);
 });
 
 test('Mirror.preview - two distinct points, draws mirror line and mirrors selected items', () => {
@@ -425,8 +425,8 @@ test('Mirror.preview - two distinct points, draws mirror line and mirrors select
   mirror.points.push(new Point(1, 0)); // pt2 — mirror across X axis
   mirror.preview();
 
-  // Temp mirror line should exist
-  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+  // Rubber-band mirror line should exist
+  expect(core.scene.auxiliaryEntities.count()).toBeGreaterThanOrEqual(1);
 
   // The selectedItems copy should have its points mirrored (y negated)
   const previewItem = core.scene.selectionManager.selectedItems[0];
@@ -445,8 +445,8 @@ test('Mirror.preview - identical points, draws line but skips mirroring selected
   mirror.points.push(new Point(5, 5)); // pt2 — same as pt1, zero-length mirror line
   mirror.preview();
 
-  // Temp line is still drawn
-  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+  // Rubber-band line is still drawn
+  expect(core.scene.auxiliaryEntities.count()).toBeGreaterThanOrEqual(1);
 
   // Selected item points should be unchanged (mirroring skipped)
   const previewItem = core.scene.selectionManager.selectedItems[0];
