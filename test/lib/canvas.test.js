@@ -36,8 +36,6 @@ test('Test Canvas constructor defaults', () => {
   expect(canvas.minScaleFactor).toBe(0.05);
   expect(canvas.maxScaleFactor).toBe(300);
   expect(canvas.flipped).toBe(false);
-  expect(canvas.panDelta).toBeDefined();
-  expect(canvas.lastDelta).toBeDefined();
 });
 
 test('Test Canvas.getScale', () => {
@@ -138,11 +136,14 @@ test('Test Canvas.paint flips only once', () => {
   expect(canvas.flipped).toBe(true);
 });
 
-test('Test Canvas.mouseUp resets pan state on middle button', () => {
-  canvas.lastDelta = new Point(50, 50);
-  canvas.mouseUp(1);
-  expect(canvas.lastDelta.x).toBe(0);
-  expect(canvas.lastDelta.y).toBe(0);
+test('Test Canvas.mouseUp calls requestPaint on middle button', () => {
+  const paintSpy = jest.spyOn(canvas, 'requestPaint').mockImplementation(() => {});
+  try {
+    canvas.mouseUp(1);
+    expect(paintSpy).toHaveBeenCalled();
+  } finally {
+    paintSpy.mockRestore();
+  }
 });
 
 test('Test Canvas.getSceneOffset returns extents', () => {
@@ -403,17 +404,70 @@ describe('Test Canvas.setContext paint states', () => {
 
 describe('Test Canvas.zoom', () => {
   beforeEach(() => {
+    core.activate();
     canvas.matrix = new Matrix();
+    canvas.width = 800;
+    canvas.height = 600;
+    canvas.flipped = true;
   });
 
-  test('zoom increases scale', () => {
+  test('zoom(2) doubles the scale', () => {
+    const before = canvas.getScale();
     canvas.zoom(2);
-    expect(canvas.getScale()).toBeGreaterThan(1);
+    expect(canvas.getScale()).toBeCloseTo(before * 2, 10);
   });
 
-  test('zoom decreases scale', () => {
+  test('zoom(0.5) halves the scale', () => {
+    const before = canvas.getScale();
     canvas.zoom(0.5);
-    expect(canvas.getScale()).toBeLessThan(1);
+    expect(canvas.getScale()).toBeCloseTo(before * 0.5, 10);
+  });
+
+  test('zoom(1) leaves scale unchanged', () => {
+    const before = canvas.getScale();
+    canvas.zoom(1);
+    expect(canvas.getScale()).toBeCloseTo(before, 10);
+  });
+
+  test('zoom keeps the scene point under the cursor fixed (zoom-point invariant)', () => {
+    // Position mouse at canvas (400, 300) — centre of the 800×600 viewport
+    core.mouse.mouseMoved(400, 300);
+    const sceneBefore = core.mouse.pointOnScene();
+
+    canvas.zoom(2);
+
+    // The scene point that was under the cursor should not have moved
+    const sceneAfter = core.mouse.pointOnScene();
+    expect(sceneAfter.x).toBeCloseTo(sceneBefore.x, 4);
+    expect(sceneAfter.y).toBeCloseTo(sceneBefore.y, 4);
+  });
+
+  test('zoom-point invariant holds for an off-centre mouse position', () => {
+    core.mouse.mouseMoved(200, 150);
+    const sceneBefore = core.mouse.pointOnScene();
+
+    canvas.zoom(3);
+
+    const sceneAfter = core.mouse.pointOnScene();
+    expect(sceneAfter.x).toBeCloseTo(sceneBefore.x, 4);
+    expect(sceneAfter.y).toBeCloseTo(sceneBefore.y, 4);
+  });
+
+  test('zoom-point invariant holds when zooming out', () => {
+    core.mouse.mouseMoved(600, 450);
+    const sceneBefore = core.mouse.pointOnScene();
+
+    canvas.zoom(0.5);
+
+    const sceneAfter = core.mouse.pointOnScene();
+    expect(sceneAfter.x).toBeCloseTo(sceneBefore.x, 4);
+    expect(sceneAfter.y).toBeCloseTo(sceneBefore.y, 4);
+  });
+
+  test('successive zooms compound scale correctly', () => {
+    canvas.zoom(2);
+    canvas.zoom(3);
+    expect(canvas.getScale()).toBeCloseTo(6, 10);
   });
 });
 
@@ -612,5 +666,122 @@ describe('Test Canvas cursor states', () => {
 
   test('mouseMoved does not throw when not panning', () => {
     expect(() => canvas.mouseMoved()).not.toThrow();
+  });
+});
+
+// ─── Canvas.pan() ─────────────────────────────────────────────────────────────
+
+describe('Test Canvas.pan', () => {
+  beforeEach(() => {
+    core.activate();
+    canvas.matrix = new Matrix();
+    canvas.width = 800;
+    canvas.height = 600;
+    canvas.flipped = true; // avoid flip side-effect in pan calls
+  });
+
+  test('pan translates matrix by the scene-space mouse movement', () => {
+    // Simulate a left mouseDown at canvas (100, 300) — sets #lastPanCanvasPoint
+    core.mouse.mouseMoved(100, 300);
+    canvas.mouseDown(0);
+
+    // Move mouse 50 pixels right, 20 pixels down in canvas space
+    core.mouse.mouseMoved(150, 320);
+    canvas.pan();
+
+    // At scale=1 the canvas y-axis is inverted relative to scene:
+    // canvas dy = +20 → scene dy = -20
+    const e = canvas.matrix.e; // x translation
+    const f = canvas.matrix.f; // y translation (raw matrix value)
+    expect(e).toBeCloseTo(50, 5);
+    // Moving the mouse 20 raw pixels down decreases Mouse.y by 20 (y = -raw + height).
+    // transformToScene re-inverts, so scene delta.y = +20. matrix.translate(50, 20) → f += 20.
+    expect(f).toBeCloseTo(20, 5);
+  });
+
+  test('second pan call accumulates correctly (incremental anchor advances)', () => {
+    // mouseDown at (0, 0)
+    core.mouse.mouseMoved(0, 0);
+    canvas.mouseDown(0);
+
+    // First move: +100 x, no y
+    core.mouse.mouseMoved(100, 0);
+    canvas.pan();
+
+    // Second move: another +100 x — anchor advanced so delta is still +100, not +200
+    core.mouse.mouseMoved(200, 0);
+    canvas.pan();
+
+    expect(canvas.matrix.e).toBeCloseTo(200, 5);
+  });
+
+  test('pan at 2× zoom applies correct scene-space delta', () => {
+    canvas.zoom(2);
+    const scaledE = canvas.matrix.e;
+
+    core.mouse.mouseMoved(0, 300);
+    canvas.mouseDown(0);
+
+    // Move 100 canvas pixels right
+    core.mouse.mouseMoved(100, 300);
+    canvas.pan();
+
+    // At any zoom level, dragging 100 canvas pixels right always changes matrix.e by 100:
+    // scene_delta = 100 / scale, then matrix.translate(scene_delta) multiplies by scale → 100.
+    // This gives a consistent 1:1 screen-space pan feel regardless of zoom.
+    const deltaE = canvas.matrix.e - scaledE;
+    expect(deltaE).toBeCloseTo(100, 4);
+  });
+
+  test('pan at 0.5× zoom applies correct scene-space delta', () => {
+    canvas.zoom(0.5);
+    const scaledE = canvas.matrix.e;
+
+    core.mouse.mouseMoved(0, 300);
+    canvas.mouseDown(0);
+
+    // Move 100 canvas pixels right
+    core.mouse.mouseMoved(100, 300);
+    canvas.pan();
+
+    // Same invariant: canvas_delta/scale * scale = canvas_delta → deltaE = 100.
+    const deltaE = canvas.matrix.e - scaledE;
+    expect(deltaE).toBeCloseTo(100, 4);
+  });
+
+  test('pan with no movement produces no translation', () => {
+    core.mouse.mouseMoved(200, 200);
+    canvas.mouseDown(0);
+    const eBefore = canvas.matrix.e;
+    const fBefore = canvas.matrix.f;
+
+    canvas.pan(); // mouse hasn't moved
+
+    expect(canvas.matrix.e).toBeCloseTo(eBefore, 10);
+    expect(canvas.matrix.f).toBeCloseTo(fBefore, 10);
+  });
+
+  test('middle-button mouseDown also seeds the pan anchor correctly', () => {
+    core.mouse.mouseMoved(50, 300);
+    canvas.mouseDown(1); // middle button
+
+    core.mouse.mouseMoved(150, 300); // +100 x
+    canvas.pan();
+
+    expect(canvas.matrix.e).toBeCloseTo(100, 5);
+  });
+
+  test('mouseDownCanvasPoint is not mutated by pan()', () => {
+    core.mouse.mouseMoved(100, 300);
+    canvas.mouseDown(0);
+    const originalX = core.mouse.mouseDownCanvasPoint.x;
+    const originalY = core.mouse.mouseDownCanvasPoint.y;
+
+    core.mouse.mouseMoved(200, 400);
+    canvas.pan();
+
+    // pan() must not touch Mouse.mouseDownCanvasPoint
+    expect(core.mouse.mouseDownCanvasPoint.x).toBe(originalX);
+    expect(core.mouse.mouseDownCanvasPoint.y).toBe(originalY);
   });
 });

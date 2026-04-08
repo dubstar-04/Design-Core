@@ -9,6 +9,7 @@ import { DesignCore } from '../designCore.js';
 export class Canvas {
   #panCursorTimeout;
   #baseCursorState = 'DEFAULT';
+  #lastPanCanvasPoint = new Point();
 
   /** Create Canvas */
   constructor() {
@@ -21,8 +22,6 @@ export class Canvas {
     this.width = 1;
     this.height = 1;
 
-    this.panDelta = new Point();
-    this.lastDelta = new Point();
     this.flipped = false;
 
     this.paintState;
@@ -116,8 +115,10 @@ export class Canvas {
   mouseDown(button) {
     switch (button) {
       case 0: // left button
+        this.#lastPanCanvasPoint = DesignCore.Mouse.pointOnCanvas();
         break;
       case 1: // middle button
+        this.#lastPanCanvasPoint = DesignCore.Mouse.pointOnCanvas();
         clearTimeout(this.#panCursorTimeout);
         this.#panCursorTimeout = setTimeout(() => this.#setCursor(Input.Cursor.GRABBING), 250);
         break;
@@ -138,7 +139,6 @@ export class Canvas {
         break;
       case 1: // middle button
         clearTimeout(this.#panCursorTimeout);
-        this.lastDelta = new Point();
         this.requestPaint();
         this.#setCursor(this.#baseCursorState);
         break;
@@ -169,13 +169,10 @@ export class Canvas {
    * Pan the canvas
    */
   pan() {
-    // pandelta: mouse drag distance in scene scale
-    this.panDelta = DesignCore.Mouse.pointOnScene().subtract(DesignCore.Mouse.transformToScene(DesignCore.Mouse.mouseDownCanvasPoint));
-    // delta difference between last delta calculation and current mouse position
-    const delta = this.panDelta.subtract(this.lastDelta);
-    // set the last delta value
-    this.lastDelta = this.panDelta;
-    // add translation to the matrix object
+    const current = DesignCore.Mouse.pointOnCanvas();
+    const delta = DesignCore.Mouse.transformToScene(current)
+        .subtract(DesignCore.Mouse.transformToScene(this.#lastPanCanvasPoint));
+    this.#lastPanCanvasPoint = current;
     this.matrix.translate(delta.x, delta.y);
     this.requestPaint();
   }
