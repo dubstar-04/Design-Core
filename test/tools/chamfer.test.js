@@ -968,3 +968,31 @@ test('Chamfer.action dist>0 trimMode=false Line + Lwpolyline: standalone chamfer
   expect(core.scene.entities.get(0).points.length).toBe(2);
   expect(core.scene.entities.get(1).points.length).toBe(4);
 });
+
+// ─── action: entity property inheritance ─────────────────────────────────────
+
+test('Chamfer.action chamfer line inherits layer, lineWidth, lineType from first entity', () => {
+  // Perpendicular L-corner at origin; first entity on a non-default layer.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)], layer: 'walls', lineWidth: 5, lineType: 'DASHED' });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = false;
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
+  chamfer.action();
+
+  expect(core.scene.entities.count()).toBe(3);
+  const chamferLine = core.scene.entities.get(2);
+  expect(chamferLine.type).toBe('Line');
+  expect(chamferLine.layer).toBe('walls');
+  expect(chamferLine.lineWidth).toBe(5);
+  expect(chamferLine.lineType).toBe('DASHED');
+});
