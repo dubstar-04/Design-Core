@@ -872,11 +872,20 @@ test('Chamfer.action dist>0 trimMode=true closed Lwpolyline closing-wrap (seg4+s
   const poly = core.scene.entities.get(0);
   // Shared vertex (0,0) at index 0 replaced by two chamfer points → total 5 points
   expect(poly.points.length).toBe(5);
-  // Endpoints must NOT have been moved to the intersection (open-ends symptom)
-  // The first two new points should be the chamfer points, not (0,0)/(0,0)
-  const allAtOrigin = poly.points[0].x === 0 && poly.points[0].y === 0 &&
-    poly.points[1].x === 0 && poly.points[1].y === 0;
-  expect(allAtOrigin).toBe(false);
+  // Verify the actual chamfer point coordinates and traversal order.
+  // The closing segment (0,10)→(0,0) is chamfered at (0,2),
+  // seg 1 (0,0)→(10,0) is chamfered at (2,0).
+  // After splice: [(0,2), (2,0), (10,0), (10,10), (0,10)]
+  expect(poly.points[0].x).toBeCloseTo(0);
+  expect(poly.points[0].y).toBeCloseTo(2);
+  expect(poly.points[1].x).toBeCloseTo(2);
+  expect(poly.points[1].y).toBeCloseTo(0);
+  expect(poly.points[2].x).toBeCloseTo(10);
+  expect(poly.points[2].y).toBeCloseTo(0);
+  expect(poly.points[3].x).toBeCloseTo(10);
+  expect(poly.points[3].y).toBeCloseTo(10);
+  expect(poly.points[4].x).toBeCloseTo(0);
+  expect(poly.points[4].y).toBeCloseTo(10);
 });
 
 test('Chamfer.action dist>0 trimMode=false closed Lwpolyline closing-wrap: standalone chamfer Line only', () => {
