@@ -612,3 +612,120 @@ describe('Test Canvas cursor states', () => {
     expect(() => canvas.mouseMoved()).not.toThrow();
   });
 });
+
+// ─── Canvas.pan() ─────────────────────────────────────────────────────────────
+
+describe('Test Canvas.pan', () => {
+  beforeEach(() => {
+    core.activate();
+    canvas.matrix = new Matrix();
+    canvas.width = 800;
+    canvas.height = 600;
+    canvas.flipped = true; // avoid flip side-effect in pan calls
+  });
+
+  test('pan translates matrix by the scene-space mouse movement', () => {
+    // Simulate a left mouseDown at canvas (100, 300) — sets #lastPanCanvasPoint
+    core.mouse.mouseMoved(100, 300);
+    canvas.mouseDown(0);
+
+    // Move mouse 50 pixels right, 20 pixels down in canvas space
+    core.mouse.mouseMoved(150, 320);
+    canvas.pan();
+
+    // At scale=1 the canvas y-axis is inverted relative to scene:
+    // canvas dy = +20 → scene dy = -20
+    const e = canvas.matrix.e; // x translation
+    const f = canvas.matrix.f; // y translation (raw matrix value)
+    expect(e).toBeCloseTo(50, 5);
+    // Moving the mouse 20 raw pixels down decreases Mouse.y by 20 (y = -raw + height).
+    // transformToScene re-inverts, so scene delta.y = +20. matrix.translate(50, 20) → f += 20.
+    expect(f).toBeCloseTo(20, 5);
+  });
+
+  test('second pan call accumulates correctly (incremental anchor advances)', () => {
+    // mouseDown at (0, 0)
+    core.mouse.mouseMoved(0, 0);
+    canvas.mouseDown(0);
+
+    // First move: +100 x, no y
+    core.mouse.mouseMoved(100, 0);
+    canvas.pan();
+
+    // Second move: another +100 x — anchor advanced so delta is still +100, not +200
+    core.mouse.mouseMoved(200, 0);
+    canvas.pan();
+
+    expect(canvas.matrix.e).toBeCloseTo(200, 5);
+  });
+
+  test('pan at 2× zoom applies correct scene-space delta', () => {
+    canvas.zoom(2);
+    const scaledE = canvas.matrix.e;
+
+    core.mouse.mouseMoved(0, 300);
+    canvas.mouseDown(0);
+
+    // Move 100 canvas pixels right
+    core.mouse.mouseMoved(100, 300);
+    canvas.pan();
+
+    // At any zoom level, dragging 100 canvas pixels right always changes matrix.e by 100:
+    // scene_delta = 100 / scale, then matrix.translate(scene_delta) multiplies by scale → 100.
+    // This gives a consistent 1:1 screen-space pan feel regardless of zoom.
+    const deltaE = canvas.matrix.e - scaledE;
+    expect(deltaE).toBeCloseTo(100, 4);
+  });
+
+  test('pan at 0.5× zoom applies correct scene-space delta', () => {
+    canvas.zoom(0.5);
+    const scaledE = canvas.matrix.e;
+
+    core.mouse.mouseMoved(0, 300);
+    canvas.mouseDown(0);
+
+    // Move 100 canvas pixels right
+    core.mouse.mouseMoved(100, 300);
+    canvas.pan();
+
+    // Same invariant: canvas_delta/scale * scale = canvas_delta → deltaE = 100.
+    const deltaE = canvas.matrix.e - scaledE;
+    expect(deltaE).toBeCloseTo(100, 4);
+  });
+
+  test('pan with no movement produces no translation', () => {
+    core.mouse.mouseMoved(200, 200);
+    canvas.mouseDown(0);
+    const eBefore = canvas.matrix.e;
+    const fBefore = canvas.matrix.f;
+
+    canvas.pan(); // mouse hasn't moved
+
+    expect(canvas.matrix.e).toBeCloseTo(eBefore, 10);
+    expect(canvas.matrix.f).toBeCloseTo(fBefore, 10);
+  });
+
+  test('middle-button mouseDown also seeds the pan anchor correctly', () => {
+    core.mouse.mouseMoved(50, 300);
+    canvas.mouseDown(1); // middle button
+
+    core.mouse.mouseMoved(150, 300); // +100 x
+    canvas.pan();
+
+    expect(canvas.matrix.e).toBeCloseTo(100, 5);
+  });
+
+  test('mouseDownCanvasPoint is not mutated by pan()', () => {
+    core.mouse.mouseMoved(100, 300);
+    canvas.mouseDown(0);
+    const originalX = core.mouse.mouseDownCanvasPoint.x;
+    const originalY = core.mouse.mouseDownCanvasPoint.y;
+
+    core.mouse.mouseMoved(200, 400);
+    canvas.pan();
+
+    // pan() must not touch Mouse.mouseDownCanvasPoint
+    expect(core.mouse.mouseDownCanvasPoint.x).toBe(originalX);
+    expect(core.mouse.mouseDownCanvasPoint.y).toBe(originalY);
+  });
+});
