@@ -2,7 +2,7 @@ import { Tool } from './tool.js';
 import { Strings } from '../lib/strings.js';
 import { Constants } from '../lib/constants.js';
 import { BasePolyline } from '../entities/basePolyline.js';
-import { RemoveState, UpdateState } from '../lib/stateManager.js';
+import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 import { CornerEntity } from './cornerEntity.js';
 import { Intersection } from '../lib/intersect.js';
 
@@ -11,7 +11,7 @@ import { DesignCore } from '../designCore.js';
 /**
  * ChamferFilletBase Class
  * Base class for Chamfer and Fillet commands, providing shared entity selection
- * state, segment resolution, and sharp-trim logic.
+ * state, segment resolution, and shared corner-trim logic.
  * @extends Tool
  */
 export class ChamferFilletBase extends Tool {
@@ -90,74 +90,134 @@ export class ChamferFilletBase extends Tool {
   }
 
   /**
-   * Trim both entities to the sharp intersection point with no arc or chamfer line.
-   * Handles Line+Line, Polyline+Polyline (same entity), and Line+Polyline cases.
-   * Reads geometry from instance fields set by resolveCornerGeometry().
-   * @return {Array} - array of state changes to be committed by the caller
+   * Unified corner-trim method for sharp trims, chamfer, and fillet.
+   * Computes and applies state changes based on entity types.
+   *
+   * For sharp trims (newEntity === null), both corner points are the intersection
+   * point and a single point is spliced/assigned (not two copies).
+   *
+   * For fillet, firstCornerPoint carries the arc bulge from arc.toPolylinePoints().
+   * This method transfers the bulge to whichever point comes first in the polyline
+   * traversal order, ensuring correct arc encoding.
+   *
+   * @param {Point} firstCornerPoint - trim/chamfer/tangent point on the first entity
+   * @param {Point} secondCornerPoint - trim/chamfer/tangent point on the second entity
+   * @param {Entity|null} newEntity - entity to add (Arc for fillet, Line for chamfer, null for sharp trim)
+   * @return {Array} - array of state changes
    */
-  applySharpTrim() {
+  applyCornerTrim(firstCornerPoint, secondCornerPoint, newEntity) {
+    const isSharpTrim = newEntity === null;
     const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
     const secondIsPolyline = this.secondPick.entity instanceof BasePolyline;
 
-    // Line + Line: trim both lines to the intersection point.
+    // Two standalone entities: update both, optionally add the new entity.
     if (!firstIsPolyline && !secondIsPolyline) {
-      return [
-        new UpdateState(this.firstPick.entity, { points: [this.firstPick.lineKeptEnd(this.intersectionPoint), this.intersectionPoint] }),
-        new UpdateState(this.secondPick.entity, { points: [this.secondPick.lineKeptEnd(this.intersectionPoint), this.intersectionPoint] }),
-      ];
+      const stateChanges = isSharpTrim ? [] : [new AddState(newEntity)];
+      stateChanges.push(
+          new UpdateState(this.firstPick.entity, { points: [this.firstPick.lineKeptEnd(this.intersectionPoint), firstCornerPoint] }),
+          new UpdateState(this.secondPick.entity, { points: [this.secondPick.lineKeptEnd(this.intersectionPoint), secondCornerPoint] }),
+      );
+      return stateChanges;
     }
 
-    // Polyline + Polyline (same entity): replace the shared corner vertex (or open endpoints)
-    // with the intersection point.
+    // Same polyline: splice the corner points into the point array.
     if (firstIsPolyline && secondIsPolyline && this.firstPick.entity === this.secondPick.entity) {
-      const lastIdx = this.firstPick.entity.points.length - 1;
+      const closeSegIdx = this.firstPick.entity.points.length;
+      const lastIdx = closeSegIdx - 1;
       const segDiff = Math.abs(this.firstPick.segmentIndex - this.secondPick.segmentIndex);
       const isOpenEnds = !this.firstPick.entity.flags.hasFlag(1) && segDiff !== 1 && (
         (this.firstPick.segmentIndex === 1 && this.secondPick.segmentIndex === lastIdx) ||
         (this.firstPick.segmentIndex === lastIdx && this.secondPick.segmentIndex === 1)
       );
-
       const newPoints = this.firstPick.entity.points.map((p) => p.clone());
+      const stateChanges = [];
 
       if (isOpenEnds) {
-        newPoints[0] = this.intersectionPoint.clone();
-        newPoints[lastIdx] = this.intersectionPoint.clone();
+        if (!isSharpTrim) stateChanges.push(new AddState(newEntity));
+        if (this.firstPick.segmentIndex === 1) {
+          newPoints[0] = firstCornerPoint.clone();
+          newPoints[lastIdx] = secondCornerPoint.clone();
+        } else {
+          newPoints[0] = secondCornerPoint.clone();
+          newPoints[lastIdx] = firstCornerPoint.clone();
+        }
       } else {
-        const closeSegIdx = this.firstPick.entity.points.length;
         const seg1 = this.firstPick.segmentIndex;
         const seg2 = this.secondPick.segmentIndex;
         const isClosingWrap = (seg1 === closeSegIdx && seg2 === 1) || (seg2 === closeSegIdx && seg1 === 1);
+        const isFirstLower = seg1 < seg2;
         const cornerIdx = isClosingWrap ? 0 : Math.min(seg1, seg2);
-        newPoints.splice(cornerIdx, 1, this.intersectionPoint.clone());
+
+        if (isSharpTrim) {
+          // Sharp trim: splice in a single copy of the intersection point.
+          newPoints.splice(cornerIdx, 1, firstCornerPoint.clone());
+        } else {
+          // Chamfer/fillet: splice in two points. Ensure the bulge (if any) is on
+          // the lower point (the one that comes first in polyline traversal).
+          const swapped = isClosingWrap ? seg1 !== closeSegIdx : !isFirstLower;
+          const lowerSrc = swapped ? secondCornerPoint : firstCornerPoint;
+          const upperSrc = swapped ? firstCornerPoint : secondCornerPoint;
+          const arcBulge = firstCornerPoint.bulge || 0;
+          const lowerClone = lowerSrc.clone();
+          const upperClone = upperSrc.clone();
+          lowerClone.bulge = swapped ? -arcBulge : arcBulge;
+          upperClone.bulge = 0;
+          newPoints.splice(cornerIdx, 1, lowerClone, upperClone);
+        }
       }
-      return [new UpdateState(this.firstPick.entity, { points: newPoints })];
+
+      stateChanges.push(new UpdateState(this.firstPick.entity, { points: newPoints }));
+      return stateChanges;
     }
 
-    // Line + Polyline (or Polyline + Line): consume the line into the polyline.
-    const poly = firstIsPolyline ? this.firstPick : this.secondPick;
-    const line = firstIsPolyline ? this.secondPick : this.firstPick;
+    // Standalone + Polyline: consume the standalone entity into the polyline.
+    const [poly, standalone] = firstIsPolyline ? [this.firstPick, this.secondPick] : [this.secondPick, this.firstPick];
+    const polyCornerPoint = poly === this.firstPick ? firstCornerPoint : secondCornerPoint;
+    const standaloneCornerPoint = poly === this.firstPick ? secondCornerPoint : firstCornerPoint;
+    const arcBulge = firstCornerPoint.bulge || 0;
     const polySegIdx = poly.segmentIndex;
     const keepStart = poly.keepStart(this.intersectionPoint);
     let newPoints;
-    if (keepStart) {
-      // Keep the polyline points up to (not including) the selected segment start,
-      // trim to the intersection and append the kept end of the line.
+    if (isSharpTrim) {
+      // Sharp trim: single intersection point between poly and standalone kept ends.
+      if (keepStart) {
+        newPoints = [
+          ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
+          polyCornerPoint.clone(),
+          standalone.lineKeptEnd(this.intersectionPoint).clone(),
+        ];
+      } else {
+        newPoints = [
+          standalone.lineKeptEnd(this.intersectionPoint).clone(),
+          polyCornerPoint.clone(),
+          ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),
+        ];
+      }
+    } else if (keepStart) {
+      // Keep start: [...polyBefore, polyCorner(with bulge), standaloneCorner, lineKeptEnd]
+      // The arc runs from polyCorner to standaloneCorner in polyline traversal order.
+      const polyClone = polyCornerPoint.clone();
+      polyClone.bulge = poly === this.firstPick ? arcBulge : -arcBulge;
       newPoints = [
         ...poly.entity.points.slice(0, polySegIdx).map((p) => p.clone()),
-        this.intersectionPoint.clone(),
-        line.lineKeptEnd(this.intersectionPoint).clone(),
+        polyClone,
+        standaloneCornerPoint.clone(),
+        standalone.lineKeptEnd(this.intersectionPoint).clone(),
       ];
     } else {
-      // Keep the polyline points from the selected segment start onwards,
-      // prepending the kept end of the line and the intersection.
+      // Keep end: [lineKeptEnd, standaloneCorner(with negated bulge), polyCorner, ...polyAfter]
+      // The arc runs from standaloneCorner to polyCorner in reversed traversal.
+      const standaloneClone = standaloneCornerPoint.clone();
+      standaloneClone.bulge = poly === this.firstPick ? -arcBulge : arcBulge;
       newPoints = [
-        line.lineKeptEnd(this.intersectionPoint).clone(),
-        this.intersectionPoint.clone(),
+        standalone.lineKeptEnd(this.intersectionPoint).clone(),
+        standaloneClone,
+        polyCornerPoint.clone(),
         ...poly.entity.points.slice(polySegIdx).map((p) => p.clone()),
       ];
     }
     return [
-      new RemoveState(line.entity),
+      new RemoveState(standalone.entity),
       new UpdateState(poly.entity, { points: newPoints }),
     ];
   }
