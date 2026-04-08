@@ -122,6 +122,24 @@ export class Utils {
   }
 
   /**
+   * Copy display properties from a source entity into a plain data object.
+   * Useful when creating a new entity that should inherit the visual properties
+   * of an existing one (e.g. the arc produced by Fillet).
+   * @param {Entity} entity - source entity
+   * @param {Array<string>} properties - property names to copy
+   * @return {Object} plain object containing the copied properties
+   */
+  static cloneProperties(entity, properties = ['colour', 'layer', 'lineType', 'lineWidth', 'height', 'styleName', 'dimensionStyle']) {
+    const result = {};
+    for (const prop of properties) {
+      if (entity.hasOwnProperty(prop)) {
+        result[prop] = entity[prop];
+      }
+    }
+    return result;
+  }
+
+  /**
    * Calculate area of triangle given 3 points
    * @param {Point} p1
    * @param {Point} p2
