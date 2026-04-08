@@ -2,6 +2,7 @@ import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Strings } from '../lib/strings.js';
 import { Logging } from '../lib/logging.js';
+import { Utils } from '../lib/utils.js';
 import { UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
@@ -82,15 +83,9 @@ export class MatchProp extends Tool {
     // loop through destination set
     for (let i = 0; i < this.destinationSetIndices.length; i++) {
       const targetItem = DesignCore.Scene.entities.get(this.destinationSetIndices[i]);
-      const propertySet = {};
-      // loop through properties and match
-      for (let p = 0; p < this.properties.length; p++) {
-        // check property exists on both items
-        const prop = this.properties[p];
-        if (sourceItem.hasOwnProperty(prop)) {
-          propertySet[prop] = sourceItem[prop];
-        }
-      }
+      // propertySet: plain object containing only the properties that exist on
+      // the source entity, keyed by property name and ready to pass to UpdateState.
+      const propertySet = Utils.cloneProperties(sourceItem, this.properties);
 
       // only add state change if there are properties to change
       if (Object.keys(propertySet).length > 0) {

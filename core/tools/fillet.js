@@ -3,6 +3,7 @@ import { ChamferFilletBase } from './chamferFilletBase.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Constants } from '../lib/constants.js';
+import { Utils } from '../lib/utils.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
@@ -184,10 +185,7 @@ export class Fillet extends ChamferFilletBase {
     const arc = DesignCore.CommandManager.createNew('Arc', {
       points: [arcCentre, firstTangentPoint, secondTangentPoint],
       direction: arcDirection,
-      layer: this.firstPick.entity.layer,
-      colour: this.firstPick.entity.colour,
-      lineWidth: this.firstPick.entity.lineWidth,
-      lineType: this.firstPick.entity.lineType,
+      ...Utils.cloneProperties(this.firstPick.entity),
     });
 
     const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;

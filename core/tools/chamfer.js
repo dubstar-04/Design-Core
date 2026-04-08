@@ -3,6 +3,7 @@ import { ChamferFilletBase } from './chamferFilletBase.js';
 import { Intersection } from '../lib/intersect.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { Utils } from '../lib/utils.js';
 import { Point } from '../entities/point.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
@@ -242,10 +243,7 @@ export class Chamfer extends ChamferFilletBase {
 
     const chamferLine = DesignCore.CommandManager.createNew('Line', {
       points: [firstChamferPoint, secondChamferPoint],
-      layer: this.firstPick.entity.layer,
-      colour: this.firstPick.entity.colour,
-      lineWidth: this.firstPick.entity.lineWidth,
-      lineType: this.firstPick.entity.lineType,
+      ...Utils.cloneProperties(this.firstPick.entity),
     });
 
     const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
