@@ -131,3 +131,33 @@ test('Test Rotate.action', () => {
     expect(core.scene.entities.get(i).points[0].y).toBeCloseTo(0);
   }
 });
+
+test('Rotate.execute with reference - resets inputPoint to rotation center', async () => {
+  const origInputManager = core.scene.inputManager;
+
+  const basePoint = new Point(10, 0);
+  // inputs: basePoint, 'r' (reference option), refBase, refEnd, then undefined to exit the while loop
+  const inputs = [basePoint, 'r', new Point(5, 0), new Point(5, 10), undefined];
+  let callCount = 0;
+  const mockInputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) return inputs[callCount++];
+    },
+    executeCommand: () => {},
+    inputPoint: null,
+  };
+  core.scene.inputManager = mockInputManager;
+
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+
+  const rotate = new Rotate();
+  await rotate.execute();
+
+  // After the reference sequence completes, inputPoint must be reset to the
+  // rotation center (points[0]) so the tracking line uses the correct origin.
+  expect(mockInputManager.inputPoint).toEqual(basePoint);
+
+  core.scene.inputManager = origInputManager;
+});
