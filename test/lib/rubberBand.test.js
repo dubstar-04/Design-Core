@@ -7,7 +7,10 @@ new Core();
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
-/** Build a mock HTML Canvas context (setLineDash succeeds) */
+/**
+ * Build a mock HTML Canvas context (setLineDash succeeds)
+ * @return {object} mock context
+ */
 function makeCanvasCtx() {
   return {
     strokeStyle: '',
@@ -23,6 +26,7 @@ function makeCanvasCtx() {
 /**
  * Build a mock Cairo context where assigning strokeStyle throws,
  * exercising the Cairo fallback branch in RubberBand.draw().
+ * @return {object} mock context
  */
 function makeCairoCtx() {
   const ctx = {
