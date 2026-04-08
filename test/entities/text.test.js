@@ -1,6 +1,7 @@
 import { Text } from '../../core/entities/text.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
+import { Input } from '../../core/lib/input.js';
 
 import { File, withMockInput } from '../test-helpers/test-helpers.js';
 import { Core } from '../../core/core/core.js';
@@ -638,4 +639,34 @@ test('Text.snaps node snap position matches points[0]', () => {
   expect(nodeSnaps.length).toBe(1);
   expect(nodeSnaps[0].snapPoint.x).toBe(5);
   expect(nodeSnaps[0].snapPoint.y).toBe(10);
+});
+
+test('Text.preview - uses rubber band when not waiting for string input', () => {
+  const text = new Text({ points: [new Point(5, 5)] });
+  DesignCore.Scene.auxiliaryEntities.clear();
+  DesignCore.Scene.tempEntities.clear();
+  // Simulate a pending POINT prompt (not STRING)
+  DesignCore.Scene.inputManager.promptOption = { types: [Input.Type.POINT] };
+
+  text.preview();
+
+  expect(DesignCore.Scene.auxiliaryEntities.count()).toBeGreaterThanOrEqual(1);
+  expect(DesignCore.Scene.tempEntities.count()).toBe(0);
+
+  DesignCore.Scene.inputManager.promptOption = undefined;
+});
+
+test('Text.preview - shows text entity when waiting for string input', () => {
+  const text = new Text({ points: [new Point(5, 5)], height: 5, rotation: 0, string: '' });
+  DesignCore.Scene.auxiliaryEntities.clear();
+  DesignCore.Scene.tempEntities.clear();
+  // Simulate a pending STRING prompt
+  DesignCore.Scene.inputManager.promptOption = { types: [Input.Type.STRING] };
+
+  text.preview();
+
+  expect(DesignCore.Scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+  expect(DesignCore.Scene.auxiliaryEntities.count()).toBe(0);
+
+  DesignCore.Scene.inputManager.promptOption = undefined;
 });
