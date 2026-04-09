@@ -164,7 +164,7 @@ export class BasePolyline extends Entity {
       const points = [...this.points, mousePoint];
       if (this.inputMode === this.modes.ARC) {
         // Straight segment is not the final form — show as rubber-band indicator
-        DesignCore.Scene.auxiliaryEntities.add(new RubberBand(points));
+        DesignCore.Scene.auxiliaryEntities.add(new RubberBand([this.points.at(-1), mousePoint]));
         // Arc segment is the final form — draw on the current layer
         const arcpoints = Utils.cloneObject(this.points);
         arcpoints.at(-1).bulge = this.getBulgeFromSegment(mousePoint);
