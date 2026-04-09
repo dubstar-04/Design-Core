@@ -54,7 +54,7 @@ test('RubberBand constructor stores points and defaults', () => {
   const rb = new RubberBand(pts);
 
   expect(rb.points).toBe(pts);
-  expect(rb.lineWidth).toBe(1);
+  expect(rb.lineWidth).toBe(1.5);
   expect(rb.dashPattern).toEqual([12, 6]);
 });
 
