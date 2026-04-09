@@ -9,7 +9,7 @@ export class RubberBand {
    */
   constructor(points) {
     this.points = points;
-    this.lineWidth = 1;
+    this.lineWidth = 1.5;
     this.dashPattern = [12, 6];
   }
 
