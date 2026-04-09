@@ -104,6 +104,7 @@ describe('AlignedDimension.getPointsFromSelection', () => {
 });
 
 test('AlignedDimension.preview runs without error and calls createTempItem', () => {
+  const origAddAux = DesignCore.Scene.auxiliaryEntities.add;
   const origCreateTempItem = DesignCore.Scene.tempEntities.create;
   const origPointOnScene = DesignCore.Mouse.pointOnScene;
   // Manual mock for createTempItem
@@ -111,16 +112,21 @@ test('AlignedDimension.preview runs without error and calls createTempItem', () 
   DesignCore.Scene.tempEntities.create = function(type, obj) {
     createTempItemCalls.push([type, obj]);
   };
+  // Manual mock for auxiliaryEntities.add
+  const addAuxCalls = [];
+  DesignCore.Scene.auxiliaryEntities.add = function(item) {
+    addAuxCalls.push(item);
+  };
   // Manual mock for pointOnScene
   DesignCore.Mouse.pointOnScene = function() {
     return new Point(5, 5);
   };
 
-  // Test with 1 point (should call createTempItem with 'Line')
+  // Test with 1 point (should add a RubberBand to auxiliaryEntities)
   const dim1 = new AlignedDimension();
   dim1.points = [new Point(0, 0)];
   expect(() => dim1.preview()).not.toThrow();
-  expect(createTempItemCalls.some((call) => call[0] === 'Line')).toBe(true);
+  expect(addAuxCalls.length).toBeGreaterThanOrEqual(1);
 
   // Test with >1 point (should call createTempItem with this.type)
   const dim2 = new AlignedDimension();
@@ -129,6 +135,7 @@ test('AlignedDimension.preview runs without error and calls createTempItem', () 
   expect(createTempItemCalls.some((call) => call[0] === dim2.type)).toBe(true);
 
   // Restore
+  DesignCore.Scene.auxiliaryEntities.add = origAddAux;
   DesignCore.Scene.tempEntities.create = origCreateTempItem;
   DesignCore.Mouse.pointOnScene = origPointOnScene;
 });

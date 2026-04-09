@@ -110,8 +110,8 @@ export class SnapPoint {
 class TrackingLine {
   /**
    * Create TrackingLine
-   * @param {Point} inputPoint - the previous input point (line passes through this)
-   * @param {Point} snapPoint - the current snapped mouse point (direction reference)
+   * @param {Point} inputPoint - the previous input point (defines direction)
+   * @param {Point} snapPoint - the current snapped mouse point (line starts here)
    */
   constructor(inputPoint, snapPoint) {
     this.inputPoint = inputPoint;
@@ -124,8 +124,8 @@ class TrackingLine {
    * @param {number} scale
    */
   draw(ctx, scale) {
-    const from = this.inputPoint;
-    const dir = this.snapPoint.subtract(from);
+    const from = this.snapPoint;
+    const dir = this.snapPoint.subtract(this.inputPoint);
     const lineWidth = 2 / scale;
 
     if (dir.x === 0 && dir.y === 0) {
@@ -140,8 +140,8 @@ class TrackingLine {
     const boundsMin = corner0.min(corner1);
     const boundsMax = corner0.max(corner1);
 
-    // Clip the infinite line (through 'from' in direction dir) to canvas bounds
-    let tMin = -Infinity;
+    // Clip the ray (from snapPoint outward, away from inputPoint) to canvas bounds
+    let tMin = 0;
     let tMax = Infinity;
 
     if (dir.x !== 0) {

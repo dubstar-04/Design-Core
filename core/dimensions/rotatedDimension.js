@@ -7,6 +7,7 @@ import { Point } from '../entities/point.js';
 import { BaseLinearDimension } from './baseLinearDimension.js';
 
 import { DesignCore } from '../designCore.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 
 /**
@@ -117,8 +118,7 @@ export class RotatedDimension extends BaseLinearDimension {
   preview() {
     if (this.points.length === 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
-      const points = [this.points.at(0), mousePoint];
-      DesignCore.Scene.tempEntities.create('Line', { points: points });
+      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([this.points.at(0), mousePoint]));
     }
 
     if (this.points.length > 1) {

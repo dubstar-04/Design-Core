@@ -11,6 +11,7 @@ import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
 import { SnapPoint } from '../lib/snapping.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 /**
  * Text Entity Class
@@ -235,7 +236,7 @@ export class Text extends Entity {
       } else {
         const mousePoint = DesignCore.Mouse.pointOnScene();
         const points = [this.points.at(-1), mousePoint];
-        DesignCore.Scene.tempEntities.create('Line', { points: points });
+        DesignCore.Scene.auxiliaryEntities.add(new RubberBand(points));
       }
     }
   }

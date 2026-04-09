@@ -6,6 +6,7 @@ import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 import { UpdateState } from '../lib/stateManager.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 /**
  * Move Command Class
@@ -66,9 +67,8 @@ export class Move extends Tool {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
 
-      // Draw a line
-      const points = [this.points.at(-1), mousePoint];
-      DesignCore.Scene.tempEntities.create('Line', { points: points });
+      // Draw a rubber-band line from base point to mouse
+      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([this.points.at(-1), mousePoint]));
 
       // Get the delta from the last mouse point
       const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);

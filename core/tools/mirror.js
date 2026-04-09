@@ -7,6 +7,7 @@ import { Point } from '../entities/point.js';
 import { AddState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 /**
  * Mirror Command Class
@@ -74,8 +75,8 @@ export class Mirror extends Tool {
       const pt1 = this.points[0];
       const pt2 = this.points.length >= 2 ? this.points[1] : mousePoint;
 
-      // Draw the mirror line
-      DesignCore.Scene.tempEntities.create('Line', { points: [pt1, pt2] });
+      // Draw the mirror line as a rubber-band indicator
+      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([pt1, pt2]));
 
       // Preview mirrored entities (skip if mirror line has zero length)
       if (!pt1.isSame(pt2)) {

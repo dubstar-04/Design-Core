@@ -7,6 +7,7 @@ import { Point } from '../entities/point.js';
 import { AddState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 /**
  * Copy Command Class
@@ -77,9 +78,8 @@ export class Copy extends Tool {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
 
-      // Draw a line
-      const points = [this.points.at(-1), mousePoint];
-      DesignCore.Scene.tempEntities.create('Line', { points: points });
+      // Draw a rubber-band line from base point to mouse
+      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([this.points.at(-1), mousePoint]));
 
       const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);
       this.lastMousePoint = mousePoint;
