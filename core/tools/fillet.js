@@ -7,8 +7,6 @@ import { Utils } from '../lib/utils.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { AddState } from '../lib/stateManager.js';
-import { CornerEntity } from './cornerEntity.js';
-import { Intersection } from '../lib/intersect.js';
 import { Colour } from '../lib/colour.js';
 
 import { DesignCore } from '../designCore.js';
@@ -117,38 +115,13 @@ export class Fillet extends ChamferFilletBase {
    * Preview the command during execution
    */
   preview() {
-    if (!this.firstPick.entity) return;
-    if (!this.firstPick.resolveEndpoints()) return;
-
-    const mousePoint = DesignCore.Mouse.pointOnScene();
-    const index = DesignCore.Scene.selectionManager.findClosestItem(mousePoint);
-    if (index === undefined) return;
-
-    const candidate = DesignCore.Scene.entities.get(index);
-    if (!(candidate instanceof Line) && !(candidate instanceof BasePolyline)) return;
-
-    // Temporary second pick — do NOT write to this.secondPick
-    const tempSecond = new CornerEntity();
-    if (!tempSecond.setPick(candidate, mousePoint, '')) return;
-    if (!tempSecond.resolveEndpoints()) return;
-
-    // Virtual intersection of the two infinite lines
-    const result = Intersection.intersectSegmentSegment(
-        this.firstPick.lineStart, this.firstPick.lineEnd,
-        tempSecond.lineStart, tempSecond.lineEnd,
-        true, true,
-    );
-    if (result.status === Intersection.Status.PARALLEL ||
-        result.status === Intersection.Status.OVERLAPPING ||
-        result.status === Intersection.Status.COINCIDENT) return;
-
-    const intersectionPoint = result.points[0];
-    if (!intersectionPoint) return;
+    const selection = this.validateSelection();
+    if (!selection) return;
 
     const filletRadius = DesignCore.Scene.headers.filletRadius;
     const trimMode = DesignCore.Scene.headers.trimMode;
 
-    const geo = this.#computeFillet(this.firstPick, tempSecond, intersectionPoint, filletRadius);
+    const geo = this.#computeFillet(this.firstPick, selection.tempSecond, selection.intersectionPoint, filletRadius);
     if (!geo) return;
     if (trimMode && !geo.tangentsInBounds) return;
 
@@ -159,15 +132,15 @@ export class Fillet extends ChamferFilletBase {
 
     // trimMode: dull the original segments then show the shortened versions + arc
     this.#dullSegment(this.firstPick);
-    this.#dullSegment(tempSecond);
+    this.#dullSegment(selection.tempSecond);
 
     DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
-      points: [this.firstPick.lineKeptEnd(intersectionPoint), geo.firstTangentPoint],
+      points: [this.firstPick.lineKeptEnd(selection.intersectionPoint), geo.firstTangentPoint],
       ...Utils.cloneProperties(this.firstPick.entity),
     }));
     DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
-      points: [tempSecond.lineKeptEnd(intersectionPoint), geo.secondTangentPoint],
-      ...Utils.cloneProperties(candidate),
+      points: [selection.tempSecond.lineKeptEnd(selection.intersectionPoint), geo.secondTangentPoint],
+      ...Utils.cloneProperties(selection.candidate),
     }));
     if (geo.arc) DesignCore.Scene.previewEntities.add(geo.arc);
   }

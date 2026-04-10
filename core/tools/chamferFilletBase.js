@@ -1,6 +1,7 @@
 import { Tool } from './tool.js';
 import { Strings } from '../lib/strings.js';
 import { Constants } from '../lib/constants.js';
+import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 import { CornerEntity } from './cornerEntity.js';
@@ -87,6 +88,41 @@ export class ChamferFilletBase extends Tool {
     }
 
     return true;
+  }
+
+  /**
+   * Resolves the preview second-pick and virtual intersection for the mouse position.
+   * Returns { candidate, tempSecond, intersectionPoint } or null if no valid preview exists.
+   * @return {{candidate, tempSecond, intersectionPoint}|null}
+   */
+  validateSelection() {
+    if (!this.firstPick.entity) return null;
+    if (!this.firstPick.resolveEndpoints()) return null;
+
+    const mousePoint = DesignCore.Mouse.pointOnScene();
+    const index = DesignCore.Scene.selectionManager.findClosestItem(mousePoint);
+    if (index === undefined) return null;
+
+    const candidate = DesignCore.Scene.entities.get(index);
+    if (!(candidate instanceof Line) && !(candidate instanceof BasePolyline)) return null;
+
+    const tempSecond = new CornerEntity();
+    if (!tempSecond.setPick(candidate, mousePoint, '')) return null;
+    if (!tempSecond.resolveEndpoints()) return null;
+
+    const result = Intersection.intersectSegmentSegment(
+        this.firstPick.lineStart, this.firstPick.lineEnd,
+        tempSecond.lineStart, tempSecond.lineEnd,
+        true, true,
+    );
+    if (result.status === Intersection.Status.PARALLEL ||
+        result.status === Intersection.Status.OVERLAPPING ||
+        result.status === Intersection.Status.COINCIDENT) return null;
+
+    const intersectionPoint = result.points[0];
+    if (!intersectionPoint) return null;
+
+    return { candidate, tempSecond, intersectionPoint };
   }
 
   /**
