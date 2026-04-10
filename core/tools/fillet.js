@@ -7,6 +7,9 @@ import { Utils } from '../lib/utils.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { AddState } from '../lib/stateManager.js';
+import { CornerEntity } from './cornerEntity.js';
+import { Intersection } from '../lib/intersect.js';
+import { Colour } from '../lib/colour.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -114,7 +117,103 @@ export class Fillet extends ChamferFilletBase {
    * Preview the command during execution
    */
   preview() {
-    // No preview
+    if (!this.firstPick.entity) return;
+    if (!this.firstPick.resolveEndpoints()) return;
+
+    const mousePoint = DesignCore.Mouse.pointOnScene();
+    const index = DesignCore.Scene.selectionManager.findClosestItem(mousePoint);
+    if (index === undefined) return;
+
+    const candidate = DesignCore.Scene.entities.get(index);
+    if (!(candidate instanceof Line) && !(candidate instanceof BasePolyline)) return;
+
+    // Temporary second pick — do NOT write to this.secondPick
+    const tempSecond = new CornerEntity();
+    if (!tempSecond.setPick(candidate, mousePoint, '')) return;
+    if (!tempSecond.resolveEndpoints()) return;
+
+    // Virtual intersection of the two infinite lines
+    const result = Intersection.intersectSegmentSegment(
+        this.firstPick.lineStart, this.firstPick.lineEnd,
+        tempSecond.lineStart, tempSecond.lineEnd,
+        true, true,
+    );
+    if (result.status === Intersection.Status.PARALLEL ||
+        result.status === Intersection.Status.OVERLAPPING ||
+        result.status === Intersection.Status.COINCIDENT) return;
+
+    const intersectionPoint = result.points[0];
+    if (!intersectionPoint) return;
+
+    const filletRadius = DesignCore.Scene.headers.filletRadius;
+    const trimMode = DesignCore.Scene.headers.trimMode;
+
+    if (filletRadius === 0) {
+      if (trimMode) {
+        // Sharp corner trim: dull both segments, show lines trimmed to the intersection
+        this.#dullSegment(this.firstPick);
+        this.#dullSegment(tempSecond);
+        DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
+          points: [this.firstPick.lineKeptEnd(intersectionPoint), intersectionPoint],
+          ...Utils.cloneProperties(this.firstPick.entity),
+        }));
+        DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
+          points: [tempSecond.lineKeptEnd(intersectionPoint), intersectionPoint],
+          ...Utils.cloneProperties(candidate),
+        }));
+      }
+      return;
+    }
+
+    const firstUnit = this.firstPick.clickUnit(intersectionPoint);
+    const secondUnit = tempSecond.clickUnit(intersectionPoint);
+    const cosAngle = Math.min(1, Math.max(-1, firstUnit.dot(secondUnit)));
+    const cornerAngle = Math.acos(cosAngle);
+    if (cornerAngle < Constants.Tolerance.EPSILON || cornerAngle > Math.PI - Constants.Tolerance.EPSILON) return;
+
+    const bisectorUnit = firstUnit.add(secondUnit).normalise();
+    const arcCentre = intersectionPoint.add(bisectorUnit.scale(filletRadius / Math.sin(cornerAngle / 2)));
+
+    const firstTangentPoint = arcCentre.perpendicular(this.firstPick.lineStart, this.firstPick.lineEnd);
+    const secondTangentPoint = arcCentre.perpendicular(tempSecond.lineStart, tempSecond.lineEnd);
+
+    if (trimMode) {
+      // Silently skip the preview if the radius is too large to fit
+      const firstKeptDir = this.firstPick.lineKeptEnd(intersectionPoint).subtract(intersectionPoint);
+      const secondKeptDir = tempSecond.lineKeptEnd(intersectionPoint).subtract(intersectionPoint);
+      const firstTangentDot = firstTangentPoint.subtract(intersectionPoint).dot(firstKeptDir);
+      const secondTangentDot = secondTangentPoint.subtract(intersectionPoint).dot(secondKeptDir);
+      if (firstTangentDot < 0 || firstTangentDot > firstKeptDir.dot(firstKeptDir) ||
+          secondTangentDot < 0 || secondTangentDot > secondKeptDir.dot(secondKeptDir)) return;
+    }
+
+    const windingCross = firstTangentPoint.subtract(arcCentre).cross(secondTangentPoint.subtract(arcCentre));
+    const arcDirection = windingCross > 0 ? 1 : -1;
+
+    const arc = DesignCore.CommandManager.createNew('Arc', {
+      points: [arcCentre, firstTangentPoint, secondTangentPoint],
+      direction: arcDirection,
+      ...Utils.cloneProperties(this.firstPick.entity),
+    });
+
+    if (!trimMode) {
+      DesignCore.Scene.previewEntities.add(arc);
+      return;
+    }
+
+    // trimMode: dull the original segments then show the shortened versions + arc
+    this.#dullSegment(this.firstPick);
+    this.#dullSegment(tempSecond);
+
+    DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
+      points: [this.firstPick.lineKeptEnd(intersectionPoint), firstTangentPoint],
+      ...Utils.cloneProperties(this.firstPick.entity),
+    }));
+    DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
+      points: [tempSecond.lineKeptEnd(intersectionPoint), secondTangentPoint],
+      ...Utils.cloneProperties(candidate),
+    }));
+    DesignCore.Scene.previewEntities.add(arc);
   }
 
   /**
@@ -200,6 +299,17 @@ export class Fillet extends ChamferFilletBase {
 
     const stateChanges = this.applyCornerTrim(firstCornerPoint, secondCornerPoint, arc);
     DesignCore.Scene.commit(stateChanges);
+  }
+
+  /**
+   * Dull a segment for preview by cloning it and blending its colour toward the background.
+   * For polyline picks, only the relevant line segment is dulled (not the full polyline).
+   * @param {CornerEntity} pick
+   */
+  #dullSegment(pick) {
+    const seg = Utils.cloneObject(pick.activeSeg);
+    seg.setColour(Colour.blend(pick.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, 0.8));
+    DesignCore.Scene.previewEntities.add(seg);
   }
 
   /**
