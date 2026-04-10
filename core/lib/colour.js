@@ -63,6 +63,22 @@ export class Colour {
       this.rgb = rgb;
     }
   }
+
+  /**
+   * Blend two RGB colours together.
+   * @param {{r:number,g:number,b:number}} colourA
+   * @param {{r:number,g:number,b:number}} colourB
+   * @param {number} factor - 0 returns colourA, 1 returns colourB
+   * @return {{r:number,g:number,b:number}}
+   */
+  static blend(colourA, colourB, factor) {
+    const inverseFactor = 1 - factor;
+    return {
+      r: Math.round(colourA.r * inverseFactor + colourB.r * factor),
+      g: Math.round(colourA.g * inverseFactor + colourB.g * factor),
+      b: Math.round(colourA.b * inverseFactor + colourB.b * factor),
+    };
+  }
 }
 
 /**
