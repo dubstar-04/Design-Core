@@ -165,39 +165,12 @@ export class Fillet extends ChamferFilletBase {
       return;
     }
 
-    const firstUnit = this.firstPick.clickUnit(intersectionPoint);
-    const secondUnit = tempSecond.clickUnit(intersectionPoint);
-    const cosAngle = Math.min(1, Math.max(-1, firstUnit.dot(secondUnit)));
-    const cornerAngle = Math.acos(cosAngle);
-    if (cornerAngle < Constants.Tolerance.EPSILON || cornerAngle > Math.PI - Constants.Tolerance.EPSILON) return;
-
-    const bisectorUnit = firstUnit.add(secondUnit).normalise();
-    const arcCentre = intersectionPoint.add(bisectorUnit.scale(filletRadius / Math.sin(cornerAngle / 2)));
-
-    const firstTangentPoint = arcCentre.perpendicular(this.firstPick.lineStart, this.firstPick.lineEnd);
-    const secondTangentPoint = arcCentre.perpendicular(tempSecond.lineStart, tempSecond.lineEnd);
-
-    if (trimMode) {
-      // Silently skip the preview if the radius is too large to fit
-      const firstKeptDir = this.firstPick.lineKeptEnd(intersectionPoint).subtract(intersectionPoint);
-      const secondKeptDir = tempSecond.lineKeptEnd(intersectionPoint).subtract(intersectionPoint);
-      const firstTangentDot = firstTangentPoint.subtract(intersectionPoint).dot(firstKeptDir);
-      const secondTangentDot = secondTangentPoint.subtract(intersectionPoint).dot(secondKeptDir);
-      if (firstTangentDot < 0 || firstTangentDot > firstKeptDir.dot(firstKeptDir) ||
-          secondTangentDot < 0 || secondTangentDot > secondKeptDir.dot(secondKeptDir)) return;
-    }
-
-    const windingCross = firstTangentPoint.subtract(arcCentre).cross(secondTangentPoint.subtract(arcCentre));
-    const arcDirection = windingCross > 0 ? 1 : -1;
-
-    const arc = DesignCore.CommandManager.createNew('Arc', {
-      points: [arcCentre, firstTangentPoint, secondTangentPoint],
-      direction: arcDirection,
-      ...Utils.cloneProperties(this.firstPick.entity),
-    });
+    const geo = this.#computeFilletArc(this.firstPick, tempSecond, intersectionPoint, filletRadius);
+    if (!geo) return;
+    if (trimMode && !geo.tangentsInBounds) return;
 
     if (!trimMode) {
-      DesignCore.Scene.previewEntities.add(arc);
+      DesignCore.Scene.previewEntities.add(geo.arc);
       return;
     }
 
@@ -206,14 +179,14 @@ export class Fillet extends ChamferFilletBase {
     this.#dullSegment(tempSecond);
 
     DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
-      points: [this.firstPick.lineKeptEnd(intersectionPoint), firstTangentPoint],
+      points: [this.firstPick.lineKeptEnd(intersectionPoint), geo.firstTangentPoint],
       ...Utils.cloneProperties(this.firstPick.entity),
     }));
     DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
-      points: [tempSecond.lineKeptEnd(intersectionPoint), secondTangentPoint],
+      points: [tempSecond.lineKeptEnd(intersectionPoint), geo.secondTangentPoint],
       ...Utils.cloneProperties(candidate),
     }));
-    DesignCore.Scene.previewEntities.add(arc);
+    DesignCore.Scene.previewEntities.add(geo.arc);
   }
 
   /**
@@ -234,71 +207,67 @@ export class Fillet extends ChamferFilletBase {
       return;
     }
 
-    // Angle between the two clicked-side direction vectors (i.e. the opening angle of the chosen corner)
-    const firstUnit = this.firstPick.clickUnit(this.intersectionPoint);
-    const secondUnit = this.secondPick.clickUnit(this.intersectionPoint);
-    const cosAngle = Math.min(1, Math.max(-1, firstUnit.dot(secondUnit)));
-    const cornerAngle = Math.acos(cosAngle);
-
-    // Collinear or antiparallel lines cannot be filleted
-    if (cornerAngle < Constants.Tolerance.EPSILON || cornerAngle > Math.PI - Constants.Tolerance.EPSILON) {
+    const geo = this.#computeFilletArc(this.firstPick, this.secondPick, this.intersectionPoint, filletRadius);
+    if (!geo) {
       DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
       return;
     }
 
-    // Bisector unit vector: points into the chosen corner toward the fillet centre
-    const bisectorUnit = firstUnit.add(secondUnit).normalise();
-
-    // Distance from the intersection point to the fillet centre along the bisector
-    const intersectToCentreDistance = filletRadius / Math.sin(cornerAngle / 2);
-
-    // Fillet arc centre point
-    const arcCentre = this.intersectionPoint.add(bisectorUnit.scale(intersectToCentreDistance));
-
-    // Tangent points where the fillet arc meets each line (foot of perpendicular from centre to line)
-    const firstTangentPoint = arcCentre.perpendicular(this.firstPick.lineStart, this.firstPick.lineEnd);
-    const secondTangentPoint = arcCentre.perpendicular(this.secondPick.lineStart, this.secondPick.lineEnd);
-
-    // Verify the tangent points are reachable — same direction as the kept end from the
-    // intersection and not farther than the kept end (which would flip the line direction).
-    if (trimMode) {
-      const firstKeptDir = this.firstPick.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
-      const secondKeptDir = this.secondPick.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
-      const firstTangentDot = firstTangentPoint.subtract(this.intersectionPoint).dot(firstKeptDir);
-      const secondTangentDot = secondTangentPoint.subtract(this.intersectionPoint).dot(secondKeptDir);
-      if (firstTangentDot < 0 || firstTangentDot > firstKeptDir.dot(firstKeptDir) ||
-          secondTangentDot < 0 || secondTangentDot > secondKeptDir.dot(secondKeptDir)) {
-        DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.RADIUSTOOLARGE}`);
-        return;
-      }
+    if (trimMode && !geo.tangentsInBounds) {
+      DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.RADIUSTOOLARGE}`);
+      return;
     }
 
-    // Determine arc winding direction: if the cross product of the two centre-to-tangent
-    // vectors is positive, the short arc from firstTangentPoint to secondTangentPoint
-    // travels CCW (direction = 1), otherwise CW (direction = -1).
-    const centreToFirst = firstTangentPoint.subtract(arcCentre);
-    const centreToSecond = secondTangentPoint.subtract(arcCentre);
-    const windingCross = centreToFirst.cross(centreToSecond);
-    const arcDirection = windingCross > 0 ? 1 : -1;
-
-    const arc = DesignCore.CommandManager.createNew('Arc', {
-      points: [arcCentre, firstTangentPoint, secondTangentPoint],
-      direction: arcDirection,
-      ...Utils.cloneProperties(this.firstPick.entity),
-    });
-
     if (!trimMode) {
-      DesignCore.Scene.commit([new AddState(arc)]);
+      DesignCore.Scene.commit([new AddState(geo.arc)]);
       return;
     }
 
     // Use arc.toPolylinePoints() to get the tangent points with bulge already computed
-    const arcPolyPoints = arc.toPolylinePoints();
+    const arcPolyPoints = geo.arc.toPolylinePoints();
     const firstCornerPoint = arcPolyPoints[0]; // firstTangentPoint with bulge
     const secondCornerPoint = arcPolyPoints[1]; // secondTangentPoint
 
-    const stateChanges = this.applyCornerTrim(firstCornerPoint, secondCornerPoint, arc);
+    const stateChanges = this.applyCornerTrim(firstCornerPoint, secondCornerPoint, geo.arc);
     DesignCore.Scene.commit(stateChanges);
+  }
+
+  /**
+   * Compute the fillet arc geometry for two picks meeting at intersectionPoint.
+   * Returns null if the lines are collinear or antiparallel.
+   * @param {CornerEntity} firstPick
+   * @param {CornerEntity} secondPick
+   * @param {Point} intersectionPoint
+   * @param {number} filletRadius
+   * @return {{arc, firstTangentPoint, secondTangentPoint, tangentsInBounds}|null}
+   */
+  #computeFilletArc(firstPick, secondPick, intersectionPoint, filletRadius) {
+    const firstUnit = firstPick.clickUnit(intersectionPoint);
+    const secondUnit = secondPick.clickUnit(intersectionPoint);
+    const cosAngle = Math.min(1, Math.max(-1, firstUnit.dot(secondUnit)));
+    const cornerAngle = Math.acos(cosAngle);
+    if (cornerAngle < Constants.Tolerance.EPSILON || cornerAngle > Math.PI - Constants.Tolerance.EPSILON) return null;
+
+    const bisectorUnit = firstUnit.add(secondUnit).normalise();
+    const arcCentre = intersectionPoint.add(bisectorUnit.scale(filletRadius / Math.sin(cornerAngle / 2)));
+    const firstTangentPoint = arcCentre.perpendicular(firstPick.lineStart, firstPick.lineEnd);
+    const secondTangentPoint = arcCentre.perpendicular(secondPick.lineStart, secondPick.lineEnd);
+
+    const firstKeptDir = firstPick.lineKeptEnd(intersectionPoint).subtract(intersectionPoint);
+    const secondKeptDir = secondPick.lineKeptEnd(intersectionPoint).subtract(intersectionPoint);
+    const firstDot = firstTangentPoint.subtract(intersectionPoint).dot(firstKeptDir);
+    const secondDot = secondTangentPoint.subtract(intersectionPoint).dot(secondKeptDir);
+    const tangentsInBounds = firstDot >= 0 && firstDot <= firstKeptDir.dot(firstKeptDir) &&
+                             secondDot >= 0 && secondDot <= secondKeptDir.dot(secondKeptDir);
+
+    const windingCross = firstTangentPoint.subtract(arcCentre).cross(secondTangentPoint.subtract(arcCentre));
+    const arc = DesignCore.CommandManager.createNew('Arc', {
+      points: [arcCentre, firstTangentPoint, secondTangentPoint],
+      direction: windingCross > 0 ? 1 : -1,
+      ...Utils.cloneProperties(firstPick.entity),
+    });
+
+    return { arc, firstTangentPoint, secondTangentPoint, tangentsInBounds };
   }
 
   /**
