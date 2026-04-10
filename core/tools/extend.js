@@ -3,6 +3,8 @@ import { Strings } from '../lib/strings.js';
 import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { UpdateState } from '../lib/stateManager.js';
+import { Utils } from '../lib/utils.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -70,7 +72,25 @@ export class Extend extends Tool {
    * Preview the command during execution
    */
   preview() {
-    // No Preview
+    if (!this.selectedBoundaryItems.length) return;
+
+    const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
+    if (index === undefined) return;
+
+    const entity = DesignCore.Scene.entities.get(index);
+    const intersectPoints = this.#collectIntersectPoints(entity);
+    if (!intersectPoints.length) return;
+
+    const stateChanges = entity.extend(intersectPoints);
+    if (!stateChanges?.length) return;
+
+    for (const change of stateChanges) {
+      if (change instanceof UpdateState) {
+        const extended = Utils.cloneObject(entity);
+        extended.setProperty('points', change.properties.points);
+        DesignCore.Scene.previewEntities.add(extended);
+      }
+    }
   }
 
   /**
@@ -78,23 +98,7 @@ export class Extend extends Tool {
    */
   action() {
     if (this.selectedItem && this.selectedBoundaryItems.length) {
-      const intersectPoints = [];
-
-      for (const boundaryItem of this.selectedBoundaryItems) {
-        if (boundaryItem !== this.selectedItem) {
-          try {
-            const intersect = Intersection.intersectPolylinePolyline(boundaryItem.toPolylinePoints(), this.selectedItem.toPolylinePoints(), true);
-            if (intersect.points.length) {
-              for (let point = 0; point < intersect.points.length; point++) {
-                intersectPoints.push(intersect.points[point]);
-              }
-            }
-          } catch {
-            Logging.instance.warn(`${this.constructor.name}: Error intersecting between ${boundaryItem.type} and ${this.selectedItem.type}`);
-            continue;
-          }
-        }
-      }
+      const intersectPoints = this.#collectIntersectPoints(this.selectedItem);
 
       if (intersectPoints.length) {
         const stateChanges = this.selectedItem.extend(intersectPoints);
@@ -106,8 +110,27 @@ export class Extend extends Tool {
       }
     }
 
-    // reset selected item
     this.selectedItem = null;
+  }
+
+  /**
+   * Collect all intersection points between the boundary items and the given entity.
+   * Unsupported entity combinations are silently skipped.
+   * @param {Object} entity
+   * @return {Array}
+   */
+  #collectIntersectPoints(entity) {
+    const intersectPoints = [];
+    for (const boundaryItem of this.selectedBoundaryItems) {
+      if (boundaryItem === entity) continue;
+      try {
+        const intersect = Intersection.intersectPolylinePolyline(boundaryItem.toPolylinePoints(), entity.toPolylinePoints(), true);
+        intersectPoints.push(...intersect.points);
+      } catch {
+        // skip unsupported entity combinations
+      }
+    }
+    return intersectPoints;
   }
 }
 
