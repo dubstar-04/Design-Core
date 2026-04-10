@@ -3,6 +3,9 @@ import { Strings } from '../lib/strings.js';
 import { Tool } from './tool.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
+import { AddState } from '../lib/stateManager.js';
+import { Utils } from '../lib/utils.js';
+import { Colour } from '../lib/colour.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -70,7 +73,29 @@ export class Trim extends Tool {
    * Preview the command during execution
    */
   preview() {
-    // No Preview
+    if (!this.selectedBoundaryItems.length) return;
+
+    const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
+    if (index === undefined) return;
+
+    const entity = DesignCore.Scene.entities.get(index);
+    const intersectPoints = this.#collectIntersectPoints(entity);
+    if (!intersectPoints.length) return;
+
+    const stateChanges = entity.trim(intersectPoints);
+    if (!stateChanges?.length) return;
+
+    // Draw the full entity in a dulled colour, then draw survivors on top.
+    // 80% blend towards background: heavily muted, removed portion barely visible.
+    const dulledEntity = Utils.cloneObject(entity);
+    dulledEntity.setColour(Colour.blend(entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, 0.8));
+    DesignCore.Scene.previewEntities.add(dulledEntity);
+
+    for (const change of stateChanges) {
+      if (change instanceof AddState) {
+        DesignCore.Scene.previewEntities.add(change.entity);
+      }
+    }
   }
 
   /**
@@ -78,23 +103,7 @@ export class Trim extends Tool {
    */
   action() {
     if (this.selectedItem && this.selectedBoundaryItems.length) {
-      const intersectPoints = [];
-
-      for (const boundaryItem of this.selectedBoundaryItems) {
-        if (boundaryItem !== this.selectedItem) {
-          try {
-            const intersect = Intersection.intersectPolylinePolyline(boundaryItem.toPolylinePoints(), this.selectedItem.toPolylinePoints());
-            if (intersect.points.length) {
-              for (let point = 0; point < intersect.points.length; point++) {
-                intersectPoints.push(intersect.points[point]);
-              }
-            }
-          } catch {
-            Logging.instance.warn(`${this.constructor.name}: Error intersecting between ${boundaryItem.type} and ${this.selectedItem.type}`);
-            continue;
-          }
-        }
-      }
+      const intersectPoints = this.#collectIntersectPoints(this.selectedItem);
 
       if (intersectPoints.length) {
         const stateChanges = this.selectedItem.trim(intersectPoints);
@@ -106,8 +115,27 @@ export class Trim extends Tool {
       }
     }
 
-    // reset selected item
     this.selectedItem = null;
+  }
+
+  /**
+   * Collect all intersection points between the boundary items and the given entity.
+   * Unsupported entity combinations are silently skipped.
+   * @param {Object} entity
+   * @return {Array}
+   */
+  #collectIntersectPoints(entity) {
+    const intersectPoints = [];
+    for (const boundaryItem of this.selectedBoundaryItems) {
+      if (boundaryItem === entity) continue;
+      try {
+        const intersect = Intersection.intersectPolylinePolyline(boundaryItem.toPolylinePoints(), entity.toPolylinePoints());
+        intersectPoints.push(...intersect.points);
+      } catch {
+        // skip unsupported entity combinations
+      }
+    }
+    return intersectPoints;
   }
 }
 
