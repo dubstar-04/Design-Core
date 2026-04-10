@@ -217,6 +217,17 @@ export class InputManager {
   }
 
   /**
+   * Clears preview entities and re-runs the active command preview
+   */
+  refreshPreview() {
+    if (this.activeCommand === undefined) return;
+    DesignCore.Scene.previewEntities.clear();
+    DesignCore.Scene.auxiliaryEntities.clear();
+    this.activeCommand.preview();
+    DesignCore.Canvas.requestPaint();
+  }
+
+  /**
    * Handle mouse position changes
    */
   mouseMoved() {
