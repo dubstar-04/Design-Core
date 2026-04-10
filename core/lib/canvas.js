@@ -390,6 +390,7 @@ export class Canvas {
       context.strokeStyle = Colours.rgbToString(colour);
       context.fillStyle = Colours.rgbToString(colour);
       context.lineWidth = lineWidth;
+      context.lineCap = 'round';
       context.setLineDash(lineType.getPattern(scale));
       context.beginPath();
     } catch { // Cairo
@@ -397,6 +398,7 @@ export class Canvas {
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       context.setDash(lineType.getPattern(scale), 1);
       context.setLineWidth(lineWidth);
+      context.setLineCap(1); // Cairo.LineCap.ROUND
     }
   }
 
