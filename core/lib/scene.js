@@ -26,6 +26,7 @@ export class Scene {
 
     this.entities = new EntityManager();
     this.previewEntities = new EntityManager(false);
+    this.hoverEntities = new EntityManager(false);
     this.auxiliaryEntities = new EntityManager(false);
 
     this.stateManager = new StateManager();
@@ -44,15 +45,15 @@ export class Scene {
   /** Clear the scene of all items */
   clear() {
     this.entities.clear();
-    this.tempEntities.clear();
     this.previewEntities.clear();
+    this.hoverEntities.clear();
     this.auxiliaryEntities.clear();
   }
 
   /** Reset the scene */
   reset() {
-    this.tempEntities.clear();
     this.previewEntities.clear();
+    this.hoverEntities.clear();
     this.auxiliaryEntities.clear();
     this.selectionManager.reset();
     DesignCore.Canvas.requestPaint();
