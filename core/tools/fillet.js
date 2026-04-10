@@ -131,17 +131,26 @@ export class Fillet extends ChamferFilletBase {
     }
 
     // trimMode: dull the original segments then show the shortened versions + arc
-    this.#dullSegment(this.firstPick);
-    this.#dullSegment(selection.tempSecond);
+    const firstSeg = Utils.cloneObject(this.firstPick.activeSeg);
+    firstSeg.setColour(Colour.blend(this.firstPick.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
+    DesignCore.Scene.previewEntities.add(firstSeg);
 
-    DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
+    const secondSeg = Utils.cloneObject(selection.tempSecond.activeSeg);
+    secondSeg.setColour(Colour.blend(selection.tempSecond.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
+    DesignCore.Scene.previewEntities.add(secondSeg);
+
+    const firstTrimLine = DesignCore.CommandManager.createNew('Line', {
       points: [this.firstPick.lineKeptEnd(selection.intersectionPoint), geo.firstTangentPoint],
       ...Utils.cloneProperties(this.firstPick.entity),
-    }));
-    DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
+    });
+    DesignCore.Scene.previewEntities.add(firstTrimLine);
+
+    const secondTrimLine = DesignCore.CommandManager.createNew('Line', {
       points: [selection.tempSecond.lineKeptEnd(selection.intersectionPoint), geo.secondTangentPoint],
       ...Utils.cloneProperties(selection.candidate),
-    }));
+    });
+    DesignCore.Scene.previewEntities.add(secondTrimLine);
+
     if (geo.arc) DesignCore.Scene.previewEntities.add(geo.arc);
   }
 
@@ -219,17 +228,6 @@ export class Fillet extends ChamferFilletBase {
     });
 
     return { arc, firstTangentPoint, secondTangentPoint, tangentsInBounds };
-  }
-
-  /**
-   * Dull a segment for preview by cloning it and blending its colour toward the background.
-   * For polyline picks, only the relevant line segment is dulled (not the full polyline).
-   * @param {CornerEntity} pick
-   */
-  #dullSegment(pick) {
-    const seg = Utils.cloneObject(pick.activeSeg);
-    seg.setColour(Colour.blend(pick.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, 0.8));
-    DesignCore.Scene.previewEntities.add(seg);
   }
 
   /**
