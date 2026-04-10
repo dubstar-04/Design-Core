@@ -693,20 +693,20 @@ test('BasePolyline.closestPoint is consistent with getClosestSegmentIndex for cl
 test('BasePolyline.preview - 0 points does nothing', () => {
   const poly = new BasePolyline({});
   DesignCore.Scene.auxiliaryEntities.clear();
-  DesignCore.Scene.tempEntities.clear();
+  DesignCore.Scene.previewEntities.clear();
 
   expect(() => poly.preview()).not.toThrow();
   expect(DesignCore.Scene.auxiliaryEntities.count()).toBe(0);
-  expect(DesignCore.Scene.tempEntities.count()).toBe(0);
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
 });
 
 test('BasePolyline.preview - LINE mode creates temp entity', () => {
   const poly = new BasePolyline({});
   poly.points.push(new Point(0, 0));
 
-  const origCreate = DesignCore.Scene.tempEntities.create;
+  const origCreate = DesignCore.Scene.previewEntities.create;
   const calls = [];
-  DesignCore.Scene.tempEntities.create = (type, data) => calls.push({ type, data });
+  DesignCore.Scene.previewEntities.create = (type, data) => calls.push({ type, data });
 
   DesignCore.Scene.auxiliaryEntities.clear();
   poly.preview();
@@ -715,7 +715,7 @@ test('BasePolyline.preview - LINE mode creates temp entity', () => {
   // LINE mode: no rubber-band auxiliary entity
   expect(DesignCore.Scene.auxiliaryEntities.count()).toBe(0);
 
-  DesignCore.Scene.tempEntities.create = origCreate;
+  DesignCore.Scene.previewEntities.create = origCreate;
 });
 
 test('BasePolyline.preview - ARC mode adds rubber band and creates arc temp entity', () => {
@@ -725,19 +725,19 @@ test('BasePolyline.preview - ARC mode adds rubber band and creates arc temp enti
   poly.inputMode = poly.modes.ARC;
 
   const origAdd = DesignCore.Scene.auxiliaryEntities.add;
-  const origCreate = DesignCore.Scene.tempEntities.create;
+  const origCreate = DesignCore.Scene.previewEntities.create;
   const auxAdded = [];
   const tempCreated = [];
   DesignCore.Scene.auxiliaryEntities.add = (item) => auxAdded.push(item);
-  DesignCore.Scene.tempEntities.create = (type, data) => tempCreated.push({ type, data });
+  DesignCore.Scene.previewEntities.create = (type, data) => tempCreated.push({ type, data });
 
   poly.preview();
 
   // ARC mode: rubber-band drawn in auxiliaryEntities
   expect(auxAdded.length).toBeGreaterThanOrEqual(1);
-  // ARC mode: arc preview drawn in tempEntities
+  // ARC mode: arc preview drawn in previewEntities
   expect(tempCreated.length).toBeGreaterThanOrEqual(1);
 
   DesignCore.Scene.auxiliaryEntities.add = origAdd;
-  DesignCore.Scene.tempEntities.create = origCreate;
+  DesignCore.Scene.previewEntities.create = origCreate;
 });
