@@ -148,29 +148,12 @@ export class Fillet extends ChamferFilletBase {
     const filletRadius = DesignCore.Scene.headers.filletRadius;
     const trimMode = DesignCore.Scene.headers.trimMode;
 
-    if (filletRadius === 0) {
-      if (trimMode) {
-        // Sharp corner trim: dull both segments, show lines trimmed to the intersection
-        this.#dullSegment(this.firstPick);
-        this.#dullSegment(tempSecond);
-        DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
-          points: [this.firstPick.lineKeptEnd(intersectionPoint), intersectionPoint],
-          ...Utils.cloneProperties(this.firstPick.entity),
-        }));
-        DesignCore.Scene.previewEntities.add(DesignCore.CommandManager.createNew('Line', {
-          points: [tempSecond.lineKeptEnd(intersectionPoint), intersectionPoint],
-          ...Utils.cloneProperties(candidate),
-        }));
-      }
-      return;
-    }
-
-    const geo = this.#computeFilletArc(this.firstPick, tempSecond, intersectionPoint, filletRadius);
+    const geo = this.#computeFillet(this.firstPick, tempSecond, intersectionPoint, filletRadius);
     if (!geo) return;
     if (trimMode && !geo.tangentsInBounds) return;
 
     if (!trimMode) {
-      DesignCore.Scene.previewEntities.add(geo.arc);
+      if (geo.arc) DesignCore.Scene.previewEntities.add(geo.arc);
       return;
     }
 
@@ -186,7 +169,7 @@ export class Fillet extends ChamferFilletBase {
       points: [tempSecond.lineKeptEnd(intersectionPoint), geo.secondTangentPoint],
       ...Utils.cloneProperties(candidate),
     }));
-    DesignCore.Scene.previewEntities.add(geo.arc);
+    if (geo.arc) DesignCore.Scene.previewEntities.add(geo.arc);
   }
 
   /**
@@ -199,15 +182,7 @@ export class Fillet extends ChamferFilletBase {
     // radius = 0: trim/extend both lines to the sharp intersection with no arc
     const filletRadius = DesignCore.Scene.headers.filletRadius;
     const trimMode = DesignCore.Scene.headers.trimMode;
-    if (filletRadius === 0) {
-      if (trimMode) {
-        const stateChanges = this.applyCornerTrim(this.intersectionPoint, this.intersectionPoint, null);
-        DesignCore.Scene.commit(stateChanges);
-      }
-      return;
-    }
-
-    const geo = this.#computeFilletArc(this.firstPick, this.secondPick, this.intersectionPoint, filletRadius);
+    const geo = this.#computeFillet(this.firstPick, this.secondPick, this.intersectionPoint, filletRadius);
     if (!geo) {
       DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
       return;
@@ -219,29 +194,32 @@ export class Fillet extends ChamferFilletBase {
     }
 
     if (!trimMode) {
-      DesignCore.Scene.commit([new AddState(geo.arc)]);
+      if (geo.arc) DesignCore.Scene.commit([new AddState(geo.arc)]);
       return;
     }
 
-    // Use arc.toPolylinePoints() to get the tangent points with bulge already computed
-    const arcPolyPoints = geo.arc.toPolylinePoints();
-    const firstCornerPoint = arcPolyPoints[0]; // firstTangentPoint with bulge
-    const secondCornerPoint = arcPolyPoints[1]; // secondTangentPoint
-
-    const stateChanges = this.applyCornerTrim(firstCornerPoint, secondCornerPoint, geo.arc);
+    const [firstCornerPoint, secondCornerPoint] = geo.arc ?
+      geo.arc.toPolylinePoints() :
+      [this.intersectionPoint, this.intersectionPoint];
+    const stateChanges = this.applyCornerTrim(firstCornerPoint, secondCornerPoint, geo.arc ?? null);
     DesignCore.Scene.commit(stateChanges);
   }
 
   /**
-   * Compute the fillet arc geometry for two picks meeting at intersectionPoint.
+   * Compute the fillet geometry for two picks meeting at intersectionPoint.
    * Returns null if the lines are collinear or antiparallel.
+   * When filletRadius is 0, returns arc: null with both tangent points at the intersection.
    * @param {CornerEntity} firstPick
    * @param {CornerEntity} secondPick
    * @param {Point} intersectionPoint
    * @param {number} filletRadius
    * @return {{arc, firstTangentPoint, secondTangentPoint, tangentsInBounds}|null}
    */
-  #computeFilletArc(firstPick, secondPick, intersectionPoint, filletRadius) {
+  #computeFillet(firstPick, secondPick, intersectionPoint, filletRadius) {
+    if (filletRadius === 0) {
+      return { arc: null, firstTangentPoint: intersectionPoint, secondTangentPoint: intersectionPoint, tangentsInBounds: true };
+    }
+
     const firstUnit = firstPick.clickUnit(intersectionPoint);
     const secondUnit = secondPick.clickUnit(intersectionPoint);
     const cosAngle = Math.min(1, Math.max(-1, firstUnit.dot(secondUnit)));
