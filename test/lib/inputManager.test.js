@@ -670,6 +670,9 @@ test('highlightEntityUnderMouse returns true when entity found and no active com
   const mockLine = new Line();
   jest.spyOn(core.scene.entities, 'get').mockReturnValue(mockLine);
   expect(inputManager.highlightEntityUnderMouse()).toBe(true);
+  // entity should go into hoverEntities, not previewEntities
+  expect(core.scene.hoverEntities.count()).toBe(1);
+  expect(core.scene.previewEntities.count()).toBe(0);
   jest.restoreAllMocks();
 });
 
@@ -785,9 +788,9 @@ test('mouseMoved calls activeCommand.preview when command is active and no entit
   inputManager.reset();
 });
 
-test('mouseMoved does not call preview when entity is being selected', () => {
+test('mouseMoved calls preview even when entity is being highlighted', () => {
   inputManager.reset();
-  // with SINGLESELECTION prompt, highlightEntityUnderMouse will run and return true (selecting = true)
+  // preview() is always called for the active command, including when an entity is highlighted
   inputManager.activeCommand = new Line();
   const po = new PromptOptions('', [Input.Type.SINGLESELECTION]);
   inputManager.requestInput(po);
@@ -796,7 +799,7 @@ test('mouseMoved does not call preview when entity is being selected', () => {
   jest.spyOn(core.scene.entities, 'get').mockReturnValue(new Line());
   core.mouse.buttonOneDown = false;
   inputManager.mouseMoved();
-  expect(previewSpy).not.toHaveBeenCalled();
+  expect(previewSpy).toHaveBeenCalled();
   jest.restoreAllMocks();
   po.cancel();
   inputManager.reset();
@@ -904,6 +907,7 @@ test('highlightEntityUnderMouse returns true with SINGLESELECTION prompt and ent
   jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(0);
   jest.spyOn(core.scene.entities, 'get').mockReturnValue(new Line());
   expect(inputManager.highlightEntityUnderMouse()).toBe(true);
+  expect(core.scene.hoverEntities.count()).toBe(1);
   jest.restoreAllMocks();
   po.cancel();
   inputManager.reset();
@@ -917,6 +921,7 @@ test('highlightEntityUnderMouse returns true with SELECTIONSET prompt and entity
   jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(0);
   jest.spyOn(core.scene.entities, 'get').mockReturnValue(new Line());
   expect(inputManager.highlightEntityUnderMouse()).toBe(true);
+  expect(core.scene.hoverEntities.count()).toBe(1);
   jest.restoreAllMocks();
   po.cancel();
   inputManager.reset();
@@ -1002,16 +1007,14 @@ test('reset sets inputPoint to null', () => {
 
 // ─── mouseMoved – auxiliaryEntities cleared at start ─────────────────────────
 
-test('mouseMoved clears auxiliaryEntities and tempEntities at the start', () => {
-  // pre-populate both collections
+test('mouseMoved clears auxiliaryEntities, previewEntities and hoverEntities at the start', () => {
+  // pre-populate all three collections
   const addTrackLineSpy = jest.spyOn(inputManager.snapping, 'addTrackingLine').mockImplementation(() => {});
   DesignCore.Scene.auxiliaryEntities.add({ draw: () => {} });
-  DesignCore.Scene.tempEntities.add({ draw: () => {} });
+  DesignCore.Scene.previewEntities.add({ draw: () => {} });
+  DesignCore.Scene.hoverEntities.add({ draw: () => {} });
   inputManager.mouseMoved();
-  // both should have been cleared (count re-started from 0 before any new adds)
-  // After mouseMoved the tracking line may or may not have been re-added, but the
-  // clear happened — verify by checking they were empty after the initial clear
-  // (we can confirm this indirectly: no crash and spies didn't see stale data)
+  // all should have been cleared — confirm no crash and stale data is gone
   expect(() => inputManager.mouseMoved()).not.toThrow();
   addTrackLineSpy.mockRestore();
 });
