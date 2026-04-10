@@ -86,9 +86,8 @@ export class Trim extends Tool {
     if (!stateChanges?.length) return;
 
     // Draw the full entity in a dulled colour, then draw survivors on top.
-    // 80% blend towards background: heavily muted, removed portion barely visible.
     const dulledEntity = Utils.cloneObject(entity);
-    dulledEntity.setColour(Colour.blend(entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, 0.8));
+    dulledEntity.setColour(Colour.blend(entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
     DesignCore.Scene.previewEntities.add(dulledEntity);
 
     for (const change of stateChanges) {
