@@ -2,6 +2,7 @@ import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { Matrix } from '../../core/lib/matrix.js';
 import { Input } from '../../core/lib/input.js';
+import { Colour } from '../../core/lib/colour.js';
 import { jest } from '@jest/globals';
 
 const core = new Core();
@@ -40,13 +41,6 @@ test('Test Canvas constructor defaults', () => {
 
 test('Test Canvas.getScale', () => {
   expect(canvas.getScale()).toBe(canvas.matrix.getScale());
-});
-
-test('Test Canvas.paintStates', () => {
-  expect(canvas.paintStates.ENTITIES).toBe('ENTITIES');
-  expect(canvas.paintStates.TEMPORARY).toBe('TEMPORARY');
-  expect(canvas.paintStates.SELECTED).toBe('SELECTED');
-  expect(canvas.paintStates.AUXILLARY).toBe('AUXILLARY');
 });
 
 test('Test Canvas.setExternalPaintCallbackFunction', () => {
@@ -206,7 +200,6 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   beforeEach(() => {
     core.activate();
     originalBackground = core.settings.canvasbackgroundcolour;
-    canvas.paintState = canvas.paintStates.ENTITIES;
   });
 
   afterEach(() => {
@@ -290,20 +283,18 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
     expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
   });
 
-  test('ACI 7 is not recoloured in SELECTED state', () => {
+  test('ACI 7 is recoloured in SELECTED state', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     const context = createMockContext();
-    canvas.paintState = canvas.paintStates.SELECTED;
     canvas.setContext(aci7MockEntity, context);
-    const sel = core.settings.selecteditemscolour;
-    expect(context.strokeStyle).toBe(`rgb(${sel.r}, ${sel.g}, ${sel.b})`);
+    // SELECTED pass uses no special flags — ACI 7 background-adaptive logic still applies
+    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
   });
 });
 
 describe('Test Canvas.setContext ByBlock colour', () => {
   beforeEach(() => {
     core.activate();
-    canvas.paintState = canvas.paintStates.ENTITIES;
   });
 
   const byBlockItem = {
@@ -324,12 +315,11 @@ describe('Test Canvas.setContext ByBlock colour', () => {
     expect(context.fillStyle).toBe('rgb(255, 0, 0)');
   });
 
-  test('ByBlock colour is not applied in SELECTED state', () => {
+  test('overrides.colour takes precedence over ByBlock colour resolution', () => {
     const context = createMockContext();
-    canvas.paintState = canvas.paintStates.SELECTED;
-    canvas.setContext(byBlockItem, context, block);
-    const sel = core.settings.selecteditemscolour;
-    expect(context.strokeStyle).toBe(`rgb(${sel.r}, ${sel.g}, ${sel.b})`);
+    canvas.setContext(byBlockItem, context, block, { colour: { r: 0, g: 255, b: 0 } });
+    // overrides.colour wins unconditionally over ByBlock
+    expect(context.strokeStyle).toBe('rgb(0, 255, 0)');
   });
 
   test('non-ByBlock item with block keeps its own colour', () => {
@@ -358,30 +348,27 @@ describe('Test Canvas.setContext paint states', () => {
     canvas.matrix = new Matrix();
   });
 
-  test('ENTITIES state uses entity colour and normal lineWidth', () => {
+  test('default (no flags) uses entity colour and normal lineWidth', () => {
     const context = createMockContext();
-    canvas.paintState = canvas.paintStates.ENTITIES;
     canvas.setContext(redEntity, context);
     expect(context.strokeStyle).toBe('rgb(255, 0, 0)');
     expect(context.fillStyle).toBe('rgb(255, 0, 0)');
     expect(context.lineWidth).toBe(10 / canvas.getScale());
   });
 
-  test('SELECTED state overrides colour with selecteditemscolour and doubles lineWidth', () => {
+  test('overrides.colour and overrides.lineWidthDelta override colour and widen line', () => {
     const context = createMockContext();
-    canvas.paintState = canvas.paintStates.SELECTED;
-    canvas.setContext(redEntity, context);
-    const sel = core.settings.selecteditemscolour;
-    expect(context.strokeStyle).toBe(`rgb(${sel.r}, ${sel.g}, ${sel.b})`);
-    expect(context.lineWidth).toBe(10 * 2 / canvas.getScale());
+    const haloColour = Colour.blend(core.settings.accentcolour, core.settings.canvasbackgroundcolour, 0.5);
+    canvas.setContext(redEntity, context, undefined, { colour: haloColour, lineWidthDelta: 4 });
+    expect(context.strokeStyle).toBe(`rgb(${haloColour.r}, ${haloColour.g}, ${haloColour.b})`);
+    expect(context.lineWidth).toBe(10 / canvas.getScale() + 4 / canvas.getScale());
   });
 
-  test('TEMPORARY state keeps entity colour and doubles lineWidth', () => {
+  test('overrides.colour without lineWidthDelta keeps normal lineWidth', () => {
     const context = createMockContext();
-    canvas.paintState = canvas.paintStates.TEMPORARY;
-    canvas.setContext(redEntity, context);
-    expect(context.strokeStyle).toBe('rgb(255, 0, 0)');
-    expect(context.lineWidth).toBe(10 * 2 / canvas.getScale());
+    canvas.setContext(redEntity, context, undefined, { colour: { r: 0, g: 255, b: 0 } });
+    expect(context.strokeStyle).toBe('rgb(0, 255, 0)');
+    expect(context.lineWidth).toBe(10 / canvas.getScale());
   });
 
   test('setContext applies line type dash pattern to context', () => {
@@ -396,7 +383,6 @@ describe('Test Canvas.setContext paint states', () => {
       lineWidth: 1,
       entityColour: { aci: 1, byLayer: false, byBlock: false },
     };
-    canvas.paintState = canvas.paintStates.ENTITIES;
     canvas.setContext(dashedEntity, context);
     expect(appliedPattern).toEqual([5, 5]);
   });
@@ -495,14 +481,6 @@ test('Test Canvas.zoomToWindow with inverted coordinate order', () => {
   // pt1 > pt2 — Math.min/max should handle this the same as normal order
   canvas.zoomToWindow(new Point(100, 100), new Point(0, 0));
   expect(canvas.getScale()).toBeGreaterThan(1);
-});
-
-test('Test Canvas.paint resets paintState to undefined after painting', () => {
-  core.activate();
-  canvas.matrix = new Matrix();
-  canvas.flipped = true;
-  canvas.paint(createMockContext(), 800, 600);
-  expect(canvas.paintState).toBeUndefined();
 });
 
 test('Test Canvas.getSceneOffset visible area shrinks when zoomed in', () => {
