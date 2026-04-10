@@ -401,9 +401,9 @@ test('Arc.toPolylinePoints handles a full circle (360 degrees)', () => {
 });
 
 test('Arc.preview does not throw with 1, 2 or 3 points', () => {
-  const origCreate = DesignCore.Scene.tempEntities.create;
+  const origCreate = DesignCore.Scene.previewEntities.create;
   const origMouse = DesignCore.Mouse.pointOnScene;
-  DesignCore.Scene.tempEntities.create = () => {};
+  DesignCore.Scene.previewEntities.create = () => {};
   DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
 
   const arc1 = new Arc({});
@@ -418,7 +418,7 @@ test('Arc.preview does not throw with 1, 2 or 3 points', () => {
   arc3.points = [new Point(0, 0), new Point(10, 0), new Point(0, 10)];
   expect(() => arc3.preview()).not.toThrow();
 
-  DesignCore.Scene.tempEntities.create = origCreate;
+  DesignCore.Scene.previewEntities.create = origCreate;
   DesignCore.Mouse.pointOnScene = origMouse;
 });
 
