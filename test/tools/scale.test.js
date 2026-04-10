@@ -438,7 +438,7 @@ test('Scale.preview - no points set, adds no temp entities', () => {
   // No points — guard condition prevents any work
   scale.preview();
 
-  expect(core.scene.tempEntities.count()).toBe(0);
+  expect(core.scene.previewEntities.count()).toBe(0);
 });
 
 test('Scale.preview - referencePoint set, suppresses preview', () => {
@@ -454,7 +454,7 @@ test('Scale.preview - referencePoint set, suppresses preview', () => {
 
   scale.preview();
 
-  expect(core.scene.tempEntities.count()).toBe(0);
+  expect(core.scene.previewEntities.count()).toBe(0);
 });
 
 test('Scale.preview - mouse on base point (distance 0), draws line but skips scaling', () => {
@@ -472,7 +472,7 @@ test('Scale.preview - mouse on base point (distance 0), draws line but skips sca
   scale.preview();
 
   // Temp line is still created
-  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+  expect(core.scene.previewEntities.count()).toBeGreaterThanOrEqual(1);
 
   // Selected item points should be unchanged (scaling skipped)
   const previewItem = core.scene.selectionManager.selectedItems[0];
@@ -494,7 +494,7 @@ test('Scale.preview - one point set, draws temp line and scales selected items',
   scale.preview();
 
   // Temp line should be created
-  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+  expect(core.scene.previewEntities.count()).toBeGreaterThanOrEqual(1);
 
   // Preview item should have been scaled (x differs from original 1.0)
   const previewItem = core.scene.selectionManager.selectedItems[0];
@@ -520,7 +520,7 @@ test('Scale.preview - reference mode uses referenceLength to compute factor', ()
   // before and after with a known referenceLength to confirm scaling occurred.
   scale.preview();
 
-  expect(core.scene.tempEntities.count()).toBeGreaterThanOrEqual(1);
+  expect(core.scene.previewEntities.count()).toBeGreaterThanOrEqual(1);
 
   // The preview item's first point should differ from the original (10,0)
   // because the factor (distance/10) is applied
