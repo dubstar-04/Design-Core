@@ -25,7 +25,7 @@ export class Scene {
     this.blockManager = new BlockManager();
 
     this.entities = new EntityManager();
-    this.tempEntities = new EntityManager(false);
+    this.previewEntities = new EntityManager(false);
     this.auxiliaryEntities = new EntityManager(false);
 
     this.stateManager = new StateManager();
@@ -45,12 +45,14 @@ export class Scene {
   clear() {
     this.entities.clear();
     this.tempEntities.clear();
+    this.previewEntities.clear();
     this.auxiliaryEntities.clear();
   }
 
   /** Reset the scene */
   reset() {
     this.tempEntities.clear();
+    this.previewEntities.clear();
     this.auxiliaryEntities.clear();
     this.selectionManager.reset();
     DesignCore.Canvas.requestPaint();

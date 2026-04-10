@@ -126,7 +126,7 @@ export class RotatedDimension extends BaseLinearDimension {
       pt11.sequence = 11;
       const tempLine = new Line({ points: [this.points[0], this.points[1]] });
       const points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.linearDimAngle);
-      DesignCore.Scene.tempEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 

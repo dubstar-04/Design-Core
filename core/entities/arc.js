@@ -173,7 +173,7 @@ export class Arc extends Entity {
         direction = Arc.#inferDirection(points[0], points[1], points[2]);
       }
 
-      DesignCore.Scene.tempEntities.create(this.type, { points: points, direction: direction });
+      DesignCore.Scene.previewEntities.create(this.type, { points: points, direction: direction });
     }
   }
 

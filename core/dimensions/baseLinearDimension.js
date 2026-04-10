@@ -71,7 +71,7 @@ export class BaseLinearDimension extends BaseDimension {
       pt11.sequence = 11;
       const tempLine = new Line({ points: [...this.points] });
       const points = this.constructor.getPointsFromSelection([tempLine], pt11);
-      DesignCore.Scene.tempEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 

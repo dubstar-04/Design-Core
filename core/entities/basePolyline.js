@@ -168,9 +168,9 @@ export class BasePolyline extends Entity {
         // Arc segment is the final form — draw on the current layer
         const arcpoints = Utils.cloneObject(this.points);
         arcpoints.at(-1).bulge = this.getBulgeFromSegment(mousePoint);
-        DesignCore.Scene.tempEntities.create(this.type, { points: [...arcpoints, mousePoint] });
+        DesignCore.Scene.previewEntities.create(this.type, { points: [...arcpoints, mousePoint] });
       } else {
-        DesignCore.Scene.tempEntities.create(this.type, { points: points });
+        DesignCore.Scene.previewEntities.create(this.type, { points: points });
       }
     }
   }

@@ -122,7 +122,7 @@ export class Scale extends Tool {
     if (this.points.length >= 1 && this.referencePoint === null) {
       // Draw a line from base point to mouse
       const points = [this.points[0], mousePoint];
-      DesignCore.Scene.tempEntities.create('Line', { points: points });
+      DesignCore.Scene.previewEntities.create('Line', { points: points });
 
       const base = this.points[0];
       const distance = base.distance(mousePoint);

@@ -308,7 +308,7 @@ export class ArcAlignedText extends Entity {
           string: DesignCore.CommandLine.command,
         };
 
-        DesignCore.Scene.tempEntities.create(this.type, data);
+        DesignCore.Scene.previewEntities.create(this.type, data);
       }
     }
   }

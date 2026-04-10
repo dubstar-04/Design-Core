@@ -99,7 +99,7 @@ export class Zoom extends Tool {
         new Point(p1.x, p1.y),
       ];
 
-      DesignCore.Scene.tempEntities.create('Polyline', { points: points });
+      DesignCore.Scene.previewEntities.create('Polyline', { points: points });
     }
   }
 

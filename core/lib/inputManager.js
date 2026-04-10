@@ -222,6 +222,7 @@ export class InputManager {
    */
   mouseMoved() {
     DesignCore.Scene.tempEntities.clear();
+    DesignCore.Scene.previewEntities.clear();
     DesignCore.Scene.auxiliaryEntities.clear();
 
     if (DesignCore.Mouse.buttonOneDown) {
