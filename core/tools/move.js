@@ -6,7 +6,7 @@ import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 import { UpdateState } from '../lib/stateManager.js';
-import { RubberBand } from '../lib/rubberBand.js';
+import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 /**
  * Move Command Class

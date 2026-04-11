@@ -1,6 +1,6 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
-import { RubberBand } from '../../core/lib/rubberBand.js';
+import { RubberBand } from '../../core/lib/auxiliary/rubberBand.js';
 import { jest } from '@jest/globals';
 
 new Core();

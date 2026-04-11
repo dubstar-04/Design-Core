@@ -8,7 +8,7 @@ import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 import { Utils } from '../lib/utils.js';
-import { RubberBand } from '../lib/rubberBand.js';
+import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 /**
  * Aligned Dimension Entity Class

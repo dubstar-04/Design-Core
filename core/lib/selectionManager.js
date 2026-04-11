@@ -1,6 +1,6 @@
 import { Utils } from './utils.js';
 import { Point } from '../entities/point.js';
-import { SelectionWindow } from './selectionWindow.js';
+import { SelectionWindow } from './auxiliary/selectionWindow.js';
 import { DesignCore } from '../designCore.js';
 
 /** SingleSelection Class */
