@@ -192,12 +192,28 @@ export class Chamfer extends ChamferFilletBase {
     if (!this.firstPick.entity || !this.secondPick.entity) return;
     if (!this.resolveCornerGeometry(Strings.Message.NOCHAMFER)) return;
 
+    const chamferMode = DesignCore.Scene.headers.chamferMode;
     const trimMode = DesignCore.Scene.headers.trimMode;
+
+    // Validate angle before computing — parallel-lines error would be misleading
+    if (chamferMode) {
+      const alpha = DesignCore.Scene.headers.chamferAngle * (Math.PI / 180);
+      if (alpha <= 0 || alpha >= Math.PI) {
+        DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.INVALIDNUMBER}`);
+        return;
+      }
+    }
+
     const geo = this.#computeChamfer(this.firstPick, this.secondPick, this.intersectionPoint);
     if (!geo) {
       DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
       return;
     }
+
+    // dist=0 in distance mode: sharp corner trim with no chamfer line (mirrors fillet radius=0)
+    const isSharpCorner = !chamferMode &&
+      DesignCore.Scene.headers.chamferDistanceA === 0 &&
+      DesignCore.Scene.headers.chamferDistanceB === 0;
 
     if (trimMode && !geo.chamferInBounds) {
       DesignCore.Core.notify(`${this.type} - ${Strings.Error.MAXVALUE}`);
@@ -205,11 +221,14 @@ export class Chamfer extends ChamferFilletBase {
     }
 
     if (!trimMode) {
-      DesignCore.Scene.commit([new AddState(geo.chamferLine)]);
+      if (!isSharpCorner) DesignCore.Scene.commit([new AddState(geo.chamferLine)]);
       return;
     }
 
-    const stateChanges = this.applyCornerTrim(geo.firstChamferPoint, geo.secondChamferPoint, geo.chamferLine);
+    const stateChanges = this.applyCornerTrim(
+        geo.firstChamferPoint, geo.secondChamferPoint,
+        isSharpCorner ? null : geo.chamferLine,
+    );
     DesignCore.Scene.commit(stateChanges);
   }
 
