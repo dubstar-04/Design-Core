@@ -95,6 +95,7 @@ export class Arc extends Entity {
       const pt1 = await DesignCore.Scene.inputManager.requestInput(op1);
       if (pt1 === undefined) return;
       this.points.push(pt1);
+      DesignCore.Scene.inputManager.inputPoint = pt; // polar/ortho tracks from center when picking end
 
       let pt2;
       while (true) {
