@@ -9,7 +9,7 @@ import { Property } from '../properties/property.js';
 import { Logging } from '../lib/logging.js';
 
 import { DesignCore } from '../designCore.js';
-import { SnapPoint } from '../lib/snapping.js';
+import { SnapPoint } from '../lib/snapPoint.js';
 
 
 /**

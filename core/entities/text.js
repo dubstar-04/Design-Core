@@ -10,7 +10,7 @@ import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
-import { SnapPoint } from '../lib/snapping.js';
+import { SnapPoint } from '../lib/snapPoint.js';
 import { RubberBand } from '../lib/rubberBand.js';
 
 /**

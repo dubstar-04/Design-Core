@@ -11,7 +11,7 @@ import { Property } from '../properties/property.js';
 import { Text } from './text.js';
 
 import { DesignCore } from '../designCore.js';
-import { SnapPoint } from '../lib/snapping.js';
+import { SnapPoint } from '../lib/snapPoint.js';
 
 /**
  * Arc Aligned Character Class
