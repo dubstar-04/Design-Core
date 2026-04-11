@@ -35,14 +35,7 @@ export class Hatch extends Entity {
     super(data);
 
     // cache for pre-computed world-space pattern line segments
-    Object.defineProperty(this, 'cachedLines', {
-      value: null,
-      writable: true,
-      enumerable: false,
-    });
-
-    // cache for pre-computed clip path commands (avoids per-frame trig on arc boundaries)
-    Object.defineProperty(this, 'cachedClipPath', {
+    Object.defineProperty(this, 'cachedPattern', {
       value: null,
       writable: true,
       enumerable: false,
@@ -148,8 +141,7 @@ export class Hatch extends Entity {
     if (this.pattern === upper) return;
     this.pattern = upper;
     this.solid = this.pattern === 'SOLID';
-    this.cachedLines = null;
-    this.cachedClipPath = null;
+    this.cachedPattern = null;
   }
 
   /**
@@ -157,43 +149,14 @@ export class Hatch extends Entity {
    * For pattern hatches, segments are pre-clipped against the boundary using
    * geometric intersection so draw() requires no ctx.save/clip/restore overhead.
    */
-  buildCache() {
+  buildPatternCache() {
     if (!this.childEntities.length) {
-      this.cachedLines = [];
-      this.cachedClipPath = [];
+      this.cachedPattern = [];
       return;
     }
 
-    // Compute clip path commands for solid fills (pattern hatches don't use this at draw time)
-    const clipPath = [];
-    for (let i = 0; i < this.childEntities.length; i++) {
-      const shape = this.childEntities[i];
-      if (!shape.points.length) continue;
-      clipPath.push({ op: 'moveTo', x: shape.points[0].x, y: shape.points[0].y });
-      for (let j = 0; j < shape.points.length; j++) {
-        const pt = shape.points[j];
-        if (pt.bulge === 0) {
-          clipPath.push({ op: 'lineTo', x: pt.x, y: pt.y });
-        } else {
-          const next = shape.points[j + 1] || shape.points[0];
-          const center = pt.bulgeCentrePoint(next);
-          clipPath.push({
-            op: 'arc',
-            cx: center.x,
-            cy: center.y,
-            r: pt.bulgeRadius(next),
-            startAngle: center.angle(pt),
-            endAngle: center.angle(next),
-            ccw: pt.bulge < 0,
-          });
-        }
-      }
-      clipPath.push({ op: 'closePath' });
-    }
-    this.cachedClipPath = clipPath;
-
     if (this.solid || !Patterns.patternExists(this.patternName)) {
-      this.cachedLines = [];
+      this.cachedPattern = [];
       return;
     }
 
@@ -209,9 +172,12 @@ export class Hatch extends Entity {
       boundaries.push(pts);
     }
 
-    // Even-odd point-in-compound-boundary test using a horizontal ray to the right
+    // Even-odd point-in-compound-boundary test using a horizontal ray to the right.
+    // A tiny y-perturbation prevents the ray from being tangent to a curved boundary
+    // (e.g. exactly at the top/bottom of a circle), which would give a wrong odd count.
+    const RAY_EPS = 1e-9 * (bb.xLength + bb.yLength + 1);
     const isInsideCompound = (px, py) => {
-      const testLine = [new Point(px, py), new Point(testRayEndX, py)];
+      const testLine = [new Point(px, py + RAY_EPS), new Point(testRayEndX, py + RAY_EPS)];
       let count = 0;
       for (const b of boundaries) {
         count += Intersection.intersectPolylinePolyline(b, testLine).points.length;
@@ -279,6 +245,7 @@ export class Hatch extends Entity {
         const dy = ry2 - ry1;
         const lenSq = dx * dx + dy * dy;
         if (lenSq === 0) continue;
+        const sqrtLenSq = Math.sqrt(lenSq);
 
         // Find all intersection t-values where this segment crosses a boundary edge
         const segStartPt = new Point(rx1, ry1);
@@ -300,6 +267,12 @@ export class Hatch extends Entity {
           if (ts[k] - uniqueTs.at(-1) > 0.0001) uniqueTs.push(ts[k]);
         }
 
+        // Raw segments always extend beyond the bounding box on both sides, so a
+        // segment with no real boundary crossings must be entirely outside. Skip it
+        // to avoid false positives from the symmetric midpoint test (e.g. a tangent
+        // line whose discriminant rounds negative in floating-point).
+        if (uniqueTs.length === 2) continue;
+
         // Test each interval's midpoint; keep sub-segments that are inside the boundary
         for (let k = 0; k < uniqueTs.length - 1; k++) {
           const tMid = (uniqueTs[k] + uniqueTs[k + 1]) / 2;
@@ -309,6 +282,7 @@ export class Hatch extends Entity {
               y1: ry1 + uniqueTs[k] * dy,
               x2: rx1 + uniqueTs[k + 1] * dx,
               y2: ry1 + uniqueTs[k + 1] * dy,
+              dashPhase: uniqueTs[k] * sqrtLenSq,
             });
           }
         }
@@ -317,7 +291,7 @@ export class Hatch extends Entity {
       lines.push({ dashes, lineWidthFactor: 1 / s, segments });
     });
 
-    this.cachedLines = lines;
+    this.cachedPattern = lines;
   }
 
   /**
@@ -615,14 +589,13 @@ export class Hatch extends Entity {
     // ensure the scale is valid
     if (this.scale < 0.01) {
       this.scale = 1;
-      this.cachedLines = null;
-      this.cachedClipPath = null;
+      this.cachedPattern = null;
     }
 
     if (!this.childEntities.length) return;
 
-    // Build cache if stale (cachedLines === null means never built or invalidated)
-    if (this.cachedLines === null) this.buildCache();
+    // Build cache if stale (cachedPattern === null means never built or invalidated)
+    if (this.cachedPattern === null) this.buildPatternCache();
 
     if (this.solid) {
       // Solid fill: clip region + fill rectangle
@@ -634,24 +607,12 @@ export class Hatch extends Entity {
         ctx.newPath();
       }
 
-      for (const cmd of this.cachedClipPath) {
-        if (cmd.op === 'moveTo') {
-          ctx.moveTo(cmd.x, cmd.y);
-        } else if (cmd.op === 'lineTo') {
-          ctx.lineTo(cmd.x, cmd.y);
-        } else if (cmd.op === 'arc') {
-          try { // HTML Canvas
-            ctx.arc(cmd.cx, cmd.cy, cmd.r, cmd.startAngle, cmd.endAngle, cmd.ccw);
-          } catch { // Cairo
-            if (cmd.ccw) {
-              ctx.arcNegative(cmd.cx, cmd.cy, cmd.r, cmd.startAngle, cmd.endAngle);
-            } else {
-              ctx.arc(cmd.cx, cmd.cy, cmd.r, cmd.startAngle, cmd.endAngle);
-            }
-          }
-        } else if (cmd.op === 'closePath') {
-          ctx.closePath();
-        }
+      for (let i = 0; i < this.childEntities.length; i++) {
+        const shape = this.childEntities[i];
+        if (!shape.points.length) continue;
+        ctx.moveTo(shape.points[0].x, shape.points[0].y);
+        shape.draw(ctx, scale, false);
+        ctx.closePath();
       }
 
       try { // Cairo - clip() takes no arguments, uses the fill rule set above
@@ -678,26 +639,48 @@ export class Hatch extends Entity {
       ctx.restore();
     } else {
       // Pattern hatch: draw pre-clipped segments directly — no ctx.save/clip/restore needed.
-      // Segments were clipped against the boundary during buildCache() so only visible
+      // Segments were clipped against the boundary during buildPatternCache() so only visible
       // portions are stored, eliminating per-frame clip region overhead.
       const haloExtra = Math.max(0, ctx.lineWidth - this.lineWidth / scale);
 
-      for (const family of this.cachedLines) {
-        try {
-          ctx.setLineDash(family.dashes);
-          ctx.lineWidth = family.lineWidthFactor / scale + haloExtra;
-          ctx.beginPath();
-        } catch { // Cairo
-          ctx.setDash(family.dashes, 0);
-          ctx.setLineWidth(family.lineWidthFactor / scale + haloExtra);
-          ctx.newPath();
-        }
+      for (const family of this.cachedPattern) {
+        const lineW = family.lineWidthFactor / scale + haloExtra;
 
-        for (const seg of family.segments) {
-          ctx.moveTo(seg.x1, seg.y1);
-          ctx.lineTo(seg.x2, seg.y2);
+        if (!family.dashes.length) {
+          // Solid-line family: batch all segments into one path for performance
+          try {
+            ctx.setLineDash([]);
+            ctx.lineWidth = lineW;
+            ctx.beginPath();
+          } catch { // Cairo
+            ctx.setDash([], 0);
+            ctx.setLineWidth(lineW);
+            ctx.newPath();
+          }
+          for (const seg of family.segments) {
+            ctx.moveTo(seg.x1, seg.y1);
+            ctx.lineTo(seg.x2, seg.y2);
+          }
+          ctx.stroke();
+        } else {
+          // Dashed family: each sub-segment needs its own dash phase to maintain
+          // pattern continuity across clipped boundaries.
+          for (const seg of family.segments) {
+            try {
+              ctx.setLineDash(family.dashes);
+              ctx.lineDashOffset = seg.dashPhase;
+              ctx.lineWidth = lineW;
+              ctx.beginPath();
+            } catch { // Cairo
+              ctx.setDash(family.dashes, seg.dashPhase);
+              ctx.setLineWidth(lineW);
+              ctx.newPath();
+            }
+            ctx.moveTo(seg.x1, seg.y1);
+            ctx.lineTo(seg.x2, seg.y2);
+            ctx.stroke();
+          }
         }
-        ctx.stroke();
       }
     }
   }
@@ -917,14 +900,12 @@ export class Hatch extends Entity {
           });
         }
 
-        this.cachedLines = null;
-        this.cachedClipPath = null;
+        this.cachedPattern = null;
       }
 
       // clear pattern cache for any property that affects geometry or pattern
       if (property === 'scale' || property === 'angle' || property === 'childEntities') {
-        this.cachedLines = null;
-        this.cachedClipPath = null;
+        this.cachedPattern = null;
       }
 
       // other properties as normal
