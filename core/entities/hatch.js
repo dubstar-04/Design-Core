@@ -164,12 +164,21 @@ export class Hatch extends Entity {
     const bb = this.boundingBox();
     const testRayEndX = bb.xMax + bb.xLength + 1;
     const boundaries = [];
+    // Collect all interior boundary vertices (the junction points between segments).
+    // An intersection point that lands exactly on a junction vertex will be reported
+    // by both adjacent segments, doubling the crossing count unless we deduplicate.
+    const boundaryVertices = [];
     for (let i = 0; i < this.childEntities.length; i++) {
       const shape = this.childEntities[i];
       if (!shape.points.length) continue;
       const pts = [...shape.points];
       if (!pts[0].isSame(pts.at(-1))) pts.push(pts[0]);
       boundaries.push(pts);
+      // All unique vertices (skip only the closure duplicate at pts[length-1]).
+      // pts[0] is also a junction — shared by the last and first segments.
+      for (let j = 0; j < pts.length - 1; j++) {
+        boundaryVertices.push(pts[j]);
+      }
     }
 
     // Even-odd point-in-compound-boundary test using a horizontal ray to the right.
@@ -232,8 +241,13 @@ export class Hatch extends Entity {
 
       const segments = [];
       for (let i = -yIncrement; i < yIncrement; i++) {
-        const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
         const yOffset = patternLine.yDelta * i;
+        // A line whose |yOffset| equals or exceeds halfY is tangent to or outside
+        // the bounding box in the perpendicular direction — it cannot produce any
+        // valid inside sub-segment. Skip it to avoid phantom slivers caused by
+        // near-tangent numerical artefacts in the arc-intersection code.
+        if (Math.abs(yOffset) >= halfY) continue;
+        const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
         const lx1 = -xOffset + dashOffset;
         const ly = yOffset;
         const rx1 = (lx1 * cosR - ly * sinR) * s + cx;
@@ -247,15 +261,40 @@ export class Hatch extends Entity {
         if (lenSq === 0) continue;
         const sqrtLenSq = Math.sqrt(lenSq);
 
-        // Find all intersection t-values where this segment crosses a boundary edge
+        // Find all intersection t-values where this segment crosses a boundary edge.
+        // A point that falls on a boundary vertex is shared by two adjacent segments
+        // and would be reported twice, doubling the crossing count. Track which vertex
+        // t-values have already been added and skip duplicates.
         const segStartPt = new Point(rx1, ry1);
         const segEndPt = new Point(rx2, ry2);
         const ts = [0, 1];
+        const vertexTsAdded = new Set();
         for (const b of boundaries) {
           const result = Intersection.intersectPolylinePolyline(b, [segStartPt, segEndPt]);
           for (const pt of result.points) {
             const t = ((pt.x - rx1) * dx + (pt.y - ry1) * dy) / lenSq;
-            if (t > 0.0001 && t < 0.9999) ts.push(t);
+            if (t > 0.0001 && t < 0.9999) {
+              // Check if this point coincides with a boundary vertex
+              let isVertex = false;
+              for (const v of boundaryVertices) {
+                const vdx = pt.x - v.x;
+                const vdy = pt.y - v.y;
+                if (vdx * vdx + vdy * vdy < 1e-10) {
+                  isVertex = true;
+                  break;
+                }
+              }
+              if (isVertex) {
+                // Round t to 6 decimal places to get a stable key
+                const tKey = Math.round(t * 1e6);
+                if (!vertexTsAdded.has(tKey)) {
+                  vertexTsAdded.add(tKey);
+                  ts.push(t);
+                }
+              } else {
+                ts.push(t);
+              }
+            }
           }
         }
 
@@ -266,12 +305,6 @@ export class Hatch extends Entity {
         for (let k = 1; k < ts.length; k++) {
           if (ts[k] - uniqueTs.at(-1) > 0.0001) uniqueTs.push(ts[k]);
         }
-
-        // Raw segments always extend beyond the bounding box on both sides, so a
-        // segment with no real boundary crossings must be entirely outside. Skip it
-        // to avoid false positives from the symmetric midpoint test (e.g. a tangent
-        // line whose discriminant rounds negative in floating-point).
-        if (uniqueTs.length === 2) continue;
 
         // Test each interval's midpoint; keep sub-segments that are inside the boundary
         for (let k = 0; k < uniqueTs.length - 1; k++) {
@@ -288,6 +321,7 @@ export class Hatch extends Entity {
         }
       }
 
+      // why is lineWidthFactor needed?
       lines.push({ dashes, lineWidthFactor: 1 / s, segments });
     });
 
