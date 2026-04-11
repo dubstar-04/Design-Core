@@ -1,6 +1,7 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { Fillet } from '../../core/tools/fillet.js';
+import { DesignCore } from '../../core/designCore.js';
 import { Strings } from '../../core/lib/strings.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 import { expect, jest } from '@jest/globals';
@@ -969,4 +970,122 @@ test('Fillet.action arc inherits layer, lineWidth, lineType from first entity', 
   expect(arc.layer).toBe('walls');
   expect(arc.lineWidth).toBe(5);
   expect(arc.lineType).toBe('DASHED');
+});
+
+test('Fillet.preview does not throw', () => {
+  const fillet = new Fillet();
+  expect(() => fillet.preview()).not.toThrow();
+});
+
+test('Fillet.preview returns early when findClosestItem returns undefined', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  const fillet = new Fillet();
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(undefined);
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 5);
+  fillet.preview();
+  findSpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Fillet.preview adds fillet arc to previewEntities in no-trim mode', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = false;
+
+  const fillet = new Fillet();
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 5);
+  fillet.preview();
+  findSpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBeGreaterThanOrEqual(1);
+});
+
+test('Fillet.preview adds dulled segments and arc to previewEntities in trim mode', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  core.scene.headers.filletRadius = 2;
+  core.scene.headers.trimMode = true;
+
+  const fillet = new Fillet();
+  fillet.firstPick.entity = core.scene.entities.get(0);
+  fillet.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 5);
+  fillet.preview();
+  findSpy.mockRestore();
+
+  // dulled firstSeg + dulled secondSeg + firstTrimLine + secondTrimLine + arc = 5
+  expect(DesignCore.Scene.previewEntities.count()).toBeGreaterThanOrEqual(5);
+});
+
+test('Fillet.execute returns early when second-entity input is undefined (inner loop)', async () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  const executeCommandSpy = jest.fn();
+  // Only one input: the first selection. Second requestInput returns undefined → inner loop returns.
+  await withMockInput(
+      core.scene,
+      [new SingleSelection(0, new Point(-5, 0))],
+      async () => {
+        const fillet = new Fillet();
+        await fillet.execute();
+        expect(executeCommandSpy).not.toHaveBeenCalled();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+});
+
+test('Fillet.execute notifies NONCONSECUTIVESEGMENTS for non-adjacent polyline segments', async () => {
+  // 5-point polyline → 4 segments. Pick segment 1 (near -15,0) then segment 3 (near 5,0).
+  // Neither consecutive nor open-ends → NONCONSECUTIVESEGMENTS, then undefined to exit.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0), new Point(20, 0)] });
+
+  const notifySpy = jest.spyOn(core, 'notify');
+  await withMockInput(
+      core.scene,
+      [new SingleSelection(0, new Point(-15, 0)), new SingleSelection(0, new Point(5, 0)), undefined],
+      async () => {
+        const fillet = new Fillet();
+        await fillet.execute();
+      },
+  );
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NONCONSECUTIVESEGMENTS));
+  notifySpy.mockRestore();
+});
+
+test('Fillet.execute Trim→Trim keeps trimMode=true', async () => {
+  core.scene.headers.trimMode = true;
+
+  await withMockInput(
+      core.scene,
+      ['Trim', 'Trim', undefined],
+      async () => {
+        const fillet = new Fillet();
+        await fillet.execute();
+      },
+  );
+
+  expect(core.scene.headers.trimMode).toBe(true);
 });

@@ -8,6 +8,7 @@ import { Point } from '../entities/point.js';
 import { Line } from '../entities/line.js';
 import { BasePolyline } from '../entities/basePolyline.js';
 import { AddState } from '../lib/stateManager.js';
+import { Colour } from '../lib/colour.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -147,7 +148,46 @@ export class Chamfer extends ChamferFilletBase {
    * Preview the command during execution
    */
   preview() {
-    // No preview
+    const selection = this.validateSelection();
+    if (!selection) return;
+
+    const chamferMode = DesignCore.Scene.headers.chamferMode;
+    const trimMode = DesignCore.Scene.headers.trimMode;
+    const geo = this.#computeChamfer(this.firstPick, selection.tempSecond, selection.intersectionPoint);
+    if (!geo) return;
+    if (trimMode && !geo.chamferInBounds) return;
+
+    const isSharpCorner = !chamferMode &&
+      DesignCore.Scene.headers.chamferDistanceA === 0 &&
+      DesignCore.Scene.headers.chamferDistanceB === 0;
+
+    if (!trimMode) {
+      if (!isSharpCorner) DesignCore.Scene.previewEntities.add(geo.chamferLine);
+      return;
+    }
+
+    // trimMode: dull the original segments then show the shortened versions + chamfer line
+    const firstSeg = Utils.cloneObject(this.firstPick.activeSeg);
+    firstSeg.setColour(Colour.blend(this.firstPick.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
+    DesignCore.Scene.previewEntities.add(firstSeg);
+
+    const secondSeg = Utils.cloneObject(selection.tempSecond.activeSeg);
+    secondSeg.setColour(Colour.blend(selection.tempSecond.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
+    DesignCore.Scene.previewEntities.add(secondSeg);
+
+    const firstTrimLine = DesignCore.CommandManager.createNew('Line', {
+      points: [this.firstPick.lineKeptEnd(selection.intersectionPoint), geo.firstChamferPoint],
+      ...Utils.cloneProperties(this.firstPick.entity),
+    });
+    DesignCore.Scene.previewEntities.add(firstTrimLine);
+
+    const secondTrimLine = DesignCore.CommandManager.createNew('Line', {
+      points: [selection.tempSecond.lineKeptEnd(selection.intersectionPoint), geo.secondChamferPoint],
+      ...Utils.cloneProperties(selection.candidate),
+    });
+    DesignCore.Scene.previewEntities.add(secondTrimLine);
+
+    DesignCore.Scene.previewEntities.add(geo.chamferLine);
   }
 
   /**
@@ -157,102 +197,107 @@ export class Chamfer extends ChamferFilletBase {
     if (!this.firstPick.entity || !this.secondPick.entity) return;
     if (!this.resolveCornerGeometry(Strings.Message.NOCHAMFER)) return;
 
-    const trimMode = DesignCore.Scene.headers.trimMode;
     const chamferMode = DesignCore.Scene.headers.chamferMode;
-    const distA = DesignCore.Scene.headers.chamferDistanceA;
+    const trimMode = DesignCore.Scene.headers.trimMode;
 
-    // distA = distB = 0: trim/extend both lines to the sharp intersection with no chamfer line
-    if (!chamferMode && distA === 0 && DesignCore.Scene.headers.chamferDistanceB === 0) {
-      if (trimMode) {
-        const stateChanges = this.applyCornerTrim(this.intersectionPoint, this.intersectionPoint, null);
-        DesignCore.Scene.commit(stateChanges);
-      }
-      return;
-    }
-
-    // Compute the two chamfer endpoints on each line
-    const firstUnit = this.firstPick.clickUnit(this.intersectionPoint);
-    const secondUnit = this.secondPick.clickUnit(this.intersectionPoint);
-    let firstChamferPoint;
-    let secondChamferPoint;
-
-    if (!chamferMode) {
-      // Distance method: measure distA along line1 and distB along line2 from intersection
-      const distB = DesignCore.Scene.headers.chamferDistanceB;
-      firstChamferPoint = this.intersectionPoint.add(firstUnit.scale(distA));
-      secondChamferPoint = this.intersectionPoint.add(secondUnit.scale(distB));
-    } else {
-      // Angle method: measure chamferLength along line1, then project using chamferAngle to find
-      // where the chamfer line meets line2.
-      // chamferAngle is stored in degrees (as entered by the user).
-      const chamferLength = DesignCore.Scene.headers.chamferLength;
+    // Validate angle before computing — parallel-lines error would be misleading
+    if (chamferMode) {
       const alpha = DesignCore.Scene.headers.chamferAngle * (Math.PI / 180);
-
       if (alpha <= 0 || alpha >= Math.PI) {
         DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.INVALIDNUMBER}`);
         return;
       }
+    }
 
-      firstChamferPoint = this.intersectionPoint.add(firstUnit.scale(chamferLength));
+    const geo = this.#computeChamfer(this.firstPick, this.secondPick, this.intersectionPoint);
+    if (!geo) {
+      DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
+      return;
+    }
 
-      // Rotate firstUnit by ±(π - alpha) to get the chamfer direction from
-      // firstChamferPoint. Choose the rotation that points toward line2 (positive
-      // dot product with secondUnit).
+    // dist=0 in distance mode: sharp corner trim with no chamfer line (mirrors fillet radius=0)
+    const isSharpCorner = !chamferMode &&
+      DesignCore.Scene.headers.chamferDistanceA === 0 &&
+      DesignCore.Scene.headers.chamferDistanceB === 0;
+
+    if (trimMode && !geo.chamferInBounds) {
+      DesignCore.Core.notify(`${this.type} - ${Strings.Error.MAXVALUE}`);
+      return;
+    }
+
+    if (!trimMode) {
+      if (!isSharpCorner) DesignCore.Scene.commit([new AddState(geo.chamferLine)]);
+      return;
+    }
+
+    const stateChanges = this.applyCornerTrim(
+        geo.firstChamferPoint, geo.secondChamferPoint,
+        isSharpCorner ? null : geo.chamferLine,
+    );
+    DesignCore.Scene.commit(stateChanges);
+  }
+
+  /**
+   * Compute the chamfer geometry for two picks meeting at intersectionPoint.
+   * Returns null if the lines are parallel/collinear or the chamfer direction is parallel to line2 (angle mode).
+   * @param {CornerEntity} firstPick
+   * @param {CornerEntity} secondPick
+   * @param {Point} intersectionPoint
+   * @return {{chamferLine, firstChamferPoint, secondChamferPoint, chamferInBounds}|null}
+   */
+  #computeChamfer(firstPick, secondPick, intersectionPoint) {
+    const chamferMode = DesignCore.Scene.headers.chamferMode;
+    const distA = DesignCore.Scene.headers.chamferDistanceA;
+    const firstUnit = firstPick.clickUnit(intersectionPoint);
+    const secondUnit = secondPick.clickUnit(intersectionPoint);
+
+    let firstChamferPoint;
+    let secondChamferPoint;
+
+    if (!chamferMode) {
+      // Distance method: distA = distB = 0 means sharp corner trim with no chamfer line
+      const distB = DesignCore.Scene.headers.chamferDistanceB;
+      firstChamferPoint = intersectionPoint.add(firstUnit.scale(distA));
+      secondChamferPoint = intersectionPoint.add(secondUnit.scale(distB));
+    } else {
+      // Angle method
+      const chamferLength = DesignCore.Scene.headers.chamferLength;
+      const alpha = DesignCore.Scene.headers.chamferAngle * (Math.PI / 180);
+      if (alpha <= 0 || alpha >= Math.PI) return null;
+
+      firstChamferPoint = intersectionPoint.add(firstUnit.scale(chamferLength));
+
       const rotAngle = Math.PI - alpha;
       const origin = new Point(0, 0);
       const candidate1 = firstUnit.rotate(origin, rotAngle);
       const chamferDir = candidate1.dot(secondUnit) >= 0 ? candidate1 : firstUnit.rotate(origin, -rotAngle);
 
-      // Intersect chamfer ray from firstChamferPoint with the infinite line2
       const chamferResult = Intersection.intersectSegmentSegment(
           firstChamferPoint, firstChamferPoint.add(chamferDir),
-          this.secondPick.lineStart, this.secondPick.lineEnd,
+          secondPick.lineStart, secondPick.lineEnd,
           true, true,
       );
+      if (chamferResult.status === Intersection.Status.PARALLEL ||
+          chamferResult.status === Intersection.Status.OVERLAPPING ||
+          chamferResult.status === Intersection.Status.COINCIDENT) return null;
 
-      const chamferStatus = chamferResult.status;
-      if (chamferStatus === Intersection.Status.PARALLEL ||
-          chamferStatus === Intersection.Status.OVERLAPPING ||
-          chamferStatus === Intersection.Status.COINCIDENT) {
-        DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
-        return;
-      }
-
-      secondChamferPoint = chamferResult.points[0] || null;
-      if (!secondChamferPoint) {
-        // Chamfer direction is parallel to line2 — no intersection
-        DesignCore.Core.notify(`${this.type} - ${Strings.Error.ERROR}:${Strings.Error.PARALLELLINES}`);
-        return;
-      }
+      secondChamferPoint = chamferResult.points[0];
+      if (!secondChamferPoint) return null;
     }
 
-    // Verify both chamfer endpoints lie on the correct side of the intersection and
-    // not beyond the kept endpoints.  Uses the same dot-product approach as Fillet so
-    // that segments are treated as infinite lines (extensions are allowed).
-    if (trimMode) {
-      const firstKeptDir = this.firstPick.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
-      const secondKeptDir = this.secondPick.lineKeptEnd(this.intersectionPoint).subtract(this.intersectionPoint);
-      const firstChamferDot = firstChamferPoint.subtract(this.intersectionPoint).dot(firstKeptDir);
-      const secondChamferDot = secondChamferPoint.subtract(this.intersectionPoint).dot(secondKeptDir);
-      if (firstChamferDot < 0 || firstChamferDot > firstKeptDir.dot(firstKeptDir) ||
-          secondChamferDot < 0 || secondChamferDot > secondKeptDir.dot(secondKeptDir)) {
-        DesignCore.Core.notify(`${this.type} - ${Strings.Error.MAXVALUE}`);
-        return;
-      }
-    }
+    const firstKeptDir = firstPick.lineKeptEnd(intersectionPoint).subtract(intersectionPoint);
+    const secondKeptDir = secondPick.lineKeptEnd(intersectionPoint).subtract(intersectionPoint);
+    const firstDot = firstChamferPoint.subtract(intersectionPoint).dot(firstKeptDir);
+    const secondDot = secondChamferPoint.subtract(intersectionPoint).dot(secondKeptDir);
+    const chamferInBounds = firstDot >= 0 && firstDot <= firstKeptDir.dot(firstKeptDir) &&
+                            secondDot >= 0 && secondDot <= secondKeptDir.dot(secondKeptDir);
 
     const chamferLine = DesignCore.CommandManager.createNew('Line', {
       points: [firstChamferPoint, secondChamferPoint],
-      ...Utils.cloneProperties(this.firstPick.entity),
+      ...Utils.cloneProperties(firstPick.entity),
     });
 
-    if (!trimMode) {
-      DesignCore.Scene.commit([new AddState(chamferLine)]);
-      return;
-    }
-
-    const stateChanges = this.applyCornerTrim(firstChamferPoint, secondChamferPoint, chamferLine);
-    DesignCore.Scene.commit(stateChanges);
+    return { chamferLine, firstChamferPoint, secondChamferPoint, chamferInBounds };
   }
 
   /**

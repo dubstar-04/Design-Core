@@ -263,10 +263,10 @@ test('Circle.execute re-prompts on zero-distance point input', async () => {
 });
 
 test('Circle.preview does not throw with 0 or 1 points', () => {
-  const origCreate = DesignCore.Scene.tempEntities.create;
+  const origCreate = DesignCore.Scene.previewEntities.create;
   const origMouse = DesignCore.Mouse.pointOnScene;
   const calls = [];
-  DesignCore.Scene.tempEntities.create = (type, obj) => calls.push([type, obj]);
+  DesignCore.Scene.previewEntities.create = (type, obj) => calls.push([type, obj]);
   DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
 
   const circle0 = new Circle({});
@@ -278,7 +278,7 @@ test('Circle.preview does not throw with 0 or 1 points', () => {
   expect(() => circle1.preview()).not.toThrow();
   expect(calls.some(([type]) => type === 'Circle')).toBe(true);
 
-  DesignCore.Scene.tempEntities.create = origCreate;
+  DesignCore.Scene.previewEntities.create = origCreate;
   DesignCore.Mouse.pointOnScene = origMouse;
 });
 

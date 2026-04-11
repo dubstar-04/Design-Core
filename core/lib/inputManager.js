@@ -1,6 +1,5 @@
 import { Tool } from '../tools/tool.js';
 import { Snapping } from './snapping.js';
-import { Utils } from './utils.js';
 
 import { DesignCore } from '../designCore.js';
 import { Point } from '../entities/point.js';
@@ -218,10 +217,23 @@ export class InputManager {
   }
 
   /**
+   * Clears preview entities and re-runs the active command preview
+   */
+  refreshPreview() {
+    if (this.activeCommand === undefined) return;
+    DesignCore.Scene.previewEntities.clear();
+    DesignCore.Scene.auxiliaryEntities.clear();
+    DesignCore.Scene.hoverEntities.clear();
+    this.activeCommand.preview();
+    DesignCore.Canvas.requestPaint();
+  }
+
+  /**
    * Handle mouse position changes
    */
   mouseMoved() {
-    DesignCore.Scene.tempEntities.clear();
+    DesignCore.Scene.previewEntities.clear();
+    DesignCore.Scene.hoverEntities.clear();
     DesignCore.Scene.auxiliaryEntities.clear();
 
     if (DesignCore.Mouse.buttonOneDown) {
@@ -255,11 +267,14 @@ export class InputManager {
       }
     }
 
-    const selecting = !snapped && this.highlightEntityUnderMouse();
-
-    // preview active commands when items are not being selected
-    if (this.activeCommand !== undefined && !selecting) {
+    // preview active commands
+    if (this.activeCommand !== undefined) {
       this.activeCommand.preview();
+    }
+
+    // Only show hover glow when no command preview is occupying previewEntities
+    if (!snapped && DesignCore.Scene.previewEntities.count() === 0) {
+      this.highlightEntityUnderMouse();
     }
 
     DesignCore.Canvas.requestPaint();
@@ -282,7 +297,7 @@ export class InputManager {
 
     const index = DesignCore.Scene.selectionManager.findClosestItem(DesignCore.Mouse.pointOnScene());
     if (index !== undefined) {
-      DesignCore.Scene.tempEntities.add(Utils.cloneObject(DesignCore.Scene.entities.get(index)));
+      DesignCore.Scene.hoverEntities.add(DesignCore.Scene.entities.get(index));
       return true;
     }
 

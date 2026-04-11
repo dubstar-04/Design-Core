@@ -114,11 +114,11 @@ describe('RotatedDimension.getPointsFromSelection', () => {
 
 test('RotatedDimension.preview runs without error and calls createTempItem', () => {
   const origAddAux = DesignCore.Scene.auxiliaryEntities.add;
-  const origCreateTempItem = DesignCore.Scene.tempEntities.create;
+  const origCreateTempItem = DesignCore.Scene.previewEntities.create;
   const origPointOnScene = DesignCore.Mouse.pointOnScene;
   // Manual mock for createTempItem
   const createTempItemCalls = [];
-  DesignCore.Scene.tempEntities.create = function(type, obj) {
+  DesignCore.Scene.previewEntities.create = function(type, obj) {
     createTempItemCalls.push([type, obj]);
   };
   // Manual mock for auxiliaryEntities.add
@@ -145,7 +145,7 @@ test('RotatedDimension.preview runs without error and calls createTempItem', () 
 
   // Restore
   DesignCore.Scene.auxiliaryEntities.add = origAddAux;
-  DesignCore.Scene.tempEntities.create = origCreateTempItem;
+  DesignCore.Scene.previewEntities.create = origCreateTempItem;
   DesignCore.Mouse.pointOnScene = origPointOnScene;
 });
 

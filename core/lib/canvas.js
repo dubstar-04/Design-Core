@@ -1,5 +1,6 @@
 import { Matrix } from './matrix.js';
 import { Colours } from './colours.js';
+import { Colour } from './colour.js';
 import { Point } from '../entities/point.js';
 import { Input } from './input.js';
 
@@ -23,15 +24,6 @@ export class Canvas {
     this.height = 1;
 
     this.flipped = false;
-
-    this.paintState;
-
-    this.paintStates = {
-      ENTITIES: 'ENTITIES',
-      TEMPORARY: 'TEMPORARY',
-      SELECTED: 'SELECTED',
-      AUXILLARY: 'AUXILLARY',
-    };
 
     this.cursorStates = Input.Cursor;
 
@@ -310,91 +302,97 @@ export class Canvas {
     this.paintGrid(context, width, height);
 
     const scale = this.getScale();
+    const bg = DesignCore.Settings.canvasbackgroundcolour;
+    const hoverHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.5);
+    const selectionHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.25);
+    const selectionLineWidthDelta = 5;
 
-    // Paint the primary scene items
-    this.paintState = this.paintStates.ENTITIES;
+    // Hover glow pass: draw wide accent-coloured glow behind the hovered entity.
+    // The primary entities pass below redraws the entity at its own colour naturally.
+    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { colour: hoverHaloColour, lineWidthDelta: selectionLineWidthDelta });
+    // Draw the hovered entity with a wider line width
+    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { lineWidthDelta: selectionLineWidthDelta * 0.5 });
 
-    const entityCount = DesignCore.Scene.entities.count();
-    for (let i = 0; i < entityCount; i++) {
-      const entity = DesignCore.Scene.entities.get(i);
-      const layer = DesignCore.LayerManager.getItemByName(entity.layer);
-
-      if (!layer?.isVisible) {
-        continue;
-      }
-
-      this.setContext(entity, context, undefined, scale);
-      entity.draw(context, scale);
-    }
+    // Paint the primary scene items (layer-visibility filtered)
+    this.#paintEntities(
+        DesignCore.Scene.entities, context, scale, null,
+        (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isVisible,
+    );
 
     // Paint the temporary scene items
-    this.paintState = this.paintStates.TEMPORARY;
-    const tempCount = DesignCore.Scene.tempEntities.count();
-    for (let j = 0; j < tempCount; j++) {
-      const entity = DesignCore.Scene.tempEntities.get(j);
-      this.setContext(entity, context, undefined, scale);
-      entity.draw(context, scale);
-    }
+    this.#paintEntities(DesignCore.Scene.previewEntities, context, scale);
 
-    // Paint the selected scene items
-    this.paintState = this.paintStates.SELECTED;
+    // Paint the selected scene items: glow pass then entity pass
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
-    for (let k = 0; k < selectedItems.length; k++) {
-      const entity = selectedItems[k];
-      this.setContext(entity, context, undefined, scale);
-      entity.draw(context, scale);
-    }
+    this.#paintEntities(selectedItems, context, scale, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
+    this.#paintEntities(selectedItems, context, scale);
 
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
-    this.paintState = this.paintStates.AUXILLARY;
     const auxCount = DesignCore.Scene.auxiliaryEntities.count();
     for (let l = 0; l < auxCount; l++) {
       DesignCore.Scene.auxiliaryEntities.get(l).draw(context, scale);
     }
+  }
 
-    this.paintState = undefined;
+  /**
+   * Draw a collection of entities, calling setContext before each draw.
+   * Supports EntityManager instances (with .count()/.get()) and plain arrays.
+   * @param {EntityManager|Array} entities
+   * @param {Object} context
+   * @param {number} scale
+   * @param {Object|null} [overrides] - optional rendering overrides passed to setContext
+   * @param {Object} [overrides.colour] - overrides colour resolution for all entities in this pass
+   * @param {number} [overrides.lineWidthDelta] - additional width in pixels (divided by scale) added to each entity's line width
+   * @param {Function} [filter] - optional predicate; entity is skipped when it returns falsy
+   */
+  #paintEntities(entities, context, scale, overrides = null, filter = undefined) {
+    const isManager = typeof entities.count === 'function';
+    const count = isManager ? entities.count() : entities.length;
+    for (let i = 0; i < count; i++) {
+      const entity = isManager ? entities.get(i) : entities[i];
+      if (filter && !filter(entity)) continue;
+      this.setContext(entity, context, undefined, overrides ?? {});
+      entity.draw(context, scale);
+    }
   }
 
   /**
    * Set the scene context
-   * @param {entity} item
+   * @param {Object} item - entity to draw
    * @param {Object} context - scene painting context from ui
-   * @param {Object} block - insert or dimension element for the current block, required for colour ByBlock
+   * @param {Object} [block] - insert or dimension element for the current block, required for colour ByBlock
+   * @param {Object} [overrides] - optional rendering overrides
+   * @param {Object} [overrides.colour] - overrides all colour resolution (e.g. for halo/glow passes)
+   * @param {number} [overrides.lineWidthDelta] - additional width in pixels (divided by scale) added to the entity's line width
    */
-  setContext(item, context, block = undefined) {
+  setContext(item, context, block = undefined, overrides = {}) {
     const scale = this.getScale();
     let colour = item.getDrawColour();
     const lineType = item.getLineType();
     let lineWidth = item.lineWidth / scale;
+    const bg = DesignCore.Settings.canvasbackgroundcolour;
 
-    if (this.paintState === this.paintStates.SELECTED) {
-      // Set Context for selected items
-      colour = DesignCore.Core.settings.selecteditemscolour;
-      lineWidth = (item.lineWidth * 2) / scale;
-    } else if (this.paintState === this.paintStates.TEMPORARY) {
-      // Set context for temp items
-      lineWidth = (item.lineWidth * 2) / scale;
-    }
-
-    if (block && this.paintState != this.paintStates.SELECTED) {
-      // set colour for items with colour byblock
-      if (item.entityColour.aci === 0) {
+    if (overrides.colour !== undefined) {
+      colour = overrides.colour;
+    } else {
+      if (block && item.entityColour.aci === 0) {
         colour = block.getDrawColour();
+      }
+      // ACI 7: white on dark background, black on light background
+      if (this.#isAci7(item, block)) {
+        colour = (bg.r + bg.g + bg.b) / 3 < 128 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
       }
     }
 
-    // ACI 7: white on dark background, black on light background
-    if (this.paintState !== this.paintStates.SELECTED && this.#isAci7(item, block)) {
-      const bg = DesignCore.Settings.canvasbackgroundcolour;
-      colour = (bg.r + bg.g + bg.b) / 3 < 128 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
-    }
+    lineWidth += (overrides.lineWidthDelta ?? 0) / scale;
 
     try { // HTML Canvas
       context.strokeStyle = Colours.rgbToString(colour);
       context.fillStyle = Colours.rgbToString(colour);
       context.lineWidth = lineWidth;
+      context.lineCap = 'round';
       context.setLineDash(lineType.getPattern(scale));
       context.beginPath();
     } catch { // Cairo
@@ -402,14 +400,15 @@ export class Canvas {
       context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
       context.setDash(lineType.getPattern(scale), 1);
       context.setLineWidth(lineWidth);
+      context.setLineCap(1); // Cairo.LineCap.ROUND
     }
   }
 
   /**
    * Resolve whether the effective draw colour for an item is ACI 7.
    * Follows ByLayer and ByBlock indirection.
-   * @param {entity} item
-   * @param {entity} block - enclosing insert/dimension, or undefined
+   * @param {Object} item - entity to check
+   * @param {Object} [block] - enclosing insert/dimension, or undefined
    * @return {boolean}
    */
   #isAci7(item, block) {

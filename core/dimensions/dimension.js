@@ -292,7 +292,7 @@ export class Dimension extends BaseDimension {
       // get the points for the dimension
       const points = dimensionType.getPointsFromSelection(this.selectedItems, Pt11);
       // create the temporary dimension
-      DesignCore.Scene.tempEntities.create(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.previewEntities.create(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 }

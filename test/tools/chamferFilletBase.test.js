@@ -444,3 +444,92 @@ test('ChamferFilletBase.applySharpTrim first=Poly second=Line: poly/line orderin
   expect(poly.points[3].x).toBeCloseTo(0);
   expect(poly.points[3].y).toBeCloseTo(10);
 });
+
+// ─── validateSelection ────────────────────────────────────────────────────────
+
+test('ChamferFilletBase.validateSelection returns null when firstPick has no entity', () => {
+  const chamfer = new Chamfer();
+  expect(chamfer.validateSelection()).toBeNull();
+});
+
+test('ChamferFilletBase.validateSelection returns null when firstPick entity is not a Line', () => {
+  core.scene.clear();
+  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0); // Circle — resolveEndpoints fails
+
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
+  expect(chamfer.validateSelection()).toBeNull();
+});
+
+test('ChamferFilletBase.validateSelection returns null when findClosestItem returns undefined', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(undefined);
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
+  const result = chamfer.validateSelection();
+  findSpy.mockRestore();
+
+  expect(result).toBeNull();
+});
+
+test('ChamferFilletBase.validateSelection returns null when hovered entity is not a Line or BasePolyline', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Circle', { points: [new Point(5, 5), new Point(10, 5)] });
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
+  const result = chamfer.validateSelection();
+  findSpy.mockRestore();
+
+  expect(result).toBeNull();
+});
+
+test('ChamferFilletBase.validateSelection returns null when first and second segments are parallel', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 2), new Point(10, 2)] }); // parallel horizontal
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 2);
+  const result = chamfer.validateSelection();
+  findSpy.mockRestore();
+
+  expect(result).toBeNull();
+});
+
+test('ChamferFilletBase.validateSelection returns selection object for valid perpendicular lines', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] }); // horizontal
+  core.scene.addItem('Line', { points: [new Point(5, -5), new Point(5, 5)] }); // vertical at x=5
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 2);
+  const result = chamfer.validateSelection();
+  findSpy.mockRestore();
+
+  expect(result).not.toBeNull();
+  expect(result.candidate).toBe(core.scene.entities.get(1));
+  expect(result.intersectionPoint.x).toBeCloseTo(5);
+  expect(result.intersectionPoint.y).toBeCloseTo(0);
+  expect(result.tempSecond).toBeDefined();
+});

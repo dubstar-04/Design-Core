@@ -3,6 +3,7 @@ import { Point } from '../../core/entities/point.js';
 import { Trim } from '../../core/tools/trim.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 import { Strings } from '../../core/lib/strings.js';
+import { DesignCore } from '../../core/designCore.js';
 import { expect, jest } from '@jest/globals';
 import { withMockInput } from '../test-helpers/test-helpers.js';
 
@@ -431,6 +432,96 @@ test('Trim.preview does not throw', () => {
   expect(() => trim.preview()).not.toThrow();
 });
 
+test('Trim.preview returns early when no boundary items set', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  const trim = new Trim();
+  // selectedBoundaryItems is empty by default
+  trim.preview();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Trim.preview returns early when findClosestItem returns undefined', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] });
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  const trim = new Trim();
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(undefined);
+  trim.preview();
+  findSpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Trim.preview returns early when hovered entity does not implement trim', () => {
+  // Text does not override Entity.trim() — preview must not emit a notification.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
+  core.scene.addItem('Text', { points: [new Point(5, 0)], string: 'hello' }); // unsupported
+  DesignCore.Scene.previewEntities.clear();
+
+  const notifySpy = jest.spyOn(core, 'notify');
+  const trim = new Trim();
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 0);
+  trim.preview();
+  findSpy.mockRestore();
+  notifySpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+  expect(notifySpy).not.toHaveBeenCalled();
+});
+
+test('Trim.preview returns early when hovered entity has no intersections with boundary', () => {
+  // Two parallel horizontal lines — no intersection with the vertical boundary
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary (vertical)
+  core.scene.addItem('Line', { points: [new Point(-10, 5), new Point(10, 5)] }); // hovered (horizontal, no intersection with boundary)
+  DesignCore.Scene.previewEntities.clear();
+
+  // Boundary is entity 0; hovered is entity 1 — they are parallel on the y-axis, so no intersection
+  core.scene.addItem('Line', { points: [new Point(-10, 20), new Point(10, 20)] }); // extra line, no intersection
+
+  const trim = new Trim();
+  trim.selectedBoundaryItems = [core.scene.entities.get(2)]; // horizontal boundary — parallel to hovered
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 5);
+  trim.preview();
+  findSpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Trim.preview populates previewEntities when entity can be trimmed', () => {
+  // Vertical boundary at x=0; horizontal line from (-10,0) to (10,0) is the hovered entity.
+  // Mouse at (5,0) → trims the right half, leaving the left half as a preview.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] }); // hovered
+  DesignCore.Scene.previewEntities.clear();
+
+  const trim = new Trim();
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 0);
+  trim.preview();
+  findSpy.mockRestore();
+
+  // dulled original + at least one trimmed survivor
+  expect(DesignCore.Scene.previewEntities.count()).toBeGreaterThanOrEqual(2);
+});
+
 test('Trim.execute returns early when boundary input is undefined', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
@@ -535,4 +626,65 @@ test('Trim.action notifies when boundary item equals selected item', () => {
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOTRIM));
   notifySpy.mockRestore();
+});
+
+test('Trim.action trims an arc', () => {
+  // Arc: center (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10)
+  // Boundary: vertical line at x=0, intersects arc at (0,10)
+  // Mouse at (7,7) — in the right half, selects (10,0)→(0,10) segment for removal
+  // Expected: original arc removed, shorter arc from (0,10) to (-10,0) added
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(7, 7));
+  trim.action();
+
+  expect(core.scene.entities.count()).toBe(2);
+
+  let arc;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Arc') arc = core.scene.entities.get(i);
+  }
+  expect(arc).toBeDefined();
+  // Remaining arc runs from the intersection (0,10) to the original end (-10,0)
+  expect(arc.points[1].x).toBeCloseTo(0);
+  expect(arc.points[1].y).toBeCloseTo(10);
+  expect(arc.points[2].x).toBeCloseTo(-10);
+  expect(arc.points[2].y).toBeCloseTo(0);
+});
+
+test('Trim.action trims a circle', () => {
+  // Circle: center (0,0), radius 10
+  // Boundary: vertical line at x=0, intersects circle at (0,10) and (0,-10)
+  // Mouse at (8,0) — on the right side
+  // Expected: original circle removed, arc covering the right side added
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(8, 0));
+  trim.action();
+
+  // circle removed, arc added, boundary line remains
+  expect(core.scene.entities.count()).toBe(2);
+
+  let arc;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Arc') arc = core.scene.entities.get(i);
+  }
+  expect(arc).toBeDefined();
+  // Arc center should match the original circle center
+  expect(arc.points[0].x).toBe(0);
+  expect(arc.points[0].y).toBe(0);
 });

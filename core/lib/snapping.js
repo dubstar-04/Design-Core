@@ -35,7 +35,7 @@ export class SnapPoint {
    * @param {number} scale
    */
   draw(ctx, scale) {
-    const snapColour = DesignCore.Settings.snaptrackingcolour;
+    const snapColour = DesignCore.Settings.accentcolour;
     const size = 6 / scale;
     const x = this.snapPoint.x;
     const y = this.snapPoint.y;
@@ -169,7 +169,7 @@ class TrackingLine {
     const start = from.add(dir.scale(tMin));
     const end = from.add(dir.scale(tMax));
 
-    const lineColour = DesignCore.Settings.snaptrackingcolour;
+    const lineColour = DesignCore.Settings.accentcolour;
     const dashSize = 4 / scale;
 
     ctx.save();

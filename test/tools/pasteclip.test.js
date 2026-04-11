@@ -12,7 +12,7 @@ describe('Pasteclip Tool', () => {
   beforeEach(() => {
     DesignCore.Scene.entities.clear();
     DesignCore.Scene.selectionManager.reset();
-    DesignCore.Scene.tempEntities.clear();
+    DesignCore.Scene.previewEntities.clear();
     DesignCore.Clipboard.Entities = []; // also resets basePoint
   });
 
@@ -57,8 +57,8 @@ describe('Pasteclip Tool', () => {
 
     const tool = new Pasteclip();
     tool.preview();
-    expect(DesignCore.Scene.tempEntities.count()).toBeGreaterThan(0);
-    const tempLine = DesignCore.Scene.tempEntities.get(0);
+    expect(DesignCore.Scene.previewEntities.count()).toBeGreaterThan(0);
+    const tempLine = DesignCore.Scene.previewEntities.get(0);
     const deltaX = targetPoint.x - basePoint.x;
     const deltaY = targetPoint.y - basePoint.y;
     expect(tempLine.points[0].x).toBe(line.points[0].x + deltaX);

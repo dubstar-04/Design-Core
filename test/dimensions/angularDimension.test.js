@@ -100,11 +100,11 @@ test('getPointsFromSelection returns correct sequenced points', () => {
 });
 
 test('AngularDimension.preview runs without error and calls createTempItem', () => {
-  const origCreateTempItem = DesignCore.Scene.tempEntities.create;
+  const origCreateTempItem = DesignCore.Scene.previewEntities.create;
   const origPointOnScene = DesignCore.Mouse.pointOnScene;
   // Manual mock for createTempItem
   const createTempItemCalls = [];
-  DesignCore.Scene.tempEntities.create = function(type, obj) {
+  DesignCore.Scene.previewEntities.create = function(type, obj) {
     createTempItemCalls.push([type, obj]);
   };
   // Manual mock for pointOnScene
@@ -138,7 +138,7 @@ test('AngularDimension.preview runs without error and calls createTempItem', () 
   expect(createTempItemCalls.some((call) => call[0] === dim2.type)).toBe(true);
 
   // Restore
-  DesignCore.Scene.tempEntities.create = origCreateTempItem;
+  DesignCore.Scene.previewEntities.create = origCreateTempItem;
   DesignCore.Mouse.pointOnScene = origPointOnScene;
 });
 

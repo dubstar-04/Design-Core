@@ -109,7 +109,7 @@ export class Offset extends Tool {
       if (offsetPoints) {
         const previewEntity = Utils.cloneObject(this.selectedItem);
         previewEntity.fromPolylinePoints(offsetPoints);
-        DesignCore.Scene.tempEntities.add(previewEntity);
+        DesignCore.Scene.previewEntities.add(previewEntity);
       }
     }
   }

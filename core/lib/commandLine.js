@@ -56,12 +56,7 @@ export class CommandLine {
       this.updateCallbackFunction(this.cmdLine);
     }
 
-    if (DesignCore.Scene.inputManager.activeCommand !== undefined) {
-      // TODO: This should call a common function that is currently called mouseMove in the scene class
-      DesignCore.Scene.tempEntities.clear();
-      DesignCore.Scene.inputManager.activeCommand.preview();
-      DesignCore.Canvas.requestPaint();
-    }
+    DesignCore.Scene.inputManager.refreshPreview();
   }
 
   /**

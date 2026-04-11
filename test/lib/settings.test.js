@@ -40,8 +40,7 @@ test('polar and ortho are mutually exclusive', () => {
 test('Settings constructor - colour defaults', () => {
   const fresh = new (settings.constructor)();
   expect(fresh.canvasbackgroundcolour).toEqual({ r: 30, g: 30, b: 30 });
-  expect(fresh.selecteditemscolour).toEqual({ r: 0, g: 255, b: 0 });
-  expect(fresh.snaptrackingcolour).toEqual({ r: 55, g: 180, b: 75 });
+  expect(fresh.accentcolour).toEqual({ r: 55, g: 180, b: 75 });
   expect(fresh.gridcolour).toEqual({ r: 119, g: 118, b: 123 });
   expect(fresh.selectionWindow).toEqual({ r: 0, g: 255, b: 0 });
   expect(fresh.crossingWindow).toEqual({ r: 0, g: 0, b: 255 });
@@ -82,9 +81,9 @@ test('setSetting with false value does not trigger polar/ortho exclusion', () =>
 });
 
 test('setSetting updates arbitrary colour settings', () => {
-  settings.setSetting('snaptrackingcolour', { r: 1, g: 2, b: 3 });
-  expect(settings.snaptrackingcolour).toEqual({ r: 1, g: 2, b: 3 });
-  settings.setSetting('snaptrackingcolour', { r: 55, g: 180, b: 75 });
+  settings.setSetting('accentcolour', { r: 1, g: 2, b: 3 });
+  expect(settings.accentcolour).toEqual({ r: 1, g: 2, b: 3 });
+  settings.setSetting('accentcolour', { r: 55, g: 180, b: 75 });
 });
 
 test('setSetting updates polarangle', () => {
@@ -116,7 +115,7 @@ test('getSetting returns current value after setSetting', () => {
 });
 
 test('getSetting returns correct type for colour objects', () => {
-  const colour = settings.getSetting('snaptrackingcolour');
+  const colour = settings.getSetting('accentcolour');
   expect(colour).toHaveProperty('r');
   expect(colour).toHaveProperty('g');
   expect(colour).toHaveProperty('b');

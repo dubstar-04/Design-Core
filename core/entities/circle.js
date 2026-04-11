@@ -115,7 +115,7 @@ export class Circle extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       DesignCore.Scene.auxiliaryEntities.add(new RubberBand([this.points.at(0), mousePoint]));
-      DesignCore.Scene.tempEntities.create(this.type, { points: [this.points.at(0), mousePoint] });
+      DesignCore.Scene.previewEntities.create(this.type, { points: [this.points.at(0), mousePoint] });
     }
   }
 

@@ -4,6 +4,7 @@ import { Entity } from './entity.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Polyline } from './polyline.js';
+import { RubberBand } from '../lib/rubberBand.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -67,8 +68,9 @@ export class Rectangle extends Entity {
   preview() {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
+      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([this.points.at(-1), mousePoint]));
       const points = this.rectPoints(this.points.at(-1), mousePoint);
-      DesignCore.Scene.tempEntities.create('Polyline', { points: points });
+      DesignCore.Scene.previewEntities.create('Polyline', { points: points });
     }
   }
 

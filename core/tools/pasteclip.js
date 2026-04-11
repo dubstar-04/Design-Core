@@ -66,7 +66,7 @@ export class Pasteclip extends Tool {
       const tempEntity = Utils.cloneObject(entity);
       const offsetPoints = tempEntity.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
       tempEntity.setProperty('points', offsetPoints);
-      DesignCore.Scene.tempEntities.add(tempEntity);
+      DesignCore.Scene.previewEntities.add(tempEntity);
     }
   }
 

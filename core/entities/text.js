@@ -232,7 +232,7 @@ export class Text extends Entity {
           string: DesignCore.CommandLine.command,
         };
 
-        DesignCore.Scene.tempEntities.create(this.type, data);
+        DesignCore.Scene.previewEntities.create(this.type, data);
       } else {
         const mousePoint = DesignCore.Mouse.pointOnScene();
         const points = [this.points.at(-1), mousePoint];

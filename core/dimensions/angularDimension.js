@@ -146,7 +146,7 @@ export class AngularDimension extends BaseDimension {
 
       const points = AngularDimension.getPointsFromSelection([tempLineOne, tempLineTwo], Pt11);
 
-      DesignCore.Scene.tempEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
     }
   }
 

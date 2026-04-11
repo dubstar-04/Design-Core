@@ -90,7 +90,7 @@ export class Line extends Entity {
     if (this.points.length >= 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(-1), mousePoint];
-      DesignCore.Scene.tempEntities.create(this.type, { points: points });
+      DesignCore.Scene.previewEntities.create(this.type, { points: points });
     }
   }
 

@@ -96,7 +96,7 @@ export class BaseCircularDimension extends BaseDimension {
       const tempCircle = new Circle({ points: [Pt10, Pt15] });
       const points = this.constructor.getPointsFromSelection([tempCircle], Pt11);
 
-      DesignCore.Scene.tempEntities.create(this.type, { points: points });
+      DesignCore.Scene.previewEntities.create(this.type, { points: points });
     }
   }
 
