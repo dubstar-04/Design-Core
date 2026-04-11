@@ -1,6 +1,7 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { Chamfer } from '../../core/tools/chamfer.js';
+import { DesignCore } from '../../core/designCore.js';
 import { Strings } from '../../core/lib/strings.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 import { expect, jest } from '@jest/globals';
@@ -1009,6 +1010,70 @@ test('Chamfer.action chamfer line inherits layer, lineWidth, lineType from first
 test('Chamfer.preview does not throw', () => {
   const chamfer = new Chamfer();
   expect(() => chamfer.preview()).not.toThrow();
+});
+
+test('Chamfer.preview returns early when findClosestItem returns undefined', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(undefined);
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 5);
+  chamfer.preview();
+  findSpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Chamfer.preview adds chamfer line to previewEntities in no-trim mode', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = false;
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 5);
+  chamfer.preview();
+  findSpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBeGreaterThanOrEqual(1);
+});
+
+test('Chamfer.preview adds 5 entities to previewEntities in trim mode', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  core.scene.headers.chamferDistanceA = 2;
+  core.scene.headers.chamferDistanceB = 2;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = true;
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 5);
+  chamfer.preview();
+  findSpy.mockRestore();
+
+  // dulled firstSeg + dulled secondSeg + firstTrimLine + secondTrimLine + chamferLine = 5
+  expect(DesignCore.Scene.previewEntities.count()).toBeGreaterThanOrEqual(5);
 });
 
 test('Chamfer.execute returns early when second-entity input is undefined (inner loop)', async () => {
