@@ -95,7 +95,7 @@ const arcInputScenarios = [
     input1: new Point(0, 0),
     input2: new Point(10, 0),
     input3: new Point(10, 10),
-    expectedPt2: (input1, input2, input3) => input3,
+    expectedPt2: (input1, input2, input3) => input1.project(input1.angle(input3), input1.distance(input2)),
     expectedStart: 0,
     expectedEnd: Math.PI / 4,
   },
