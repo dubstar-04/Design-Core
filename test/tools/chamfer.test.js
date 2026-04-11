@@ -1005,3 +1005,100 @@ test('Chamfer.action chamfer line inherits layer, lineWidth, lineType from first
   expect(chamferLine.lineWidth).toBe(5);
   expect(chamferLine.lineType).toBe('DASHED');
 });
+
+test('Chamfer.preview does not throw', () => {
+  const chamfer = new Chamfer();
+  expect(() => chamfer.preview()).not.toThrow();
+});
+
+test('Chamfer.execute returns early when second-entity input is undefined (inner loop)', async () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  const executeCommandSpy = jest.fn();
+  await withMockInput(
+      core.scene,
+      [new SingleSelection(0, new Point(-5, 0))],
+      async () => {
+        const chamfer = new Chamfer();
+        await chamfer.execute();
+        expect(executeCommandSpy).not.toHaveBeenCalled();
+      },
+      { extraMethods: { executeCommand: executeCommandSpy } },
+  );
+});
+
+test('Chamfer.execute notifies NONCONSECUTIVESEGMENTS for non-adjacent polyline segments', async () => {
+  // 5-point polyline → 4 segments. Pick segment 1 (near -15,0) then segment 3 (near 5,0).
+  // Neither consecutive nor open-ends → NONCONSECUTIVESEGMENTS, then undefined to exit.
+  core.scene.clear();
+  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0), new Point(20, 0)] });
+
+  const notifySpy = jest.spyOn(core, 'notify');
+  await withMockInput(
+      core.scene,
+      [new SingleSelection(0, new Point(-15, 0)), new SingleSelection(0, new Point(5, 0)), undefined],
+      async () => {
+        const chamfer = new Chamfer();
+        await chamfer.execute();
+      },
+  );
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NONCONSECUTIVESEGMENTS));
+  notifySpy.mockRestore();
+});
+
+test('Chamfer.execute Method→Distance sets chamferMode to false', async () => {
+  core.scene.headers.chamferMode = true;
+
+  await withMockInput(
+      core.scene,
+      ['Method', 'Distance', undefined],
+      async () => {
+        const chamfer = new Chamfer();
+        await chamfer.execute();
+      },
+  );
+
+  expect(core.scene.headers.chamferMode).toBe(false);
+});
+
+test('Chamfer.execute Trim→Trim keeps trimMode=true', async () => {
+  core.scene.headers.trimMode = true;
+
+  await withMockInput(
+      core.scene,
+      ['Trim', 'Trim', undefined],
+      async () => {
+        const chamfer = new Chamfer();
+        await chamfer.execute();
+      },
+  );
+
+  expect(core.scene.headers.trimMode).toBe(true);
+});
+
+test('Chamfer.action angle method angle=180 notifies INVALIDNUMBER', () => {
+  // alpha = 180 * π/180 = π; checks alpha >= Math.PI → INVALIDNUMBER
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+
+  core.scene.headers.chamferLength = 2;
+  core.scene.headers.chamferAngle = 180;
+  core.scene.headers.chamferMode = true;
+  core.scene.headers.trimMode = true;
+
+  const notifySpy = jest.spyOn(core, 'notify');
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.secondPick.entity = core.scene.entities.get(1);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+  chamfer.secondPick.clickPoint = new Point(0, 5);
+  chamfer.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
+  expect(core.scene.entities.count()).toBe(2);
+  notifySpy.mockRestore();
+});
