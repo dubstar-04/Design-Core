@@ -1148,3 +1148,29 @@ test('highlightEntityUnderMouse returns false when buttonThreeDown is true', () 
   expect(inputManager.highlightEntityUnderMouse()).toBe(false);
   core.mouse.buttonThreeDown = false;
 });
+
+test('refreshPreview clears hoverEntities in addition to previewEntities and auxiliaryEntities', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+
+  // Simulate a stale hover glow left by the previous mouseMoved()
+  DesignCore.Scene.hoverEntities.add(core.scene.entities.get(0));
+  expect(DesignCore.Scene.hoverEntities.count()).toBe(1);
+
+  // Attach a minimal active command so refreshPreview doesn't bail early
+  inputManager.activeCommand = { preview: () => {} };
+  inputManager.refreshPreview();
+
+  expect(DesignCore.Scene.hoverEntities.count()).toBe(0);
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+  expect(DesignCore.Scene.auxiliaryEntities.count()).toBe(0);
+});
+
+test('refreshPreview returns early without clearing when there is no active command', () => {
+  DesignCore.Scene.hoverEntities.add({ draw: () => {} });
+  inputManager.activeCommand = undefined;
+  inputManager.refreshPreview();
+  // hoverEntities should be untouched — no active command means no refresh
+  expect(DesignCore.Scene.hoverEntities.count()).toBe(1);
+  DesignCore.Scene.hoverEntities.clear();
+});

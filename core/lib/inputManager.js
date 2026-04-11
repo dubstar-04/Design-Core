@@ -223,6 +223,7 @@ export class InputManager {
     if (this.activeCommand === undefined) return;
     DesignCore.Scene.previewEntities.clear();
     DesignCore.Scene.auxiliaryEntities.clear();
+    DesignCore.Scene.hoverEntities.clear();
     this.activeCommand.preview();
     DesignCore.Canvas.requestPaint();
   }
