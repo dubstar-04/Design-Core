@@ -2,6 +2,7 @@ import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
 import { Extend } from '../../core/tools/extend.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
+import { Strings } from '../../core/lib/strings.js';
 import { expect, jest } from '@jest/globals';
 import { withMockInput } from '../test-helpers/test-helpers.js';
 
@@ -392,4 +393,142 @@ test('Test Extend.action polyline - no intersections', () => {
   const polyline = core.scene.entities.get(0);
   expect(polyline.points[0].x).toBe(0);
   expect(polyline.points[1].x).toBe(50);
+});
+
+test('Extend.register returns correct metadata', () => {
+  const reg = Extend.register();
+  expect(reg.command).toBe('Extend');
+  expect(reg.shortcut).toBe('EX');
+  expect(reg.type).toBe('Tool');
+});
+
+test('Extend.preview does not throw', () => {
+  const extend = new Extend();
+  expect(() => extend.preview()).not.toThrow();
+});
+
+test('Extend.execute returns early when boundary input is undefined', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+
+  await withMockInput(core.scene, [undefined], async () => {
+    const extend = new Extend();
+    await extend.execute();
+    expect(extend.selectedBoundaryItems).toHaveLength(0);
+  });
+});
+
+test('Extend.execute exits selection loop when selection input is undefined', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+  core.scene.addItem('Line', { points: [new Point(100, -10), new Point(100, 10)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] });
+  core.scene.selectionManager.selectionSet.selectionSet.push(0);
+
+  const executeCommandSpy = jest.fn();
+  await withMockInput(core.scene, [undefined], async () => {
+    const extend = new Extend();
+    await extend.execute();
+    expect(extend.selectedBoundaryItems).toHaveLength(1);
+    expect(executeCommandSpy).toHaveBeenCalled();
+  }, { extraMethods: { executeCommand: () => executeCommandSpy() } });
+});
+
+test('Extend.execute calls actionCommand once per extend selection', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+  core.scene.addItem('Line', { points: [new Point(100, -10), new Point(100, 10)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(50, 5)] });
+  core.scene.selectionManager.selectionSet.selectionSet.push(0);
+
+  const actionSpy = jest.fn();
+  await withMockInput(
+      core.scene,
+      [new SingleSelection(1, new Point(45, 0)), new SingleSelection(2, new Point(45, 5)), undefined],
+      async () => {
+        const extend = new Extend();
+        await extend.execute();
+        expect(actionSpy).toHaveBeenCalledTimes(2);
+      },
+      { extraMethods: { actionCommand: () => actionSpy() } },
+  );
+});
+
+test('Extend.action does nothing when selectedItem is null', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  const extend = new Extend();
+  extend.selectedItem = null;
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  expect(() => extend.action()).not.toThrow();
+});
+
+test('Extend.action does nothing when selectedBoundaryItems is empty', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  const extend = new Extend();
+  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedBoundaryItems = [];
+
+  expect(() => extend.action()).not.toThrow();
+  expect(extend.selectedItem).toBeNull();
+});
+
+test('Extend.action notifies when no intersection found (parallel lines)', () => {
+  core.scene.clear();
+  // Two parallel horizontal lines — no intersection possible
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 50), new Point(50, 50)] });
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+  extend.selectedItem = core.scene.entities.get(1);
+  core.mouse.setPosFromScenePoint(new Point(40, 50));
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  extend.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
+  expect(extend.selectedItem).toBeNull();
+  notifySpy.mockRestore();
+});
+
+test('Extend.action notifies when boundary item equals selected item', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] });
+  const entity = core.scene.entities.get(0);
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [entity];
+  extend.selectedItem = entity;
+  core.mouse.setPosFromScenePoint(new Point(40, 0));
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  extend.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
+  notifySpy.mockRestore();
+});
+
+test('Extend.action extends the start of a line', () => {
+  // Line from (50,50) to (100,50) — horizontal
+  // Boundary: vertical line at x=0
+  // Mouse near the start (50,50) → extend start back to x=0
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 100)] });
+  core.scene.addItem('Line', { points: [new Point(50, 50), new Point(100, 50)] });
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+  extend.selectedItem = core.scene.entities.get(1);
+  core.mouse.setPosFromScenePoint(new Point(55, 50));
+  extend.action();
+
+  expect(core.scene.entities.get(1).points[0].x).toBeCloseTo(0);
+  expect(core.scene.entities.get(1).points[0].y).toBeCloseTo(50);
+  expect(core.scene.entities.get(1).points[1].x).toBe(100);
+  expect(core.scene.entities.get(1).points[1].y).toBe(50);
 });
