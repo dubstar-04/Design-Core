@@ -536,3 +536,64 @@ test('Trim.action notifies when boundary item equals selected item', () => {
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOTRIM));
   notifySpy.mockRestore();
 });
+
+test('Trim.action trims an arc', () => {
+  // Arc: center (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10)
+  // Boundary: vertical line at x=0, intersects arc at (0,10)
+  // Mouse at (7,7) — in the right half, selects (10,0)→(0,10) segment for removal
+  // Expected: original arc removed, shorter arc from (0,10) to (-10,0) added
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(7, 7));
+  trim.action();
+
+  expect(core.scene.entities.count()).toBe(2);
+
+  let arc;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Arc') arc = core.scene.entities.get(i);
+  }
+  expect(arc).toBeDefined();
+  // Remaining arc runs from the intersection (0,10) to the original end (-10,0)
+  expect(arc.points[1].x).toBeCloseTo(0);
+  expect(arc.points[1].y).toBeCloseTo(10);
+  expect(arc.points[2].x).toBeCloseTo(-10);
+  expect(arc.points[2].y).toBeCloseTo(0);
+});
+
+test('Trim.action trims a circle', () => {
+  // Circle: center (0,0), radius 10
+  // Boundary: vertical line at x=0, intersects circle at (0,10) and (0,-10)
+  // Mouse at (8,0) — on the right side
+  // Expected: original circle removed, arc covering the right side added
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(8, 0));
+  trim.action();
+
+  // circle removed, arc added, boundary line remains
+  expect(core.scene.entities.count()).toBe(2);
+
+  let arc;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Arc') arc = core.scene.entities.get(i);
+  }
+  expect(arc).toBeDefined();
+  // Arc center should match the original circle center
+  expect(arc.points[0].x).toBe(0);
+  expect(arc.points[0].y).toBe(0);
+});
