@@ -460,6 +460,27 @@ test('Trim.preview returns early when findClosestItem returns undefined', () => 
   expect(DesignCore.Scene.previewEntities.count()).toBe(0);
 });
 
+test('Trim.preview returns early when hovered entity does not implement trim', () => {
+  // Text does not override Entity.trim() — preview must not emit a notification.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
+  core.scene.addItem('Text', { points: [new Point(5, 0)], string: 'hello' }); // unsupported
+  DesignCore.Scene.previewEntities.clear();
+
+  const notifySpy = jest.spyOn(core, 'notify');
+  const trim = new Trim();
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 0);
+  trim.preview();
+  findSpy.mockRestore();
+  notifySpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+  expect(notifySpy).not.toHaveBeenCalled();
+});
+
 test('Trim.preview returns early when hovered entity has no intersections with boundary', () => {
   // Two parallel horizontal lines — no intersection with the vertical boundary
   core.scene.clear();

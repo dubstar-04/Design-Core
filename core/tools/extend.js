@@ -1,6 +1,7 @@
 import { Intersection } from '../lib/intersect.js';
 import { Strings } from '../lib/strings.js';
 import { Tool } from './tool.js';
+import { Entity } from '../entities/entity.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { UpdateState } from '../lib/stateManager.js';
@@ -78,6 +79,7 @@ export class Extend extends Tool {
     if (index === undefined) return;
 
     const entity = DesignCore.Scene.entities.get(index);
+    if (entity.extend === Entity.prototype.extend) return;
     const intersectPoints = this.#collectIntersectPoints(entity);
     if (!intersectPoints.length) return;
 

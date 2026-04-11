@@ -436,6 +436,27 @@ test('Extend.preview returns early when findClosestItem returns undefined', () =
   expect(DesignCore.Scene.previewEntities.count()).toBe(0);
 });
 
+test('Extend.preview returns early when hovered entity does not implement extend', () => {
+  // Circle does not override Entity.extend() — preview must not emit a notification.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(100, -10), new Point(100, 10)] }); // boundary
+  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] }); // unsupported
+  DesignCore.Scene.previewEntities.clear();
+
+  const notifySpy = jest.spyOn(core, 'notify');
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 0);
+  extend.preview();
+  findSpy.mockRestore();
+  notifySpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+  expect(notifySpy).not.toHaveBeenCalled();
+});
+
 test('Extend.preview returns early when hovered entity has no valid extension', () => {
   // Hovered line is parallel to the boundary — no intersection ahead of its endpoint.
   core.scene.clear();
