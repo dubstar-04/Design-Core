@@ -34,6 +34,13 @@ export class Hatch extends Entity {
   constructor(data) {
     super(data);
 
+    // cache for pre-computed world-space pattern line segments
+    Object.defineProperty(this, 'cachedLines', {
+      value: null,
+      writable: true,
+      enumerable: false,
+    });
+
     // store the boundary shapes
     Object.defineProperty(this, 'childEntities', {
       value: [],
@@ -132,6 +139,81 @@ export class Hatch extends Entity {
   setPatternName(name) {
     this.pattern = name.toUpperCase();
     this.solid = this.pattern === 'SOLID';
+    this.cachedLines = null;
+  }
+
+  /**
+   * Build and cache world-space line segments for the current pattern.
+   * Segments are in world coordinates so no canvas transforms are needed at draw time.
+   */
+  buildCache() {
+    if (!this.childEntities.length || !Patterns.patternExists(this.patternName) || this.solid) {
+      this.cachedLines = [];
+      return;
+    }
+
+    const bb = this.boundingBox();
+    const centerPoint = bb.centerPoint;
+    const bbXLength = bb.xLength;
+    const bbYLength = bb.yLength;
+    const s = this.scale;
+    const lines = [];
+
+    const pattern = Patterns.getPattern(this.patternName);
+    pattern.forEach((patternLine) => {
+      let dashLength = bbXLength / 2;
+      if (patternLine.dashes.length) {
+        dashLength = patternLine.getDashLength();
+      }
+
+      let dashes = [...patternLine.dashes];
+      let dashOffset = 0;
+
+      if (dashes.length && dashes[0] < 0) {
+        const firstIndex = dashes.shift();
+        dashOffset = Math.abs(firstIndex);
+        dashes.push(firstIndex);
+      }
+
+      dashes = dashes.map((x) => Math.abs(x) + 0.00001);
+
+      const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
+      const cosR = Math.cos(rotation);
+      const sinR = Math.sin(rotation);
+      const cx = centerPoint.x + patternLine.xOrigin * s;
+      const cy = centerPoint.y + patternLine.yOrigin * s;
+
+      const halfW = bbXLength / (2 * s);
+      const halfH = bbYLength / (2 * s);
+      const sinA = Math.abs(sinR);
+      const cosA = Math.abs(cosR);
+
+      const halfX = halfW * cosA + halfH * sinA;
+      const halfY = halfW * sinA + halfH * cosA;
+
+      const xIncrement = Math.ceil(halfX / dashLength);
+      const yIncrement = Math.ceil(halfY / Math.abs(patternLine.yDelta));
+
+      const segments = [];
+      for (let i = -yIncrement; i < yIncrement; i++) {
+        const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
+        const yOffset = patternLine.yDelta * i;
+        const lx1 = -xOffset + dashOffset;
+        const ly = yOffset;
+        segments.push({
+          x1: (lx1 * cosR - ly * sinR) * s + cx,
+          y1: (lx1 * sinR + ly * cosR) * s + cy,
+          x2: (xOffset * cosR - ly * sinR) * s + cx,
+          y2: (xOffset * sinR + ly * cosR) * s + cy,
+        });
+      }
+
+      lines.push({ dashes, lineWidthFactor: 1 / s, segments });
+    });
+
+    console.log('Hatch pattern cache built');
+
+    this.cachedLines = lines;
   }
 
   /**
@@ -429,32 +511,25 @@ export class Hatch extends Entity {
     // ensure the scale is valid
     if (this.scale < 0.01) {
       this.scale = 1;
+      this.cachedLines = null;
     }
 
     if (!this.childEntities.length) return;
 
     ctx.save();
 
-    // Start a new composite path for all boundary loops
+    // Build the composite boundary path for clipping
     try {
       ctx.beginPath();
     } catch { // Cairo
       ctx.newPath();
     }
 
-    // Trace all boundary paths as sub-paths in a single composite path
-    // Using even-odd fill rule, islands are automatically handled:
-    // areas enclosed by an odd number of boundaries are filled,
-    // areas enclosed by an even number are left empty
     for (let i = 0; i < this.childEntities.length; i++) {
       const shape = this.childEntities[i];
       if (!shape.points.length) continue;
-
-      // Start a new sub-path for this boundary
       ctx.moveTo(shape.points[0].x, shape.points[0].y);
-      // Trace the boundary path (without stroking)
       shape.draw(ctx, scale, false);
-      // Close the sub-path
       ctx.closePath();
     }
 
@@ -466,124 +541,49 @@ export class Hatch extends Entity {
       ctx.clip('evenodd');
     }
 
-    // Start a new path for the pattern/fill area
-    try {
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.newPath();
-    }
-
-    // Create an oversized rectangle covering all boundaries
-    const bb = this.boundingBox();
-    try {
-      ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-    } catch { // Cairo
-      ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-    }
-
-    // Draw the pattern/fill once over the composite clipped region
-    this.createPattern(ctx, scale, bb);
-
-    ctx.restore();
-  }
-
-  /**
-   * Draw the hatch pattern to the context
-   * @param {Object} ctx
-   * @param {number} scale
-   * @param {BoundingBox} boundingbox - bounding box of the hatch boundaries, used to size the pattern
-   */
-  createPattern(ctx, scale, boundingbox) {
-    if (!Patterns.patternExists(this.patternName) || this.solid) {
-      ctx.fill();
-      return;
-    }
-
-    const boundingBox = boundingbox;
-    const centerPoint = boundingBox.centerPoint;
-    const bbXLength = boundingBox.xLength;
-    const bbYLength = boundingBox.yLength;
-
-    const pattern = Patterns.getPattern(this.patternName);
-    pattern.forEach((patternLine) => {
-      // Each pattern line is considered to be the first member of a line family,
-      // Patterns are created by applying the delta offsets in both directions to generate an infinite family of parallel lines.
-      // originX and originY values are the offsets of the line from the origin and are applied without rotation
-      // The delta-x value indicates the displacement between members of the family in the direction of the line. It is used only for dashed lines.
-      // The delta-y value indicates the spacing between members of the family; that is, it is measured perpendicular to the lines.
-      // A line is considered to be of infinite length.
-      // A dash pattern is superimposed on the line.
-
-      // define dashlength - i.e. the length of each dash summed
-      // where there is no dash defined use half the boundingbox xlength
-      let dashLength = bbXLength / 2;
-      if (patternLine.dashes.length) {
-        dashLength = patternLine.getDashLength();
-      }
-
-      // copy dashes to avoid mutating the pattern line
-      let dashes = [...patternLine.dashes];
-      let dashOffset = 0;
-
-      if (dashes[0] < 0) {
-        // if the first dash is negative move it to the end
-        const firstIndex = dashes.shift();
-        dashOffset = Math.abs(firstIndex);
-        dashes.push(firstIndex);
-      }
-
-      dashes = dashes.map((x) => Math.abs(x) + 0.00001);
-
+    if (this.solid) {
+      // Solid fill: fill a rectangle covering the clipped area
       try {
-        ctx.setLineDash(dashes, 0);
-        ctx.lineWidth = (1 / scale / this.scale);
         ctx.beginPath();
       } catch { // Cairo
-        ctx.setDash(dashes, 0);
-        ctx.setLineWidth(1 / scale / this.scale);
         ctx.newPath();
       }
-
-      const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
-
-      // Project the bounding box onto the pattern's rotated local axes
-      // to compute tight line counts instead of using the worst-case max dimension.
-      const halfW = bbXLength / (2 * this.scale);
-      const halfH = bbYLength / (2 * this.scale);
-      const sinR = Math.abs(Math.sin(rotation));
-      const cosR = Math.abs(Math.cos(rotation));
-
-      // Half-extent along the line direction (X in local frame)
-      const halfX = halfW * cosR + halfH * sinR;
-      // Half-extent perpendicular to lines (Y in local frame)
-      const halfY = halfW * sinR + halfH * cosR;
-
-      const xIncrement = Math.ceil(halfX / dashLength);
-      const yIncrement = Math.ceil(halfY / Math.abs(patternLine.yDelta));
-
-      // Set transform once for all lines in this pattern line family
-      ctx.save();
-      // translate to the center of the shape
-      // apply the origin offsets without rotation
-      ctx.translate(centerPoint.x + patternLine.xOrigin * this.scale, centerPoint.y + patternLine.yOrigin * this.scale);
-      // scale the context
-      ctx.scale(this.scale, this.scale);
-      // rotate the context
-      ctx.rotate(rotation);
-
-      for (let i = -yIncrement; i < yIncrement; i++) {
-        // apply the deltaX offset for odd iterations
-        // define offsets for the current iteration
-        const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
-        const yOffset = patternLine.yDelta * i;
-
-        ctx.moveTo(-xOffset + dashOffset, yOffset);
-        ctx.lineTo(xOffset, yOffset);
+      const bb = this.boundingBox();
+      try {
+        ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+      } catch { // Cairo
+        ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
       }
+      ctx.fill();
+    } else {
+      // Pattern hatch: stroke cached world-space line segments within the clip region
+      if (!this.cachedLines) this.buildCache();
 
-      ctx.stroke();
-      ctx.restore();
-    });
+      // Preserve any extra line width added by the halo/selection pass in setContext.
+      // setContext sets lineWidth = (entity.lineWidth + delta) / scale. We compute the
+      // delta so the thin pattern lines also receive the halo boost.
+      const haloExtra = Math.max(0, ctx.lineWidth - this.lineWidth / scale);
+
+      for (const family of this.cachedLines) {
+        try {
+          ctx.setLineDash(family.dashes);
+          ctx.lineWidth = family.lineWidthFactor / scale + haloExtra;
+          ctx.beginPath();
+        } catch { // Cairo
+          ctx.setDash(family.dashes, 0);
+          ctx.setLineWidth(family.lineWidthFactor / scale + haloExtra);
+          ctx.newPath();
+        }
+
+        for (const seg of family.segments) {
+          ctx.moveTo(seg.x1, seg.y1);
+          ctx.lineTo(seg.x2, seg.y2);
+        }
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
   }
 
   /**
@@ -800,6 +800,13 @@ export class Hatch extends Entity {
             child.setProperty('points', offsetPoints);
           });
         }
+
+        this.cachedLines = null;
+      }
+
+      // clear pattern cache for any property that affects geometry or pattern
+      if (property === 'scale' || property === 'angle' || property === 'childEntities') {
+        this.cachedLines = null;
       }
 
       // other properties as normal
