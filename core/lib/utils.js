@@ -129,10 +129,11 @@ export class Utils {
    * @param {Array<string>} properties - property names to copy
    * @return {Object} plain object containing the copied properties
    */
-  static cloneProperties(entity, properties = ['colour', 'layer', 'lineType', 'lineWidth', 'height', 'styleName', 'dimensionStyle']) {
+  static cloneProperties(entity, properties = ['colour', 'layer', 'lineType', 'lineWidth', 'height', 'styleName', 'dimensionStyle', 'patternName', 'scale']) {
     const result = {};
     for (const prop of properties) {
-      if (entity.hasOwnProperty(prop)) {
+      const descriptor = Object.getOwnPropertyDescriptor(entity, prop);
+      if (descriptor && descriptor.enumerable) {
         result[prop] = entity[prop];
       }
     }

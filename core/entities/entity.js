@@ -31,6 +31,7 @@ export class Entity {
     Object.defineProperty(this, 'colour', {
       get: this.getColour,
       set: this.setColour,
+      enumerable: true,
     });
 
     Object.defineProperty(this, 'entityColour', {

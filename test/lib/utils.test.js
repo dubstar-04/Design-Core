@@ -1,4 +1,5 @@
 import { Arc } from '../../core/entities/arc.js';
+import { Hatch } from '../../core/entities/hatch.js';
 import { Utils } from '../../core/lib/utils.js';
 import { Point } from '../../core/entities/point.js';
 
@@ -126,6 +127,21 @@ test('Test Utils.cloneProperties respects custom properties list', () => {
   expect(props.lineWidth).toBe(5);
   expect(props.lineType).toBeUndefined();
   expect(props.colour).toBeUndefined();
+});
+
+test('Test Utils.cloneProperties copies patternName from Hatch', () => {
+  const hatch = new Hatch({ patternName: 'ANSI37' });
+  const props = Utils.cloneProperties(hatch);
+  expect(props.patternName).toBe('ANSI37');
+  // lineType and lineWidth are hidden on Hatch
+  expect(props.lineType).toBeUndefined();
+  expect(props.lineWidth).toBeUndefined();
+});
+
+test('Test Utils.cloneProperties does not include patternName for non-hatch entities', () => {
+  const arc = new Arc({ layer: 'walls' });
+  const props = Utils.cloneProperties(arc);
+  expect(props.patternName).toBeUndefined();
 });
 
 test('Test Utils.areaOfTriangle', () => {

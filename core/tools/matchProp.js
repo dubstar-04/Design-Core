@@ -22,8 +22,6 @@ export class MatchProp extends Tool {
     this.sourceIndex = null;
     // array of destination item indices
     this.destinationSetIndices = [];
-    // properties to match
-    this.properties = ['colour', 'layer', 'lineType', 'lineWidth', 'height', 'styleName', 'dimensionStyle'];
   }
 
   /**
@@ -77,15 +75,13 @@ export class MatchProp extends Tool {
 
     // get source item
     const sourceItem = DesignCore.Scene.entities.get(this.sourceIndex);
+    const propertySet = Utils.cloneProperties(sourceItem);
 
     const stateChanges = [];
 
     // loop through destination set
     for (let i = 0; i < this.destinationSetIndices.length; i++) {
       const targetItem = DesignCore.Scene.entities.get(this.destinationSetIndices[i]);
-      // propertySet: plain object containing only the properties that exist on
-      // the source entity, keyed by property name and ready to pass to UpdateState.
-      const propertySet = Utils.cloneProperties(sourceItem, this.properties);
 
       // only add state change if there are properties to change
       if (Object.keys(propertySet).length > 0) {
