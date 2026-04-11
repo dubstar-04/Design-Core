@@ -1,6 +1,6 @@
-import { Colours } from './colours.js';
+import { Colours } from '../colours.js';
 
-import { DesignCore } from '../designCore.js';
+import { DesignCore } from '../../designCore.js';
 
 /** SnapPoint Class */
 export class SnapPoint {

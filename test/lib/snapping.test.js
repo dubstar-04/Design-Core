@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { Core } from '../../core/core/core.js';
 import { Snapping } from '../../core/lib/snapping.js';
-import { SnapPoint } from '../../core/lib/snapPoint.js';
+import { SnapPoint } from '../../core/lib/auxiliary/snapPoint.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 

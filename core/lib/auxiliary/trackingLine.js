@@ -1,7 +1,7 @@
-import { Point } from '../entities/point.js';
-import { Colours } from './colours.js';
+import { Point } from '../../entities/point.js';
+import { Colours } from '../colours.js';
 
-import { DesignCore } from '../designCore.js';
+import { DesignCore } from '../../designCore.js';
 
 /** TrackingLine Class - dotted tracking line for polar/ortho snap */
 export class TrackingLine {

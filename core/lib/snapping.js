@@ -2,8 +2,8 @@
 import { Point } from '../entities/point.js';
 import { Utils } from './utils.js';
 
-import { SnapPoint } from './snapPoint.js';
-import { TrackingLine } from './trackingLine.js';
+import { SnapPoint } from './auxiliary/snapPoint.js';
+import { TrackingLine } from './auxiliary/trackingLine.js';
 import { DesignCore } from '../designCore.js';
 
 /** Snapping Class */

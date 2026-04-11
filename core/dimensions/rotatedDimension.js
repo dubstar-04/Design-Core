@@ -7,7 +7,7 @@ import { Point } from '../entities/point.js';
 import { BaseLinearDimension } from './baseLinearDimension.js';
 
 import { DesignCore } from '../designCore.js';
-import { RubberBand } from '../lib/rubberBand.js';
+import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 
 /**

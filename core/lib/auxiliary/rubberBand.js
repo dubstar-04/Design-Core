@@ -1,5 +1,5 @@
-import { DesignCore } from '../designCore.js';
-import { Colours } from './colours.js';
+import { DesignCore } from '../../designCore.js';
+import { Colours } from '../colours.js';
 
 /** RubberBand Class - rubber-band indicator line drawn between two or more points */
 export class RubberBand {

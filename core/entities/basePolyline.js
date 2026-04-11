@@ -13,8 +13,8 @@ import { Property } from '../properties/property.js';
 import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
-import { SnapPoint } from '../lib/snapPoint.js';
-import { RubberBand } from '../lib/rubberBand.js';
+import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
+import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 /**
  * Base Polyline Entity Class

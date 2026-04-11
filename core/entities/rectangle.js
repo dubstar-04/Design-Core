@@ -4,7 +4,7 @@ import { Entity } from './entity.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { Polyline } from './polyline.js';
-import { RubberBand } from '../lib/rubberBand.js';
+import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 import { DesignCore } from '../designCore.js';
 

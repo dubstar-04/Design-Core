@@ -9,7 +9,7 @@ import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { Utils } from '../lib/utils.js';
-import { SnapPoint } from '../lib/snapPoint.js';
+import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
 
 
 /**

@@ -7,7 +7,7 @@ import { Point } from '../entities/point.js';
 import { AddState, UpdateState } from '../lib/stateManager.js';
 
 import { DesignCore } from '../designCore.js';
-import { RubberBand } from '../lib/rubberBand.js';
+import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 /**
  * Mirror Command Class
