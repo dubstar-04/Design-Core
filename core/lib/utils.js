@@ -132,7 +132,8 @@ export class Utils {
   static cloneProperties(entity, properties = ['colour', 'layer', 'lineType', 'lineWidth', 'height', 'styleName', 'dimensionStyle', 'patternName', 'scale']) {
     const result = {};
     for (const prop of properties) {
-      if (entity.hasOwnProperty(prop)) {
+      const descriptor = Object.getOwnPropertyDescriptor(entity, prop);
+      if (descriptor && descriptor.enumerable) {
         result[prop] = entity[prop];
       }
     }
