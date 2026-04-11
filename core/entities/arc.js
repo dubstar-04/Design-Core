@@ -104,10 +104,10 @@ export class Arc extends Entity {
       }
       this.points.push(pt1);
       this.radius = this.points[0].distance(pt1);
-      DesignCore.Scene.inputManager.inputPoint = pt; // polar/ortho tracks from center when picking end
 
       let pt2;
       while (true) {
+        DesignCore.Scene.inputManager.inputPoint = pt; // polar/ortho tracks from center on each attempt
         const op2 = new PromptOptions(`${Strings.Input.END} ${Strings.Strings.OR} ${Strings.Input.ANGLE}`, [Input.Type.POINT, Input.Type.NUMBER]);
         pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
         if (pt2 === undefined) return;
@@ -120,7 +120,15 @@ export class Arc extends Entity {
             DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDPOINT}`);
             continue;
           }
-          this.points.push(pt2);
+
+          const angle = this.points[0].angle(pt2);
+          const projectedEnd = this.points[0].project(angle, this.radius);
+          if (projectedEnd.isSame(this.points[1])) {
+            DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDPOINT}`);
+            continue;
+          }
+          this.points.push(projectedEnd);
+
           // Infer arc direction using cross product if we have 3 points
           if (this.points.length === 3) {
             this.direction = Arc.#inferDirection(this.points[0], this.points[1], this.points[2]);
@@ -175,7 +183,11 @@ export class Arc extends Entity {
 
     if (this.points.length >= 2) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
-      const points = [...this.points, mousePoint];
+      // const points = [...this.points, mousePoint];
+      const center = this.points[0];
+      const endPoint = center.project(center.angle(mousePoint), this.radius);
+      if (endPoint.isSame(this.points[1])) return;
+      const points = [...this.points, endPoint];
 
       // Infer direction for preview, so it matches what will be created
       let direction = 1;
