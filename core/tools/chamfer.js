@@ -151,13 +151,18 @@ export class Chamfer extends ChamferFilletBase {
     const selection = this.validateSelection();
     if (!selection) return;
 
+    const chamferMode = DesignCore.Scene.headers.chamferMode;
     const trimMode = DesignCore.Scene.headers.trimMode;
     const geo = this.#computeChamfer(this.firstPick, selection.tempSecond, selection.intersectionPoint);
     if (!geo) return;
     if (trimMode && !geo.chamferInBounds) return;
 
+    const isSharpCorner = !chamferMode &&
+      DesignCore.Scene.headers.chamferDistanceA === 0 &&
+      DesignCore.Scene.headers.chamferDistanceB === 0;
+
     if (!trimMode) {
-      DesignCore.Scene.previewEntities.add(geo.chamferLine);
+      if (!isSharpCorner) DesignCore.Scene.previewEntities.add(geo.chamferLine);
       return;
     }
 

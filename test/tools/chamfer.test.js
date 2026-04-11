@@ -1052,6 +1052,29 @@ test('Chamfer.preview adds chamfer line to previewEntities in no-trim mode', () 
   expect(DesignCore.Scene.previewEntities.count()).toBeGreaterThanOrEqual(1);
 });
 
+test('Chamfer.preview skips chamfer line in no-trim mode when distances are both 0 (sharp corner)', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  core.scene.headers.chamferDistanceA = 0;
+  core.scene.headers.chamferDistanceB = 0;
+  core.scene.headers.chamferMode = false;
+  core.scene.headers.trimMode = false;
+
+  const chamfer = new Chamfer();
+  chamfer.firstPick.entity = core.scene.entities.get(0);
+  chamfer.firstPick.clickPoint = new Point(-5, 0);
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 5);
+  chamfer.preview();
+  findSpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
 test('Chamfer.preview adds 5 entities to previewEntities in trim mode', () => {
   core.scene.clear();
   core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
