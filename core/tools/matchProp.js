@@ -75,13 +75,13 @@ export class MatchProp extends Tool {
 
     // get source item
     const sourceItem = DesignCore.Scene.entities.get(this.sourceIndex);
+    const propertySet = Utils.cloneProperties(sourceItem);
 
     const stateChanges = [];
 
     // loop through destination set
     for (let i = 0; i < this.destinationSetIndices.length; i++) {
       const targetItem = DesignCore.Scene.entities.get(this.destinationSetIndices[i]);
-      const propertySet = Utils.cloneProperties(sourceItem);
 
       // only add state change if there are properties to change
       if (Object.keys(propertySet).length > 0) {
