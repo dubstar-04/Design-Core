@@ -303,13 +303,15 @@ export class Canvas {
 
     const scale = this.getScale();
     const bg = DesignCore.Settings.canvasbackgroundcolour;
-    const haloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.5);
+    const hoverHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.5);
+    const selectionHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.25);
+    const selectionLineWidthDelta = 5;
 
     // Hover glow pass: draw wide accent-coloured glow behind the hovered entity.
     // The primary entities pass below redraws the entity at its own colour naturally.
-    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { colour: haloColour, lineWidthDelta: 4 });
+    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { colour: hoverHaloColour, lineWidthDelta: selectionLineWidthDelta });
     // Draw the hovered entity with a wider line width
-    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { lineWidthDelta: 1 });
+    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { lineWidthDelta: selectionLineWidthDelta * 0.5 });
 
     // Paint the primary scene items (layer-visibility filtered)
     this.#paintEntities(
@@ -322,7 +324,7 @@ export class Canvas {
 
     // Paint the selected scene items: glow pass then entity pass
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
-    this.#paintEntities(selectedItems, context, scale, { colour: haloColour, lineWidthDelta: 4 });
+    this.#paintEntities(selectedItems, context, scale, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
     this.#paintEntities(selectedItems, context, scale);
 
     // Paint the auxiliary scene items
