@@ -440,7 +440,7 @@ test('Extend.preview returns early when hovered entity has no valid extension', 
   // Hovered line is parallel to the boundary — no intersection ahead of its endpoint.
   core.scene.clear();
   core.scene.addItem('Line', { points: [new Point(0, 50), new Point(100, 50)] }); // boundary (horizontal)
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] });   // hovered (parallel, y=0)
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] }); // hovered (parallel, y=0)
   DesignCore.Scene.previewEntities.clear();
 
   const extend = new Extend();
@@ -459,7 +459,7 @@ test('Extend.preview populates previewEntities when entity can be extended', () 
   // Mouse near end (45,0) → end extends to (100,0).
   core.scene.clear();
   core.scene.addItem('Line', { points: [new Point(100, -10), new Point(100, 10)] }); // boundary
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] });        // hovered
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] }); // hovered
   DesignCore.Scene.previewEntities.clear();
 
   const extend = new Extend();
