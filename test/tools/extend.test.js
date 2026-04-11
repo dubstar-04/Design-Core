@@ -3,6 +3,7 @@ import { Point } from '../../core/entities/point.js';
 import { Extend } from '../../core/tools/extend.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 import { Strings } from '../../core/lib/strings.js';
+import { DesignCore } from '../../core/designCore.js';
 import { expect, jest } from '@jest/globals';
 import { withMockInput } from '../test-helpers/test-helpers.js';
 
@@ -405,6 +406,76 @@ test('Extend.register returns correct metadata', () => {
 test('Extend.preview does not throw', () => {
   const extend = new Extend();
   expect(() => extend.preview()).not.toThrow();
+});
+
+test('Extend.preview returns early when no boundary items set', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(100, -10), new Point(100, 10)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  const extend = new Extend();
+  // selectedBoundaryItems is empty by default
+  extend.preview();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Extend.preview returns early when findClosestItem returns undefined', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(100, -10), new Point(100, 10)] });
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] });
+  DesignCore.Scene.previewEntities.clear();
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(undefined);
+  extend.preview();
+  findSpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Extend.preview returns early when hovered entity has no valid extension', () => {
+  // Hovered line is parallel to the boundary — no intersection ahead of its endpoint.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 50), new Point(100, 50)] }); // boundary (horizontal)
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] });   // hovered (parallel, y=0)
+  DesignCore.Scene.previewEntities.clear();
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(45, 0);
+  extend.preview();
+  findSpy.mockRestore();
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Extend.preview populates previewEntities when entity can be extended', () => {
+  // Vertical boundary at x=100; short horizontal line from (0,0) to (50,0).
+  // Mouse near end (45,0) → end extends to (100,0).
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(100, -10), new Point(100, 10)] }); // boundary
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(50, 0)] });        // hovered
+  DesignCore.Scene.previewEntities.clear();
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
+  DesignCore.Mouse.pointOnScene = () => new Point(45, 0);
+  extend.preview();
+  findSpy.mockRestore();
+
+  // Preview of the extended line should be added
+  expect(DesignCore.Scene.previewEntities.count()).toBeGreaterThanOrEqual(1);
+  // The previewed line should reach the boundary
+  const preview = DesignCore.Scene.previewEntities.get(DesignCore.Scene.previewEntities.count() - 1);
+  expect(preview.points[1].x).toBeCloseTo(100);
+  expect(preview.points[1].y).toBeCloseTo(0);
 });
 
 test('Extend.execute returns early when boundary input is undefined', async () => {
