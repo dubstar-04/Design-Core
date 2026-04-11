@@ -91,9 +91,17 @@ export class Arc extends Entity {
       if (pt === undefined) return;
       this.points.push(pt);
 
-      const op1 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
-      const pt1 = await DesignCore.Scene.inputManager.requestInput(op1);
-      if (pt1 === undefined) return;
+      let pt1;
+      while (true) {
+        const op1 = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
+        pt1 = await DesignCore.Scene.inputManager.requestInput(op1);
+        if (pt1 === undefined) return;
+        if (pt1.isSame?.(pt)) {
+          DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDPOINT}`);
+          continue;
+        }
+        break;
+      }
       this.points.push(pt1);
       this.radius = this.points[0].distance(pt1);
       DesignCore.Scene.inputManager.inputPoint = pt; // polar/ortho tracks from center when picking end
