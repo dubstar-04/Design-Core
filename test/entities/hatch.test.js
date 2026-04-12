@@ -919,3 +919,160 @@ test('Hatch.buildPatternCache HONEY outer circle + inner circle hole: no segment
     }
   }
 });
+
+// ── setProperty ──────────────────────────────────────────────────────────────
+
+test('Hatch.setProperty unknown property does nothing', () => {
+  const h = new Hatch({ patternName: 'ANSI31', angle: 10 });
+  h.setProperty('nonExistentProperty', 99);
+  expect(h.hasOwnProperty('nonExistentProperty')).toBe(false);
+  expect(h.angle).toBe(10);
+});
+
+test('Hatch.setProperty known property updates value and invalidates cache', () => {
+  const h = new Hatch({ patternName: 'ANSI31', angle: 0 });
+  h.childEntities = makeSquare();
+  h.buildPatternCache();
+  expect(h.cachedPattern).not.toBeNull();
+
+  h.setProperty('angle', 45);
+
+  expect(h.angle).toBe(45);
+  expect(h.cachedPattern).toBeNull();
+});
+
+test('Hatch.setProperty patternName updates pattern and solid flag via setter', () => {
+  const h = new Hatch({ patternName: 'ANSI31' });
+  expect(h.solid).toBe(false);
+
+  h.setProperty('patternName', 'SOLID');
+
+  expect(h.pattern).toBe('SOLID');
+  expect(h.solid).toBe(true);
+  expect(h.cachedPattern).toBeNull();
+});
+
+test('Hatch.setProperty points translation shifts child entity positions', () => {
+  const h = new Hatch({ patternName: 'ANSI31' });
+  // h.points = [Point(0,0), Point(1,1)] — 45° angle set by constructor
+  h.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })];
+
+  // New points: same 45° angle (delta angle = 0 → no rotation), origin shifted by (5, 0)
+  h.setProperty('points', [new Point(5, 0), new Point(6, 1)]);
+
+  expect(h.childEntities[0].points[0].x).toBeCloseTo(5);
+  expect(h.childEntities[0].points[0].y).toBeCloseTo(0);
+  expect(h.childEntities[0].points[1].x).toBeCloseTo(15);
+  expect(h.childEntities[0].points[1].y).toBeCloseTo(0);
+  expect(h.cachedPattern).toBeNull();
+});
+
+test('Hatch.setProperty points rotation updates hatch angle', () => {
+  const h = new Hatch({ patternName: 'ANSI31', angle: 0 });
+  h.childEntities = makeSquare();
+  // h.points = [Point(0,0), Point(1,1)] — 45° angle
+  // New points: [Point(0,0), Point(1,0)] — 0° angle → theta = -45°
+  h.setProperty('points', [new Point(0, 0), new Point(1, 0)]);
+
+  // hatch.angle should decrease by 45°
+  expect(h.angle).toBeCloseTo(-45, 1);
+  expect(h.cachedPattern).toBeNull();
+});
+
+// ── touched ──────────────────────────────────────────────────────────────────
+
+test('Hatch.touched with no childEntities returns false', () => {
+  const h = new Hatch();
+  expect(h.touched({ min: new Point(-999, -999), max: new Point(999, 999) })).toBe(false);
+});
+
+test('Hatch.touched returns true when selection overlaps boundary', () => {
+  const h = new Hatch({ patternName: 'ANSI31' });
+  h.childEntities = makeSquare(); // 0,0 → 100,100
+  expect(h.touched({ min: new Point(-10, -10), max: new Point(50, 50) })).toBe(true);
+});
+
+test('Hatch.touched returns false when selection does not overlap boundary', () => {
+  const h = new Hatch({ patternName: 'ANSI31' });
+  h.childEntities = makeSquare(); // 0,0 → 100,100
+  expect(h.touched({ min: new Point(200, 200), max: new Point(300, 300) })).toBe(false);
+});
+
+// ── draw: scale guard and stroke/dash tracking ───────────────────────────────
+
+test('Hatch.draw scale guard resets sub-zero scale to 1 and rebuilds cache', () => {
+  const h = new Hatch({ patternName: 'ANSI31' });
+  h.childEntities = makeSquare();
+  h.scale = 0.001; // below guard threshold
+
+  const ctx = makeMockCtx();
+  h.draw(ctx, 1);
+
+  expect(h.scale).toBe(1);
+  expect(h.cachedPattern).not.toBeNull();
+});
+
+/**
+ * Create a mock ctx that tracks stroke call count and lineDashOffset assignments
+ * @return {Object} tracking mock context
+ */
+function makeTrackingCtx() {
+  let strokeCount = 0;
+  const lineDashOffsets = [];
+  let _ldo = 0;
+  return {
+    save: () => {},
+    restore: () => {},
+    beginPath: () => {},
+    closePath: () => {},
+    clip: () => {},
+    rect: () => {},
+    setLineDash: () => {},
+    moveTo: () => {},
+    lineTo: () => {},
+    stroke: () => { strokeCount++; },
+    fill: () => {},
+    get lineDashOffset() { return _ldo; },
+    set lineDashOffset(v) { _ldo = v; lineDashOffsets.push(v); },
+    getStrokeCalls: () => strokeCount,
+    getLineDashOffsets: () => lineDashOffsets,
+  };
+}
+
+test('Hatch.draw ANSI31 solid-line family batches all segments into one stroke call', () => {
+  const h = new Hatch({ patternName: 'ANSI31' });
+  h.childEntities = makeSquare();
+
+  const ctx = makeTrackingCtx();
+  h.draw(ctx, 1);
+
+  // ANSI31 has no dashes → solid-line branch → one beginPath + all moveTo/lineTo + one stroke()
+  expect(ctx.getStrokeCalls()).toBe(1);
+  expect(ctx.getLineDashOffsets().length).toBe(0);
+});
+
+test('Hatch.draw HONEY dashed family sets lineDashOffset and strokes once per segment', () => {
+  const h = new Hatch({ patternName: 'HONEY' });
+  h.childEntities = makeSquare();
+  h.buildPatternCache();
+  const expectedSegs = totalSegments(h);
+
+  const ctx = makeTrackingCtx();
+  h.draw(ctx, 1);
+
+  // Every dashed segment gets its own lineDashOffset and stroke call
+  expect(ctx.getLineDashOffsets().length).toBe(expectedSegs);
+  expect(ctx.getStrokeCalls()).toBe(expectedSegs);
+});
+
+// ── processSelection: uncloseable items ──────────────────────────────────────
+
+test('Hatch.processSelection returns empty array when items cannot form a closed loop', () => {
+  // Two parallel lines that share no endpoints — no closed boundary possible
+  const disconnected = [
+    new Line({ points: [new Point(0, 0), new Point(10, 0)] }),
+    new Line({ points: [new Point(0, 5), new Point(10, 5)] }),
+  ];
+  const h = new Hatch();
+  expect(h.processSelection(disconnected)).toEqual([]);
+});
