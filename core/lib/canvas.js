@@ -394,6 +394,7 @@ export class Canvas {
       context.lineWidth = lineWidth;
       context.lineCap = 'round';
       context.setLineDash(lineType.getPattern(scale));
+      context.lineDashOffset = 0;
       context.beginPath();
     } catch { // Cairo
       const rgbColour = Colours.rgbToScaledRGB(colour);
