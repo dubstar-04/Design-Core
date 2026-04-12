@@ -338,6 +338,7 @@ export class Hatch extends Entity {
           if (isInsideCompound(segStartPt.x + tMid * dir.x, segStartPt.y + tMid * dir.y)) {
             const p1 = segStartPt.lerp(segEndPt, uniqueTs[k]);
             const p2 = segStartPt.lerp(segEndPt, uniqueTs[k + 1]);
+            // Store the segment along with its initial dash phase, which is used by draw()
             segments.push({
               x1: p1.x,
               y1: p1.y,
