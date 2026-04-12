@@ -737,6 +737,26 @@ export class Hatch extends Entity {
         }
       }
     }
+
+    // When selected, stroke the boundary outline so the hatch region is visible.
+    // The canvas makes two passes over selected items (halo + normal), so this
+    // automatically receives both the accent-colour glow and the entity colour.
+    if (DesignCore.Scene.selectionManager.selectedItems.includes(this)) {
+      try {
+        ctx.setLineDash([]);
+        ctx.beginPath();
+      } catch { // Cairo
+        ctx.setDash([], 0);
+        ctx.newPath();
+      }
+      for (const shape of this.childEntities) {
+        if (!shape.points.length) continue;
+        ctx.moveTo(shape.points[0].x, shape.points[0].y);
+        shape.draw(ctx, scale, false);
+        ctx.closePath();
+      }
+      ctx.stroke();
+    }
   }
 
   /**
