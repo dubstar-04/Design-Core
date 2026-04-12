@@ -84,6 +84,8 @@ export class Hatch extends Entity {
     });
 
     Object.defineProperty(this, 'lineWidth', {
+      value: 1,
+      writable: true,
       enumerable: false,
     });
 
@@ -344,8 +346,7 @@ export class Hatch extends Entity {
         }
       }
 
-      // why is lineWidthFactor needed?
-      lines.push({ dashes, lineWidthFactor: 1 / s, segments });
+      lines.push({ dashes, segments });
     });
 
     this.cachedPattern = lines;
@@ -698,20 +699,14 @@ export class Hatch extends Entity {
       // Pattern hatch: draw pre-clipped segments directly — no ctx.save/clip/restore needed.
       // Segments were clipped against the boundary during buildPatternCache() so only visible
       // portions are stored, eliminating per-frame clip region overhead.
-      const haloExtra = Math.max(0, ctx.lineWidth - this.lineWidth / scale);
-
       for (const family of this.cachedPattern) {
-        const lineW = family.lineWidthFactor / scale + haloExtra;
-
         if (!family.dashes.length) {
           // Solid-line family: batch all segments into one path for performance
           try {
             ctx.setLineDash([]);
-            ctx.lineWidth = lineW;
             ctx.beginPath();
           } catch { // Cairo
             ctx.setDash([], 0);
-            ctx.setLineWidth(lineW);
             ctx.newPath();
           }
           for (const seg of family.segments) {
@@ -726,11 +721,9 @@ export class Hatch extends Entity {
             try {
               ctx.setLineDash(family.dashes);
               ctx.lineDashOffset = seg.dashPhase;
-              ctx.lineWidth = lineW;
               ctx.beginPath();
             } catch { // Cairo
               ctx.setDash(family.dashes, seg.dashPhase);
-              ctx.setLineWidth(lineW);
               ctx.newPath();
             }
             ctx.moveTo(seg.x1, seg.y1);
