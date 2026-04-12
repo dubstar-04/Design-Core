@@ -663,7 +663,7 @@ export class Hatch extends Entity {
       // Solid fill: clip region + fill rectangle
       ctx.save();
 
-      this.#traceBoundaryPath(ctx, scale);
+      this.traceBoundaryPath(ctx, scale);
 
       try { // Cairo - clip() takes no arguments, uses the fill rule set above
         ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
@@ -735,7 +735,7 @@ export class Hatch extends Entity {
       } catch { // Cairo
         ctx.setDash([], 0);
       }
-      this.#traceBoundaryPath(ctx, scale);
+      this.traceBoundaryPath(ctx, scale);
       ctx.stroke();
     }
   }
@@ -746,7 +746,7 @@ export class Hatch extends Entity {
    * @param {Object} ctx - canvas context
    * @param {number} scale
    */
-  #traceBoundaryPath(ctx, scale) {
+  traceBoundaryPath(ctx, scale) {
     try {
       ctx.beginPath();
     } catch { // Cairo
