@@ -3,7 +3,6 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 
 import { BasePolyline } from '../../core/entities/basePolyline.js';
-import { BoundingBox } from '../../core/lib/boundingBox.js';
 import { Circle } from '../../core/entities/circle.js';
 import { Line } from '../../core/entities/line.js';
 import { Polyline } from '../../core/entities/polyline.js';
@@ -609,10 +608,17 @@ test('Test Hatch.draw tight bound produces fewer lines for flat boundary', () =>
 
 // ── buildPatternCache — pattern structure and scale tests ────────────────────
 
-/** Build a 100×100 square boundary */
+/**
+ * Build a 100×100 square boundary
+ * @return {Array} array containing one BasePolyline boundary
+ */
 const makeSquare = () => [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
 
-/** Sum all segment counts across all families in a cached hatch */
+/**
+ * Sum all segment counts across all families in a cached hatch
+ * @param {Hatch} h
+ * @return {number} total segment count
+ */
 const totalSegments = (h) => h.cachedPattern.reduce((s, f) => s + f.segments.length, 0);
 
 test('Hatch.buildPatternCache HONEY has 3 families each with dashes and segments', () => {
@@ -702,7 +708,10 @@ test('Hatch.buildPatternCache scale change invalidates and rebuilds cache with u
 
 // ── buildPatternCache — nested boundary tests ────────────────────────────────
 
-/** A 20×20 inner square hole centred in the 100×100 outer square */
+/**
+ * A 20×20 inner square hole centred in the 100×100 outer square
+ * @return {BasePolyline} inner boundary polyline
+ */
 const makeInnerSquare = () => new BasePolyline({ points: [new Point(40, 40), new Point(60, 40), new Point(60, 60), new Point(40, 60)] });
 
 test('Hatch.buildPatternCache ANSI31 nested boundary: no segment midpoint inside inner hole', () => {
@@ -758,4 +767,131 @@ test('Hatch.buildPatternCache HONEY nested boundary produces more segments than 
   withHole.buildPatternCache();
 
   expect(totalSegments(withHole)).toBeGreaterThan(totalSegments(outerOnly));
+});
+
+// ── buildPatternCache — circle boundary tests ────────────────────────────────
+
+/**
+ * Build a circular boundary by converting a Circle entity to a polyline
+ * @param {number} cx - centre x
+ * @param {number} cy - centre y
+ * @param {number} r - radius
+ * @return {Polyline} boundary polyline
+ */
+const makeCircleBoundary = (cx, cy, r) => {
+  const h = new Hatch();
+  return h.processSelection([new Circle({ points: [new Point(cx, cy), new Point(cx + r, cy)] })])[0];
+};
+
+test('Hatch.buildPatternCache HONEY circle boundary has 3 families with dashes and segments', () => {
+  const h = new Hatch({ patternName: 'HONEY', scale: 1 });
+  h.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h.buildPatternCache();
+
+  expect(h.cachedPattern.length).toBe(3);
+  for (const family of h.cachedPattern) {
+    expect(family.dashes.length).toBeGreaterThan(0);
+    expect(family.segments.length).toBeGreaterThan(0);
+  }
+});
+
+test('Hatch.buildPatternCache HONEY circle scale 2 dashes are 2× scale 1 dashes', () => {
+  const h1 = new Hatch({ patternName: 'HONEY', scale: 1 });
+  h1.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h1.buildPatternCache();
+
+  const h2 = new Hatch({ patternName: 'HONEY', scale: 2 });
+  h2.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h2.buildPatternCache();
+
+  for (let i = 0; i < h1.cachedPattern.length; i++) {
+    const d1 = h1.cachedPattern[i].dashes;
+    const d2 = h2.cachedPattern[i].dashes;
+    expect(d2.length).toBe(d1.length);
+    for (let j = 0; j < d1.length; j++) {
+      expect(d2[j]).toBeCloseTo(d1[j] * 2, 5);
+    }
+  }
+});
+
+test('Hatch.buildPatternCache HONEY circle scale 2 produces fewer segments than scale 1', () => {
+  const h1 = new Hatch({ patternName: 'HONEY', scale: 1 });
+  h1.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h1.buildPatternCache();
+
+  const h2 = new Hatch({ patternName: 'HONEY', scale: 2 });
+  h2.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h2.buildPatternCache();
+
+  expect(totalSegments(h2)).toBeLessThan(totalSegments(h1));
+});
+
+test('Hatch.buildPatternCache HONEY circle all dashPhase values are non-negative', () => {
+  const h = new Hatch({ patternName: 'HONEY', scale: 1 });
+  h.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h.buildPatternCache();
+
+  for (const family of h.cachedPattern) {
+    for (const seg of family.segments) {
+      expect(seg.dashPhase).toBeGreaterThanOrEqual(0);
+    }
+  }
+});
+
+test('Hatch.buildPatternCache ANSI31 outer square + inner circle hole: no segment midpoint inside circle', () => {
+  const h = new Hatch({ patternName: 'ANSI31', scale: 1 });
+  h.childEntities = [makeSquare()[0], makeCircleBoundary(50, 50, 15)];
+  h.buildPatternCache();
+
+  for (const family of h.cachedPattern) {
+    for (const seg of family.segments) {
+      const mx = (seg.x1 + seg.x2) / 2;
+      const my = (seg.y1 + seg.y2) / 2;
+      expect((mx - 50) ** 2 + (my - 50) ** 2).toBeGreaterThanOrEqual(15 * 15);
+    }
+  }
+});
+
+test('Hatch.buildPatternCache HONEY outer square + inner circle hole: no segment midpoint inside circle', () => {
+  const h = new Hatch({ patternName: 'HONEY', scale: 1 });
+  h.childEntities = [makeSquare()[0], makeCircleBoundary(50, 50, 15)];
+  h.buildPatternCache();
+
+  for (const family of h.cachedPattern) {
+    for (const seg of family.segments) {
+      const mx = (seg.x1 + seg.x2) / 2;
+      const my = (seg.y1 + seg.y2) / 2;
+      expect((mx - 50) ** 2 + (my - 50) ** 2).toBeGreaterThanOrEqual(15 * 15);
+    }
+  }
+});
+
+test('Hatch.buildPatternCache ANSI31 outer circle + inner circle hole: no segment midpoint inside inner circle', () => {
+  const h = new Hatch({ patternName: 'ANSI31', scale: 1 });
+  h.childEntities = [makeCircleBoundary(50, 50, 40), makeCircleBoundary(50, 50, 15)];
+  h.buildPatternCache();
+
+  expect(h.cachedPattern[0].segments.length).toBeGreaterThan(0);
+  for (const family of h.cachedPattern) {
+    for (const seg of family.segments) {
+      const mx = (seg.x1 + seg.x2) / 2;
+      const my = (seg.y1 + seg.y2) / 2;
+      expect((mx - 50) ** 2 + (my - 50) ** 2).toBeGreaterThanOrEqual(15 * 15);
+    }
+  }
+});
+
+test('Hatch.buildPatternCache HONEY outer circle + inner circle hole: no segment midpoint inside inner circle', () => {
+  const h = new Hatch({ patternName: 'HONEY', scale: 1 });
+  h.childEntities = [makeCircleBoundary(50, 50, 40), makeCircleBoundary(50, 50, 15)];
+  h.buildPatternCache();
+
+  expect(h.cachedPattern.length).toBe(3);
+  for (const family of h.cachedPattern) {
+    for (const seg of family.segments) {
+      const mx = (seg.x1 + seg.x2) / 2;
+      const my = (seg.y1 + seg.y2) / 2;
+      expect((mx - 50) ** 2 + (my - 50) ** 2).toBeGreaterThanOrEqual(15 * 15);
+    }
+  }
 });
