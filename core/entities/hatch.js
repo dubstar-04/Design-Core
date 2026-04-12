@@ -184,11 +184,14 @@ export class Hatch extends Entity {
     }
 
     // Even-odd point-in-compound-boundary test using a horizontal ray to the right.
-    // A tiny y-perturbation prevents the ray from being tangent to a curved boundary
-    // (e.g. exactly at the top/bottom of a circle), which would give a wrong odd count.
-    const RAY_EPS = 1e-9 * (bb.xLength + bb.yLength + 1);
+    // A tiny y-perturbation (rayEps) is added to the ray's y-coordinate to prevent
+    // it from being exactly tangent to a curved boundary (e.g. at the top or bottom
+    // of a circle), which would produce a wrong crossing count.  The perturbation is
+    // scaled to the bounding box so it stays negligibly small relative to the geometry
+    // but large enough to avoid floating-point near-zero comparisons.
+    const rayEps = 1e-9 * (bb.xLength + bb.yLength + 1);
     const isInsideCompound = (px, py) => {
-      const testLine = [new Point(px, py + RAY_EPS), new Point(testRayEndX, py + RAY_EPS)];
+      const testLine = [new Point(px, py + rayEps), new Point(testRayEndX, py + rayEps)];
       let count = 0;
       for (const b of boundaries) {
         count += Intersection.intersectPolylinePolyline(b, testLine).points.length;
