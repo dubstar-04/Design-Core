@@ -952,14 +952,11 @@ export class Hatch extends Entity {
             child.setProperty('points', offsetPoints);
           });
         }
-
-        this.cachedPattern = null;
       }
 
-      // clear pattern cache for any property that affects geometry or pattern
-      if (property === 'scale' || property === 'angle' || property === 'childEntities') {
-        this.cachedPattern = null;
-      }
+      // invalidate the pattern cache for any property change — the cache encodes
+      // geometry, scale, angle, and boundary shape, so any update may affect it
+      this.cachedPattern = null;
 
       // other properties as normal
       this[property] = value;
