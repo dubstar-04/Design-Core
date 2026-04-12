@@ -83,12 +83,6 @@ export class Hatch extends Entity {
       enumerable: false,
     });
 
-    Object.defineProperty(this, 'lineWidth', {
-      value: 1,
-      writable: true,
-      enumerable: false,
-    });
-
     // add a single point to this.points if no other points exist
     if (!this.points.length) {
       this.points.push(new Point());
