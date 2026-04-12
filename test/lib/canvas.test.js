@@ -999,4 +999,25 @@ describe('Test Canvas.#paintEntity', () => {
     const restores = ctx.saveRestoreLog.filter((e) => e === 'restore').length;
     expect(saves).toBe(restores);
   });
+
+  test('restore() is called even when draw() throws', () => {
+    const throwing = {
+      getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
+      getLineType: () => ({ getPattern: () => [] }),
+      lineWidth: 1,
+      entityColour: { aci: 1, byLayer: false, byBlock: false },
+      draw: jest.fn(() => {
+        throw new Error('draw failure');
+      }),
+    };
+    paintCore.scene.previewEntities.add(throwing);
+
+    const ctx = createSpyContext();
+    // paint() wraps #paintEntities — the throw propagates; we catch it here
+    expect(() => paintCanvas.paint(ctx, 800, 600)).toThrow('draw failure');
+
+    const saves = ctx.saveRestoreLog.filter((e) => e === 'save').length;
+    const restores = ctx.saveRestoreLog.filter((e) => e === 'restore').length;
+    expect(saves).toBe(restores);
+  });
 });
