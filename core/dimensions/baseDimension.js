@@ -472,13 +472,14 @@ export class BaseDimension extends Entity {
    * Draw the entity
    * @param {Object} ctx - context
    * @param {number} scale
+   * @return {Array} block items for the canvas to render recursively
    */
   draw(ctx, scale) {
     if (this.block.items.length === 0) {
       this.refresh();
     }
 
-    this.block.draw(ctx, scale, this);
+    return this.block.items;
   }
 
   /**
