@@ -348,14 +348,17 @@ export class Canvas {
    */
   #paintEntity(entity, context, scale, parent, overrides) {
     context.save();
-    this.setContext(entity, context, parent, overrides);
-    const children = entity.draw(context, scale);
-    if (children) {
-      for (const item of children) {
-        this.#paintEntity(item, context, scale, entity, overrides);
+    try {
+      this.setContext(entity, context, parent, overrides);
+      const children = entity.draw(context, scale);
+      if (children) {
+        for (const item of children) {
+          this.#paintEntity(item, context, scale, entity, overrides);
+        }
       }
+    } finally {
+      context.restore();
     }
-    context.restore();
   }
 
   /**
