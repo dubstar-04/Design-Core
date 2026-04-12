@@ -337,6 +337,31 @@ export class Canvas {
   }
 
   /**
+   * Recursively paint a single entity and any children it returns.
+   * Container entities (Insert, BaseDimension) return an array of child items from draw().
+   * Leaf entities return undefined. Canvas state is saved/restored around each entity.
+   * @param {Object} entity - entity to paint
+   * @param {Object} context - canvas rendering context
+   * @param {number} scale
+   * @param {Object|undefined} parent - enclosing insert/dimension for ByBlock colour resolution
+   * @param {Object} overrides - rendering overrides passed to setContext
+   */
+  #paintEntity(entity, context, scale, parent, overrides) {
+    context.save();
+    try {
+      this.setContext(entity, context, parent, overrides);
+      const children = entity.draw(context, scale);
+      if (children) {
+        for (const item of children) {
+          this.#paintEntity(item, context, scale, entity, overrides);
+        }
+      }
+    } finally {
+      context.restore();
+    }
+  }
+
+  /**
    * Draw a collection of entities, calling setContext before each draw.
    * Supports EntityManager instances (with .count()/.get()) and plain arrays.
    * @param {EntityManager|Array} entities
@@ -353,8 +378,7 @@ export class Canvas {
     for (let i = 0; i < count; i++) {
       const entity = isManager ? entities.get(i) : entities[i];
       if (filter && !filter(entity)) continue;
-      this.setContext(entity, context, undefined, overrides ?? {});
-      entity.draw(context, scale);
+      this.#paintEntity(entity, context, scale, undefined, overrides ?? {});
     }
   }
 

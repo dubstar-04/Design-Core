@@ -119,6 +119,8 @@ export class Block extends Entity {
         const item = DesignCore.Scene.entities.get(index);
         // remove item from scene
         const copyofitem = Utils.cloneObject(item);
+        // assign a fresh handle — the block item is a new entity distinct from the scene entity
+        copyofitem.handle = DesignCore.HandleManager.next();
         // adjust the items points to reflect the insert point
         const delta = new Point(-insertPoint.x, -insertPoint.y);
         if (item.hasOwnProperty('points')) {
@@ -194,41 +196,6 @@ export class Block extends Entity {
    */
   addItem(item) {
     this.items.push(item);
-  }
-
-  /**
-   * Draw the entity
-   * @param {Object} ctx - context
-   * @param {number} scale
-   * @param {Object} insert - insert entity
-   */
-  draw(ctx, scale, insert = undefined) {
-    if (!this.items.length) {
-      // nothing to draw
-      return;
-    }
-
-    this.items.forEach((item) => {
-      ctx.save();
-      // Use the current item and block insert to set the context
-      // insert required for colour ByBlock
-      DesignCore.Canvas.setContext(item, ctx, insert);
-
-      item.draw(ctx, scale);
-      ctx.restore();
-    });
-
-    /*
-        //////////////////////////////////////////
-        // draw test point for location
-        ctx.strokeStyle = Colours.rgbToString(colour);
-        ctx.lineWidth = 1 / scale;
-        ctx.beginPath()
-        ctx.moveTo(this.points[0].x, this.points[0].y);
-        ctx.arc(this.points[0].x, this.points[0].y, 5 / scale, radians2degrees(0), radians2degrees(360), false);
-        ctx.stroke();
-        //////////////////////////////////////////
-        */
   }
 
   /**

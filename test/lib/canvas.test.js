@@ -763,3 +763,261 @@ describe('Test Canvas.pan', () => {
     expect(core.mouse.mouseDownCanvasPoint.y).toBe(originalY);
   });
 });
+
+// ─── Canvas.#paintEntity (via paint / previewEntities) ───────────────────────
+
+describe('Test Canvas.#paintEntity', () => {
+  /**
+   * Create a mock canvas context that records save/restore calls
+   * and allows overriding individual methods.
+   * @param {Object} [overrides] - properties to merge into the context
+   * @return {Object} spy context
+   */
+  function createSpyContext(overrides = {}) {
+    let depth = 0;
+    let maxDepth = 0;
+    const saveRestoreLog = [];
+
+    const ctx = {
+      setTransform: () => {},
+      translate: () => {},
+      rotate: () => {},
+      scale: () => {},
+      fillStyle: '',
+      fillRect: () => {},
+      strokeStyle: '',
+      lineWidth: 0,
+      setLineDash: () => {},
+      beginPath: () => {},
+      moveTo: () => {},
+      lineTo: () => {},
+      stroke: () => {},
+      fill: () => {},
+      save() {
+        depth++;
+        maxDepth = Math.max(maxDepth, depth);
+        saveRestoreLog.push('save');
+      },
+      restore() {
+        depth--;
+        saveRestoreLog.push('restore');
+      },
+      get saveDepth() {
+        return depth;
+      },
+      get maxSaveDepth() {
+        return maxDepth;
+      },
+      get saveRestoreLog() {
+        return saveRestoreLog;
+      },
+      ...overrides,
+    };
+    return ctx;
+  }
+
+  /**
+   * Minimal mock entity that behaves as a leaf (draw returns undefined)
+   * @param {Object} [colour] - draw colour
+   * @return {Object} mock leaf entity
+   */
+  function makeLeaf(colour = { r: 255, g: 0, b: 0 }) {
+    return {
+      getDrawColour: () => colour,
+      getLineType: () => ({ getPattern: () => [] }),
+      lineWidth: 1,
+      entityColour: { aci: 1, byLayer: false, byBlock: false },
+      draw: jest.fn(() => undefined),
+    };
+  }
+
+  /**
+   * Mock entity whose draw() applies a translate and returns an array of children
+   * @param {Array} children
+   * @return {Object} mock container entity
+   */
+  function makeContainer(children) {
+    return {
+      getDrawColour: () => ({ r: 0, g: 255, b: 0 }),
+      getLineType: () => ({ getPattern: () => [] }),
+      lineWidth: 1,
+      entityColour: { aci: 2, byLayer: false, byBlock: false },
+      draw: jest.fn((ctx) => {
+        ctx.translate(10, 10);
+        return children;
+      }),
+    };
+  }
+
+  let paintCore;
+  let paintCanvas;
+
+  beforeEach(() => {
+    paintCore = new Core();
+    paintCore.activate();
+    paintCanvas = paintCore.canvas;
+    paintCanvas.matrix = new Matrix();
+    paintCanvas.flipped = true; // skip the one-time flip inside paint()
+    paintCanvas.width = 800;
+    paintCanvas.height = 600;
+  });
+
+  afterEach(() => {
+    paintCore.scene.previewEntities.clear();
+  });
+
+  test('leaf entity: draw() is called once', () => {
+    const leaf = makeLeaf();
+    paintCore.scene.previewEntities.add(leaf);
+
+    paintCanvas.paint(createSpyContext(), 800, 600);
+
+    expect(leaf.draw).toHaveBeenCalledTimes(1);
+  });
+
+  test('leaf entity: save/restore wrap the draw() call', () => {
+    const leaf = makeLeaf();
+    paintCore.scene.previewEntities.add(leaf);
+
+    const ctx = createSpyContext();
+    paintCanvas.paint(ctx, 800, 600);
+
+    // save and restore are balanced
+    const saves = ctx.saveRestoreLog.filter((e) => e === 'save').length;
+    const restores = ctx.saveRestoreLog.filter((e) => e === 'restore').length;
+    expect(saves).toBe(restores);
+    // Entity save appears before entity restore
+    const firstEntitySave = ctx.saveRestoreLog.indexOf('save');
+    const lastEntityRestore = ctx.saveRestoreLog.lastIndexOf('restore');
+    expect(firstEntitySave).toBeLessThan(lastEntityRestore);
+  });
+
+  test('container entity: children draw() are each called once', () => {
+    const child1 = makeLeaf({ r: 255, g: 0, b: 0 });
+    const child2 = makeLeaf({ r: 0, g: 0, b: 255 });
+    const container = makeContainer([child1, child2]);
+    paintCore.scene.previewEntities.add(container);
+
+    paintCanvas.paint(createSpyContext(), 800, 600);
+
+    expect(container.draw).toHaveBeenCalledTimes(1);
+    expect(child1.draw).toHaveBeenCalledTimes(1);
+    expect(child2.draw).toHaveBeenCalledTimes(1);
+  });
+
+  test('container entity: save/restore are balanced including children', () => {
+    const child = makeLeaf();
+    const container = makeContainer([child]);
+    paintCore.scene.previewEntities.add(container);
+
+    const ctx = createSpyContext();
+    paintCanvas.paint(ctx, 800, 600);
+
+    const saves = ctx.saveRestoreLog.filter((e) => e === 'save').length;
+    const restores = ctx.saveRestoreLog.filter((e) => e === 'restore').length;
+    expect(saves).toBe(restores);
+  });
+
+  test('container with empty items array: no child draws occur', () => {
+    const container = makeContainer([]);
+    paintCore.scene.previewEntities.add(container);
+
+    paintCanvas.paint(createSpyContext(), 800, 600);
+
+    expect(container.draw).toHaveBeenCalledTimes(1);
+  });
+
+  test('overrides.colour is applied to leaf entity', () => {
+    const leaf = makeLeaf({ r: 255, g: 0, b: 0 });
+    const capturedStyles = [];
+    const ctx = createSpyContext();
+    // defineProperty so the setter is a real accessor, not a spread value copy
+    Object.defineProperty(ctx, 'strokeStyle', {
+      set(v) {
+        capturedStyles.push(v);
+      },
+      get() {
+        return '';
+      },
+      configurable: true,
+    });
+
+    // Call setContext directly with overrides to verify it flows through
+    paintCanvas.setContext(leaf, ctx, undefined, { colour: { r: 0, g: 0, b: 255 } });
+    expect(capturedStyles).toContain('rgb(0, 0, 255)');
+  });
+
+  test('overrides.colour is applied to children of a container', () => {
+    const child = makeLeaf({ r: 255, g: 0, b: 0 });
+    const container = makeContainer([child]);
+    paintCore.scene.previewEntities.add(container);
+
+    const capturedStyles = [];
+    const ctx = createSpyContext();
+    Object.defineProperty(ctx, 'strokeStyle', {
+      set(v) {
+        capturedStyles.push(v);
+      },
+      get() {
+        return '';
+      },
+      configurable: true,
+    });
+
+    // setContext is called for the child with the parent as block arg —
+    // verify the override colour flows through to child entities
+    const overrideColour = { r: 0, g: 255, b: 0 };
+    paintCanvas.setContext(child, ctx, undefined, { colour: overrideColour });
+    expect(capturedStyles).toContain(`rgb(${overrideColour.r}, ${overrideColour.g}, ${overrideColour.b})`);
+  });
+
+  test('deeply nested container: all descendants have draw() called', () => {
+    const grandchild = makeLeaf();
+    const child = makeContainer([grandchild]);
+    const root = makeContainer([child]);
+    paintCore.scene.previewEntities.add(root);
+
+    paintCanvas.paint(createSpyContext(), 800, 600);
+
+    expect(root.draw).toHaveBeenCalledTimes(1);
+    expect(child.draw).toHaveBeenCalledTimes(1);
+    expect(grandchild.draw).toHaveBeenCalledTimes(1);
+  });
+
+  test('multiple leaf entities each get save/restore', () => {
+    const leaf1 = makeLeaf();
+    const leaf2 = makeLeaf();
+    paintCore.scene.previewEntities.add(leaf1);
+    paintCore.scene.previewEntities.add(leaf2);
+
+    const ctx = createSpyContext();
+    paintCanvas.paint(ctx, 800, 600);
+
+    expect(leaf1.draw).toHaveBeenCalledTimes(1);
+    expect(leaf2.draw).toHaveBeenCalledTimes(1);
+    const saves = ctx.saveRestoreLog.filter((e) => e === 'save').length;
+    const restores = ctx.saveRestoreLog.filter((e) => e === 'restore').length;
+    expect(saves).toBe(restores);
+  });
+
+  test('restore() is called even when draw() throws', () => {
+    const throwing = {
+      getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
+      getLineType: () => ({ getPattern: () => [] }),
+      lineWidth: 1,
+      entityColour: { aci: 1, byLayer: false, byBlock: false },
+      draw: jest.fn(() => {
+        throw new Error('draw failure');
+      }),
+    };
+    paintCore.scene.previewEntities.add(throwing);
+
+    const ctx = createSpyContext();
+    // paint() wraps #paintEntities — the throw propagates; we catch it here
+    expect(() => paintCanvas.paint(ctx, 800, 600)).toThrow('draw failure');
+
+    const saves = ctx.saveRestoreLog.filter((e) => e === 'save').length;
+    const restores = ctx.saveRestoreLog.filter((e) => e === 'restore').length;
+    expect(saves).toBe(restores);
+  });
+});

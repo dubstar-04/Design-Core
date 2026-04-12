@@ -162,19 +162,15 @@ export class Insert extends Entity {
    * Draw the entity
    * @param {Object} ctx - context
    * @param {number} scale
+   * @return {Array} block items for the canvas to render recursively
    */
   draw(ctx, scale) {
     // blocks are associated with an insert point.
     // translate ctx by the insert location
-    // this allows the block items to be draw without knowing the insert location
-
-    ctx.save();
+    // this allows the block items to be drawn without knowing the insert location
     ctx.translate(this.points[0].x, this.points[0].y);
-    const rotation = Utils.degrees2radians(this.rotation);
-    ctx.rotate(rotation);
-    // pass *this* to the block to allow colour ByBlock
-    this.block.draw(ctx, scale, this);
-    ctx.restore();
+    ctx.rotate(Utils.degrees2radians(this.rotation));
+    return this.block.items;
   }
 
   /**

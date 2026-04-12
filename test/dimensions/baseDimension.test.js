@@ -2,6 +2,8 @@ import { BaseDimension } from '../../core/dimensions/baseDimension.js';
 import { Point } from '../../core/entities/point.js';
 import { Core } from '../../core/core/core.js';
 import { Text } from '../../core/entities/text.js';
+import { Line } from '../../core/entities/line.js';
+import { jest } from '@jest/globals';
 // import { DimType } from '../../core/properties/dimType.js';
 
 // initialise core
@@ -235,5 +237,64 @@ describe('BaseDimension', () => {
   test('touched delegates to block', () => {
     baseDim.block = { touched: () => false };
     expect(baseDim.touched({})).toBe(false);
+  });
+
+  describe('draw()', () => {
+    /**
+     * Return a BaseDimension with a stubbed buildDimension() that produces one Line.
+     * @return {BaseDimension}
+     */
+    function makeDim() {
+      const dim = new BaseDimension({});
+      dim.points = [new Point(0, 0), new Point(10, 0)];
+      dim.buildDimension = jest.fn(() => {
+        return [new Line({ points: [new Point(0, 0), new Point(10, 0)] })];
+      });
+      return dim;
+    }
+
+    test('draw() returns the block items array', () => {
+      const dim = makeDim();
+      const result = dim.draw({}, 1);
+      expect(result).toBe(dim.block.items);
+    });
+
+    test('draw() calls refresh() (via buildDimension) when block is empty', () => {
+      const dim = makeDim();
+      expect(dim.block.items).toHaveLength(0);
+      dim.draw({}, 1);
+      expect(dim.buildDimension).toHaveBeenCalledTimes(1);
+      expect(dim.block.items.length).toBeGreaterThan(0);
+    });
+
+    test('draw() does not call refresh() when block already has items', () => {
+      const dim = makeDim();
+      // pre-populate the block
+      dim.block.addItem(new Line({ points: [new Point(0, 0), new Point(1, 1)] }));
+      dim.draw({}, 1);
+      expect(dim.buildDimension).not.toHaveBeenCalled();
+    });
+
+    test('draw() returns populated items after initial refresh', () => {
+      const dim = makeDim();
+      const items = dim.draw({}, 1);
+      expect(items).toBeInstanceOf(Array);
+      expect(items.length).toBeGreaterThan(0);
+    });
+
+    test('draw() returns same array reference on repeated calls', () => {
+      const dim = makeDim();
+      const first = dim.draw({}, 1);
+      const second = dim.draw({}, 1);
+      expect(first).toBe(second);
+    });
+
+    test('draw() block items have BYBLOCK colour after refresh', () => {
+      const dim = makeDim();
+      dim.draw({}, 1);
+      for (const item of dim.block.items) {
+        expect(item.entityColour.aci).toBe(0); // BYBLOCK = ACI 0
+      }
+    });
   });
 });
