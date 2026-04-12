@@ -39,7 +39,7 @@ export class Entity {
       writable: true,
     });
 
-    this.lineWidth = 2;
+    this.lineWidth = 1;
     this.lineType = 'ByLayer';
     this.layer = '0';
 
