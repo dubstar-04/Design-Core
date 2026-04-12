@@ -451,21 +451,22 @@ export class Intersection {
 
   /**
    * Even-odd point-in-boundary test using a horizontal ray to the right.
-   * A tiny y-offset (rayEps) prevents the ray from passing exactly through the
+   * A tiny y-offset prevents the ray from passing exactly through the
    * top or bottom of a curved boundary (e.g. a circle), which would produce a
-   * wrong crossing count.
+   * wrong crossing count. The offset scales with the y-coordinate of the test
+   * point so it stays negligible regardless of drawing scale or position.
    * @param {number} px - x coordinate of the test point
    * @param {number} py - y coordinate of the test point
    * @param {Array} boundaries - array of closed point arrays (each a polyline loop)
-   * @param {number} testRayEndX - x coordinate of the ray endpoint, must be rightward of all geometry
+   * @param {number} boundaryExtentX - x coordinate of the ray endpoint, must be rightward of all geometry
    * @return {boolean} true if the point is inside the boundaries under the even-odd rule
    */
-  static isInsidePolyline(px, py, boundaries, testRayEndX) {
-    // TODO: consider extending Boundbox.fromPoints to calculate bounds for an entire polyline
-    // Calculate a test ray endpoint that is guaranteed to be outside the geometry bounds
-    // and remove testRayEndX parameter
-    const rayEps = 1e-9 * testRayEndX; // negligibly small relative to the geometry
-    const testLine = [new Point(px, py + rayEps), new Point(testRayEndX, py + rayEps)];
+  static isInsidePolyline(px, py, boundaries, boundaryExtentX) {
+    // Scale epsilon by the y-coordinate magnitude of the test point rather than
+    // boundaryExtentX: a y-offset should be negligible relative to the y-scale of
+    // the geometry, not the (unrelated) x-extent of the ray. The +1 handles py=0.
+    const rayEps = Constants.Tolerance.DELTA * (Math.abs(py) + 1);
+    const testLine = [new Point(px, py + rayEps), new Point(boundaryExtentX, py + rayEps)];
     let count = 0;
     for (const b of boundaries) {
       count += Intersection.intersectPolylinePolyline(b, testLine).points.length;

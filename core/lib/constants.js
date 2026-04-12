@@ -11,6 +11,10 @@ export class Constants {
   static Tolerance = {
     /** Near-zero threshold for floating-point geometric comparisons (1e-10). */
     EPSILON: 1e-10,
+    /** Small relative offset for geometric offsets (1e-9).
+     * Suitable where a nudge must be negligible compared to the scale of
+     * the geometry but larger than floating-point noise. */
+    DELTA: 1e-9,
   };
 
   /**
