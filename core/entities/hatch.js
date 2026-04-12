@@ -218,17 +218,30 @@ export class Hatch extends Entity {
 
       dashes = dashes.map((x) => Math.abs(x) + 0.00001);
 
+      // Combined rotation: pattern line angle plus the hatch entity angle
       const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
+
+      // Precomputed rotation components used to transform between pattern-local
+      // (line-aligned) space and world space throughout this family's loop.
       const cosR = Math.cos(rotation);
       const sinR = Math.sin(rotation);
+
+      // World-space anchor for this family: bounding-box centre shifted by the
+      // pattern line's origin offset (scaled to match the hatch scale).
       const cx = centerPoint.x + patternLine.xOrigin * s;
       const cy = centerPoint.y + patternLine.yOrigin * s;
 
+      // Bounding-box half-extents in pattern-local (unscaled) space.
       const halfW = bbXLength / (2 * s);
       const halfH = bbYLength / (2 * s);
+
+      // Absolute trig values for projecting axis-aligned extents onto rotated axes.
       const sinA = Math.abs(sinR);
       const cosA = Math.abs(cosR);
 
+      // Half-extents of the bounding box projected onto the pattern line's
+      // parallel (halfX) and perpendicular (halfY) axes.  halfX bounds how far
+      // each raw segment must reach; halfY bounds how many parallel lines are needed.
       const halfX = halfW * cosA + halfH * sinA;
       const halfY = halfW * sinA + halfH * cosA;
 
@@ -238,10 +251,10 @@ export class Hatch extends Entity {
       // side and the tangent guard must use the shifted position.
       const originPerpOffset = patternLine.yOrigin * cosR - patternLine.xOrigin * sinR;
 
-      const MAX_SEGMENTS_PER_FAMILY = 1000;
+      const maxSegmentsPerFamily = 1000;
       const yIncrement = Math.min(
           Math.ceil((halfY + Math.abs(originPerpOffset)) / Math.abs(patternLine.yDelta)),
-          MAX_SEGMENTS_PER_FAMILY,
+          maxSegmentsPerFamily,
       );
 
       const segments = [];
@@ -265,24 +278,22 @@ export class Hatch extends Entity {
         const rx2 = (lx2 * cosR - ly * sinR) * s + cx;
         const ry2 = (lx2 * sinR + ly * cosR) * s + cy;
 
-        const dx = rx2 - rx1;
-        const dy = ry2 - ry1;
-        const lenSq = dx * dx + dy * dy;
-        if (lenSq === 0) continue;
-        const sqrtLenSq = Math.sqrt(lenSq);
-
         // Find all intersection t-values where this segment crosses a boundary edge.
         // A point that falls on a boundary vertex is shared by two adjacent segments
         // and would be reported twice, doubling the crossing count. Track which vertex
         // t-values have already been added and skip duplicates.
         const segStartPt = new Point(rx1, ry1);
         const segEndPt = new Point(rx2, ry2);
+        const dir = segEndPt.subtract(segStartPt);
+        const lenSq = dir.dot(dir);
+        if (lenSq === 0) continue;
+        const sqrtLenSq = Math.sqrt(lenSq);
         const ts = [0, 1];
         const vertexTsAdded = new Set();
         for (const b of boundaries) {
           const result = Intersection.intersectPolylinePolyline(b, [segStartPt, segEndPt]);
           for (const pt of result.points) {
-            const t = ((pt.x - rx1) * dx + (pt.y - ry1) * dy) / lenSq;
+            const t = pt.subtract(segStartPt).dot(dir) / lenSq;
             if (t > 0.0001 && t < 0.9999) {
               // Check if this point coincides with a boundary vertex
               let isVertex = false;
@@ -319,12 +330,14 @@ export class Hatch extends Entity {
         // Test each interval's midpoint; keep sub-segments that are inside the boundary
         for (let k = 0; k < uniqueTs.length - 1; k++) {
           const tMid = (uniqueTs[k] + uniqueTs[k + 1]) / 2;
-          if (isInsideCompound(rx1 + tMid * dx, ry1 + tMid * dy)) {
+          if (isInsideCompound(segStartPt.x + tMid * dir.x, segStartPt.y + tMid * dir.y)) {
+            const p1 = segStartPt.lerp(segEndPt, uniqueTs[k]);
+            const p2 = segStartPt.lerp(segEndPt, uniqueTs[k + 1]);
             segments.push({
-              x1: rx1 + uniqueTs[k] * dx,
-              y1: ry1 + uniqueTs[k] * dy,
-              x2: rx1 + uniqueTs[k + 1] * dx,
-              y2: ry1 + uniqueTs[k + 1] * dy,
+              x1: p1.x,
+              y1: p1.y,
+              x2: p2.x,
+              y2: p2.y,
               dashPhase: uniqueTs[k] * sqrtLenSq,
             });
           }
