@@ -1030,10 +1030,17 @@ function makeTrackingCtx() {
     setLineDash: () => {},
     moveTo: () => {},
     lineTo: () => {},
-    stroke: () => { strokeCount++; },
+    stroke: () => {
+      strokeCount++;
+    },
     fill: () => {},
-    get lineDashOffset() { return _ldo; },
-    set lineDashOffset(v) { _ldo = v; lineDashOffsets.push(v); },
+    get lineDashOffset() {
+      return _ldo;
+    },
+    set lineDashOffset(v) {
+      _ldo = v;
+      lineDashOffsets.push(v);
+    },
     getStrokeCalls: () => strokeCount,
     getLineDashOffsets: () => lineDashOffsets,
   };
