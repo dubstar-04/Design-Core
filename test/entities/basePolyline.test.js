@@ -322,7 +322,7 @@ AcDbPolyline
 6
 ByLayer
 39
-2
+1
 90
 3
 70
