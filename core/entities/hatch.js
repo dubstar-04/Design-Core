@@ -238,7 +238,6 @@ export class Hatch extends Entity {
       // side and the tangent guard must use the shifted position.
       const originPerpOffset = patternLine.yOrigin * cosR - patternLine.xOrigin * sinR;
 
-      const xIncrement = Math.ceil(halfX / dashLength);
       const MAX_SEGMENTS_PER_FAMILY = 1000;
       const yIncrement = Math.min(
           Math.ceil((halfY + Math.abs(originPerpOffset)) / Math.abs(patternLine.yDelta)),
@@ -253,13 +252,18 @@ export class Hatch extends Entity {
         // inside sub-segment.  Skip it to avoid phantom slivers caused by
         // near-tangent numerical artefacts in the arc-intersection code.
         if (Math.abs(yOffset + originPerpOffset) >= halfY) continue;
-        const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
-        const lx1 = -xOffset + dashOffset;
+        // Each family member i is phase-shifted along the line direction by i × xDelta.
+        const xPhaseShift = patternLine.xDelta * i;
+        // Extend the raw segment far enough in both directions to cover the bounding
+        // box regardless of how large the phase shift grows for large i.
+        const xHalfSpan = dashLength * Math.ceil((halfX + Math.abs(xPhaseShift)) / dashLength);
+        const lx1 = xPhaseShift - xHalfSpan + dashOffset;
+        const lx2 = xPhaseShift + xHalfSpan;
         const ly = yOffset;
         const rx1 = (lx1 * cosR - ly * sinR) * s + cx;
         const ry1 = (lx1 * sinR + ly * cosR) * s + cy;
-        const rx2 = (xOffset * cosR - ly * sinR) * s + cx;
-        const ry2 = (xOffset * sinR + ly * cosR) * s + cy;
+        const rx2 = (lx2 * cosR - ly * sinR) * s + cx;
+        const ry2 = (lx2 * sinR + ly * cosR) * s + cy;
 
         const dx = rx2 - rx1;
         const dy = ry2 - ry1;
