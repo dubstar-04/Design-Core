@@ -539,3 +539,86 @@ test('intersectPolylinePolyline - two full circles outside each other, no inters
   expect(result.status).toBe('None');
   expect(result.points.length).toBe(0);
 });
+
+// --- isInsidePolyline ---
+// Helper: axis-aligned rectangle as a closed polyline
+/**
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @return {Array}
+ */
+function makeRect(x1, y1, x2, y2) {
+  return [
+    new Point(x1, y1), new Point(x2, y1),
+    new Point(x2, y2), new Point(x1, y2),
+    new Point(x1, y1),
+  ];
+}
+
+// Helper: full circle as two bulge-encoded semicircles, centre (cx,cy) radius r
+/**
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} r
+ * @return {Array}
+ */
+function makeCircle(cx, cy, r) {
+  return [
+    new Point(cx, cy + r, 1),
+    new Point(cx, cy - r, 1),
+    new Point(cx, cy + r),
+  ];
+}
+
+test('isInsidePolyline - point inside a rectangle', () => {
+  const rect = makeRect(0, 0, 10, 10);
+  expect(Intersection.isInsidePolyline(5, 5, [rect], 20)).toBe(true);
+});
+
+test('isInsidePolyline - point outside a rectangle', () => {
+  const rect = makeRect(0, 0, 10, 10);
+  expect(Intersection.isInsidePolyline(15, 5, [rect], 20)).toBe(false);
+});
+
+test('isInsidePolyline - point on the boundary edge does not throw', () => {
+  const rect = makeRect(0, 0, 10, 10);
+  expect(() => Intersection.isInsidePolyline(0, 5, [rect], 20)).not.toThrow();
+});
+
+test('isInsidePolyline - point inside a circle boundary', () => {
+  const circle = makeCircle(0, 0, 10);
+  expect(Intersection.isInsidePolyline(0, 0, [circle], 25)).toBe(true);
+});
+
+test('isInsidePolyline - point outside a circle boundary', () => {
+  const circle = makeCircle(0, 0, 10);
+  expect(Intersection.isInsidePolyline(15, 0, [circle], 25)).toBe(false);
+});
+
+test('isInsidePolyline - ray at exact top of circle is handled correctly by rayEps', () => {
+  // Without the rayEps nudge a horizontal ray fired from y=10 would be tangent
+  // to the top of the circle and produce a wrong crossing count.
+  // The point (0,10) is on the boundary; the method must not return true.
+  const circle = makeCircle(0, 0, 10);
+  expect(Intersection.isInsidePolyline(0, 10, [circle], 25)).toBe(false);
+});
+
+test('isInsidePolyline - multiple boundaries, point inside inner boundary is outside under even-odd', () => {
+  // Outer 20×20 rect + inner 6×6 rect acting as a hole.
+  // A point inside the inner rect crosses both boundaries (count=2, even) → outside.
+  const outer = makeRect(0, 0, 20, 20);
+  const inner = makeRect(7, 7, 13, 13);
+  expect(Intersection.isInsidePolyline(10, 10, [outer, inner], 30)).toBe(false);
+});
+
+test('isInsidePolyline - multiple boundaries, point between outer and inner is inside', () => {
+  const outer = makeRect(0, 0, 20, 20);
+  const inner = makeRect(7, 7, 13, 13);
+  expect(Intersection.isInsidePolyline(2, 2, [outer, inner], 30)).toBe(true);
+});
+
+test('isInsidePolyline - empty boundaries returns false', () => {
+  expect(Intersection.isInsidePolyline(5, 5, [], 20)).toBe(false);
+});
