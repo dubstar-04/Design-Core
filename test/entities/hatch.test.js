@@ -559,7 +559,7 @@ test('Test Hatch.draw unknown pattern does not stroke pattern lines', () => {
   const ctx = makeMockCtx();
   unknownHatch.draw(ctx, 1);
 
-  // No pattern lines drawn — only boundary moveTo calls from clip setup
+  // No pattern lines drawn
   expect(ctx.getFillCalled()).toBe(false);
 });
 
