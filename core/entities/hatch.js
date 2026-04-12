@@ -218,7 +218,7 @@ export class Hatch extends Entity {
         dashes.push(firstIndex);
       }
 
-      dashes = dashes.map((x) => Math.abs(x) + 0.00001);
+      dashes = dashes.map((x) => (Math.abs(x) + 0.00001) * s);
 
       // Combined rotation: pattern line angle plus the hatch entity angle
       const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
