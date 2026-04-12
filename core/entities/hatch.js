@@ -158,7 +158,7 @@ export class Hatch extends Entity {
 
     // Build closed boundary arrays for intersection-based pre-clipping
     const bb = this.boundingBox();
-    const testRayEndX = bb.xMax + bb.xLength + 1;
+    const boundaryExtentX = bb.xMax + bb.xLength + 1;
     const boundaries = [];
     // Collect all interior boundary vertices (the junction points between segments).
     // An intersection point that lands exactly on a junction vertex will be reported
@@ -313,7 +313,7 @@ export class Hatch extends Entity {
         // Test each interval's midpoint; keep sub-segments that are inside the boundary
         for (let k = 0; k < uniqueTs.length - 1; k++) {
           const tMid = (uniqueTs[k] + uniqueTs[k + 1]) / 2;
-          if (Intersection.isInsidePolyline(segStartPt.x + tMid * dir.x, segStartPt.y + tMid * dir.y, boundaries, testRayEndX)) {
+          if (Intersection.isInsidePolyline(segStartPt.x + tMid * dir.x, segStartPt.y + tMid * dir.y, boundaries, boundaryExtentX)) {
             const p1 = segStartPt.lerp(segEndPt, uniqueTs[k]);
             const p2 = segStartPt.lerp(segEndPt, uniqueTs[k + 1]);
             // Store the segment along with its initial dash phase, which is used by draw()
