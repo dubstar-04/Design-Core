@@ -5,6 +5,9 @@ import { Point } from '../../core/entities/point.js';
 
 import { File } from '../test-helpers/test-helpers.js';
 import { Flags } from '../../core/properties/flags.js';
+import { DesignCore } from '../../core/designCore.js';
+import { Utils } from '../../core/lib/utils.js';
+import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
 
 new Core();
 
@@ -154,4 +157,31 @@ test('Test Block.touched', () => {
   block.addItem(line);
   expect(block.touched(selectionExtremesTrue)).toBe(true);
   expect(block.touched(selectionExtremesFalse)).toBe(false);
+});
+
+test('Test Block.dxf throws when a block item has an undefined handle', () => {
+  const block = new Block({ handle: '1', endblkHandle: '2' });
+  // cloneObject clears the handle, simulating an item added without a handle assignment
+  const line = new Line({ handle: '3', points: [new Point(0, 0), new Point(1, 1)] });
+  const clone = Utils.cloneObject(line);
+  expect(clone.handle).toBeUndefined();
+  block.addItem(clone);
+
+  // Use a real DXFFile (R2000+) so the version-gated handle validation fires
+  const file = new DXFFile('R2000');
+  expect(() => block.dxf(file)).toThrow();
+});
+
+test('Test Block.dxf succeeds when block items have valid handles', () => {
+  const block = new Block({ handle: '1', endblkHandle: '2' });
+  const line = new Line({ handle: '3', points: [new Point(0, 0), new Point(1, 1)] });
+  const clone = Utils.cloneObject(line);
+  // simulate the handle assignment done in Block.execute()
+  clone.handle = DesignCore.HandleManager.next();
+  expect(clone.handle).toMatch(/^[0-9A-F]+$/i);
+  block.addItem(clone);
+
+  const file = new DXFFile('R2000');
+  expect(() => block.dxf(file)).not.toThrow();
+  expect(file.contents).toContain(clone.handle);
 });
