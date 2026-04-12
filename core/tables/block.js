@@ -119,6 +119,8 @@ export class Block extends Entity {
         const item = DesignCore.Scene.entities.get(index);
         // remove item from scene
         const copyofitem = Utils.cloneObject(item);
+        // assign a fresh handle — the block item is a new entity distinct from the scene entity
+        copyofitem.handle = DesignCore.HandleManager.next();
         // adjust the items points to reflect the insert point
         const delta = new Point(-insertPoint.x, -insertPoint.y);
         if (item.hasOwnProperty('points')) {
