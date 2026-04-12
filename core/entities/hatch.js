@@ -663,19 +663,7 @@ export class Hatch extends Entity {
       // Solid fill: clip region + fill rectangle
       ctx.save();
 
-      try {
-        ctx.beginPath();
-      } catch { // Cairo
-        ctx.newPath();
-      }
-
-      for (let i = 0; i < this.childEntities.length; i++) {
-        const shape = this.childEntities[i];
-        if (!shape.points.length) continue;
-        ctx.moveTo(shape.points[0].x, shape.points[0].y);
-        shape.draw(ctx, scale, false);
-        ctx.closePath();
-      }
+      this.#traceBoundaryPath(ctx, scale);
 
       try { // Cairo - clip() takes no arguments, uses the fill rule set above
         ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
@@ -744,18 +732,31 @@ export class Hatch extends Entity {
     if (DesignCore.Scene.selectionManager.selectedItems.includes(this)) {
       try {
         ctx.setLineDash([]);
-        ctx.beginPath();
       } catch { // Cairo
         ctx.setDash([], 0);
-        ctx.newPath();
       }
-      for (const shape of this.childEntities) {
-        if (!shape.points.length) continue;
-        ctx.moveTo(shape.points[0].x, shape.points[0].y);
-        shape.draw(ctx, scale, false);
-        ctx.closePath();
-      }
+      this.#traceBoundaryPath(ctx, scale);
       ctx.stroke();
+    }
+  }
+
+  /**
+   * Trace all boundary shapes into the current canvas path as closed sub-paths.
+   * Used by both the solid-fill clip pass and the selection outline pass.
+   * @param {Object} ctx - canvas context
+   * @param {number} scale
+   */
+  #traceBoundaryPath(ctx, scale) {
+    try {
+      ctx.beginPath();
+    } catch { // Cairo
+      ctx.newPath();
+    }
+    for (const shape of this.childEntities) {
+      if (!shape.points.length) continue;
+      ctx.moveTo(shape.points[0].x, shape.points[0].y);
+      shape.draw(ctx, scale, false);
+      ctx.closePath();
     }
   }
 
