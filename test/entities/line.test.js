@@ -110,7 +110,7 @@ ByLayer
 31
 0.0
 39
-2
+1
 `;
 
   expect(file.contents).toEqual(dxfString);
