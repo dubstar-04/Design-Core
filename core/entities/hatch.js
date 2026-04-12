@@ -232,21 +232,27 @@ export class Hatch extends Entity {
       const halfX = halfW * cosA + halfH * sinA;
       const halfY = halfW * sinA + halfH * cosA;
 
+      // Perpendicular projection of the family's origin offset from the bounding-box
+      // centre onto the direction perpendicular to the pattern lines.  A non-zero
+      // origin shifts the whole family, so the loop range must be widened on the far
+      // side and the tangent guard must use the shifted position.
+      const originPerpOffset = patternLine.yOrigin * cosR - patternLine.xOrigin * sinR;
+
       const xIncrement = Math.ceil(halfX / dashLength);
       const MAX_SEGMENTS_PER_FAMILY = 1000;
       const yIncrement = Math.min(
-          Math.ceil(halfY / Math.abs(patternLine.yDelta)),
+          Math.ceil((halfY + Math.abs(originPerpOffset)) / Math.abs(patternLine.yDelta)),
           MAX_SEGMENTS_PER_FAMILY,
       );
 
       const segments = [];
       for (let i = -yIncrement; i < yIncrement; i++) {
         const yOffset = patternLine.yDelta * i;
-        // A line whose |yOffset| equals or exceeds halfY is tangent to or outside
-        // the bounding box in the perpendicular direction — it cannot produce any
-        // valid inside sub-segment. Skip it to avoid phantom slivers caused by
+        // A line whose shifted perpendicular position equals or exceeds halfY is
+        // tangent to or outside the bounding box — it cannot produce any valid
+        // inside sub-segment.  Skip it to avoid phantom slivers caused by
         // near-tangent numerical artefacts in the arc-intersection code.
-        if (Math.abs(yOffset) >= halfY) continue;
+        if (Math.abs(yOffset + originPerpOffset) >= halfY) continue;
         const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
         const lx1 = -xOffset + dashOffset;
         const ly = yOffset;
