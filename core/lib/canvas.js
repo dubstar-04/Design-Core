@@ -311,7 +311,7 @@ export class Canvas {
     // The primary entities pass below redraws the entity at its own colour naturally.
     this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { colour: hoverHaloColour, lineWidthDelta: selectionLineWidthDelta });
     // Draw the hovered entity with a wider line width
-    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { lineWidthDelta: selectionLineWidthDelta * 0.5 });
+    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { lineWidthDelta: 1 });
 
     // Paint the primary scene items (layer-visibility filtered)
     this.#paintEntities(
@@ -394,6 +394,7 @@ export class Canvas {
       context.lineWidth = lineWidth;
       context.lineCap = 'round';
       context.setLineDash(lineType.getPattern(scale));
+      context.lineDashOffset = 0;
       context.beginPath();
     } catch { // Cairo
       const rgbColour = Colours.rgbToScaledRGB(colour);

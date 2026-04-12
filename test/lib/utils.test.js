@@ -133,9 +133,9 @@ test('Test Utils.cloneProperties copies patternName from Hatch', () => {
   const hatch = new Hatch({ patternName: 'ANSI37' });
   const props = Utils.cloneProperties(hatch);
   expect(props.patternName).toBe('ANSI37');
-  // lineType and lineWidth are hidden on Hatch
+  // lineType is hidden on Hatch
   expect(props.lineType).toBeUndefined();
-  expect(props.lineWidth).toBeUndefined();
+  expect(props.lineWidth).toBeDefined();
 });
 
 test('Test Utils.cloneProperties does not include patternName for non-hatch entities', () => {

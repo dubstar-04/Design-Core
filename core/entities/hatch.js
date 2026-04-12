@@ -34,6 +34,13 @@ export class Hatch extends Entity {
   constructor(data) {
     super(data);
 
+    // cache for pre-computed world-space pattern line segments
+    Object.defineProperty(this, 'cachedPattern', {
+      value: null,
+      writable: true,
+      enumerable: false,
+    });
+
     // store the boundary shapes
     Object.defineProperty(this, 'childEntities', {
       value: [],
@@ -73,10 +80,6 @@ export class Hatch extends Entity {
     // hide inherited properties
     // needs to be enumerable=false to not appear in the object props
     Object.defineProperty(this, 'lineType', {
-      enumerable: false,
-    });
-
-    Object.defineProperty(this, 'lineWidth', {
       enumerable: false,
     });
 
@@ -130,8 +133,205 @@ export class Hatch extends Entity {
    * @param {string} name
    */
   setPatternName(name) {
-    this.pattern = name.toUpperCase();
+    const upper = name.toUpperCase();
+    if (this.pattern === upper) return;
+    this.pattern = upper;
     this.solid = this.pattern === 'SOLID';
+    this.cachedPattern = null;
+  }
+
+  /**
+   * Build and cache world-space line segments for the current pattern.
+   * For pattern hatches, segments are pre-clipped against the boundary using
+   * geometric intersection so draw() requires no ctx.save/clip/restore overhead.
+   */
+  buildPatternCache() {
+    if (!this.childEntities.length) {
+      this.cachedPattern = [];
+      return;
+    }
+
+    if (this.solid || !Patterns.patternExists(this.patternName)) {
+      this.cachedPattern = [];
+      return;
+    }
+
+    // Build closed boundary arrays for intersection-based pre-clipping
+    const bb = this.boundingBox();
+    const boundaryExtentX = bb.xMax + bb.xLength + 1;
+    const boundaries = [];
+    // Collect all interior boundary vertices (the junction points between segments).
+    // An intersection point that lands exactly on a junction vertex will be reported
+    // by both adjacent segments, doubling the crossing count unless we deduplicate.
+    const boundaryVertices = [];
+    for (let i = 0; i < this.childEntities.length; i++) {
+      const shape = this.childEntities[i];
+      if (!shape.points.length) continue;
+      const pts = [...shape.points];
+      if (!pts[0].isSame(pts.at(-1))) pts.push(pts[0]);
+      boundaries.push(pts);
+      // All unique vertices (skip only the closure duplicate at pts[length-1]).
+      // pts[0] is also a junction — shared by the last and first segments.
+      for (let j = 0; j < pts.length - 1; j++) {
+        boundaryVertices.push(pts[j]);
+      }
+    }
+
+    const centerPoint = bb.centerPoint;
+    const bbXLength = bb.xLength;
+    const bbYLength = bb.yLength;
+    const s = this.scale;
+    const lines = [];
+
+    const pattern = Patterns.getPattern(this.patternName);
+    pattern.forEach((patternLine) => {
+      let dashLength = bbXLength / 2;
+      if (patternLine.dashes.length) {
+        dashLength = patternLine.getDashLength();
+      }
+
+      let dashes = [...patternLine.dashes];
+      let dashOffset = 0;
+
+      if (dashes.length && dashes[0] < 0) {
+        const firstIndex = dashes.shift();
+        dashOffset = Math.abs(firstIndex);
+        dashes.push(firstIndex);
+      }
+
+      dashes = dashes.map((x) => (Math.abs(x) + 0.00001) * s);
+
+      // Combined rotation: pattern line angle plus the hatch entity angle
+      const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
+
+      // Precomputed rotation components used to transform between pattern-local
+      // (line-aligned) space and world space throughout this family's loop.
+      const cosR = Math.cos(rotation);
+      const sinR = Math.sin(rotation);
+
+      // World-space anchor for this family: bounding-box centre shifted by the
+      // pattern line's origin offset (scaled to match the hatch scale).
+      const cx = centerPoint.x + patternLine.xOrigin * s;
+      const cy = centerPoint.y + patternLine.yOrigin * s;
+
+      // Bounding-box half-extents in pattern-local (unscaled) space.
+      const halfW = bbXLength / (2 * s);
+      const halfH = bbYLength / (2 * s);
+
+      // Absolute trig values for projecting axis-aligned extents onto rotated axes.
+      const sinA = Math.abs(sinR);
+      const cosA = Math.abs(cosR);
+
+      // Half-extents of the bounding box projected onto the pattern line's
+      // parallel (halfX) and perpendicular (halfY) axes.  halfX bounds how far
+      // each raw segment must reach; halfY bounds how many parallel lines are needed.
+      const halfX = halfW * cosA + halfH * sinA;
+      const halfY = halfW * sinA + halfH * cosA;
+
+      // Perpendicular projection of the family's origin offset from the bounding-box
+      // centre onto the direction perpendicular to the pattern lines.  A non-zero
+      // origin shifts the whole family, so the loop range must be widened on the far
+      // side and the tangent guard must use the shifted position.
+      const originPerpOffset = patternLine.yOrigin * cosR - patternLine.xOrigin * sinR;
+
+      const maxSegmentsPerFamily = 1000;
+      const yIncrement = Math.min(
+          Math.ceil((halfY + Math.abs(originPerpOffset)) / Math.abs(patternLine.yDelta)),
+          maxSegmentsPerFamily,
+      );
+
+      const segments = [];
+      for (let i = -yIncrement; i < yIncrement; i++) {
+        const yOffset = patternLine.yDelta * i;
+        // A line whose shifted perpendicular position equals or exceeds halfY is
+        // tangent to or outside the bounding box — it cannot produce any valid
+        // inside sub-segment.  Skip it to avoid phantom slivers caused by
+        // near-tangent numerical artefacts in the arc-intersection code.
+        if (Math.abs(yOffset + originPerpOffset) >= halfY) continue;
+        // Each family member i is phase-shifted along the line direction by i × xDelta.
+        const xPhaseShift = patternLine.xDelta * i;
+        // Extend the raw segment far enough in both directions to cover the bounding
+        // box regardless of how large the phase shift grows for large i.
+        const xHalfSpan = dashLength * Math.ceil((halfX + Math.abs(xPhaseShift)) / dashLength);
+        const lx1 = xPhaseShift - xHalfSpan + dashOffset;
+        const lx2 = xPhaseShift + xHalfSpan;
+        const ly = yOffset;
+        const rx1 = (lx1 * cosR - ly * sinR) * s + cx;
+        const ry1 = (lx1 * sinR + ly * cosR) * s + cy;
+        const rx2 = (lx2 * cosR - ly * sinR) * s + cx;
+        const ry2 = (lx2 * sinR + ly * cosR) * s + cy;
+
+        // Find all intersection t-values where this segment crosses a boundary edge.
+        // A point that falls on a boundary vertex is shared by two adjacent segments
+        // and would be reported twice, doubling the crossing count. Track which vertex
+        // t-values have already been added and skip duplicates.
+        const segStartPt = new Point(rx1, ry1);
+        const segEndPt = new Point(rx2, ry2);
+        const dir = segEndPt.subtract(segStartPt);
+        const lenSq = dir.dot(dir);
+        if (lenSq === 0) continue;
+        const sqrtLenSq = Math.sqrt(lenSq);
+        const ts = [0, 1];
+        const vertexTsAdded = new Set();
+        for (const b of boundaries) {
+          const result = Intersection.intersectPolylinePolyline(b, [segStartPt, segEndPt]);
+          for (const pt of result.points) {
+            const t = pt.subtract(segStartPt).dot(dir) / lenSq;
+            if (t > 0.0001 && t < 0.9999) {
+              // Check if this point coincides with a boundary vertex
+              let isVertex = false;
+              for (const v of boundaryVertices) {
+                const vdx = pt.x - v.x;
+                const vdy = pt.y - v.y;
+                if (vdx * vdx + vdy * vdy < 1e-10) {
+                  isVertex = true;
+                  break;
+                }
+              }
+              if (isVertex) {
+                // Round t to 6 decimal places to get a stable key
+                const tKey = Math.round(t * 1e6);
+                if (!vertexTsAdded.has(tKey)) {
+                  vertexTsAdded.add(tKey);
+                  ts.push(t);
+                }
+              } else {
+                ts.push(t);
+              }
+            }
+          }
+        }
+
+        ts.sort((a, b) => a - b);
+
+        // Deduplicate very close t-values (e.g. a corner vertex found by two edges)
+        const uniqueTs = [ts[0]];
+        for (let k = 1; k < ts.length; k++) {
+          if (ts[k] - uniqueTs.at(-1) > 0.0001) uniqueTs.push(ts[k]);
+        }
+
+        // Test each interval's midpoint; keep sub-segments that are inside the boundary
+        for (let k = 0; k < uniqueTs.length - 1; k++) {
+          const tMid = (uniqueTs[k] + uniqueTs[k + 1]) / 2;
+          if (Intersection.isInsidePolyline(segStartPt.x + tMid * dir.x, segStartPt.y + tMid * dir.y, boundaries, boundaryExtentX)) {
+            const p1 = segStartPt.lerp(segEndPt, uniqueTs[k]);
+            const p2 = segStartPt.lerp(segEndPt, uniqueTs[k + 1]);
+            // Store the segment along with its initial dash phase, which is used by draw()
+            segments.push({
+              x1: p1.x,
+              y1: p1.y,
+              x2: p2.x,
+              y2: p2.y,
+              dashPhase: uniqueTs[k] * sqrtLenSq,
+            });
+          }
+        }
+      }
+
+      lines.push({ dashes, segments });
+    });
+
+    this.cachedPattern = lines;
   }
 
   /**
@@ -429,161 +629,113 @@ export class Hatch extends Entity {
     // ensure the scale is valid
     if (this.scale < 0.01) {
       this.scale = 1;
+      this.cachedPattern = null;
     }
 
     if (!this.childEntities.length) return;
 
-    ctx.save();
+    // Build cache if stale (cachedPattern === null means never built or invalidated)
+    if (this.cachedPattern === null) this.buildPatternCache();
 
-    // Start a new composite path for all boundary loops
-    try {
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.newPath();
-    }
+    if (this.solid) {
+      // Solid fill: clip region + fill rectangle
+      ctx.save();
 
-    // Trace all boundary paths as sub-paths in a single composite path
-    // Using even-odd fill rule, islands are automatically handled:
-    // areas enclosed by an odd number of boundaries are filled,
-    // areas enclosed by an even number are left empty
-    for (let i = 0; i < this.childEntities.length; i++) {
-      const shape = this.childEntities[i];
-      if (!shape.points.length) continue;
+      this.traceBoundaryPath(ctx, scale);
 
-      // Start a new sub-path for this boundary
-      ctx.moveTo(shape.points[0].x, shape.points[0].y);
-      // Trace the boundary path (without stroking)
-      shape.draw(ctx, scale, false);
-      // Close the sub-path
-      ctx.closePath();
-    }
-
-    // Clip using even-odd rule
-    try { // Cairo - clip() takes no arguments, uses the fill rule set above
-      ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
-      ctx.clip();
-    } catch { // HTML Canvas
-      ctx.clip('evenodd');
-    }
-
-    // Start a new path for the pattern/fill area
-    try {
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.newPath();
-    }
-
-    // Create an oversized rectangle covering all boundaries
-    const bb = this.boundingBox();
-    try {
-      ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-    } catch { // Cairo
-      ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-    }
-
-    // Draw the pattern/fill once over the composite clipped region
-    this.createPattern(ctx, scale, bb);
-
-    ctx.restore();
-  }
-
-  /**
-   * Draw the hatch pattern to the context
-   * @param {Object} ctx
-   * @param {number} scale
-   * @param {BoundingBox} boundingbox - bounding box of the hatch boundaries, used to size the pattern
-   */
-  createPattern(ctx, scale, boundingbox) {
-    if (!Patterns.patternExists(this.patternName) || this.solid) {
-      ctx.fill();
-      return;
-    }
-
-    const boundingBox = boundingbox;
-    const centerPoint = boundingBox.centerPoint;
-    const bbXLength = boundingBox.xLength;
-    const bbYLength = boundingBox.yLength;
-
-    const pattern = Patterns.getPattern(this.patternName);
-    pattern.forEach((patternLine) => {
-      // Each pattern line is considered to be the first member of a line family,
-      // Patterns are created by applying the delta offsets in both directions to generate an infinite family of parallel lines.
-      // originX and originY values are the offsets of the line from the origin and are applied without rotation
-      // The delta-x value indicates the displacement between members of the family in the direction of the line. It is used only for dashed lines.
-      // The delta-y value indicates the spacing between members of the family; that is, it is measured perpendicular to the lines.
-      // A line is considered to be of infinite length.
-      // A dash pattern is superimposed on the line.
-
-      // define dashlength - i.e. the length of each dash summed
-      // where there is no dash defined use half the boundingbox xlength
-      let dashLength = bbXLength / 2;
-      if (patternLine.dashes.length) {
-        dashLength = patternLine.getDashLength();
+      try { // Cairo - clip() takes no arguments, uses the fill rule set above
+        ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
+        ctx.clip();
+      } catch { // HTML Canvas
+        ctx.clip('evenodd');
       }
-
-      // copy dashes to avoid mutating the pattern line
-      let dashes = [...patternLine.dashes];
-      let dashOffset = 0;
-
-      if (dashes[0] < 0) {
-        // if the first dash is negative move it to the end
-        const firstIndex = dashes.shift();
-        dashOffset = Math.abs(firstIndex);
-        dashes.push(firstIndex);
-      }
-
-      dashes = dashes.map((x) => Math.abs(x) + 0.00001);
 
       try {
-        ctx.setLineDash(dashes, 0);
-        ctx.lineWidth = (1 / scale / this.scale);
         ctx.beginPath();
       } catch { // Cairo
-        ctx.setDash(dashes, 0);
-        ctx.setLineWidth(1 / scale / this.scale);
         ctx.newPath();
       }
 
-      const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
-
-      // Project the bounding box onto the pattern's rotated local axes
-      // to compute tight line counts instead of using the worst-case max dimension.
-      const halfW = bbXLength / (2 * this.scale);
-      const halfH = bbYLength / (2 * this.scale);
-      const sinR = Math.abs(Math.sin(rotation));
-      const cosR = Math.abs(Math.cos(rotation));
-
-      // Half-extent along the line direction (X in local frame)
-      const halfX = halfW * cosR + halfH * sinR;
-      // Half-extent perpendicular to lines (Y in local frame)
-      const halfY = halfW * sinR + halfH * cosR;
-
-      const xIncrement = Math.ceil(halfX / dashLength);
-      const yIncrement = Math.ceil(halfY / Math.abs(patternLine.yDelta));
-
-      // Set transform once for all lines in this pattern line family
-      ctx.save();
-      // translate to the center of the shape
-      // apply the origin offsets without rotation
-      ctx.translate(centerPoint.x + patternLine.xOrigin * this.scale, centerPoint.y + patternLine.yOrigin * this.scale);
-      // scale the context
-      ctx.scale(this.scale, this.scale);
-      // rotate the context
-      ctx.rotate(rotation);
-
-      for (let i = -yIncrement; i < yIncrement; i++) {
-        // apply the deltaX offset for odd iterations
-        // define offsets for the current iteration
-        const xOffset = patternLine.xDelta * Math.abs(i) + dashLength * xIncrement;
-        const yOffset = patternLine.yDelta * i;
-
-        ctx.moveTo(-xOffset + dashOffset, yOffset);
-        ctx.lineTo(xOffset, yOffset);
+      const bb = this.boundingBox();
+      try {
+        ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
+      } catch { // Cairo
+        ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
       }
 
-      ctx.stroke();
+      ctx.fill();
       ctx.restore();
-    });
+    } else {
+      // Pattern hatch: draw pre-clipped segments directly — no ctx.save/clip/restore needed.
+      // Segments were clipped against the boundary during buildPatternCache() so only visible
+      // portions are stored, eliminating per-frame clip region overhead.
+      for (const family of this.cachedPattern) {
+        if (!family.dashes.length) {
+          // Solid-line family: batch all segments into one path for performance
+          try {
+            ctx.setLineDash([]);
+            ctx.beginPath();
+          } catch { // Cairo
+            ctx.setDash([], 0);
+            ctx.newPath();
+          }
+          for (const seg of family.segments) {
+            ctx.moveTo(seg.x1, seg.y1);
+            ctx.lineTo(seg.x2, seg.y2);
+          }
+          ctx.stroke();
+        } else {
+          // Dashed family: each sub-segment needs its own dash phase to maintain
+          // pattern continuity across clipped boundaries.
+          for (const seg of family.segments) {
+            try {
+              ctx.setLineDash(family.dashes);
+              ctx.lineDashOffset = seg.dashPhase;
+              ctx.beginPath();
+            } catch { // Cairo
+              ctx.setDash(family.dashes, seg.dashPhase);
+              ctx.newPath();
+            }
+            ctx.moveTo(seg.x1, seg.y1);
+            ctx.lineTo(seg.x2, seg.y2);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    // When selected, stroke the boundary outline so the hatch region is visible.
+    // The canvas makes two passes over selected items (halo + normal), so this
+    // automatically receives both the accent-colour glow and the entity colour.
+    if (DesignCore.Scene.selectionManager.selectedItems.includes(this)) {
+      try {
+        ctx.setLineDash([]);
+      } catch { // Cairo
+        ctx.setDash([], 0);
+      }
+      this.traceBoundaryPath(ctx, scale);
+      ctx.stroke();
+    }
+  }
+
+  /**
+   * Trace all boundary shapes into the current canvas path as closed sub-paths.
+   * Used by both the solid-fill clip pass and the selection outline pass.
+   * @param {Object} ctx - canvas context
+   * @param {number} scale
+   */
+  traceBoundaryPath(ctx, scale) {
+    try {
+      ctx.beginPath();
+    } catch { // Cairo
+      ctx.newPath();
+    }
+    for (const shape of this.childEntities) {
+      if (!shape.points.length) continue;
+      ctx.moveTo(shape.points[0].x, shape.points[0].y);
+      shape.draw(ctx, scale, false);
+      ctx.closePath();
+    }
   }
 
   /**
@@ -801,6 +953,10 @@ export class Hatch extends Entity {
           });
         }
       }
+
+      // invalidate the pattern cache for any property change — the cache encodes
+      // geometry, scale, angle, and boundary shape, so any update may affect it
+      this.cachedPattern = null;
 
       // other properties as normal
       this[property] = value;

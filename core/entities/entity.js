@@ -39,7 +39,7 @@ export class Entity {
       writable: true,
     });
 
-    this.lineWidth = 2;
+    this.lineWidth = 1;
     this.lineType = 'ByLayer';
     this.layer = '0';
 
@@ -51,7 +51,7 @@ export class Entity {
     // DXF Groupcode 6 - lineType
     this.lineType = Property.loadValue([data?.lineType, data?.[6]], 'ByLayer');
     // DXF Groupcode 39 - Thickness (lineWidth)
-    this.lineWidth = Property.loadValue([data?.lineWidth, data?.[39]], 2);
+    this.lineWidth = Property.loadValue([data?.lineWidth, data?.[39]], 1);
     // DXF Groupcode 8 - layername
     this.layer = Property.loadValue([data?.layer, data?.[8]], '0');
 
