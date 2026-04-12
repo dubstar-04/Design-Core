@@ -448,5 +448,29 @@ export class Intersection {
 
     return result;
   };
+
+  /**
+   * Even-odd point-in-boundary test using a horizontal ray to the right.
+   * A tiny y-offset (rayEps) prevents the ray from passing exactly through the
+   * top or bottom of a curved boundary (e.g. a circle), which would produce a
+   * wrong crossing count.
+   * @param {number} px - x coordinate of the test point
+   * @param {number} py - y coordinate of the test point
+   * @param {Array} boundaries - array of closed point arrays (each a polyline loop)
+   * @param {number} testRayEndX - x coordinate of the ray endpoint, must be rightward of all geometry
+   * @return {boolean} true if the point is inside the boundaries under the even-odd rule
+   */
+  static isInsidePolyline(px, py, boundaries, testRayEndX) {
+    // TODO: consider extending Boundbox.fromPoints to calculate bounds for an entire polyline
+    // Calculate a test ray endpoint that is guaranteed to be outside the geometry bounds
+    // and remove testRayEndX parameter
+    const rayEps = 1e-9 * testRayEndX; // negligibly small relative to the geometry
+    const testLine = [new Point(px, py + rayEps), new Point(testRayEndX, py + rayEps)];
+    let count = 0;
+    for (const b of boundaries) {
+      count += Intersection.intersectPolylinePolyline(b, testLine).points.length;
+    }
+    return (count % 2) === 1;
+  }
 }
 

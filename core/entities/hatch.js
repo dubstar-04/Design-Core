@@ -183,22 +183,6 @@ export class Hatch extends Entity {
       }
     }
 
-    // Even-odd point-in-compound-boundary test using a horizontal ray to the right.
-    // A tiny y-perturbation (rayEps) is added to the ray's y-coordinate to prevent
-    // it from being exactly tangent to a curved boundary (e.g. at the top or bottom
-    // of a circle), which would produce a wrong crossing count.  The perturbation is
-    // scaled to the bounding box so it stays negligibly small relative to the geometry
-    // but large enough to avoid floating-point near-zero comparisons.
-    const rayEps = 1e-9 * (bb.xLength + bb.yLength + 1);
-    const isInsideCompound = (px, py) => {
-      const testLine = [new Point(px, py + rayEps), new Point(testRayEndX, py + rayEps)];
-      let count = 0;
-      for (const b of boundaries) {
-        count += Intersection.intersectPolylinePolyline(b, testLine).points.length;
-      }
-      return (count % 2) === 1;
-    };
-
     const centerPoint = bb.centerPoint;
     const bbXLength = bb.xLength;
     const bbYLength = bb.yLength;
@@ -335,7 +319,7 @@ export class Hatch extends Entity {
         // Test each interval's midpoint; keep sub-segments that are inside the boundary
         for (let k = 0; k < uniqueTs.length - 1; k++) {
           const tMid = (uniqueTs[k] + uniqueTs[k + 1]) / 2;
-          if (isInsideCompound(segStartPt.x + tMid * dir.x, segStartPt.y + tMid * dir.y)) {
+          if (Intersection.isInsidePolyline(segStartPt.x + tMid * dir.x, segStartPt.y + tMid * dir.y, boundaries, testRayEndX)) {
             const p1 = segStartPt.lerp(segEndPt, uniqueTs[k]);
             const p2 = segStartPt.lerp(segEndPt, uniqueTs[k + 1]);
             // Store the segment along with its initial dash phase, which is used by draw()
