@@ -606,6 +606,30 @@ test('Test Hatch.draw tight bound produces fewer lines for flat boundary', () =>
   expect(flatCtx.getMoveCalls()).toBeLessThan(squareCtx.getMoveCalls());
 });
 
+// ── buildPatternCache — early return tests ───────────────────────────────────
+
+test('Hatch.buildPatternCache no childEntities sets cachedPattern to empty array', () => {
+  const h = new Hatch({ patternName: 'HONEY' });
+  // childEntities is empty by default
+  h.buildPatternCache();
+  expect(h.cachedPattern).toEqual([]);
+});
+
+test('Hatch.buildPatternCache solid fill sets cachedPattern to empty array', () => {
+  const h = new Hatch({ patternName: 'SOLID' });
+  h.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
+  h.buildPatternCache();
+  expect(h.cachedPattern).toEqual([]);
+});
+
+test('Hatch.buildPatternCache unknown pattern sets cachedPattern to empty array', () => {
+  const h = new Hatch({ patternName: 'HONEY' });
+  h.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
+  h.pattern = 'NOTAPATTERN';
+  h.buildPatternCache();
+  expect(h.cachedPattern).toEqual([]);
+});
+
 // ── buildPatternCache — pattern structure and scale tests ────────────────────
 
 /**
