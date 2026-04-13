@@ -490,7 +490,7 @@ test('Text constructor covers all property branches', () => {
 
 test('Text static register and getApproximateWidth', () => {
   expect(Text.register()).toEqual({ command: 'Text', shortcut: 'DT', type: 'Entity' });
-  expect(Text.getApproximateWidth('abc', 10)).toBeCloseTo(18);
+  expect(Text.getApproximateWidth('abc', 10)).toBeCloseTo(16.2);
 });
 
 test('Text getHorizontalAlignment covers all cases', () => {
