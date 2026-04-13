@@ -21,18 +21,21 @@ export class ArcAlignedCharacter {
   #position;
   #angle;
   #height;
+  #width;
 
   /**
    * @param {string} character - text character
    * @param {Point} position - center mid point of character
    * @param {number} angle - in radians
    * @param {number} height - character height
+   * @param {number} width - character width
    */
-  constructor(character, position, angle, height = 1) {
+  constructor(character, position, angle, height = 1, width = 1) {
     this.#character = character;
     this.#position = position;
     this.#angle = angle;
     this.#height = height;
+    this.#width = width;
   }
 
   /**
@@ -68,6 +71,14 @@ export class ArcAlignedCharacter {
   }
 
   /**
+   * Get width
+   * @return {number}
+   */
+  get width() {
+    return this.#width;
+  }
+
+  /**
    * Get baseline point
    * @return {Point}
    */
@@ -83,7 +94,7 @@ export class ArcAlignedCharacter {
    */
   get boundingBox() {
     const halfHeight = this.#height / 2;
-    const halfWidth = halfHeight * 0.6; // approximate width as half height
+    const halfWidth = this.#width / 2;
     const pt1 = new Point(this.position.x - halfWidth, this.position.y - halfHeight);
     const pt2 = new Point(this.position.x + halfWidth, this.position.y + halfHeight);
     return new BoundingBox(pt1, pt2);
@@ -447,7 +458,8 @@ export class ArcAlignedText extends Entity {
     for (let index = 0; index < string.length; index++) {
       const charPosition = stringStartPoint.rotate(this.points[0], -totalCharWidthAsAngle*((index) * direction));
       const charAngle = this.points[0].angle(charPosition) - textRotationAngle;
-      const arcChar = new ArcAlignedCharacter(string[index], charPosition, charAngle, this.height);
+      const charWidth = Text.getApproximateWidth(string[index], this.height);
+      const arcChar = new ArcAlignedCharacter(string[index], charPosition, charAngle, this.height, charWidth);
       arcAlignedCharacters.push(arcChar);
     }
 
