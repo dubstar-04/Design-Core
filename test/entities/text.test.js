@@ -717,8 +717,8 @@ test('Text getHorizontalAlignment unsupported cases return left when verticalAli
 
 test('Text.dxf includes non-zero flags and rotation', () => {
   const text = new Text({ handle: '1', points: [new Point(0, 0)] });
-  text.backwards = true;   // flag value 2
-  text.upsideDown = true;  // flag value 4  → combined = 6
+  text.backwards = true; // flag value 2
+  text.upsideDown = true; // flag value 4  → combined = 6
   text.setRotation(90);
   text.string = 'R';
 
