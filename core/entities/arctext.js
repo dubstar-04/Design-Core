@@ -392,18 +392,12 @@ export class ArcAlignedText extends Entity {
 
     // calculate the radial distance - Arc Side: convex = 1, concave = 2
     const radialDistance = this.arcSide === 2 ? this.radius - this.offsetFromArc - this.height * 0.5 : this.radius + this.offsetFromArc + this.height * 0.5;
-    // calculate character width
-    const charWidth = Text.getApproximateWidth(this.string[0], this.height);
-    // calculate total char width including additional spacing
-    const totalCharWidth = charWidth + this.characterSpacing;
-    // convert the linear width of a character as an angle on the arc
-    const charWidthAsAngle = this.linearToAngular(charWidth*0.5, radialDistance);
-    // get total charwidth as angle
-    let totalCharWidthAsAngle = this.linearToAngular(totalCharWidth*0.5, radialDistance);
 
-    // calculate start and end offsets
-    const startOffsetAngle = this.linearToAngular(this.offsetFromRight, radialDistance) + charWidthAsAngle * 0.5;
-    const endOffsetAngle = this.linearToAngular(this.offsetFromLeft, radialDistance) + charWidthAsAngle * 0.5;
+    // calculate start and end offsets using the first and last character widths of the original string
+    const firstCharWidth = Text.getApproximateWidth(this.string[0], this.height);
+    const lastCharWidth = Text.getApproximateWidth(this.string.at(-1), this.height);
+    const startOffsetAngle = this.linearToAngular(this.offsetFromRight, radialDistance) + this.linearToAngular(firstCharWidth * 0.5, radialDistance);
+    const endOffsetAngle = this.linearToAngular(this.offsetFromLeft, radialDistance) + this.linearToAngular(lastCharWidth * 0.5, radialDistance);
 
     // total arc angle
     const totalArcAngle = Math.abs(this.endAngle() - this.startAngle()) - startOffsetAngle - endOffsetAngle;
@@ -420,21 +414,11 @@ export class ArcAlignedText extends Entity {
     let string = this.string.slice(); // make a copy of the string
 
     // 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
-    if (this.textAlignment === 1) { // fit to arc
-      totalCharWidthAsAngle = totalArcAngle / (this.string.length - 1);
-    }
-    if (this.textAlignment === 2) { // left align
-      // default
-    }
     if (this.textAlignment === 3) { // right align
       // start at the arc start position and create the text cw around the arc
       stringStartPoint = startPosition;
       direction = -1;
       string = string.split('').reverse().join('');
-    }
-    if (this.textAlignment === 4) { // center
-      const arcMidPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
-      stringStartPoint = arcMidPoint.rotate(this.points[0], 0.5 * totalCharWidthAsAngle * (string.length - 1));
     }
 
     // calculate the text rotation angle: 1 = outward, 2 = inward
@@ -454,12 +438,34 @@ export class ArcAlignedText extends Entity {
     }
       */
 
+    // build per-character widths for the final (possibly reversed) string
+    const charWidths = string.split('').map((ch) => Text.getApproximateWidth(ch, this.height));
+
+    // build cumulative arc angle offsets from the string start position to each character center
+    // step between adjacent centers is the average of their two half-widths plus spacing
+    const charOffsetAngles = [0];
+    for (let i = 0; i < string.length - 1; i++) {
+      const step = (charWidths[i] + charWidths[i + 1]) / 2 + this.characterSpacing;
+      charOffsetAngles.push(charOffsetAngles[i] + this.linearToAngular(step * 0.5, radialDistance));
+    }
+
+    // 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
+    if (this.textAlignment === 1) { // fit to arc
+      const fitStep = totalArcAngle / (string.length - 1);
+      for (let i = 1; i < string.length; i++) {
+        charOffsetAngles[i] = fitStep * i;
+      }
+    }
+    if (this.textAlignment === 4) { // center
+      const arcMidPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
+      stringStartPoint = arcMidPoint.rotate(this.points[0], charOffsetAngles.at(-1) * 0.5);
+    }
+
     // loop through string and calculate position and angle of each character
     for (let index = 0; index < string.length; index++) {
-      const charPosition = stringStartPoint.rotate(this.points[0], -totalCharWidthAsAngle*((index) * direction));
+      const charPosition = stringStartPoint.rotate(this.points[0], -charOffsetAngles[index] * direction);
       const charAngle = this.points[0].angle(charPosition) - textRotationAngle;
-      const charWidth = Text.getApproximateWidth(string[index], this.height);
-      const arcChar = new ArcAlignedCharacter(string[index], charPosition, charAngle, this.height, charWidth);
+      const arcChar = new ArcAlignedCharacter(string[index], charPosition, charAngle, this.height, charWidths[index]);
       arcAlignedCharacters.push(arcChar);
     }
 
