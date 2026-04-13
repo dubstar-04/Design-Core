@@ -20,6 +20,21 @@ import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 export class Text extends Entity {
   static type = 'Text';
 
+  static #charWidths = {
+    ' ': 0.28, '!': 0.28, '"': 0.35, '#': 0.56, '$': 0.56, '%': 0.89, '&': 0.67, '\'': 0.19,
+    '(': 0.33, ')': 0.33, '*': 0.39, '+': 0.58, ',': 0.28, '-': 0.33, '.': 0.28, '/': 0.31,
+    '0': 0.56, '1': 0.56, '2': 0.56, '3': 0.56, '4': 0.56, '5': 0.56, '6': 0.56, '7': 0.56,
+    '8': 0.56, '9': 0.56, ':': 0.28, ';': 0.28, '<': 0.58, '=': 0.58, '>': 0.58, '?': 0.56,
+    '@': 1.02, 'A': 0.67, 'B': 0.67, 'C': 0.72, 'D': 0.72, 'E': 0.61, 'F': 0.56, 'G': 0.78,
+    'H': 0.72, 'I': 0.28, 'J': 0.39, 'K': 0.67, 'L': 0.56, 'M': 0.83, 'N': 0.72, 'O': 0.78,
+    'P': 0.61, 'Q': 0.78, 'R': 0.67, 'S': 0.56, 'T': 0.61, 'U': 0.72, 'V': 0.67, 'W': 0.94,
+    'X': 0.67, 'Y': 0.67, 'Z': 0.61, '[': 0.28, '\\': 0.31, ']': 0.28, '^': 0.47, '_': 0.56,
+    '`': 0.33, 'a': 0.56, 'b': 0.56, 'c': 0.50, 'd': 0.56, 'e': 0.56, 'f': 0.28, 'g': 0.56,
+    'h': 0.56, 'i': 0.22, 'j': 0.22, 'k': 0.50, 'l': 0.22, 'm': 0.83, 'n': 0.56, 'o': 0.56,
+    'p': 0.56, 'q': 0.56, 'r': 0.33, 's': 0.50, 't': 0.33, 'u': 0.56, 'v': 0.50, 'w': 0.72,
+    'x': 0.50, 'y': 0.50, 'z': 0.44, '{': 0.33, '|': 0.26, '}': 0.33, '~': 0.58,
+  };
+
   /**
    * Create a Text Entity
    * @param {Array} data
@@ -154,9 +169,11 @@ export class Text extends Entity {
    * Actual width depends on the font and style used
    */
   static getApproximateWidth(string, textHeight) {
-    // Approximate width of the text based on the string length and height
-    // This is a rough estimate, as actual width depends on the font and style
-    return string.length * textHeight * 0.6; // 0.6 is an approximation factor for average character width
+    let width = 0;
+    for (const ch of string) {
+      width += (Text.#charWidths[ch] ?? 0.56) * textHeight;
+    }
+    return width;
   }
 
   /**
@@ -390,6 +407,13 @@ export class Text extends Entity {
       return;
     }
 
+    // Detect hover/selection halo pass: setContext adds lineWidthDelta (5 px) to the line width.
+    // HTML Canvas: setContext writes ctx.lineWidth directly (readable property).
+    // Cairo: setContext calls setLineWidth(); read it back via getLineWidth().
+    // lineWidthDelta > 2 identifies the glow pass (selectionLineWidthDelta = 5 in canvas.js).
+    const ctxLineWidth = ctx.lineWidth ?? ctx.getLineWidth?.() ?? 0;
+    const isHaloPass = (ctxLineWidth * scale - this.lineWidth) > 2;
+
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
     const corners = this.getTextFrameCorners();
@@ -414,12 +438,18 @@ export class Text extends Entity {
 
     try { // HTML
       ctx.font = this.height + 'pt ' + style.font;
-      ctx.fillText(this.string, 0, 0);
-      // TODO: find a better way to define the boundingRect
-      const metrics = ctx.measureText(String(this.string));
-      this.boundingRect = { width: metrics.width, height: this.height };
+      if (isHaloPass) {
+        // strokeText uses the strokeStyle (halo colour) and lineWidth (thick) already
+        // set up by setContext — no positioning adjustments needed.
+        ctx.strokeText(this.string, 0, 0);
+      } else {
+        ctx.fillText(this.string, 0, 0);
+        // TODO: find a better way to define the boundingRect
+        const metrics = ctx.measureText(String(this.string));
+        this.boundingRect = { width: metrics.width, height: this.height };
+      }
     } catch { // Cairo
-      ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
+      ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 
       // Hack to test the text height vs bounding box height to find a scale factor to make the drawn text match the specified height.
       // This is needed because Cairo's font size is not the same as the actual drawn text height, and can vary based on the font used.
@@ -437,9 +467,21 @@ export class Text extends Entity {
       */
       // Adjust the font size by the ratio of the desired height to the drawn height to get closer to the desired text height.
       ctx.setFontSize(this.height * this.height / drawTextRect.height);
-      this.boundingRect = ctx.textExtents(String(this.string));
 
-      ctx.showText(String(this.string));
+      if (isHaloPass) {
+        // cairo_text_path is not yet available in the GNOME SDK version of GJS.
+        // Simulate a stroke-like halo by drawing the text at 8 small offsets.
+        // Each offset is half the set line width (world units) — the same outward
+        // reach as a stroked path. Replace with ctx.textPath once GJS ships it.
+        const d = ctx.getLineWidth() / 2;
+        for (const [dx, dy] of [[d, 0], [-d, 0], [0, d], [0, -d], [d, d], [-d, d], [d, -d], [-d, -d]]) {
+          ctx.moveTo(dx, dy);
+          ctx.showText(String(this.string));
+        }
+      } else {
+        this.boundingRect = ctx.textExtents(String(this.string));
+        ctx.showText(String(this.string));
+      }
     }
 
     ctx.stroke();
