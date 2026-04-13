@@ -416,8 +416,7 @@ export class Text extends Entity {
 
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
-    const corners = this.getTextFrameCorners();
-    const bottomLeft = corners[0];
+    const [bottomLeft, bottomRight, /* topRight */, topLeft] = this.getTextFrameCorners();
     ctx.translate(bottomLeft.x, -bottomLeft.y);
 
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
@@ -425,19 +424,19 @@ export class Text extends Entity {
     ctx.rotate(-rotation);
 
     if (this.upsideDown) {
-      const upsideDownOffset = corners[0].distance(corners[3]);
+      const upsideDownOffset = bottomLeft.distance(topLeft);
       ctx.translate(0, -upsideDownOffset);
       ctx.scale(1, -1);
     }
 
     if (this.backwards) {
-      const backwardsOffset = corners[0].distance(corners[1]);
+      const backwardsOffset = bottomLeft.distance(bottomRight);
       ctx.translate(backwardsOffset, 0);
       ctx.scale(-1, 1);
     }
 
     try { // HTML
-      ctx.font = this.height + 'pt ' + style.font;
+      ctx.font = this.height + 'pt ' + style?.font;
       if (isHaloPass) {
         // strokeText uses the strokeStyle (halo colour) and lineWidth (thick) already
         // set up by setContext — no positioning adjustments needed.
@@ -445,17 +444,17 @@ export class Text extends Entity {
       } else {
         ctx.fillText(this.string, 0, 0);
         // TODO: find a better way to define the boundingRect
-        const metrics = ctx.measureText(String(this.string));
+        const metrics = ctx.measureText(this.string);
         this.boundingRect = { width: metrics.width, height: this.height };
       }
     } catch { // Cairo
-      ctx.selectFontFace(style.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+      ctx.selectFontFace(style?.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 
       // Hack to test the text height vs bounding box height to find a scale factor to make the drawn text match the specified height.
       // This is needed because Cairo's font size is not the same as the actual drawn text height, and can vary based on the font used.
       // This is a rough approximation and may not be accurate for all fonts or sizes.
       ctx.setFontSize(this.height);
-      const drawTextRect = ctx.textExtents(String(this.string));
+      const drawTextRect = ctx.textExtents(this.string);
 
       /* GJS Cairo needs additional support for font handling
       https://www.cairographics.org/tutorial/#L1understandingtext
@@ -476,11 +475,11 @@ export class Text extends Entity {
         const d = ctx.getLineWidth() / 2;
         for (const [dx, dy] of [[d, 0], [-d, 0], [0, d], [0, -d], [d, d], [-d, d], [d, -d], [-d, -d]]) {
           ctx.moveTo(dx, dy);
-          ctx.showText(String(this.string));
+          ctx.showText(this.string);
         }
       } else {
-        this.boundingRect = ctx.textExtents(String(this.string));
-        ctx.showText(String(this.string));
+        this.boundingRect = ctx.textExtents(this.string);
+        ctx.showText(this.string);
       }
     }
 

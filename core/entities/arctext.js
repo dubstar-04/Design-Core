@@ -484,9 +484,12 @@ export class ArcAlignedText extends Entity {
 
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
 
-    // Cairo
-    ctx.setFontSize(this.height);
-    ctx.selectFontFace(style?.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
+    try { // HTML Canvas
+      ctx.font = this.height + 'pt ' + style?.font;
+    } catch { // Cairo
+      ctx.setFontSize(this.height);
+      ctx.selectFontFace(style?.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+    }
 
     const ArcAlignedCharacters = this.getArcAlignedCharacters();
 
@@ -495,11 +498,13 @@ export class ArcAlignedText extends Entity {
       ctx.translate(arcAlignedChar.baseline.x, -arcAlignedChar.baseline.y);
       ctx.rotate(-arcAlignedChar.angle);
 
+      const char = arcAlignedChar.character;
+
       try { // HTML Canvas
         if (isHaloPass) {
-          ctx.strokeText(String(arcAlignedChar.character), 0, 0);
+          ctx.strokeText(char, 0, 0);
         } else {
-          ctx.fillText(String(arcAlignedChar.character), 0, 0);
+          ctx.fillText(char, 0, 0);
         }
       } catch { // Cairo
         if (isHaloPass) {
@@ -508,10 +513,10 @@ export class ArcAlignedText extends Entity {
           const d = ctx.getLineWidth() / 2;
           for (const [dx, dy] of [[d, 0], [-d, 0], [0, d], [0, -d], [d, d], [-d, d], [d, -d], [-d, -d]]) {
             ctx.moveTo(dx, dy);
-            ctx.showText(String(arcAlignedChar.character));
+            ctx.showText(char);
           }
         } else {
-          ctx.showText(String(arcAlignedChar.character));
+          ctx.showText(char);
         }
       }
 
