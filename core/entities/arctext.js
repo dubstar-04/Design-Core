@@ -475,9 +475,9 @@ export class ArcAlignedText extends Entity {
     // Detect hover/selection halo pass: setContext adds lineWidthDelta (5 px) to the line width.
     // HTML Canvas: setContext writes ctx.lineWidth directly (readable property).
     // Cairo: setContext calls setLineWidth(); read it back via getLineWidth().
-    // lineWidthDelta > 2 identifies the glow pass (selectionLineWidthDelta = 5 in canvas.js).
+    // lineWidthDelta > 2 identifies the hovered or selected pass (selectionLineWidthDelta = 5 in canvas.js).
     const ctxLineWidth = ctx.lineWidth ?? ctx.getLineWidth?.() ?? 0;
-    const isHaloPass = (ctxLineWidth * scale - this.lineWidth) > 2;
+    const isHoveredOrSelected = (ctxLineWidth * scale - this.lineWidth) > 2;
 
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
@@ -501,13 +501,13 @@ export class ArcAlignedText extends Entity {
       const char = arcAlignedChar.character;
 
       try { // HTML Canvas
-        if (isHaloPass) {
+        if (isHoveredOrSelected) {
           ctx.strokeText(char, 0, 0);
         } else {
           ctx.fillText(char, 0, 0);
         }
       } catch { // Cairo
-        if (isHaloPass) {
+        if (isHoveredOrSelected) {
           // cairo_text_path is not yet available in the GNOME SDK version of GJS.
           // Simulate a stroke-like halo by drawing the text at 8 small offsets.
           const d = ctx.getLineWidth() / 2;

@@ -410,9 +410,9 @@ export class Text extends Entity {
     // Detect hover/selection halo pass: setContext adds lineWidthDelta (5 px) to the line width.
     // HTML Canvas: setContext writes ctx.lineWidth directly (readable property).
     // Cairo: setContext calls setLineWidth(); read it back via getLineWidth().
-    // lineWidthDelta > 2 identifies the glow pass (selectionLineWidthDelta = 5 in canvas.js).
+    // lineWidthDelta > 2 identifies the hovered or selected pass (selectionLineWidthDelta = 5 in canvas.js).
     const ctxLineWidth = ctx.lineWidth ?? ctx.getLineWidth?.() ?? 0;
-    const isHaloPass = (ctxLineWidth * scale - this.lineWidth) > 2;
+    const isHoveredOrSelected = (ctxLineWidth * scale - this.lineWidth) > 2;
 
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
@@ -437,7 +437,7 @@ export class Text extends Entity {
 
     try { // HTML
       ctx.font = this.height + 'pt ' + style?.font;
-      if (isHaloPass) {
+      if (isHoveredOrSelected) {
         // strokeText uses the strokeStyle (halo colour) and lineWidth (thick) already
         // set up by setContext — no positioning adjustments needed.
         ctx.strokeText(this.string, 0, 0);
@@ -467,7 +467,7 @@ export class Text extends Entity {
       // Adjust the font size by the ratio of the desired height to the drawn height to get closer to the desired text height.
       ctx.setFontSize(this.height * this.height / drawTextRect.height);
 
-      if (isHaloPass) {
+      if (isHoveredOrSelected) {
         // cairo_text_path is not yet available in the GNOME SDK version of GJS.
         // Simulate a stroke-like halo by drawing the text at 8 small offsets.
         // Each offset is half the set line width (world units) — the same outward
