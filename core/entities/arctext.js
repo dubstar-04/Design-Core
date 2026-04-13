@@ -486,9 +486,18 @@ export class ArcAlignedText extends Entity {
 
     try { // HTML Canvas
       ctx.font = this.height + 'pt ' + style?.font;
+      ctx.measureText('M'); // Canvas-only method — throws on Cairo, confirming the context type
     } catch { // Cairo
-      ctx.setFontSize(this.height);
       ctx.selectFontFace(style?.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+
+      // Hack to test the text height vs bounding box height to find a scale factor to make the drawn text match the specified height.
+      // This is needed because Cairo's font size is not the same as the actual drawn text height, and can vary based on the font used.
+      // This is a rough approximation and may not be accurate for all fonts or sizes.
+      ctx.setFontSize(this.height);
+      const refChar = this.string || 'A';
+      const drawTextRect = ctx.textExtents(refChar);
+      // Adjust the font size by the ratio of the desired height to the drawn height to get closer to the desired text height.
+      ctx.setFontSize(this.height * this.height / drawTextRect.height);
     }
 
     const ArcAlignedCharacters = this.getArcAlignedCharacters();
