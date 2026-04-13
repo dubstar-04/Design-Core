@@ -383,6 +383,16 @@ test('ArcText closestPoint returns distance 0.1 when within height * 0.35', () =
   expect(dist).toBe(0.1);
 });
 
+test('ArcText getArcAlignedCharacters fit-to-arc single character places at midpoint', () => {
+  const t = new ArcAlignedText({ points: [new Point(0, 0)], radius: 10, string: 'X',
+    startAngle: 0, endAngle: 180, textAlignment: 1 });
+  const chars = t.getArcAlignedCharacters();
+  expect(chars).toHaveLength(1);
+  // midpoint of 0°–180° arc at radius 10 is 90° → point near (0, 10)
+  expect(chars[0].position.x).toBeCloseTo(0, 0);
+  expect(chars[0].position.y).toBeGreaterThan(0);
+});
+
 test('ArcText getArcAlignedCharacters single character is placed at arc midpoint', () => {
   // Single char with center alignment: charOffsetAngles = [0], stringStartPoint = arcMidPoint
   // arcMidAngle(0, PI) = PI/2 → project(PI/2, 101.25) = (0, 101.25), angle = PI/2 - PI/2 = 0

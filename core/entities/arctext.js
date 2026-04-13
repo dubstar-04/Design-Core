@@ -438,10 +438,15 @@ export class ArcAlignedText extends Entity {
     // step between adjacent centers is the average of their two half-widths plus spacing
     const charOffsetAngles = [0];
     if (this.textAlignment === 1) { // fit to arc
-      const totalArcAngle = Math.abs(this.endAngle() - this.startAngle()) - startOffsetAngle - endOffsetAngle;
-      const fitStep = totalArcAngle / (string.length - 1);
-      for (let i = 1; i < string.length; i++) {
-        charOffsetAngles.push(fitStep * i);
+      if (string.length === 1) {
+        // single character: place at arc midpoint — division by zero otherwise
+        stringStartPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
+      } else {
+        const totalArcAngle = Math.abs(this.endAngle() - this.startAngle()) - startOffsetAngle - endOffsetAngle;
+        const fitStep = totalArcAngle / (string.length - 1);
+        for (let i = 1; i < string.length; i++) {
+          charOffsetAngles.push(fitStep * i);
+        }
       }
     } else {
       for (let i = 0; i < string.length - 1; i++) {
