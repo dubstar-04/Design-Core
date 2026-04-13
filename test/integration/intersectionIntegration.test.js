@@ -285,7 +285,7 @@ describe('Entity.touched - selection rectangle intersection', () => {
       const charPos = pts[0];
       const sE = selectionExtremes(
           new Point(charPos.x - 5, charPos.y - 5),
-          new Point(charPos.x + 5, charPos.y + 5),
+          new Point(charPos.x + 1, charPos.y + 5),
       );
       expect(arcText.touched(sE)).toBe(true);
     }

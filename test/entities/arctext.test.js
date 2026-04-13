@@ -52,7 +52,7 @@ test('ArcAlignedCharacter', () => {
   expect(ac.position.y).toBe(point.y);
   expect(ac.angle).toBeCloseTo(angle);
   expect(ac.baseline.x).toBe(10.5);
-  expect(ac.baseline.y).toBe(19.7);
+  expect(ac.baseline.y).toBe(19.5);
   expect(ac.boundingBox).toBeInstanceOf(BoundingBox);
 });
 
@@ -115,14 +115,14 @@ test('ArcText getArcAlignedCharacters', () => {
   expect(chars.length).toBe(4);
   // First character
   expect(chars[0].character).toBe('T');
-  expect(chars[0].position.x).toBeCloseTo(-2.39222);
-  expect(chars[0].position.y).toBeCloseTo(101.22173);
-  expect(chars[0].angle).toBeCloseTo(0.02362);
+  expect(chars[0].position.x).toBeCloseTo(-2.05483);
+  expect(chars[0].position.y).toBeCloseTo(101.22915);
+  expect(chars[0].angle).toBeCloseTo(0.02030);
   // Fourth character
   expect(chars.at(-1).character).toBe('t');
-  expect(chars.at(-1).position.x).toBeCloseTo(2.39222);
-  expect(chars.at(-1).position.y).toBeCloseTo(101.22173);
-  expect(chars.at(-1).angle).toBeCloseTo(-0.02362);
+  expect(chars.at(-1).position.x).toBeCloseTo(2.05483);
+  expect(chars.at(-1).position.y).toBeCloseTo(101.22915);
+  expect(chars.at(-1).angle).toBeCloseTo(-0.02030);
 
 
   // //////// Text Alignment Tests //////////
@@ -133,29 +133,29 @@ test('ArcText getArcAlignedCharacters', () => {
   expect(chars.length).toBe(4);
   // First character - Reversed!
   expect(chars[0].character).toBe('t');
-  expect(chars[0].position.x).toBeCloseTo(101.24722);
-  expect(chars[0].position.y).toBeCloseTo(0.74997);
-  expect(chars[0].angle).toBeCloseTo(-1.56338);
+  expect(chars[0].position.x).toBeCloseTo(101.23852);
+  expect(chars[0].position.y).toBeCloseTo(1.52491);
+  expect(chars[0].angle).toBeCloseTo(-1.55573);
   // Last character - Reversed!
   expect(chars.at(-1).character).toBe('T');
-  expect(chars.at(-1).position.x).toBeCloseTo(101.09875);
-  expect(chars.at(-1).position.y).toBeCloseTo(5.53213);
-  expect(chars.at(-1).angle).toBeCloseTo(-1.51613);
+  expect(chars.at(-1).position.x).toBeCloseTo(101.09324);
+  expect(chars.at(-1).position.y).toBeCloseTo(5.63200);
+  expect(chars.at(-1).angle).toBeCloseTo(-1.51514);
 
-  // Create ArcAlignedText - left aligned - textAlignment = 3
+  // Create ArcAlignedText - left aligned - textAlignment = 2
   const arcTextAlignLeft = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100, textAlignment: 2 });
   chars = arcTextAlignLeft.getArcAlignedCharacters();
   expect(chars.length).toBe(4);
   // First character
   expect(chars[0].character).toBe('T');
-  expect(chars[0].position.x).toBeCloseTo(-101.247222);
-  expect(chars[0].position.y).toBeCloseTo(0.749979);
-  expect(chars[0].angle).toBeCloseTo(1.56338);
+  expect(chars[0].position.x).toBeCloseTo(-101.24664);
+  expect(chars[0].position.y).toBeCloseTo(0.82499);
+  expect(chars[0].angle).toBeCloseTo(1.56265);
   // Last character
   expect(chars.at(-1).character).toBe('t');
-  expect(chars.at(-1).position.x).toBeCloseTo(-101.09875);
-  expect(chars.at(-1).position.y).toBeCloseTo(5.53213);
-  expect(chars.at(-1).angle).toBeCloseTo(1.51613);
+  expect(chars.at(-1).position.x).toBeCloseTo(-101.12976);
+  expect(chars.at(-1).position.y).toBeCloseTo(4.93298);
+  expect(chars.at(-1).angle).toBeCloseTo(1.52206);
 
   // Create ArcAlignedText - fit to arc - textAlignment = 1
   const arcTextFitToArc = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100, textAlignment: 1 });
@@ -163,14 +163,14 @@ test('ArcText getArcAlignedCharacters', () => {
   expect(chars.length).toBe(4);
   // First character
   expect(chars[0].character).toBe('T');
-  expect(chars[0].position.x).toBeCloseTo(-101.247222);
-  expect(chars[0].position.y).toBeCloseTo(0.74997);
-  expect(chars[0].angle).toBeCloseTo(1.56338);
+  expect(chars[0].position.x).toBeCloseTo(-101.24664);
+  expect(chars[0].position.y).toBeCloseTo(0.82499);
+  expect(chars[0].angle).toBeCloseTo(1.56265);
   // Last character
   expect(chars.at(-1).character).toBe('t');
-  expect(chars.at(-1).position.x).toBeCloseTo(101.24722);
-  expect(chars.at(-1).position.y).toBeCloseTo(0.74997);
-  expect(chars.at(-1).angle).toBeCloseTo(-1.56338);
+  expect(chars.at(-1).position.x).toBeCloseTo(101.23852);
+  expect(chars.at(-1).position.y).toBeCloseTo(1.52491);
+  expect(chars.at(-1).angle).toBeCloseTo(-1.55573);
 
   // //////// Arc Side Tests //////////
 
@@ -180,14 +180,14 @@ test('ArcText getArcAlignedCharacters', () => {
   expect(chars.length).toBe(4);
   // First character
   expect(chars[0].character).toBe('T');
-  expect(chars[0].position.x).toBeCloseTo(-2.39222);
-  expect(chars[0].position.y).toBeCloseTo(101.22173);
-  expect(chars[0].angle).toBeCloseTo(0.02362);
+  expect(chars[0].position.x).toBeCloseTo(-2.05483);
+  expect(chars[0].position.y).toBeCloseTo(101.22915);
+  expect(chars[0].angle).toBeCloseTo(0.02030);
   // Fourth character
   expect(chars.at(-1).character).toBe('t');
-  expect(chars.at(-1).position.x).toBeCloseTo(2.39222);
-  expect(chars.at(-1).position.y).toBeCloseTo(101.22173);
-  expect(chars.at(-1).angle).toBeCloseTo(-0.02362);
+  expect(chars.at(-1).position.x).toBeCloseTo(2.05483);
+  expect(chars.at(-1).position.y).toBeCloseTo(101.22915);
+  expect(chars.at(-1).angle).toBeCloseTo(-0.02030);
 
   // Create ArcAlignedText with string 'Test' and radius 100
   const arcTextConcave = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100, arcSide: 2 });
@@ -195,14 +195,14 @@ test('ArcText getArcAlignedCharacters', () => {
   expect(chars.length).toBe(4);
   // First character
   expect(chars[0].character).toBe('T');
-  expect(chars[0].position.x).toBeCloseTo(-2.39222);
-  expect(chars[0].position.y).toBeCloseTo(98.72102);
-  expect(chars[0].angle).toBeCloseTo(0.02422);
+  expect(chars[0].position.x).toBeCloseTo(-2.05482);
+  expect(chars[0].position.y).toBeCloseTo(98.72862);
+  expect(chars[0].angle).toBeCloseTo(0.02081);
   // Fourth character
   expect(chars.at(-1).character).toBe('t');
-  expect(chars.at(-1).position.x).toBeCloseTo(2.39222);
-  expect(chars.at(-1).position.y).toBeCloseTo(98.72102);
-  expect(chars.at(-1).angle).toBeCloseTo(-0.02362);
+  expect(chars.at(-1).position.x).toBeCloseTo(2.05482);
+  expect(chars.at(-1).position.y).toBeCloseTo(98.72862);
+  expect(chars.at(-1).angle).toBeCloseTo(-0.02081);
 });
 
 test('ArcText.dxf', () => {
@@ -301,32 +301,32 @@ test('Test ArcText.snaps', () => {
   const point = new Point(100, 100);
   const snaps = arcText.snaps(point, 1);
   const nodeSnaps = snaps.filter((s) => s.type === 'node');
-  expect(nodeSnaps[0].snapPoint.x).toBeCloseTo(-2.39222);
-  expect(nodeSnaps[0].snapPoint.y).toBeCloseTo(101.22173);
+  expect(nodeSnaps[0].snapPoint.x).toBeCloseTo(-2.05483);
+  expect(nodeSnaps[0].snapPoint.y).toBeCloseTo(101.22915);
 });
 
 test('Test ArcText.closestPoint', () => {
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
   const point = new Point(100, 100);
   const closest = arcText.closestPoint(point);
-  expect(closest[0].x).toBeCloseTo(2.39222);
-  expect(closest[0].y).toBeCloseTo(101.22173);
+  expect(closest[0].x).toBeCloseTo(2.05483);
+  expect(closest[0].y).toBeCloseTo(101.22915);
 });
 
 test('Test ArcText.boundingBox', () => {
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
-  expect(arcText.boundingBox().xMin).toBeCloseTo(-3.14222);
-  expect(arcText.boundingBox().xMax).toBeCloseTo(3.14222);
-  expect(arcText.boundingBox().yMin).toBeCloseTo(99.97173);
-  expect(arcText.boundingBox().yMax).toBeCloseTo(102.49685);
+  expect(arcText.boundingBox().xMin).toBeCloseTo(-2.81733);
+  expect(arcText.boundingBox().xMax).toBeCloseTo(2.46733);
+  expect(arcText.boundingBox().yMin).toBeCloseTo(99.97915);
+  expect(arcText.boundingBox().yMax).toBeCloseTo(102.49878);
 });
 
 test('Test ArcText.toPolylinePoints - returns correct points array', () => {
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100 });
   const result = arcText.toPolylinePoints();
   expect(result.length).toBe(4);
-  expect(result[0].x).toBeCloseTo(-2.39222);
-  expect(result[0].y).toBeCloseTo(101.22173);
+  expect(result[0].x).toBeCloseTo(-2.05483);
+  expect(result[0].y).toBeCloseTo(101.22915);
 });
 
 test('ArcText.snaps returns a centre snap at points[0]', () => {
@@ -342,4 +342,92 @@ test('ArcText.snaps returns node snaps only for non-space characters', () => {
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'A B', radius: 100 });
   const nodeSnaps = arcText.snaps(new Point(0, 0), 100).filter((s) => s.type === 'node');
   expect(nodeSnaps.length).toBe(2);
+});
+
+test('ArcAlignedCharacter respects explicit height and width', () => {
+  const ac = new ArcAlignedCharacter('A', new Point(0, 0), 0, 5, 3);
+  expect(ac.height).toBe(5);
+  expect(ac.width).toBe(3);
+});
+
+test('ArcText getArcAlignedCharacters empty string returns empty array', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: '', radius: 100 });
+  expect(arcText.getArcAlignedCharacters()).toHaveLength(0);
+});
+
+test('ArcText boundingBox empty string returns BoundingBox instance', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: '', radius: 100 });
+  expect(arcText.boundingBox()).toBeInstanceOf(BoundingBox);
+});
+
+test('ArcText toPolylinePoints empty string returns empty array', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: '', radius: 100 });
+  expect(arcText.toPolylinePoints()).toHaveLength(0);
+});
+
+test('ArcText snaps with empty string returns only centre snap', () => {
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: '', radius: 100 });
+  const snaps = arcText.snaps(new Point(0, 0), 1);
+  expect(snaps).toHaveLength(1);
+  expect(snaps[0].type).toBe('centre');
+});
+
+test('ArcText closestPoint returns distance 0.1 when within height * 0.35', () => {
+  // Single char 'T' center-aligned sits at (0, 101.25); height = 2.5, threshold = 0.875
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'T', radius: 100 });
+  const chars = arcText.getArcAlignedCharacters();
+  const charPos = chars[0].position;
+  // 0.5 units away is within the 0.875 threshold
+  const closePoint = new Point(charPos.x + 0.5, charPos.y);
+  const [, dist] = arcText.closestPoint(closePoint);
+  expect(dist).toBe(0.1);
+});
+
+test('ArcText getArcAlignedCharacters fit-to-arc single character places at midpoint', () => {
+  const t = new ArcAlignedText({ points: [new Point(0, 0)], radius: 10, string: 'X',
+    startAngle: 0, endAngle: 180, textAlignment: 1 });
+  const chars = t.getArcAlignedCharacters();
+  expect(chars).toHaveLength(1);
+  // midpoint of 0°–180° arc at radius 10 is 90° → point near (0, 10)
+  expect(chars[0].position.x).toBeCloseTo(0, 0);
+  expect(chars[0].position.y).toBeGreaterThan(0);
+});
+
+test('ArcText getArcAlignedCharacters single character is placed at arc midpoint', () => {
+  // Single char with center alignment: charOffsetAngles = [0], stringStartPoint = arcMidPoint
+  // arcMidAngle(0, PI) = PI/2 → project(PI/2, 101.25) = (0, 101.25), angle = PI/2 - PI/2 = 0
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'X', radius: 100 });
+  const chars = arcText.getArcAlignedCharacters();
+  expect(chars).toHaveLength(1);
+  expect(chars[0].character).toBe('X');
+  expect(chars[0].position.x).toBeCloseTo(0, 4);
+  expect(chars[0].position.y).toBeCloseTo(101.25, 4);
+  expect(chars[0].angle).toBeCloseTo(0, 4);
+});
+
+test('ArcText getArcAlignedCharacters textOrientation inward reverses character order', () => {
+  // textOrientation 2 reverses the string before placing characters
+  const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100, textOrientation: 2 });
+  const chars = arcText.getArcAlignedCharacters();
+  expect(chars).toHaveLength(4);
+  expect(chars[0].character).toBe('t'); // reversed
+  expect(chars.at(-1).character).toBe('T'); // reversed
+});
+
+test('ArcText getArcAlignedCharacters offsetFromLeft shifts character positions', () => {
+  // offsetFromLeft moves the string start away from the arc end for left-aligned text
+  const base = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100, textAlignment: 2, offsetFromLeft: 0 });
+  const offset = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100, textAlignment: 2, offsetFromLeft: 10 });
+  const baseChars = base.getArcAlignedCharacters();
+  const offsetChars = offset.getArcAlignedCharacters();
+  expect(offsetChars[0].position.x).not.toBeCloseTo(baseChars[0].position.x, 1);
+});
+
+test('ArcText getArcAlignedCharacters offsetFromRight shifts character positions', () => {
+  // offsetFromRight moves the string start away from the arc start for right-aligned text
+  const base = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100, textAlignment: 3, offsetFromRight: 0 });
+  const offset = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Test', radius: 100, textAlignment: 3, offsetFromRight: 10 });
+  const baseChars = base.getArcAlignedCharacters();
+  const offsetChars = offset.getArcAlignedCharacters();
+  expect(offsetChars[0].position.x).not.toBeCloseTo(baseChars[0].position.x, 1);
 });

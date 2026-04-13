@@ -21,18 +21,21 @@ export class ArcAlignedCharacter {
   #position;
   #angle;
   #height;
+  #width;
 
   /**
    * @param {string} character - text character
    * @param {Point} position - center mid point of character
    * @param {number} angle - in radians
    * @param {number} height - character height
+   * @param {number} width - character width
    */
-  constructor(character, position, angle, height = 1) {
+  constructor(character, position, angle, height = 1, width = 1) {
     this.#character = character;
     this.#position = position;
     this.#angle = angle;
     this.#height = height;
+    this.#width = width;
   }
 
   /**
@@ -68,6 +71,14 @@ export class ArcAlignedCharacter {
   }
 
   /**
+   * Get width
+   * @return {number}
+   */
+  get width() {
+    return this.#width;
+  }
+
+  /**
    * Get baseline point
    * @return {Point}
    */
@@ -83,7 +94,7 @@ export class ArcAlignedCharacter {
    */
   get boundingBox() {
     const halfHeight = this.#height / 2;
-    const halfWidth = halfHeight * 0.6; // approximate width as half height
+    const halfWidth = this.#width / 2;
     const pt1 = new Point(this.position.x - halfWidth, this.position.y - halfHeight);
     const pt2 = new Point(this.position.x + halfWidth, this.position.y + halfHeight);
     return new BoundingBox(pt1, pt2);
@@ -381,49 +392,26 @@ export class ArcAlignedText extends Entity {
 
     // calculate the radial distance - Arc Side: convex = 1, concave = 2
     const radialDistance = this.arcSide === 2 ? this.radius - this.offsetFromArc - this.height * 0.5 : this.radius + this.offsetFromArc + this.height * 0.5;
-    // calculate character width
-    const charWidth = Text.getApproximateWidth(this.string[0], this.height);
-    // calculate total char width including additional spacing
-    const totalCharWidth = charWidth + this.characterSpacing;
-    // convert the linear width of a character as an angle on the arc
-    const charWidthAsAngle = this.linearToAngular(charWidth*0.5, radialDistance);
-    // get total charwidth as angle
-    let totalCharWidthAsAngle = this.linearToAngular(totalCharWidth*0.5, radialDistance);
 
-    // calculate start and end offsets
-    const startOffsetAngle = this.linearToAngular(this.offsetFromRight, radialDistance) + charWidthAsAngle * 0.5;
-    const endOffsetAngle = this.linearToAngular(this.offsetFromLeft, radialDistance) + charWidthAsAngle * 0.5;
-
-    // total arc angle
-    const totalArcAngle = Math.abs(this.endAngle() - this.startAngle()) - startOffsetAngle - endOffsetAngle;
-
-    // defined positions - Start and end angles +/- half char width
-    const startPosition = this.points[0].project(this.startAngle() + startOffsetAngle, radialDistance);
-    const endPosition = this.points[0].project(this.endAngle() - endOffsetAngle, radialDistance);
+    // calculate start and end offsets using the first and last character widths of the original string
+    const firstCharWidth = Text.getApproximateWidth(this.string[0], this.height);
+    const lastCharWidth = Text.getApproximateWidth(this.string.at(-1), this.height);
+    const startOffsetAngle = this.linearToAngular(this.offsetFromRight, radialDistance) + this.linearToAngular(firstCharWidth * 0.5, radialDistance);
+    const endOffsetAngle = this.linearToAngular(this.offsetFromLeft, radialDistance) + this.linearToAngular(lastCharWidth * 0.5, radialDistance);
 
     // default to the arc end position as the string start
-    let stringStartPoint = endPosition;
+    let stringStartPoint = this.points[0].project(this.endAngle() - endOffsetAngle, radialDistance);
     // direction: - ccw > 0, cw <= 0
     let direction = 1; // default to ccw
 
     let string = this.string.slice(); // make a copy of the string
 
     // 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
-    if (this.textAlignment === 1) { // fit to arc
-      totalCharWidthAsAngle = totalArcAngle / (this.string.length - 1);
-    }
-    if (this.textAlignment === 2) { // left align
-      // default
-    }
     if (this.textAlignment === 3) { // right align
       // start at the arc start position and create the text cw around the arc
-      stringStartPoint = startPosition;
+      stringStartPoint = this.points[0].project(this.startAngle() + startOffsetAngle, radialDistance);
       direction = -1;
-      string = string.split('').reverse().join('');
-    }
-    if (this.textAlignment === 4) { // center
-      const arcMidPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
-      stringStartPoint = arcMidPoint.rotate(this.points[0], 0.5 * totalCharWidthAsAngle * (string.length - 1));
+      string = [...string].reverse().join('');
     }
 
     // calculate the text rotation angle: 1 = outward, 2 = inward
@@ -431,23 +419,52 @@ export class ArcAlignedText extends Entity {
 
     if (this.textOrientation === 2) {
       // direction = -direction;
-      string = string.split('').reverse().join('');
+      string = [...string].reverse().join('');
     }
 
     /*
     if (this.textReversed === 1) {
       // reverse the string
-      string = string.split('').reverse().join('');
+      string = [...string].reverse().join('');
       // reverse the direction
       direction = -direction;
     }
       */
 
+    // build per-character widths for the final (possibly reversed) string
+    const charWidths = [...string].map((ch) => Text.getApproximateWidth(ch, this.height));
+
+    // build cumulative arc angle offsets from the string start position to each character center
+    // step between adjacent centers is the average of their two half-widths plus spacing
+    const charOffsetAngles = [0];
+    if (this.textAlignment === 1) { // fit to arc
+      if (string.length === 1) {
+        // single character: place at arc midpoint — division by zero otherwise
+        stringStartPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
+      } else {
+        const totalArcAngle = Math.abs(this.endAngle() - this.startAngle()) - startOffsetAngle - endOffsetAngle;
+        const fitStep = totalArcAngle / (string.length - 1);
+        for (let i = 1; i < string.length; i++) {
+          charOffsetAngles.push(fitStep * i);
+        }
+      }
+    } else {
+      for (let i = 0; i < string.length - 1; i++) {
+        const step = (charWidths[i] + charWidths[i + 1]) / 2 + this.characterSpacing;
+        charOffsetAngles.push(charOffsetAngles[i] + this.linearToAngular(step * 0.5, radialDistance));
+      }
+
+      if (this.textAlignment === 4) { // center
+        const arcMidPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
+        stringStartPoint = arcMidPoint.rotate(this.points[0], charOffsetAngles.at(-1) * 0.5);
+      }
+    }
+
     // loop through string and calculate position and angle of each character
     for (let index = 0; index < string.length; index++) {
-      const charPosition = stringStartPoint.rotate(this.points[0], -totalCharWidthAsAngle*((index) * direction));
+      const charPosition = stringStartPoint.rotate(this.points[0], -charOffsetAngles[index] * direction);
       const charAngle = this.points[0].angle(charPosition) - textRotationAngle;
-      const arcChar = new ArcAlignedCharacter(string[index], charPosition, charAngle, this.height);
+      const arcChar = new ArcAlignedCharacter(string[index], charPosition, charAngle, this.height, charWidths[index]);
       arcAlignedCharacters.push(arcChar);
     }
 
@@ -460,14 +477,33 @@ export class ArcAlignedText extends Entity {
    * @param {number} scale
    */
   draw(ctx, scale) {
+    // Detect hover/selection halo pass: setContext adds lineWidthDelta (5 px) to the line width.
+    // HTML Canvas: setContext writes ctx.lineWidth directly (readable property).
+    // Cairo: setContext calls setLineWidth(); read it back via getLineWidth().
+    // lineWidthDelta > 2 identifies the hovered or selected pass (selectionLineWidthDelta = 5 in canvas.js).
+    const ctxLineWidth = ctx.lineWidth ?? ctx.getLineWidth?.() ?? 0;
+    const isHoveredOrSelected = (ctxLineWidth * scale - this.lineWidth) > 2;
+
     ctx.save(); // save current context before scale and translate
     ctx.scale(1, -1);
 
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
 
-    // Cairo
-    ctx.setFontSize(this.height);
-    ctx.selectFontFace(style?.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL);
+    try { // HTML Canvas
+      ctx.font = this.height + 'pt ' + style?.font;
+      ctx.measureText('M'); // Canvas-only method — throws on Cairo, confirming the context type
+    } catch { // Cairo
+      ctx.selectFontFace(style?.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+
+      // Hack to test the text height vs bounding box height to find a scale factor to make the drawn text match the specified height.
+      // This is needed because Cairo's font size is not the same as the actual drawn text height, and can vary based on the font used.
+      // This is a rough approximation and may not be accurate for all fonts or sizes.
+      ctx.setFontSize(this.height);
+      const refChar = this.string || 'A';
+      const drawTextRect = ctx.textExtents(refChar);
+      // Adjust the font size by the ratio of the desired height to the drawn height to get closer to the desired text height.
+      ctx.setFontSize(this.height * this.height / drawTextRect.height);
+    }
 
     const ArcAlignedCharacters = this.getArcAlignedCharacters();
 
@@ -475,7 +511,28 @@ export class ArcAlignedText extends Entity {
       ctx.save(); // save current context
       ctx.translate(arcAlignedChar.baseline.x, -arcAlignedChar.baseline.y);
       ctx.rotate(-arcAlignedChar.angle);
-      ctx.showText(String(arcAlignedChar.character));
+
+      const char = arcAlignedChar.character;
+
+      try { // HTML Canvas
+        if (isHoveredOrSelected) {
+          ctx.strokeText(char, 0, 0);
+        } else {
+          ctx.fillText(char, 0, 0);
+        }
+      } catch { // Cairo
+        if (isHoveredOrSelected) {
+          // cairo_text_path is not yet available in the GNOME SDK version of GJS.
+          // Simulate a stroke-like halo by drawing the text at 8 small offsets.
+          const d = ctx.getLineWidth() / 2;
+          for (const [dx, dy] of [[d, 0], [-d, 0], [0, d], [0, -d], [d, d], [-d, d], [d, -d], [-d, -d]]) {
+            ctx.moveTo(dx, dy);
+            ctx.showText(char);
+          }
+        } else {
+          ctx.showText(char);
+        }
+      }
 
       ctx.stroke();
       ctx.restore(); // restore context

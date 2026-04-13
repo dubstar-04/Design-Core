@@ -490,7 +490,7 @@ test('Text constructor covers all property branches', () => {
 
 test('Text static register and getApproximateWidth', () => {
   expect(Text.register()).toEqual({ command: 'Text', shortcut: 'DT', type: 'Entity' });
-  expect(Text.getApproximateWidth('abc', 10)).toBeCloseTo(18);
+  expect(Text.getApproximateWidth('abc', 10)).toBeCloseTo(16.2);
 });
 
 test('Text getHorizontalAlignment covers all cases', () => {
@@ -669,4 +669,62 @@ test('Text.preview - shows text entity when waiting for string input', () => {
   expect(DesignCore.Scene.auxiliaryEntities.count()).toBe(0);
 
   DesignCore.Scene.inputManager.promptOption = undefined;
+});
+
+test('Text.getApproximateWidth unknown character uses fallback width', () => {
+  // Unknown characters fall back to 0.56 em per character
+  const unknown = Text.getApproximateWidth('€', 10);
+  expect(unknown).toBeCloseTo(5.6);
+});
+
+test('Text.getApproximateWidth empty string returns 0', () => {
+  expect(Text.getApproximateWidth('', 10)).toBe(0);
+});
+
+test('Text setRotation with height 0 does not move points[1]', () => {
+  const t = new Text({ points: [new Point(0, 0)] });
+  t.height = 0;
+  const originalPoint1 = t.points[1];
+  t.setRotation(45);
+  expect(t.points[1]).toBe(originalPoint1);
+});
+
+test('Text constructor remaps insertion point from sequence-11 point', () => {
+  // When points[1] has sequence == 11, it becomes the new insertion point (points[0])
+  const t = new Text({
+    points: [
+      { x: 0, y: 0 },
+      { x: 50, y: 75, sequence: 11 },
+    ],
+  });
+  expect(t.points[0].x).toBe(50);
+  expect(t.points[0].y).toBe(75);
+});
+
+test('Text getHorizontalAlignment unsupported cases return left when verticalAlignment !== 0', () => {
+  const t = new Text({ points: [new Point()] });
+  t.verticalAlignment = 1; // non-zero
+
+  t.horizontalAlignment = 3;
+  expect(t.getHorizontalAlignment()).toBe('left');
+
+  t.horizontalAlignment = 4;
+  expect(t.getHorizontalAlignment()).toBe('left');
+
+  t.horizontalAlignment = 5;
+  expect(t.getHorizontalAlignment()).toBe('left');
+});
+
+test('Text.dxf includes non-zero flags and rotation', () => {
+  const text = new Text({ handle: '1', points: [new Point(0, 0)] });
+  text.backwards = true; // flag value 2
+  text.upsideDown = true; // flag value 4  → combined = 6
+  text.setRotation(90);
+  text.string = 'R';
+
+  const file = new File();
+  text.dxf(file);
+
+  expect(file.contents).toContain('71\n6\n');
+  expect(file.contents).toContain('50\n90\n');
 });
