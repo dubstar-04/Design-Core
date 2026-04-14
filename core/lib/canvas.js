@@ -11,6 +11,7 @@ export class Canvas {
   #panCursorTimeout;
   #baseCursorState = 'DEFAULT';
   #lastPanCanvasPoint = new Point();
+  #renderer = null;
 
   /** Create Canvas */
   constructor() {
@@ -51,6 +52,15 @@ export class Canvas {
   setExternalPaintCallbackFunction(callback) {
     // set the callback
     this.externalPaintCallbackFunction = callback;
+  }
+
+  /**
+   * Set the renderer class to use for entity drawing.
+   * Must be called once during UI initialisation before the first paint.
+   * @param {Function} RendererClass - CanvasRenderer or CairoRenderer class
+   */
+  setRenderer(RendererClass) {
+    this.#renderer = RendererClass;
   }
 
   /**
@@ -267,15 +277,11 @@ export class Canvas {
       this.flipped = true;
     }
 
+    const renderer = new this.#renderer(context);
+
     // set the transform for the context
     // this will set all the pan and zoom actions
-    try {
-      context.setTransform(this.matrix);
-    } catch {
-      // context.setMatrix(this.matrix)
-      context.translate(this.matrix.e, this.matrix.f);
-      context.scale(this.matrix.a, this.matrix.d);
-    }
+    renderer.setTransform(this.matrix);
 
     const pos = new Point();
     const origin = DesignCore.Mouse.transformToScene(pos);
