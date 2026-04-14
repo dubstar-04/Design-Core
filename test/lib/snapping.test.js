@@ -70,21 +70,10 @@ test('Test SnapPoint.draw', () => {
   DesignCore.Scene.auxiliaryEntities.clear();
   snapping.addSnapPoint(new SnapPoint(new Point(0.5, 0.5), SnapPoint.Type.CENTRE));
   const snapPointEntity = DesignCore.Scene.auxiliaryEntities.get(0);
-  const ctx = {
-    strokeStyle: '',
-    lineWidth: 0,
-    setLineDash: jest.fn(),
-    beginPath: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    closePath: jest.fn(),
-    arc: jest.fn(),
-    stroke: jest.fn(),
-  };
-  snapPointEntity.draw(ctx, 1);
-  expect(ctx.beginPath).toHaveBeenCalled();
-  expect(ctx.arc).toHaveBeenCalledWith(0.5, 0.5, expect.any(Number), 0, 6.283);
-  expect(ctx.stroke).toHaveBeenCalled();
+  const renderer = makeSnapRenderer();
+  snapPointEntity.draw(renderer, 1);
+  expect(renderer.setColour).toHaveBeenCalled();
+  expect(renderer.drawShape).toHaveBeenCalled();
 });
 
 test('Test Snapping.addTrackingLine', () => {
@@ -99,23 +88,11 @@ test('Test TrackingLine.draw', () => {
   // note: the default matrix has d=-1, so scene y is in [-1, 0] for a 1x1 canvas
   snapping.addTrackingLine(new Point(0.2, -0.5), new Point(0.8, -0.5));
   const trackingLine = DesignCore.Scene.auxiliaryEntities.get(0);
-  const ctx = {
-    save: jest.fn(),
-    restore: jest.fn(),
-    beginPath: jest.fn(),
-    strokeStyle: '',
-    lineWidth: 0,
-    setLineDash: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
-  };
-  trackingLine.draw(ctx, 1);
-  expect(ctx.save).toHaveBeenCalled();
-  expect(ctx.moveTo).toHaveBeenCalled();
-  expect(ctx.lineTo).toHaveBeenCalled();
-  expect(ctx.stroke).toHaveBeenCalled();
-  expect(ctx.restore).toHaveBeenCalled();
+  const renderer = makeTrackingRenderer();
+  trackingLine.draw(renderer, 1);
+  expect(renderer.save).toHaveBeenCalled();
+  expect(renderer.drawShape).toHaveBeenCalled();
+  expect(renderer.restore).toHaveBeenCalled();
 });
 
 test('Test TrackingLine.draw degenerate zero direction', () => {
@@ -123,20 +100,10 @@ test('Test TrackingLine.draw degenerate zero direction', () => {
   // inputPoint equals snapPoint → direction is zero vector → draw returns early
   snapping.addTrackingLine(new Point(0.5, 0.5), new Point(0.5, 0.5));
   const trackingLine = DesignCore.Scene.auxiliaryEntities.get(0);
-  const ctx = {
-    save: jest.fn(),
-    restore: jest.fn(),
-    beginPath: jest.fn(),
-    strokeStyle: '',
-    lineWidth: 0,
-    setLineDash: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
-  };
-  trackingLine.draw(ctx, 1);
-  expect(ctx.moveTo).not.toHaveBeenCalled();
-  expect(ctx.stroke).not.toHaveBeenCalled();
+  const renderer = makeTrackingRenderer();
+  trackingLine.draw(renderer, 1);
+  expect(renderer.drawShape).not.toHaveBeenCalled();
+  expect(renderer.restore).not.toHaveBeenCalled();
 });
 
 test('Test Snapping.polarSnap', () => {
@@ -200,35 +167,27 @@ test('Test Snapping.orthoSnap', () => {
   expect(snapping.orthoSnap(new Point(0, 0))).toBeUndefined();
 });
 
-// ─── Context mock helpers ────────────────────────────────────────────────────
+// ─── Renderer mock helpers ──────────────────────────────────────────────────
 
-/** @return {object} mock HTML canvas context for SnapPoint.draw tests */
-function makeSnapCtx() {
+/** @return {object} mock renderer for SnapPoint.draw tests */
+function makeSnapRenderer() {
   return {
-    strokeStyle: '',
-    lineWidth: 0,
-    setLineDash: jest.fn(),
-    beginPath: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    closePath: jest.fn(),
-    arc: jest.fn(),
-    stroke: jest.fn(),
+    setColour: jest.fn(),
+    setLineWidth: jest.fn(),
+    setDash: jest.fn(),
+    drawShape: jest.fn(),
   };
 }
 
-/** @return {object} mock HTML canvas context for TrackingLine.draw tests */
-function makeTrackingCtx() {
+/** @return {object} mock renderer for TrackingLine.draw tests */
+function makeTrackingRenderer() {
   return {
     save: jest.fn(),
     restore: jest.fn(),
-    beginPath: jest.fn(),
-    strokeStyle: '',
-    lineWidth: 0,
-    setLineDash: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
+    setColour: jest.fn(),
+    setLineWidth: jest.fn(),
+    setDash: jest.fn(),
+    drawShape: jest.fn(),
   };
 }
 
@@ -295,74 +254,58 @@ test('Test Snapping.getSnapPoint with non-matching override returns undefined', 
 
 // ─── SnapPoint.draw – all snap types ────────────────────────────────────────
 
-test('Test SnapPoint.draw END type draws closed polygon without arc', () => {
+test('Test SnapPoint.draw END type draws closed polygon', () => {
   const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.END);
-  const ctx = makeSnapCtx();
-  sp.draw(ctx, 1);
-  expect(ctx.beginPath).toHaveBeenCalled();
-  expect(ctx.closePath).toHaveBeenCalled();
-  expect(ctx.stroke).toHaveBeenCalled();
-  expect(ctx.arc).not.toHaveBeenCalled();
+  const renderer = makeSnapRenderer();
+  sp.draw(renderer, 1);
+  expect(renderer.drawShape).toHaveBeenCalledTimes(1);
+  expect(renderer.drawShape).toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
-test('Test SnapPoint.draw MID type draws closed polygon without arc', () => {
+test('Test SnapPoint.draw MID type draws closed polygon', () => {
   const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.MID);
-  const ctx = makeSnapCtx();
-  sp.draw(ctx, 1);
-  expect(ctx.beginPath).toHaveBeenCalled();
-  expect(ctx.closePath).toHaveBeenCalled();
-  expect(ctx.stroke).toHaveBeenCalled();
-  expect(ctx.arc).not.toHaveBeenCalled();
+  const renderer = makeSnapRenderer();
+  sp.draw(renderer, 1);
+  expect(renderer.drawShape).toHaveBeenCalledTimes(1);
+  expect(renderer.drawShape).toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
-test('Test SnapPoint.draw QUADRANT type draws closed polygon without arc', () => {
+test('Test SnapPoint.draw QUADRANT type draws closed polygon', () => {
   const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.QUADRANT);
-  const ctx = makeSnapCtx();
-  sp.draw(ctx, 1);
-  expect(ctx.beginPath).toHaveBeenCalled();
-  expect(ctx.closePath).toHaveBeenCalled();
-  expect(ctx.stroke).toHaveBeenCalled();
-  expect(ctx.arc).not.toHaveBeenCalled();
+  const renderer = makeSnapRenderer();
+  sp.draw(renderer, 1);
+  expect(renderer.drawShape).toHaveBeenCalledTimes(1);
+  expect(renderer.drawShape).toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
-test('Test SnapPoint.draw NEAREST type draws closed polygon without arc', () => {
+test('Test SnapPoint.draw NEAREST type draws closed polygon', () => {
   const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.NEAREST);
-  const ctx = makeSnapCtx();
-  sp.draw(ctx, 1);
-  expect(ctx.beginPath).toHaveBeenCalled();
-  expect(ctx.closePath).toHaveBeenCalled();
-  expect(ctx.stroke).toHaveBeenCalled();
-  expect(ctx.arc).not.toHaveBeenCalled();
+  const renderer = makeSnapRenderer();
+  sp.draw(renderer, 1);
+  expect(renderer.drawShape).toHaveBeenCalledTimes(1);
+  expect(renderer.drawShape).toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
-test('Test SnapPoint.draw TANGENT type draws arc with tangent line', () => {
+test('Test SnapPoint.draw TANGENT type draws circle and tangent line', () => {
   const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.TANGENT);
-  const ctx = makeSnapCtx();
-  sp.draw(ctx, 1);
-  expect(ctx.beginPath).toHaveBeenCalled();
-  expect(ctx.arc).toHaveBeenCalledWith(5, 5, expect.any(Number), 0, 6.283);
-  expect(ctx.stroke).toHaveBeenCalled();
-  expect(ctx.closePath).not.toHaveBeenCalled();
+  const renderer = makeSnapRenderer();
+  sp.draw(renderer, 1);
+  expect(renderer.drawShape).toHaveBeenCalledTimes(2);
 });
 
-test('Test SnapPoint.draw NODE type draws arc with X inside', () => {
+test('Test SnapPoint.draw NODE type draws circle and X lines', () => {
   const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.NODE);
-  const ctx = makeSnapCtx();
-  sp.draw(ctx, 1);
-  expect(ctx.beginPath).toHaveBeenCalled();
-  expect(ctx.arc).toHaveBeenCalledWith(5, 5, expect.any(Number), 0, 6.283);
-  expect(ctx.stroke).toHaveBeenCalled();
-  expect(ctx.closePath).not.toHaveBeenCalled();
+  const renderer = makeSnapRenderer();
+  sp.draw(renderer, 1);
+  expect(renderer.drawShape).toHaveBeenCalledTimes(3);
 });
 
-test('Test SnapPoint.draw PERPENDICULAR type draws L-shape without arc', () => {
+test('Test SnapPoint.draw PERPENDICULAR type draws L-shape', () => {
   const sp = new SnapPoint(new Point(5, 5), SnapPoint.Type.PERPENDICULAR);
-  const ctx = makeSnapCtx();
-  sp.draw(ctx, 1);
-  expect(ctx.beginPath).toHaveBeenCalled();
-  expect(ctx.stroke).toHaveBeenCalled();
-  expect(ctx.closePath).not.toHaveBeenCalled();
-  expect(ctx.arc).not.toHaveBeenCalled();
+  const renderer = makeSnapRenderer();
+  sp.draw(renderer, 1);
+  expect(renderer.drawShape).toHaveBeenCalledTimes(1);
+  expect(renderer.drawShape).not.toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
 // ─── TrackingLine.draw – out-of-bounds cases ─────────────────────────────────
@@ -372,10 +315,10 @@ test('Test TrackingLine.draw vertical line outside x bounds', () => {
   // dir.x === 0 and from.x = 2 > boundsMax.x = 1 → draw returns early
   snapping.addTrackingLine(new Point(2, -0.5), new Point(2, 0.5));
   const trackingLine = DesignCore.Scene.auxiliaryEntities.get(0);
-  const ctx = makeTrackingCtx();
-  trackingLine.draw(ctx, 1);
-  expect(ctx.moveTo).not.toHaveBeenCalled();
-  expect(ctx.stroke).not.toHaveBeenCalled();
+  const renderer = makeTrackingRenderer();
+  trackingLine.draw(renderer, 1);
+  expect(renderer.drawShape).not.toHaveBeenCalled();
+  expect(renderer.restore).not.toHaveBeenCalled();
 });
 
 test('Test TrackingLine.draw horizontal line outside y bounds', () => {
@@ -383,10 +326,10 @@ test('Test TrackingLine.draw horizontal line outside y bounds', () => {
   // dir.y === 0 and from.y = -5 < boundsMin.y = -1 → draw returns early
   snapping.addTrackingLine(new Point(0.5, -5), new Point(0.8, -5));
   const trackingLine = DesignCore.Scene.auxiliaryEntities.get(0);
-  const ctx = makeTrackingCtx();
-  trackingLine.draw(ctx, 1);
-  expect(ctx.moveTo).not.toHaveBeenCalled();
-  expect(ctx.stroke).not.toHaveBeenCalled();
+  const renderer = makeTrackingRenderer();
+  trackingLine.draw(renderer, 1);
+  expect(renderer.drawShape).not.toHaveBeenCalled();
+  expect(renderer.restore).not.toHaveBeenCalled();
 });
 
 test('Test TrackingLine.draw line does not intersect canvas bounds', () => {
@@ -395,8 +338,8 @@ test('Test TrackingLine.draw line does not intersect canvas bounds', () => {
   // tMax (-1) < tMin (-0.5) → draw returns early
   snapping.addTrackingLine(new Point(2, -0.5), new Point(3, 0.5));
   const trackingLine = DesignCore.Scene.auxiliaryEntities.get(0);
-  const ctx = makeTrackingCtx();
-  trackingLine.draw(ctx, 1);
-  expect(ctx.moveTo).not.toHaveBeenCalled();
-  expect(ctx.stroke).not.toHaveBeenCalled();
+  const renderer = makeTrackingRenderer();
+  trackingLine.draw(renderer, 1);
+  expect(renderer.drawShape).not.toHaveBeenCalled();
+  expect(renderer.restore).not.toHaveBeenCalled();
 });
