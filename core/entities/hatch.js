@@ -625,7 +625,7 @@ export class Hatch extends Entity {
    * @param {Object} ctx - context
    * @param {number} scale
    */
-  draw(ctx, scale) {
+  draw(renderer) {
     // ensure the scale is valid
     if (this.scale < 0.01) {
       this.scale = 1;
@@ -638,103 +638,23 @@ export class Hatch extends Entity {
     if (this.cachedPattern === null) this.buildPatternCache();
 
     if (this.solid) {
-      // Solid fill: clip region + fill rectangle
-      ctx.save();
+      // TODO: solid fill requires renderer clip API — not yet implemented
+      return;
+    }
 
-      this.traceBoundaryPath(ctx, scale);
-
-      try { // Cairo - clip() takes no arguments, uses the fill rule set above
-        ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
-        ctx.clip();
-      } catch { // HTML Canvas
-        ctx.clip('evenodd');
-      }
-
-      try {
-        ctx.beginPath();
-      } catch { // Cairo
-        ctx.newPath();
-      }
-
-      const bb = this.boundingBox();
-      try {
-        ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-      } catch { // Cairo
-        ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-      }
-
-      ctx.fill();
-      ctx.restore();
-    } else {
-      // Pattern hatch: draw pre-clipped segments directly — no ctx.save/clip/restore needed.
-      // Segments were clipped against the boundary during buildPatternCache() so only visible
-      // portions are stored, eliminating per-frame clip region overhead.
-      for (const family of this.cachedPattern) {
-        if (!family.dashes.length) {
-          // Solid-line family: batch all segments into one path for performance
-          try {
-            ctx.setLineDash([]);
-            ctx.beginPath();
-          } catch { // Cairo
-            ctx.setDash([], 0);
-            ctx.newPath();
-          }
-          for (const seg of family.segments) {
-            ctx.moveTo(seg.x1, seg.y1);
-            ctx.lineTo(seg.x2, seg.y2);
-          }
-          ctx.stroke();
-        } else {
-          // Dashed family: each sub-segment needs its own dash phase to maintain
-          // pattern continuity across clipped boundaries.
-          for (const seg of family.segments) {
-            try {
-              ctx.setLineDash(family.dashes);
-              ctx.lineDashOffset = seg.dashPhase;
-              ctx.beginPath();
-            } catch { // Cairo
-              ctx.setDash(family.dashes, seg.dashPhase);
-              ctx.newPath();
-            }
-            ctx.moveTo(seg.x1, seg.y1);
-            ctx.lineTo(seg.x2, seg.y2);
-            ctx.stroke();
-          }
-        }
-      }
+    // Pattern hatch: draw pre-clipped segments directly.
+    for (const family of this.cachedPattern) {
+      renderer.setDash([], 0);
+      renderer.drawSegments(family.segments, family.dashes);
     }
 
     // When selected, stroke the boundary outline so the hatch region is visible.
-    // The canvas makes two passes over selected items (halo + normal), so this
-    // automatically receives both the accent-colour glow and the entity colour.
     if (DesignCore.Scene.selectionManager.selectedItems.includes(this)) {
-      try {
-        ctx.setLineDash([]);
-      } catch { // Cairo
-        ctx.setDash([], 0);
+      renderer.setDash([], 0);
+      for (const shape of this.childEntities) {
+        if (!shape.points.length) continue;
+        renderer.drawShape(this, shape.toPolylinePoints(), { closed: true });
       }
-      this.traceBoundaryPath(ctx, scale);
-      ctx.stroke();
-    }
-  }
-
-  /**
-   * Trace all boundary shapes into the current canvas path as closed sub-paths.
-   * Used by both the solid-fill clip pass and the selection outline pass.
-   * @param {Object} ctx - canvas context
-   * @param {number} scale
-   */
-  traceBoundaryPath(ctx, scale) {
-    try {
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.newPath();
-    }
-    for (const shape of this.childEntities) {
-      if (!shape.points.length) continue;
-      ctx.moveTo(shape.points[0].x, shape.points[0].y);
-      shape.draw(ctx, scale, false);
-      ctx.closePath();
     }
   }
 
