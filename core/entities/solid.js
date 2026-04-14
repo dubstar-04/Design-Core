@@ -19,20 +19,10 @@ export class Solid extends Entity {
 
   /**
    * Draw the entity
-   * @param {Object} ctx - context
-   * @param {number} scale
+   * @param {Object} renderer
    */
-  draw(ctx, scale) {
-    this.points.forEach((point, index) => {
-      if (index == 0) {
-        ctx.moveTo(point.x, point.y);
-      } else {
-        ctx.lineTo(point.x, point.y);
-      }
-    });
-
-    ctx.closePath();
-    ctx.fill();
+  draw(renderer) {
+    renderer.drawShape(this, this.points, { closed: true, fill: true, stroke: false });
   }
 
   /**
