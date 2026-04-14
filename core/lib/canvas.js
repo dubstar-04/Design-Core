@@ -287,25 +287,6 @@ export class Canvas {
     const origin = DesignCore.Mouse.transformToScene(pos);
 
     // Paint the scene background
-    try {// HTML
-      // this.clear()
-      context.fillStyle = Colours.rgbToString(DesignCore.Settings.canvasbackgroundcolour);
-      context.fillRect(origin.x, origin.y, width / this.getScale(), height / this.getScale());
-      // context.globalAlpha = this.cvs.alpha
-    } catch { // Cairo
-      const rgbColour = Colours.rgbToScaledRGB(DesignCore.Settings.canvasbackgroundcolour);
-      context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-      const scaled = new Point(width, height);
-      const sc = DesignCore.Mouse.transformToScene(scaled);
-      context.moveTo(origin.x, origin.y);
-      context.lineTo(origin.x, sc.y);
-      context.lineTo(sc.x, sc.y);
-      context.lineTo(sc.x, origin.y);
-      context.lineTo(origin.x, origin.y);
-      context.fill();
-    }
-
-    this.paintGrid(context, width, height);
     renderer.fillBackground(
         DesignCore.Settings.canvasbackgroundcolour,
         origin,
@@ -422,23 +403,9 @@ export class Canvas {
       }
     }
 
-    lineWidth += (overrides.lineWidthDelta ?? 0) / scale;
-
-    try { // HTML Canvas
-      context.strokeStyle = Colours.rgbToString(colour);
-      context.fillStyle = Colours.rgbToString(colour);
-      context.lineWidth = lineWidth;
-      context.lineCap = 'round';
-      context.setLineDash(lineType.getPattern(scale));
-      context.lineDashOffset = 0;
-      context.beginPath();
-    } catch { // Cairo
-      const rgbColour = Colours.rgbToScaledRGB(colour);
-      context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-      context.setDash(lineType.getPattern(scale), 1);
-      context.setLineWidth(lineWidth);
-      context.setLineCap(1); // Cairo.LineCap.ROUND
-    }
+    renderer.setColour(colour);
+    renderer.setLineWidth(lineWidth);
+    renderer.setDash(lineType.getPattern(scale), 0);
   }
 
   /**
