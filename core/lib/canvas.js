@@ -439,7 +439,7 @@ export class Canvas {
 
   /**
    * Paint the background grid
-   * @param {object} context
+   * @param {object} renderer
    */
   paintGrid(renderer) {
     const scale = this.getScale();
