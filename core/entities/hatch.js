@@ -622,7 +622,7 @@ export class Hatch extends Entity {
 
   /**
    * Draw the entity
-   * @param {Object} ctx - context
+   * @param {Object} renderer
    * @param {number} scale
    */
   draw(renderer) {
