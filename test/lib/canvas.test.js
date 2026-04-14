@@ -4,9 +4,12 @@ import { Matrix } from '../../core/lib/matrix.js';
 import { Input } from '../../core/lib/input.js';
 import { Colour } from '../../core/lib/colour.js';
 import { jest } from '@jest/globals';
+import { MockRenderer } from '../test-helpers/test-helpers.js';
 
 const core = new Core();
 const canvas = core.canvas;
+
+canvas.setRenderer(MockRenderer);
 
 /**
  * Create a mock canvas rendering context for testing
@@ -207,36 +210,36 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   });
 
   test('ACI 7 is white on dark background', () => {
-    const context = createMockContext();
+    const renderer = new MockRenderer();
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-    canvas.setContext(aci7MockEntity, context);
-    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+    canvas.setContext(aci7MockEntity, renderer);
+    expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
   });
 
   test('ACI 7 is black on light background', () => {
-    const context = createMockContext();
+    const renderer = new MockRenderer();
     core.settings.canvasbackgroundcolour = { r: 246, g: 245, b: 244 };
-    canvas.setContext(aci7MockEntity, context);
-    expect(context.strokeStyle).toBe('rgb(0, 0, 0)');
+    canvas.setContext(aci7MockEntity, renderer);
+    expect(renderer.strokeStyle).toBe('rgb(0, 0, 0)');
   });
 
   test('non-ACI-7 near-white colour is not recoloured', () => {
-    const context = createMockContext();
+    const renderer = new MockRenderer();
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-    canvas.setContext(nearWhiteMockEntity, context);
-    expect(context.strokeStyle).toBe('rgb(254, 254, 254)');
+    canvas.setContext(nearWhiteMockEntity, renderer);
+    expect(renderer.strokeStyle).toBe('rgb(254, 254, 254)');
   });
 
   test('true colour with fallback aci=7 is not recoloured', () => {
-    const context = createMockContext();
+    const renderer = new MockRenderer();
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-    canvas.setContext(trueColourFallbackAci7MockEntity, context);
-    expect(context.strokeStyle).toBe('rgb(200, 100, 50)');
+    canvas.setContext(trueColourFallbackAci7MockEntity, renderer);
+    expect(renderer.strokeStyle).toBe('rgb(200, 100, 50)');
   });
 
   test('ACI 7 via ByLayer resolves white on dark background', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-    const context = createMockContext();
+    const renderer = new MockRenderer();
     const byLayerEntity = {
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       getLineType: () => ({ getPattern: () => [] }),
@@ -244,13 +247,13 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
       entityColour: { aci: 256, byLayer: true, byBlock: false },
       layer: '0',
     };
-    canvas.setContext(byLayerEntity, context);
-    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+    canvas.setContext(byLayerEntity, renderer);
+    expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
   });
 
   test('ACI 7 via ByBlock (direct) resolves white on dark background', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-    const context = createMockContext();
+    const renderer = new MockRenderer();
     const byBlockItem = {
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       getLineType: () => ({ getPattern: () => [] }),
@@ -261,13 +264,13 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       entityColour: { aci: 7, byLayer: false, byBlock: false },
     };
-    canvas.setContext(byBlockItem, context, block);
-    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+    canvas.setContext(byBlockItem, renderer, block);
+    expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
   });
 
   test('ACI 7 via ByBlock → ByLayer resolves white on dark background', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-    const context = createMockContext();
+    const renderer = new MockRenderer();
     const byBlockItem = {
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       getLineType: () => ({ getPattern: () => [] }),
@@ -279,16 +282,16 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
       entityColour: { aci: 256, byLayer: true, byBlock: false },
       layer: '0',
     };
-    canvas.setContext(byBlockItem, context, block);
-    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+    canvas.setContext(byBlockItem, renderer, block);
+    expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
   });
 
   test('ACI 7 is recoloured in SELECTED state', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
-    const context = createMockContext();
-    canvas.setContext(aci7MockEntity, context);
+    const renderer = new MockRenderer();
+    canvas.setContext(aci7MockEntity, renderer);
     // SELECTED pass uses no special flags — ACI 7 background-adaptive logic still applies
-    expect(context.strokeStyle).toBe('rgb(255, 255, 255)');
+    expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
   });
 });
 
@@ -309,29 +312,32 @@ describe('Test Canvas.setContext ByBlock colour', () => {
   };
 
   test('ByBlock item inherits draw colour from block', () => {
-    const context = createMockContext();
-    canvas.setContext(byBlockItem, context, block);
-    expect(context.strokeStyle).toBe('rgb(255, 0, 0)');
-    expect(context.fillStyle).toBe('rgb(255, 0, 0)');
+    const renderer = new MockRenderer();
+    canvas.setContext(byBlockItem, renderer, block);
+    expect(renderer.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(renderer.fillStyle).toBe('rgb(255, 0, 0)');
   });
 
-  test('overrides.colour takes precedence over ByBlock colour resolution', () => {
-    const context = createMockContext();
-    canvas.setContext(byBlockItem, context, block, { colour: { r: 0, g: 255, b: 0 } });
-    // overrides.colour wins unconditionally over ByBlock
-    expect(context.strokeStyle).toBe('rgb(0, 255, 0)');
+  test('overrides.colour is the glow colour; ByBlock colour resolution still applies for normal draw', () => {
+    const renderer = new MockRenderer();
+    canvas.setContext(byBlockItem, renderer, block, { colour: { r: 0, g: 255, b: 0 } });
+    // Entity still draws in its ByBlock-resolved colour
+    expect(renderer.strokeStyle).toBe('rgb(255, 0, 0)');
+    // overrides.colour goes into the highlight glow
+    expect(renderer.isHighlighted).toBe(true);
+    expect(renderer.highlightColour).toEqual({ r: 0, g: 255, b: 0 });
   });
 
   test('non-ByBlock item with block keeps its own colour', () => {
-    const context = createMockContext();
+    const renderer = new MockRenderer();
     const directItem = {
       getDrawColour: () => ({ r: 0, g: 255, b: 0 }),
       getLineType: () => ({ getPattern: () => [] }),
       lineWidth: 1,
       entityColour: { aci: 2, byLayer: false, byBlock: false },
     };
-    canvas.setContext(directItem, context, block);
-    expect(context.strokeStyle).toBe('rgb(0, 255, 0)');
+    canvas.setContext(directItem, renderer, block);
+    expect(renderer.strokeStyle).toBe('rgb(0, 255, 0)');
   });
 });
 
@@ -349,42 +355,46 @@ describe('Test Canvas.setContext paint states', () => {
   });
 
   test('default (no flags) uses entity colour and normal lineWidth', () => {
-    const context = createMockContext();
-    canvas.setContext(redEntity, context);
-    expect(context.strokeStyle).toBe('rgb(255, 0, 0)');
-    expect(context.fillStyle).toBe('rgb(255, 0, 0)');
-    expect(context.lineWidth).toBe(10 / canvas.getScale());
+    const renderer = new MockRenderer();
+    canvas.setContext(redEntity, renderer);
+    expect(renderer.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(renderer.fillStyle).toBe('rgb(255, 0, 0)');
+    expect(renderer.lineWidth).toBe(10 / canvas.getScale());
   });
 
-  test('overrides.colour and overrides.lineWidthDelta override colour and widen line', () => {
-    const context = createMockContext();
+  test('overrides.colour becomes the highlight glow colour; entity draws in its natural colour', () => {
+    const renderer = new MockRenderer();
     const haloColour = Colour.blend(core.settings.accentcolour, core.settings.canvasbackgroundcolour, 0.5);
-    canvas.setContext(redEntity, context, undefined, { colour: haloColour, lineWidthDelta: 4 });
-    expect(context.strokeStyle).toBe(`rgb(${haloColour.r}, ${haloColour.g}, ${haloColour.b})`);
-    expect(context.lineWidth).toBe(10 / canvas.getScale() + 4 / canvas.getScale());
+    canvas.setContext(redEntity, renderer, undefined, { colour: haloColour, lineWidthDelta: 4 });
+    // Entity always draws in its own colour on the normal pass
+    expect(renderer.strokeStyle).toBe('rgb(255, 0, 0)');
+    // lineWidthDelta goes to the highlight delta, not to lineWidth
+    expect(renderer.lineWidth).toBe(10 / canvas.getScale());
+    expect(renderer.isHighlighted).toBe(true);
+    expect(renderer.highlightColour).toEqual(haloColour);
+    expect(renderer.highlightLineWidthDelta).toBeCloseTo(4 / canvas.getScale());
   });
 
-  test('overrides.colour without lineWidthDelta keeps normal lineWidth', () => {
-    const context = createMockContext();
-    canvas.setContext(redEntity, context, undefined, { colour: { r: 0, g: 255, b: 0 } });
-    expect(context.strokeStyle).toBe('rgb(0, 255, 0)');
-    expect(context.lineWidth).toBe(10 / canvas.getScale());
+  test('overrides.colour without lineWidthDelta sets highlight glow; entity draws in its own colour', () => {
+    const renderer = new MockRenderer();
+    canvas.setContext(redEntity, renderer, undefined, { colour: { r: 0, g: 255, b: 0 } });
+    // Entity still draws in its own colour
+    expect(renderer.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(renderer.lineWidth).toBe(10 / canvas.getScale());
+    expect(renderer.isHighlighted).toBe(true);
+    expect(renderer.highlightColour).toEqual({ r: 0, g: 255, b: 0 });
   });
 
-  test('setContext applies line type dash pattern to context', () => {
-    const context = createMockContext();
-    let appliedPattern = null;
-    context.setLineDash = (pattern) => {
-      appliedPattern = pattern;
-    };
+  test('setContext applies line type dash pattern to renderer', () => {
+    const renderer = new MockRenderer();
     const dashedEntity = {
       getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
       getLineType: () => ({ getPattern: () => [5, 5] }),
       lineWidth: 1,
       entityColour: { aci: 1, byLayer: false, byBlock: false },
     };
-    canvas.setContext(dashedEntity, context);
-    expect(appliedPattern).toEqual([5, 5]);
+    canvas.setContext(dashedEntity, renderer);
+    expect(renderer.dashPattern).toEqual([5, 5]);
   });
 });
 
@@ -856,6 +866,7 @@ describe('Test Canvas.#paintEntity', () => {
     paintCore = new Core();
     paintCore.activate();
     paintCanvas = paintCore.canvas;
+    paintCanvas.setRenderer(MockRenderer);
     paintCanvas.matrix = new Matrix();
     paintCanvas.flipped = true; // skip the one-time flip inside paint()
     paintCanvas.width = 800;
@@ -927,48 +938,27 @@ describe('Test Canvas.#paintEntity', () => {
     expect(container.draw).toHaveBeenCalledTimes(1);
   });
 
-  test('overrides.colour is applied to leaf entity', () => {
+  test('overrides.colour sets highlight glow; leaf entity draws in its natural colour', () => {
     const leaf = makeLeaf({ r: 255, g: 0, b: 0 });
-    const capturedStyles = [];
-    const ctx = createSpyContext();
-    // defineProperty so the setter is a real accessor, not a spread value copy
-    Object.defineProperty(ctx, 'strokeStyle', {
-      set(v) {
-        capturedStyles.push(v);
-      },
-      get() {
-        return '';
-      },
-      configurable: true,
-    });
-
-    // Call setContext directly with overrides to verify it flows through
-    paintCanvas.setContext(leaf, ctx, undefined, { colour: { r: 0, g: 0, b: 255 } });
-    expect(capturedStyles).toContain('rgb(0, 0, 255)');
+    const renderer = new MockRenderer();
+    paintCanvas.setContext(leaf, renderer, undefined, { colour: { r: 0, g: 0, b: 255 } });
+    // Entity draws in its natural colour, not the override
+    expect(renderer.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(renderer.isHighlighted).toBe(true);
+    expect(renderer.highlightColour).toEqual({ r: 0, g: 0, b: 255 });
   });
 
-  test('overrides.colour is applied to children of a container', () => {
+  test('overrides.colour sets highlight glow for children of a container', () => {
     const child = makeLeaf({ r: 255, g: 0, b: 0 });
-    const container = makeContainer([child]);
-    paintCore.scene.previewEntities.add(container);
-
-    const capturedStyles = [];
-    const ctx = createSpyContext();
-    Object.defineProperty(ctx, 'strokeStyle', {
-      set(v) {
-        capturedStyles.push(v);
-      },
-      get() {
-        return '';
-      },
-      configurable: true,
-    });
-
-    // setContext is called for the child with the parent as block arg —
-    // verify the override colour flows through to child entities
     const overrideColour = { r: 0, g: 255, b: 0 };
-    paintCanvas.setContext(child, ctx, undefined, { colour: overrideColour });
-    expect(capturedStyles).toContain(`rgb(${overrideColour.r}, ${overrideColour.g}, ${overrideColour.b})`);
+    const renderer = new MockRenderer();
+
+    // setContext is called for the child — verify the highlight glow colour flows through
+    // and the entity draws in its own natural colour
+    paintCanvas.setContext(child, renderer, undefined, { colour: overrideColour });
+    expect(renderer.strokeStyle).toBe('rgb(255, 0, 0)');
+    expect(renderer.isHighlighted).toBe(true);
+    expect(renderer.highlightColour).toEqual(overrideColour);
   });
 
   test('deeply nested container: all descendants have draw() called', () => {
@@ -1013,8 +1003,8 @@ describe('Test Canvas.#paintEntity', () => {
     paintCore.scene.previewEntities.add(throwing);
 
     const ctx = createSpyContext();
-    // paint() wraps #paintEntities — the throw propagates; we catch it here
-    expect(() => paintCanvas.paint(ctx, 800, 600)).toThrow('draw failure');
+    // broken entities are caught and logged — paint() must not throw
+    expect(() => paintCanvas.paint(ctx, 800, 600)).not.toThrow();
 
     const saves = ctx.saveRestoreLog.filter((e) => e === 'save').length;
     const restores = ctx.saveRestoreLog.filter((e) => e === 'restore').length;
