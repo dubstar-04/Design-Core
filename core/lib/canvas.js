@@ -306,6 +306,13 @@ export class Canvas {
     }
 
     this.paintGrid(context, width, height);
+    renderer.fillBackground(
+        DesignCore.Settings.canvasbackgroundcolour,
+        origin,
+        width,
+        height,
+        this.getScale(),
+    );
 
     const scale = this.getScale();
     const bg = DesignCore.Settings.canvasbackgroundcolour;
