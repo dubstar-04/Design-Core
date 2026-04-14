@@ -320,32 +320,28 @@ export class Canvas {
     const selectionHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.25);
     const selectionLineWidthDelta = 5;
 
-    // Hover glow pass: draw wide accent-coloured glow behind the hovered entity.
-    // The primary entities pass below redraws the entity at its own colour naturally.
-    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { colour: hoverHaloColour, lineWidthDelta: selectionLineWidthDelta });
-    // Draw the hovered entity with a wider line width
-    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { lineWidthDelta: 1 });
-
-    // Paint the primary scene items (layer-visibility filtered)
+    // Paint the primary scene items (layer-visibility filtered).
+    // Hovered entity detected inline: renderer draws glow + entity in a single drawShape call.
     this.#paintEntities(
-        DesignCore.Scene.entities, context, scale, null,
+        DesignCore.Scene.entities, renderer, null,
         (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isVisible,
+        DesignCore.Scene.hoverEntities,
+        { colour: hoverHaloColour, lineWidthDelta: selectionLineWidthDelta },
     );
 
     // Paint the temporary scene items
-    this.#paintEntities(DesignCore.Scene.previewEntities, context, scale);
+    this.#paintEntities(DesignCore.Scene.previewEntities, renderer);
 
-    // Paint the selected scene items: glow pass then entity pass
+    // Paint the selected scene items: single pass — renderer handles glow + entity internally.
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
-    this.#paintEntities(selectedItems, context, scale, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
-    this.#paintEntities(selectedItems, context, scale);
+    this.#paintEntities(selectedItems, renderer, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
 
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
     const auxCount = DesignCore.Scene.auxiliaryEntities.count();
     for (let l = 0; l < auxCount; l++) {
-      DesignCore.Scene.auxiliaryEntities.get(l).draw(context, scale);
+      DesignCore.Scene.auxiliaryEntities.get(l).draw(renderer, scale);
     }
   }
 
