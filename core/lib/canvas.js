@@ -376,31 +376,38 @@ export class Canvas {
   }
 
   /**
-   * Set the scene context
+   * Set the scene context on the renderer before drawing an entity.
    * @param {Object} item - entity to draw
-   * @param {Object} context - scene painting context from ui
+   * @param {Object} renderer - renderer instance
    * @param {Object} [block] - insert or dimension element for the current block, required for colour ByBlock
    * @param {Object} [overrides] - optional rendering overrides
    * @param {Object} [overrides.colour] - overrides all colour resolution (e.g. for halo/glow passes)
    * @param {number} [overrides.lineWidthDelta] - additional width in pixels (divided by scale) added to the entity's line width
    */
-  setContext(item, context, block = undefined, overrides = {}) {
+  setContext(item, renderer, block = undefined, overrides = {}) {
     const scale = this.getScale();
     let colour = item.getDrawColour();
     const lineType = item.getLineType();
     let lineWidth = item.lineWidth / scale;
     const bg = DesignCore.Settings.canvasbackgroundcolour;
 
+    if (block && item.entityColour.aci === 0) {
+      colour = block.getDrawColour();
+    }
+    // ACI 7: white on dark background, black on light background
+    if (this.#isAci7(item, block)) {
+      colour = (bg.r + bg.g + bg.b) / 3 < 128 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
+    }
+
     if (overrides.colour !== undefined) {
-      colour = overrides.colour;
+      // Highlight pass: overrides.colour is the glow colour only — the entity
+      // always draws in its natural resolved colour on the normal pass.
+      // lineWidthDelta goes to the highlight delta so the glow extends beyond
+      // the entity line; the entity's own lineWidth is unchanged.
+      renderer.setHighlight(true, overrides.colour, (overrides.lineWidthDelta ?? 0) / scale);
     } else {
-      if (block && item.entityColour.aci === 0) {
-        colour = block.getDrawColour();
-      }
-      // ACI 7: white on dark background, black on light background
-      if (this.#isAci7(item, block)) {
-        colour = (bg.r + bg.g + bg.b) / 3 < 128 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
-      }
+      renderer.setHighlight(false);
+      lineWidth += (overrides.lineWidthDelta ?? 0) / scale;
     }
 
     renderer.setColour(colour);
