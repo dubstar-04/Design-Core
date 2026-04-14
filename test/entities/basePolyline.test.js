@@ -46,6 +46,21 @@ test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => 
   }, { extraMethods: { actionCommand: () => {} } });
 });
 
+test('Test BasePolyline.draw calls renderer.drawShape with toPolylinePoints', () => {
+  const polyline = new Polyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 5)] });
+  let capturedEntity;
+  let capturedPoints;
+  const mockRenderer = {
+    drawShape(entity, points) {
+      capturedEntity = entity;
+      capturedPoints = points;
+    },
+  };
+  polyline.draw(mockRenderer);
+  expect(capturedEntity).toBe(polyline);
+  expect(capturedPoints).toEqual(polyline.toPolylinePoints());
+});
+
 test('Test BasePolyline.getClosestSegment', () => {
   // Polyline with a line and an arc segment
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10)];
