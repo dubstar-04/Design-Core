@@ -348,25 +348,26 @@ export class Canvas {
   /**
    * Recursively paint a single entity and any children it returns.
    * Container entities (Insert, BaseDimension) return an array of child items from draw().
-   * Leaf entities return undefined. Canvas state is saved/restored around each entity.
+   * Leaf entities return undefined. Renderer state is saved/restored around each entity.
    * @param {Object} entity - entity to paint
-   * @param {Object} context - canvas rendering context
-   * @param {number} scale
+   * @param {Object} renderer - renderer instance
    * @param {Object|undefined} parent - enclosing insert/dimension for ByBlock colour resolution
    * @param {Object} overrides - rendering overrides passed to setContext
    */
-  #paintEntity(entity, context, scale, parent, overrides) {
-    context.save();
+  #paintEntity(entity, renderer, parent, overrides) {
+    renderer.save();
     try {
-      this.setContext(entity, context, parent, overrides);
-      const children = entity.draw(context, scale);
+      this.setContext(entity, renderer, parent, overrides);
+      const children = entity.draw(renderer);
       if (children) {
         for (const item of children) {
-          this.#paintEntity(item, context, scale, entity, overrides);
+          this.#paintEntity(item, renderer, entity, overrides);
         }
       }
+    } catch (err) {
+      Logging.instance.warn(`draw failed for entity type '${entity.type}': ${err}`);
     } finally {
-      context.restore();
+      renderer.restore();
     }
   }
 
@@ -374,20 +375,22 @@ export class Canvas {
    * Draw a collection of entities, calling setContext before each draw.
    * Supports EntityManager instances (with .count()/.get()) and plain arrays.
    * @param {EntityManager|Array} entities
-   * @param {Object} context
-   * @param {number} scale
-   * @param {Object|null} [overrides] - optional rendering overrides passed to setContext
-   * @param {Object} [overrides.colour] - overrides colour resolution for all entities in this pass
-   * @param {number} [overrides.lineWidthDelta] - additional width in pixels (divided by scale) added to each entity's line width
+   * @param {Object} renderer - renderer instance
+   * @param {Object|null} [overrides] - optional rendering overrides passed to setContext for all entities
+   * @param {Object} [overrides.colour] - highlight glow colour (entity always draws in its natural colour)
+   * @param {number} [overrides.lineWidthDelta] - glow extension in pixels (divided by scale); added to renderer highlight delta
    * @param {Function} [filter] - optional predicate; entity is skipped when it returns falsy
+   * @param {EntityManager|null} [hoverCollection] - when provided, entities found in this set receive hoverOverrides
+   * @param {Object|null} [hoverOverrides] - overrides applied to entities matched in hoverCollection
    */
-  #paintEntities(entities, context, scale, overrides = null, filter = undefined) {
+  #paintEntities(entities, renderer, overrides = null, filter = undefined, hoverCollection = null, hoverOverrides = null) {
     const isManager = typeof entities.count === 'function';
     const count = isManager ? entities.count() : entities.length;
     for (let i = 0; i < count; i++) {
       const entity = isManager ? entities.get(i) : entities[i];
       if (filter && !filter(entity)) continue;
-      this.#paintEntity(entity, context, scale, undefined, overrides ?? {});
+      const isHovered = hoverCollection !== null && hoverCollection.indexOf(entity) !== -1;
+      this.#paintEntity(entity, renderer, undefined, isHovered ? hoverOverrides : (overrides ?? {}));
     }
   }
 
