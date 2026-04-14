@@ -728,3 +728,60 @@ test('Text.dxf includes non-zero flags and rotation', () => {
   expect(file.contents).toContain('71\n6\n');
   expect(file.contents).toContain('50\n90\n');
 });
+
+test('Text.toCharacters returns one entry with scene coords, rotation and string', () => {
+  const text = new Text({ points: [new Point(5, 10), new Point(15, 10)], string: 'Hello', height: 2.5, rotation: 0 });
+  const chars = text.toCharacters();
+  expect(chars).toHaveLength(1);
+  expect(chars[0].char).toBe('Hello');
+  expect(typeof chars[0].x).toBe('number');
+  expect(typeof chars[0].y).toBe('number');
+  expect(chars[0].rotation).toBeCloseTo(0);
+  expect(chars[0].upsideDownOffset).toBe(0);
+  expect(chars[0].backwardsOffset).toBe(0);
+});
+
+test('Text.toCharacters returns empty array for empty string', () => {
+  const text = new Text({ points: [new Point(0, 0), new Point(10, 0)], string: '', height: 2.5 });
+  expect(text.toCharacters()).toEqual([]);
+});
+
+test('Text.draw calls renderer.drawText with correct font and string', () => {
+  const text = new Text({ points: [new Point(0, 0), new Point(10, 0)], string: 'Hello', height: 2.5 });
+  let calledEntity; let calledChars; let calledFont; let calledHeight;
+  const mockRenderer = {
+    drawText(entity, characters, fontName, height) {
+      calledEntity = entity;
+      calledChars = characters;
+      calledFont = fontName;
+      calledHeight = height;
+    },
+    measureText: () => ({ width: 20 }),
+  };
+  text.draw(mockRenderer);
+  expect(calledEntity).toBe(text);
+  expect(calledChars).toHaveLength(1);
+  expect(calledChars[0].char).toBe('Hello');
+  expect(calledHeight).toBe(2.5);
+});
+
+test('Text.draw skips call for empty string', () => {
+  const text = new Text({ points: [new Point(0, 0), new Point(10, 0)], string: '', height: 2.5 });
+  let drawTextCalled = false;
+  const mockRenderer = { drawText() {
+    drawTextCalled = true;
+  }, measureText() {} };
+  text.draw(mockRenderer);
+  expect(drawTextCalled).toBe(false);
+});
+
+test('Text.draw updates boundingRect from measureText result', () => {
+  const text = new Text({ points: [new Point(0, 0), new Point(10, 0)], string: 'Hi', height: 3 });
+  const mockRenderer = {
+    drawText() {},
+    measureText: () => ({ width: 42 }),
+  };
+  text.draw(mockRenderer);
+  expect(text.boundingRect.width).toBe(42);
+  expect(text.boundingRect.height).toBe(3);
+});
