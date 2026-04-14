@@ -177,41 +177,10 @@ export class BasePolyline extends Entity {
 
   /**
    * Draw the polyline
-   * @param {Object} ctx
-   * @param {number} scale
-   * @param {boolean} stroke - don't stroke hatch boundary shapes
+   * @param {Object} renderer
    */
-  draw(ctx, scale, stroke = true) {
-    for (let i = 0; i < this.points.length; i++) {
-      if (this.points[i].bulge === 0) {
-        ctx.lineTo(this.points[i].x, this.points[i].y);
-      } else {
-        // define the next point or the first point for closed shapes
-        const nextPoint = this.points[i + 1] || this.points[0];
-        const centerPoint = this.points[i].bulgeCentrePoint(nextPoint);
-        const radius = this.points[i].bulgeRadius(nextPoint);
-
-        if (this.points[i].bulge > 0) {
-          // TODO: make this work with canvas
-          ctx.arc(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
-        } else {
-          try { // HTML
-            ctx.arc(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint), true);
-          } catch { // Cairo
-            ctx.arcNegative(centerPoint.x, centerPoint.y, radius, centerPoint.angle(this.points[i]), centerPoint.angle(nextPoint));
-          }
-        }
-      }
-    }
-
-    // handle a closed shape
-    if (this.flags.hasFlag(1)) {
-      ctx.lineTo(this.points[0].x, this.points[0].y);
-    }
-
-    if (stroke) {
-      ctx.stroke();
-    }
+  draw(renderer) {
+    renderer.drawShape(this, this.toPolylinePoints());
   }
 
   /**
