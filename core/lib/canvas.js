@@ -1,8 +1,8 @@
 import { Matrix } from './matrix.js';
-import { Colours } from './colours.js';
 import { Colour } from './colour.js';
 import { Point } from '../entities/point.js';
 import { Input } from './input.js';
+import { Logging } from './logging.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -295,6 +295,7 @@ export class Canvas {
         this.getScale(),
     );
 
+    this.paintGrid(renderer);
     const scale = this.getScale();
     const bg = DesignCore.Settings.canvasbackgroundcolour;
     const hoverHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.5);
@@ -440,21 +441,16 @@ export class Canvas {
    * Paint the background grid
    * @param {object} context
    */
-  paintGrid(context) {
+  paintGrid(renderer) {
     const scale = this.getScale();
 
     // TODO: Move grid linewidth to settings?
     let lineWidth = 0.75;
 
-    try { // HTML Canvas
-      context.strokeStyle = Colours.rgbToString(DesignCore.Settings.gridcolour);
-      context.lineWidth = lineWidth / scale;
-      context.beginPath();
-    } catch { // Cairo
-      context.setLineWidth(lineWidth / scale);
-      const rgbColour = Colours.rgbToScaledRGB(DesignCore.Settings.gridcolour);
-      context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-    }
+    renderer.setColour(DesignCore.Settings.gridcolour);
+    renderer.setLineWidth(lineWidth / scale);
+    renderer.setDash([], 0);
+    renderer.setHighlight(false);
 
     const extents = this.getSceneOffset();
 
@@ -464,13 +460,11 @@ export class Canvas {
     const ygridmax = extents.ymax;
 
     // Draw major gridlines through origin
-    context.moveTo(xgridmin, 0);
-    context.lineTo(xgridmax, 0);
-    context.moveTo(0, 0);
-    context.lineTo(0, ygridmax);
-    context.moveTo(0, 0);
-    context.lineTo(0, ygridmin);
-    context.stroke();
+    renderer.drawSegments([
+      { x1: xgridmin, y1: 0, x2: xgridmax, y2: 0 },
+      { x1: 0, y1: 0, x2: 0, y2: ygridmax },
+      { x1: 0, y1: 0, x2: 0, y2: ygridmin },
+    ], []);
 
     // only draw the grid if within scale limits
     if (scale < this.minScaleFactor || scale > this.maxScaleFactor) {
@@ -480,50 +474,35 @@ export class Canvas {
     if (DesignCore.Settings['drawgrid']) {
       // set a feint linewidth for the grid
       lineWidth = lineWidth * 0.25;
+      renderer.setLineWidth(lineWidth / scale);
 
-      try { // HTML Canvas
-        context.lineWidth = lineWidth / scale;
-        context.beginPath();
-      } catch { // Cairo
-        context.setLineWidth(lineWidth / scale);
-      }
+      // Target ~60px between grid lines; snap to nearest 1/2/5 × 10^n interval
+      const targetPx = 60;
+      const rawInterval = targetPx / scale;
+      const mag = Math.pow(10, Math.floor(Math.log10(rawInterval)));
+      const norm = rawInterval / mag;
+      const gridInterval = mag * (norm < 2 ? 1 : norm < 5 ? 2 : 5);
 
-      // TODO: add setting for grid spacing
-      let gridInterval = 100;
-
-      // define the grid spacing based on zoom level
-      if (scale > 50) {
-        gridInterval = 1;
-      } else if (scale > 5) {
-        gridInterval = 10;
-      } else if (scale < 0.6) {
-        gridInterval = 1000;
-      } else {
-        gridInterval = 100;
-      }
+      const gridSegments = [];
 
       // Draw positive minor X gridlines
       for (let i = 0; i < xgridmax; i = i + gridInterval) {
-        context.moveTo(i, ygridmin);
-        context.lineTo(i, ygridmax);
+        gridSegments.push({ x1: i, y1: ygridmin, x2: i, y2: ygridmax });
       }
       // Draw negative minor X gridlines
       for (let i = 0; i > xgridmin; i = i - gridInterval) {
-        context.moveTo(i, ygridmin);
-        context.lineTo(i, ygridmax);
+        gridSegments.push({ x1: i, y1: ygridmin, x2: i, y2: ygridmax });
       }
       // Draw positive minor Y gridlines
       for (let i = 0; i < ygridmax; i = i + gridInterval) {
-        context.moveTo(xgridmin, i);
-        context.lineTo(xgridmax, i);
+        gridSegments.push({ x1: xgridmin, y1: i, x2: xgridmax, y2: i });
       }
       // Draw negative minor Y gridlines
       for (let i = 0; i > ygridmin; i = i - gridInterval) {
-        context.moveTo(xgridmin, i);
-        context.lineTo(xgridmax, i);
+        gridSegments.push({ x1: xgridmin, y1: i, x2: xgridmax, y2: i });
       }
 
-      context.stroke();
+      renderer.drawSegments(gridSegments, []);
     }
   }
 
