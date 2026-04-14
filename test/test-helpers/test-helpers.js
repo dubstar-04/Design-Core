@@ -64,3 +64,99 @@ export async function withMockInput(scene, inputs, testFn, options = {}) {
   }
 }
 
+/**
+ * A minimal RendererBase-compatible mock for use in unit tests.
+ *
+ * Tracks colour, line width and dash state so tests can assert on them.
+ * Optionally accepts a spy context object; when provided, `save`, `restore`
+ * and `applyTransform` delegate to it so tests can verify save/restore
+ * balance and transform calls via the context's own spies.
+ *
+ * @example
+ * const renderer = new MockRenderer();
+ * entity.draw(renderer);
+ * expect(renderer.strokeStyle).toBe('rgb(255,0,0)');
+ *
+ * @example
+ * const ctx = createSpyContext();
+ * const renderer = new MockRenderer(ctx);
+ * canvas.paint(ctx, 800, 600);
+ * expect(ctx.saveDepth).toBe(0); // all saves balanced
+ */
+export class MockRenderer {
+  /**
+   * @param {object|null} [ctx=null] - optional spy context to delegate save/restore to
+   */
+  constructor(ctx = null) {
+    this._ctx = ctx;
+    this.strokeStyle = '';
+    this.fillStyle = '';
+    this.lineWidth = 0;
+    this.dashPattern = null;
+  }
+
+  /** @param {{ r: number, g: number, b: number }} rgb */
+  setColour(rgb) {
+    this.strokeStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+    this.fillStyle = this.strokeStyle;
+    if (this._ctx) {
+      this._ctx.strokeStyle = this.strokeStyle;
+      this._ctx.fillStyle = this.fillStyle;
+    }
+  }
+
+  /** @param {number} width */
+  setLineWidth(w) {
+    this.lineWidth = w;
+    if (this._ctx) this._ctx.lineWidth = w;
+  }
+
+  /** @param {number[]} pattern */
+  setDash(pattern) {
+    this.dashPattern = pattern;
+  }
+
+  setTransform() {}
+  fillBackground() {}
+  drawShape() {}
+  drawText() {}
+
+  save() {
+    if (this._ctx) this._ctx.save();
+  }
+
+  restore() {
+    if (this._ctx) this._ctx.restore();
+  }
+
+  /** @param {Object} [transform] */
+  applyTransform({ x = 0, y = 0 } = {}) {
+    if (this._ctx) this._ctx.translate(x, y);
+  }
+
+  /** @param {number} x @param {number} y */
+  translate(x, y) {
+    if (this._ctx) this._ctx.translate(x, y);
+  }
+
+  setHighlight(isHighlighted = false, colour = null, lineWidthDelta = 0) {
+    this.isHighlighted = isHighlighted;
+    this.highlightColour = colour;
+    this.highlightLineWidthDelta = lineWidthDelta;
+  }
+
+  measureText() {
+    return 0;
+  }
+
+  measureCharWidth() {
+    return 0;
+  }
+
+  drawSegments() {}
+  tracePath() {}
+  beginPath() {}
+  stroke() {}
+  closePath() {}
+}
+
