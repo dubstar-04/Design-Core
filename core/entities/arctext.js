@@ -472,103 +472,26 @@ export class ArcAlignedText extends Entity {
   }
 
   /**
-   * Draw the entity
-   * @param {Object} ctx - context
-   * @param {number} scale
+   * Return a character descriptor array for use with renderer.drawText().
+   * Coordinates are in scene space (Y-up). The renderer handles the Y-flip.
+   * @return {Array}
    */
-  draw(ctx, scale) {
-    // Detect hover/selection halo pass: setContext adds lineWidthDelta (5 px) to the line width.
-    // HTML Canvas: setContext writes ctx.lineWidth directly (readable property).
-    // Cairo: setContext calls setLineWidth(); read it back via getLineWidth().
-    // lineWidthDelta > 2 identifies the hovered or selected pass (selectionLineWidthDelta = 5 in canvas.js).
-    const ctxLineWidth = ctx.lineWidth ?? ctx.getLineWidth?.() ?? 0;
-    const isHoveredOrSelected = (ctxLineWidth * scale - this.lineWidth) > 2;
+  toCharacters() {
+    return this.getArcAlignedCharacters().map((ch) => ({
+      x: ch.baseline.x,
+      y: ch.baseline.y,
+      rotation: ch.angle,
+      char: ch.character,
+    }));
+  }
 
-    ctx.save(); // save current context before scale and translate
-    ctx.scale(1, -1);
-
+  /**
+   * Draw the entity
+   * @param {Object} renderer
+   */
+  draw(renderer) {
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
-
-    try { // HTML Canvas
-      ctx.font = this.height + 'pt ' + style?.font;
-      ctx.measureText('M'); // Canvas-only method — throws on Cairo, confirming the context type
-    } catch { // Cairo
-      ctx.selectFontFace(style?.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-
-      // Hack to test the text height vs bounding box height to find a scale factor to make the drawn text match the specified height.
-      // This is needed because Cairo's font size is not the same as the actual drawn text height, and can vary based on the font used.
-      // This is a rough approximation and may not be accurate for all fonts or sizes.
-      ctx.setFontSize(this.height);
-      const refChar = this.string || 'A';
-      const drawTextRect = ctx.textExtents(refChar);
-      // Adjust the font size by the ratio of the desired height to the drawn height to get closer to the desired text height.
-      ctx.setFontSize(this.height * this.height / drawTextRect.height);
-    }
-
-    const ArcAlignedCharacters = this.getArcAlignedCharacters();
-
-    for (const arcAlignedChar of ArcAlignedCharacters) {
-      ctx.save(); // save current context
-      ctx.translate(arcAlignedChar.baseline.x, -arcAlignedChar.baseline.y);
-      ctx.rotate(-arcAlignedChar.angle);
-
-      const char = arcAlignedChar.character;
-
-      try { // HTML Canvas
-        if (isHoveredOrSelected) {
-          ctx.strokeText(char, 0, 0);
-        } else {
-          ctx.fillText(char, 0, 0);
-        }
-      } catch { // Cairo
-        if (isHoveredOrSelected) {
-          // cairo_text_path is not yet available in the GNOME SDK version of GJS.
-          // Simulate a stroke-like halo by drawing the text at 8 small offsets.
-          const d = ctx.getLineWidth() / 2;
-          for (const [dx, dy] of [[d, 0], [-d, 0], [0, d], [0, -d], [d, d], [-d, d], [d, -d], [-d, -d]]) {
-            ctx.moveTo(dx, dy);
-            ctx.showText(char);
-          }
-        } else {
-          ctx.showText(char);
-        }
-      }
-
-      ctx.stroke();
-      ctx.restore(); // restore context
-
-      /*
-      // debug draw character bounding box
-      const bb = arcAlignedChar.boundingBox;
-      const center = arcAlignedChar.position;
-
-      const posOne = new Point(center.x - bb.xLength*0.5, center.y - bb.yLength*0.5).rotate(arcAlignedChar.position, arcAlignedChar.angle);
-      const posTwo = new Point(center.x + bb.xLength*0.5, center.y - bb.yLength*0.5).rotate(arcAlignedChar.position, arcAlignedChar.angle);
-      const posThree = new Point(center.x + bb.xLength*0.5, center.y + bb.yLength*0.5).rotate(arcAlignedChar.position, arcAlignedChar.angle);
-      const posFour = new Point(center.x - bb.xLength*0.5, center.y + bb.yLength*0.5).rotate(arcAlignedChar.position, arcAlignedChar.angle);
-
-      ctx.moveTo(posOne.x, -posOne.y);
-      ctx.lineTo(posTwo.x, -posTwo.y);
-      ctx.lineTo(posThree.x, -posThree.y);
-      ctx.lineTo(posFour.x, -posFour.y);
-      ctx.lineTo(posOne.x, -posOne.y);
-      ctx.stroke();
-      */
-
-      /*
-      // debug draw the arcText bounding box
-      const bb = this.boundingBox();
-      ctx.moveTo(bb.xMin, -bb.yMin);
-      ctx.lineTo(bb.xMax, -bb.yMin);
-      ctx.lineTo(bb.xMax, -bb.yMax);
-      ctx.lineTo(bb.xMin, -bb.yMax);
-      ctx.lineTo(bb.xMin, -bb.yMin);
-      ctx.stroke();
-      */
-    }
-
-    ctx.stroke();
-    ctx.restore(); // restore context before scale and translate
+    renderer.drawText(this, this.toCharacters(), style?.font, this.height);
   }
 
   /**
