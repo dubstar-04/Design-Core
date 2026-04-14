@@ -79,9 +79,9 @@ export class SvgRenderer extends RendererBase {
       return;
     }
 
-    const strokeAttrs = doStroke
-      ? `stroke="${this.#colourStr()}" stroke-width="${this.#fmt(this.#currentLineWidth)}"${this.#dashAttrs()}`
-      : 'stroke="none"';
+    const strokeAttrs = doStroke ?
+      `stroke="${this.#colourStr()}" stroke-width="${this.#fmt(this.#currentLineWidth)}"${this.#dashAttrs()}` :
+      'stroke="none"';
 
     let fillAttrs = doFill ? `fill="${this.#colourStr()}"` : 'fill="none"';
     if (doFill && options.fillRule) fillAttrs += ` fill-rule="${options.fillRule}"`;
@@ -227,7 +227,7 @@ export class SvgRenderer extends RendererBase {
    * Serialise the accumulated elements into a complete SVG document string.
    * Write to disk via `fs.writeFileSync(path, output, 'utf8')` (Node) or
    * `Gio.File.replace_contents(new TextEncoder().encode(output), ...)` (GJS).
-   * @returns {string}
+   * @return {string}
    */
   getOutput() {
     // Count unclosed <g> groups in #elements so getOutput() can close them.
@@ -268,7 +268,7 @@ export class SvgRenderer extends RendererBase {
    * Straight segments use L; arc segments use the native A command.
    * @param {Array}   points
    * @param {boolean} [closed=false]
-   * @returns {string}
+   * @return {string}
    */
   #buildPathD(points, closed = false) {
     if (!points.length) return '';
@@ -291,13 +291,13 @@ export class SvgRenderer extends RendererBase {
     return d;
   }
 
-  /** @returns {string} Current colour as an SVG rgb() string. */
+  /** @return {string} Current colour as an SVG rgb() string. */
   #colourStr() {
     const { r, g, b } = this.#currentColour;
     return `rgb(${r},${g},${b})`;
   }
 
-  /** @returns {string} Current dash state as SVG stroke-dasharray/offset attributes, or ''. */
+  /** @return {string} Current dash state as SVG stroke-dasharray/offset attributes, or ''. */
   #dashAttrs() {
     if (!this.#currentDash.length) return '';
     const dashStr = this.#currentDash.map((v) => this.#fmt(v)).join(',');
@@ -308,7 +308,7 @@ export class SvgRenderer extends RendererBase {
    * Format a number for SVG: integers emit as-is; floats use up to 4 decimal
    * places with trailing zeros stripped.
    * @param {number} n
-   * @returns {string}
+   * @return {string}
    */
   #fmt(n) {
     if (Number.isInteger(n)) return String(n);
@@ -318,14 +318,14 @@ export class SvgRenderer extends RendererBase {
   /**
    * Escape a string for safe use as SVG text content.
    * @param {string|number} value
-   * @returns {string}
+   * @return {string}
    */
   #escapeXml(value) {
     return String(value)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
   }
 
   /** Append a raw string to the element list. */
