@@ -140,9 +140,12 @@ export class Circle extends Entity {
    * @param {Object} ctx - context
    * @param {number} scale
    */
-  draw(ctx, scale) {
-    ctx.arc(this.points[0].x, this.points[0].y, this.radius, 0, 6.283);
-    ctx.stroke();
+  /**
+   * Draw the circle
+   * @param {Object} renderer
+   */
+  draw(renderer) {
+    renderer.drawShape(this, this.toPolylinePoints());
   }
 
   /**
