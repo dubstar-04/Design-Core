@@ -89,7 +89,7 @@ function circleOutlinePoints(cx, cy, r, n = 32) {
  * `new Core()` is called internally because Hatch.draw() requires
  * DesignCore.Scene.selectionManager to be present.
  *
- * @param {import('../../core/lib/renderers/rendererBase.js').RendererBase} renderer
+ * @param {object} renderer
  */
 export function buildHatchGrid(renderer) {
   // Required so that Hatch.draw() can access DesignCore.Scene.selectionManager
@@ -111,25 +111,25 @@ export function buildHatchGrid(renderer) {
 
   // Title
   const title = 'Hatch Pattern Reference';
-  const title_x = PAGE_W / 2 - Text.getApproximateWidth(title, TITLE_FONT) / 2;
-  const title_y = PAGE_H - MARGIN - TITLE_FONT - 2;
+  const titleX = PAGE_W / 2 - Text.getApproximateWidth(title, TITLE_FONT) / 2;
+  const titleY = PAGE_H - MARGIN - TITLE_FONT - 2;
   renderer.setColour({ r: 0, g: 0, b: 0 });
   renderer.setLineWidth(0.5);
-  renderer.drawText(null, [{ char: title, x: title_x, y: title_y, rotation: 0 }], 'Helvetica', TITLE_FONT);
+  renderer.drawText(null, [{ char: title, x: titleX, y: titleY, rotation: 0 }], 'Helvetica', TITLE_FONT);
 
   // Grid — centred horizontally, starting below the title
-  const x_grid = (PAGE_W - COLS * CELL_W) / 2;
-  const y_grid_top = title_y - TITLE_FONT - 8;
+  const xGrid = (PAGE_W - COLS * CELL_W) / 2;
+  const yGridTop = titleY - TITLE_FONT - 8;
 
   PATTERNS.forEach((name, i) => {
     const row = Math.floor(i / COLS);
     const col = i % COLS;
-    const cell_x = x_grid + col * CELL_W;
-    const cell_y_top = y_grid_top - row * CELL_H;
+    const cellX = xGrid + col * CELL_W;
+    const cellYTop = yGridTop - row * CELL_H;
 
     // Shape centre: 4 pt top padding + SHAPE_R inside the cell
-    const cx = cell_x + CELL_W / 2;
-    const cy = cell_y_top - 4 - SHAPE_R;
+    const cx = cellX + CELL_W / 2;
+    const cy = cellYTop - 4 - SHAPE_R;
 
     // Alternate square (even index) and circle (odd index) boundaries
     let hatchBoundary;
@@ -171,10 +171,10 @@ export function buildHatchGrid(renderer) {
     renderer.drawShape(null, outlinePoints, { closed: true, stroke: true });
 
     // Pattern name label, centred below the shape
-    const label_y = cell_y_top - 4 - SHAPE_R * 2 - LABEL_FONT - 2;
-    const label_x = cell_x + (CELL_W - Text.getApproximateWidth(name, LABEL_FONT)) / 2;
+    const labelY = cellYTop - 4 - SHAPE_R * 2 - LABEL_FONT - 2;
+    const labelX = cellX + (CELL_W - Text.getApproximateWidth(name, LABEL_FONT)) / 2;
     renderer.setColour({ r: 60, g: 60, b: 60 });
     renderer.setLineWidth(0.25);
-    renderer.drawText(null, [{ char: name, x: label_x, y: label_y, rotation: 0 }], 'Helvetica', LABEL_FONT);
+    renderer.drawText(null, [{ char: name, x: labelX, y: labelY, rotation: 0 }], 'Helvetica', LABEL_FONT);
   });
 }

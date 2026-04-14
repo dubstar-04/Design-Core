@@ -328,7 +328,10 @@ export class SvgRenderer extends RendererBase {
         .replace(/"/g, '&quot;');
   }
 
-  /** Append a raw string to the element list. */
+  /**
+   * Append a raw string to the element list.
+   * @param {string} str
+   */
   #emit(str) {
     this.#elements.push(str);
   }

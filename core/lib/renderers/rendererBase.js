@@ -65,7 +65,7 @@ export class RendererBase {
    * When dashes is empty, all segments are batched into a single stroke call.
    * When dashes is non-empty, each segment is stroked individually with its
    * own dash phase so that dash continuity is preserved across clipped boundaries.
-   * @param {Array<{x1:number, y1:number, x2:number, y2:number, dashPhase?:number}>} segments
+   * @param {Array} segments
    * @param {number[]} [dashes=[]]
    */
   drawSegments(segments, dashes = []) {

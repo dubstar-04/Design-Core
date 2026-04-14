@@ -105,7 +105,7 @@ export class MockRenderer {
     }
   }
 
-  /** @param {number} width */
+  /** @param {number} w */
   setLineWidth(w) {
     this.lineWidth = w;
     if (this._ctx) this._ctx.lineWidth = w;
@@ -116,47 +116,91 @@ export class MockRenderer {
     this.dashPattern = pattern;
   }
 
-  setTransform() {}
-  fillBackground() {}
-  drawShape() {}
-  drawText() {}
+  /** @param {object} matrix */
+  setTransform(matrix) {}
 
+  /** @param {object} colour */
+  fillBackground(colour) {}
+
+  /**
+   * @param {object} entity
+   * @param {Array} points
+   * @param {object} [options]
+   */
+  drawShape(entity, points, options) {}
+
+  /**
+   * @param {object} entity
+   * @param {Array} characters
+   * @param {string} fontName
+   * @param {number} height
+   */
+  drawText(entity, characters, fontName, height) {}
+
+  /** Save current drawing state. */
   save() {
     if (this._ctx) this._ctx.save();
   }
 
+  /** Restore previously saved drawing state. */
   restore() {
     if (this._ctx) this._ctx.restore();
   }
 
-  /** @param {Object} [transform] */
+  /**
+   * @param {object} [transform]
+   * @param {number} [transform.x=0]
+   * @param {number} [transform.y=0]
+   */
   applyTransform({ x = 0, y = 0 } = {}) {
     if (this._ctx) this._ctx.translate(x, y);
   }
 
-  /** @param {number} x @param {number} y */
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
   translate(x, y) {
     if (this._ctx) this._ctx.translate(x, y);
   }
 
+  /**
+   * @param {boolean} [isHighlighted=false]
+   * @param {object|null} [colour=null]
+   * @param {number} [lineWidthDelta=0]
+   */
   setHighlight(isHighlighted = false, colour = null, lineWidthDelta = 0) {
     this.isHighlighted = isHighlighted;
     this.highlightColour = colour;
     this.highlightLineWidthDelta = lineWidthDelta;
   }
 
+  /** @return {number} */
   measureText() {
     return 0;
   }
 
+  /** @return {number} */
   measureCharWidth() {
     return 0;
   }
 
-  drawSegments() {}
-  tracePath() {}
+  /**
+   * @param {Array} [segments]
+   * @param {Array} [dashes]
+   */
+  drawSegments(segments, dashes) {}
+
+  /** @param {Array} [points] */
+  tracePath(points) {}
+
+  /** Start a new path. */
   beginPath() {}
+
+  /** Stroke the current path. */
   stroke() {}
+
+  /** Close the current path. */
   closePath() {}
 }
 
