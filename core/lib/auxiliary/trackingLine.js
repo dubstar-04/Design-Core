@@ -1,5 +1,4 @@
 import { Point } from '../../entities/point.js';
-import { Colours } from '../colours.js';
 
 import { DesignCore } from '../../designCore.js';
 
@@ -17,10 +16,10 @@ export class TrackingLine {
 
   /**
    * Draw the tracking line, extended to the visible canvas edges
-   * @param {Object} ctx - context
+   * @param {Object} renderer
    * @param {number} scale
    */
-  draw(ctx, scale) {
+  draw(renderer, scale) {
     const from = this.snapPoint;
     const dir = this.snapPoint.subtract(this.inputPoint);
     const lineWidth = 2 / scale;
@@ -69,24 +68,11 @@ export class TrackingLine {
     const lineColour = DesignCore.Settings.accentcolour;
     const dashSize = 4 / scale;
 
-    ctx.save();
-
-    try { // HTML Canvas
-      ctx.beginPath();
-      ctx.strokeStyle = Colours.rgbToString(lineColour);
-      ctx.lineWidth = lineWidth;
-      ctx.setLineDash([dashSize, dashSize]);
-    } catch { // Cairo
-      const rgbColour = Colours.rgbToScaledRGB(lineColour);
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-      ctx.setLineWidth(lineWidth);
-      ctx.setDash([dashSize, dashSize], 0);
-    }
-
-    ctx.moveTo(start.x, start.y);
-    ctx.lineTo(end.x, end.y);
-    ctx.stroke();
-
-    ctx.restore();
+    renderer.save();
+    renderer.setColour(lineColour);
+    renderer.setLineWidth(lineWidth);
+    renderer.setDash([dashSize, dashSize], 0);
+    renderer.drawShape(null, [{ x: start.x, y: start.y }, { x: end.x, y: end.y }]);
+    renderer.restore();
   }
 }

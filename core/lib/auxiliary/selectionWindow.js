@@ -1,6 +1,5 @@
 import { DesignCore } from '../../designCore.js';
 import { Point } from '../../entities/point.js';
-import { Colours } from '../colours.js';
 
 /** SelectionWindow Class */
 export class SelectionWindow {
@@ -34,50 +33,34 @@ export class SelectionWindow {
 
   /**
    * Draw the entity
-   * @param {Object} ctx - context
+   * @param {Object} renderer
    * @param {number} scale
    */
-  draw(ctx, scale) {
+  draw(renderer, scale) {
     const colour = this.colour;
-    ctx.fillStyle = colour;
-
     const scaledPattern = this.dashPattern.map((x) => x / scale);
 
-    try { // HTML Canvas
-      ctx.strokeStyle = Colours.rgbToString(colour);
-      ctx.fillStyle = Colours.rgbToString(colour);
-      ctx.lineWidth = this.lineWidth / scale;
-      ctx.beginPath();
-      ctx.globalAlpha = 0.2;
-      const width = this.points[1].x - this.points[0].x;
-      const height = this.points[1].y - this.points[0].y;
-      ctx.fillRect(this.points[0].x, this.points[0].y, width, height);
-      ctx.globalAlpha = 1.0;
-      this.drawRect(ctx);
-      ctx.setLineDash(scaledPattern);
-      ctx.stroke();
-    } catch { // Cairo
-      ctx.setLineWidth(this.lineWidth / scale);
-      const rgbColour = Colours.rgbToScaledRGB(colour);
-      ctx.setSourceRGBA(rgbColour.r, rgbColour.g, rgbColour.b, 0.2);
-      this.drawRect(ctx);
-      ctx.fillPreserve();
-      ctx.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
+    const p0 = this.points[0];
+    const p1 = this.points[1];
+    const rectPoints = [
+      { x: p0.x, y: p0.y },
+      { x: p1.x, y: p0.y },
+      { x: p1.x, y: p1.y },
+      { x: p0.x, y: p1.y },
+    ];
 
-      ctx.setDash(scaledPattern, 1);
-      ctx.stroke();
-    }
-  }
+    renderer.save();
+    renderer.setColour(colour);
+    renderer.setLineWidth(this.lineWidth / scale);
 
-  /**
-   * Draw a rectangle
-   * @param {Object} ctx
-   */
-  drawRect(ctx) {
-    ctx.moveTo(this.points[0].x, this.points[0].y);
-    ctx.lineTo(this.points[1].x, this.points[0].y);
-    ctx.lineTo(this.points[1].x, this.points[1].y);
-    ctx.lineTo(this.points[0].x, this.points[1].y);
-    ctx.lineTo(this.points[0].x, this.points[0].y);
+    // Semi-transparent fill
+    renderer.setDash([], 0);
+    renderer.drawShape(null, rectPoints, { closed: true, fill: true, stroke: false, alpha: 0.2 });
+
+    // Dashed outline
+    renderer.setDash(scaledPattern, 0);
+    renderer.drawShape(null, rectPoints, { closed: true, fill: false, stroke: true });
+
+    renderer.restore();
   }
 }
