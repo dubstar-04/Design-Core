@@ -119,8 +119,17 @@ export class MockRenderer {
   /** @param {object} matrix */
   setTransform(matrix) {}
 
-  /** @param {object} colour */
-  fillBackground(colour) {}
+  /** @param {{ r: number, g: number, b: number }|null} colour */
+  setBackgroundColour(colour) {
+    this._backgroundColour = colour;
+  }
+
+  /** @return {{ r: number, g: number, b: number }|null} */
+  getBackgroundColour() {
+    return this._backgroundColour ?? null;
+  }
+
+  fillBackground() {}
 
   /**
    * @param {object} entity
