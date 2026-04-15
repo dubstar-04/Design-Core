@@ -42,8 +42,8 @@ export class CairoRenderer extends RendererBase {
   }
 
   /** @inheritdoc */
-  fillBackground(colour, origin, width, height, scale) {
-    const rgb = Colours.rgbToScaledRGB(colour);
+  fillBackground(origin, width, height, scale) {
+    const rgb = Colours.rgbToScaledRGB(this.getBackgroundColour());
     this.#cr.setSourceRGB(rgb.r, rgb.g, rgb.b);
     const w = width / scale;
     const h = height / scale;
@@ -237,7 +237,7 @@ export class CairoRenderer extends RendererBase {
 
   /** @inheritdoc @param {{ r: number, g: number, b: number }} rgb */
   setColour(rgb) {
-    this.#currentRGB = Colours.rgbToScaledRGB(rgb);
+    this.#currentRGB = Colours.rgbToScaledRGB(this.applyStyle(rgb));
     this.#cr.setSourceRGB(this.#currentRGB.r, this.#currentRGB.g, this.#currentRGB.b);
   }
 
