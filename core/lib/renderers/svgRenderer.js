@@ -156,8 +156,8 @@ export class SvgRenderer extends RendererBase {
   // --- State ---
 
   /** @inheritdoc */
-  setColour({ r, g, b }) {
-    this.#currentColour = { r, g, b };
+  setColour(rgb) {
+    this.#currentColour = this.applyStyle(rgb);
   }
 
   /** @inheritdoc */
