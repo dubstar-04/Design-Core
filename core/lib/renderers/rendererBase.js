@@ -55,6 +55,29 @@ export class RendererBase {
   getBackgroundColour() {
     return this.#backgroundColour;
   }
+
+  // --- Plot style (concrete — applied in setColour() by each renderer) ---
+
+  /**
+   * Set the active plot style.
+   * Pass one of the RendererBase.Styles values (a colour-transform function).
+   * Falls back to RendererBase.Styles.NONE if the value is falsy.
+   * @param {Function} styleTransform - a function (rgb) => rgb from RendererBase.Styles
+   */
+  setStyle(styleTransform) {
+    this.#styleTransform = styleTransform ?? RendererBase.Styles.NONE;
+  }
+
+  /**
+   * Apply the active plot style transform to a resolved colour.
+   * Called by each concrete renderer at the start of setColour().
+   * @param {{ r: number, g: number, b: number }} rgb
+   * @return {{ r: number, g: number, b: number }}
+   */
+  applyStyle(rgb) {
+    return this.#styleTransform(rgb);
+  }
+
   // --- High-level drawing ---
 
   /**
