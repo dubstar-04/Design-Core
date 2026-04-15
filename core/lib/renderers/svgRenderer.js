@@ -23,9 +23,6 @@ export class SvgRenderer extends RendererBase {
   /** @type {string[]} */
   #elements = [];
 
-  /** @type {{ r: number, g: number, b: number } | null} */
-  #background = null;
-
   // Current drawing state
   #currentColour = { r: 0, g: 0, b: 0 };
   #currentLineWidth = 1;
@@ -57,9 +54,8 @@ export class SvgRenderer extends RendererBase {
   }
 
   /** @inheritdoc */
-  fillBackground(colour) {
-    // Stored and emitted outside the Y-flip group in getOutput()
-    this.#background = colour;
+  fillBackground() {
+    // No-op: background colour is set via setBackgroundColour() and emitted in getOutput()
   }
 
   // --- High-level drawing ---
@@ -243,8 +239,9 @@ export class SvgRenderer extends RendererBase {
     ];
 
     // Background rect emitted before Y-flip group (already in SVG Y-down coords)
-    if (this.#background) {
-      const { r, g, b } = this.#background;
+    const bg = this.getBackgroundColour();
+    if (bg) {
+      const { r, g, b } = bg;
       parts.push(`<rect x="0" y="0" width="${this.#pageWidth}" height="${this.#pageHeight}" fill="rgb(${r},${g},${b})" stroke="none"/>`);
     }
 
