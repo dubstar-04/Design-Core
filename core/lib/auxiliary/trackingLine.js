@@ -68,11 +68,9 @@ export class TrackingLine {
     const lineColour = DesignCore.Settings.accentcolour;
     const dashSize = 4 / scale;
 
-    renderer.save();
     renderer.setColour(lineColour);
     renderer.setLineWidth(lineWidth);
     renderer.setDash([dashSize, dashSize], 0);
-    renderer.drawShape(null, [{ x: start.x, y: start.y }, { x: end.x, y: end.y }]);
-    renderer.restore();
+    renderer.drawShape(null, [start, end]);
   }
 }

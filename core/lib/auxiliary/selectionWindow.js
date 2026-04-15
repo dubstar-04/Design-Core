@@ -43,13 +43,12 @@ export class SelectionWindow {
     const p0 = this.points[0];
     const p1 = this.points[1];
     const rectPoints = [
-      { x: p0.x, y: p0.y },
-      { x: p1.x, y: p0.y },
-      { x: p1.x, y: p1.y },
-      { x: p0.x, y: p1.y },
+      new Point(p0.x, p0.y),
+      new Point(p1.x, p0.y),
+      new Point(p1.x, p1.y),
+      new Point(p0.x, p1.y),
     ];
 
-    renderer.save();
     renderer.setColour(colour);
     renderer.setLineWidth(this.lineWidth / scale);
 
@@ -60,7 +59,5 @@ export class SelectionWindow {
     // Dashed outline
     renderer.setDash(scaledPattern, 0);
     renderer.drawShape(null, rectPoints, { closed: true, fill: false, stroke: true });
-
-    renderer.restore();
   }
 }
