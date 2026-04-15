@@ -609,6 +609,8 @@ export class Hatch extends Entity {
             // Drop the redundant closure point — the first point already records
             // the same position; keeping it would create a zero-length segment
             shape.points.push(...iterationPoints.slice(0, -1));
+            // Mark as closed (flag bit 1)
+            shape.flags.addValue(1);
             selectedchildEntities.push(shape);
             iterationPoints = [];
             break;
