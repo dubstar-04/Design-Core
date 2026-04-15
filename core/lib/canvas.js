@@ -282,22 +282,18 @@ export class Canvas {
     // set the transform for the context
     // this will set all the pan and zoom actions
     renderer.setTransform(this.matrix);
+    renderer.setBackgroundColour(DesignCore.Settings.canvasbackgroundcolour);
 
     const pos = new Point();
     const origin = DesignCore.Mouse.transformToScene(pos);
+    const scale = this.getScale();
 
     // Paint the scene background
-    renderer.fillBackground(
-        DesignCore.Settings.canvasbackgroundcolour,
-        origin,
-        width,
-        height,
-        this.getScale(),
-    );
-
+    renderer.fillBackground(origin, width, height, scale);
+    // Paint the grid
     this.paintGrid(renderer);
-    const scale = this.getScale();
-    const bg = DesignCore.Settings.canvasbackgroundcolour;
+
+    const bg = renderer.getBackgroundColour();
     const hoverHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.5);
     const selectionHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.25);
     const selectionLineWidthDelta = 5;
@@ -391,7 +387,7 @@ export class Canvas {
     let colour = item.getDrawColour();
     const lineType = item.getLineType();
     let lineWidth = item.lineWidth / scale;
-    const bg = DesignCore.Settings.canvasbackgroundcolour;
+    const bg = renderer.getBackgroundColour() ?? { r: 0, g: 0, b: 0 };
 
     if (block && item.entityColour.aci === 0) {
       colour = block.getDrawColour();
