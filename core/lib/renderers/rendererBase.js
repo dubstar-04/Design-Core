@@ -23,11 +23,23 @@ export class RendererBase {
    * Add new entries here to extend the available styles without changing any other code.
    */
   static Styles = {
-    /** No transform — colours are rendered as-is. */
+    /**
+     * No transform — colours are rendered as-is.
+     * @param {{ r: number, g: number, b: number }} rgb
+     * @return {{ r: number, g: number, b: number }}
+     */
     NONE: (rgb) => rgb,
-    /** All colours mapped to black, matching AutoCAD's monochrome.ctb behaviour. */
+    /**
+     * All colours mapped to black, matching AutoCAD's monochrome.ctb behaviour.
+     * @param {{ r: number, g: number, b: number }} _
+     * @return {{ r: number, g: number, b: number }}
+     */
     MONOCHROME: (_) => ({ r: 0, g: 0, b: 0 }),
-    /** Colours converted to luminance-preserving grey (ITU-R BT.601 coefficients). */
+    /**
+     * Colours converted to luminance-preserving grey (ITU-R BT.601 coefficients).
+     * @param {{ r: number, g: number, b: number }} rgb
+     * @return {{ r: number, g: number, b: number }}
+     */
     GREYSCALE: (rgb) => {
       const l = Math.round(0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b);
       return { r: l, g: l, b: l };

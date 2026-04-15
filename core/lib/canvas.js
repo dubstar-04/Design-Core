@@ -3,7 +3,7 @@ import { Colour } from './colour.js';
 import { Point } from '../entities/point.js';
 import { Input } from './input.js';
 import { Logging } from './logging.js';
-import { RendererBase } from './renderers/rendererBase.js';
+// import { RendererBase } from './renderers/rendererBase.js';
 
 import { DesignCore } from '../designCore.js';
 

@@ -284,6 +284,9 @@ describe('SvgRenderer — measurement', () => {
 });
 
 describe('SvgRenderer — plot styles', () => {
+  /**
+   * @param {SvgRenderer} renderer
+   */
   function drawLine(renderer) {
     renderer.setLineWidth(1);
     renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }], {});

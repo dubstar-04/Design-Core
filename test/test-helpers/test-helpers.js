@@ -125,10 +125,14 @@ export class MockRenderer {
   }
 
   /** @return {{ r: number, g: number, b: number }|null} */
+  /**
+   * @return {object|null}
+   */
   getBackgroundColour() {
     return this._backgroundColour ?? null;
   }
 
+  /** */
   fillBackground() {}
 
   /**
