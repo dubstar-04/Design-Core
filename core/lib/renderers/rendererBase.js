@@ -15,6 +15,26 @@
  * child list from draw().
  */
 export class RendererBase {
+  #backgroundColour = null;
+  // --- Background colour (concrete — used by all renderers for ACI 7 resolution) ---
+
+  /**
+   * Store the background colour for this renderer.
+   * Called by canvas.js before painting so that setContext can resolve ACI 7
+   * correctly for both screen and export renderers.
+   * @param {{ r: number, g: number, b: number }|null} colour
+   */
+  setBackgroundColour(colour) {
+    this.#backgroundColour = colour;
+  }
+
+  /**
+   * Return the renderer's background colour, or null if not set.
+   * @return {{ r: number, g: number, b: number }|null}
+   */
+  getBackgroundColour() {
+    return this.#backgroundColour;
+  }
   // --- High-level drawing ---
 
   /**
