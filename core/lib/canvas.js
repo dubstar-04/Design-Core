@@ -321,6 +321,7 @@ export class Canvas {
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
+    renderer.setHighlight(false);
     const auxCount = DesignCore.Scene.auxiliaryEntities.count();
     for (let l = 0; l < auxCount; l++) {
       DesignCore.Scene.auxiliaryEntities.get(l).draw(renderer, scale);
