@@ -35,17 +35,17 @@ export class Constants {
    */
   static PageSizes = {
     // ISO A-series (portrait)
-    'A4':      { width: 595,  height: 842  },
-    'A3':      { width: 842,  height: 1191 },
-    'A2':      { width: 1191, height: 1684 },
-    'A1':      { width: 1684, height: 2384 },
-    'A0':      { width: 2384, height: 3370 },
+    'A4': { width: 595, height: 842 },
+    'A3': { width: 842, height: 1191 },
+    'A2': { width: 1191, height: 1684 },
+    'A1': { width: 1684, height: 2384 },
+    'A0': { width: 2384, height: 3370 },
     // ANSI sizes (portrait)
-    'Letter':  { width: 612,  height: 792  },
-    'Legal':   { width: 612,  height: 1008 },
-    'Tabloid': { width: 792,  height: 1224 },
-    'ANSI C':  { width: 1224, height: 1584 },
-    'ANSI D':  { width: 1584, height: 2448 },
-    'ANSI E':  { width: 2448, height: 3168 },
+    'Letter': { width: 612, height: 792 },
+    'Legal': { width: 612, height: 1008 },
+    'Tabloid': { width: 792, height: 1224 },
+    'ANSI C': { width: 1224, height: 1584 },
+    'ANSI D': { width: 1584, height: 2448 },
+    'ANSI E': { width: 2448, height: 3168 },
   };
 }

@@ -22,7 +22,7 @@ describe('Constants.PageSizes', () => {
   });
 
   test('all sizes have portrait orientation (width < height)', () => {
-    for (const [name, size] of Object.entries(Constants.PageSizes)) {
+    for (const [, size] of Object.entries(Constants.PageSizes)) {
       expect(size.width).toBeLessThan(size.height);
     }
   });
