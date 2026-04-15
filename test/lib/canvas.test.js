@@ -212,6 +212,7 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   test('ACI 7 is white on dark background', () => {
     const renderer = new MockRenderer();
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
     canvas.setContext(aci7MockEntity, renderer);
     expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
   });
@@ -219,6 +220,7 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   test('ACI 7 is black on light background', () => {
     const renderer = new MockRenderer();
     core.settings.canvasbackgroundcolour = { r: 246, g: 245, b: 244 };
+    renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
     canvas.setContext(aci7MockEntity, renderer);
     expect(renderer.strokeStyle).toBe('rgb(0, 0, 0)');
   });
@@ -226,6 +228,7 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   test('non-ACI-7 near-white colour is not recoloured', () => {
     const renderer = new MockRenderer();
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
     canvas.setContext(nearWhiteMockEntity, renderer);
     expect(renderer.strokeStyle).toBe('rgb(254, 254, 254)');
   });
@@ -233,6 +236,7 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   test('true colour with fallback aci=7 is not recoloured', () => {
     const renderer = new MockRenderer();
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
+    renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
     canvas.setContext(trueColourFallbackAci7MockEntity, renderer);
     expect(renderer.strokeStyle).toBe('rgb(200, 100, 50)');
   });
@@ -240,6 +244,7 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   test('ACI 7 via ByLayer resolves white on dark background', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     const renderer = new MockRenderer();
+    renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
     const byLayerEntity = {
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       getLineType: () => ({ getPattern: () => [] }),
@@ -254,6 +259,7 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   test('ACI 7 via ByBlock (direct) resolves white on dark background', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     const renderer = new MockRenderer();
+    renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
     const byBlockItem = {
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       getLineType: () => ({ getPattern: () => [] }),
@@ -271,6 +277,7 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   test('ACI 7 via ByBlock → ByLayer resolves white on dark background', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     const renderer = new MockRenderer();
+    renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
     const byBlockItem = {
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       getLineType: () => ({ getPattern: () => [] }),
@@ -289,6 +296,7 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   test('ACI 7 is recoloured in SELECTED state', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     const renderer = new MockRenderer();
+    renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
     canvas.setContext(aci7MockEntity, renderer);
     // SELECTED pass uses no special flags — ACI 7 background-adaptive logic still applies
     expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
