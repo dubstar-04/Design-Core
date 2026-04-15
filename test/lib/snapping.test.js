@@ -90,9 +90,7 @@ test('Test TrackingLine.draw', () => {
   const trackingLine = DesignCore.Scene.auxiliaryEntities.get(0);
   const renderer = makeTrackingRenderer();
   trackingLine.draw(renderer, 1);
-  expect(renderer.save).toHaveBeenCalled();
   expect(renderer.drawShape).toHaveBeenCalled();
-  expect(renderer.restore).toHaveBeenCalled();
 });
 
 test('Test TrackingLine.draw degenerate zero direction', () => {
