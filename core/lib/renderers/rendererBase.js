@@ -16,6 +16,26 @@
  */
 export class RendererBase {
   #backgroundColour = null;
+
+  /**
+   * Colour-transform functions for plot styles.
+   * Each entry maps style name (uppercase) → (rgb) => rgb.
+   * Add new entries here to extend the available styles without changing any other code.
+   */
+  static Styles = {
+    /** No transform — colours are rendered as-is. */
+    NONE: (rgb) => rgb,
+    /** All colours mapped to black, matching AutoCAD's monochrome.ctb behaviour. */
+    MONOCHROME: (_) => ({ r: 0, g: 0, b: 0 }),
+    /** Colours converted to luminance-preserving grey (ITU-R BT.601 coefficients). */
+    GREYSCALE: (rgb) => {
+      const l = Math.round(0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b);
+      return { r: l, g: l, b: l };
+    },
+  };
+
+  #styleTransform = RendererBase.Styles.NONE;
+
   // --- Background colour (concrete — used by all renderers for ACI 7 resolution) ---
 
   /**
