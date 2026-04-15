@@ -160,14 +160,13 @@ export class RendererBase {
   }
 
   /**
-   * Paint the scene background rectangle.
-   * @param {{ r: number, g: number, b: number }} colour
+   * Paint the scene background rectangle using the colour set by setBackgroundColour().
    * @param {{ x: number, y: number }} origin - scene-space top-left corner
    * @param {number} width  - canvas pixel width
    * @param {number} height - canvas pixel height
    * @param {number} scale  - current scene scale
    */
-  fillBackground(colour, origin, width, height, scale) {
+  fillBackground(origin, width, height, scale) {
     throw new Error(`${this.constructor.name}: fillBackground() not implemented`);
   }
 
