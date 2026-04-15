@@ -320,7 +320,9 @@ export class Canvas {
     renderer.setHighlight(false);
     const auxCount = DesignCore.Scene.auxiliaryEntities.count();
     for (let l = 0; l < auxCount; l++) {
+      renderer.save();
       DesignCore.Scene.auxiliaryEntities.get(l).draw(renderer, scale);
+      renderer.restore();
     }
   }
 
