@@ -1,4 +1,5 @@
 import { SvgRenderer } from '../../core/lib/renderers/svgRenderer.js';
+import { RendererBase } from '../../core/lib/renderers/rendererBase.js';
 import { Point } from '../../core/entities/point.js';
 import { Text } from '../../core/entities/text.js';
 
@@ -27,7 +28,8 @@ describe('SvgRenderer — getOutput()', () => {
 
   test('fillBackground emits rect before Y-flip group', () => {
     const renderer = new SvgRenderer(200, 100);
-    renderer.fillBackground({ r: 30, g: 30, b: 30 }, null, 200, 100, 1);
+    renderer.setBackgroundColour({ r: 30, g: 30, b: 30 });
+    renderer.fillBackground();
     const output = renderer.getOutput();
     const rectPos = output.indexOf('<rect');
     const flipPos = output.indexOf('scale(1,-1)');
@@ -278,5 +280,44 @@ describe('SvgRenderer — measurement', () => {
   test('measureCharWidth returns per-character width', () => {
     const renderer = new SvgRenderer(100, 100);
     expect(renderer.measureCharWidth('M')).toBeCloseTo(Text.getApproximateWidth('M', 1), 5);
+  });
+});
+
+describe('SvgRenderer — plot styles', () => {
+  function drawLine(renderer) {
+    renderer.setLineWidth(1);
+    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }], {});
+  }
+
+  test('default style NONE renders colour unchanged', () => {
+    const renderer = new SvgRenderer(100, 100);
+    renderer.setColour({ r: 255, g: 0, b: 0 });
+    drawLine(renderer);
+    expect(renderer.getOutput()).toContain('stroke="rgb(255,0,0)"');
+  });
+
+  test('style MONOCHROME maps all colours to black', () => {
+    const renderer = new SvgRenderer(100, 100);
+    renderer.setStyle(RendererBase.Styles.MONOCHROME);
+    renderer.setColour({ r: 255, g: 0, b: 0 });
+    drawLine(renderer);
+    expect(renderer.getOutput()).toContain('stroke="rgb(0,0,0)"');
+  });
+
+  test('style GREYSCALE maps colour to grey', () => {
+    const renderer = new SvgRenderer(100, 100);
+    renderer.setStyle(RendererBase.Styles.GREYSCALE);
+    renderer.setColour({ r: 255, g: 0, b: 0 }); // 0.299*255 ≈ 76
+    drawLine(renderer);
+    expect(renderer.getOutput()).toContain('stroke="rgb(76,76,76)"');
+  });
+
+  test('setStyle with null falls back to NONE', () => {
+    const renderer = new SvgRenderer(100, 100);
+    renderer.setStyle(RendererBase.Styles.MONOCHROME);
+    renderer.setStyle(null); // reset to NONE
+    renderer.setColour({ r: 0, g: 128, b: 255 });
+    drawLine(renderer);
+    expect(renderer.getOutput()).toContain('stroke="rgb(0,128,255)"');
   });
 });
