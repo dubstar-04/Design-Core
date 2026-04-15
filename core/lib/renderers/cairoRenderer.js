@@ -177,6 +177,31 @@ export class CairoRenderer extends RendererBase {
   /** @inheritdoc */
   drawSegments(segments, dashes = []) {
     if (!segments.length) return;
+
+    // Highlight pass: wide stroke in the highlight colour before the normal draw.
+    if (this.#isHighlighted && this.#highlightColour) {
+      this.#cr.save();
+      const s = Colours.rgbToScaledRGB(this.#highlightColour);
+      this.#cr.setSourceRGB(s.r, s.g, s.b);
+      this.#cr.setLineWidth(this.#cr.getLineWidth() + this.#highlightLineWidthDelta);
+      if (!dashes.length) {
+        this.#cr.newPath();
+        for (const seg of segments) {
+          this.tracePath([{ x: seg.x1, y: seg.y1 }, { x: seg.x2, y: seg.y2 }]);
+        }
+        this.#cr.stroke();
+      } else {
+        for (const seg of segments) {
+          this.#cr.setDash(dashes, seg.dashPhase ?? 0);
+          this.#cr.newPath();
+          this.tracePath([{ x: seg.x1, y: seg.y1 }, { x: seg.x2, y: seg.y2 }]);
+          this.#cr.stroke();
+        }
+      }
+      this.#cr.restore();
+    }
+
+    // Normal pass
     if (!dashes.length) {
       this.#cr.newPath();
       for (const seg of segments) {
