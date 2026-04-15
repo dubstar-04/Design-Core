@@ -237,6 +237,38 @@ test('onCommandButton with no active command - starts command', () => {
   inputManager.reset();
 });
 
+// ─── startCommand — selection clearing ───────────────────────────────────────
+
+test('starting an entity command from idle clears the selection', () => {
+  inputManager.reset();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+  expect(core.scene.selectionManager.selectionSet.selectionSet.length).toBe(1);
+
+  inputManager.onCommand('L');
+  expect(core.scene.selectionManager.selectionSet.selectionSet.length).toBe(0);
+  inputManager.reset();
+});
+
+test('starting a tool command from idle preserves the selection', () => {
+  inputManager.reset();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.selectionManager.addToSelectionSet(0);
+  expect(core.scene.selectionManager.selectionSet.selectionSet.length).toBe(1);
+
+  // Prevent Erase.execute() from running so we can isolate startCommand's own behaviour.
+  // Without this, Erase synchronously calls executeCommand() → reset() in the
+  // preselection branch before our assertion can fire.
+  const Erase = DesignCore.CommandManager.createNew('Erase').constructor;
+  jest.spyOn(Erase.prototype, 'execute').mockImplementation(() => {});
+
+  inputManager.onCommand('E');
+  expect(core.scene.selectionManager.selectionSet.selectionSet.length).toBe(1);
+
+  jest.restoreAllMocks();
+  inputManager.reset();
+});
+
 // ─── onCommand - command shortcut while non-accepting prompt is active ─────────
 
 test('onCommand with valid shortcut while POINT prompt active - switches command without notifying', () => {

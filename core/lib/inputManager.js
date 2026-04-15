@@ -136,6 +136,14 @@ export class InputManager {
     const resolvedCommand = DesignCore.CommandManager.getCommand(command);
     DesignCore.CommandLine.addToCommandHistory(resolvedCommand);
     this.activeCommand = DesignCore.CommandManager.createNew(resolvedCommand);
+
+    // Clear selection for Entity commands
+    // Tools (Erase, Offset, etc.) consume preselection in execute().
+    if (!(this.activeCommand instanceof Tool)) {
+      DesignCore.Scene.selectionManager.reset();
+      DesignCore.Canvas.requestPaint();
+    }
+
     this.activeCommand.execute();
   }
 
