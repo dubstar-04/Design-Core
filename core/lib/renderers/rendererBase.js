@@ -162,6 +162,20 @@ export class RendererBase {
     throw new Error(`${this.constructor.name}: closePath() not implemented`);
   }
 
+  /**
+   * Apply fill and/or stroke to the current accumulated path without resetting it first.
+   * Use after manually building a compound path via beginPath() + tracePath() + closePath()
+   * when multiple loops are needed (e.g. solid hatch with island/hole boundaries).
+   * @param {Object}  [options]
+   * @param {boolean} [options.stroke=true]
+   * @param {boolean} [options.fill=false]
+   * @param {string}  [options.fillRule]   - 'evenodd' or 'nonzero' (default)
+   * @param {number}  [options.alpha=1]    - fill opacity (0–1)
+   */
+  applyPath(options = {}) {
+    throw new Error(`${this.constructor.name}: applyPath() not implemented`);
+  }
+
   // --- State (called by canvas.js setContext before each entity.draw()) ---
 
   /**

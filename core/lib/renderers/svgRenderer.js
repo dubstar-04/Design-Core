@@ -153,6 +153,20 @@ export class SvgRenderer extends RendererBase {
     this.#currentPath = null;
   }
 
+  /** @inheritdoc */
+  applyPath(options = {}) {
+    if (this.#currentPath === null) return;
+    const { stroke = true, fill = false, fillRule, alpha = 1 } = options;
+    const strokeAttrs = stroke ?
+      `stroke="${this.#colourStr()}" stroke-width="${this.#fmt(this.#currentLineWidth)}"${this.#dashAttrs()}` :
+      'stroke="none"';
+    let fillAttrs = fill ? `fill="${this.#colourStr()}"` : 'fill="none"';
+    if (fill && fillRule) fillAttrs += ` fill-rule="${fillRule}"`;
+    if (fill && alpha !== 1) fillAttrs += ` fill-opacity="${this.#fmt(alpha)}"`;
+    this.#emit(`<path d="${this.#currentPath}" ${strokeAttrs} ${fillAttrs}/>`);
+    this.#currentPath = null;
+  }
+
   // --- State ---
 
   /** @inheritdoc */

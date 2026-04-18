@@ -145,6 +145,11 @@ export class PdfRenderer extends RendererBase {
     this.#emit('S');
   }
 
+  /** @inheritdoc */
+  applyPath(options = {}) {
+    this.#applyOptions(options);
+  }
+
   // --- State ---
 
   /** @inheritdoc */
