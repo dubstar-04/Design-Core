@@ -1,8 +1,10 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
+import { BoundingBox } from '../../core/lib/boundingBox.js';
 import { Matrix } from '../../core/lib/matrix.js';
 import { Input } from '../../core/lib/input.js';
 import { Colour } from '../../core/lib/colour.js';
+import { PlotOptions } from '../../core/lib/plotOptions.js';
 import { jest } from '@jest/globals';
 import { MockRenderer } from '../test-helpers/test-helpers.js';
 
@@ -1017,5 +1019,206 @@ describe('Test Canvas.#paintEntity', () => {
     const saves = ctx.saveRestoreLog.filter((e) => e === 'save').length;
     const restores = ctx.saveRestoreLog.filter((e) => e === 'restore').length;
     expect(saves).toBe(restores);
+  });
+});
+
+// ─── Canvas.buildExportMatrix ─────────────────────────────────────────────────
+
+/**
+ * Helper: create a BoundingBox from plain coordinates.
+ * @param {number} xMin
+ * @param {number} yMin
+ * @param {number} xMax
+ * @param {number} yMax
+ * @return {BoundingBox}
+ */
+function makeBBox(xMin, yMin, xMax, yMax) {
+  return new BoundingBox(new Point(xMin, yMin), new Point(xMax, yMax));
+}
+
+describe('Canvas.buildExportMatrix', () => {
+  beforeEach(() => {
+    core.activate();
+    canvas.matrix = new Matrix();
+  });
+
+  test('returns null when scene width is zero', () => {
+    const area = makeBBox(100, 0, 100, 200);
+    expect(canvas.buildExportMatrix({ area, pageWidth: 595, pageHeight: 842 })).toBeNull();
+  });
+
+  test('returns null when scene height is zero', () => {
+    const area = makeBBox(0, 50, 200, 50);
+    expect(canvas.buildExportMatrix({ area, pageWidth: 595, pageHeight: 842 })).toBeNull();
+  });
+
+  test('a and d equal the computed scale (no Y-flip)', () => {
+    const area = makeBBox(0, 0, 100, 100);
+    const m = canvas.buildExportMatrix({ area, pageWidth: 595, pageHeight: 842 });
+    expect(m.a).toBe(m.d);
+    expect(m.a).toBeGreaterThan(0);
+  });
+
+  test('fit scale is limited by the narrower page axis', () => {
+    // 200-wide × 100-tall scene on portrait A4 (595 × 842) with default margin 40
+    // usable = 515 × 762; limiting axis = width → scale = 515/200 = 2.575
+    const area = makeBBox(0, 0, 200, 100);
+    const m = canvas.buildExportMatrix({ area, pageWidth: 595, pageHeight: 842 });
+    expect(m.a).toBeCloseTo(515 / 200, 5);
+  });
+
+  test('explicit plotScale overrides fit calculation', () => {
+    const area = makeBBox(0, 0, 100, 100);
+    const m = canvas.buildExportMatrix({ area, pageWidth: 595, pageHeight: 842, plotScale: 2 });
+    expect(m.a).toBe(2);
+    expect(m.d).toBe(2);
+  });
+
+  test('scene origin (0,0) is centred on the page when area is square and page is square', () => {
+    // 100×100 scene on 300×300 page, margin 0 → scale = 3, translateX = (300 - 300)/2 = 0
+    const area = makeBBox(0, 0, 100, 100);
+    const m = canvas.buildExportMatrix({ area, pageWidth: 300, pageHeight: 300, margin: 0 });
+    expect(m.e).toBeCloseTo(0, 5);
+    expect(m.f).toBeCloseTo(0, 5);
+  });
+
+  test('non-zero scene origin is properly offset', () => {
+    // Scene from (50,50) to (150,150) on 300×300 page, no margin
+    // scale = 3, translateX = (300 - 100*3)/2 - 50*3 = 0 - 150 = -150
+    const area = makeBBox(50, 50, 150, 150);
+    const m = canvas.buildExportMatrix({ area, pageWidth: 300, pageHeight: 300, margin: 0 });
+    expect(m.e).toBeCloseTo(-150, 5);
+    expect(m.f).toBeCloseTo(-150, 5);
+  });
+
+  test('custom margin is respected', () => {
+    // 100×100 scene on 300×300 page, margin 50 → usable = 200×200, scale = 2
+    const area = makeBBox(0, 0, 100, 100);
+    const m = canvas.buildExportMatrix({ area, pageWidth: 300, pageHeight: 300, margin: 50 });
+    expect(m.a).toBeCloseTo(2, 5);
+    // translateX = 50 + (200 - 100*2)/2 - 0 = 50 + 0 = 50
+    expect(m.e).toBeCloseTo(50, 5);
+    expect(m.f).toBeCloseTo(50, 5);
+  });
+});
+
+// ─── Canvas.exportTo ──────────────────────────────────────────────────────────
+
+describe('Canvas.exportTo', () => {
+  let exportCore;
+  let exportCanvas;
+  let renderer;
+
+  beforeEach(() => {
+    exportCore = new Core();
+    exportCore.activate();
+    exportCanvas = exportCore.canvas;
+    exportCanvas.matrix = new Matrix();
+    exportCanvas.width = 800;
+    exportCanvas.height = 600;
+    exportCanvas.flipped = true;
+    renderer = new MockRenderer();
+  });
+
+  test('returns false when scene has no entities (no bounding box)', () => {
+    const options = new PlotOptions(595, 842);
+    // Empty scene → Scene.boundingBox() returns null/undefined
+    expect(exportCanvas.exportTo(renderer, options)).toBe(false);
+  });
+
+  test('returns true when scene has entities', () => {
+    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    const options = new PlotOptions(595, 842);
+    expect(exportCanvas.exportTo(renderer, options)).toBe(true);
+  });
+
+  test('calls renderer.setTransform with a valid matrix', () => {
+    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    let receivedMatrix;
+    renderer.setTransform = (m) => {
+      receivedMatrix = m;
+    };
+    const options = new PlotOptions(595, 842);
+    exportCanvas.exportTo(renderer, options);
+    expect(receivedMatrix).toBeDefined();
+    expect(receivedMatrix.a).toBeGreaterThan(0);
+    expect(receivedMatrix.d).toBeGreaterThan(0);
+  });
+
+  test('calls renderer.setBackgroundColour with white', () => {
+    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    let bgColour;
+    renderer.setBackgroundColour = (c) => {
+      bgColour = c;
+    };
+    const options = new PlotOptions(595, 842);
+    exportCanvas.exportTo(renderer, options);
+    expect(bgColour).toEqual({ r: 255, g: 255, b: 255 });
+  });
+
+  test('calls renderer.setStyle with the plotOptions style', () => {
+    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    const options = new PlotOptions(595, 842);
+    const spyCalls = [];
+    renderer.setStyle = (fn) => {
+      spyCalls.push(fn);
+    };
+    exportCanvas.exportTo(renderer, options);
+    expect(spyCalls).toHaveLength(1);
+  });
+
+  test('EXTENTS uses Scene.boundingBox regardless of viewport', () => {
+    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(500, 500)] });
+    // Pan far away so viewport does not contain the entity
+    exportCanvas.matrix.translate(-10000, -10000);
+    let receivedMatrix;
+    renderer.setTransform = (m) => {
+      receivedMatrix = m;
+    };
+    const options = new PlotOptions(595, 842);
+    options.setOption('plotArea', PlotOptions.Area.EXTENTS);
+    exportCanvas.exportTo(renderer, options);
+    // Should have produced a valid matrix mapping the entity extents onto the page
+    expect(receivedMatrix).toBeDefined();
+    expect(receivedMatrix.a).toBeGreaterThan(0);
+  });
+
+  test('DISPLAY uses current viewport instead of entity extents', () => {
+    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(500, 500)] });
+    let extentsMatrix;
+    let displayMatrix;
+
+    // Capture extents-mode matrix
+    renderer.setTransform = (m) => {
+      extentsMatrix = { ...m };
+    };
+    const extentsOptions = new PlotOptions(595, 842);
+    extentsOptions.setOption('plotArea', PlotOptions.Area.EXTENTS);
+    exportCanvas.exportTo(renderer, extentsOptions);
+
+    // Zoom in to a small region so viewport differs from extents
+    exportCanvas.zoom(10);
+
+    renderer.setTransform = (m) => {
+      displayMatrix = { ...m };
+    };
+    const displayOptions = new PlotOptions(595, 842);
+    displayOptions.setOption('plotArea', PlotOptions.Area.DISPLAY);
+    exportCanvas.exportTo(renderer, displayOptions);
+
+    // Display scale will be larger (more zoomed in region mapped to same page)
+    expect(displayMatrix.a).not.toBeCloseTo(extentsMatrix.a, 3);
+  });
+
+  test('explicit plotScale is forwarded to buildExportMatrix', () => {
+    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    let receivedMatrix;
+    renderer.setTransform = (m) => {
+      receivedMatrix = m;
+    };
+    const options = new PlotOptions(595, 842);
+    options.setOption('plotScale', 0.5);
+    exportCanvas.exportTo(renderer, options);
+    expect(receivedMatrix.a).toBeCloseTo(0.5, 5);
   });
 });
