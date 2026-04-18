@@ -1,6 +1,6 @@
 import { RendererBase } from '../../core/lib/renderers/rendererBase.js';
 
-// Concrete subclass used throughout — only implements what the tests need.
+/** Concrete subclass used throughout — only implements what the tests need. */
 class TestRenderer extends RendererBase {}
 
 // ─── RendererBase.Styles ──────────────────────────────────────────────────────
