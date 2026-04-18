@@ -175,14 +175,6 @@ export class MockRenderer {
   }
 
   /**
-   * @param {number} x
-   * @param {number} y
-   */
-  translate(x, y) {
-    if (this._ctx) this._ctx.translate(x, y);
-  }
-
-  /**
    * @param {boolean} [isHighlighted=false]
    * @param {object|null} [colour=null]
    * @param {number} [lineWidthDelta=0]
