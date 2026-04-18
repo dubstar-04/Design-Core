@@ -4,6 +4,7 @@
 <g transform="matrix(1 0 0 1 0 0)">
 <path d="M 14.1732 14.1732 L 1175.8268 14.1732 L 1175.8268 827.8268 L 14.1732 827.8268 Z" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
 <text transform="translate(517.37,811.8268) scale(1,-1) rotate(0)" font-family="Helvetica" font-size="14" fill="rgb(0,0,0)" stroke="none">Hatch Pattern Reference</text>
+<path d="M 45.5 721.8268 L 109.5 721.8268 L 109.5 785.8268 L 45.5 785.8268 Z" stroke="none" fill="rgb(0,0,0)" fill-rule="evenodd"/>
 <path d="M 45.5 721.8268 L 109.5 721.8268 L 109.5 785.8268 L 45.5 785.8268 Z" stroke="rgb(0,0,0)" stroke-width="0.5" fill="none"/>
 <text transform="translate(68.8,713.8268) scale(1,-1) rotate(0)" font-family="Helvetica" font-size="6" fill="rgb(60,60,60)" stroke="none">SOLID</text>
 <path d="M 176.9001 725.8868 L 208.0999 725.8868" stroke="rgb(0,0,0)" stroke-width="0.25" stroke-dasharray="5.08,1.905" stroke-dashoffset="19.3251" fill="none"/>
