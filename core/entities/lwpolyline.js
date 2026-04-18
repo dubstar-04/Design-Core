@@ -1,12 +1,13 @@
 import { Logging } from '../lib/logging.js';
-import { BasePolyline } from './basePolyline.js';
 import { Polyline } from './polyline.js';
 
 /**
  * LWPolyline Entity Class
- * @extends BasePolyline
+ * LWPolyline is a DXF import-only entity. The constructor pre-processes the
+ * raw DXF data and returns a {@link Polyline} instance. It is never
+ * instantiated as a standalone entity within the application.
  */
-export class Lwpolyline extends BasePolyline {
+export class Lwpolyline {
   static type = 'Lwpolyline';
 
   /**
@@ -14,16 +15,18 @@ export class Lwpolyline extends BasePolyline {
    * @param {Array} data
    */
   constructor(data) {
-    super(data);
-
-    if (data) {
-      if (data.hasOwnProperty('90')) {
-        // DXF Groupcode 90 - Number of vertices
-        if (this.points.length !== data[90]) {
-          Logging.instance.error(`LWPOLYLINE Vertices Count`);
-        }
+    if (data?.hasOwnProperty('90')) {
+      // DXF Groupcode 90 - Number of vertices
+      if (data.points.length !== data[90]) {
+        Logging.instance.error(`LWPOLYLINE Vertices Count`);
       }
     }
+
+    if (data?.points?.length >= 4 && data.points[0].isSame(data.points.at(-1))) {
+      data.points.pop();
+      data[70] = (data[70] ?? 0) | 1;
+    }
+
     return new Polyline(data);
   }
 
