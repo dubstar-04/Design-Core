@@ -141,14 +141,12 @@ export class MockRenderer {
   fillBackground() {}
 
   /**
-   * @param {object} entity
    * @param {Array} points
    * @param {object} [options]
    */
   drawShape(points, options) {}
 
   /**
-   * @param {object} entity
    * @param {Array} characters
    * @param {string} fontName
    * @param {number} height
