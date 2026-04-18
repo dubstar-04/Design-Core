@@ -657,17 +657,18 @@ export class Hatch extends Entity {
         renderer.closePath();
       }
       renderer.applyPath({ fill: true, stroke: false, fillRule: 'evenodd' });
-      return;
+    } else {
+      // Pattern hatch: draw pre-clipped segments directly.
+      for (const family of this.cachedPattern) {
+        renderer.setDash([], 0);
+        renderer.drawSegments(family.segments, family.dashes);
+      }
     }
 
-    // Pattern hatch: draw pre-clipped segments directly.
-    for (const family of this.cachedPattern) {
-      renderer.setDash([], 0);
-      renderer.drawSegments(family.segments, family.dashes);
-    }
-
-    // When selected, stroke the boundary outline so the hatch region is visible.
-    if (DesignCore.Scene.selectionManager.selectedItems.includes(this)) {
+    // Draw the boundary outline when hovered or selected.
+    const isSelected = DesignCore.Scene.selectionManager.selectedItems.includes(this);
+    const isHovered = DesignCore.Scene.hoverEntities.indexOf(this) !== -1;
+    if (isSelected || isHovered) {
       renderer.setDash([], 0);
       for (const shape of this.childEntities) {
         if (!shape.points.length) continue;
