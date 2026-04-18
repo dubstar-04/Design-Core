@@ -233,6 +233,11 @@ export class CairoRenderer extends RendererBase {
     this.#cr.closePath();
   }
 
+  /** @inheritdoc */
+  applyPath(options = {}) {
+    this.#applyFillAndStroke(options);
+  }
+
   // --- State ---
 
   /** @inheritdoc @param {{ r: number, g: number, b: number }} rgb */
