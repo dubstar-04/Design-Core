@@ -389,6 +389,16 @@ export class Hatch extends Entity {
                 }
 
                 shape.points.push(polyPoint);
+
+                // On the last vertex, apply the closed flag (73) to the shape.
+                // For polyline boundaries 73 = is-closed and appears once, before
+                // the vertices, so it has already been parsed into data[73]. We
+                // must not consume it inside the arc-edge branch (that branch uses
+                // 73 as the per-edge "is counter-clockwise" flag), so we read it
+                // here only when we are in the polyline branch and on the final vertex.
+                if (edgeNum === edgeCount - 1 && this.getDataValue(data, 73)) {
+                  shape.flags.addValue(1);
+                }
               } else if (edgeType === 1) {
                 // Line
                 // 10 - X; 20 - Y; 11 - X; 21 - Y
