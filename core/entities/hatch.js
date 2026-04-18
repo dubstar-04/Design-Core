@@ -640,7 +640,13 @@ export class Hatch extends Entity {
     if (this.cachedPattern === null) this.buildPatternCache();
 
     if (this.solid) {
-      // TODO: solid fill requires renderer clip API — not yet implemented
+      renderer.beginPath();
+      for (const shape of this.childEntities) {
+        if (!shape.points.length) continue;
+        renderer.tracePath(shape.toPolylinePoints());
+        renderer.closePath();
+      }
+      renderer.applyPath({ fill: true, stroke: false, fillRule: 'evenodd' });
       return;
     }
 
