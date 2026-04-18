@@ -119,6 +119,11 @@ export class MockRenderer {
   /** @param {object} matrix */
   setTransform(matrix) {}
 
+  /** @param {Function} styleTransform */
+  setStyle(styleTransform) {
+    this._styleTransform = styleTransform;
+  }
+
   /** @param {{ r: number, g: number, b: number }|null} colour */
   setBackgroundColour(colour) {
     this._backgroundColour = colour;
