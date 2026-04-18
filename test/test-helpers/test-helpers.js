@@ -210,5 +210,8 @@ export class MockRenderer {
 
   /** Close the current path. */
   closePath() {}
+
+  /** @param {object} [options] */
+  applyPath(options) {}
 }
 
