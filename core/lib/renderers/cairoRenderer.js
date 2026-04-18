@@ -38,6 +38,7 @@ export class CairoRenderer extends RendererBase {
 
   /** @inheritdoc */
   setTransform(matrix) {
+    this.#cr.setLineCap(1); // Cairo.LineCap.ROUND — round line ends and circular dots on dotted linetypes
     this.#cr.translate(matrix.e, matrix.f);
     this.#cr.scale(matrix.a, matrix.d);
   }
