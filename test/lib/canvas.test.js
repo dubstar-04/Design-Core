@@ -863,7 +863,7 @@ describe('Test Canvas.#paintEntity', () => {
       lineWidth: 1,
       entityColour: { aci: 2, byLayer: false, byBlock: false },
       draw: jest.fn((ctx) => {
-        ctx.translate(10, 10);
+        ctx.applyTransform({ x: 10, y: 10 });
         return children;
       }),
     };

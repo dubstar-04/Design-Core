@@ -13,6 +13,7 @@ export class CanvasRenderer extends RendererBase {
   #isHighlighted = false;
   #highlightColour = null;
   #highlightLineWidthDelta = 0;
+  #currentLineWidth = 0;
 
   /**
    * @param {CanvasRenderingContext2D} ctx
@@ -51,7 +52,7 @@ export class CanvasRenderer extends RendererBase {
       const s = Colours.rgbToString(this.#highlightColour);
       this.#ctx.strokeStyle = s;
       this.#ctx.fillStyle = s;
-      this.#ctx.lineWidth = this.#ctx.lineWidth + this.#highlightLineWidthDelta;
+      this.#ctx.lineWidth = this.#currentLineWidth + this.#highlightLineWidthDelta;
       this.#ctx.beginPath();
       this.tracePath(points);
       if (options.closed) this.#ctx.closePath();
@@ -88,7 +89,7 @@ export class CanvasRenderer extends RendererBase {
       const s = Colours.rgbToString(this.#highlightColour);
       this.#ctx.save();
       this.#ctx.strokeStyle = s;
-      this.#ctx.lineWidth = this.#ctx.lineWidth + this.#highlightLineWidthDelta;
+      this.#ctx.lineWidth = this.#currentLineWidth + this.#highlightLineWidthDelta;
       for (const ch of characters) {
         this.#ctx.save();
         this.#ctx.translate(ch.x, ch.y);
@@ -162,7 +163,7 @@ export class CanvasRenderer extends RendererBase {
       const s = Colours.rgbToString(this.#highlightColour);
       this.#ctx.strokeStyle = s;
       this.#ctx.fillStyle = s;
-      this.#ctx.lineWidth = this.#ctx.lineWidth + this.#highlightLineWidthDelta;
+      this.#ctx.lineWidth = this.#currentLineWidth + this.#highlightLineWidthDelta;
       if (!dashes.length) {
         this.#ctx.beginPath();
         for (const seg of segments) {
@@ -225,6 +226,7 @@ export class CanvasRenderer extends RendererBase {
 
   /** @inheritdoc @param {number} width */
   setLineWidth(width) {
+    this.#currentLineWidth = width;
     this.#ctx.lineWidth = width;
   }
 
@@ -272,16 +274,6 @@ export class CanvasRenderer extends RendererBase {
   /** @inheritdoc @param {string} character @return {number} */
   measureCharWidth(character) {
     return this.#ctx.measureText(character).width;
-  }
-
-  /**
-   * Get the current line width from the underlying Canvas context.
-   * Retained for backward compatibility with text/arctext hover detection
-   * until those entities are migrated to the new renderer interface.
-   * @return {number}
-   */
-  getLineWidth() {
-    return this.#ctx.lineWidth;
   }
 
   // --- Private helpers ---

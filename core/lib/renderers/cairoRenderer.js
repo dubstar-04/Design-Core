@@ -24,6 +24,7 @@ export class CairoRenderer extends RendererBase {
   #isHighlighted = false;
   #highlightColour = null;
   #highlightLineWidthDelta = 0;
+  #currentLineWidth = 0;
 
   /**
    * @param {Object} cr - GJS Cairo context
@@ -70,7 +71,7 @@ export class CairoRenderer extends RendererBase {
       this.#cr.save();
       const s = Colours.rgbToScaledRGB(this.#highlightColour);
       this.#cr.setSourceRGB(s.r, s.g, s.b);
-      this.#cr.setLineWidth(this.#cr.getLineWidth() + this.#highlightLineWidthDelta);
+      this.#cr.setLineWidth(this.#currentLineWidth + this.#highlightLineWidthDelta);
       this.#cr.newPath();
       this.tracePath(points);
       if (options.closed) this.#cr.closePath();
@@ -181,7 +182,7 @@ export class CairoRenderer extends RendererBase {
       this.#cr.save();
       const s = Colours.rgbToScaledRGB(this.#highlightColour);
       this.#cr.setSourceRGB(s.r, s.g, s.b);
-      this.#cr.setLineWidth(this.#cr.getLineWidth() + this.#highlightLineWidthDelta);
+      this.#cr.setLineWidth(this.#currentLineWidth + this.#highlightLineWidthDelta);
       if (!dashes.length) {
         this.#cr.newPath();
         for (const seg of segments) {
@@ -241,6 +242,7 @@ export class CairoRenderer extends RendererBase {
 
   /** @inheritdoc @param {number} width */
   setLineWidth(width) {
+    this.#currentLineWidth = width;
     this.#cr.setLineWidth(width);
   }
 
@@ -287,16 +289,6 @@ export class CairoRenderer extends RendererBase {
   /** @inheritdoc @param {string} character @return {number} */
   measureCharWidth(character) {
     return this.#cr.textExtents(character).x_advance;
-  }
-
-  /**
-   * Get the current line width from the underlying Cairo context.
-   * Retained for backward compatibility with text/arctext hover detection
-   * until those entities are migrated to the new renderer interface.
-   * @return {number}
-   */
-  getLineWidth() {
-    return this.#cr.getLineWidth();
   }
 
   // --- Private helpers ---
