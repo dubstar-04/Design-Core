@@ -29,7 +29,7 @@ import { Text } from '../../entities/text.js';
  * const r = new PdfRenderer(595, 842);
  * r.setColour({ r: 0, g: 0, b: 0 });
  * r.setLineWidth(1);
- * r.drawShape(entity, [{ x: 100, y: 100 }, { x: 400, y: 400 }]);
+ * r.drawShape([{ x: 100, y: 100 }, { x: 400, y: 400 }]);
  * const pdf = r.getOutput();
  */
 export class PdfRenderer extends RendererBase {
