@@ -523,6 +523,9 @@ function makeMockCtx() {
     fill: () => {
       fillCalled = true;
     },
+    applyPath: (options) => {
+      if (options?.fill) fillCalled = true;
+    },
     tracePath: () => {
       traceCount++;
     },
@@ -535,15 +538,14 @@ function makeMockCtx() {
   };
 }
 
-test('Test Hatch.draw solid fill is skipped (pending clip API)', () => {
+test('Test Hatch.draw solid fill renders filled boundary', () => {
   const solidHatch = new Hatch({ patternName: 'SOLID' });
   solidHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })];
 
   const ctx = makeMockCtx();
   solidHatch.draw(ctx);
 
-  // Solid fill not yet implemented — no fill called
-  expect(ctx.getFillCalled()).toBe(false);
+  expect(ctx.getFillCalled()).toBe(true);
 });
 
 test('Test Hatch.draw unknown pattern does not stroke pattern lines', () => {
