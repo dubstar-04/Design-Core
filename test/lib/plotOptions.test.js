@@ -175,5 +175,5 @@ test('setOption throws for an unknown fileType', () => {
 
 test('setOption throws for an unknown key', () => {
   const po = new PlotOptions(595, 842);
-  expect(() => po.setOption('colour', 'red')).toThrow("unknown option 'colour'");
+  expect(() => po.setOption('colour', 'red')).toThrow('unknown option \'colour\'');
 });
