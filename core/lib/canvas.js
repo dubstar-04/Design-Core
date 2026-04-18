@@ -1,8 +1,10 @@
 import { Matrix } from './matrix.js';
 import { Colour } from './colour.js';
+import { BoundingBox } from './boundingBox.js';
 import { Point } from '../entities/point.js';
 import { Input } from './input.js';
 import { Logging } from './logging.js';
+import { PlotOptions } from './plotOptions.js';
 // import { RendererBase } from './renderers/rendererBase.js';
 
 import { DesignCore } from '../designCore.js';
@@ -254,6 +256,74 @@ export class Canvas {
     if (this.externalPaintCallbackFunction) {
       this.externalPaintCallbackFunction();
     }
+  }
+
+  /**
+   * Build a renderer transform matrix that fits a scene area onto a page.
+   * Both PdfRenderer and SvgRenderer expect d = +scale (no Y-flip).
+   * @param {object} options
+   * @param {BoundingBox} options.area - scene area to map onto the page
+   * @param {number} options.pageWidth - page width in renderer units (points)
+   * @param {number} options.pageHeight - page height in renderer units (points)
+   * @param {number|null} [options.plotScale=null] - numeric scale factor, or null to fit to page
+   * @param {number} [options.margin=40] - margin on each side in renderer units
+   * @return {{a: number, d: number, e: number, f: number}|null} matrix object, or null if area is empty
+   */
+  buildExportMatrix({ area, pageWidth, pageHeight, plotScale = null, margin = 40 }) {
+    const sceneWidth = area.xMax - area.xMin;
+    const sceneHeight = area.yMax - area.yMin;
+    if (sceneWidth === 0 || sceneHeight === 0) return null;
+
+    const usableWidth = pageWidth - 2 * margin;
+    const usableHeight = pageHeight - 2 * margin;
+
+    const scale = plotScale === null ?
+      Math.min(usableWidth / sceneWidth, usableHeight / sceneHeight) :
+      plotScale;
+
+    const translateX = margin + (usableWidth - sceneWidth * scale) / 2 - area.xMin * scale;
+    const translateY = margin + (usableHeight - sceneHeight * scale) / 2 - area.yMin * scale;
+
+    return { a: scale, d: scale, e: translateX, f: translateY };
+  }
+
+  /**
+   * Export the visible scene entities to a renderer.
+   * Unlike paint(), this skips background, grid, preview, selection, and auxiliary passes.
+   * Builds and applies the export matrix from plotOptions before painting.
+   * @param {RendererBase} renderer
+   * @param {PlotOptions} plotOptions
+   * @return {boolean} false if no exportable area was found
+   */
+  exportTo(renderer, plotOptions) {
+    let area;
+    if (plotOptions.plotArea === PlotOptions.Area.DISPLAY) {
+      const viewport = this.getSceneOffset();
+      area = new BoundingBox(new Point(viewport.xmin, viewport.ymin), new Point(viewport.xmax, viewport.ymax));
+    } else {
+      area = DesignCore.Scene.boundingBox();
+    }
+    if (!area) return false;
+
+    const matrix = this.buildExportMatrix({
+      area,
+      pageWidth: plotOptions.pageWidth,
+      pageHeight: plotOptions.pageHeight,
+      plotScale: plotOptions.plotScale,
+    });
+    if (!matrix) return false;
+
+    renderer.setTransform(matrix);
+
+    renderer.setBackgroundColour({ r: 255, g: 255, b: 255 });
+    renderer.setStyle(plotOptions.style);
+
+    this.#paintEntities(
+        DesignCore.Scene.entities, renderer, null,
+        (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isVisible,
+    );
+
+    return true;
   }
 
   /**
