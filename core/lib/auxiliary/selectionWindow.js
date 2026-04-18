@@ -54,10 +54,10 @@ export class SelectionWindow {
 
     // Semi-transparent fill
     renderer.setDash([], 0);
-    renderer.drawShape(null, rectPoints, { closed: true, fill: true, stroke: false, alpha: 0.2 });
+    renderer.drawShape(rectPoints, { closed: true, fill: true, stroke: false, alpha: 0.2 });
 
     // Dashed outline
     renderer.setDash(scaledPattern, 0);
-    renderer.drawShape(null, rectPoints, { closed: true, fill: false, stroke: true });
+    renderer.drawShape(rectPoints, { closed: true, fill: false, stroke: true });
   }
 }

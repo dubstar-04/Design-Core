@@ -71,6 +71,6 @@ export class TrackingLine {
     renderer.setColour(lineColour);
     renderer.setLineWidth(lineWidth);
     renderer.setDash([dashSize, dashSize], 0);
-    renderer.drawShape(null, [start, end]);
+    renderer.drawShape([start, end]);
   }
 }

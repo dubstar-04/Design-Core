@@ -102,7 +102,7 @@ export function buildHatchGrid(renderer) {
   renderer.setColour({ r: 0, g: 0, b: 0 });
   renderer.setLineWidth(1);
   renderer.setDash([], 0);
-  renderer.drawShape(null, [
+  renderer.drawShape([
     { x: MARGIN, y: MARGIN },
     { x: PAGE_W - MARGIN, y: MARGIN },
     { x: PAGE_W - MARGIN, y: PAGE_H - MARGIN },
@@ -115,7 +115,7 @@ export function buildHatchGrid(renderer) {
   const titleY = PAGE_H - MARGIN - TITLE_FONT - 2;
   renderer.setColour({ r: 0, g: 0, b: 0 });
   renderer.setLineWidth(0.5);
-  renderer.drawText(null, [{ char: title, x: titleX, y: titleY, rotation: 0 }], 'Helvetica', TITLE_FONT);
+  renderer.drawText([{ char: title, x: titleX, y: titleY, rotation: 0 }], 'Helvetica', TITLE_FONT);
 
   // Grid — centred horizontally, starting below the title
   const xGrid = (PAGE_W - COLS * CELL_W) / 2;
@@ -168,13 +168,13 @@ export function buildHatchGrid(renderer) {
     renderer.setColour({ r: 0, g: 0, b: 0 });
     renderer.setLineWidth(0.5);
     renderer.setDash([], 0);
-    renderer.drawShape(null, outlinePoints, { closed: true, stroke: true });
+    renderer.drawShape(outlinePoints, { closed: true, stroke: true });
 
     // Pattern name label, centred below the shape
     const labelY = cellYTop - 4 - SHAPE_R * 2 - LABEL_FONT - 2;
     const labelX = cellX + (CELL_W - Text.getApproximateWidth(name, LABEL_FONT)) / 2;
     renderer.setColour({ r: 60, g: 60, b: 60 });
     renderer.setLineWidth(0.25);
-    renderer.drawText(null, [{ char: name, x: labelX, y: labelY, rotation: 0 }], 'Helvetica', LABEL_FONT);
+    renderer.drawText([{ char: name, x: labelX, y: labelY, rotation: 0 }], 'Helvetica', LABEL_FONT);
   });
 }

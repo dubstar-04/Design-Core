@@ -491,7 +491,7 @@ export class ArcAlignedText extends Entity {
    */
   draw(renderer) {
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
-    renderer.drawText(this, this.toCharacters(), style?.font, this.height);
+    renderer.drawText(this.toCharacters(), style?.font, this.height);
   }
 
   /**

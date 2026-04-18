@@ -67,14 +67,14 @@ export class PdfRenderer extends RendererBase {
   // --- High-level drawing ---
 
   /** @inheritdoc */
-  drawShape(entity, points, options = {}) {
+  drawShape(points, options = {}) {
     if (!points.length) return;
     this.tracePath(points);
     this.#applyOptions(options);
   }
 
   /** @inheritdoc */
-  drawText(entity, characters, fontName, height) {
+  drawText(characters, fontName, height) {
     if (!characters || !characters.length) return;
     for (const ch of characters) {
       const r = ch.rotation ?? 0;

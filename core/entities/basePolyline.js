@@ -180,7 +180,7 @@ export class BasePolyline extends Entity {
    * @param {Object} renderer
    */
   draw(renderer) {
-    renderer.drawShape(this, this.toPolylinePoints());
+    renderer.drawShape(this.toPolylinePoints());
   }
 
   /**

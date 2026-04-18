@@ -58,7 +58,7 @@ test('RubberBand.draw with 2 points calls drawShape with the points array', () =
 
   expect(renderer.setColour).toHaveBeenCalledTimes(1);
   expect(renderer.setDash).toHaveBeenCalledTimes(1);
-  expect(renderer.drawShape).toHaveBeenCalledWith(null, pts);
+  expect(renderer.drawShape).toHaveBeenCalledWith(pts);
   expect(renderer.drawShape).toHaveBeenCalledTimes(1);
 });
 
@@ -80,5 +80,5 @@ test('RubberBand.draw with 3 points passes all 3 points to drawShape', () => {
 
   rb.draw(renderer, 1);
 
-  expect(renderer.drawShape).toHaveBeenCalledWith(null, pts);
+  expect(renderer.drawShape).toHaveBeenCalledWith(pts);
 });

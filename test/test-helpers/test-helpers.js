@@ -145,7 +145,7 @@ export class MockRenderer {
    * @param {Array} points
    * @param {object} [options]
    */
-  drawShape(entity, points, options) {}
+  drawShape(points, options) {}
 
   /**
    * @param {object} entity
@@ -153,7 +153,7 @@ export class MockRenderer {
    * @param {string} fontName
    * @param {number} height
    */
-  drawText(entity, characters, fontName, height) {}
+  drawText(characters, fontName, height) {}
 
   /** Save current drawing state. */
   save() {

@@ -50,7 +50,7 @@ export class SnapPoint {
 
     switch (this.type) {
       case SnapPoint.Type.END: // square
-        renderer.drawShape(null, [
+        renderer.drawShape([
           new Point(x - size, y - size),
           new Point(x + size, y - size),
           new Point(x + size, y + size),
@@ -58,14 +58,14 @@ export class SnapPoint {
         ], { closed: true });
         break;
       case SnapPoint.Type.MID: // triangle
-        renderer.drawShape(null, [
+        renderer.drawShape([
           new Point(x, y + size),
           new Point(x - size, y - size),
           new Point(x + size, y - size),
         ], { closed: true });
         break;
       case SnapPoint.Type.QUADRANT: // diamond
-        renderer.drawShape(null, [
+        renderer.drawShape([
           new Point(x, y - size),
           new Point(x + size, y),
           new Point(x, y + size),
@@ -73,7 +73,7 @@ export class SnapPoint {
         ], { closed: true });
         break;
       case SnapPoint.Type.NEAREST: // hourglass
-        renderer.drawShape(null, [
+        renderer.drawShape([
           new Point(x - size, y - size),
           new Point(x + size, y - size),
           new Point(x - size, y + size),
@@ -81,32 +81,32 @@ export class SnapPoint {
         ], { closed: true });
         break;
       case SnapPoint.Type.TANGENT: // circle + horizontal line above
-        renderer.drawShape(null, circlePoints(x, y, size));
-        renderer.drawShape(null, [
+        renderer.drawShape(circlePoints(x, y, size));
+        renderer.drawShape([
           new Point(x - size, y + size * 1.5),
           new Point(x + size, y + size * 1.5),
         ]);
         break;
       case SnapPoint.Type.NODE: // circle + X inside
-        renderer.drawShape(null, circlePoints(x, y, size));
-        renderer.drawShape(null, [
+        renderer.drawShape(circlePoints(x, y, size));
+        renderer.drawShape([
           new Point(x - size * 0.7, y - size * 0.7),
           new Point(x + size * 0.7, y + size * 0.7),
         ]);
-        renderer.drawShape(null, [
+        renderer.drawShape([
           new Point(x + size * 0.7, y - size * 0.7),
           new Point(x - size * 0.7, y + size * 0.7),
         ]);
         break;
       case SnapPoint.Type.PERPENDICULAR: // L-shape corner
-        renderer.drawShape(null, [
+        renderer.drawShape([
           new Point(x - size, y + size),
           new Point(x - size, y - size),
           new Point(x + size, y - size),
         ]);
         break;
       default: // CENTRE - circle
-        renderer.drawShape(null, circlePoints(x, y, size));
+        renderer.drawShape(circlePoints(x, y, size));
         break;
     }
   }

@@ -424,23 +424,20 @@ test('Arc.preview does not throw with 1, 2 or 3 points', () => {
 
 test('Arc.draw calls renderer.drawShape with toPolylinePoints', () => {
   const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
-  let capturedEntity;
   let capturedPoints;
   const mockRenderer = {
-    drawShape(entity, points) {
-      capturedEntity = entity;
+    drawShape(points) {
       capturedPoints = points;
     },
   };
   arc.draw(mockRenderer);
-  expect(capturedEntity).toBe(arc);
   expect(capturedPoints).toEqual(arc.toPolylinePoints());
 });
 
 test('Arc.draw (cw) calls renderer.drawShape with toPolylinePoints', () => {
   const arcCw = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: -1 });
   let capturedPoints;
-  const mockRenderer = { drawShape(entity, points) {
+  const mockRenderer = { drawShape(points) {
     capturedPoints = points;
   } };
   arcCw.draw(mockRenderer);

@@ -430,12 +430,12 @@ export class Text extends Entity {
     if (measured?.width) {
       this.boundingRect = { width: measured.width, height: this.height };
     }
-    renderer.drawText(this, this.toCharacters(), style?.font, this.height);
+    renderer.drawText(this.toCharacters(), style?.font, this.height);
 
     /*
     // debug draw the bounding box
     const bb = this.boundingBox();
-    renderer.drawShape(this, [
+    renderer.drawShape([
       new Point(bb.xMin, bb.yMin),
       new Point(bb.xMax, bb.yMin),
       new Point(bb.xMax, bb.yMax),
@@ -445,7 +445,7 @@ export class Text extends Entity {
 
     // debug draw the text frame
     const [fc0, fc1, fc2, fc3] = this.getTextFrameCorners();
-    renderer.drawShape(this, [fc0, fc1, fc2, fc3, fc0]);
+    renderer.drawShape([fc0, fc1, fc2, fc3, fc0]);
     */
   }
 

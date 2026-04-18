@@ -257,7 +257,7 @@ test('Test SnapPoint.draw END type draws closed polygon', () => {
   const renderer = makeSnapRenderer();
   sp.draw(renderer, 1);
   expect(renderer.drawShape).toHaveBeenCalledTimes(1);
-  expect(renderer.drawShape).toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
+  expect(renderer.drawShape).toHaveBeenCalledWith(expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
 test('Test SnapPoint.draw MID type draws closed polygon', () => {
@@ -265,7 +265,7 @@ test('Test SnapPoint.draw MID type draws closed polygon', () => {
   const renderer = makeSnapRenderer();
   sp.draw(renderer, 1);
   expect(renderer.drawShape).toHaveBeenCalledTimes(1);
-  expect(renderer.drawShape).toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
+  expect(renderer.drawShape).toHaveBeenCalledWith(expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
 test('Test SnapPoint.draw QUADRANT type draws closed polygon', () => {
@@ -273,7 +273,7 @@ test('Test SnapPoint.draw QUADRANT type draws closed polygon', () => {
   const renderer = makeSnapRenderer();
   sp.draw(renderer, 1);
   expect(renderer.drawShape).toHaveBeenCalledTimes(1);
-  expect(renderer.drawShape).toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
+  expect(renderer.drawShape).toHaveBeenCalledWith(expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
 test('Test SnapPoint.draw NEAREST type draws closed polygon', () => {
@@ -281,7 +281,7 @@ test('Test SnapPoint.draw NEAREST type draws closed polygon', () => {
   const renderer = makeSnapRenderer();
   sp.draw(renderer, 1);
   expect(renderer.drawShape).toHaveBeenCalledTimes(1);
-  expect(renderer.drawShape).toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
+  expect(renderer.drawShape).toHaveBeenCalledWith(expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
 test('Test SnapPoint.draw TANGENT type draws circle and tangent line', () => {
@@ -303,7 +303,7 @@ test('Test SnapPoint.draw PERPENDICULAR type draws L-shape', () => {
   const renderer = makeSnapRenderer();
   sp.draw(renderer, 1);
   expect(renderer.drawShape).toHaveBeenCalledTimes(1);
-  expect(renderer.drawShape).not.toHaveBeenCalledWith(null, expect.any(Array), expect.objectContaining({ closed: true }));
+  expect(renderer.drawShape).not.toHaveBeenCalledWith(expect.any(Array), expect.objectContaining({ closed: true }));
 });
 
 // ─── TrackingLine.draw – out-of-bounds cases ─────────────────────────────────

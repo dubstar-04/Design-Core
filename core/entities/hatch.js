@@ -655,7 +655,7 @@ export class Hatch extends Entity {
       renderer.setDash([], 0);
       for (const shape of this.childEntities) {
         if (!shape.points.length) continue;
-        renderer.drawShape(this, shape.toPolylinePoints(), { closed: true });
+        renderer.drawShape(shape.toPolylinePoints(), { closed: true });
       }
     }
   }

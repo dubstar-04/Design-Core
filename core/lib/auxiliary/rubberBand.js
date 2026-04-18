@@ -27,6 +27,6 @@ export class RubberBand {
     renderer.setColour(colour);
     renderer.setLineWidth(lineWidth);
     renderer.setDash(scaledDash, 0);
-    renderer.drawShape(null, this.points);
+    renderer.drawShape(this.points);
   }
 }

@@ -59,11 +59,10 @@ export class CairoRenderer extends RendererBase {
 
   /**
    * @inheritdoc
-   * @param {Object} entity
    * @param {Array}  points
    * @param {Object} [options]
    */
-  drawShape(entity, points, options = {}) {
+  drawShape(points, options = {}) {
     if (points.length === 0) return;
 
     // Highlight pass: wide stroke in the highlight colour before the normal draw.
@@ -87,12 +86,11 @@ export class CairoRenderer extends RendererBase {
 
   /**
    * @inheritdoc
-   * @param {Object} entity
    * @param {Array}  characters
    * @param {string} fontName
    * @param {number} height
    */
-  drawText(entity, characters, fontName, height) {
+  drawText(characters, fontName, height) {
     if (!characters || characters.length === 0) return;
 
     this.#applyFontWithCorrection(fontName, height);

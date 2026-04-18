@@ -96,7 +96,6 @@ export class RendererBase {
    * Draw a shape described by a sequence of bulge-encoded points.
    * Handles the complete path lifecycle: new path, trace segments, stroke/fill.
    * When isHighlighted is set, a glow pass is prepended automatically.
-   * @param {Object}   entity           - The entity being drawn (reserved for future caching).
    * @param {Array}    points           - Bulge-encoded Point array.  Each point's .bulge
    *                                     describes the segment to the next point:
    *                                     0 = straight line, +ve = CCW arc, -ve = CW arc.
@@ -108,19 +107,18 @@ export class RendererBase {
    * @param {boolean}  [options.clip=false]     - Clip to path instead of fill/stroke.
    * @param {number}   [options.alpha=1]        - Fill opacity (0–1). Only applied to fill, not stroke.
    */
-  drawShape(entity, points, options = {}) {
+  drawShape(points, options = {}) {
     throw new Error(`${this.constructor.name}: drawShape() not implemented`);
   }
 
   /**
    * Draw an array of positioned characters.
    * When isHighlighted is set, a glow pass is prepended automatically.
-   * @param {Object}   entity     - The entity being drawn.
    * @param {Array}    characters - Array of { char, x, y, rotation } descriptors.
    * @param {string}   fontName   - Font family name.
    * @param {number}   height     - Desired text height in scene units.
    */
-  drawText(entity, characters, fontName, height) {
+  drawText(characters, fontName, height) {
     throw new Error(`${this.constructor.name}: drawText() not implemented`);
   }
 

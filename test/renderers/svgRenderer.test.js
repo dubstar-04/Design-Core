@@ -44,7 +44,7 @@ describe('SvgRenderer — drawing', () => {
     const renderer = new SvgRenderer(100, 100);
     renderer.setColour({ r: 0, g: 0, b: 0 });
     renderer.setLineWidth(1);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 20 }], {});
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 20 }], {});
     const output = renderer.getOutput();
     expect(output).toContain('<path');
     expect(output).toContain('M 0 0');
@@ -55,7 +55,7 @@ describe('SvgRenderer — drawing', () => {
     const renderer = new SvgRenderer(100, 100);
     renderer.setColour({ r: 0, g: 0, b: 0 });
     renderer.setLineWidth(1);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 5, y: 10 }], { closed: true });
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 5, y: 10 }], { closed: true });
     expect(renderer.getOutput()).toContain('Z');
   });
 
@@ -63,7 +63,7 @@ describe('SvgRenderer — drawing', () => {
     const renderer = new SvgRenderer(100, 100);
     renderer.setColour({ r: 255, g: 0, b: 0 });
     renderer.setLineWidth(1);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }], {});
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], {});
     const output = renderer.getOutput();
     expect(output).toContain('stroke="rgb(255,0,0)"');
     expect(output).toContain('fill="none"');
@@ -73,7 +73,7 @@ describe('SvgRenderer — drawing', () => {
     const renderer = new SvgRenderer(100, 100);
     renderer.setColour({ r: 0, g: 128, b: 0 });
     renderer.setLineWidth(1);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }], { fill: true, stroke: false });
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], { fill: true, stroke: false });
     const output = renderer.getOutput();
     expect(output).toContain('fill="rgb(0,128,0)"');
     expect(output).toContain('stroke="none"');
@@ -86,7 +86,7 @@ describe('SvgRenderer — drawing', () => {
     // bulge = 1 → semicircle CCW
     const p1 = new Point(100, 50, 1);
     const p2 = new Point(-100, 50);
-    renderer.drawShape(null, [p1, p2], {});
+    renderer.drawShape([p1, p2], {});
     expect(renderer.getOutput()).toContain(' A ');
   });
 
@@ -96,7 +96,7 @@ describe('SvgRenderer — drawing', () => {
     renderer.setLineWidth(1);
     const p1 = new Point(10, 0, 1); // bulge=1 → semicircle, |bulge| not > 1
     const p2 = new Point(-10, 0);
-    renderer.drawShape(null, [p1, p2], {});
+    renderer.drawShape([p1, p2], {});
     // A rx ry 0 0 sweep x y — large-arc-flag = 0
     expect(renderer.getOutput()).toMatch(/A [\d.]+ [\d.]+ 0 0 /);
   });
@@ -107,7 +107,7 @@ describe('SvgRenderer — drawing', () => {
     renderer.setLineWidth(1);
     const p1 = new Point(10, 0, 2); // |bulge| > 1 → major arc
     const p2 = new Point(-10, 0);
-    renderer.drawShape(null, [p1, p2], {});
+    renderer.drawShape([p1, p2], {});
     // A rx ry 0 1 sweep x y — large-arc-flag = 1
     expect(renderer.getOutput()).toMatch(/A [\d.]+ [\d.]+ 0 1 /);
   });
@@ -118,7 +118,7 @@ describe('SvgRenderer — drawing', () => {
     renderer.setLineWidth(1);
     const p1 = new Point(10, 0, 1); // CCW
     const p2 = new Point(-10, 0);
-    renderer.drawShape(null, [p1, p2], {});
+    renderer.drawShape([p1, p2], {});
     // A rx ry 0 large-arc 1 x y
     expect(renderer.getOutput()).toMatch(/A [\d.]+ [\d.]+ 0 \d 1 /);
   });
@@ -129,7 +129,7 @@ describe('SvgRenderer — drawing', () => {
     renderer.setLineWidth(1);
     const p1 = new Point(10, 0, -1); // CW
     const p2 = new Point(-10, 0);
-    renderer.drawShape(null, [p1, p2], {});
+    renderer.drawShape([p1, p2], {});
     // A rx ry 0 large-arc 0 x y
     expect(renderer.getOutput()).toMatch(/A [\d.]+ [\d.]+ 0 \d 0 /);
   });
@@ -167,7 +167,7 @@ describe('SvgRenderer — drawing', () => {
   test('drawText emits text element with character and transform', () => {
     const renderer = new SvgRenderer(100, 100);
     renderer.setColour({ r: 0, g: 0, b: 0 });
-    renderer.drawText(null, [{ char: 'A', x: 10, y: 20, rotation: 0 }], 'Helvetica', 5);
+    renderer.drawText([{ char: 'A', x: 10, y: 20, rotation: 0 }], 'Helvetica', 5);
     const output = renderer.getOutput();
     expect(output).toContain('<text');
     expect(output).toContain('>A<');
@@ -180,7 +180,7 @@ describe('SvgRenderer — drawing', () => {
     const renderer = new SvgRenderer(100, 100);
     renderer.setColour({ r: 0, g: 0, b: 0 });
     const r = Math.PI / 4; // 45 degrees
-    renderer.drawText(null, [{ char: 'X', x: 0, y: 0, rotation: r }], 'Helvetica', 5);
+    renderer.drawText([{ char: 'X', x: 0, y: 0, rotation: r }], 'Helvetica', 5);
     // -45 degrees in transform (negated for Y-flip compensation)
     expect(renderer.getOutput()).toContain('rotate(-45)');
   });
@@ -188,7 +188,7 @@ describe('SvgRenderer — drawing', () => {
   test('drawText escapes XML special characters', () => {
     const renderer = new SvgRenderer(100, 100);
     renderer.setColour({ r: 0, g: 0, b: 0 });
-    renderer.drawText(null, [{ char: '<', x: 0, y: 0, rotation: 0 }], 'Helvetica', 5);
+    renderer.drawText([{ char: '<', x: 0, y: 0, rotation: 0 }], 'Helvetica', 5);
     expect(renderer.getOutput()).toContain('&lt;');
   });
 });
@@ -198,7 +198,7 @@ describe('SvgRenderer — state methods', () => {
     const renderer = new SvgRenderer(100, 100);
     renderer.setColour({ r: 100, g: 150, b: 200 });
     renderer.setLineWidth(1);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 1, y: 0 }], {});
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 1, y: 0 }], {});
     expect(renderer.getOutput()).toContain('rgb(100,150,200)');
   });
 
@@ -206,7 +206,7 @@ describe('SvgRenderer — state methods', () => {
     const renderer = new SvgRenderer(100, 100);
     renderer.setColour({ r: 0, g: 0, b: 0 });
     renderer.setLineWidth(3.5);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 1, y: 0 }], {});
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 1, y: 0 }], {});
     expect(renderer.getOutput()).toContain('stroke-width="3.5"');
   });
 
@@ -215,7 +215,7 @@ describe('SvgRenderer — state methods', () => {
     renderer.setColour({ r: 0, g: 0, b: 0 });
     renderer.setLineWidth(1);
     renderer.setDash([5, 3], 1);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }], {});
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], {});
     const output = renderer.getOutput();
     expect(output).toContain('stroke-dasharray="5,3"');
     expect(output).toContain('stroke-dashoffset="1"');
@@ -253,7 +253,7 @@ describe('SvgRenderer — transform methods', () => {
     renderer.save();
     renderer.setColour({ r: 0, g: 0, b: 0 });
     renderer.setLineWidth(1);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 1, y: 0 }], {});
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 1, y: 0 }], {});
     renderer.restore();
     const output = renderer.getOutput();
     const opens = (output.match(/<g[\s>]/g) ?? []).length;
@@ -289,7 +289,7 @@ describe('SvgRenderer — plot styles', () => {
    */
   function drawLine(renderer) {
     renderer.setLineWidth(1);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }], {});
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], {});
   }
 
   test('default style NONE renders colour unchanged', () => {

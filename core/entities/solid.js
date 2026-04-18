@@ -22,7 +22,7 @@ export class Solid extends Entity {
    * @param {Object} renderer
    */
   draw(renderer) {
-    renderer.drawShape(this, this.points, { closed: true, fill: true, stroke: false });
+    renderer.drawShape(this.points, { closed: true, fill: true, stroke: false });
   }
 
   /**

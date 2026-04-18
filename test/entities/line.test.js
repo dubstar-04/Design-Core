@@ -160,16 +160,13 @@ test('Test Line.trim returns remove and add states', () => {
 
 test('Test Line.draw calls renderer.drawShape with toPolylinePoints', () => {
   const line = new Line({ points: [new Point(0, 0), new Point(10, 5)] });
-  let capturedEntity;
   let capturedPoints;
   const mockRenderer = {
-    drawShape(entity, points) {
-      capturedEntity = entity;
+    drawShape(points) {
       capturedPoints = points;
     },
   };
   line.draw(mockRenderer);
-  expect(capturedEntity).toBe(line);
   expect(capturedPoints).toEqual(line.toPolylinePoints());
 });
 

@@ -748,17 +748,15 @@ test('Text.toCharacters returns empty array for empty string', () => {
 
 test('Text.draw calls renderer.drawText with correct font and string', () => {
   const text = new Text({ points: [new Point(0, 0), new Point(10, 0)], string: 'Hello', height: 2.5 });
-  let calledEntity; let calledChars; let calledHeight;
+  let calledChars; let calledHeight;
   const mockRenderer = {
-    drawText(entity, characters, fontName, height) {
-      calledEntity = entity;
+    drawText(characters, fontName, height) {
       calledChars = characters;
       calledHeight = height;
     },
     measureText: () => ({ width: 20 }),
   };
   text.draw(mockRenderer);
-  expect(calledEntity).toBe(text);
   expect(calledChars).toHaveLength(1);
   expect(calledChars[0].char).toBe('Hello');
   expect(calledHeight).toBe(2.5);

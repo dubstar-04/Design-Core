@@ -284,16 +284,13 @@ test('Circle.preview does not throw with 0 or 1 points', () => {
 
 test('Circle.draw calls renderer.drawShape with toPolylinePoints', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  let capturedEntity;
   let capturedPoints;
   const mockRenderer = {
-    drawShape(entity, points) {
-      capturedEntity = entity;
+    drawShape(points) {
       capturedPoints = points;
     },
   };
   circle.draw(mockRenderer);
-  expect(capturedEntity).toBe(circle);
   expect(capturedPoints).toEqual(circle.toPolylinePoints());
 });
 

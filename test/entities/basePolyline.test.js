@@ -48,16 +48,13 @@ test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => 
 
 test('Test BasePolyline.draw calls renderer.drawShape with toPolylinePoints', () => {
   const polyline = new Polyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 5)] });
-  let capturedEntity;
   let capturedPoints;
   const mockRenderer = {
-    drawShape(entity, points) {
-      capturedEntity = entity;
+    drawShape(points) {
       capturedPoints = points;
     },
   };
   polyline.draw(mockRenderer);
-  expect(capturedEntity).toBe(polyline);
   expect(capturedPoints).toEqual(polyline.toPolylinePoints());
 });
 

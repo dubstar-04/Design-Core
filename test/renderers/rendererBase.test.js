@@ -124,12 +124,12 @@ test('setStyle can be changed multiple times', () => {
 
 test('drawShape throws with renderer name in message', () => {
   const r = new TestRenderer();
-  expect(() => r.drawShape({}, [])).toThrow('TestRenderer: drawShape() not implemented');
+  expect(() => r.drawShape([])).toThrow('TestRenderer: drawShape() not implemented');
 });
 
 test('drawText throws with renderer name in message', () => {
   const r = new TestRenderer();
-  expect(() => r.drawText({}, [], 'Arial', 12)).toThrow('TestRenderer: drawText() not implemented');
+  expect(() => r.drawText([], 'Arial', 12)).toThrow('TestRenderer: drawText() not implemented');
 });
 
 test('tracePath throws with renderer name in message', () => {

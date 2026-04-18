@@ -61,7 +61,7 @@ export class SvgRenderer extends RendererBase {
   // --- High-level drawing ---
 
   /** @inheritdoc */
-  drawShape(entity, points, options = {}) {
+  drawShape(points, options = {}) {
     if (!points.length) return;
     const pathD = this.#buildPathD(points, options.closed);
 
@@ -89,7 +89,7 @@ export class SvgRenderer extends RendererBase {
   }
 
   /** @inheritdoc */
-  drawText(entity, characters, fontName, height) {
+  drawText(characters, fontName, height) {
     if (!characters || !characters.length) return;
     const colour = this.#colourStr();
     for (const ch of characters) {

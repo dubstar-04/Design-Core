@@ -445,15 +445,13 @@ test('ArcAlignedText.toCharacters returns one entry per character with scene coo
 
 test('ArcAlignedText.draw calls renderer.drawText with all characters', () => {
   const arc = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Hi', radius: 50 });
-  let calledEntity; let calledChars;
+  let calledChars;
   const mockRenderer = {
-    drawText(entity, characters) {
-      calledEntity = entity;
+    drawText(characters) {
       calledChars = characters;
     },
   };
   arc.draw(mockRenderer);
-  expect(calledEntity).toBe(arc);
   expect(calledChars).toHaveLength(2);
   expect(calledChars[0].char).toBe('H');
   expect(calledChars[1].char).toBe('i');

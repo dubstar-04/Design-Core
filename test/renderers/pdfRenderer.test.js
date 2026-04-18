@@ -31,7 +31,7 @@ describe('PdfRenderer — getOutput()', () => {
 describe('PdfRenderer — drawing', () => {
   test('drawShape emits m, l, and S operators', () => {
     const renderer = new PdfRenderer(100, 100);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 20 }], {});
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 20 }], {});
     const output = renderer.getOutput();
     expect(output).toContain('0 0 m');
     expect(output).toContain('10 20 l');
@@ -40,7 +40,7 @@ describe('PdfRenderer — drawing', () => {
 
   test('drawShape with closed=true emits h before S', () => {
     const renderer = new PdfRenderer(100, 100);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 5, y: 10 }], { closed: true });
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 5, y: 10 }], { closed: true });
     const output = renderer.getOutput();
     const hPos = output.indexOf('\nh\n');
     const sPos = output.indexOf('\nS\n');
@@ -50,21 +50,21 @@ describe('PdfRenderer — drawing', () => {
 
   test('drawShape with fill+stroke emits B operator', () => {
     const renderer = new PdfRenderer(100, 100);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }], { fill: true, stroke: true });
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], { fill: true, stroke: true });
     const output = renderer.getOutput();
     expect(output).toContain('\nB\n');
   });
 
   test('drawShape with fill only emits f operator', () => {
     const renderer = new PdfRenderer(100, 100);
-    renderer.drawShape(null, [{ x: 0, y: 0 }, { x: 10, y: 0 }], { fill: true, stroke: false });
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], { fill: true, stroke: false });
     const output = renderer.getOutput();
     expect(output).toContain('\nf\n');
   });
 
   test('drawShape with bulge emits chord (straight line)', () => {
     const renderer = new PdfRenderer(100, 100);
-    renderer.drawShape(null, [{ x: 0, y: 0, bulge: 1 }, { x: 10, y: 0 }], {});
+    renderer.drawShape([{ x: 0, y: 0, bulge: 1 }, { x: 10, y: 0 }], {});
     const output = renderer.getOutput();
     // Chord approximation: bulge point emits l, not c
     expect(output).toContain('10 0 l');
@@ -101,7 +101,7 @@ describe('PdfRenderer — drawing', () => {
 
   test('drawText emits BT block with character and position transform', () => {
     const renderer = new PdfRenderer(100, 100);
-    renderer.drawText(null, [{ char: 'A', x: 10, y: 20, rotation: 0 }], 'Helvetica', 5);
+    renderer.drawText([{ char: 'A', x: 10, y: 20, rotation: 0 }], 'Helvetica', 5);
     const output = renderer.getOutput();
     expect(output).toContain('BT');
     expect(output).toContain('ET');
@@ -112,7 +112,7 @@ describe('PdfRenderer — drawing', () => {
   test('drawText with rotation applies sin/cos transform', () => {
     const renderer = new PdfRenderer(100, 100);
     const r = Math.PI / 4; // 45 degrees
-    renderer.drawText(null, [{ char: 'X', x: 0, y: 0, rotation: r }], 'Helvetica', 5);
+    renderer.drawText([{ char: 'X', x: 0, y: 0, rotation: r }], 'Helvetica', 5);
     const output = renderer.getOutput();
     // cos(π/4) ≈ 0.7071, sin(π/4) ≈ 0.7071
     expect(output).toContain('0.7071');
