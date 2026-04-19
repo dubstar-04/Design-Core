@@ -133,9 +133,11 @@ export class Line extends Entity {
   /**
    * Set entity points from a polyline point representation
    * @param {Array} points
+   * @return {Line}
    */
   fromPolylinePoints(points) {
     this.points = [new Point(points[0].x, points[0].y), new Point(points[1].x, points[1].y)];
+    return this;
   }
 
   /**

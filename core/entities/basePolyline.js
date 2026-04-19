@@ -225,6 +225,7 @@ export class BasePolyline extends Entity {
   /**
    * Set entity points from a polyline point representation
    * @param {Array} points
+   * @return {BasePolyline}
    */
   fromPolylinePoints(points) {
     const pts = points.map((p) => new Point(p.x, p.y, p.bulge));
@@ -232,6 +233,7 @@ export class BasePolyline extends Entity {
       pts.pop();
     }
     this.points = pts;
+    return this;
   }
 
   /**

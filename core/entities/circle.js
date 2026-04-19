@@ -180,13 +180,24 @@ export class Circle extends Entity {
   }
 
   /**
-   * Set entity points from a polyline point representation
+   * Set entity points from a polyline point representation.
+   * If the points describe a full circle (start === end), mutates this Circle
+   * in place and returns it. Otherwise creates and returns an Arc, since a
+   * Circle cannot represent an open arc.
    * @param {Array} points
+   * @return {Circle|Arc}
    */
   fromPolylinePoints(points) {
-    const center = points[0].bulgeCentrePoint(points[1]);
-    const radius = center.distance(points[0]);
-    this.points = [center, center.project(0, radius)];
+    if (points.length >= 3 && points[0].isSame(points.at(-1))) {
+      const center = points[0].bulgeCentrePoint(points[1]);
+      const radius = center.distance(points[0]);
+      this.points = [center, center.project(0, radius)];
+      return this;
+    }
+    const arc = DesignCore.CommandManager.createNew('Arc', this);
+    arc.handle = undefined;
+    arc.fromPolylinePoints(points);
+    return arc;
   }
 
   /**

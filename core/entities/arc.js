@@ -333,12 +333,14 @@ export class Arc extends Entity {
   /**
    * Set entity points from a polyline point representation
    * @param {Array} points
+   * @return {Arc}
    */
   fromPolylinePoints(points) {
     const center = points[0].bulgeCentrePoint(points[1]);
     const radius = center.distance(points[0]);
     this.points = [center, new Point(points[0].x, points[0].y), new Point(points.at(-1).x, points.at(-1).y)];
     this.radius = radius;
+    return this;
   }
 
   /**
