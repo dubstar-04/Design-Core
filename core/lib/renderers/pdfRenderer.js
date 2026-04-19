@@ -3,8 +3,8 @@ import { Text } from '../../entities/text.js';
 
 /**
  * Pure-JS PDF renderer.
- * Implements the RendererBase interface by accumulating a PDF content stream
- * in memory.  Call getOutput() to retrieve the complete PDF document as a string.
+ * Implements the RendererBase interface by accumulating a PDF content stream in memory.
+ * Call getOutput() to retrieve the complete PDF document as a string.
  *
  * Design notes:
  *  - Zero dependencies: uses only standard PDF operators and string concatenation.
@@ -25,6 +25,8 @@ import { Text } from '../../entities/text.js';
  * //     400 400 l         % lineto end point
  * //     S                 % stroke path
  * //
+ *
+ * Example usage:
  * const r = new PdfRenderer(595, 842);
  * r.setColour({ r: 0, g: 0, b: 0 });
  * r.setLineWidth(1);
