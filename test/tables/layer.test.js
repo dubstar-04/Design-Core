@@ -62,6 +62,36 @@ test('Test Layer.isSelectable', () => {
   expect(layer.isSelectable).toBe(true);
 });
 
+test('Test Layer.isPlottable - defaults to true', () => {
+  const layer = new Layer();
+  expect(layer.isPlottable).toBe(true);
+});
+
+test('Test Layer.isPlottable - false when plotting is false', () => {
+  const layer = new Layer();
+  layer.plotting = false;
+  expect(layer.isPlottable).toBe(false);
+});
+
+test('Test Layer.isPlottable - false when layer is frozen', () => {
+  const layer = new Layer();
+  layer.frozen = true;
+  expect(layer.isPlottable).toBe(false);
+});
+
+test('Test Layer.isPlottable - false when layer is off', () => {
+  const layer = new Layer();
+  layer.on = false;
+  expect(layer.isPlottable).toBe(false);
+});
+
+test('Test Layer.isPlottable - false when both plotting false and frozen', () => {
+  const layer = new Layer();
+  layer.plotting = false;
+  layer.frozen = true;
+  expect(layer.isPlottable).toBe(false);
+});
+
 test('Test Layer.dxf', () => {
   const layer = new Layer({ handle: 'A', name: 'TestLayer' });
   const file = new File();
