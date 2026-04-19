@@ -471,11 +471,13 @@ test('Trim.preview returns early when hovered entity does not implement trim', (
   const trim = new Trim();
   trim.selectedBoundaryItems = [core.scene.entities.get(0)];
 
+  const savedPointOnScene1 = DesignCore.Mouse.pointOnScene;
   const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
   DesignCore.Mouse.pointOnScene = () => new Point(5, 0);
   trim.preview();
   findSpy.mockRestore();
   notifySpy.mockRestore();
+  DesignCore.Mouse.pointOnScene = savedPointOnScene1;
 
   expect(DesignCore.Scene.previewEntities.count()).toBe(0);
   expect(notifySpy).not.toHaveBeenCalled();
@@ -494,10 +496,12 @@ test('Trim.preview returns early when hovered entity has no intersections with b
   const trim = new Trim();
   trim.selectedBoundaryItems = [core.scene.entities.get(2)]; // horizontal boundary — parallel to hovered
 
+  const savedPointOnScene2 = DesignCore.Mouse.pointOnScene;
   const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
   DesignCore.Mouse.pointOnScene = () => new Point(0, 5);
   trim.preview();
   findSpy.mockRestore();
+  DesignCore.Mouse.pointOnScene = savedPointOnScene2;
 
   expect(DesignCore.Scene.previewEntities.count()).toBe(0);
 });
@@ -513,10 +517,12 @@ test('Trim.preview populates previewEntities when entity can be trimmed', () => 
   const trim = new Trim();
   trim.selectedBoundaryItems = [core.scene.entities.get(0)];
 
+  const savedPointOnScene3 = DesignCore.Mouse.pointOnScene;
   const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(1);
   DesignCore.Mouse.pointOnScene = () => new Point(5, 0);
   trim.preview();
   findSpy.mockRestore();
+  DesignCore.Mouse.pointOnScene = savedPointOnScene3;
 
   // dulled original + at least one trimmed survivor
   expect(DesignCore.Scene.previewEntities.count()).toBeGreaterThanOrEqual(2);
@@ -687,4 +693,43 @@ test('Trim.action trims a circle', () => {
   // Arc center should match the original circle center
   expect(arc.points[0].x).toBeCloseTo(0, 10);
   expect(arc.points[0].y).toBeCloseTo(0, 10);
+});
+
+test('Trim.action trims a closed polyline - produces open polyline with closed flag cleared', () => {
+  // Closed square: (0,0)→(100,0)→(100,100)→(0,100) with flag bit 1
+  // Boundary: vertical line at x=50
+  // Mouse at (75,50) — right of centre, selects the right side for removal
+  // Expected: one open polyline (50,100)→(0,100)→(0,0)→(50,0), flag bit 1 cleared
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  // Five points where first === last → constructor pops last and sets flag=1
+  core.scene.addItem('Lwpolyline', {
+    points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100), new Point(0, 0)],
+  });
+  core.scene.addItem('Line', { points: [new Point(50, -10), new Point(50, 110)] });
+
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.flags.hasFlag(1)).toBe(true); // confirm closed before trim
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = polyline;
+  core.mouse.setPosFromScenePoint(new Point(75, 50));
+  trim.action();
+
+  // Original closed polyline removed, one open polyline added, boundary line remains
+  expect(core.scene.entities.count()).toBe(2);
+
+  let trimmed;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Polyline') trimmed = core.scene.entities.get(i);
+  }
+
+  expect(trimmed).toBeDefined();
+  expect(trimmed.flags.hasFlag(1)).toBe(false); // closed flag removed
+  expect(trimmed.points.length).toBe(4);
+  // Joined path runs from one intersection, around the left side, to the other
+  expect(trimmed.points[0].x).toBeCloseTo(50);
+  expect(trimmed.points[3].x).toBeCloseTo(50);
 });
