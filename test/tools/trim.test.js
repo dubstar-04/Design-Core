@@ -901,3 +901,112 @@ test('Trim.action trims an open polyline with two consecutive arc segments', () 
   expect(result.points[1].x).toBeCloseTo(200);
   expect(result.points[1].y).toBeCloseTo(0);
 });
+
+test('Trim.action trims an arc from the start (portionOne same-segment bulge)', () => {
+  // Arc: center (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10).
+  // Boundary: vertical line at x=0, intersection at (0,10).
+  // Mouse at (-7,7) — LEFT of intersection, so trimBefore=(0,10), trimAfter=null.
+  // portionOne = startLoc(seg1,(10,0)) → trimBefore(seg1,(0,10)) — same-segment arc split.
+  // Expected: arc from (10,0) to (0,10), covering the right quarter.
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(-7, 7));
+  trim.action();
+
+  expect(core.scene.entities.count()).toBe(2);
+
+  let arc;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Arc') arc = core.scene.entities.get(i);
+  }
+  expect(arc).toBeDefined();
+  // Kept portion runs from original start (10,0) to intersection (0,10)
+  expect(arc.points[1].x).toBeCloseTo(10);
+  expect(arc.points[1].y).toBeCloseTo(0);
+  expect(arc.points[2].x).toBeCloseTo(0);
+  expect(arc.points[2].y).toBeCloseTo(10);
+});
+
+test('Trim.action trims the middle of an arc (two intersections on same arc segment)', () => {
+  // Arc: center (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10).
+  // Two boundaries: vertical line at x=-5 and x=5.
+  // Intersections at (5,√75)≈(5,8.66) and (-5,√75)≈(-5,8.66), both on segment 1.
+  // Mouse at (0,9) — between both intersections at the top.
+  // Expected: two arcs: (10,0)→(5,8.66) and (-5,8.66)→(-10,0).
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(5, -20), new Point(5, 20)] });
+  core.scene.addItem('Line', { points: [new Point(-5, -20), new Point(-5, 20)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1), core.scene.entities.get(2)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(0, 9));
+  trim.action();
+
+  // Original arc removed, two new arcs added, two boundary lines remain
+  expect(core.scene.entities.count()).toBe(4);
+
+  const arcs = [];
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Arc') arcs.push(core.scene.entities.get(i));
+  }
+  expect(arcs.length).toBe(2);
+  arcs.sort((a, b) => a.points[1].x - b.points[1].x); // sort by start x
+
+  // Left arc: start near (-5,8.66), end at (-10,0)
+  expect(arcs[0].points[1].x).toBeCloseTo(-5);
+  expect(arcs[0].points[1].y).toBeCloseTo(Math.sqrt(75));
+  expect(arcs[0].points[2].x).toBeCloseTo(-10);
+  expect(arcs[0].points[2].y).toBeCloseTo(0);
+
+  // Right arc: start at (10,0), end near (5,8.66)
+  expect(arcs[1].points[1].x).toBeCloseTo(10);
+  expect(arcs[1].points[1].y).toBeCloseTo(0);
+  expect(arcs[1].points[2].x).toBeCloseTo(5);
+  expect(arcs[1].points[2].y).toBeCloseTo(Math.sqrt(75));
+});
+
+test('Trim.action trims with multiple boundary items', () => {
+  // Line: (0,0)→(200,0). Two separate boundary lines at x=50 and x=150.
+  // Mouse at (100,0) — between both boundaries.
+  // Expected: two lines: (0,0)→(50,0) and (150,0)→(200,0).
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(200, 0)] });
+  core.scene.addItem('Line', { points: [new Point(50, -20), new Point(50, 20)] });
+  core.scene.addItem('Line', { points: [new Point(150, -20), new Point(150, 20)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1), core.scene.entities.get(2)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(100, 0));
+  trim.action();
+
+  // Original line removed, two new lines added, two boundary lines remain
+  expect(core.scene.entities.count()).toBe(4);
+
+  const lines = [];
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    const e = core.scene.entities.get(i);
+    // Identify result lines by both points being at y=0 (boundary lines are vertical)
+    if (e.type === 'Line' && e.points[0].y === 0 && e.points[1].y === 0) lines.push(e);
+  }
+  expect(lines.length).toBe(2);
+  lines.sort((a, b) => a.points[0].x - b.points[0].x);
+
+  expect(lines[0].points[0].x).toBeCloseTo(0);
+  expect(lines[0].points[1].x).toBeCloseTo(50);
+  expect(lines[1].points[0].x).toBeCloseTo(150);
+  expect(lines[1].points[1].x).toBeCloseTo(200);
+});
