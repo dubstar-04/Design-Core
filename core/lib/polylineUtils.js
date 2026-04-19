@@ -1,3 +1,5 @@
+import { Utils } from './utils.js';
+
 /**
  * Shared polyline-segment geometry helpers used by the Trim and Extend tools.
  * All methods accept an explicit `points` array rather than operating on
@@ -15,6 +17,9 @@ export class PolylineUtils {
   static isPointOnSegment(point, A, B) {
     if (A.bulge !== 0 && A.bulge !== undefined) {
       const center = A.bulgeCentrePoint(B);
+      const radius = center.distance(A);
+      // Point must lie on the circle before checking the angular range.
+      if (Utils.round(center.distance(point)) !== Utils.round(radius)) return false;
       const direction = A.bulge > 0 ? 1 : -1;
       return point.isOnArc(A, B, center, direction);
     }
