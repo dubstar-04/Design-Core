@@ -1,5 +1,14 @@
+import { Core } from '../../core/core/core.js';
+import { Arc } from '../../core/entities/arc.js';
+import { Point } from '../../core/entities/point.js';
+import { DesignCore } from '../../core/designCore.js';
+
+import { File, withMockInput } from '../test-helpers/test-helpers.js';
 import { jest } from '@jest/globals';
 import { Strings } from '../../core/lib/strings.js';
+
+// initialise core
+new Core();
 
 describe('Arc.execute input validation and notifications', () => {
   let notifySpy;
@@ -69,16 +78,6 @@ describe('Arc.execute input validation and notifications', () => {
     });
   });
 });
-import { Core } from '../../core/core/core.js';
-import { Arc } from '../../core/entities/arc.js';
-import { Point } from '../../core/entities/point.js';
-import { DesignCore } from '../../core/designCore.js';
-import { AddState, RemoveState } from '../../core/lib/stateManager.js';
-
-import { File, withMockInput } from '../test-helpers/test-helpers.js';
-
-// initialise core
-new Core();
 
 const arcInputScenarios = [
   {
