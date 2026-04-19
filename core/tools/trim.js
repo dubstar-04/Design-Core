@@ -42,10 +42,10 @@ export class Trim extends Tool {
    */
   async execute() {
     try {
-      const op = new PromptOptions(Strings.Input.BOUNDARY, [Input.Type.SELECTIONSET]);
+      const boundaryOp = new PromptOptions(Strings.Input.BOUNDARY, [Input.Type.SELECTIONSET]);
 
       if (!DesignCore.Scene.selectionManager.selectionSet.selectionSet.length) {
-        const boundary = await DesignCore.Scene.inputManager.requestInput(op);
+        const boundary = await DesignCore.Scene.inputManager.requestInput(boundaryOp);
         if (boundary === undefined) return;
       }
 
@@ -55,9 +55,9 @@ export class Trim extends Tool {
         this.selectedBoundaryItems.push(boundaryItem);
       }
 
-      const op2 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
+      const selectOp = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
       while (true) {
-        const selection = await DesignCore.Scene.inputManager.requestInput(op2);
+        const selection = await DesignCore.Scene.inputManager.requestInput(selectOp);
         if (selection === undefined) break;
         this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
@@ -249,47 +249,19 @@ export class Trim extends Tool {
       return stateChanges;
     }
 
-    // Open entity: build portion1 (start → trimBefore) and portion2 (trimAfter → end)
-    let portion1Points = null;
-    if (trimBefore) {
-      const points = [];
-      for (let i = 0; i < trimBefore.segmentIndex - 1; i++) {
-        points.push(polyPoints[i].clone());
-      }
-      const segStart = polyPoints[trimBefore.segmentIndex - 1];
-      const segStartClone = segStart.clone();
-      if (segStart.bulge !== 0 && segStart.bulge !== undefined) {
-        segStartClone.bulge = segStart.partialBulge(polyPoints[trimBefore.segmentIndex], trimBefore.point);
-      }
-      points.push(segStartClone);
-      const trimPoint = trimBefore.point.clone();
-      if (!points.at(-1).isSame(trimPoint)) points.push(trimPoint);
-      if (points.length >= 2) portion1Points = points;
-    }
+    // Open entity: build portionOne (start → trimBefore) and portionTwo (trimAfter → end)
+    const startLoc = { segmentIndex: 1, point: polyPoints[0] };
+    const endLoc = { segmentIndex: polyPoints.length - 1, point: polyPoints.at(-1) };
+    const portionOnePoints = trimBefore ? this.#buildPortion(polyPoints, startLoc, trimBefore) : null;
+    const portionTwoPoints = trimAfter ? this.#buildPortion(polyPoints, trimAfter, endLoc) : null;
 
-    let portion2Points = null;
-    if (trimAfter) {
-      const points = [];
-      const trimPoint = trimAfter.point.clone();
-      const segStart = polyPoints[trimAfter.segmentIndex - 1];
-      if (segStart.bulge !== 0 && segStart.bulge !== undefined) {
-        trimPoint.bulge = segStart.partialBulge(polyPoints[trimAfter.segmentIndex], trimPoint, true);
-      }
-      points.push(trimPoint);
-      for (let i = trimAfter.segmentIndex; i < polyPoints.length; i++) {
-        const nextPoint = polyPoints[i].clone();
-        if (!points.at(-1).isSame(nextPoint)) points.push(nextPoint);
-      }
-      if (points.length >= 2) portion2Points = points;
-    }
-
-    if (portion1Points) {
-      const output = Utils.cloneObject(entity).fromPolylinePoints(portion1Points);
+    if (portionOnePoints) {
+      const output = Utils.cloneObject(entity).fromPolylinePoints(portionOnePoints);
       output.flags?.removeValue(1);
       stateChanges.push(new AddState(output));
     }
-    if (portion2Points) {
-      const output = Utils.cloneObject(entity).fromPolylinePoints(portion2Points);
+    if (portionTwoPoints) {
+      const output = Utils.cloneObject(entity).fromPolylinePoints(portionTwoPoints);
       output.flags?.removeValue(1);
       stateChanges.push(new AddState(output));
     }
@@ -359,49 +331,18 @@ export class Trim extends Tool {
   /**
    * Build a sub-polyline from fromLoc to toLoc crossing the seam (wrapping).
    * Used for closed entities when the kept portion wraps through the closure point.
+   * Implemented as two forward #buildPortion calls joined at the seam.
    * @param {Array}  polyPoints
    * @param {Object} fromLoc - { segmentIndex, point, positionAlongSegment }
    * @param {Object} toLoc   - { segmentIndex, point, positionAlongSegment }
    * @return {Array|null}
    */
   #buildWrappingPortion(polyPoints, fromLoc, toLoc) {
-    const points = [];
-    const fromSegStart = polyPoints[fromLoc.segmentIndex - 1];
-    const fromSegEnd = polyPoints[fromLoc.segmentIndex];
-
-    // Start point: fromLoc.point with partial bulge for the rest of its segment
-    const startPoint = fromLoc.point.clone();
-    if (fromSegStart.bulge !== 0 && fromSegStart.bulge !== undefined) {
-      startPoint.bulge = fromSegStart.partialBulge(fromSegEnd, fromLoc.point, true);
-    }
-    points.push(startPoint);
-
-    // Walk forward from end of fromLoc's segment to the last non-closure vertex
-    for (let i = fromLoc.segmentIndex; i < polyPoints.length - 1; i++) {
-      const v = polyPoints[i].clone();
-      if (!points.at(-1).isSame(v)) points.push(v);
-    }
-
-    // Cross the seam: add vertices from the start of the polyline up to (but not
-    // including) the segment that contains toLoc
-    for (let i = 0; i <= toLoc.segmentIndex - 2; i++) {
-      const v = polyPoints[i].clone();
-      if (!points.at(-1).isSame(v)) points.push(v);
-    }
-
-    // Start of toLoc's segment with partial bulge trimmed to toLoc.point
-    const toSegStart = polyPoints[toLoc.segmentIndex - 1];
-    const toSegEnd = polyPoints[toLoc.segmentIndex];
-    const lastSegStart = toSegStart.clone();
-    if (toSegStart.bulge !== 0 && toSegStart.bulge !== undefined) {
-      lastSegStart.bulge = toSegStart.partialBulge(toSegEnd, toLoc.point);
-    }
-    if (!points.at(-1).isSame(lastSegStart)) points.push(lastSegStart);
-
-    const endPoint = toLoc.point.clone();
-    if (!points.at(-1).isSame(endPoint)) points.push(endPoint);
-
-    return points.length >= 2 ? points : null;
+    const firstHalf = this.#buildPortion(polyPoints, fromLoc, { segmentIndex: polyPoints.length - 1, point: polyPoints.at(-1) });
+    const secondHalf = this.#buildPortion(polyPoints, { segmentIndex: 1, point: polyPoints[0] }, toLoc);
+    if (!firstHalf || !secondHalf) return null;
+    firstHalf.pop(); // discard closure point before joining
+    return firstHalf.concat(secondHalf);
   }
 }
 
