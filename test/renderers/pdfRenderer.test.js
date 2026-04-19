@@ -1,5 +1,6 @@
 import { PdfRenderer } from '../../core/lib/renderers/pdfRenderer.js';
 import { Text } from '../../core/entities/text.js';
+import { Point } from '../../core/entities/point.js';
 
 describe('PdfRenderer — getOutput()', () => {
   test('produces a valid PDF header', () => {
@@ -62,12 +63,56 @@ describe('PdfRenderer — drawing', () => {
     expect(output).toContain('\nf\n');
   });
 
-  test('drawShape with bulge emits chord (straight line)', () => {
+  test('straight segment (no bulge) emits l operator', () => {
     const renderer = new PdfRenderer(100, 100);
-    renderer.drawShape([{ x: 0, y: 0, bulge: 1 }, { x: 10, y: 0 }], {});
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], {});
     const output = renderer.getOutput();
-    // Chord approximation: bulge point emits l, not c
     expect(output).toContain('10 0 l');
+    expect(output).not.toContain(' c\n');
+  });
+
+  test('bulge segment emits cubic Bézier c operator, not chord l', () => {
+    const renderer = new PdfRenderer(100, 100);
+    // bulge=1 → 180° CCW arc from (0,0) to (10,0)
+    const start = new Point(0, 0, 1);
+    const end = new Point(10, 0);
+    renderer.drawShape([start, end], {});
+    const output = renderer.getOutput();
+    expect(output).toContain(' c');
+    expect(output).not.toContain('10 0 l');
+  });
+
+  test('180° arc (bulge=1) splits into 2 Bézier curves', () => {
+    const renderer = new PdfRenderer(100, 100);
+    const start = new Point(0, 0, 1);
+    const end = new Point(10, 0);
+    renderer.drawShape([start, end], {});
+    const streamContent = renderer.getOutput().match(/stream\n([\s\S]*?)\nendstream/)[1];
+    const cCount = (streamContent.match(/ c\n/g) || []).length;
+    expect(cCount).toBe(2);
+  });
+
+  test('90° arc splits into 1 Bézier curve', () => {
+    const renderer = new PdfRenderer(100, 100);
+    // start=(100,0) bulge=tan(π/8)≈0.4142 → 90° arc, end=(150,50), center=(100,50), r=50
+    const start = new Point(100, 0, Math.tan(Math.PI / 8));
+    const end = new Point(150, 50);
+    renderer.drawShape([start, end], {});
+    const streamContent = renderer.getOutput().match(/stream\n([\s\S]*?)\nendstream/)[1];
+    const cCount = (streamContent.match(/ c\n/g) || []).length;
+    expect(cCount).toBe(1);
+  });
+
+  test('full circle (two 180° arcs) emits 4 Bézier curves', () => {
+    const renderer = new PdfRenderer(100, 100);
+    // Circle center=(50,50) r=50 — mirrors Circle.toPolylinePoints() output
+    const p1 = new Point(100, 50, 1);
+    const p2 = new Point(0, 50, 1);
+    const p3 = new Point(100, 50);
+    renderer.drawShape([p1, p2, p3], {});
+    const streamContent = renderer.getOutput().match(/stream\n([\s\S]*?)\nendstream/)[1];
+    const cCount = (streamContent.match(/ c\n/g) || []).length;
+    expect(cCount).toBe(4);
   });
 
   test('drawSegments solid batches all segments with one S', () => {
