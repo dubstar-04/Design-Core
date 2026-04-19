@@ -3,6 +3,10 @@ import { Point } from '../../core/entities/point.js';
 
 // ─── Mock context factory ─────────────────────────────────────────────────────
 
+/**
+ * Build a minimal mock CanvasRenderingContext2D that records every call.
+ * @return {Object} mock context with a `calls` array
+ */
 function makeMockCtx() {
   const calls = [];
   const record = (name) => (...args) => calls.push({ name, args });
@@ -191,8 +195,8 @@ describe('CanvasRenderer — drawSegments', () => {
   test('calls setLineDash per segment when dashes provided', () => {
     const ctx = makeMockCtx();
     new CanvasRenderer(ctx).drawSegments(
-      [{ x1: 0, y1: 0, x2: 10, y2: 0, dashPhase: 2 }],
-      [5, 3],
+        [{ x1: 0, y1: 0, x2: 10, y2: 0, dashPhase: 2 }],
+        [5, 3],
     );
     const dashCall = ctx.calls.find((c) => c.name === 'setLineDash');
     expect(dashCall).toBeDefined();
