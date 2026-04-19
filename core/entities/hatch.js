@@ -650,6 +650,11 @@ export class Hatch extends Entity {
     if (this.cachedPattern === null) this.buildPatternCache();
 
     if (this.solid) {
+      // Design renders solid hatches with a direct fill() call rather than the
+      // dense cross-hatch line pattern used by commercial CAD applications
+      // (Commercial CAD's SOLID pattern uses two line families at 0.0001-unit spacing).
+      // fill() is resolution-independent, handles curved boundaries exactly,
+      // and avoids the cost of generating and clipping thousands of segments.
       renderer.beginPath();
       for (const shape of this.childEntities) {
         if (!shape.points.length) continue;
