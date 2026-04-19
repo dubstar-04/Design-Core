@@ -286,16 +286,19 @@ export class PdfRenderer extends RendererBase {
 
   /**
    * Apply fill/stroke/close operators to the current path based on drawShape options.
+   * Uses even-odd operators (f* / B*) when fillRule is 'evenodd' (e.g. Hatch with holes),
+   * and non-zero winding operators (f / B) otherwise.
    * @param {Object} options
    */
   #applyOptions(options) {
-    const { closed = false, stroke = true, fill = false, clip = false } = options;
+    const { closed = false, stroke = true, fill = false, clip = false, fillRule } = options;
+    const evenOdd = fillRule === 'evenodd';
     if (closed) this.#emit('h');
     if (clip) return; // clip is a screen-only operation; no-op in PDF
     if (fill && stroke) {
-      this.#emit('B');
+      this.#emit(evenOdd ? 'B*' : 'B');
     } else if (fill) {
-      this.#emit('f');
+      this.#emit(evenOdd ? 'f*' : 'f');
     } else if (stroke) {
       this.#emit('S');
     }
