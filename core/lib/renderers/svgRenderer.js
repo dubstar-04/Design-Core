@@ -32,8 +32,6 @@ export class SvgRenderer extends RendererBase {
   // Low-level path accumulation (used by beginPath / tracePath / stroke / closePath)
   #currentPath = null;
 
-  // Counter for unique clipPath IDs
-  #clipCounter = 0;
 
   /**
    * @param {number} pageWidth  - page width in user units (points)
@@ -69,11 +67,7 @@ export class SvgRenderer extends RendererBase {
     const doFill = options.fill === true;
     const doClip = options.clip === true;
 
-    if (doClip) {
-      const id = `clip${this.#clipCounter++}`;
-      this.#emit(`<clipPath id="${id}"><path d="${pathD}"/></clipPath>`);
-      return;
-    }
+    if (doClip) return; // clip is a screen-only operation; no-op in SVG export
 
     const strokeAttrs = doStroke ?
       `stroke="${this.#colourStr()}" stroke-width="${this.#fmt(this.#currentLineWidth)}"${this.#dashAttrs()}` :
