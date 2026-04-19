@@ -733,3 +733,54 @@ test('Trim.action trims a closed polyline - produces open polyline with closed f
   expect(trimmed.points[0].x).toBeCloseTo(50);
   expect(trimmed.points[3].x).toBeCloseTo(50);
 });
+
+test('Trim.action trims middle of a line - circle boundary creates two intersections on the same segment', () => {
+  // A circle boundary intersects a single-segment line at two points, both on
+  // segment index 1. The sort comparator falls through to the
+  // positionAlongSegment comparison (line 179 of trim.js) because the segment
+  // indices are equal.
+  // Circle: center (50,0) radius 20 → intersects the x-axis at (30,0) and (70,0)
+  // Line: (0,0) → (100,0), mouse at (50,0) — inside the circle
+  // Expected: original line removed, two shorter lines (0→30) and (70→100) added
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 0)] });
+  core.scene.addItem('Circle', { points: [new Point(50, 0), new Point(70, 0)] }); // radius 20
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(50, 0));
+  trim.action();
+
+  // original line removed; two shorter lines added; circle remains
+  expect(core.scene.entities.count()).toBe(3);
+
+  const lines = [];
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Line') lines.push(core.scene.entities.get(i));
+  }
+  expect(lines.length).toBe(2);
+  lines.sort((a, b) => a.points[0].x - b.points[0].x);
+
+  expect(lines[0].points[0].x).toBeCloseTo(0);
+  expect(lines[0].points[1].x).toBeCloseTo(30);
+  expect(lines[1].points[0].x).toBeCloseTo(70);
+  expect(lines[1].points[1].x).toBeCloseTo(100);
+});
+
+test('Trim.execute catches and logs errors thrown during input', async () => {
+  // Force an error inside execute() to cover the catch block (line 69 of trim.js)
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  const requestInputSpy = jest.spyOn(DesignCore.Scene.inputManager, 'requestInput')
+      .mockRejectedValue(new Error('mocked error'));
+
+  const trim = new Trim();
+  // execute() should resolve without re-throwing because the catch block handles it
+  await expect(trim.execute()).resolves.toBeUndefined();
+
+  requestInputSpy.mockRestore();
+});
