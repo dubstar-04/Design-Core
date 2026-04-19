@@ -10,7 +10,6 @@ import { Text } from '../../entities/text.js';
  *  - Zero dependencies: uses only standard PDF operators and string concatenation.
  *  - Uses /Helvetica (standard Type1 font) — no font embedding required.
  *  - Text measurement delegates to Text.getApproximateWidth (Helvetica AFM widths).
- *  - Arc segments are approximated as straight chords (TODO: arc → cubic Bezier).
  *  - No highlight/selection rendering — PDF export shows final drawing geometry only.
  *  - setTransform() is a direct passthrough: the caller (export command) must supply
  *    a PDF-space Matrix with d = +scale (no Y-flip), so no sign adjustment is needed.
