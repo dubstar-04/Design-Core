@@ -896,7 +896,9 @@ test('Offset.execute - Through mode offsets circle to the through point', async 
     requestInput: async () => {
       if (callCount < inputs.length) return inputs[callCount++];
     },
-    actionCommand: () => { offset.action(); },
+    actionCommand: () => {
+      offset.action();
+    },
     executeCommand: () => {},
     reset: () => {},
   };
