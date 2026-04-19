@@ -318,9 +318,12 @@ export class Canvas {
     renderer.setBackgroundColour({ r: 255, g: 255, b: 255 });
     renderer.setStyle(plotOptions.style);
 
+    const plotScale = matrix.a;
     this.#paintEntities(
         DesignCore.Scene.entities, renderer, null,
         (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isPlottable,
+        null, null,
+        plotScale,
     );
 
     return true;
@@ -405,15 +408,16 @@ export class Canvas {
    * @param {Object} renderer - renderer instance
    * @param {Object|undefined} parent - enclosing insert/dimension for ByBlock colour resolution
    * @param {Object} overrides - rendering overrides passed to setContext
+   * @param {number} [scale] - forwarded to setContext
    */
-  #paintEntity(entity, renderer, parent, overrides) {
+  #paintEntity(entity, renderer, parent, overrides, scale) {
     renderer.save();
     try {
-      this.setContext(entity, renderer, parent, overrides);
+      this.setContext(entity, renderer, parent, overrides, scale);
       const children = entity.draw(renderer);
       if (children) {
         for (const item of children) {
-          this.#paintEntity(item, renderer, entity, overrides);
+          this.#paintEntity(item, renderer, entity, overrides, scale);
         }
       }
     } catch (err) {
@@ -434,15 +438,16 @@ export class Canvas {
    * @param {Function} [filter] - optional predicate; entity is skipped when it returns falsy
    * @param {EntityManager|null} [hoverCollection] - when provided, entities found in this set receive hoverOverrides
    * @param {Object|null} [hoverOverrides] - overrides applied to entities matched in hoverCollection
+   * @param {number} [scale] - forwarded to #paintEntity / setContext; defaults to screen zoom when omitted
    */
-  #paintEntities(entities, renderer, overrides = null, filter = undefined, hoverCollection = null, hoverOverrides = null) {
+  #paintEntities(entities, renderer, overrides = null, filter = undefined, hoverCollection = null, hoverOverrides = null, scale = undefined) {
     const isManager = typeof entities.count === 'function';
     const count = isManager ? entities.count() : entities.length;
     for (let i = 0; i < count; i++) {
       const entity = isManager ? entities.get(i) : entities[i];
       if (filter && !filter(entity)) continue;
       const isHovered = hoverCollection !== null && hoverCollection.indexOf(entity) !== -1;
-      this.#paintEntity(entity, renderer, undefined, isHovered ? hoverOverrides : (overrides ?? {}));
+      this.#paintEntity(entity, renderer, undefined, isHovered ? hoverOverrides : (overrides ?? {}), scale);
     }
   }
 
@@ -454,9 +459,9 @@ export class Canvas {
    * @param {Object} [overrides] - optional rendering overrides
    * @param {Object} [overrides.colour] - overrides all colour resolution (e.g. for halo/glow passes)
    * @param {number} [overrides.lineWidthDelta] - additional width in pixels (divided by scale) added to the entity's line width
+   * @param {number} [scale] - scale divisor for line width and dash pattern; defaults to the current screen zoom
    */
-  setContext(item, renderer, block = undefined, overrides = {}) {
-    const scale = this.getScale();
+  setContext(item, renderer, block = undefined, overrides = {}, scale = this.getScale()) {
     let colour = item.getDrawColour();
     const lineType = item.getLineType();
     let lineWidth = item.lineWidth / scale;
