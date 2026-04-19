@@ -624,3 +624,27 @@ test('Extend.action extends the start of a line', () => {
   expect(core.scene.entities.get(1).points[1].x).toBe(100);
   expect(core.scene.entities.get(1).points[1].y).toBe(50);
 });
+
+test('Extend.action notifies NOEXTEND when end segment of an Arc is curved', () => {
+  // A standalone Arc always has a non-zero bulge on its single segment.
+  // #extendEntity must reject the extension and notify because endSegmentBulge !== 0.
+  core.scene.clear();
+  core.scene.addItem('Arc', {
+    points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)],
+    direction: 1,
+  });
+  // Vertical boundary at x=5 — intersects the CCW quarter-arc
+  core.scene.addItem('Line', { points: [new Point(5, -20), new Point(5, 20)] });
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(9, 1)); // near arc start (10,0)
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  extend.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
+  expect(extend.selectedItem).toBeNull();
+  notifySpy.mockRestore();
+});
