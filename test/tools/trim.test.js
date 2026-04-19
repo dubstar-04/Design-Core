@@ -784,3 +784,120 @@ test('Trim.execute catches and logs errors thrown during input', async () => {
 
   requestInputSpy.mockRestore();
 });
+
+test('Trim.action trims a circle near the seam (right side, mouse at angle 0)', () => {
+  // Circle: center (0,0), radius 10.
+  // Circle.toPolylinePoints() always places the seam at angle 0 → vertex (10,0).
+  // The old code failed when the mouse was near that seam because both intersections
+  // appeared "after" the mouse in linear polyline order, leaving trimBefore=null.
+  //
+  // Boundary: vertical line at x=0, intersects at (0,10) [seg 2] and (0,-10) [seg 1].
+  // Mouse at (8,0) — on the RIGHT side, which is the forward arc from (0,-10) → (10,0) → (0,10)
+  //   (crosses the seam vertex in the polyline chain but is a valid arc region).
+  // Expected: arc from (10,0) → (0,-10) covering the left half, trimming the seam-crossing right arc.
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(8, 0));
+  trim.action();
+
+  expect(core.scene.entities.count()).toBe(2);
+
+  let arc;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Arc') arc = core.scene.entities.get(i);
+  }
+  expect(arc).toBeDefined();
+  // Remaining arc is the left half: from (0,10) CCW through (-10,0) to (0,-10)
+  expect(arc.points[0].x).toBeCloseTo(0);   // center
+  expect(arc.points[0].y).toBeCloseTo(0);
+  expect(arc.points[1].x).toBeCloseTo(0);   // start at (0,10)
+  expect(arc.points[1].y).toBeCloseTo(10);
+  expect(arc.points[2].x).toBeCloseTo(0);   // end at (0,-10)
+  expect(arc.points[2].y).toBeCloseTo(-10);
+});
+
+test('Trim.action trims a closed polyline near the seam vertex', () => {
+  // Closed square drawn starting from (0,0): seam is at vertex (0,0).
+  // Boundary: horizontal line at y=50, intersects:
+  //   left edge (closing segment (0,100)→(0,0)→...) at (0,50) — segment 4 (closing seg)
+  //   right edge (100,0)→(100,100) at (100,50) — segment 2
+  //
+  // Mouse at (50,25) — in the BOTTOM half, which is the forward arc from intA=(100,50)
+  //   through the bottom vertices to intB=(0,50). This forward arc crosses the seam vertex.
+  //
+  // Expected: open polyline (100,50)→(100,0)→(0,0)→(0,50), flag bit 1 cleared.
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', {
+    points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100), new Point(0, 0)],
+  });
+  core.scene.addItem('Line', { points: [new Point(-10, 50), new Point(110, 50)] });
+
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.flags.hasFlag(1)).toBe(true);
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = polyline;
+  // Mouse in the BOTTOM half — forward arc between the two intersections, crosses the seam
+  core.mouse.setPosFromScenePoint(new Point(50, 25));
+  trim.action();
+
+  expect(core.scene.entities.count()).toBe(2);
+
+  let trimmed;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Polyline') trimmed = core.scene.entities.get(i);
+  }
+
+  expect(trimmed).toBeDefined();
+  expect(trimmed.flags.hasFlag(1)).toBe(false);
+  expect(trimmed.points.length).toBe(4);
+  // Forward arc: right edge from y=50 down to corner, across bottom, left edge up to y=50
+  expect(trimmed.points[0].x).toBeCloseTo(100);
+  expect(trimmed.points[0].y).toBeCloseTo(50);
+  expect(trimmed.points[3].x).toBeCloseTo(0);
+  expect(trimmed.points[3].y).toBeCloseTo(50);
+});
+
+test('Trim.action trims an open polyline with two consecutive arc segments', () => {
+  // Polyline: (0,0,b=1) -> arc1 -> (100,0,b=1) -> arc2 -> (200,0)
+  // arc1 center (50,0) radius 50, through (50,-50)
+  // arc2 center (150,0) radius 50, through (150,-50)
+  // Boundary: vertical line at x=150, intersection at (150,-50) on arc2.
+  // Mouse at (120,-40): on arc2 BEFORE the intersection (in arc-travel order).
+  // Expected: keep right portion = (150,-50) -> (200,0); discard left side.
+
+  const trim = new Trim();
+  core.scene.clear();
+
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0, 1), new Point(100, 0, 1), new Point(200, 0)] });
+  core.scene.addItem('Line', { points: [new Point(150, -100), new Point(150, 100)] });
+
+  trim.selectedBoundaryItems = [core.scene.entities.get(1)];
+  trim.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(120, -40));
+  trim.action();
+
+  expect(core.scene.entities.count()).toBe(2);
+
+  let result;
+  for (let i = 0; i < core.scene.entities.count(); i++) {
+    if (core.scene.entities.get(i).type === 'Polyline') result = core.scene.entities.get(i);
+  }
+
+  expect(result).toBeDefined();
+  expect(result.points.length).toBe(2);
+  expect(result.points[0].x).toBeCloseTo(150);
+  expect(result.points[0].y).toBeCloseTo(-50);
+  expect(result.points[1].x).toBeCloseTo(200);
+  expect(result.points[1].y).toBeCloseTo(0);
+});
