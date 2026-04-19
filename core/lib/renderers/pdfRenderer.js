@@ -10,7 +10,7 @@ import { Text } from '../../entities/text.js';
  *  - Zero dependencies: uses only standard PDF operators and string concatenation.
  *  - Uses /Helvetica (standard Type1 font) — no font embedding required.
  *  - Text measurement delegates to Text.getApproximateWidth (Helvetica AFM widths).
- *  - Arc segments are approximated as straight chords (TODO: arc → cubic Bézier).
+ *  - Arc segments are approximated as straight chords (TODO: arc → cubic Bezier).
  *  - No highlight/selection rendering — PDF export shows final drawing geometry only.
  *  - setTransform() is a direct passthrough: the caller (export command) must supply
  *    a PDF-space Matrix with d = +scale (no Y-flip), so no sign adjustment is needed.
@@ -101,9 +101,13 @@ export class PdfRenderer extends RendererBase {
       if (!p.bulge) {
         this.#emit(`${this.#fmt(next.x)} ${this.#fmt(next.y)} l`);
       } else {
-        // TODO: arc → cubic Bézier approximation using p.bulgeCentrePoint / p.bulgeRadius.
-        // Emit chord as straight line for now.
-        this.#emit(`${this.#fmt(next.x)} ${this.#fmt(next.y)} l`);
+        const center = p.bulgeCentrePoint(next);
+        const radius = p.bulgeRadius(next);
+        const startAngle = center.angle(p);
+        const sweepAngle = p.bulgeAngle();
+        for (const curve of this.#arcToBezier(center, radius, startAngle, sweepAngle)) {
+          this.#emit(`${this.#fmt(curve.cp1x)} ${this.#fmt(curve.cp1y)} ${this.#fmt(curve.cp2x)} ${this.#fmt(curve.cp2y)} ${this.#fmt(curve.x)} ${this.#fmt(curve.y)} c`);
+        }
       }
     }
   }
@@ -308,6 +312,40 @@ export class PdfRenderer extends RendererBase {
     if (!Number.isFinite(n)) return '0';
     if (Number.isInteger(n)) return String(n);
     return parseFloat(n.toFixed(4)).toString();
+  }
+
+  /**
+   * Approximate a circular arc as one or more PDF cubic Bezier curves.
+   * Arcs larger than 90° are split into ≤90° segments for accuracy.
+   * @param {Point} center - arc centre
+   * @param {number} radius  - arc radius
+   * @param {number} startAngle - angle from positive x-axis to arc start (radians)
+   * @param {number} sweepAngle - signed sweep: positive = CCW, negative = CW (radians)
+   * @return {Array<{cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number}>}
+   */
+  #arcToBezier(center, radius, startAngle, sweepAngle) {
+    // Number of ≤90° segments needed to keep Bezier error below ~0.03%
+    const steps = Math.max(1, Math.ceil(Math.abs(sweepAngle) / (Math.PI / 2)));
+    // Signed angle of each segment (negative for CW arcs)
+    const stepAngle = sweepAngle / steps;
+    // How far each control point is offset from its arc endpoint along the tangent.
+    // Derived from the condition that the cubic Bezier must pass through the arc midpoint
+    const tangentScale = (4 / 3) * Math.tan(stepAngle / 4);
+    const curves = [];
+    for (let i = 0; i < steps; i++) {
+      const a1 = startAngle + i * stepAngle;
+      const a2 = a1 + stepAngle;
+      // Points on the circle at the segment start and end angles
+      const p1 = center.project(a1, radius);
+      const p2 = center.project(a2, radius);
+      // Control points are offset from p1/p2 along the tangent direction by radius*tangentScale.
+      // Tangent at p1 (CCW) is a1 + π/2; tangent at p2 (CW, pointing back) is a2 - π/2.
+      // tangentScale is signed, so CW arcs (negative sweepAngle) automatically reverse the offset.
+      const cp1 = p1.project(a1 + Math.PI / 2, radius * tangentScale);
+      const cp2 = p2.project(a2 - Math.PI / 2, radius * tangentScale);
+      curves.push({ cp1x: cp1.x, cp1y: cp1.y, cp2x: cp2.x, cp2y: cp2.y, x: p2.x, y: p2.y });
+    }
+    return curves;
   }
 
   /**
