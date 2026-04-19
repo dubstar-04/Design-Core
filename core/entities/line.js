@@ -96,13 +96,10 @@ export class Line extends Entity {
 
   /**
    * Draw the entity
-   * @param {Object} ctx - context
-   * @param {number} scale
+   * @param {Object} renderer
    */
-  draw(ctx, scale) {
-    ctx.moveTo(this.points[0].x, this.points[0].y);
-    ctx.lineTo(this.points[1].x, this.points[1].y);
-    ctx.stroke();
+  draw(renderer) {
+    renderer.drawShape(this.toPolylinePoints());
   }
 
   /**

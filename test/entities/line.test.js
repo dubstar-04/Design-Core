@@ -158,6 +158,18 @@ test('Test Line.trim returns remove and add states', () => {
   expect(changes[1].entity.handle).toBeUndefined();
 });
 
+test('Test Line.draw calls renderer.drawShape with toPolylinePoints', () => {
+  const line = new Line({ points: [new Point(0, 0), new Point(10, 5)] });
+  let capturedPoints;
+  const mockRenderer = {
+    drawShape(points) {
+      capturedPoints = points;
+    },
+  };
+  line.draw(mockRenderer);
+  expect(capturedPoints).toEqual(line.toPolylinePoints());
+});
+
 
 test('Test Line.trim returns empty array when provided with empty intersection list', () => {
   const line = new Line({ points: [new Point(0, 0), new Point(100, 0)] });

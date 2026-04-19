@@ -398,112 +398,54 @@ export class Text extends Entity {
   }
 
   /**
-   * Draw the entity
-   * @param {Object} ctx - context
-   * @param {number} scale
+   * Return a character descriptor array for use with renderer.drawText().
+   * Coordinates are in scene space (Y-up). The renderer handles the Y-flip.
+   * upsideDownOffset and backwardsOffset are optional DXF-flag offsets in
+   * the local (post-rotation) text frame.
+   * @return {Array}
    */
-  draw(ctx, scale) {
-    if (this.string.length === 0) {
-      return;
-    }
-
-    // Detect hover/selection halo pass: setContext adds lineWidthDelta (5 px) to the line width.
-    // HTML Canvas: setContext writes ctx.lineWidth directly (readable property).
-    // Cairo: setContext calls setLineWidth(); read it back via getLineWidth().
-    // lineWidthDelta > 2 identifies the hovered or selected pass (selectionLineWidthDelta = 5 in canvas.js).
-    const ctxLineWidth = ctx.lineWidth ?? ctx.getLineWidth?.() ?? 0;
-    const isHoveredOrSelected = (ctxLineWidth * scale - this.lineWidth) > 2;
-
-    ctx.save(); // save current context before scale and translate
-    ctx.scale(1, -1);
+  toCharacters() {
+    if (this.string.length === 0) return [];
     const [bottomLeft, bottomRight, /* topRight */, topLeft] = this.getTextFrameCorners();
-    ctx.translate(bottomLeft.x, -bottomLeft.y);
+    return [{
+      x: bottomLeft.x,
+      y: bottomLeft.y,
+      rotation: Utils.degrees2radians(this.rotation),
+      char: this.string,
+      upsideDownOffset: this.upsideDown ? bottomLeft.distance(topLeft) : 0,
+      backwardsOffset: this.backwards ? bottomLeft.distance(bottomRight) : 0,
+    }];
+  }
 
+  /**
+   * Draw the text entity
+   * @param {Object} renderer
+   */
+  draw(renderer) {
+    if (this.string.length === 0) return;
     const style = DesignCore.StyleManager.getItemByName(this.styleName);
-    const rotation = Utils.degrees2radians(this.rotation);
-    ctx.rotate(-rotation);
-
-    if (this.upsideDown) {
-      const upsideDownOffset = bottomLeft.distance(topLeft);
-      ctx.translate(0, -upsideDownOffset);
-      ctx.scale(1, -1);
+    // Measure with the correct font before toCharacters() so that boundingRect
+    // (used for alignment offsets) is accurate on every paint pass.
+    const measured = renderer.measureText(this.string, style?.font, this.height);
+    if (measured?.width) {
+      this.boundingRect = { width: measured.width, height: this.height };
     }
-
-    if (this.backwards) {
-      const backwardsOffset = bottomLeft.distance(bottomRight);
-      ctx.translate(backwardsOffset, 0);
-      ctx.scale(-1, 1);
-    }
-
-    try { // HTML
-      ctx.font = this.height + 'pt ' + style?.font;
-      if (isHoveredOrSelected) {
-        // strokeText uses the strokeStyle (halo colour) and lineWidth (thick) already
-        // set up by setContext — no positioning adjustments needed.
-        ctx.strokeText(this.string, 0, 0);
-      } else {
-        ctx.fillText(this.string, 0, 0);
-        // TODO: find a better way to define the boundingRect
-        const metrics = ctx.measureText(this.string);
-        this.boundingRect = { width: metrics.width, height: this.height };
-      }
-    } catch { // Cairo
-      ctx.selectFontFace(style?.font, null, null); // (FontName, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-
-      // Hack to test the text height vs bounding box height to find a scale factor to make the drawn text match the specified height.
-      // This is needed because Cairo's font size is not the same as the actual drawn text height, and can vary based on the font used.
-      // This is a rough approximation and may not be accurate for all fonts or sizes.
-      ctx.setFontSize(this.height);
-      const drawTextRect = ctx.textExtents(this.string);
-
-      /* GJS Cairo needs additional support for font handling
-      https://www.cairographics.org/tutorial/#L1understandingtext
-      https://www.cairographics.org/manual/cairo-cairo-scaled-font-t.html#cairo-font-extents-t
-
-      This needs to be implemented in GJS:
-      https://gitlab.gnome.org/GNOME/gjs/-/blob/master/modules/cairo-context.cpp?ref_type=heads#L773
-      https://gitlab.gnome.org/GNOME/gjs/-/blob/master/modules/cairo-context.cpp?ref_type=heads#L780
-      */
-      // Adjust the font size by the ratio of the desired height to the drawn height to get closer to the desired text height.
-      ctx.setFontSize(this.height * this.height / drawTextRect.height);
-
-      if (isHoveredOrSelected) {
-        // cairo_text_path is not yet available in the GNOME SDK version of GJS.
-        // Simulate a stroke-like halo by drawing the text at 8 small offsets.
-        // Each offset is half the set line width (world units) — the same outward
-        // reach as a stroked path. Replace with ctx.textPath once GJS ships it.
-        const d = ctx.getLineWidth() / 2;
-        for (const [dx, dy] of [[d, 0], [-d, 0], [0, d], [0, -d], [d, d], [-d, d], [d, -d], [-d, -d]]) {
-          ctx.moveTo(dx, dy);
-          ctx.showText(this.string);
-        }
-      } else {
-        this.boundingRect = ctx.textExtents(this.string);
-        ctx.showText(this.string);
-      }
-    }
-
-    ctx.stroke();
-    ctx.restore(); // restore context before scale and translate
+    renderer.drawText(this.toCharacters(), style?.font, this.height);
 
     /*
     // debug draw the bounding box
     const bb = this.boundingBox();
-    ctx.moveTo(bb.xMin, bb.yMin);
-    ctx.lineTo(bb.xMax, bb.yMin);
-    ctx.lineTo(bb.xMax, bb.yMax);
-    ctx.lineTo(bb.xMin, bb.yMax);
-    ctx.lineTo(bb.xMin, bb.yMin);
-    ctx.stroke();
+    renderer.drawShape([
+      new Point(bb.xMin, bb.yMin),
+      new Point(bb.xMax, bb.yMin),
+      new Point(bb.xMax, bb.yMax),
+      new Point(bb.xMin, bb.yMax),
+      new Point(bb.xMin, bb.yMin),
+    ]);
 
     // debug draw the text frame
-    const frameCorners = this.getTextFrameCorners();
-    ctx.moveTo(frameCorners[0].x, frameCorners[0].y);
-    ctx.lineTo(frameCorners[1].x, frameCorners[1].y);
-    ctx.lineTo(frameCorners[2].x, frameCorners[2].y);
-    ctx.lineTo(frameCorners[3].x, frameCorners[3].y);
-    ctx.lineTo(frameCorners[0].x, frameCorners[0].y);
-    ctx.stroke();
+    const [fc0, fc1, fc2, fc3] = this.getTextFrameCorners();
+    renderer.drawShape([fc0, fc1, fc2, fc3, fc0]);
     */
   }
 

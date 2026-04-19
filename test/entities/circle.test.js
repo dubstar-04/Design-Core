@@ -282,12 +282,16 @@ test('Circle.preview does not throw with 0 or 1 points', () => {
   DesignCore.Mouse.pointOnScene = origMouse;
 });
 
-test('Circle.draw does not throw', () => {
+test('Circle.draw calls renderer.drawShape with toPolylinePoints', () => {
   const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-  const ctx = { arc: jest.fn(), stroke: jest.fn() };
-  expect(() => circle.draw(ctx, 1)).not.toThrow();
-  expect(ctx.arc).toHaveBeenCalledTimes(1);
-  expect(ctx.stroke).toHaveBeenCalledTimes(1);
+  let capturedPoints;
+  const mockRenderer = {
+    drawShape(points) {
+      capturedPoints = points;
+    },
+  };
+  circle.draw(mockRenderer);
+  expect(capturedPoints).toEqual(circle.toPolylinePoints());
 });
 
 test('Circle.snaps returns centre snap', () => {

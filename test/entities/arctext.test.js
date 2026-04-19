@@ -431,3 +431,28 @@ test('ArcText getArcAlignedCharacters offsetFromRight shifts character positions
   const offsetChars = offset.getArcAlignedCharacters();
   expect(offsetChars[0].position.x).not.toBeCloseTo(baseChars[0].position.x, 1);
 });
+
+test('ArcAlignedText.toCharacters returns one entry per character with scene coords', () => {
+  const arc = new ArcAlignedText({ points: [new Point(0, 0)], string: 'AB', radius: 100 });
+  const chars = arc.toCharacters();
+  expect(chars).toHaveLength(2);
+  expect(chars[0].char).toBe('A');
+  expect(chars[1].char).toBe('B');
+  expect(typeof chars[0].x).toBe('number');
+  expect(typeof chars[0].y).toBe('number');
+  expect(typeof chars[0].rotation).toBe('number');
+});
+
+test('ArcAlignedText.draw calls renderer.drawText with all characters', () => {
+  const arc = new ArcAlignedText({ points: [new Point(0, 0)], string: 'Hi', radius: 50 });
+  let calledChars;
+  const mockRenderer = {
+    drawText(characters) {
+      calledChars = characters;
+    },
+  };
+  arc.draw(mockRenderer);
+  expect(calledChars).toHaveLength(2);
+  expect(calledChars[0].char).toBe('H');
+  expect(calledChars[1].char).toBe('i');
+});

@@ -149,6 +149,11 @@ export class ChamferFilletBase extends Tool {
     // Two standalone entities: update both, optionally add the new entity.
     if (!firstIsPolyline && !secondIsPolyline) {
       const stateChanges = isSharpTrim ? [] : [new AddState(newEntity)];
+      // Corner points may carry a bulge value from arc.toPolylinePoints() — a Line
+      // endpoint must never have a non-zero bulge or it renders as an arc.
+      // toPolylinePoints() returns fresh Point objects so direct mutation is safe.
+      firstCornerPoint.bulge = 0;
+      secondCornerPoint.bulge = 0;
       stateChanges.push(
           new UpdateState(this.firstPick.entity, { points: [this.firstPick.lineKeptEnd(this.intersectionPoint), firstCornerPoint] }),
           new UpdateState(this.secondPick.entity, { points: [this.secondPick.lineKeptEnd(this.intersectionPoint), secondCornerPoint] }),

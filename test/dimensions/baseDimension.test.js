@@ -255,14 +255,14 @@ describe('BaseDimension', () => {
 
     test('draw() returns the block items array', () => {
       const dim = makeDim();
-      const result = dim.draw({}, 1);
+      const result = dim.draw({});
       expect(result).toBe(dim.block.items);
     });
 
     test('draw() calls refresh() (via buildDimension) when block is empty', () => {
       const dim = makeDim();
       expect(dim.block.items).toHaveLength(0);
-      dim.draw({}, 1);
+      dim.draw({});
       expect(dim.buildDimension).toHaveBeenCalledTimes(1);
       expect(dim.block.items.length).toBeGreaterThan(0);
     });
@@ -271,27 +271,27 @@ describe('BaseDimension', () => {
       const dim = makeDim();
       // pre-populate the block
       dim.block.addItem(new Line({ points: [new Point(0, 0), new Point(1, 1)] }));
-      dim.draw({}, 1);
+      dim.draw({});
       expect(dim.buildDimension).not.toHaveBeenCalled();
     });
 
     test('draw() returns populated items after initial refresh', () => {
       const dim = makeDim();
-      const items = dim.draw({}, 1);
+      const items = dim.draw({});
       expect(items).toBeInstanceOf(Array);
       expect(items.length).toBeGreaterThan(0);
     });
 
     test('draw() returns same array reference on repeated calls', () => {
       const dim = makeDim();
-      const first = dim.draw({}, 1);
-      const second = dim.draw({}, 1);
+      const first = dim.draw({});
+      const second = dim.draw({});
       expect(first).toBe(second);
     });
 
     test('draw() block items have BYBLOCK colour after refresh', () => {
       const dim = makeDim();
-      dim.draw({}, 1);
+      dim.draw({});
       for (const item of dim.block.items) {
         expect(item.entityColour.aci).toBe(0); // BYBLOCK = ACI 0
       }

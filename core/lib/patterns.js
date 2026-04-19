@@ -116,8 +116,15 @@ export class Patterns {
 
   static hatch_patterns = {
     'SOLID': {
+      // Commercial CAD defines SOLID as two dense cross-hatch line families
+      // (45° and -45°) with a near-zero spacing of 0.0001 inches. Design does
+      // not use this pattern for rendering — solid hatches are drawn with a
+      // direct fill() call for quality and performance reasons. The definition
+      // is retained here so that patternExists('SOLID') returns true and the
+      // name is available for pattern selection and DXF round-trip validation.
       description: 'Solid Fill', pattern:
-                `45, 0,0, 0,3.175`,
+                `45, 0,0, 0,0.00254
+-45, 0,0, 0,0.00254`,
     },
 
     'ANGLE': {

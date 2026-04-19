@@ -389,6 +389,16 @@ export class Hatch extends Entity {
                 }
 
                 shape.points.push(polyPoint);
+
+                // On the last vertex, apply the closed flag (73) to the shape.
+                // For polyline boundaries 73 = is-closed and appears once, before
+                // the vertices, so it has already been parsed into data[73]. We
+                // must not consume it inside the arc-edge branch (that branch uses
+                // 73 as the per-edge "is counter-clockwise" flag), so we read it
+                // here only when we are in the polyline branch and on the final vertex.
+                if (edgeNum === edgeCount - 1 && this.getDataValue(data, 73)) {
+                  shape.flags.addValue(1);
+                }
               } else if (edgeType === 1) {
                 // Line
                 // 10 - X; 20 - Y; 11 - X; 21 - Y
@@ -609,6 +619,8 @@ export class Hatch extends Entity {
             // Drop the redundant closure point — the first point already records
             // the same position; keeping it would create a zero-length segment
             shape.points.push(...iterationPoints.slice(0, -1));
+            // Mark as closed (flag bit 1)
+            shape.flags.addValue(1);
             selectedchildEntities.push(shape);
             iterationPoints = [];
             break;
@@ -622,10 +634,10 @@ export class Hatch extends Entity {
 
   /**
    * Draw the entity
-   * @param {Object} ctx - context
+   * @param {Object} renderer
    * @param {number} scale
    */
-  draw(ctx, scale) {
+  draw(renderer) {
     // ensure the scale is valid
     if (this.scale < 0.01) {
       this.scale = 1;
@@ -638,103 +650,35 @@ export class Hatch extends Entity {
     if (this.cachedPattern === null) this.buildPatternCache();
 
     if (this.solid) {
-      // Solid fill: clip region + fill rectangle
-      ctx.save();
-
-      this.traceBoundaryPath(ctx, scale);
-
-      try { // Cairo - clip() takes no arguments, uses the fill rule set above
-        ctx.setFillRule(1); // Cairo.FillRule.EVEN_ODD
-        ctx.clip();
-      } catch { // HTML Canvas
-        ctx.clip('evenodd');
+      // Design renders solid hatches with a direct fill() call rather than the
+      // dense cross-hatch line pattern used by commercial CAD applications
+      // (Commercial CAD's SOLID pattern uses two line families at 0.0001-unit spacing).
+      // fill() is resolution-independent, handles curved boundaries exactly,
+      // and avoids the cost of generating and clipping thousands of segments.
+      renderer.beginPath();
+      for (const shape of this.childEntities) {
+        if (!shape.points.length) continue;
+        renderer.tracePath(shape.toPolylinePoints());
+        renderer.closePath();
       }
-
-      try {
-        ctx.beginPath();
-      } catch { // Cairo
-        ctx.newPath();
-      }
-
-      const bb = this.boundingBox();
-      try {
-        ctx.rect(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-      } catch { // Cairo
-        ctx.rectangle(bb.xMin - bb.xLength, bb.yMin - bb.yLength, bb.xLength * 3, bb.yLength * 3);
-      }
-
-      ctx.fill();
-      ctx.restore();
+      renderer.applyPath({ fill: true, stroke: false, fillRule: 'evenodd' });
     } else {
-      // Pattern hatch: draw pre-clipped segments directly — no ctx.save/clip/restore needed.
-      // Segments were clipped against the boundary during buildPatternCache() so only visible
-      // portions are stored, eliminating per-frame clip region overhead.
+      // Pattern hatch: draw pre-clipped segments directly.
       for (const family of this.cachedPattern) {
-        if (!family.dashes.length) {
-          // Solid-line family: batch all segments into one path for performance
-          try {
-            ctx.setLineDash([]);
-            ctx.beginPath();
-          } catch { // Cairo
-            ctx.setDash([], 0);
-            ctx.newPath();
-          }
-          for (const seg of family.segments) {
-            ctx.moveTo(seg.x1, seg.y1);
-            ctx.lineTo(seg.x2, seg.y2);
-          }
-          ctx.stroke();
-        } else {
-          // Dashed family: each sub-segment needs its own dash phase to maintain
-          // pattern continuity across clipped boundaries.
-          for (const seg of family.segments) {
-            try {
-              ctx.setLineDash(family.dashes);
-              ctx.lineDashOffset = seg.dashPhase;
-              ctx.beginPath();
-            } catch { // Cairo
-              ctx.setDash(family.dashes, seg.dashPhase);
-              ctx.newPath();
-            }
-            ctx.moveTo(seg.x1, seg.y1);
-            ctx.lineTo(seg.x2, seg.y2);
-            ctx.stroke();
-          }
-        }
+        renderer.setDash([], 0);
+        renderer.drawSegments(family.segments, family.dashes);
       }
     }
 
-    // When selected, stroke the boundary outline so the hatch region is visible.
-    // The canvas makes two passes over selected items (halo + normal), so this
-    // automatically receives both the accent-colour glow and the entity colour.
-    if (DesignCore.Scene.selectionManager.selectedItems.includes(this)) {
-      try {
-        ctx.setLineDash([]);
-      } catch { // Cairo
-        ctx.setDash([], 0);
+    // Draw the boundary outline when hovered or selected.
+    const isSelected = DesignCore.Scene.selectionManager.selectedItems.includes(this);
+    const isHovered = DesignCore.Scene.hoverEntities.indexOf(this) !== -1;
+    if (isSelected || isHovered) {
+      renderer.setDash([], 0);
+      for (const shape of this.childEntities) {
+        if (!shape.points.length) continue;
+        renderer.drawShape(shape.toPolylinePoints(), { closed: true });
       }
-      this.traceBoundaryPath(ctx, scale);
-      ctx.stroke();
-    }
-  }
-
-  /**
-   * Trace all boundary shapes into the current canvas path as closed sub-paths.
-   * Used by both the solid-fill clip pass and the selection outline pass.
-   * @param {Object} ctx - canvas context
-   * @param {number} scale
-   */
-  traceBoundaryPath(ctx, scale) {
-    try {
-      ctx.beginPath();
-    } catch { // Cairo
-      ctx.newPath();
-    }
-    for (const shape of this.childEntities) {
-      if (!shape.points.length) continue;
-      ctx.moveTo(shape.points[0].x, shape.points[0].y);
-      shape.draw(ctx, scale, false);
-      ctx.closePath();
     }
   }
 

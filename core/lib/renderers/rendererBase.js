@@ -1,0 +1,284 @@
+/**
+ * Abstract renderer base class.
+ * Defines the interface all render targets must implement.
+ *
+ * State-setting methods (setColour, setLineWidth, setDash, setHighlight) are
+ * called by canvas.js once per entity before entity.draw(renderer) is invoked.
+ *
+ * High-level drawing methods (drawShape, drawText, tracePath) are called by
+ * entity draw() implementations.  Concrete renderers handle backend-specific
+ * details such as bulge-to-arc decoding, highlight glow passes, and font size
+ * correction.
+ *
+ * Transform helpers (applyTransform, save, restore) are called by canvas.js
+ * when processing container entities (Insert, BaseDimension) that return a
+ * child list from draw().
+ */
+export class RendererBase {
+  #backgroundColour = null;
+
+  /**
+   * Colour-transform functions for plot styles.
+   * Each entry maps style name (uppercase) → (rgb) => rgb.
+   * Add new entries here to extend the available styles without changing any other code.
+   */
+  static Styles = {
+    /**
+     * No transform — colours are rendered as-is.
+     * @param {{ r: number, g: number, b: number }} rgb
+     * @return {{ r: number, g: number, b: number }}
+     */
+    NONE: (rgb) => rgb,
+    /**
+     * All colours mapped to black, matching AutoCAD's monochrome.ctb behaviour.
+     * @param {{ r: number, g: number, b: number }} _
+     * @return {{ r: number, g: number, b: number }}
+     */
+    MONOCHROME: (_) => ({ r: 0, g: 0, b: 0 }),
+    /**
+     * Colours converted to luminance-preserving grey (ITU-R BT.601 coefficients).
+     * @param {{ r: number, g: number, b: number }} rgb
+     * @return {{ r: number, g: number, b: number }}
+     */
+    GREYSCALE: (rgb) => {
+      const l = Math.round(0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b);
+      return { r: l, g: l, b: l };
+    },
+  };
+
+  #styleTransform = RendererBase.Styles.NONE;
+
+  // --- Background colour (concrete — used by all renderers for ACI 7 resolution) ---
+
+  /**
+   * Store the background colour for this renderer.
+   * Called by canvas.js before painting so that setContext can resolve ACI 7
+   * correctly for both screen and export renderers.
+   * @param {{ r: number, g: number, b: number }|null} colour
+   */
+  setBackgroundColour(colour) {
+    this.#backgroundColour = colour;
+  }
+
+  /**
+   * Return the renderer's background colour, or null if not set.
+   * @return {{ r: number, g: number, b: number }|null}
+   */
+  getBackgroundColour() {
+    return this.#backgroundColour;
+  }
+
+  // --- Plot style (concrete — applied in setColour() by each renderer) ---
+
+  /**
+   * Set the active plot style.
+   * Pass one of the RendererBase.Styles values (a colour-transform function).
+   * Falls back to RendererBase.Styles.NONE if the value is falsy.
+   * @param {Function} styleTransform - a function (rgb) => rgb from RendererBase.Styles
+   */
+  setStyle(styleTransform) {
+    this.#styleTransform = styleTransform ?? RendererBase.Styles.NONE;
+  }
+
+  /**
+   * Apply the active plot style transform to a resolved colour.
+   * Called by each concrete renderer at the start of setColour().
+   * @param {{ r: number, g: number, b: number }} rgb
+   * @return {{ r: number, g: number, b: number }}
+   */
+  applyStyle(rgb) {
+    return this.#styleTransform(rgb);
+  }
+
+  // --- High-level drawing ---
+
+  /**
+   * Draw a shape described by a sequence of bulge-encoded points.
+   * Handles the complete path lifecycle: new path, trace segments, stroke/fill.
+   * When isHighlighted is set, a glow pass is prepended automatically.
+   * @param {Array}    points           - Bulge-encoded Point array.  Each point's .bulge
+   *                                     describes the segment to the next point:
+   *                                     0 = straight line, +ve = CCW arc, -ve = CW arc.
+   * @param {Object}   [options]
+   * @param {boolean}  [options.closed=false]   - Call closePath before fill/stroke.
+   * @param {boolean}  [options.stroke=true]    - Stroke the path.
+   * @param {boolean}  [options.fill=false]     - Fill the path.
+   * @param {string}   [options.fillRule]       - 'evenodd' or 'nonzero' (default).
+   * @param {boolean}  [options.clip=false]     - Clip to path instead of fill/stroke.
+   * @param {number}   [options.alpha=1]        - Fill opacity (0–1). Only applied to fill, not stroke.
+   */
+  drawShape(points, options = {}) {
+    throw new Error(`${this.constructor.name}: drawShape() not implemented`);
+  }
+
+  /**
+   * Draw an array of positioned characters.
+   * When isHighlighted is set, a glow pass is prepended automatically.
+   * @param {Array}    characters - Array of { char, x, y, rotation } descriptors.
+   * @param {string}   fontName   - Font family name.
+   * @param {number}   height     - Desired text height in scene units.
+   */
+  drawText(characters, fontName, height) {
+    throw new Error(`${this.constructor.name}: drawText() not implemented`);
+  }
+
+  /**
+   * Trace a path from bulge-encoded points WITHOUT starting a new path and
+   * without stroking or filling.  The caller is responsible for starting the
+   * path (e.g. via a preceding drawShape or a future beginPath call) so that
+   * multiple tracePath calls can build up a compound path — needed by Hatch.
+   * @param {Array} points - Bulge-encoded Point array.
+   */
+  tracePath(points) {
+    throw new Error(`${this.constructor.name}: tracePath() not implemented`);
+  }
+
+  /**
+   * Draw an array of disconnected line segments.
+   * When dashes is empty, all segments are batched into a single stroke call.
+   * When dashes is non-empty, each segment is stroked individually with its
+   * own dash phase so that dash continuity is preserved across clipped boundaries.
+   * @param {Array} segments
+   * @param {number[]} [dashes=[]]
+   */
+  drawSegments(segments, dashes = []) {
+    throw new Error(`${this.constructor.name}: drawSegments() not implemented`);
+  }
+
+  // --- Low-level path (used by Hatch compound clip paths) ---
+
+  /** Start a new path, clearing any previous path. */
+  beginPath() {
+    throw new Error(`${this.constructor.name}: beginPath() not implemented`);
+  }
+
+  /** Stroke the current path with the current line style. */
+  stroke() {
+    throw new Error(`${this.constructor.name}: stroke() not implemented`);
+  }
+
+  /** Close the current sub-path by drawing a straight line back to its start point. */
+  closePath() {
+    throw new Error(`${this.constructor.name}: closePath() not implemented`);
+  }
+
+  /**
+   * Apply fill and/or stroke to the current accumulated path without resetting it first.
+   * Use after manually building a compound path via beginPath() + tracePath() + closePath()
+   * when multiple loops are needed (e.g. solid hatch with island/hole boundaries).
+   * @param {Object}  [options]
+   * @param {boolean} [options.stroke=true]
+   * @param {boolean} [options.fill=false]
+   * @param {string}  [options.fillRule]   - 'evenodd' or 'nonzero' (default)
+   * @param {number}  [options.alpha=1]    - fill opacity (0–1)
+   */
+  applyPath(options = {}) {
+    throw new Error(`${this.constructor.name}: applyPath() not implemented`);
+  }
+
+  // --- State (called by canvas.js setContext before each entity.draw()) ---
+
+  /**
+   * Set the current drawing colour.
+   * @param {{ r: number, g: number, b: number }} rgb
+   */
+  setColour(rgb) {
+    throw new Error(`${this.constructor.name}: setColour() not implemented`);
+  }
+
+  /**
+   * Set the current line width (already scaled to scene units by canvas.js).
+   * @param {number} width
+   */
+  setLineWidth(width) {
+    throw new Error(`${this.constructor.name}: setLineWidth() not implemented`);
+  }
+
+  /**
+   * Set the current dash pattern.
+   * @param {number[]} array
+   * @param {number}   [offset=0]
+   */
+  setDash(array, offset = 0) {
+    throw new Error(`${this.constructor.name}: setDash() not implemented`);
+  }
+
+  /**
+   * Configure the highlight (hover/selection glow) state for subsequent draws.
+   * When isHighlighted is true, drawShape and drawText prepend a wide stroke
+   * pass in highlightColour before the normal pass.
+   * @param {boolean}                  isHighlighted
+   * @param {{ r, g, b }|null}         [colour]
+   * @param {number}                   [lineWidthDelta=0] - extra width in scene units (pre-scaled by canvas.js).
+   */
+  setHighlight(isHighlighted, colour = null, lineWidthDelta = 0) {
+    throw new Error(`${this.constructor.name}: setHighlight() not implemented`);
+  }
+
+  // --- Frame setup (called once per paint by canvas.js) ---
+
+  /**
+   * Set the pan/zoom transform matrix on the underlying context.
+   * Must be called once at the start of each paint, before any drawing.
+   * @param {Matrix} matrix
+   */
+  setTransform(matrix) {
+    throw new Error(`${this.constructor.name}: setTransform() not implemented`);
+  }
+
+  /**
+   * Paint the scene background rectangle using the colour set by setBackgroundColour().
+   * @param {{ x: number, y: number }} origin - scene-space top-left corner
+   * @param {number} width  - canvas pixel width
+   * @param {number} height - canvas pixel height
+   * @param {number} scale  - current scene scale
+   */
+  fillBackground(origin, width, height, scale) {
+    throw new Error(`${this.constructor.name}: fillBackground() not implemented`);
+  }
+
+  // --- Transform (called by canvas.js for container entities) ---
+
+  /**
+   * Translate and optionally rotate the current graphics state.
+   * @param {Object} transform
+   * @param {number} [transform.x=0]
+   * @param {number} [transform.y=0]
+   * @param {number} [transform.rotation=0]
+   */
+  applyTransform(transform) {
+    throw new Error(`${this.constructor.name}: applyTransform() not implemented`);
+  }
+
+  /** Save the current graphics state onto the renderer's stack. */
+  save() {
+    throw new Error(`${this.constructor.name}: save() not implemented`);
+  }
+
+  /** Restore the most recently saved graphics state. */
+  restore() {
+    throw new Error(`${this.constructor.name}: restore() not implemented`);
+  }
+
+  // --- Measurement (used by text/arctext rendering) ---
+
+  /**
+   * Measure the rendered extent of a string.
+   * If fontName and height are supplied the font is set before measuring,
+   * so the result reflects the correct face and size.
+   * @param {string} str
+   * @param {string} [fontName]
+   * @param {number} [height]
+   */
+  measureText(str, fontName, height) {
+    throw new Error(`${this.constructor.name}: measureText() not implemented`);
+  }
+
+  /**
+   * Measure the advance width of a single character.
+   * @param {string} character
+   */
+  measureCharWidth(character) {
+    throw new Error(`${this.constructor.name}: measureCharWidth() not implemented`);
+  }
+}

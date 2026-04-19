@@ -1,8 +1,11 @@
 import { Matrix } from './matrix.js';
-import { Colours } from './colours.js';
 import { Colour } from './colour.js';
+import { BoundingBox } from './boundingBox.js';
 import { Point } from '../entities/point.js';
 import { Input } from './input.js';
+import { Logging } from './logging.js';
+import { PlotOptions } from './plotOptions.js';
+// import { RendererBase } from './renderers/rendererBase.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -11,6 +14,7 @@ export class Canvas {
   #panCursorTimeout;
   #baseCursorState = 'DEFAULT';
   #lastPanCanvasPoint = new Point();
+  #renderer = null;
 
   /** Create Canvas */
   constructor() {
@@ -51,6 +55,15 @@ export class Canvas {
   setExternalPaintCallbackFunction(callback) {
     // set the callback
     this.externalPaintCallbackFunction = callback;
+  }
+
+  /**
+   * Set the renderer class to use for entity drawing.
+   * Must be called once during UI initialisation before the first paint.
+   * @param {Function} RendererClass - CanvasRenderer or CairoRenderer class
+   */
+  setRenderer(RendererClass) {
+    this.#renderer = RendererClass;
   }
 
   /**
@@ -246,6 +259,77 @@ export class Canvas {
   }
 
   /**
+   * Build a renderer transform matrix that fits a scene area onto a page.
+   * Both PdfRenderer and SvgRenderer expect d = +scale (no Y-flip).
+   * @param {object} options
+   * @param {BoundingBox} options.area - scene area to map onto the page
+   * @param {number} options.pageWidth - page width in renderer units (points)
+   * @param {number} options.pageHeight - page height in renderer units (points)
+   * @param {number|null} [options.plotScale=null] - numeric scale factor, or null to fit to page
+   * @param {number} [options.margin=40] - margin on each side in renderer units
+   * @return {{a: number, d: number, e: number, f: number}|null} matrix object, or null if area is empty
+   */
+  buildExportMatrix({ area, pageWidth, pageHeight, plotScale = null, margin = 40 }) {
+    const sceneWidth = area.xMax - area.xMin;
+    const sceneHeight = area.yMax - area.yMin;
+    if (sceneWidth === 0 || sceneHeight === 0) return null;
+
+    const usableWidth = pageWidth - 2 * margin;
+    const usableHeight = pageHeight - 2 * margin;
+
+    const scale = plotScale === null ?
+      Math.min(usableWidth / sceneWidth, usableHeight / sceneHeight) :
+      plotScale;
+
+    const translateX = margin + (usableWidth - sceneWidth * scale) / 2 - area.xMin * scale;
+    const translateY = margin + (usableHeight - sceneHeight * scale) / 2 - area.yMin * scale;
+
+    return { a: scale, d: scale, e: translateX, f: translateY };
+  }
+
+  /**
+   * Export the visible scene entities to a renderer.
+   * Unlike paint(), this skips background, grid, preview, selection, and auxiliary passes.
+   * Builds and applies the export matrix from plotOptions before painting.
+   * @param {RendererBase} renderer
+   * @param {PlotOptions} plotOptions
+   * @return {boolean} false if no exportable area was found
+   */
+  exportTo(renderer, plotOptions) {
+    let area;
+    if (plotOptions.plotArea === PlotOptions.Area.DISPLAY) {
+      const viewport = this.getSceneOffset();
+      area = new BoundingBox(new Point(viewport.xmin, viewport.ymin), new Point(viewport.xmax, viewport.ymax));
+    } else {
+      area = DesignCore.Scene.boundingBox();
+    }
+    if (!area) return false;
+
+    const matrix = this.buildExportMatrix({
+      area,
+      pageWidth: plotOptions.pageWidth,
+      pageHeight: plotOptions.pageHeight,
+      plotScale: plotOptions.plotScale,
+    });
+    if (!matrix) return false;
+
+    renderer.setTransform(matrix);
+
+    renderer.setBackgroundColour({ r: 255, g: 255, b: 255 });
+    renderer.setStyle(plotOptions.style);
+
+    const plotScale = matrix.a;
+    this.#paintEntities(
+        DesignCore.Scene.entities, renderer, null,
+        (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isPlottable,
+        null, null,
+        plotScale,
+    );
+
+    return true;
+  }
+
+  /**
    * Paint the canvas
    * @param {object} context
    * @param {number} width
@@ -267,97 +351,79 @@ export class Canvas {
       this.flipped = true;
     }
 
+    const renderer = new this.#renderer(context);
+
     // set the transform for the context
     // this will set all the pan and zoom actions
-    try {
-      context.setTransform(this.matrix);
-    } catch {
-      // context.setMatrix(this.matrix)
-      context.translate(this.matrix.e, this.matrix.f);
-      context.scale(this.matrix.a, this.matrix.d);
-    }
+    renderer.setTransform(this.matrix);
+    renderer.setBackgroundColour(DesignCore.Settings.canvasbackgroundcolour);
 
     const pos = new Point();
     const origin = DesignCore.Mouse.transformToScene(pos);
+    const scale = this.getScale();
 
     // Paint the scene background
-    try {// HTML
-      // this.clear()
-      context.fillStyle = Colours.rgbToString(DesignCore.Settings.canvasbackgroundcolour);
-      context.fillRect(origin.x, origin.y, width / this.getScale(), height / this.getScale());
-      // context.globalAlpha = this.cvs.alpha
-    } catch { // Cairo
-      const rgbColour = Colours.rgbToScaledRGB(DesignCore.Settings.canvasbackgroundcolour);
-      context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-      const scaled = new Point(width, height);
-      const sc = DesignCore.Mouse.transformToScene(scaled);
-      context.moveTo(origin.x, origin.y);
-      context.lineTo(origin.x, sc.y);
-      context.lineTo(sc.x, sc.y);
-      context.lineTo(sc.x, origin.y);
-      context.lineTo(origin.x, origin.y);
-      context.fill();
-    }
+    renderer.fillBackground(origin, width, height, scale);
+    // Paint the grid
+    this.paintGrid(renderer);
 
-    this.paintGrid(context, width, height);
-
-    const scale = this.getScale();
-    const bg = DesignCore.Settings.canvasbackgroundcolour;
+    const bg = renderer.getBackgroundColour();
     const hoverHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.5);
     const selectionHaloColour = Colour.blend(DesignCore.Core.settings.accentcolour, bg, 0.25);
     const selectionLineWidthDelta = 5;
 
-    // Hover glow pass: draw wide accent-coloured glow behind the hovered entity.
-    // The primary entities pass below redraws the entity at its own colour naturally.
-    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { colour: hoverHaloColour, lineWidthDelta: selectionLineWidthDelta });
-    // Draw the hovered entity with a wider line width
-    this.#paintEntities(DesignCore.Scene.hoverEntities, context, scale, { lineWidthDelta: 1 });
-
-    // Paint the primary scene items (layer-visibility filtered)
+    // Paint the primary scene items (layer-visibility filtered).
+    // Hovered entity detected inline: renderer draws glow + entity in a single drawShape call.
     this.#paintEntities(
-        DesignCore.Scene.entities, context, scale, null,
+        DesignCore.Scene.entities, renderer, null,
         (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isVisible,
+        DesignCore.Scene.hoverEntities,
+        { colour: hoverHaloColour, lineWidthDelta: selectionLineWidthDelta },
     );
 
     // Paint the temporary scene items
-    this.#paintEntities(DesignCore.Scene.previewEntities, context, scale);
+    this.#paintEntities(DesignCore.Scene.previewEntities, renderer);
 
-    // Paint the selected scene items: glow pass then entity pass
+    // Paint the selected scene items: single pass — renderer handles glow + entity internally.
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
-    this.#paintEntities(selectedItems, context, scale, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
-    this.#paintEntities(selectedItems, context, scale);
+    this.#paintEntities(selectedItems, renderer, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
 
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
+    renderer.setHighlight(false);
     const auxCount = DesignCore.Scene.auxiliaryEntities.count();
     for (let l = 0; l < auxCount; l++) {
-      DesignCore.Scene.auxiliaryEntities.get(l).draw(context, scale);
+      renderer.save();
+      DesignCore.Scene.auxiliaryEntities.get(l).draw(renderer, scale);
+      renderer.restore();
     }
   }
 
   /**
    * Recursively paint a single entity and any children it returns.
    * Container entities (Insert, BaseDimension) return an array of child items from draw().
-   * Leaf entities return undefined. Canvas state is saved/restored around each entity.
+   * Leaf entities return undefined. Renderer state is saved/restored around each entity.
    * @param {Object} entity - entity to paint
-   * @param {Object} context - canvas rendering context
-   * @param {number} scale
+   * @param {Object} renderer - renderer instance
    * @param {Object|undefined} parent - enclosing insert/dimension for ByBlock colour resolution
    * @param {Object} overrides - rendering overrides passed to setContext
+   * @param {number} [scale] - forwarded to setContext
    */
-  #paintEntity(entity, context, scale, parent, overrides) {
-    context.save();
+  #paintEntity(entity, renderer, parent, overrides, scale) {
+    renderer.save();
     try {
-      this.setContext(entity, context, parent, overrides);
-      const children = entity.draw(context, scale);
+      this.setContext(entity, renderer, parent, overrides, scale);
+      const children = entity.draw(renderer);
       if (children) {
         for (const item of children) {
-          this.#paintEntity(item, context, scale, entity, overrides);
+          this.#paintEntity(item, renderer, entity, overrides, scale);
         }
       }
+    } catch (err) {
+      Logging.instance.warn(`draw failed for entity type '${entity.type}': ${err}`);
     } finally {
-      context.restore();
+      renderer.restore();
     }
   }
 
@@ -365,68 +431,64 @@ export class Canvas {
    * Draw a collection of entities, calling setContext before each draw.
    * Supports EntityManager instances (with .count()/.get()) and plain arrays.
    * @param {EntityManager|Array} entities
-   * @param {Object} context
-   * @param {number} scale
-   * @param {Object|null} [overrides] - optional rendering overrides passed to setContext
-   * @param {Object} [overrides.colour] - overrides colour resolution for all entities in this pass
-   * @param {number} [overrides.lineWidthDelta] - additional width in pixels (divided by scale) added to each entity's line width
+   * @param {Object} renderer - renderer instance
+   * @param {Object|null} [overrides] - optional rendering overrides passed to setContext for all entities
+   * @param {Object} [overrides.colour] - highlight glow colour (entity always draws in its natural colour)
+   * @param {number} [overrides.lineWidthDelta] - glow extension in pixels (divided by scale); added to renderer highlight delta
    * @param {Function} [filter] - optional predicate; entity is skipped when it returns falsy
+   * @param {EntityManager|null} [hoverCollection] - when provided, entities found in this set receive hoverOverrides
+   * @param {Object|null} [hoverOverrides] - overrides applied to entities matched in hoverCollection
+   * @param {number} [scale] - forwarded to #paintEntity / setContext; defaults to screen zoom when omitted
    */
-  #paintEntities(entities, context, scale, overrides = null, filter = undefined) {
+  #paintEntities(entities, renderer, overrides = null, filter = undefined, hoverCollection = null, hoverOverrides = null, scale = undefined) {
     const isManager = typeof entities.count === 'function';
     const count = isManager ? entities.count() : entities.length;
     for (let i = 0; i < count; i++) {
       const entity = isManager ? entities.get(i) : entities[i];
       if (filter && !filter(entity)) continue;
-      this.#paintEntity(entity, context, scale, undefined, overrides ?? {});
+      const isHovered = hoverCollection !== null && hoverCollection.indexOf(entity) !== -1;
+      this.#paintEntity(entity, renderer, undefined, isHovered ? hoverOverrides : (overrides ?? {}), scale);
     }
   }
 
   /**
-   * Set the scene context
+   * Set the scene context on the renderer before drawing an entity.
    * @param {Object} item - entity to draw
-   * @param {Object} context - scene painting context from ui
+   * @param {Object} renderer - renderer instance
    * @param {Object} [block] - insert or dimension element for the current block, required for colour ByBlock
    * @param {Object} [overrides] - optional rendering overrides
    * @param {Object} [overrides.colour] - overrides all colour resolution (e.g. for halo/glow passes)
    * @param {number} [overrides.lineWidthDelta] - additional width in pixels (divided by scale) added to the entity's line width
+   * @param {number} [scale] - scale divisor for line width and dash pattern; defaults to the current screen zoom
    */
-  setContext(item, context, block = undefined, overrides = {}) {
-    const scale = this.getScale();
+  setContext(item, renderer, block = undefined, overrides = {}, scale = this.getScale()) {
     let colour = item.getDrawColour();
     const lineType = item.getLineType();
     let lineWidth = item.lineWidth / scale;
-    const bg = DesignCore.Settings.canvasbackgroundcolour;
+    const bg = renderer.getBackgroundColour() ?? { r: 0, g: 0, b: 0 };
+
+    if (block && item.entityColour.aci === 0) {
+      colour = block.getDrawColour();
+    }
+    // ACI 7: white on dark background, black on light background
+    if (this.#isAci7(item, block)) {
+      colour = (bg.r + bg.g + bg.b) / 3 < 128 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
+    }
 
     if (overrides.colour !== undefined) {
-      colour = overrides.colour;
+      // Highlight pass: overrides.colour is the glow colour only — the entity
+      // always draws in its natural resolved colour on the normal pass.
+      // lineWidthDelta goes to the highlight delta so the glow extends beyond
+      // the entity line; the entity's own lineWidth is unchanged.
+      renderer.setHighlight(true, overrides.colour, (overrides.lineWidthDelta ?? 0) / scale);
     } else {
-      if (block && item.entityColour.aci === 0) {
-        colour = block.getDrawColour();
-      }
-      // ACI 7: white on dark background, black on light background
-      if (this.#isAci7(item, block)) {
-        colour = (bg.r + bg.g + bg.b) / 3 < 128 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
-      }
+      renderer.setHighlight(false);
+      lineWidth += (overrides.lineWidthDelta ?? 0) / scale;
     }
 
-    lineWidth += (overrides.lineWidthDelta ?? 0) / scale;
-
-    try { // HTML Canvas
-      context.strokeStyle = Colours.rgbToString(colour);
-      context.fillStyle = Colours.rgbToString(colour);
-      context.lineWidth = lineWidth;
-      context.lineCap = 'round';
-      context.setLineDash(lineType.getPattern(scale));
-      context.lineDashOffset = 0;
-      context.beginPath();
-    } catch { // Cairo
-      const rgbColour = Colours.rgbToScaledRGB(colour);
-      context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-      context.setDash(lineType.getPattern(scale), 1);
-      context.setLineWidth(lineWidth);
-      context.setLineCap(1); // Cairo.LineCap.ROUND
-    }
+    renderer.setColour(colour);
+    renderer.setLineWidth(lineWidth);
+    renderer.setDash(lineType.getPattern(scale), 0);
   }
 
   /**
@@ -452,23 +514,18 @@ export class Canvas {
 
   /**
    * Paint the background grid
-   * @param {object} context
+   * @param {object} renderer
    */
-  paintGrid(context) {
+  paintGrid(renderer) {
     const scale = this.getScale();
 
     // TODO: Move grid linewidth to settings?
     let lineWidth = 0.75;
 
-    try { // HTML Canvas
-      context.strokeStyle = Colours.rgbToString(DesignCore.Settings.gridcolour);
-      context.lineWidth = lineWidth / scale;
-      context.beginPath();
-    } catch { // Cairo
-      context.setLineWidth(lineWidth / scale);
-      const rgbColour = Colours.rgbToScaledRGB(DesignCore.Settings.gridcolour);
-      context.setSourceRGB(rgbColour.r, rgbColour.g, rgbColour.b);
-    }
+    renderer.setColour(DesignCore.Settings.gridcolour);
+    renderer.setLineWidth(lineWidth / scale);
+    renderer.setDash([], 0);
+    renderer.setHighlight(false);
 
     const extents = this.getSceneOffset();
 
@@ -478,13 +535,11 @@ export class Canvas {
     const ygridmax = extents.ymax;
 
     // Draw major gridlines through origin
-    context.moveTo(xgridmin, 0);
-    context.lineTo(xgridmax, 0);
-    context.moveTo(0, 0);
-    context.lineTo(0, ygridmax);
-    context.moveTo(0, 0);
-    context.lineTo(0, ygridmin);
-    context.stroke();
+    renderer.drawSegments([
+      { x1: xgridmin, y1: 0, x2: xgridmax, y2: 0 },
+      { x1: 0, y1: 0, x2: 0, y2: ygridmax },
+      { x1: 0, y1: 0, x2: 0, y2: ygridmin },
+    ], []);
 
     // only draw the grid if within scale limits
     if (scale < this.minScaleFactor || scale > this.maxScaleFactor) {
@@ -494,50 +549,35 @@ export class Canvas {
     if (DesignCore.Settings['drawgrid']) {
       // set a feint linewidth for the grid
       lineWidth = lineWidth * 0.25;
+      renderer.setLineWidth(lineWidth / scale);
 
-      try { // HTML Canvas
-        context.lineWidth = lineWidth / scale;
-        context.beginPath();
-      } catch { // Cairo
-        context.setLineWidth(lineWidth / scale);
-      }
+      // Target ~60px between grid lines; snap to nearest 1/2/5 × 10^n interval
+      const targetPx = 60;
+      const rawInterval = targetPx / scale;
+      const mag = Math.pow(10, Math.floor(Math.log10(rawInterval)));
+      const norm = rawInterval / mag;
+      const gridInterval = mag * (norm < 2 ? 1 : norm < 5 ? 2 : 5);
 
-      // TODO: add setting for grid spacing
-      let gridInterval = 100;
-
-      // define the grid spacing based on zoom level
-      if (scale > 50) {
-        gridInterval = 1;
-      } else if (scale > 5) {
-        gridInterval = 10;
-      } else if (scale < 0.6) {
-        gridInterval = 1000;
-      } else {
-        gridInterval = 100;
-      }
+      const gridSegments = [];
 
       // Draw positive minor X gridlines
       for (let i = 0; i < xgridmax; i = i + gridInterval) {
-        context.moveTo(i, ygridmin);
-        context.lineTo(i, ygridmax);
+        gridSegments.push({ x1: i, y1: ygridmin, x2: i, y2: ygridmax });
       }
       // Draw negative minor X gridlines
       for (let i = 0; i > xgridmin; i = i - gridInterval) {
-        context.moveTo(i, ygridmin);
-        context.lineTo(i, ygridmax);
+        gridSegments.push({ x1: i, y1: ygridmin, x2: i, y2: ygridmax });
       }
       // Draw positive minor Y gridlines
       for (let i = 0; i < ygridmax; i = i + gridInterval) {
-        context.moveTo(xgridmin, i);
-        context.lineTo(xgridmax, i);
+        gridSegments.push({ x1: xgridmin, y1: i, x2: xgridmax, y2: i });
       }
       // Draw negative minor Y gridlines
       for (let i = 0; i > ygridmin; i = i - gridInterval) {
-        context.moveTo(xgridmin, i);
-        context.lineTo(xgridmax, i);
+        gridSegments.push({ x1: xgridmin, y1: i, x2: xgridmax, y2: i });
       }
 
-      context.stroke();
+      renderer.drawSegments(gridSegments, []);
     }
   }
 

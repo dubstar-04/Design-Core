@@ -1089,3 +1089,39 @@ test('Fillet.execute Trim→Trim keeps trimMode=true', async () => {
 
   expect(core.scene.headers.trimMode).toBe(true);
 });
+
+// ─── regression: bulge must not leak onto Line endpoints ─────────────────────
+
+test('Fillet.action two fillets on the same line: trimmed endpoints have bulge = 0', () => {
+  // Line A: (-10, 0) → (10, 0)  horizontal
+  // Line B: (-10, 2) → (-10, -2) vertical at left end
+  // Line C: ( 10, 2) → ( 10, -2) vertical at right end
+  // Fillet A–B at the left corner, then A–C at the right corner.
+  // arc.toPolylinePoints() sets bulge on the start point;
+  // that value must not bleed onto the Line endpoints.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
+  core.scene.addItem('Line', { points: [new Point(-10, 2), new Point(-10, -2)] });
+  core.scene.addItem('Line', { points: [new Point(10, 2), new Point(10, -2)] });
+
+  core.scene.headers.filletRadius = 1;
+  core.scene.headers.trimMode = true;
+
+  const fillet1 = new Fillet();
+  fillet1.firstPick.entity = core.scene.entities.get(0);
+  fillet1.secondPick.entity = core.scene.entities.get(1);
+  fillet1.firstPick.clickPoint = new Point(-5, 0);
+  fillet1.secondPick.clickPoint = new Point(-10, 1);
+  fillet1.action();
+
+  const fillet2 = new Fillet();
+  fillet2.firstPick.entity = core.scene.entities.get(0);
+  fillet2.secondPick.entity = core.scene.entities.get(2);
+  fillet2.firstPick.clickPoint = new Point(5, 0);
+  fillet2.secondPick.clickPoint = new Point(10, 1);
+  fillet2.action();
+
+  const line = core.scene.entities.get(0);
+  expect(line.points[0].bulge).toBe(0);
+  expect(line.points[1].bulge).toBe(0);
+});

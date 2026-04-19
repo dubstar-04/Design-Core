@@ -422,16 +422,26 @@ test('Arc.preview does not throw with 1, 2 or 3 points', () => {
   DesignCore.Mouse.pointOnScene = origMouse;
 });
 
-test('Arc.draw does not throw (ccw and cw)', () => {
-  const ctx = { arc: jest.fn(), stroke: jest.fn() };
+test('Arc.draw calls renderer.drawShape with toPolylinePoints', () => {
   const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: 1 });
-  expect(() => arc.draw(ctx, 1)).not.toThrow();
-  expect(ctx.arc).toHaveBeenCalledTimes(1);
-  expect(ctx.stroke).toHaveBeenCalledTimes(1);
+  let capturedPoints;
+  const mockRenderer = {
+    drawShape(points) {
+      capturedPoints = points;
+    },
+  };
+  arc.draw(mockRenderer);
+  expect(capturedPoints).toEqual(arc.toPolylinePoints());
+});
 
-  const ctx2 = { arc: jest.fn(), stroke: jest.fn() };
+test('Arc.draw (cw) calls renderer.drawShape with toPolylinePoints', () => {
   const arcCw = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: -1 });
-  expect(() => arcCw.draw(ctx2, 1)).not.toThrow();
+  let capturedPoints;
+  const mockRenderer = { drawShape(points) {
+    capturedPoints = points;
+  } };
+  arcCw.draw(mockRenderer);
+  expect(capturedPoints).toEqual(arcCw.toPolylinePoints());
 });
 
 test('Arc.snaps returns end and centre snap points', () => {

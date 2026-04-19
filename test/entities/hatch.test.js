@@ -509,43 +509,41 @@ test('Test Hatch.processSelection', () => {
 
 // Minimal mock canvas context that records moveTo calls and supports try/catch split
 /**
- * Create a minimal mock canvas context
- * @return {Object} mock context
+ * Create a minimal mock renderer
+ * @return {Object} mock renderer
  */
 function makeMockCtx() {
-  let moveCount = 0;
+  let traceCount = 0;
   let fillCalled = false;
   return {
-    save: () => {},
-    restore: () => {},
-    translate: () => {},
-    scale: () => {},
-    rotate: () => {},
+    setDash: () => {},
     beginPath: () => {},
     closePath: () => {},
-    clip: () => {},
-    rect: () => {},
-    setLineDash: () => {},
-    lineWidth: 0,
-    moveTo: () => {
-      moveCount++;
-    },
-    lineTo: () => {},
     stroke: () => {},
     fill: () => {
       fillCalled = true;
     },
-    getMoveCalls: () => moveCount,
+    applyPath: (options) => {
+      if (options?.fill) fillCalled = true;
+    },
+    tracePath: () => {
+      traceCount++;
+    },
+    drawShape: () => {},
+    drawSegments: (segments) => {
+      traceCount += segments.length;
+    },
+    getMoveCalls: () => traceCount,
     getFillCalled: () => fillCalled,
   };
 }
 
-test('Test Hatch.draw solid fill calls ctx.fill', () => {
+test('Test Hatch.draw solid fill renders filled boundary', () => {
   const solidHatch = new Hatch({ patternName: 'SOLID' });
   solidHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })];
 
   const ctx = makeMockCtx();
-  solidHatch.draw(ctx, 1);
+  solidHatch.draw(ctx);
 
   expect(ctx.getFillCalled()).toBe(true);
 });
@@ -557,7 +555,7 @@ test('Test Hatch.draw unknown pattern does not stroke pattern lines', () => {
   unknownHatch.pattern = 'NOTAPATTERN';
 
   const ctx = makeMockCtx();
-  unknownHatch.draw(ctx, 1);
+  unknownHatch.draw(ctx);
 
   // No pattern lines drawn
   expect(ctx.getFillCalled()).toBe(false);
@@ -572,7 +570,7 @@ test('Test Hatch.draw tight bound line count - square boundary', () => {
   const squareHatch = new Hatch({ patternName: 'ANSI31' });
   squareHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
   const ctx = makeMockCtx();
-  squareHatch.draw(ctx, 1);
+  squareHatch.draw(ctx);
   expect(ctx.getMoveCalls()).toBe(45);
 });
 
@@ -585,7 +583,7 @@ test('Test Hatch.draw tight bound line count - flat boundary', () => {
   const flatHatch = new Hatch({ patternName: 'ANSI31' });
   flatHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })];
   const ctx = makeMockCtx();
-  flatHatch.draw(ctx, 1);
+  flatHatch.draw(ctx);
   expect(ctx.getMoveCalls()).toBe(25);
 });
 
@@ -598,10 +596,10 @@ test('Test Hatch.draw tight bound produces fewer lines for flat boundary', () =>
   flatHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })];
 
   const squareCtx = makeMockCtx();
-  squareHatch.draw(squareCtx, 1);
+  squareHatch.draw(squareCtx);
 
   const flatCtx = makeMockCtx();
-  flatHatch.draw(flatCtx, 1);
+  flatHatch.draw(flatCtx);
 
   expect(flatCtx.getMoveCalls()).toBeLessThan(squareCtx.getMoveCalls());
 });
@@ -1006,40 +1004,38 @@ test('Hatch.draw scale guard resets sub-zero scale to 1 and rebuilds cache', () 
   h.scale = 0.001; // below guard threshold
 
   const ctx = makeMockCtx();
-  h.draw(ctx, 1);
+  h.draw(ctx);
 
   expect(h.scale).toBe(1);
   expect(h.cachedPattern).not.toBeNull();
 });
 
 /**
- * Create a mock ctx that tracks stroke call count and lineDashOffset assignments
- * @return {Object} tracking mock context
+ * Create a mock renderer that tracks stroke call count and setDash offset arguments
+ * @return {Object} tracking mock renderer
  */
 function makeTrackingCtx() {
   let strokeCount = 0;
   const lineDashOffsets = [];
-  let _ldo = 0;
   return {
-    save: () => {},
-    restore: () => {},
+    setDash: () => {},
     beginPath: () => {},
     closePath: () => {},
-    clip: () => {},
-    rect: () => {},
-    setLineDash: () => {},
-    moveTo: () => {},
-    lineTo: () => {},
+    tracePath: () => {},
     stroke: () => {
       strokeCount++;
     },
     fill: () => {},
-    get lineDashOffset() {
-      return _ldo;
-    },
-    set lineDashOffset(v) {
-      _ldo = v;
-      lineDashOffsets.push(v);
+    drawShape: () => {},
+    drawSegments: (segments, dashes) => {
+      if (!dashes.length) {
+        strokeCount++;
+      } else {
+        for (const seg of segments) {
+          lineDashOffsets.push(seg.dashPhase ?? 0);
+          strokeCount++;
+        }
+      }
     },
     getStrokeCalls: () => strokeCount,
     getLineDashOffsets: () => lineDashOffsets,
@@ -1051,9 +1047,9 @@ test('Hatch.draw ANSI31 solid-line family batches all segments into one stroke c
   h.childEntities = makeSquare();
 
   const ctx = makeTrackingCtx();
-  h.draw(ctx, 1);
+  h.draw(ctx);
 
-  // ANSI31 has no dashes → solid-line branch → one beginPath + all moveTo/lineTo + one stroke()
+  // ANSI31 has no dashes → solid-line branch → one beginPath + all tracePath + one stroke()
   expect(ctx.getStrokeCalls()).toBe(1);
   expect(ctx.getLineDashOffsets().length).toBe(0);
 });
@@ -1065,9 +1061,9 @@ test('Hatch.draw HONEY dashed family sets lineDashOffset and strokes once per se
   const expectedSegs = totalSegments(h);
 
   const ctx = makeTrackingCtx();
-  h.draw(ctx, 1);
+  h.draw(ctx);
 
-  // Every dashed segment gets its own lineDashOffset and stroke call
+  // Every dashed segment gets its own setDash offset and stroke call
   expect(ctx.getLineDashOffsets().length).toBe(expectedSegs);
   expect(ctx.getStrokeCalls()).toBe(expectedSegs);
 });

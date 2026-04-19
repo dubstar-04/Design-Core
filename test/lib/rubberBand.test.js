@@ -8,43 +8,16 @@ new Core();
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Build a mock HTML Canvas context (setLineDash succeeds)
- * @return {object} mock context
+ * Build a mock renderer that records calls to setColour, setLineWidth, setDash, drawShape.
+ * @return {object} mock renderer
  */
-function makeCanvasCtx() {
+function makeRenderer() {
   return {
-    strokeStyle: '',
-    lineWidth: 0,
-    setLineDash: jest.fn(),
-    beginPath: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
-  };
-}
-
-/**
- * Build a mock Cairo context where assigning strokeStyle throws,
- * exercising the Cairo fallback branch in RubberBand.draw().
- * @return {object} mock context
- */
-function makeCairoCtx() {
-  const ctx = {
-    setSourceRGB: jest.fn(),
+    setColour: jest.fn(),
     setLineWidth: jest.fn(),
     setDash: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
+    drawShape: jest.fn(),
   };
-  // Assigning strokeStyle throws, triggering the Cairo catch-branch
-  Object.defineProperty(ctx, 'strokeStyle', {
-    set() {
-      throw new Error('Cairo context has no strokeStyle');
-    },
-    configurable: true,
-  });
-  return ctx;
 }
 
 // ─── constructor ─────────────────────────────────────────────────────────────
@@ -62,80 +35,50 @@ test('RubberBand constructor stores points and defaults', () => {
 
 test('RubberBand.draw does nothing when points.length < 2', () => {
   const rb = new RubberBand([new Point(0, 0)]);
-  const ctx = makeCanvasCtx();
-  expect(() => rb.draw(ctx, 1)).not.toThrow();
-  expect(ctx.stroke).not.toHaveBeenCalled();
+  const renderer = makeRenderer();
+  expect(() => rb.draw(renderer, 1)).not.toThrow();
+  expect(renderer.drawShape).not.toHaveBeenCalled();
 });
 
 test('RubberBand.draw does nothing when points is empty', () => {
   const rb = new RubberBand([]);
-  const ctx = makeCanvasCtx();
-  expect(() => rb.draw(ctx, 1)).not.toThrow();
-  expect(ctx.stroke).not.toHaveBeenCalled();
+  const renderer = makeRenderer();
+  expect(() => rb.draw(renderer, 1)).not.toThrow();
+  expect(renderer.drawShape).not.toHaveBeenCalled();
 });
 
-// ─── draw – HTML Canvas path ──────────────────────────────────────────────────
+// ─── draw ─────────────────────────────────────────────────────────────────────
 
-test('RubberBand.draw with 2 points uses HTML Canvas path', () => {
-  const rb = new RubberBand([new Point(0, 0), new Point(10, 5)]);
-  const ctx = makeCanvasCtx();
+test('RubberBand.draw with 2 points calls drawShape with the points array', () => {
+  const pts = [new Point(0, 0), new Point(10, 5)];
+  const rb = new RubberBand(pts);
+  const renderer = makeRenderer();
 
-  rb.draw(ctx, 1);
+  rb.draw(renderer, 1);
 
-  expect(ctx.beginPath).toHaveBeenCalledTimes(1);
-  expect(ctx.setLineDash).toHaveBeenCalledTimes(1);
-  expect(ctx.moveTo).toHaveBeenCalledWith(0, 0);
-  expect(ctx.lineTo).toHaveBeenCalledWith(10, 5);
-  expect(ctx.stroke).toHaveBeenCalledTimes(1);
+  expect(renderer.setColour).toHaveBeenCalledTimes(1);
+  expect(renderer.setDash).toHaveBeenCalledTimes(1);
+  expect(renderer.drawShape).toHaveBeenCalledWith(pts);
+  expect(renderer.drawShape).toHaveBeenCalledTimes(1);
 });
 
 test('RubberBand.draw scales lineWidth and dashPattern by 1/scale', () => {
   const scale = 2;
   const rb = new RubberBand([new Point(0, 0), new Point(10, 0)]);
-  const ctx = makeCanvasCtx();
+  const renderer = makeRenderer();
 
-  rb.draw(ctx, scale);
+  rb.draw(renderer, scale);
 
-  expect(ctx.lineWidth).toBe(rb.lineWidth / scale);
-  expect(ctx.setLineDash).toHaveBeenCalledWith([12 / scale, 6 / scale]);
+  expect(renderer.setLineWidth).toHaveBeenCalledWith(rb.lineWidth / scale);
+  expect(renderer.setDash).toHaveBeenCalledWith([12 / scale, 6 / scale], 0);
 });
 
-test('RubberBand.draw with 3 points calls lineTo twice', () => {
+test('RubberBand.draw with 3 points passes all 3 points to drawShape', () => {
   const pts = [new Point(0, 0), new Point(5, 5), new Point(10, 0)];
   const rb = new RubberBand(pts);
-  const ctx = makeCanvasCtx();
+  const renderer = makeRenderer();
 
-  rb.draw(ctx, 1);
+  rb.draw(renderer, 1);
 
-  expect(ctx.moveTo).toHaveBeenCalledWith(0, 0);
-  expect(ctx.lineTo).toHaveBeenNthCalledWith(1, 5, 5);
-  expect(ctx.lineTo).toHaveBeenNthCalledWith(2, 10, 0);
-  expect(ctx.stroke).toHaveBeenCalledTimes(1);
-});
-
-// ─── draw – Cairo path ────────────────────────────────────────────────────────
-
-test('RubberBand.draw falls back to Cairo path when strokeStyle throws', () => {
-  const rb = new RubberBand([new Point(0, 0), new Point(10, 5)]);
-  const ctx = makeCairoCtx();
-
-  expect(() => rb.draw(ctx, 1)).not.toThrow();
-
-  expect(ctx.setSourceRGB).toHaveBeenCalledTimes(1);
-  expect(ctx.setLineWidth).toHaveBeenCalledTimes(1);
-  expect(ctx.setDash).toHaveBeenCalledTimes(1);
-  expect(ctx.moveTo).toHaveBeenCalledWith(0, 0);
-  expect(ctx.lineTo).toHaveBeenCalledWith(10, 5);
-  expect(ctx.stroke).toHaveBeenCalledTimes(1);
-});
-
-test('RubberBand.draw Cairo path scales lineWidth and dashPattern by 1/scale', () => {
-  const scale = 4;
-  const rb = new RubberBand([new Point(0, 0), new Point(10, 0)]);
-  const ctx = makeCairoCtx();
-
-  rb.draw(ctx, scale);
-
-  expect(ctx.setLineWidth).toHaveBeenCalledWith(rb.lineWidth / scale);
-  expect(ctx.setDash).toHaveBeenCalledWith([12 / scale, 6 / scale], 0);
+  expect(renderer.drawShape).toHaveBeenCalledWith(pts);
 });

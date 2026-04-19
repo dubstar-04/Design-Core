@@ -26,6 +26,7 @@ import { DesignCore } from '../designCore.js';
 
 // re-export core components for external use
 export { Patterns } from '../lib/patterns.js';
+export { CanvasRenderer } from '../lib/renderers/canvasRenderer.js';
 
 /** Class representing design core. This is the primary entry point */
 export class Core {
