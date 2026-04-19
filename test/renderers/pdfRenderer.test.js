@@ -63,6 +63,22 @@ describe('PdfRenderer — drawing', () => {
     expect(output).toContain('\nf\n');
   });
 
+  test('drawShape with fillRule evenodd emits f* operator', () => {
+    const renderer = new PdfRenderer(100, 100);
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], { fill: true, stroke: false, fillRule: 'evenodd' });
+    const output = renderer.getOutput();
+    expect(output).toContain('\nf*\n');
+    expect(output).not.toContain('\nf\n');
+  });
+
+  test('drawShape with fill+stroke and fillRule evenodd emits B* operator', () => {
+    const renderer = new PdfRenderer(100, 100);
+    renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], { fill: true, stroke: true, fillRule: 'evenodd' });
+    const output = renderer.getOutput();
+    expect(output).toContain('\nB*\n');
+    expect(output).not.toContain('\nB\n');
+  });
+
   test('straight segment (no bulge) emits l operator', () => {
     const renderer = new PdfRenderer(100, 100);
     renderer.drawShape([{ x: 0, y: 0 }, { x: 10, y: 0 }], {});
