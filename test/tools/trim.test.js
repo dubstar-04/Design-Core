@@ -815,11 +815,11 @@ test('Trim.action trims a circle near the seam (right side, mouse at angle 0)', 
   }
   expect(arc).toBeDefined();
   // Remaining arc is the left half: from (0,10) CCW through (-10,0) to (0,-10)
-  expect(arc.points[0].x).toBeCloseTo(0);   // center
+  expect(arc.points[0].x).toBeCloseTo(0); // center
   expect(arc.points[0].y).toBeCloseTo(0);
-  expect(arc.points[1].x).toBeCloseTo(0);   // start at (0,10)
+  expect(arc.points[1].x).toBeCloseTo(0); // start at (0,10)
   expect(arc.points[1].y).toBeCloseTo(10);
-  expect(arc.points[2].x).toBeCloseTo(0);   // end at (0,-10)
+  expect(arc.points[2].x).toBeCloseTo(0); // end at (0,-10)
   expect(arc.points[2].y).toBeCloseTo(-10);
 });
 
