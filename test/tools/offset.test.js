@@ -4,6 +4,7 @@ import { Offset } from '../../core/tools/offset.js';
 import { Line } from '../../core/entities/line.js';
 import { Arc } from '../../core/entities/arc.js';
 import { Circle } from '../../core/entities/circle.js';
+import { DesignCore } from '../../core/designCore.js';
 import { expect, jest } from '@jest/globals';
 
 const core = new Core();
@@ -743,6 +744,170 @@ test('Offset.execute - Through mode offsets entity to the through point distance
   const newLine = core.scene.entities.get(1);
   expect(newLine.points[0].y).toBeCloseTo(7);
   expect(newLine.points[1].y).toBeCloseTo(7);
+
+  core.scene.inputManager = origInputManager;
+});
+
+// ─── register ─────────────────────────────────────────────────────────────────
+
+test('Offset.register returns correct metadata', () => {
+  const reg = Offset.register();
+  expect(reg.command).toBe('Offset');
+  expect(reg.shortcut).toBe('O');
+});
+
+// ─── preview ──────────────────────────────────────────────────────────────────
+
+test('Offset.preview does not add preview entity when selectedItem is null', () => {
+  core.scene.clear();
+  DesignCore.Scene.previewEntities.clear();
+  core.scene.headers.offsetDistance = 5;
+
+  const offset = new Offset();
+  offset.selectedItem = null;
+  expect(() => offset.preview()).not.toThrow();
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Offset.preview does not add preview entity when offsetDistance is 0', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  DesignCore.Scene.previewEntities.clear();
+  core.scene.headers.offsetDistance = 0;
+
+  const savedPointOnScene = DesignCore.Mouse.pointOnScene;
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
+
+  const offset = new Offset();
+  offset.selectedItem = core.scene.entities.get(0);
+  offset.preview();
+
+  DesignCore.Mouse.pointOnScene = savedPointOnScene;
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+});
+
+test('Offset.preview adds entity to previewEntities for a valid line', () => {
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  DesignCore.Scene.previewEntities.clear();
+  core.scene.headers.offsetDistance = 5;
+
+  const savedPointOnScene = DesignCore.Mouse.pointOnScene;
+  DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
+
+  const offset = new Offset();
+  offset.selectedItem = core.scene.entities.get(0);
+  offset.preview();
+
+  DesignCore.Mouse.pointOnScene = savedPointOnScene;
+  expect(DesignCore.Scene.previewEntities.count()).toBe(1);
+  expect(DesignCore.Scene.previewEntities.get(0).points[0].y).toBeCloseTo(5);
+});
+
+// ─── Lwpolyline action ─────────────────────────────────────────────────────────
+
+test('Test Offset.action - offset open Lwpolyline', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  // L-shape: (0,0) → (10,0) → (10,10)
+  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
+
+  const offset = new Offset();
+  offset.selectedItem = core.scene.entities.get(0);
+  core.scene.headers.offsetDistance = 1;
+  offset.points = [new Point(5, 2)]; // above the bottom segment → offset upward/left
+
+  offset.action();
+
+  expect(core.scene.entities.count()).toBe(2);
+  const newPoly = core.scene.entities.get(1);
+  expect(newPoly.points[0].x).toBeCloseTo(0);
+  expect(newPoly.points[0].y).toBeCloseTo(1);
+  expect(newPoly.points[2].x).toBeCloseTo(9);
+  expect(newPoly.points[2].y).toBeCloseTo(10);
+});
+
+test('Test Offset.action - offset closed Lwpolyline outward', () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  // Closed square: 5 points where first === last → constructor sets flag=1
+  core.scene.addItem('Lwpolyline', {
+    points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10), new Point(0, 0)],
+  });
+
+  const polyline = core.scene.entities.get(0);
+  expect(polyline.flags.hasFlag(1)).toBe(true); // confirm closed
+
+  const offset = new Offset();
+  offset.selectedItem = polyline;
+  core.scene.headers.offsetDistance = 1;
+  offset.points = [new Point(-5, 5)]; // outside the left edge
+
+  offset.action();
+
+  expect(core.scene.entities.count()).toBe(2);
+  const newPoly = core.scene.entities.get(1);
+  expect(newPoly.flags.hasFlag(1)).toBe(true); // closed flag preserved
+  const xs = newPoly.points.map((p) => p.x);
+  const ys = newPoly.points.map((p) => p.y);
+  expect(Math.min(...xs)).toBeCloseTo(-1);
+  expect(Math.max(...xs)).toBeCloseTo(11);
+  expect(Math.min(...ys)).toBeCloseTo(-1);
+  expect(Math.max(...ys)).toBeCloseTo(11);
+});
+
+// ─── closed inward offset ──────────────────────────────────────────────────────
+
+test('Test Offset.getOffsetPolylinePoints - closed rectangle offset inward', () => {
+  const offset = new Offset();
+  const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
+
+  // sidePoint inside the rectangle
+  const result = offset.getOffsetPolylinePoints(points, true, new Point(5, 5), 1);
+
+  expect(result).not.toBeNull();
+  expect(result.length).toBe(4);
+  const xs = result.map((p) => p.x);
+  const ys = result.map((p) => p.y);
+  expect(Math.min(...xs)).toBeCloseTo(1);
+  expect(Math.max(...xs)).toBeCloseTo(9);
+  expect(Math.min(...ys)).toBeCloseTo(1);
+  expect(Math.max(...ys)).toBeCloseTo(9);
+});
+
+// ─── Through mode with circle ──────────────────────────────────────────────────
+
+test('Offset.execute - Through mode offsets circle to the through point', async () => {
+  core.scene.clear();
+  core.scene.selectionManager.reset();
+
+  // Circle: center (0,0), radius 10
+  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+
+  const origInputManager = core.scene.inputManager;
+  let callCount = 0;
+  // Through → select circle → through point at (15,0) → undefined exits loop
+  const inputs = ['Through', { selectedItemIndex: 0 }, new Point(15, 0)];
+
+  const offset = new Offset();
+  core.scene.inputManager = {
+    requestInput: async () => {
+      if (callCount < inputs.length) return inputs[callCount++];
+    },
+    actionCommand: () => { offset.action(); },
+    executeCommand: () => {},
+    reset: () => {},
+  };
+
+  await offset.execute();
+
+  // getThroughDistance(circle at radius 10, throughPoint at r=15) = |15 - 10| = 5
+  expect(core.scene.headers.offsetDistance).toBeCloseTo(5);
+  expect(core.scene.entities.count()).toBe(2);
+  const newCircle = core.scene.entities.get(1);
+  expect(newCircle.radius).toBeCloseTo(15); // original 10 + outward 5
 
   core.scene.inputManager = origInputManager;
 });
