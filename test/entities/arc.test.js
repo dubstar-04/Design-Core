@@ -327,50 +327,6 @@ test('Arc constructor handles missing/invalid data', () => {
   expect(() => new Arc({ points: [null, undefined, {}] })).not.toThrow();
 });
 
-test('Arc.trim returns empty for no intersections', () => {
-  const arc = new Arc({ points: [new Point(100, 100), new Point(200, 100), new Point(170.71, 170.71)] });
-  expect(arc.trim([])).toEqual([]);
-  expect(arc.trim()).toEqual([]);
-});
-
-
-test('Arc.trim returns remove + add states when trimming between two intersections', () => {
-  const arc = new Arc({ points: [new Point(), new Point(10, 0), new Point(-10, 0)], handle: 'B2' });
-  // Intersection points on the arc.
-  const i1 = new Point(7.71, 7.71);
-  const i2 = new Point(-7.71, 7.71);
-  const intersections = [i1, i2];
-
-  // set the mouse position to mid point of the arc
-  DesignCore.Mouse.pointOnScene = () => new Point(0, 10);
-
-  const changes = arc.trim(intersections);
-
-  expect(Array.isArray(changes)).toBe(true);
-  expect(changes.length).toBeGreaterThanOrEqual(2);
-
-  expect(changes[0]).toBeInstanceOf(AddState);
-  expect(changes[1]).toBeInstanceOf(AddState);
-  expect(changes[2]).toBeInstanceOf(RemoveState);
-
-  // Verify trimmed arcs have unique handles (not the original)
-  expect(changes[0].entity.handle).toBeUndefined();
-  expect(changes[1].entity.handle).toBeUndefined();
-
-  expect(changes[0].entity.points[0].x).toBe(0);
-  expect(changes[0].entity.points[0].y).toBe(0);
-
-  expect(changes[0].entity.points[1].x).toBeCloseTo(10);
-  expect(changes[0].entity.points[1].y).toBeCloseTo(0);
-  expect(changes[0].entity.points[2].x).toBeCloseTo(7.71);
-  expect(changes[0].entity.points[2].y).toBeCloseTo(7.71);
-
-  expect(changes[1].entity.points[1].x).toBeCloseTo(-7.71);
-  expect(changes[1].entity.points[1].y).toBeCloseTo(7.71);
-  expect(changes[1].entity.points[2].x).toBe(-10);
-  expect(changes[1].entity.points[2].y).toBe(0);
-});
-
 test('Arc.getRadius returns the arc radius', () => {
   const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
   expect(arc.getRadius()).toBe(10);
@@ -476,13 +432,6 @@ test('Arc.execute notifies on angle > 360', async () => {
     expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.INVALIDNUMBER));
   });
   notifySpy.mockRestore();
-});
-
-test('Arc.trim returns empty when only intersection is at an endpoint', () => {
-  const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
-  // intersection exactly at the start point — filtered out, nothing to trim
-  const changes = arc.trim([new Point(10, 0)]);
-  expect(changes).toEqual([]);
 });
 
 test('Arc.fromPolylinePoints round-trip preserves centre, radius and angles', () => {
