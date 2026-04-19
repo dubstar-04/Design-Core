@@ -147,7 +147,6 @@ test('Test Line.draw calls renderer.drawShape with toPolylinePoints', () => {
 });
 
 
-
 test('Line.execute handles Close option', async () => {
   const pt1 = new Point(0, 0);
   const pt2 = new Point(10, 0);
