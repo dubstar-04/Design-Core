@@ -320,7 +320,7 @@ export class Canvas {
 
     this.#paintEntities(
         DesignCore.Scene.entities, renderer, null,
-        (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isVisible,
+        (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isPlottable,
     );
 
     return true;
