@@ -162,9 +162,7 @@ export class Trim extends Tool {
     const mousePosition = DesignCore.Mouse.pointOnScene();
 
     // Drop any intersection point that coincides with an existing vertex
-    const filtered = intersectPoints.filter(
-        (p) => !polyPoints.some((v) => v.isSame(p)),
-    );
+    const filtered = intersectPoints.filter((p) => !polyPoints.some((v) => v.isSame(p)));
     if (!filtered.length) return [];
 
     // Locate each intersection point within the polyline segments
@@ -204,9 +202,9 @@ export class Trim extends Tool {
     }
 
     const mouseClosest = PolylineUtils.closestPointOnSegment(polyPoints, mousePosition, mouseSegmentIndex);
-    const mousePos = mouseClosest
-      ? PolylineUtils.positionOnSegment(polyPoints, mouseClosest, mouseSegmentIndex)
-      : 0;
+    const mousePos = mouseClosest ?
+      PolylineUtils.positionOnSegment(polyPoints, mouseClosest, mouseSegmentIndex) :
+      0;
 
     // Find the nearest intersections before and after the mouse position
     let trimBefore = null;
@@ -245,6 +243,7 @@ export class Trim extends Tool {
       if (points.length >= 2) {
         const output = Utils.cloneObject(entity);
         output.fromPolylinePoints(points);
+        output.flags?.removeValue(1);
         stateChanges.push(new AddState(output));
       }
     }
@@ -266,6 +265,7 @@ export class Trim extends Tool {
       if (points.length >= 2) {
         const output = Utils.cloneObject(entity);
         output.fromPolylinePoints(points);
+        output.flags?.removeValue(1);
         stateChanges.push(new AddState(output));
       }
     }
