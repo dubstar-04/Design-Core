@@ -167,6 +167,14 @@ export class Layer {
   }
 
   /**
+   * Determine if layer is plottable (visible and plotting flag set)
+   * @return {boolean}
+   */
+  get isPlottable() {
+    return this.isVisible && this.plotting;
+  }
+
+  /**
    * Determine if layer is selectable
    * @return {boolean}
    */
