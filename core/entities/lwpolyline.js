@@ -17,8 +17,10 @@ export class Lwpolyline {
   constructor(data) {
     if (data?.hasOwnProperty('90')) {
       // DXF Groupcode 90 - Number of vertices
-      if (data.points.length !== data[90]) {
-        Logging.instance.error(`LWPOLYLINE Vertices Count`);
+      if (!Array.isArray(data.points)) {
+        Logging.instance.error(`LWPOLYLINE: group code 90 specifies ${data[90]} vertices but points array is missing or invalid`);
+      } else if (data.points.length !== data[90]) {
+        Logging.instance.error(`LWPOLYLINE: group code 90 specifies ${data[90]} vertices but ${data.points.length} were parsed`);
       }
     }
 
