@@ -152,6 +152,7 @@ export class Trim extends Tool {
   #trimEntity(entity, intersectPoints) {
     const polyPoints = entity.toPolylinePoints();
     const mousePosition = DesignCore.Mouse.pointOnScene();
+    const isClosed = polyPoints[0].isSame(polyPoints.at(-1));
 
     // Drop any intersection point that coincides with an existing vertex
     const filtered = intersectPoints.filter((p) => !polyPoints.some((v) => v.isSame(p)));
@@ -215,7 +216,40 @@ export class Trim extends Tool {
       }
     }
 
-    // Build Portion 1 points: start of entity to trimBefore
+    const stateChanges = [];
+
+    if (isClosed) {
+      // Wrap cyclically: if trimBefore is null use the last intersection,
+      // if trimAfter is null use the first.
+      if (!trimBefore) trimBefore = locatedIntersections.at(-1);
+      if (!trimAfter) trimAfter = locatedIntersections[0];
+
+      // A single intersection point cannot divide a closed shape.
+      if (trimBefore === trimAfter) return [];
+
+      // Build the single kept open portion from trimAfter to trimBefore,
+      // going away from the mouse (i.e. not through the mouse segment).
+      let outputPoints;
+      if (trimAfter.segmentIndex < trimBefore.segmentIndex ||
+          (trimAfter.segmentIndex === trimBefore.segmentIndex &&
+           trimAfter.positionAlongSegment < trimBefore.positionAlongSegment)) {
+        // Forward walk: trimAfter → trimBefore without crossing the seam
+        outputPoints = this.#buildPortion(polyPoints, trimAfter, trimBefore);
+      } else {
+        // Wrapping walk: trimAfter → end → seam → start → trimBefore
+        outputPoints = this.#buildWrappingPortion(polyPoints, trimAfter, trimBefore);
+      }
+
+      if (outputPoints && outputPoints.length >= 2) {
+        const output = Utils.cloneObject(entity).fromPolylinePoints(outputPoints);
+        output.flags?.removeValue(1);
+        stateChanges.push(new AddState(output));
+        stateChanges.push(new RemoveState(entity));
+      }
+      return stateChanges;
+    }
+
+    // Open entity: build portion1 (start → trimBefore) and portion2 (trimAfter → end)
     let portion1Points = null;
     if (trimBefore) {
       const points = [];
@@ -233,7 +267,6 @@ export class Trim extends Tool {
       if (points.length >= 2) portion1Points = points;
     }
 
-    // Build Portion 2 points: trimAfter to end of entity
     let portion2Points = null;
     if (trimAfter) {
       const points = [];
@@ -250,29 +283,15 @@ export class Trim extends Tool {
       if (points.length >= 2) portion2Points = points;
     }
 
-    const stateChanges = [];
-    const isClosed = polyPoints[0].isSame(polyPoints.at(-1));
-
-    if (isClosed && portion1Points && portion2Points) {
-      // Closed entity trimmed at two points: the two open-ended portions are
-      // actually one continuous arc/path running from trimAfter → seam → trimBefore.
-      // Drop the bulge-less closure point at the end of portion2 and prepend
-      // portion2 before portion1 so the bulge on portion1[0] is preserved.
-      const joinedPoints = [...portion2Points.slice(0, -1), ...portion1Points];
-      const output = Utils.cloneObject(entity).fromPolylinePoints(joinedPoints);
+    if (portion1Points) {
+      const output = Utils.cloneObject(entity).fromPolylinePoints(portion1Points);
       output.flags?.removeValue(1);
       stateChanges.push(new AddState(output));
-    } else {
-      if (portion1Points) {
-        const output = Utils.cloneObject(entity).fromPolylinePoints(portion1Points);
-        output.flags?.removeValue(1);
-        stateChanges.push(new AddState(output));
-      }
-      if (portion2Points) {
-        const output = Utils.cloneObject(entity).fromPolylinePoints(portion2Points);
-        output.flags?.removeValue(1);
-        stateChanges.push(new AddState(output));
-      }
+    }
+    if (portion2Points) {
+      const output = Utils.cloneObject(entity).fromPolylinePoints(portion2Points);
+      output.flags?.removeValue(1);
+      stateChanges.push(new AddState(output));
     }
 
     if (trimBefore || trimAfter) {
@@ -280,6 +299,109 @@ export class Trim extends Tool {
     }
 
     return stateChanges;
+  }
+
+  /**
+   * Build a sub-polyline from fromLoc to toLoc going forward (no seam crossing).
+   * Both locations must appear in forward order along the polyline.
+   * @param {Array}  polyPoints
+   * @param {Object} fromLoc - { segmentIndex, point, positionAlongSegment }
+   * @param {Object} toLoc   - { segmentIndex, point, positionAlongSegment }
+   * @return {Array|null}
+   */
+  #buildPortion(polyPoints, fromLoc, toLoc) {
+    const fromSegStart = polyPoints[fromLoc.segmentIndex - 1];
+    const fromSegEnd = polyPoints[fromLoc.segmentIndex];
+
+    // Same-segment case: compute the sub-arc bulge directly from the arc geometry
+    if (fromLoc.segmentIndex === toLoc.segmentIndex) {
+      const startPoint = fromLoc.point.clone();
+      if (fromSegStart.bulge !== 0 && fromSegStart.bulge !== undefined) {
+        const center = fromSegStart.bulgeCentrePoint(fromSegEnd);
+        const direction = fromSegStart.bulge > 0 ? 1 : -1;
+        const startAngle = center.angle(fromLoc.point);
+        const endAngle = center.angle(toLoc.point);
+        const includedAngle = ((endAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
+        startPoint.bulge = Math.tan(includedAngle / 4) * direction;
+      }
+      return [startPoint, toLoc.point.clone()];
+    }
+
+    const points = [];
+
+    // Start point: fromLoc.point with partial bulge covering the rest of its segment
+    const startPoint = fromLoc.point.clone();
+    if (fromSegStart.bulge !== 0 && fromSegStart.bulge !== undefined) {
+      startPoint.bulge = fromSegStart.partialBulge(fromSegEnd, fromLoc.point, true);
+    }
+    points.push(startPoint);
+
+    // Intermediate vertices between the two segments
+    for (let i = fromLoc.segmentIndex; i <= toLoc.segmentIndex - 2; i++) {
+      points.push(polyPoints[i].clone());
+    }
+
+    // Start of toLoc's segment with partial bulge trimmed to toLoc.point
+    const toSegStart = polyPoints[toLoc.segmentIndex - 1];
+    const toSegEnd = polyPoints[toLoc.segmentIndex];
+    const lastSegStart = toSegStart.clone();
+    if (toSegStart.bulge !== 0 && toSegStart.bulge !== undefined) {
+      lastSegStart.bulge = toSegStart.partialBulge(toSegEnd, toLoc.point);
+    }
+    if (!points.at(-1).isSame(lastSegStart)) points.push(lastSegStart);
+
+    const endPoint = toLoc.point.clone();
+    if (!points.at(-1).isSame(endPoint)) points.push(endPoint);
+
+    return points.length >= 2 ? points : null;
+  }
+
+  /**
+   * Build a sub-polyline from fromLoc to toLoc crossing the seam (wrapping).
+   * Used for closed entities when the kept portion wraps through the closure point.
+   * @param {Array}  polyPoints
+   * @param {Object} fromLoc - { segmentIndex, point, positionAlongSegment }
+   * @param {Object} toLoc   - { segmentIndex, point, positionAlongSegment }
+   * @return {Array|null}
+   */
+  #buildWrappingPortion(polyPoints, fromLoc, toLoc) {
+    const points = [];
+    const fromSegStart = polyPoints[fromLoc.segmentIndex - 1];
+    const fromSegEnd = polyPoints[fromLoc.segmentIndex];
+
+    // Start point: fromLoc.point with partial bulge for the rest of its segment
+    const startPoint = fromLoc.point.clone();
+    if (fromSegStart.bulge !== 0 && fromSegStart.bulge !== undefined) {
+      startPoint.bulge = fromSegStart.partialBulge(fromSegEnd, fromLoc.point, true);
+    }
+    points.push(startPoint);
+
+    // Walk forward from end of fromLoc's segment to the last non-closure vertex
+    for (let i = fromLoc.segmentIndex; i < polyPoints.length - 1; i++) {
+      const v = polyPoints[i].clone();
+      if (!points.at(-1).isSame(v)) points.push(v);
+    }
+
+    // Cross the seam: add vertices from the start of the polyline up to (but not
+    // including) the segment that contains toLoc
+    for (let i = 0; i <= toLoc.segmentIndex - 2; i++) {
+      const v = polyPoints[i].clone();
+      if (!points.at(-1).isSame(v)) points.push(v);
+    }
+
+    // Start of toLoc's segment with partial bulge trimmed to toLoc.point
+    const toSegStart = polyPoints[toLoc.segmentIndex - 1];
+    const toSegEnd = polyPoints[toLoc.segmentIndex];
+    const lastSegStart = toSegStart.clone();
+    if (toSegStart.bulge !== 0 && toSegStart.bulge !== undefined) {
+      lastSegStart.bulge = toSegStart.partialBulge(toSegEnd, toLoc.point);
+    }
+    if (!points.at(-1).isSame(lastSegStart)) points.push(lastSegStart);
+
+    const endPoint = toLoc.point.clone();
+    if (!points.at(-1).isSame(endPoint)) points.push(endPoint);
+
+    return points.length >= 2 ? points : null;
   }
 }
 
