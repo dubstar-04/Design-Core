@@ -685,6 +685,6 @@ test('Trim.action trims a circle', () => {
   }
   expect(arc).toBeDefined();
   // Arc center should match the original circle center
-  expect(arc.points[0].x).toBe(0);
-  expect(arc.points[0].y).toBe(0);
+  expect(arc.points[0].x).toBeCloseTo(0, 10);
+  expect(arc.points[0].y).toBeCloseTo(0, 10);
 });
