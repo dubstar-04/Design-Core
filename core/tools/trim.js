@@ -182,6 +182,7 @@ export class Trim extends Tool {
 
     // Find which segment the mouse is closest to
     let mouseSegmentIndex = 0;
+    let mouseClosest = null;
     let minDistance = Infinity;
     for (let i = 1; i < polyPoints.length; i++) {
       const closest = PolylineUtils.closestPointOnSegment(polyPoints, mousePosition, i);
@@ -190,11 +191,11 @@ export class Trim extends Tool {
         if (dist < minDistance) {
           minDistance = dist;
           mouseSegmentIndex = i;
+          mouseClosest = closest;
         }
       }
     }
 
-    const mouseClosest = PolylineUtils.closestPointOnSegment(polyPoints, mousePosition, mouseSegmentIndex);
     const mousePos = mouseClosest ?
       PolylineUtils.positionOnSegment(polyPoints, mouseClosest, mouseSegmentIndex) :
       0;
