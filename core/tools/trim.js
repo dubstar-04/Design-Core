@@ -7,7 +7,6 @@ import { AddState, RemoveState } from '../lib/stateManager.js';
 import { Utils } from '../lib/utils.js';
 import { Colour } from '../lib/colour.js';
 import { PolylineUtils } from '../lib/polylineUtils.js';
-import { Circle } from '../entities/circle.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -144,20 +143,13 @@ export class Trim extends Tool {
    * Compute state changes to trim entity at the pair of intersection points
    * surrounding the mouse position. Operates entirely in polyline-point space
    * via entity.toPolylinePoints() / entity.fromPolylinePoints(), so it works
-   * for any entity that implements that protocol (Line, Arc, BasePolyline,
-   * and future entities such as Spline or Ellipse).
-   * Circles are handled separately via #trimCircle since their closed polyline
-   * representation spans two segments in a way that Arc.fromPolylinePoints
-   * cannot reconstruct from a sub-sequence.
+   * for any entity that implements that protocol (Line, Arc, Circle,
+   * BasePolyline, and future entities such as Spline or Ellipse).
    * @param {Object} entity
    * @param {Array}  intersectPoints
    * @return {Array}
    */
   #trimEntity(entity, intersectPoints) {
-    if (entity instanceof Circle) {
-      return this.#trimCircle(entity, intersectPoints);
-    }
-
     const polyPoints = entity.toPolylinePoints();
     const mousePosition = DesignCore.Mouse.pointOnScene();
 
@@ -223,9 +215,8 @@ export class Trim extends Tool {
       }
     }
 
-    const stateChanges = [];
-
-    // Portion 1: start of entity to trimBefore
+    // Build Portion 1 points: start of entity to trimBefore
+    let portion1Points = null;
     if (trimBefore) {
       const points = [];
       for (let i = 0; i < trimBefore.segmentIndex - 1; i++) {
@@ -239,16 +230,11 @@ export class Trim extends Tool {
       points.push(segStartClone);
       const trimPoint = trimBefore.point.clone();
       if (!points.at(-1).isSame(trimPoint)) points.push(trimPoint);
-
-      if (points.length >= 2) {
-        const output = Utils.cloneObject(entity);
-        output.fromPolylinePoints(points);
-        output.flags?.removeValue(1);
-        stateChanges.push(new AddState(output));
-      }
+      if (points.length >= 2) portion1Points = points;
     }
 
-    // Portion 2: trimAfter to end of entity
+    // Build Portion 2 points: trimAfter to end of entity
+    let portion2Points = null;
     if (trimAfter) {
       const points = [];
       const trimPoint = trimAfter.point.clone();
@@ -261,10 +247,29 @@ export class Trim extends Tool {
         const nextPoint = polyPoints[i].clone();
         if (!points.at(-1).isSame(nextPoint)) points.push(nextPoint);
       }
+      if (points.length >= 2) portion2Points = points;
+    }
 
-      if (points.length >= 2) {
-        const output = Utils.cloneObject(entity);
-        output.fromPolylinePoints(points);
+    const stateChanges = [];
+    const isClosed = polyPoints[0].isSame(polyPoints.at(-1));
+
+    if (isClosed && portion1Points && portion2Points) {
+      // Closed entity trimmed at two points: the two open-ended portions are
+      // actually one continuous arc/path running from trimAfter → seam → trimBefore.
+      // Drop the bulge-less closure point at the end of portion2 and prepend
+      // portion2 before portion1 so the bulge on portion1[0] is preserved.
+      const joinedPoints = [...portion2Points.slice(0, -1), ...portion1Points];
+      const output = Utils.cloneObject(entity).fromPolylinePoints(joinedPoints);
+      output.flags?.removeValue(1);
+      stateChanges.push(new AddState(output));
+    } else {
+      if (portion1Points) {
+        const output = Utils.cloneObject(entity).fromPolylinePoints(portion1Points);
+        output.flags?.removeValue(1);
+        stateChanges.push(new AddState(output));
+      }
+      if (portion2Points) {
+        const output = Utils.cloneObject(entity).fromPolylinePoints(portion2Points);
         output.flags?.removeValue(1);
         stateChanges.push(new AddState(output));
       }
@@ -275,54 +280,6 @@ export class Trim extends Tool {
     }
 
     return stateChanges;
-  }
-
-  /**
-   * Trim a Circle to an Arc by removing the portion of the circumference
-   * that the mouse is positioned on. The arc center and radius are taken
-   * directly from the Circle, avoiding any floating-point reconstruction.
-   * @param {Object} entity        - Circle entity
-   * @param {Array}  intersectPoints
-   * @return {Array}
-   */
-  #trimCircle(entity, intersectPoints) {
-    if (!intersectPoints?.length) return [];
-
-    const direction = 1; // Circles are traversed CCW for trim purposes
-    const mousePosition = DesignCore.Mouse.pointOnScene();
-
-    // Find the circumference point closest to the mouse
-    const edgePoint = entity.points[1];
-    const pointOnCircle = mousePosition.closestPointOnArc(edgePoint, edgePoint, entity.points[0]);
-
-    Utils.sortPointsOnArc(intersectPoints, entity.points[0], entity.points[0], entity.points[0], direction);
-
-    // Close the circle by repeating the first intersection
-    const testPoints = [...intersectPoints, intersectPoints.at(0)];
-
-    for (let i = 0; i < testPoints.length - 1; i++) {
-      const startPoint = testPoints[i];
-      const endPoint = testPoints[i + 1];
-
-      if (pointOnCircle.isOnArc(startPoint, endPoint, entity.points[0], direction)) {
-        const arc = DesignCore.CommandManager.createNew('Arc', entity);
-        arc.handle = undefined;
-        arc.direction = direction * -1;
-        arc.points = [entity.points[0], startPoint, endPoint];
-        return [new AddState(arc), new RemoveState(entity)];
-      }
-    }
-
-    return [];
-  }
-
-  /**
-   * Create a clone of the entity to use as a trim result output.
-   * @param {Object} entity
-   * @return {Object}
-   */
-  #outputEntity(entity) {
-    return Utils.cloneObject(entity);
   }
 }
 

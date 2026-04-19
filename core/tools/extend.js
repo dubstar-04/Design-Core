@@ -204,8 +204,8 @@ export class Extend extends Tool {
     if (newPolyPoints[endPointIndex].isSame(polyPoints[endPointIndex])) return [];
 
     const clone = Utils.cloneObject(entity);
-    clone.fromPolylinePoints(newPolyPoints);
-    return [new UpdateState(entity, { points: clone.points })];
+    const output = clone.fromPolylinePoints(newPolyPoints);
+    return [new UpdateState(entity, { points: output.points })];
   }
 }
 

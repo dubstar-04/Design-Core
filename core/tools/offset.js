@@ -107,8 +107,7 @@ export class Offset extends Tool {
       const offsetPoints = this.getOffsetPoints(this.selectedItem, mousePoint, offsetDistance);
 
       if (offsetPoints) {
-        const previewEntity = Utils.cloneObject(this.selectedItem);
-        previewEntity.fromPolylinePoints(offsetPoints);
+        const previewEntity = Utils.cloneObject(this.selectedItem).fromPolylinePoints(offsetPoints);
         DesignCore.Scene.previewEntities.add(previewEntity);
       }
     }
@@ -130,8 +129,7 @@ export class Offset extends Tool {
       return;
     }
 
-    const offsetEntity = Utils.cloneObject(entity);
-    offsetEntity.fromPolylinePoints(offsetPoints);
+    const offsetEntity = Utils.cloneObject(entity).fromPolylinePoints(offsetPoints);
 
     const stateChange = new AddState(offsetEntity);
     DesignCore.Scene.commit([stateChange]);
