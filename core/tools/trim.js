@@ -1,12 +1,13 @@
 import { Intersection } from '../lib/intersect.js';
 import { Strings } from '../lib/strings.js';
 import { Tool } from './tool.js';
-import { Entity } from '../entities/entity.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
-import { AddState } from '../lib/stateManager.js';
+import { AddState, RemoveState } from '../lib/stateManager.js';
 import { Utils } from '../lib/utils.js';
 import { Colour } from '../lib/colour.js';
+import { PolylineUtils } from '../lib/polylineUtils.js';
+import { Circle } from '../entities/circle.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -80,11 +81,11 @@ export class Trim extends Tool {
     if (index === undefined) return;
 
     const entity = DesignCore.Scene.entities.get(index);
-    if (entity.trim === Entity.prototype.trim) return;
+    if (typeof entity.toPolylinePoints !== 'function') return;
     const intersectPoints = this.#collectIntersectPoints(entity);
     if (!intersectPoints.length) return;
 
-    const stateChanges = entity.trim(intersectPoints);
+    const stateChanges = this.#trimEntity(entity, intersectPoints);
     if (!stateChanges?.length) return;
 
     // Draw the full entity in a dulled colour, then draw survivors on top.
@@ -107,7 +108,7 @@ export class Trim extends Tool {
       const intersectPoints = this.#collectIntersectPoints(this.selectedItem);
 
       if (intersectPoints.length) {
-        const stateChanges = this.selectedItem.trim(intersectPoints);
+        const stateChanges = this.#trimEntity(this.selectedItem, intersectPoints);
         if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
         }
@@ -137,6 +138,191 @@ export class Trim extends Tool {
       }
     }
     return intersectPoints;
+  }
+
+  /**
+   * Compute state changes to trim entity at the pair of intersection points
+   * surrounding the mouse position. Operates entirely in polyline-point space
+   * via entity.toPolylinePoints() / entity.fromPolylinePoints(), so it works
+   * for any entity that implements that protocol (Line, Arc, BasePolyline,
+   * and future entities such as Spline or Ellipse).
+   * Circles are handled separately via #trimCircle since their closed polyline
+   * representation spans two segments in a way that Arc.fromPolylinePoints
+   * cannot reconstruct from a sub-sequence.
+   * @param {Object} entity
+   * @param {Array}  intersectPoints
+   * @return {Array}
+   */
+  #trimEntity(entity, intersectPoints) {
+    if (entity instanceof Circle) {
+      return this.#trimCircle(entity, intersectPoints);
+    }
+
+    const polyPoints = entity.toPolylinePoints();
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+
+    // Drop any intersection point that coincides with an existing vertex
+    const filtered = intersectPoints.filter(
+        (p) => !polyPoints.some((v) => v.isSame(p)),
+    );
+    if (!filtered.length) return [];
+
+    // Locate each intersection point within the polyline segments
+    const locatedIntersections = [];
+    for (const point of filtered) {
+      for (let i = 1; i < polyPoints.length; i++) {
+        if (PolylineUtils.isPointOnSegment(point, polyPoints[i - 1], polyPoints[i])) {
+          locatedIntersections.push({
+            segmentIndex: i,
+            point,
+            positionAlongSegment: PolylineUtils.positionOnSegment(polyPoints, point, i),
+          });
+          break;
+        }
+      }
+    }
+
+    if (!locatedIntersections.length) return [];
+
+    locatedIntersections.sort((a, b) => {
+      if (a.segmentIndex !== b.segmentIndex) return a.segmentIndex - b.segmentIndex;
+      return a.positionAlongSegment - b.positionAlongSegment;
+    });
+
+    // Find which segment the mouse is closest to
+    let mouseSegmentIndex = 0;
+    let minDistance = Infinity;
+    for (let i = 1; i < polyPoints.length; i++) {
+      const closest = PolylineUtils.closestPointOnSegment(polyPoints, mousePosition, i);
+      if (closest) {
+        const dist = mousePosition.distance(closest);
+        if (dist < minDistance) {
+          minDistance = dist;
+          mouseSegmentIndex = i;
+        }
+      }
+    }
+
+    const mouseClosest = PolylineUtils.closestPointOnSegment(polyPoints, mousePosition, mouseSegmentIndex);
+    const mousePos = mouseClosest
+      ? PolylineUtils.positionOnSegment(polyPoints, mouseClosest, mouseSegmentIndex)
+      : 0;
+
+    // Find the nearest intersections before and after the mouse position
+    let trimBefore = null;
+    let trimAfter = null;
+    for (const loc of locatedIntersections) {
+      if (loc.segmentIndex < mouseSegmentIndex) {
+        trimBefore = loc;
+      } else if (loc.segmentIndex === mouseSegmentIndex) {
+        if (loc.positionAlongSegment <= mousePos) {
+          trimBefore = loc;
+        } else if (!trimAfter) {
+          trimAfter = loc;
+        }
+      } else if (!trimAfter) {
+        trimAfter = loc;
+      }
+    }
+
+    const stateChanges = [];
+
+    // Portion 1: start of entity to trimBefore
+    if (trimBefore) {
+      const points = [];
+      for (let i = 0; i < trimBefore.segmentIndex - 1; i++) {
+        points.push(polyPoints[i].clone());
+      }
+      const segStart = polyPoints[trimBefore.segmentIndex - 1];
+      const segStartClone = segStart.clone();
+      if (segStart.bulge !== 0 && segStart.bulge !== undefined) {
+        segStartClone.bulge = segStart.partialBulge(polyPoints[trimBefore.segmentIndex], trimBefore.point);
+      }
+      points.push(segStartClone);
+      const trimPoint = trimBefore.point.clone();
+      if (!points.at(-1).isSame(trimPoint)) points.push(trimPoint);
+
+      if (points.length >= 2) {
+        const output = Utils.cloneObject(entity);
+        output.fromPolylinePoints(points);
+        stateChanges.push(new AddState(output));
+      }
+    }
+
+    // Portion 2: trimAfter to end of entity
+    if (trimAfter) {
+      const points = [];
+      const trimPoint = trimAfter.point.clone();
+      const segStart = polyPoints[trimAfter.segmentIndex - 1];
+      if (segStart.bulge !== 0 && segStart.bulge !== undefined) {
+        trimPoint.bulge = segStart.partialBulge(polyPoints[trimAfter.segmentIndex], trimPoint, true);
+      }
+      points.push(trimPoint);
+      for (let i = trimAfter.segmentIndex; i < polyPoints.length; i++) {
+        const nextPoint = polyPoints[i].clone();
+        if (!points.at(-1).isSame(nextPoint)) points.push(nextPoint);
+      }
+
+      if (points.length >= 2) {
+        const output = Utils.cloneObject(entity);
+        output.fromPolylinePoints(points);
+        stateChanges.push(new AddState(output));
+      }
+    }
+
+    if (trimBefore || trimAfter) {
+      stateChanges.push(new RemoveState(entity));
+    }
+
+    return stateChanges;
+  }
+
+  /**
+   * Trim a Circle to an Arc by removing the portion of the circumference
+   * that the mouse is positioned on. The arc center and radius are taken
+   * directly from the Circle, avoiding any floating-point reconstruction.
+   * @param {Object} entity        - Circle entity
+   * @param {Array}  intersectPoints
+   * @return {Array}
+   */
+  #trimCircle(entity, intersectPoints) {
+    if (!intersectPoints?.length) return [];
+
+    const direction = 1; // Circles are traversed CCW for trim purposes
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+
+    // Find the circumference point closest to the mouse
+    const edgePoint = entity.points[1];
+    const pointOnCircle = mousePosition.closestPointOnArc(edgePoint, edgePoint, entity.points[0]);
+
+    Utils.sortPointsOnArc(intersectPoints, entity.points[0], entity.points[0], entity.points[0], direction);
+
+    // Close the circle by repeating the first intersection
+    const testPoints = [...intersectPoints, intersectPoints.at(0)];
+
+    for (let i = 0; i < testPoints.length - 1; i++) {
+      const startPoint = testPoints[i];
+      const endPoint = testPoints[i + 1];
+
+      if (pointOnCircle.isOnArc(startPoint, endPoint, entity.points[0], direction)) {
+        const arc = DesignCore.CommandManager.createNew('Arc', entity);
+        arc.handle = undefined;
+        arc.direction = direction * -1;
+        arc.points = [entity.points[0], startPoint, endPoint];
+        return [new AddState(arc), new RemoveState(entity)];
+      }
+    }
+
+    return [];
+  }
+
+  /**
+   * Create a clone of the entity to use as a trim result output.
+   * @param {Object} entity
+   * @return {Object}
+   */
+  #outputEntity(entity) {
+    return Utils.cloneObject(entity);
   }
 }
 

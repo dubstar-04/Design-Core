@@ -1,11 +1,11 @@
 import { Intersection } from '../lib/intersect.js';
 import { Strings } from '../lib/strings.js';
 import { Tool } from './tool.js';
-import { Entity } from '../entities/entity.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { UpdateState } from '../lib/stateManager.js';
 import { Utils } from '../lib/utils.js';
+import { PolylineUtils } from '../lib/polylineUtils.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -79,11 +79,11 @@ export class Extend extends Tool {
     if (index === undefined) return;
 
     const entity = DesignCore.Scene.entities.get(index);
-    if (entity.extend === Entity.prototype.extend) return;
+    if (typeof entity.toPolylinePoints !== 'function') return;
     const intersectPoints = this.#collectIntersectPoints(entity);
     if (!intersectPoints.length) return;
 
-    const stateChanges = entity.extend(intersectPoints);
+    const stateChanges = this.#extendEntity(entity, intersectPoints);
     if (!stateChanges?.length) return;
 
     for (const change of stateChanges) {
@@ -103,7 +103,7 @@ export class Extend extends Tool {
       const intersectPoints = this.#collectIntersectPoints(this.selectedItem);
 
       if (intersectPoints.length) {
-        const stateChanges = this.selectedItem.extend(intersectPoints);
+        const stateChanges = this.#extendEntity(this.selectedItem, intersectPoints);
         if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
         }
@@ -133,6 +133,79 @@ export class Extend extends Tool {
       }
     }
     return intersectPoints;
+  }
+
+  /**
+   * Compute a state change to extend entity to the nearest valid boundary
+   * intersection. Operates entirely in polyline-point space via
+   * entity.toPolylinePoints() / entity.fromPolylinePoints(), so it works for
+   * any entity that implements that protocol (Line, BasePolyline, and future
+   * entities such as Spline or Ellipse).
+   * Only straight end-segments (bulge === 0) can be extended.
+   * @param {Object} entity
+   * @param {Array}  intersectPoints
+   * @return {Array}
+   */
+  #extendEntity(entity, intersectPoints) {
+    if (!intersectPoints?.length) return [];
+
+    const polyPoints = entity.toPolylinePoints();
+    const mousePosition = DesignCore.Mouse.pointOnScene();
+    const lastIndex = polyPoints.length - 1;
+
+    // Determine which end segment is closest to the mouse
+    const closestOnFirst = PolylineUtils.closestPointOnSegment(polyPoints, mousePosition, 1);
+    const closestOnLast = PolylineUtils.closestPointOnSegment(polyPoints, mousePosition, lastIndex);
+    const distToFirst = mousePosition.distance(closestOnFirst);
+    const distToLast = mousePosition.distance(closestOnLast);
+
+    let endPointIndex;
+    let endSegmentBulge;
+    if (distToFirst < distToLast) {
+      endPointIndex = 0;
+      endSegmentBulge = polyPoints[0].bulge ?? 0;
+    } else if (distToLast < distToFirst) {
+      endPointIndex = lastIndex;
+      endSegmentBulge = polyPoints[lastIndex - 1].bulge ?? 0;
+    } else {
+      if (mousePosition.distance(polyPoints[0]) <= mousePosition.distance(polyPoints[lastIndex])) {
+        endPointIndex = 0;
+        endSegmentBulge = polyPoints[0].bulge ?? 0;
+      } else {
+        endPointIndex = lastIndex;
+        endSegmentBulge = polyPoints[lastIndex - 1].bulge ?? 0;
+      }
+    }
+
+    // Only straight end-segments can be extended
+    if (endSegmentBulge !== 0) {
+      DesignCore.Core.notify(`${entity.type} - ${Strings.Message.NOEXTEND}`);
+      return [];
+    }
+
+    const endPoint = polyPoints[endPointIndex];
+    const adjacentPoint = endPointIndex === 0 ? polyPoints[1] : polyPoints[lastIndex - 1];
+
+    Utils.sortPointsByDistance(intersectPoints, endPoint);
+
+    const direction = endPoint.subtract(adjacentPoint);
+    const newEndPoint = intersectPoints.find((p) => {
+      if (p.isSame(endPoint)) return false;
+      if (p.subtract(endPoint).dot(direction) <= 0) return false;
+      if (adjacentPoint.distance(p) <= adjacentPoint.distance(endPoint)) return false;
+      return true;
+    });
+
+    if (!newEndPoint) return [];
+
+    const newPolyPoints = polyPoints.map((p) => p.clone());
+    newPolyPoints[endPointIndex] = newEndPoint.clone();
+
+    if (newPolyPoints[endPointIndex].isSame(polyPoints[endPointIndex])) return [];
+
+    const clone = Utils.cloneObject(entity);
+    clone.fromPolylinePoints(newPolyPoints);
+    return [new UpdateState(entity, { points: clone.points })];
   }
 }
 
