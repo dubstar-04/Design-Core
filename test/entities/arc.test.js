@@ -495,9 +495,9 @@ describe('Arc.fromDxf', () => {
     const result = Arc.fromDxf({ points: [center], 40: 10, 50: 0, 51: 90 });
     expect(result.points.length).toBe(3);
     expect(result.points[0]).toBe(center);
-    expect(result.points[1].x).toBeCloseTo(10);  // project(0°, 10)
+    expect(result.points[1].x).toBeCloseTo(10); // project(0°, 10)
     expect(result.points[1].y).toBeCloseTo(0);
-    expect(result.points[2].x).toBeCloseTo(0);   // project(90°, 10)
+    expect(result.points[2].x).toBeCloseTo(0); // project(90°, 10)
     expect(result.points[2].y).toBeCloseTo(10);
   });
 

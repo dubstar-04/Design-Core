@@ -167,8 +167,8 @@ test('Circle.register returns command object', () => {
   expect(Circle.register()).toEqual({ command: 'Circle', shortcut: 'C', type: 'Entity' });
 });
 
-test('Circle constructor loads radius from DXF group code 40', () => {
-  const circle = new Circle({ points: [new Point(0, 0)], 40: 50 });
+test('Circle constructor loads radius from DXF group code 40 via fromDxf', () => {
+  const circle = new Circle(Circle.fromDxf({ points: [new Point(0, 0)], 40: 50 }));
   expect(circle.getRadius()).toBeCloseTo(50);
   expect(circle.points[1].x).toBeCloseTo(50);
   expect(circle.points[1].y).toBeCloseTo(0);
@@ -292,6 +292,41 @@ test('Circle.snaps returns two tangent snaps from outside', () => {
   expect(tangentSnaps.some((s) => s.snapPoint.x > 4.9 && s.snapPoint.y > 8.5)).toBe(true);
   expect(tangentSnaps.some((s) => s.snapPoint.x > 4.9 && s.snapPoint.y < -8.5)).toBe(true);
   DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+describe('Circle.fromDxf', () => {
+  test('projects edge point from DXF radius code', () => {
+    const center = new Point(0, 0);
+    const result = Circle.fromDxf({ points: [center], 40: 10 });
+    expect(result.points.length).toBe(2);
+    expect(result.points[0]).toBe(center);
+    expect(result.points[1].x).toBeCloseTo(10);
+    expect(result.points[1].y).toBeCloseTo(0);
+  });
+
+  test('preserves all other data properties', () => {
+    const result = Circle.fromDxf({ points: [new Point(0, 0)], 40: 10, 8: 'MyLayer' });
+    expect(result[8]).toBe('MyLayer');
+  });
+
+  test('returns data unchanged when no center point', () => {
+    const data = { 40: 10 };
+    expect(Circle.fromDxf(data)).toBe(data);
+  });
+
+  test('returns data unchanged when no radius code', () => {
+    const data = { points: [new Point(0, 0)] };
+    expect(Circle.fromDxf(data)).toBe(data);
+  });
+
+  test('circle constructed via fromDxf matches circle constructed directly', () => {
+    const center = new Point(100, 100);
+    const fromDxfCircle = new Circle(Circle.fromDxf({ points: [center], 40: 50 }));
+    const directCircle = new Circle({ points: [center, new Point(150, 100)] });
+    expect(fromDxfCircle.getRadius()).toBeCloseTo(directCircle.getRadius());
+    expect(fromDxfCircle.points[0].x).toBeCloseTo(directCircle.points[0].x);
+    expect(fromDxfCircle.points[0].y).toBeCloseTo(directCircle.points[0].y);
+  });
 });
 
 test('Circle.snaps returns no tangent when fromPoint is inside the circle', () => {

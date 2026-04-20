@@ -5,8 +5,6 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
-import { Property } from '../properties/property.js';
-
 import { DesignCore } from '../designCore.js';
 
 import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
@@ -34,11 +32,10 @@ export class Circle extends Entity {
       enumerable: true,
     });
 
-    if (data) {
-      if (data.hasOwnProperty('radius') || data.hasOwnProperty('40')) {
-        // DXF Groupcode 40 - Radius
-        this.setRadius(Property.loadValue([data.radius, data[40]], 0));
-      }
+    // Named scalar radius (internal API / named prop) — projects points[1] from center.
+    // Full-points data (post-execute or post-fromDxf) skips this.
+    if (data?.radius !== undefined && this.points.length < 2) {
+      this.setRadius(data.radius);
     }
   }
 
@@ -52,6 +49,21 @@ export class Circle extends Entity {
   static register() {
     const command = { command: 'Circle', shortcut: 'C', type: 'Entity' };
     return command;
+  }
+
+  /**
+   * Normalise DXF group codes into the canonical points-based representation.
+   * Called by the DXF loader before construction.
+   * @param {Object} data
+   * @return {Object}
+   */
+  static fromDxf(data) {
+    const center = data.points?.[0];
+    if (!center || data[40] === undefined) return data;
+    return {
+      ...data,
+      points: [center, center.project(0, data[40])],
+    };
   }
 
   /**
