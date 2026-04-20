@@ -600,6 +600,58 @@ test('Trim.action does nothing when selectedBoundaryItems is empty', () => {
   expect(trim.selectedItem).toBeNull();
 });
 
+test('Trim.action notifies NOTRIM when selected entity lacks fromPolylinePoints', () => {
+  // Use a stub entity that has toPolylinePoints but no fromPolylinePoints.
+  // action() must notify and not throw.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
+
+  const trim = new Trim();
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
+  trim.selectedItem = {
+    type: 'FakeEntity',
+    toPolylinePoints: () => [new Point(-5, 0), new Point(5, 0)],
+    // deliberately no fromPolylinePoints
+  };
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  trim.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOTRIM));
+  expect(trim.selectedItem).toBeNull();
+  notifySpy.mockRestore();
+});
+
+test('Trim.preview silently skips entity that lacks fromPolylinePoints', () => {
+  // Stub entity implements toPolylinePoints but not fromPolylinePoints.
+  // preview() must return early without calling notify.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
+  DesignCore.Scene.previewEntities.clear();
+
+  const stubEntity = {
+    type: 'FakeEntity',
+    toPolylinePoints: () => [new Point(-5, 0), new Point(5, 0)],
+    // deliberately no fromPolylinePoints
+  };
+
+  const notifySpy = jest.spyOn(core, 'notify');
+  const trim = new Trim();
+  trim.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const savedPointOnScene = DesignCore.Mouse.pointOnScene;
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(0);
+  jest.spyOn(core.scene.entities, 'get').mockReturnValue(stubEntity);
+  DesignCore.Mouse.pointOnScene = () => new Point(0, 0);
+  trim.preview();
+  findSpy.mockRestore();
+  jest.restoreAllMocks();
+  DesignCore.Mouse.pointOnScene = savedPointOnScene;
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+  expect(notifySpy).not.toHaveBeenCalled();
+});
+
 test('Trim.action notifies when no intersection found (parallel lines)', () => {
   core.scene.clear();
   // Two parallel vertical lines - no intersection
