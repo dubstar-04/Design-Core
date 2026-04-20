@@ -190,9 +190,14 @@ export class Extend extends Tool {
 
     const direction = endPoint.subtract(adjacentPoint);
     const newEndPoint = intersectPoints.find((p) => {
+      // Ignore the current end point itself
       if (p.isSame(endPoint)) return false;
+      // Point must be ahead of the end point in the extension direction
       if (p.subtract(endPoint).dot(direction) <= 0) return false;
+      // Point must be further from the adjacent point than the end point is (i.e. actually extends the segment)
       if (adjacentPoint.distance(p) <= adjacentPoint.distance(endPoint)) return false;
+      // Point must lie on the extension line of the end segment; intersections from internal
+      // segments extended as infinite lines will have a non-zero cross product with direction
       if (Utils.round(direction.cross(p.subtract(adjacentPoint))) !== 0) return false;
       return true;
     });
