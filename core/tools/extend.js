@@ -193,6 +193,7 @@ export class Extend extends Tool {
       if (p.isSame(endPoint)) return false;
       if (p.subtract(endPoint).dot(direction) <= 0) return false;
       if (adjacentPoint.distance(p) <= adjacentPoint.distance(endPoint)) return false;
+      if (Utils.round(direction.cross(p.subtract(adjacentPoint))) !== 0) return false;
       return true;
     });
 
