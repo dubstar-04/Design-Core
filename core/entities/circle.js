@@ -201,8 +201,6 @@ export class Circle extends Entity {
   }
 
   /**
-   * Trim the entity
-  /**
    * Get snap points
    * @param {Point} mousePoint
    * @param {number} delta
