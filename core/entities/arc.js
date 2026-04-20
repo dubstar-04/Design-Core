@@ -26,46 +26,27 @@ export class Arc extends Entity {
    */
   constructor(data) {
     super(data);
-    this.radius = 1;
 
-    // direction: - ccw > 0, cw <= 0
-    // default to 1 - counter clockwise
+    // direction: ccw > 0, cw <= 0 — default counter clockwise
     Object.defineProperty(this, 'direction', {
       value: 1,
       writable: true,
     });
 
-    if (data) {
-      if (data.hasOwnProperty('points') || data.hasOwnProperty('40')) {
-        // DXF Groupcode 40 - Radius
-        // get the radius from the points or the incoming dxf groupcode
-        const radius = this.points[1] ? this.points[0].distance(this.points[1]) : data[40];
-
-        if (radius !== undefined) {
-          this.radius = radius;
-        }
+    // If only the center point is present, project start/end from named scalar properties.
+    // Full-points data (post-execute or post-fromDxf) skips this block entirely.
+    if (data && this.points.length < 2) {
+      const radius = data.radius ?? 1;
+      if (data.hasOwnProperty('startAngle')) {
+        this.points[1] = this.points[0].project(Utils.degrees2radians(data.startAngle), radius);
       }
-
-      if (data.hasOwnProperty('startAngle') || data.hasOwnProperty('50')) {
-        // DXF Groupcode 50 - Start Angle
-
-        const angle = Property.loadValue([data.startAngle, data[50]], 0);
-        const projectionAngle = Utils.degrees2radians(angle);
-        this.points[1] = this.points[0].project(projectionAngle, this.radius);
-      }
-
-      if (data.hasOwnProperty('endAngle') || data.hasOwnProperty('51')) {
-        // DXF Groupcode 51 - End Angle
-        const angle = Property.loadValue([data.endAngle, data[51]], 0);
-        const projectionAngle = Utils.degrees2radians(angle);
-        this.points[2] = this.points[0].project(projectionAngle, this.radius);
-      }
-
-      if (data.hasOwnProperty('direction') || data.hasOwnProperty('73')) {
-        // No DXF Groupcode - Arc Direction
-        this.direction = Property.loadValue([data.direction, data[73]], 1);
+      if (data.hasOwnProperty('endAngle')) {
+        this.points[2] = this.points[0].project(Utils.degrees2radians(data.endAngle), radius);
       }
     }
+
+    this.radius = this.points[1] ? this.points[0].distance(this.points[1]) : 1;
+    this.direction = data?.direction ?? 1;
   }
 
   /**
@@ -78,6 +59,27 @@ export class Arc extends Entity {
   static register() {
     const command = { command: 'Arc', shortcut: 'A', type: 'Entity' };
     return command;
+  }
+
+  /**
+   * Normalise DXF group codes into the canonical points-based representation.
+   * Called by the DXF loader before construction.
+   * @param {Object} data
+   * @return {Object}
+   */
+  static fromDxf(data) {
+    const center = data.points?.[0];
+    if (!center) return data;
+    const radius = data[40];
+    return {
+      ...data,
+      points: [
+        center,
+        center.project(Utils.degrees2radians(data[50] ?? 0), radius),
+        center.project(Utils.degrees2radians(data[51] ?? 0), radius),
+      ],
+      direction: data[73] ?? 1,
+    };
   }
 
   /**

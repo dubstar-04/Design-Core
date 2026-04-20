@@ -159,6 +159,26 @@ export class CommandManager {
   };
 
   /**
+   * Create a new instance from DXF data, calling fromDxf() to normalise before construction.
+   * @param {string} type
+   * @param {Object} data
+   * @return {Object} instance of type
+   */
+  createNewFromDxf(type, data) {
+    let newItem;
+    if (this.isCommand(type)) {
+      const Cls = classes[this.getCommand(type)];
+      const normalisedData = Cls.fromDxf ? Cls.fromDxf(data) : data;
+      newItem = new Cls(normalisedData);
+    } else {
+      Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
+      return;
+    }
+
+    return newItem;
+  };
+
+  /**
    * Check if input is valid command or shortcut
    * @param {string} input
    * @return {boolean} boolean

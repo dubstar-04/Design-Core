@@ -91,6 +91,14 @@ export class Entity {
     }
   }
 
+  /**
+   * Default DXF data normalisation — subclasses override when geometric transformation is needed.
+   * @param {Object} data
+   * @return {Object}
+   */
+  static fromDxf(data) {
+    return data;
+  }
 
   /**
    * get rgb colour

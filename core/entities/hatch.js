@@ -433,7 +433,7 @@ export class Hatch extends Entity {
                   throw Error(err);
                 }
                 shapeData.points.push(centerPoint);
-                shapeData[40] = this.getDataValue(data, 40);
+                shapeData.radius = this.getDataValue(data, 40);
                 shapeData.startAngle = this.getDataValue(data, 50);
                 shapeData.endAngle = this.getDataValue(data, 51);
                 // arc direction: - ccw > 0, cw <= 0 default 1

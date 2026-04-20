@@ -387,7 +387,7 @@ export class DXF {
 
     const command = item[0];
     if (DesignCore.CommandManager.isCommand(command)) {
-      const entity = DesignCore.CommandManager.createNew(command, item);
+      const entity = DesignCore.CommandManager.createNewFromDxf(command, item);
       DesignCore.Scene.entities.add(entity);
     } else {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
