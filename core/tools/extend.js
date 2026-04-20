@@ -156,6 +156,13 @@ export class Extend extends Tool {
     if (!intersectPoints?.length) return [];
 
     const polyPoints = entity.toPolylinePoints();
+
+    // Closed entities have no open endpoints to extend
+    if (polyPoints[0].isSame(polyPoints.at(-1))) {
+      DesignCore.Core.notify(`${entity.type} - ${Strings.Message.NOEXTEND}`);
+      return [];
+    }
+
     const mousePosition = DesignCore.Mouse.pointOnScene();
     const lastIndex = polyPoints.length - 1;
 
