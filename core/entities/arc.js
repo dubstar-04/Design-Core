@@ -344,7 +344,6 @@ export class Arc extends Entity {
   }
 
   /**
-  /**
    * Get snap points
    * @param {Point} mousePoint
    * @param {number} delta
