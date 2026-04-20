@@ -80,7 +80,7 @@ export class Trim extends Tool {
     if (index === undefined) return;
 
     const entity = DesignCore.Scene.entities.get(index);
-    if (typeof entity.toPolylinePoints !== 'function') return;
+    if (typeof entity.toPolylinePoints !== 'function' || typeof entity.fromPolylinePoints !== 'function') return;
     const intersectPoints = this.#collectIntersectPoints(entity);
     if (!intersectPoints.length) return;
 
@@ -104,6 +104,12 @@ export class Trim extends Tool {
    */
   action() {
     if (this.selectedItem && this.selectedBoundaryItems.length) {
+      if (typeof this.selectedItem.fromPolylinePoints !== 'function') {
+        DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOTRIM}`);
+        this.selectedItem = null;
+        return;
+      }
+
       const intersectPoints = this.#collectIntersectPoints(this.selectedItem);
 
       if (intersectPoints.length) {
