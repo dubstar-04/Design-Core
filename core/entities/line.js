@@ -5,10 +5,10 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
-import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
+
 
 import { DesignCore } from '../designCore.js';
-import { Utils } from '../lib/utils.js';
+
 import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
 
 
@@ -133,134 +133,11 @@ export class Line extends Entity {
   /**
    * Set entity points from a polyline point representation
    * @param {Array} points
+   * @return {Line}
    */
   fromPolylinePoints(points) {
     this.points = [new Point(points[0].x, points[0].y), new Point(points[1].x, points[1].y)];
-  }
-
-  /**
-   * Trim the entity
-   * @param {Array} intersections
-   * @return {Array} - array of state changes
-   */
-  trim(intersections) {
-    // array to hold state changes
-    const stateChanges = [];
-
-    if (intersections?.length === 0 || !intersections) {
-      return stateChanges;
-    }
-
-    // get the mouse position
-    const mousePosition = DesignCore.Mouse.pointOnScene();
-    // get the point on the line closest to the mouse
-    const pointOnLine = mousePosition.closestPointOnLine(this.points[0], this.points[1]);
-    // remove any intersections that are at the end points of the line
-    intersections = intersections.filter((p) => !p.isSame(this.points[0]) && !p.isSame(this.points[1]));
-
-    Utils.sortPointsByDistance(intersections, this.points[0]);
-
-    // Add line points to the start and the end of the point array
-    const testPoints = [this.points[0], ...intersections, this.points[1]];
-
-    // Test if mouse position is between two intersection points
-    if (testPoints.length > 1) {
-      for (let i = 0; i < testPoints.length - 1; i++) {
-        const startPoint = testPoints[i];
-        const endPoint = testPoints[i + 1];
-
-        // check if the mouse is between startPoint and endPoint
-        if (pointOnLine.isOnLine(startPoint, endPoint)) {
-          const newPoints = [];
-
-          for (const p of testPoints) {
-            const inOriginalLine = this.points.indexOf(p) !== -1;
-            const inIntersections = intersections.indexOf(p) !== -1;
-
-            // Keep points which:
-            // - The mouse is between are intersections
-            // - The mouse is not between and in this line
-            const isBetween = p.isSame(startPoint) || p.isSame(endPoint);
-            if ((isBetween && inIntersections) || (!isBetween && inOriginalLine)) {
-              newPoints.push(p);
-            }
-          }
-
-          if (newPoints.length % 2 === 0) {
-            // Add lines for each point pair
-            for (let j = 0; j < newPoints.length; j += 2) {
-              const line = Utils.cloneObject(this);
-              line.points = [newPoints[j], newPoints[j + 1]];
-              const addState = new AddState(line);
-              stateChanges.push(addState);
-            }
-          }
-          // Remove the existing line
-          const removeState = new RemoveState(this);
-          stateChanges.push(removeState);
-        }
-      }
-    }
-
-    return stateChanges;
-  }
-
-  /**
-   * Extend the entity
-   * @param {Array} intersections
-   * @return {Array} - array of state changes
-   */
-  extend(intersections) {
-    // array to hold state changes
-    const stateChanges = [];
-
-    if (intersections?.length === 0 || !intersections) {
-      return stateChanges;
-    }
-
-    let originPoint;
-    // Find which end is closer to the mouse
-    if (this.points[0].distance(DesignCore.Mouse.pointOnScene()) < this.points[1].distance(DesignCore.Mouse.pointOnScene())) {
-      originPoint = 0;
-    } else {
-      originPoint = 1;
-    }
-
-    Utils.sortPointsByDistance(intersections, this.points[originPoint]);
-
-    const endPoint = this.points[originPoint];
-    const adjacentPoint = this.points[1 - originPoint];
-
-    // Find the closest intersection that lies beyond the endpoint
-    const direction = endPoint.subtract(adjacentPoint);
-    const newEndPoint = intersections.find((p) => {
-      if (p.isSame(endPoint)) return false;
-      if (p.subtract(endPoint).dot(direction) <= 0) return false;
-      if (adjacentPoint.distance(p) <= adjacentPoint.distance(endPoint)) return false;
-      return true;
-    });
-
-    if (!newEndPoint) {
-      return stateChanges;
-    }
-
-    const newPoints = [];
-    if (originPoint === 0) {
-      newPoints.push(newEndPoint, this.points[1]);
-    } else {
-      newPoints.push(this.points[0], newEndPoint);
-    }
-
-    if (newPoints[0].isSame(this.points[0]) && newPoints[1].isSame(this.points[1])) {
-      // No change
-      return stateChanges;
-    }
-
-    // update the line
-    const addState = new UpdateState(this, { points: newPoints });
-    stateChanges.push(addState);
-
-    return stateChanges;
+    return this;
   }
 
   /**

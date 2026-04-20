@@ -6,10 +6,9 @@ import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
 import { Property } from '../properties/property.js';
-import { Utils } from '../lib/utils.js';
 
 import { DesignCore } from '../designCore.js';
-import { AddState, RemoveState } from '../lib/stateManager.js';
+
 import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
 import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
@@ -181,67 +180,24 @@ export class Circle extends Entity {
   }
 
   /**
-   * Set entity points from a polyline point representation
+   * Set entity points from a polyline point representation.
+   * If the points describe a full circle (start === end), mutates this Circle
+   * in place and returns it. Otherwise creates and returns an Arc, since a
+   * Circle cannot represent an open arc.
    * @param {Array} points
+   * @return {Circle|Arc}
    */
   fromPolylinePoints(points) {
-    const center = points[0].bulgeCentrePoint(points[1]);
-    const radius = center.distance(points[0]);
-    this.points = [center, center.project(0, radius)];
-  }
-
-  /**
-   * Trim the entity
-   * @param {Array} intersections
-   * @return {Array} - array of state changes
-   */
-  trim(intersections) {
-    // array to hold state changes
-    const stateChanges = [];
-
-    if (intersections?.length === 0 || !intersections) {
-      return stateChanges;
+    if (points.length >= 3 && points[0].isSame(points.at(-1))) {
+      const center = points[0].bulgeCentrePoint(points[1]);
+      const radius = center.distance(points[0]);
+      this.points = [center, center.project(0, radius)];
+      return this;
     }
-
-    const direction = 1; // Circle is always CCW for trimming purposes
-
-    // get the mouse position
-    const mousePosition = DesignCore.Mouse.pointOnScene();
-    // get the point on the arc closest to the mouse
-    const pointOnCircle = mousePosition.closestPointOnArc(this.points[1], this.points[1], this.points[0]);
-    // sort intersection points
-    Utils.sortPointsOnArc(intersections, this.points[0], this.points[0], this.points[0], direction);
-    // Repeat the first point to close the circle
-    const testPoints = [...intersections, intersections.at(0)]; // Closing the circle
-
-    // Test if mouse position is between two intersection points
-    if (testPoints.length > 1) {
-      for (let i = 0; i < testPoints.length - 1; i++) {
-        const startPoint = testPoints[i];
-        const endPoint = testPoints[i + 1];
-
-        // check if the mouse is between startPoint and endPoint
-        if (pointOnCircle.isOnArc(startPoint, endPoint, this.points[0], direction)) {
-          // create a new arc entity
-          const arc = DesignCore.CommandManager.createNew('Arc', this);
-          arc.handle = undefined;
-          // flip direction
-          arc.direction = direction * -1;
-          arc.points = [this.points[0], startPoint, endPoint];
-          const addState = new AddState(arc);
-          stateChanges.push(addState);
-
-          // Remove the existing arc
-          if (stateChanges.length > 0) {
-            const removeState = new RemoveState(this);
-            stateChanges.push(removeState);
-            return stateChanges;
-          }
-        }
-      }
-    }
-
-    return stateChanges;
+    const arc = DesignCore.CommandManager.createNew('Arc', this);
+    arc.handle = undefined;
+    arc.fromPolylinePoints(points);
+    return arc;
   }
 
   /**

@@ -127,73 +127,6 @@ test('Test Circle.toPolylinePoints', () => {
   expect(circlePoints[2].bulge).toBe(0);
 });
 
-test('Test Circle.trim returns empty array when provided with empty intersection list', () => {
-  const circle = new Circle({ points: [new Point(0, 0), new Point(100, 0)] });
-
-  expect(circle.trim([])).toEqual([]);
-  expect(circle.trim()).toEqual([]);
-});
-
-test('Test Circle.trim does not modify circle', () => {
-  const circle = new Circle({ points: [new Point(0, 0), new Point(10, 0)] });
-
-  DesignCore.Mouse.pointOnScene = () => new Point(7.71, 7.71);
-
-  // test a single intersection - not valid
-  const intersections = [new Point(10, 0)];
-  expect(circle.trim(intersections)).toEqual([]);
-
-  // test two intersections - should return an arc
-  intersections.push(new Point(-10, 0));
-  let trimWithTwoPoints = circle.trim(intersections);
-  let trimResult = trimWithTwoPoints[0].entity;
-  expect(trimResult.type).toEqual('Arc');
-  // Verify trimmed arc has a unique handle (not the circle's)
-  expect(trimResult.handle).toBeUndefined();
-  expect(trimResult.points[0].x).toEqual(0);
-  expect(trimResult.points[0].y).toEqual(0);
-
-  expect(trimResult.points[1].x).toEqual(10);
-  expect(trimResult.points[1].y).toEqual(0);
-
-  expect(trimResult.points[2].x).toEqual(-10);
-  expect(trimResult.points[2].y).toEqual(0);
-
-  expect(trimWithTwoPoints[1].entity).toEqual(circle);
-
-  // test three intersections - should return an arc from first two points found
-  intersections.push(new Point(0, 10));
-  trimWithTwoPoints = circle.trim(intersections);
-  trimResult = trimWithTwoPoints[0].entity;
-  expect(trimResult.type).toEqual('Arc');
-  expect(trimResult.points[0].x).toEqual(0);
-  expect(trimResult.points[0].y).toEqual(0);
-
-  expect(trimResult.points[1].x).toEqual(10);
-  expect(trimResult.points[1].y).toEqual(0);
-
-  expect(trimResult.points[2].x).toEqual(0);
-  expect(trimResult.points[2].y).toEqual(10);
-
-  expect(trimWithTwoPoints[1].entity).toEqual(circle);
-
-  // test four intersections - should return an arc from first two points found
-  intersections.push(new Point(0, -10));
-  trimWithTwoPoints = circle.trim(intersections);
-  trimResult = trimWithTwoPoints[0].entity;
-  expect(trimResult.type).toEqual('Arc');
-  expect(trimResult.points[0].x).toEqual(0);
-  expect(trimResult.points[0].y).toEqual(0);
-
-  expect(trimResult.points[1].x).toEqual(10);
-  expect(trimResult.points[1].y).toEqual(0);
-
-  expect(trimResult.points[2].x).toEqual(0);
-  expect(trimResult.points[2].y).toEqual(10);
-
-  expect(trimWithTwoPoints[1].entity).toEqual(circle);
-});
-
 test('Circle.execute creates circle from diameter input', async () => {
   const center = new Point(0, 0);
 
@@ -330,8 +263,8 @@ test('Circle.snaps nearest snap does not fire when too far', () => {
 test('Circle.fromPolylinePoints round-trip preserves centre and radius', () => {
   const circle = new Circle({ points: [new Point(5, 10), new Point(5, 10).project(0, 8)] });
   const polyPts = circle.toPolylinePoints();
-  const rebuilt = new Circle({});
-  rebuilt.fromPolylinePoints(polyPts);
+  const rebuilt = new Circle({}).fromPolylinePoints(polyPts);
+  expect(rebuilt.type).toBe('Circle');
   expect(rebuilt.points[0].x).toBeCloseTo(5, 10);
   expect(rebuilt.points[0].y).toBeCloseTo(10, 10);
   expect(rebuilt.radius).toBeCloseTo(8, 10);
@@ -340,8 +273,8 @@ test('Circle.fromPolylinePoints round-trip preserves centre and radius', () => {
 test('Circle.fromPolylinePoints precision drift is negligible', () => {
   const circle = new Circle({ points: [new Point(123.456, -789.012), new Point(123.456, -789.012).project(1.234, 56.789)] });
   const polyPts = circle.toPolylinePoints();
-  const rebuilt = new Circle({});
-  rebuilt.fromPolylinePoints(polyPts);
+  const rebuilt = new Circle({}).fromPolylinePoints(polyPts);
+  expect(rebuilt.type).toBe('Circle');
   const drift = Math.hypot(rebuilt.points[0].x - circle.points[0].x, rebuilt.points[0].y - circle.points[0].y);
   expect(drift).toBeLessThan(1e-10);
   expect(Math.abs(rebuilt.radius - circle.radius)).toBeLessThan(1e-10);

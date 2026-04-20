@@ -2,7 +2,6 @@ import { Line } from '../../core/entities/line.js';
 import { Point } from '../../core/entities/point.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
-import { AddState, RemoveState } from '../../core/lib/stateManager.js';
 import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
@@ -135,29 +134,6 @@ test('Test Line.toPolylinePoints', () => {
 });
 
 
-test('Test Line.trim returns remove and add states', () => {
-  const line = new Line({ points: [new Point(0, 0), new Point(100, 0)], handle: 'A1' });
-
-  // intersections along the line
-  const i1 = new Point(30, 0);
-  const i2 = new Point(60, 0);
-
-  // place mouse between intersections so trim targets that segment
-  DesignCore.Mouse.pointOnScene = () => new Point(45, 0);
-
-  const changes = line.trim([i1, i2]);
-
-  expect(Array.isArray(changes)).toBe(true);
-  expect(changes.length).toBeGreaterThanOrEqual(2);
-  expect(changes[0]).toBeInstanceOf(AddState);
-  expect(changes[1]).toBeInstanceOf(AddState);
-  expect(changes[2]).toBeInstanceOf(RemoveState);
-
-  // Verify trimmed lines have unique handles (not the original)
-  expect(changes[0].entity.handle).toBeUndefined();
-  expect(changes[1].entity.handle).toBeUndefined();
-});
-
 test('Test Line.draw calls renderer.drawShape with toPolylinePoints', () => {
   const line = new Line({ points: [new Point(0, 0), new Point(10, 5)] });
   let capturedPoints;
@@ -170,21 +146,6 @@ test('Test Line.draw calls renderer.drawShape with toPolylinePoints', () => {
   expect(capturedPoints).toEqual(line.toPolylinePoints());
 });
 
-
-test('Test Line.trim returns empty array when provided with empty intersection list', () => {
-  const line = new Line({ points: [new Point(0, 0), new Point(100, 0)] });
-
-  expect(line.trim([])).toEqual([]);
-  expect(line.trim()).toEqual([]);
-});
-
-
-test('Test Line.extend returns empty array when provided with empty intersection list', () => {
-  const line = new Line({ points: [new Point(0, 0), new Point(100, 0)] });
-
-  expect(line.extend([])).toEqual([]);
-  expect(line.extend()).toEqual([]);
-});
 
 test('Line.execute handles Close option', async () => {
   const pt1 = new Point(0, 0);

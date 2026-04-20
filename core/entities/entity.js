@@ -2,7 +2,7 @@ import { Colours } from '../lib/colours.js';
 import { EntityColour } from '../lib/colour.js';
 import { Intersection } from '../lib/intersect.js';
 import { Point } from './point.js';
-import { Strings } from '../lib/strings.js';
+
 import { Property } from '../properties/property.js';
 
 
@@ -204,28 +204,6 @@ export class Entity {
     }
     // no intersection found. return false
     return false;
-  }
-
-  /**
-   * Extend the entity
-   * @param {Array} points
-   * @return {Array} - array of state changes
-   */
-  extend(points) {
-    // extend function to be overridden by implementation
-    DesignCore.Core.notify(`${this.type} - ${Strings.Message.NOEXTEND}`);
-    return [];
-  }
-
-  /**
-   * Trim the entity
-   * @param {Array} points
-   * @return {Array} - array of state changes
-   */
-  trim(points) {
-    // trim function to be overridden by implementation
-    DesignCore.Core.notify(`${this.type} - ${Strings.Message.NOTRIM}`);
-    return [];
   }
 
   /**

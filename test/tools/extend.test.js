@@ -569,6 +569,82 @@ test('Extend.action does nothing when selectedBoundaryItems is empty', () => {
   expect(extend.selectedItem).toBeNull();
 });
 
+test('Extend.action notifies NOEXTEND when selected entity lacks fromPolylinePoints', () => {
+  // Use a stub entity that has toPolylinePoints but no fromPolylinePoints.
+  // action() must notify and not throw.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(100, -10), new Point(100, 10)] }); // boundary
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+  extend.selectedItem = {
+    type: 'FakeEntity',
+    toPolylinePoints: () => [new Point(0, 0), new Point(50, 0)],
+    // deliberately no fromPolylinePoints
+  };
+  core.mouse.setPosFromScenePoint(new Point(45, 0));
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  extend.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
+  expect(extend.selectedItem).toBeNull();
+  notifySpy.mockRestore();
+});
+
+test('Extend.action notifies NOEXTEND when selected entity is a closed polyline', () => {
+  // Closed polylines have no open endpoints — extend must notify and leave the entity unchanged.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(200, -10), new Point(200, 10)] }); // boundary
+  // Closed square: flag bit 1 set
+  core.scene.addItem('Lwpolyline', {
+    points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)],
+    flags: 1,
+  });
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+  extend.selectedItem = core.scene.entities.get(1);
+  core.mouse.setPosFromScenePoint(new Point(95, 0));
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  extend.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
+  expect(extend.selectedItem).toBeNull();
+  notifySpy.mockRestore();
+});
+
+test('Extend.preview silently skips entity that lacks fromPolylinePoints', () => {
+  // Stub entity implements toPolylinePoints but not fromPolylinePoints.
+  // preview() must return early without calling notify.
+  core.scene.clear();
+  core.scene.addItem('Line', { points: [new Point(100, -10), new Point(100, 10)] }); // boundary
+  DesignCore.Scene.previewEntities.clear();
+
+  const stubEntity = {
+    type: 'FakeEntity',
+    toPolylinePoints: () => [new Point(0, 0), new Point(50, 0)],
+    // deliberately no fromPolylinePoints
+  };
+
+  const notifySpy = jest.spyOn(core, 'notify');
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(0)];
+
+  const savedPointOnScene = DesignCore.Mouse.pointOnScene;
+  const findSpy = jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(0);
+  jest.spyOn(core.scene.entities, 'get').mockReturnValue(stubEntity);
+  DesignCore.Mouse.pointOnScene = () => new Point(45, 0);
+  extend.preview();
+  findSpy.mockRestore();
+  jest.restoreAllMocks();
+  DesignCore.Mouse.pointOnScene = savedPointOnScene;
+
+  expect(DesignCore.Scene.previewEntities.count()).toBe(0);
+  expect(notifySpy).not.toHaveBeenCalled();
+});
+
 test('Extend.action notifies when no intersection found (parallel lines)', () => {
   core.scene.clear();
   // Two parallel horizontal lines — no intersection possible
@@ -623,4 +699,28 @@ test('Extend.action extends the start of a line', () => {
   expect(core.scene.entities.get(1).points[0].y).toBeCloseTo(50);
   expect(core.scene.entities.get(1).points[1].x).toBe(100);
   expect(core.scene.entities.get(1).points[1].y).toBe(50);
+});
+
+test('Extend.action notifies NOEXTEND when end segment of an Arc is curved', () => {
+  // A standalone Arc always has a non-zero bulge on its single segment.
+  // #extendEntity must reject the extension and notify because endSegmentBulge !== 0.
+  core.scene.clear();
+  core.scene.addItem('Arc', {
+    points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)],
+    direction: 1,
+  });
+  // Vertical boundary at x=5 — intersects the CCW quarter-arc
+  core.scene.addItem('Line', { points: [new Point(5, -20), new Point(5, 20)] });
+
+  const extend = new Extend();
+  extend.selectedBoundaryItems = [core.scene.entities.get(1)];
+  extend.selectedItem = core.scene.entities.get(0);
+  core.mouse.setPosFromScenePoint(new Point(9, 1)); // near arc start (10,0)
+
+  const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
+  extend.action();
+
+  expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
+  expect(extend.selectedItem).toBeNull();
+  notifySpy.mockRestore();
 });

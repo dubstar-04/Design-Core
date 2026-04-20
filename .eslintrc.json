@@ -9,10 +9,14 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
+    "plugins": [
+        "import"
+    ],
     "rules": {
         "require-jsdoc": 2,
         "valid-jsdoc": 2,
         "max-len": 0,
+        "import/first": "error",
         "function-paren-newline": "warn",
         "object-curly-spacing": [
             "error",
