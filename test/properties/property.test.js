@@ -11,3 +11,18 @@ test('Test property.loadValue', () => {
   flags.setFlagValue(4);
   expect(Property.loadValue([flags], 3)).toBe(4);
 });
+
+describe('Property.Type', () => {
+  test('has all expected members', () => {
+    expect(Property.Type.NUMBER).toBe('NUMBER');
+    expect(Property.Type.STRING).toBe('STRING');
+    expect(Property.Type.BOOLEAN).toBe('BOOLEAN');
+    expect(Property.Type.LIST).toBe('LIST');
+    expect(Property.Type.COLOUR).toBe('COLOUR');
+    expect(Property.Type.LABEL).toBe('LABEL');
+  });
+
+  test('has exactly 6 members', () => {
+    expect(Object.keys(Property.Type)).toHaveLength(6);
+  });
+});
