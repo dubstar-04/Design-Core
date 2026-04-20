@@ -689,14 +689,15 @@ test('Text setRotation with height 0 does not move points[1]', () => {
   expect(t.points[1]).toBe(originalPoint1);
 });
 
-test('Text constructor remaps insertion point from sequence-11 point', () => {
-  // When points[1] has sequence == 11, it becomes the new insertion point (points[0])
-  const t = new Text({
+test('Text.fromDxf remaps insertion point from sequence-11 point', () => {
+  // When DXF points[1] has sequence == 11, fromDxf uses it as the insertion point (points[0])
+  const data = Text.fromDxf({
     points: [
       { x: 0, y: 0 },
       { x: 50, y: 75, sequence: 11 },
     ],
   });
+  const t = new Text(data);
   expect(t.points[0].x).toBe(50);
   expect(t.points[0].y).toBe(75);
 });
@@ -781,4 +782,61 @@ test('Text.draw updates boundingRect from measureText result', () => {
   text.draw(mockRenderer);
   expect(text.boundingRect.width).toBe(42);
   expect(text.boundingRect.height).toBe(3);
+});
+
+describe('Text.fromDxf', () => {
+  test('projects points[1] from rotation angle (group code 50)', () => {
+    const data = Text.fromDxf({
+      points: [new Point(10, 20)],
+      50: 90,
+      40: 2.5,
+    });
+    const t = new Text(data);
+    expect(t.rotation).toBeCloseTo(90);
+    expect(t.points[1].x).toBeCloseTo(10);
+    expect(t.points[1].y).toBeCloseTo(22.5);
+  });
+
+  test('remaps sequence-11 alignment point to points[0]', () => {
+    const data = Text.fromDxf({
+      points: [
+        new Point(0, 0),
+        { x: 30, y: 40, sequence: 11 },
+      ],
+    });
+    const t = new Text(data);
+    expect(t.points[0].x).toBe(30);
+    expect(t.points[0].y).toBe(40);
+  });
+
+  test('preserves other properties unchanged', () => {
+    const data = Text.fromDxf({
+      points: [new Point(0, 0)],
+      1: 'hello',
+      40: 5,
+      layer: 'TEST',
+    });
+    expect(data[1]).toBe('hello');
+    expect(data[40]).toBe(5);
+    expect(data.layer).toBe('TEST');
+  });
+
+  test('returns data unchanged when no points present', () => {
+    const data = Text.fromDxf({ 1: 'abc' });
+    expect(data[1]).toBe('abc');
+    expect(data.points).toEqual([]);
+  });
+
+  test('result equivalent to direct construction with setRotation', () => {
+    const pt = new Point(5, 10);
+    const fromDxfData = Text.fromDxf({ points: [pt], 50: 45, 40: 2.5 });
+    const t1 = new Text(fromDxfData);
+
+    const t2 = new Text({ points: [pt] });
+    t2.setRotation(45);
+
+    expect(t1.points[0].x).toBeCloseTo(t2.points[0].x);
+    expect(t1.points[0].y).toBeCloseTo(t2.points[0].y);
+    expect(t1.rotation).toBeCloseTo(t2.rotation);
+  });
 });

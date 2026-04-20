@@ -94,16 +94,6 @@ export class Text extends Entity {
       enumerable: true,
     });
 
-    if (data) {
-      // DXF Groupcode 11,21,31 - Second alignment point (optional, used for aligned, middle, or fit text)
-      if (data?.points?.length > 1) {
-        if (data.points[1].sequence == 11) {
-          this.points = [];
-          this.points.push(new Point(data.points[1].x, data.points[1].y));
-        }
-      }
-    }
-
     // DXF Groupcode 1 - Text String
     this.string = Property.loadValue([data?.string, data?.[1]], '');
     // DXF Groupcode 7 - Text Style Name
@@ -111,18 +101,11 @@ export class Text extends Entity {
     // DXF Groupcode 40 - Text Height
     this.height = Property.loadValue([data?.height, data?.[40]], 2.5);
 
-    if (data) {
-      if (data.hasOwnProperty('rotation') || data.hasOwnProperty('50')) {
-        // DXF Groupcode 50 - Text Rotation, angle in degrees
-        // if we get rotation data store this as a point[1] at an angle from point[0]
-        // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
-        this.setRotation(Property.loadValue([data.rotation, data[50]], 0));
-      } else {
-        // create points[1] used to determine the text rotation
-        if (this.points.length && this.height !== undefined) {
-          this.points[1] = this.points[0].add(new Point(this.height, 0));
-        }
-      }
+    // Named scalar rotation for internal API usage (DXF group code 50 is handled by fromDxf)
+    if (data?.rotation !== undefined && !this.points[1]) {
+      this.setRotation(data.rotation);
+    } else if (!this.points[1] && this.points.length && this.height !== undefined) {
+      this.points[1] = this.points[0].add(new Point(this.height, 0));
     }
 
     // DXF Groupcode 72 - Horizontal Alignment
@@ -158,6 +141,34 @@ export class Text extends Entity {
   static register() {
     const command = { command: 'Text', shortcut: 'DT', type: 'Entity' };
     return command;
+  }
+
+  /**
+   * Normalise raw DXF data before construction
+   * @param {Object} data - raw DXF group code object
+   * @return {Object} normalised data with full points array and rotation encoded as points[1]
+   *
+   * Handles:
+   * - Group codes 11,21,31: when a second alignment point with sequence 11 is present it
+   *   replaces points[0] as the text insertion point
+   * - Group code 50: rotation angle (degrees) is projected into points[1] so that all
+   *   rotation logic in the entity works uniformly through the points array
+   */
+  static fromDxf(data) {
+    // DXF group codes 11,21,31 - second alignment point overrides first when present
+    let points = data.points ? [...data.points] : [];
+    if (points.length > 1 && points[1]?.sequence == 11) {
+      points = [new Point(points[1].x, points[1].y)];
+    }
+
+    // DXF group code 50 - text rotation angle in degrees
+    // project points[1] from the insertion point to encode rotation
+    if (data[50] !== undefined && points[0]) {
+      const height = data[40] ?? data.height ?? 2.5;
+      points[1] = points[0].project(Utils.degrees2radians(data[50]), height);
+    }
+
+    return { ...data, points };
   }
 
   /**
