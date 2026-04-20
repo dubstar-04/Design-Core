@@ -1,4 +1,5 @@
 import { Line } from '../entities/line.js';
+import { Entity } from '../entities/entity.js';
 import { Polyline } from '../entities/polyline.js';
 import { Lwpolyline } from '../entities/lwpolyline.js';
 import { Circle } from '../entities/circle.js';
@@ -168,7 +169,10 @@ export class CommandManager {
     let newItem;
     if (this.isCommand(type)) {
       const Cls = classes[this.getCommand(type)];
-      const normalisedData = Cls.fromDxf ? Cls.fromDxf(data) : data;
+      // Phase 1: entity-level normalisation (colour codes etc.) — always applied
+      const entityData = Entity.fromDxf(data);
+      // Phase 2: class-specific geometric normalisation — only when Cls defines its own fromDxf
+      const normalisedData = Object.prototype.hasOwnProperty.call(Cls, 'fromDxf') ? Cls.fromDxf(entityData) : entityData;
       newItem = new Cls(normalisedData);
     } else {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);

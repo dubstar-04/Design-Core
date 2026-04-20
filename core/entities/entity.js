@@ -55,49 +55,46 @@ export class Entity {
     // DXF Groupcode 8 - layername
     this.layer = Property.loadValue([data?.layer, data?.[8]], '0');
 
-    if (data) {
-      if (data.hasOwnProperty('points')) {
-        this.points = data.points;
-      }
+    if (data?.points) {
+      this.points = data.points;
+    }
 
-      if (data.hasOwnProperty('colour') || data.hasOwnProperty('62')) {
-        // DXF Groupcode 62 - Color Number (present if not BYLAYER)(optional);
-        // zero indicates BYBLOCK
-        // 256 indicates BYLAYER;
-        // a negative value indicates that the layer is turned off
-        if (data.colour) {
-          if (Colours.isRGB(data.colour)) {
-            this.colour = data.colour;
-          }
-        } else if (data.hasOwnProperty('62')) {
-          this.entityColour.setColourFromACI(Math.abs(data[62]));
-        }
-      }
+    // DXF Groupcode 62 (normalised to colourACI by Entity.fromDxf) - ACI colour index
+    // DXF Groupcode 420 (normalised to trueColour by Entity.fromDxf) - 24-bit true colour
+    if (data?.colour && Colours.isRGB(data.colour)) {
+      this.colour = data.colour;
+    } else if (data?.colourACI !== undefined) {
+      this.entityColour.setColourFromACI(data.colourACI);
+    }
 
-      if (data.hasOwnProperty('trueColour') || data.hasOwnProperty('420')) {
-        // DXF Groupcode 420 - true color
-        // A 24-bit color value that should be dealt with in terms of bytes with values
-        // of 0 to 255. The lowest byte is the blue value, the middle byte is the
-        // green value, and the third byte is the red value. The top byte is always
-        // 0. The group code cannot be used by custom entities for their own data
-        // because the group code is reserved for AcDbEntity, class-level color data
-        // and AcDbEntity, class-level transparency data
-
-        const trueColour = Colours.trueColourToRGB(data.trueColour || data[420]);
-        if (trueColour) {
-          this.colour = trueColour;
-        }
-      }
+    if (data?.trueColour !== undefined) {
+      const trueColour = Colours.trueColourToRGB(data.trueColour);
+      if (trueColour) this.colour = trueColour;
     }
   }
 
   /**
-   * Default DXF data normalisation — subclasses override when geometric transformation is needed.
-   * @param {Object} data
-   * @return {Object}
+   * Normalise entity-level DXF group codes before construction.
+   * Subclasses override this for geometric transformation; they receive data
+   * that has already passed through this method via CommandManager.
+   * @param {Object} data - raw DXF group code object
+   * @return {Object} normalised data
+   *
+   * Handles:
+   * - Group code 62: ACI colour index → colourACI (absolute value)
+   * - Group code 420: 24-bit true colour integer → trueColour
    */
   static fromDxf(data) {
-    return data;
+    const normalised = { ...data };
+    // DXF group code 62 - Color Number (ACI)
+    if (data[62] !== undefined) {
+      normalised.colourACI = Math.abs(data[62]);
+    }
+    // DXF group code 420 - True Color (24-bit integer)
+    if (data[420] !== undefined) {
+      normalised.trueColour = data[420];
+    }
+    return normalised;
   }
 
   /**
