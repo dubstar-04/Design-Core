@@ -112,6 +112,8 @@ export class Extend extends Tool {
         const stateChanges = this.#extendEntity(this.selectedItem, intersectPoints);
         if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
+        } else {
+          DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOEXTEND}`);
         }
       } else {
         DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOEXTEND}`);
@@ -158,10 +160,7 @@ export class Extend extends Tool {
     const polyPoints = entity.toPolylinePoints();
 
     // Closed entities have no open endpoints to extend
-    if (polyPoints[0].isSame(polyPoints.at(-1))) {
-      DesignCore.Core.notify(`${entity.type} - ${Strings.Message.NOEXTEND}`);
-      return [];
-    }
+    if (polyPoints[0].isSame(polyPoints.at(-1))) return [];
 
     const mousePosition = DesignCore.Mouse.pointOnScene();
     const lastIndex = polyPoints.length - 1;
@@ -191,10 +190,7 @@ export class Extend extends Tool {
     }
 
     // Only straight end-segments can be extended
-    if (endSegmentBulge !== 0) {
-      DesignCore.Core.notify(`${entity.type} - ${Strings.Message.NOEXTEND}`);
-      return [];
-    }
+    if (endSegmentBulge !== 0) return [];
 
     const endPoint = polyPoints[endPointIndex];
     const adjacentPoint = endPointIndex === 0 ? polyPoints[1] : polyPoints[lastIndex - 1];
