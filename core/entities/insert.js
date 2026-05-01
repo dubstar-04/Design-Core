@@ -34,12 +34,17 @@ export class Insert extends Entity {
       writable: true,
     });
 
-    // add rotation property with getter and setter
-    // needs to be enumerable to appear in the object props
-    Object.defineProperty(this, 'rotation', {
-      get: this.getRotation,
-      set: this.setRotation,
-      enumerable: true,
+    this.properties.add(Property.Names.ROTATION, {
+      type: Property.Type.NUMBER,
+      dxfCode: 50,
+      _get: (entity) => entity.getRotation(),
+      _set: (entity, value) => entity.setRotation(value),
+    });
+
+    this.properties.add(Property.Names.BLOCKNAME, {
+      type: Property.Type.LABEL,
+      readOnly: true,
+      _get: (entity) => entity.block?.name ?? '',
     });
 
     if (data) {
@@ -140,8 +145,8 @@ export class Insert extends Entity {
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
-    if (this.rotation) {
-      file.writeGroupCode('50', this.rotation);
+    if (this.getProperty(Property.Names.ROTATION)) {
+      file.writeGroupCode('50', this.getProperty(Property.Names.ROTATION));
     }
   }
 
@@ -153,7 +158,7 @@ export class Insert extends Entity {
   draw(renderer) {
     // blocks are associated with an insert point.
     // Apply the insert location and rotation so block items draw correctly.
-    renderer.applyTransform({ x: this.points[0].x, y: this.points[0].y, rotation: Utils.degrees2radians(this.rotation) });
+    renderer.applyTransform({ x: this.points[0].x, y: this.points[0].y, rotation: Utils.degrees2radians(this.getRotation()) });
     return this.block.items;
   }
 
@@ -202,7 +207,7 @@ export class Insert extends Entity {
       // offset the item snap point by the block insert location
       const rotatedPoint = sp.snapPoint.add(this.points[0]);
       // rotate the snap point to match the item positions
-      const adjustedPoint = rotatedPoint.rotate(this.points[0], Utils.degrees2radians(this.rotation));
+      const adjustedPoint = rotatedPoint.rotate(this.points[0], Utils.degrees2radians(this.getRotation()));
       snaps.push(new SnapPoint(adjustedPoint, sp.type));
     }
 
@@ -230,7 +235,7 @@ export class Insert extends Entity {
   closestPoint(P) {
     // get the closest point from the blocks entities
     // rotate P to match the block rotation
-    const rotatedPoint = P.rotate(this.points[0], Utils.degrees2radians(-this.rotation));
+    const rotatedPoint = P.rotate(this.points[0], Utils.degrees2radians(-this.getRotation()));
     // adjust P by the insert position
     const adjustedPoint = rotatedPoint.subtract(this.points[0]);
     return this.block.closestPoint(adjustedPoint);
