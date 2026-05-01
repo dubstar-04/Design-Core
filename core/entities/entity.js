@@ -4,6 +4,7 @@ import { Intersection } from '../lib/intersect.js';
 import { Point } from './point.js';
 
 import { Property } from '../properties/property.js';
+import { EntityProperties } from '../properties/entityProperties.js';
 
 
 import { DesignCore } from '../designCore.js';
@@ -70,6 +71,11 @@ export class Entity {
     if (data?.trueColour !== undefined) {
       const trueColour = Colours.trueColourToRGB(data.trueColour);
       if (trueColour) this.colour = trueColour;
+    // Typed property store — non-enumerable so it doesn't appear in serialisation
+    Object.defineProperty(this, 'properties', {
+      value: new EntityProperties(),
+      writable: true,
+    });
     }
   }
 
