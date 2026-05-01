@@ -541,12 +541,12 @@ test('actionCommand with a Tool as activeCommand - calls its action method', () 
 test('executeCommand with an entity item - adds item to scene then resets', () => {
   inputManager.reset();
   inputManager.onCommand('Line');
-  const addItemSpy = jest.spyOn(core.scene, 'addItem').mockReturnValue(1);
+  const commitEntitySpy = jest.spyOn(core.scene, 'commitEntity').mockReturnValue(1);
   const line = new Line();
   inputManager.executeCommand(line);
-  expect(addItemSpy).toHaveBeenCalled();
+  expect(commitEntitySpy).toHaveBeenCalled();
   expect(inputManager.activeCommand).toBeUndefined();
-  addItemSpy.mockRestore();
+  commitEntitySpy.mockRestore();
 });
 
 // ─── requestInput validation ──────────────────────────────────────────────────
@@ -763,22 +763,22 @@ test('actionCommand with undefined item and non-Tool activeCommand - does nothin
 test('actionCommand returns the item index when adding an entity', () => {
   inputManager.reset();
   inputManager.onCommand('Line');
-  const addItemSpy = jest.spyOn(core.scene, 'addItem').mockReturnValue(42);
+  const commitEntitySpy = jest.spyOn(core.scene, 'commitEntity').mockReturnValue(42);
   const line = new Line();
   const index = inputManager.actionCommand(line);
   expect(index).toBe(42);
-  addItemSpy.mockRestore();
+  commitEntitySpy.mockRestore();
   inputManager.reset();
 });
 
-test('actionCommand passes index parameter to addItem', () => {
+test('actionCommand passes index parameter to commitEntity', () => {
   inputManager.reset();
   inputManager.onCommand('Line');
-  const addItemSpy = jest.spyOn(core.scene, 'addItem').mockReturnValue(5);
+  const commitEntitySpy = jest.spyOn(core.scene, 'commitEntity').mockReturnValue(5);
   const line = new Line();
   inputManager.actionCommand(line, 5);
-  expect(addItemSpy).toHaveBeenCalledWith(line.type, expect.any(Object), 5);
-  addItemSpy.mockRestore();
+  expect(commitEntitySpy).toHaveBeenCalledWith(line, 5);
+  commitEntitySpy.mockRestore();
   inputManager.reset();
 });
 
