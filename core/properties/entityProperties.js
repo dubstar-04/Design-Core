@@ -34,9 +34,9 @@ export class EntityProperties {
   /**
    * Get the current value of a property.
    * For computed properties, invokes get(entity).
-   * For stored properties, reads entity[name] if entity is provided, else prop.value.
+   * For stored properties, returns prop.value directly.
    * @param {string} name
-   * @param {Object} [entity] - required for computed/stored properties on entity
+   * @param {Object} [entity] - passed to the computed getter when prop.get is defined
    * @return {any} value, or undefined if not registered
    */
   get(name, entity) {
@@ -49,11 +49,11 @@ export class EntityProperties {
   /**
    * Set the value of a property.
    * For computed properties, invokes set(entity, value).
-   * For stored properties, writes entity[name] if entity is provided, else updates prop.value.
+   * For stored properties, updates prop.value directly.
    * No-op if the property is not registered or is readOnly.
    * @param {string} name
    * @param {any} value
-   * @param {Object} [entity] - required for computed/stored properties on entity
+   * @param {Object} [entity] - passed to the computed setter when prop.set is defined
    */
   set(name, value, entity) {
     const prop = this._store[name];
