@@ -58,24 +58,24 @@ describe('StateManager', () => {
     }
     const target = em.get(2);
     sm.commit(em, [new UpdateState(target, { layer: 'newLayer' })]);
-    expect(em.get(2).layer).toBe('newLayer');
+    expect(em.get(2).getProperty('layer')).toBe('newLayer');
     sm.undo();
-    expect(em.get(2).layer).toBe('testLayer');
+    expect(em.get(2).getProperty('layer')).toBe('testLayer');
     sm.redo();
-    expect(em.get(2).layer).toBe('newLayer');
+    expect(em.get(2).getProperty('layer')).toBe('newLayer');
   });
 
   test('addState removed future states', () => {
     const em = new EntityManager();
     const line = new Line({ layer: 'testLayer', points: [new Point(), new Point(10, 11)] });
     sm.commit(em, [new AddState(line)]);
-    expect(em.get(0).layer).toBe('testLayer');
+    expect(em.get(0).getProperty('layer')).toBe('testLayer');
     sm.commit(em, [new UpdateState(line, { layer: 'differentLayer', points: [new Point(1, 2), new Point(101, 110)] })]);
-    expect(em.get(0).layer).toBe('differentLayer');
+    expect(em.get(0).getProperty('layer')).toBe('differentLayer');
     sm.undo();
-    expect(em.get(0).layer).toBe('testLayer');
+    expect(em.get(0).getProperty('layer')).toBe('testLayer');
     sm.redo();
-    expect(em.get(0).layer).toBe('differentLayer');
+    expect(em.get(0).getProperty('layer')).toBe('differentLayer');
   });
 
   test('clearHistory resets history and indices', () => {
