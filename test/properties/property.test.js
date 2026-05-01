@@ -20,9 +20,10 @@ describe('Property.Type', () => {
     expect(Property.Type.LIST).toBe('LIST');
     expect(Property.Type.COLOUR).toBe('COLOUR');
     expect(Property.Type.LABEL).toBe('LABEL');
+    expect(Property.Type.ENTITIES).toBe('ENTITIES');
   });
 
-  test('has exactly 6 members', () => {
+  test('has exactly 7 members', () => {
     expect(Object.keys(Property.Type)).toHaveLength(7);
   });
 });
