@@ -89,7 +89,7 @@ export class Trim extends Tool {
 
     // Draw the full entity in a dulled colour, then draw survivors on top.
     const dulledEntity = Utils.cloneObject(entity);
-    dulledEntity.setColour(Colour.blend(entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
+    dulledEntity.setProperty('colour', Colour.blend(entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
     DesignCore.Scene.previewEntities.add(dulledEntity);
 
     for (const change of stateChanges) {
