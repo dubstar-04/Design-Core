@@ -200,7 +200,7 @@ class State {
           // capture previous properties for undo
           const previousProperties = {};
           for (const prop of Object.getOwnPropertyNames(stateChange.properties)) {
-            previousProperties[prop] = stateChange.entity[prop];
+            previousProperties[prop] = stateChange.entity.getProperty(prop);
           }
           const undoStateChange = new UpdateState(stateChange.entity, previousProperties);
           this.undoStateChanges.push(undoStateChange);
