@@ -1,5 +1,6 @@
 
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 
 /**
  * Entity Manager Class
@@ -36,10 +37,13 @@ export class EntityManager {
     if (!entity) return;
 
     if (this.#trackHandles) {
-      if (entity.handle === undefined) {
-        entity.handle = DesignCore.HandleManager.next();
+      const existingHandle = entity.getProperty?.(Property.Names.HANDLE) ?? entity.handle;
+      if (existingHandle === undefined) {
+        if (entity.setProperty) {
+          entity.setProperty(Property.Names.HANDLE, DesignCore.HandleManager.next());
+        }
       } else {
-        DesignCore.HandleManager.checkHandle(entity.handle);
+        DesignCore.HandleManager.checkHandle(existingHandle);
       }
     }
 
@@ -53,8 +57,9 @@ export class EntityManager {
   remove(index) {
     if (this.#trackHandles) {
       const entity = this.#entities[index];
-      if (entity?.handle !== undefined) {
-        DesignCore.HandleManager.releaseHandle(entity.handle);
+      const handle = entity?.getProperty?.(Property.Names.HANDLE) ?? entity?.handle;
+      if (handle !== undefined) {
+        DesignCore.HandleManager.releaseHandle(handle);
       }
     }
     this.#entities.splice(index, 1);
@@ -97,8 +102,12 @@ export class EntityManager {
     const filteredItems = [];
 
     this.#entities.forEach((item, index) => {
-      if ((type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) && item.hasOwnProperty(prop) && item[prop] === value) {
-        filteredItems.push(index);
+      if (type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) {
+        const inStore = item.properties?.has(prop);
+        const propValue = inStore ? item.getProperty(prop) : (Object.prototype.hasOwnProperty.call(item, prop) ? item[prop] : undefined);
+        if (propValue !== undefined && propValue === value) {
+          filteredItems.push(index);
+        }
       }
     });
 
@@ -125,7 +134,7 @@ export class EntityManager {
 
     for (let i = 0; i < this.#entities.length; i++) {
       // check the items layer is selectable - i.e. on, thawed, etc...
-      const layer = DesignCore.LayerManager.getItemByName(this.#entities[i].layer);
+      const layer = DesignCore.LayerManager.getItemByName(this.#entities[i].getProperty(Property.Names.LAYER));
 
       if (!layer?.isSelectable) {
         continue;
@@ -155,9 +164,7 @@ export class EntityManager {
     }
 
     for (const property of Object.keys(data)) {
-      if (item.hasOwnProperty(property)) {
-        item.setProperty(property, data[property]);
-      }
+      item.setProperty(property, data[property]);
     }
   }
 
