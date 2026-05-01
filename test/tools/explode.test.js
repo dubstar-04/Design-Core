@@ -38,8 +38,8 @@ test('Test Explode.action', () => {
     expect(item.points[0].y).toBe(i * 10 + insertPoint.y);
 
     // Verify each exploded entity has a unique handle
-    expect(item.handle).toBeDefined();
-    expect(handles.has(item.handle)).toBe(false);
-    handles.add(item.handle);
+    expect(item.getProperty('handle')).toBeDefined();
+    expect(handles.has(item.getProperty('handle'))).toBe(false);
+    handles.add(item.getProperty('handle'));
   }
 });
