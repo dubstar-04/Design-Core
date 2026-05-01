@@ -465,7 +465,7 @@ export class Canvas {
   setContext(item, renderer, block = undefined, overrides = {}, scale = this.getScale()) {
     let colour = item.getDrawColour();
     const lineType = item.getLineType();
-    let lineWidth = item.getProperty(Property.Names.LINEWIDTH) / scale;
+    let lineWidth = (item.getProperty(Property.Names.LINEWIDTH) ?? 1) / scale;
     const bg = renderer.getBackgroundColour() ?? { r: 0, g: 0, b: 0 };
 
     if (block && item.entityColour.aci === 0) {
