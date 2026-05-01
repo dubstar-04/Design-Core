@@ -70,13 +70,18 @@ export class Line extends Entity {
         if (pt2 === undefined) break;
 
         if (Input.getType(pt2) === Input.Type.STRING && pt2 === 'Close') {
-          this.points.push(pt1);
-          DesignCore.Scene.inputManager.executeCommand(this);
+          // Commit a 2-point segment from the last accumulated point back to pt1
+          const segment = new Line({ points: [this.points.at(-1), pt1] });
+          DesignCore.Scene.inputManager.executeCommand(segment);
           return;
         }
 
+        // Commit a fresh 2-point segment; keep this.points as the accumulator
+        // so preview() always draws from the last confirmed point to the mouse.
+        const segStart = this.points.at(-1);
         this.points.push(pt2);
-        DesignCore.Scene.inputManager.actionCommand(this);
+        const segment = new Line({ points: [segStart, pt2] });
+        DesignCore.Scene.inputManager.actionCommand(segment);
       }
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
