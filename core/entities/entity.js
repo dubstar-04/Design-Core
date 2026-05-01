@@ -31,15 +31,15 @@ export class Entity {
 
     // DXF Groupcode 62 (normalised to colourACI by Entity.fromDxf) - ACI colour index
     // DXF Groupcode 420 (normalised to trueColour by Entity.fromDxf) - 24-bit true colour
-    if (data?.colour && Colours.isRGB(data.colour)) {
-      this.colour = data.colour;
-    } else if (data?.colourACI !== undefined) {
+    if (data?.colourACI !== undefined) {
       this.entityColour.setColourFromACI(data.colourACI);
     }
 
     if (data?.trueColour !== undefined) {
       const trueColour = Colours.trueColourToRGB(data.trueColour);
-      if (trueColour) this.colour = trueColour;
+      if (trueColour) this.entityColour.setColour(trueColour);
+    }
+
     // Typed property store — non-enumerable so it doesn't appear in serialisation
     Object.defineProperty(this, 'properties', {
       value: new EntityProperties(),
@@ -84,13 +84,10 @@ export class Entity {
       this.entityColour.setColour(data.colour);
     }
 
-    // points — computed, backed by the non-enumerable points array
+    // points — stored value in EntityProperties
     this.properties.add(Property.Names.POINTS, {
       visible: false,
-      _get: (entity) => entity.points,
-      _set: (entity, value) => {
-        entity.points = value;
-      },
+      value: data?.points ?? [],
     });
   }
 
@@ -164,14 +161,6 @@ export class Entity {
     }
 
     return rgb;
-  }
-
-  /**
-   * Set the entity colour
-   * @param {Object} rgb
-   */
-  setColour(rgb) {
-    this.entityColour.setColour(rgb);
   }
 
   /**
