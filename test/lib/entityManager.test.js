@@ -23,7 +23,7 @@ describe('EntityManager', () => {
     expect(mgr.count()).toBe(1);
     const ent = mgr.get(0);
     expect(ent).toBeInstanceOf(Line);
-    expect(ent.layer).toBe(DesignCore.LayerManager.getCstyle());
+    expect(ent.getProperty('layer')).toBe(DesignCore.LayerManager.getCstyle());
   });
 
   test('add/get/count manage entities correctly', () => {
@@ -62,7 +62,7 @@ describe('EntityManager', () => {
     const mgr = DesignCore.Scene.entities;
     const line = new Line({ points: [new Point(0, 0), new Point(1, 0)] });
     mgr.add(line);
-    const handle = line.handle;
+    const handle = line.getProperty('handle');
     expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(true);
     mgr.remove(0);
     expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(false);
@@ -72,7 +72,7 @@ describe('EntityManager', () => {
     const mgr = DesignCore.Scene.entities;
     const line = new Line({ points: [new Point(0, 0), new Point(1, 0)] });
     mgr.add(line);
-    const handle = line.handle;
+    const handle = line.getProperty('handle');
     const sizeAfterAdd = DesignCore.HandleManager.usedHandles.size;
 
     mgr.remove(0);
@@ -82,7 +82,7 @@ describe('EntityManager', () => {
 
     // Re-add the same entity (simulates undo of a delete)
     mgr.add(line);
-    expect(line.handle).toBe(handle);
+    expect(line.getProperty('handle')).toBe(handle);
     expect(DesignCore.HandleManager.usedHandles.has(handle)).toBe(true);
     // Size must return to what it was after the first add, not grow by one.
     // If checkHandle silently re-inserted without the prior releaseHandle, the
