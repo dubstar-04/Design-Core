@@ -46,10 +46,10 @@ test.each(textInputScenarios)('Text.execute handles $desc', async (scenario) => 
     expect(text.points.length).toBeGreaterThanOrEqual(1);
     expect(text.points[0].x).toBe(pt0.x);
     expect(text.points[0].y).toBe(pt0.y);
-    expect(text.height).toBe(expectedHeight);
-    expect(text.rotation).toBe(expectedRotation);
-    expect(text.string).toBe(expectedString);
-    expect(text.styleName).toBe(styleName);
+    expect(text.getProperty('height')).toBe(expectedHeight);
+    expect(text.getProperty('rotation')).toBe(expectedRotation);
+    expect(text.getProperty('string')).toBe(expectedString);
+    expect(text.getProperty('styleName')).toBe(styleName);
   });
 });
 
@@ -97,8 +97,8 @@ test('Test Text.getTextFrameCorners', () => {
 
   // backwards and upsideDown
   text.setRotation(0);
-  text.backwards = true;
-  text.upsideDown = true;
+  text.setProperty('backwards', true);
+  text.setProperty('upsideDown', true);
   corners = text.getTextFrameCorners();
 
   expect(corners[0].x).toBeCloseTo(90);
@@ -116,7 +116,7 @@ test('Test Text.getTextFrameCorners', () => {
   // Text frame calculation with text alignment
   // bounding rect is 10x10, so with center/middle alignment the text frame should be offset by 5 in both x and y from the insertion point
   const alignedText = new Text({ points: [new Point(100, 100)] });
-  alignedText.horizontalAlignment = 1; // center
+  alignedText.setProperty('horizontalAlignment', 1); // center
   corners = alignedText.getTextFrameCorners();
 
   expect(corners[0].x).toBeCloseTo(95);
@@ -133,7 +133,7 @@ test('Test Text.getTextFrameCorners', () => {
 
   // set vertical alignment to middle as well
   // offset the text frame up by another 5 in y so the corners should be at 95,95 - 105,105
-  alignedText.verticalAlignment = 2; // middle
+  alignedText.setProperty('verticalAlignment', 2); // middle
   corners = alignedText.getTextFrameCorners();
 
   expect(corners[0].x).toBeCloseTo(95);
@@ -166,7 +166,7 @@ test('Test Text.getTextFrameCorners', () => {
   expect(corners[3].y).toBeCloseTo(100);
 
   // flip the text backwards and ensure the text frame corners are still correctly calculated with the flipped text
-  alignedText.backwards = true;
+  alignedText.setProperty('backwards', true);
   corners = alignedText.getTextFrameCorners();
 
   expect(corners[0].x).toBeCloseTo(92.92893);
@@ -183,7 +183,7 @@ test('Test Text.getTextFrameCorners', () => {
 
   // test right and top alignment
   const rightAlignedtext = new Text({ points: [new Point(100, 100)] });
-  rightAlignedtext.horizontalAlignment = 2; // right
+  rightAlignedtext.setProperty('horizontalAlignment', 2); // right
   corners = rightAlignedtext.getTextFrameCorners();
 
   expect(corners[0].x).toBeCloseTo(90);
@@ -199,7 +199,7 @@ test('Test Text.getTextFrameCorners', () => {
   expect(corners[3].y).toBeCloseTo(110);
 
   // add vertical alignment top and ensure the text frame is still correctly calculated with the right and top alignment applied
-  rightAlignedtext.verticalAlignment = 3; // top
+  rightAlignedtext.setProperty('verticalAlignment', 3); // top
   corners = rightAlignedtext.getTextFrameCorners();
 
   expect(corners[0].x).toBeCloseTo(90);
@@ -220,47 +220,47 @@ test('Test Text.setRotation', () => {
 
   // Zero
   setRotText.setRotation(0);
-  expect(setRotText.rotation).toBeCloseTo(0);
+  expect(setRotText.getProperty('rotation')).toBeCloseTo(0);
 
   // Positive
   setRotText.setRotation(22.5);
-  expect(setRotText.rotation).toBe(22.5);
+  expect(setRotText.getProperty('rotation')).toBe(22.5);
 
   setRotText.setRotation(23);
-  expect(setRotText.rotation).toBe(23);
+  expect(setRotText.getProperty('rotation')).toBe(23);
 
   setRotText.setRotation(45);
-  expect(setRotText.rotation).toBe(45);
+  expect(setRotText.getProperty('rotation')).toBe(45);
 
   setRotText.setRotation(90);
-  expect(setRotText.rotation).toBe(90);
+  expect(setRotText.getProperty('rotation')).toBe(90);
 
   setRotText.setRotation(135);
-  expect(setRotText.rotation).toBe(135);
+  expect(setRotText.getProperty('rotation')).toBe(135);
 
   setRotText.setRotation(180);
-  expect(setRotText.rotation).toBe(180);
+  expect(setRotText.getProperty('rotation')).toBe(180);
 
   setRotText.setRotation(225);
-  expect(setRotText.rotation).toBe(225);
+  expect(setRotText.getProperty('rotation')).toBe(225);
 
   setRotText.setRotation(270);
-  expect(setRotText.rotation).toBe(270);
+  expect(setRotText.getProperty('rotation')).toBe(270);
 
   // Greater than 360
   setRotText.setRotation((360 + 90));
-  expect(setRotText.rotation).toBe(90);
+  expect(setRotText.getProperty('rotation')).toBe(90);
 
   // Negative
   setRotText.setRotation(-22.5);
-  expect(setRotText.rotation).toBe(337.5);
+  expect(setRotText.getProperty('rotation')).toBe(337.5);
 
   setRotText.setRotation(-90);
-  expect(setRotText.rotation).toBe(270);
+  expect(setRotText.getProperty('rotation')).toBe(270);
 
   // precision - rounds to closest 5 dp
   setRotText.setRotation(10.123456789);
-  expect(setRotText.rotation).toBe(10.12346);
+  expect(setRotText.getProperty('rotation')).toBe(10.12346);
 });
 
 
@@ -308,13 +308,13 @@ test('Test Text.flags', () => {
   const text = new Text();
   expect(text.flags.getFlagValue()).toBe(0);
   // set backwards - set 2 on flags
-  text.backwards = true;
+  text.setProperty('backwards', true);
   expect(text.flags.getFlagValue()).toBe(2);
   // set upsideDown - set 4 on flags
-  text.upsideDown = true;
+  text.setProperty('upsideDown', true);
   expect(text.flags.getFlagValue()).toBe(6);
   // unset backwards - remove 2 on flags
-  text.backwards = false;
+  text.setProperty('backwards', false);
   expect(text.flags.getFlagValue()).toBe(4);
 });
 
@@ -323,10 +323,10 @@ test('Test Text.backwards', () => {
   // 2 = Text is backward (mirrored in X).
   // 4 = Text is upside down (mirrored in Y).
   const text = new Text();
-  expect(text.backwards).toBe(false);
+  expect(text.getProperty('backwards')).toBe(false);
   expect(text.flags.getFlagValue()).toBe(0);
-  text.backwards = true;
-  expect(text.backwards).toBe(true);
+  text.setProperty('backwards', true);
+  expect(text.getProperty('backwards')).toBe(true);
   expect(text.flags.getFlagValue()).toBe(2);
 });
 
@@ -335,10 +335,10 @@ test('Test Text.upsideDown', () => {
   // 2 = Text is backward (mirrored in X).
   // 4 = Text is upside down (mirrored in Y).
   const text = new Text();
-  expect(text.upsideDown).toBe(false);
+  expect(text.getProperty('upsideDown')).toBe(false);
   expect(text.flags.getFlagValue()).toBe(0);
-  text.upsideDown = true;
-  expect(text.upsideDown).toBe(true);
+  text.setProperty('upsideDown', true);
+  expect(text.getProperty('upsideDown')).toBe(true);
   expect(text.flags.getFlagValue()).toBe(4);
 });
 
@@ -389,7 +389,15 @@ AcDbText
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newText = new Text(text);
+  const newText = new Text({
+    handle: text.getProperty('handle'),
+    points: text.points,
+    string: text.getProperty('string'),
+    height: text.getProperty('height'),
+    styleName: text.getProperty('styleName'),
+    horizontalAlignment: text.getProperty('horizontalAlignment'),
+    verticalAlignment: text.getProperty('verticalAlignment'),
+  });
   file = new File();
   newText.dxf(file);
   expect(file.contents).toEqual(dxfString);
@@ -400,9 +408,17 @@ AcDbText
   // and a second alignment point with groupcode 11,21,31 for the text insertion point
   // bounding rect is 10x10, so second point should be at 100-(10*0.5), 200-(10*0.5) = 95, 195
 
-  const centeredText = new Text(text);
-  centeredText.horizontalAlignment = 1; // center
-  centeredText.verticalAlignment = 2; // middle
+  const centeredText = new Text({
+    handle: text.getProperty('handle'),
+    points: text.points,
+    string: text.getProperty('string'),
+    height: text.getProperty('height'),
+    styleName: text.getProperty('styleName'),
+    horizontalAlignment: text.getProperty('horizontalAlignment'),
+    verticalAlignment: text.getProperty('verticalAlignment'),
+  });
+  centeredText.setProperty('horizontalAlignment', 1); // center
+  centeredText.setProperty('verticalAlignment', 2); // middle
   file = new File();
   centeredText.dxf(file);
 
@@ -446,7 +462,15 @@ AcDbText
   expect(file.contents).toEqual(dxfCenteredString);
 
   // create new entity from entity data to ensure all props are loaded
-  const importCenteredText = new Text(centeredText);
+  const importCenteredText = new Text({
+    handle: centeredText.getProperty('handle'),
+    points: centeredText.points,
+    string: centeredText.getProperty('string'),
+    height: centeredText.getProperty('height'),
+    styleName: centeredText.getProperty('styleName'),
+    horizontalAlignment: centeredText.getProperty('horizontalAlignment'),
+    verticalAlignment: centeredText.getProperty('verticalAlignment'),
+  });
   file = new File();
   importCenteredText.dxf(file);
   expect(file.contents).toEqual(dxfCenteredString);
@@ -455,11 +479,11 @@ AcDbText
 test('Text constructor covers all property branches', () => {
   // Minimal data
   let t = new Text({ points: [new Point(1, 2)] });
-  expect(t.string).toBe('');
-  expect(t.height).toBe(2.5);
-  expect(t.horizontalAlignment).toBe(0);
-  expect(t.verticalAlignment).toBe(0);
-  expect(t.styleName).toBe('STANDARD');
+  expect(t.getProperty('string')).toBe('');
+  expect(t.getProperty('height')).toBe(2.5);
+  expect(t.getProperty('horizontalAlignment')).toBe(0);
+  expect(t.getProperty('verticalAlignment')).toBe(0);
+  expect(t.getProperty('styleName')).toBe('STANDARD');
 
   // All DXF groupcodes
   t = new Text({
@@ -479,12 +503,12 @@ test('Text constructor covers all property branches', () => {
     flags: 2,
     71: 4,
   });
-  expect(['abc', 'def']).toContain(t.string);
-  expect(['FOO', 'BAR']).toContain(t.styleName);
-  expect([5, 6]).toContain(t.height);
-  expect([45, 90]).toContain(t.rotation);
-  expect([2, 1]).toContain(t.horizontalAlignment);
-  expect([3, 2]).toContain(t.verticalAlignment);
+  expect(['abc', 'def']).toContain(t.getProperty('string'));
+  expect(['FOO', 'BAR']).toContain(t.getProperty('styleName'));
+  expect([5, 6]).toContain(t.getProperty('height'));
+  expect([45, 90]).toContain(t.getProperty('rotation'));
+  expect([2, 1]).toContain(t.getProperty('horizontalAlignment'));
+  expect([3, 2]).toContain(t.getProperty('verticalAlignment'));
   expect([2, 4, 6, 0]).toContain(t.flags.getFlagValue());
 });
 
@@ -495,33 +519,33 @@ test('Text static register and getApproximateWidth', () => {
 
 test('Text getHorizontalAlignment covers all cases', () => {
   const t = new Text({ points: [new Point()] });
-  t.horizontalAlignment = 0;
+  t.setProperty('horizontalAlignment', 0);
   expect(t.getHorizontalAlignment()).toBe('left');
-  t.horizontalAlignment = 1;
+  t.setProperty('horizontalAlignment', 1);
   expect(t.getHorizontalAlignment()).toBe('center');
-  t.horizontalAlignment = 2;
+  t.setProperty('horizontalAlignment', 2);
   expect(t.getHorizontalAlignment()).toBe('right');
-  t.horizontalAlignment = 3; t.verticalAlignment = 0;
+  t.setProperty('horizontalAlignment', 3); t.setProperty('verticalAlignment', 0);
   expect(t.getHorizontalAlignment()).toBe('aligned');
-  t.horizontalAlignment = 4; t.verticalAlignment = 0;
+  t.setProperty('horizontalAlignment', 4); t.setProperty('verticalAlignment', 0);
   expect(t.getHorizontalAlignment()).toBe('center');
-  t.horizontalAlignment = 5; t.verticalAlignment = 0;
+  t.setProperty('horizontalAlignment', 5); t.setProperty('verticalAlignment', 0);
   expect(t.getHorizontalAlignment()).toBe('fit');
-  t.horizontalAlignment = 99;
+  t.setProperty('horizontalAlignment', 99);
   expect(t.getHorizontalAlignment()).toBe('left');
 });
 
 test('Text getVerticalAlignment covers all cases', () => {
   const t = new Text({ points: [new Point()] });
-  t.verticalAlignment = 0;
+  t.setProperty('verticalAlignment', 0);
   expect(t.getVerticalAlignment()).toBe('alphabetic');
-  t.verticalAlignment = 1;
+  t.setProperty('verticalAlignment', 1);
   expect(t.getVerticalAlignment()).toBe('bottom');
-  t.verticalAlignment = 2;
+  t.setProperty('verticalAlignment', 2);
   expect(t.getVerticalAlignment()).toBe('middle');
-  t.verticalAlignment = 3;
+  t.setProperty('verticalAlignment', 3);
   expect(t.getVerticalAlignment()).toBe('top');
-  t.verticalAlignment = 99;
+  t.setProperty('verticalAlignment', 99);
   expect(t.getVerticalAlignment()).toBe('alphabetic');
 });
 
@@ -579,13 +603,13 @@ test('Text toPolylinePoints returns correct array', () => {
 test('Text setBackwards and setUpsideDown edge cases', () => {
   const t = new Text({ points: [new Point()] });
   t.setBackwards(true);
-  expect(t.backwards).toBe(true);
+  expect(t.getProperty('backwards')).toBe(true);
   t.setBackwards(false);
-  expect(t.backwards).toBe(false);
+  expect(t.getProperty('backwards')).toBe(false);
   t.setUpsideDown(true);
-  expect(t.upsideDown).toBe(true);
+  expect(t.getProperty('upsideDown')).toBe(true);
   t.setUpsideDown(false);
-  expect(t.upsideDown).toBe(false);
+  expect(t.getProperty('upsideDown')).toBe(false);
 });
 
 test('Text setRotation handles undefined and height 0', () => {
@@ -612,8 +636,8 @@ test('Text.execute re-prompts on zero or negative height', async () => {
     const text = new Text({});
     await text.execute();
 
-    expect(text.height).toBe(5);
-    expect(text.string).toBe('Hello');
+    expect(text.getProperty('height')).toBe(5);
+    expect(text.getProperty('string')).toBe('Hello');
   });
 });
 
@@ -625,7 +649,7 @@ test('Text.execute does not create entity for empty string', async () => {
     const text = new Text({});
     await text.execute();
 
-    expect(text.string).toBe('');
+    expect(text.getProperty('string')).toBe('');
   }, { extraMethods: { executeCommand: () => {
     executeCommandCalled = true;
   } } });
@@ -683,7 +707,7 @@ test('Text.getApproximateWidth empty string returns 0', () => {
 
 test('Text setRotation with height 0 does not move points[1]', () => {
   const t = new Text({ points: [new Point(0, 0)] });
-  t.height = 0;
+  t.setProperty('height', 0);
   const originalPoint1 = t.points[1];
   t.setRotation(45);
   expect(t.points[1]).toBe(originalPoint1);
@@ -704,24 +728,24 @@ test('Text.fromDxf remaps insertion point from sequence-11 point', () => {
 
 test('Text getHorizontalAlignment unsupported cases return left when verticalAlignment !== 0', () => {
   const t = new Text({ points: [new Point()] });
-  t.verticalAlignment = 1; // non-zero
+  t.setProperty('verticalAlignment', 1); // non-zero
 
-  t.horizontalAlignment = 3;
+  t.setProperty('horizontalAlignment', 3);
   expect(t.getHorizontalAlignment()).toBe('left');
 
-  t.horizontalAlignment = 4;
+  t.setProperty('horizontalAlignment', 4);
   expect(t.getHorizontalAlignment()).toBe('left');
 
-  t.horizontalAlignment = 5;
+  t.setProperty('horizontalAlignment', 5);
   expect(t.getHorizontalAlignment()).toBe('left');
 });
 
 test('Text.dxf includes non-zero flags and rotation', () => {
   const text = new Text({ handle: '1', points: [new Point(0, 0)] });
-  text.backwards = true; // flag value 2
-  text.upsideDown = true; // flag value 4  → combined = 6
+  text.setProperty('backwards', true); // flag value 2
+  text.setProperty('upsideDown', true); // flag value 4  → combined = 6
   text.setRotation(90);
-  text.string = 'R';
+  text.setProperty('string', 'R');
 
   const file = new File();
   text.dxf(file);
@@ -792,7 +816,7 @@ describe('Text.fromDxf', () => {
       40: 2.5,
     });
     const t = new Text(data);
-    expect(t.rotation).toBeCloseTo(90);
+    expect(t.getProperty('rotation')).toBeCloseTo(90);
     expect(t.points[1].x).toBeCloseTo(10);
     expect(t.points[1].y).toBeCloseTo(22.5);
   });
@@ -837,6 +861,6 @@ describe('Text.fromDxf', () => {
 
     expect(t1.points[0].x).toBeCloseTo(t2.points[0].x);
     expect(t1.points[0].y).toBeCloseTo(t2.points[0].y);
-    expect(t1.rotation).toBeCloseTo(t2.rotation);
+    expect(t1.getProperty('rotation')).toBeCloseTo(t2.getProperty('rotation'));
   });
 });
