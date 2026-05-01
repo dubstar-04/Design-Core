@@ -76,7 +76,53 @@ export class Entity {
       value: new EntityProperties(),
       writable: true,
     });
+
+    // DXF Groupcode 5 - Handle
+    this.properties.add(Property.Names.HANDLE, {
+      type: Property.Type.STRING,
+      value: Property.loadValue([data?.handle, data?.[5]]),
+      visible: false,
+      dxfCode: 5,
+    });
+    // DXF Groupcode 8 - Layer name
+    this.properties.add(Property.Names.LAYER, {
+      type: Property.Type.LIST,
+      value: Property.loadValue([data?.layer, data?.[8]], '0'),
+      dxfCode: 8,
+    });
+    // DXF Groupcode 6 - Line type
+    this.properties.add(Property.Names.LINETYPE, {
+      type: Property.Type.LIST,
+      value: Property.loadValue([data?.lineType, data?.[6]], 'ByLayer'),
+      dxfCode: 6,
+    });
+    // DXF Groupcode 39 - Thickness (lineWidth)
+    this.properties.add(Property.Names.LINEWIDTH, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.lineWidth, data?.[39]], 1),
+      dxfCode: 39,
+    });
+    // DXF Groupcode 62/420 - colour (computed, backed by entityColour)
+    this.properties.add(Property.Names.COLOUR, {
+      type: Property.Type.COLOUR,
+      _get: (entity) => entity.entityColour.getColour(),
+      _set: (entity, value) => entity.entityColour.setColour(value),
+      dxfCode: 62,
+    });
+
+    // Apply colour from data if RGB was passed directly
+    if (data?.colour && Colours.isRGB(data.colour)) {
+      this.entityColour.setColour(data.colour);
     }
+
+    // points — computed, backed by the non-enumerable points array
+    this.properties.add(Property.Names.POINTS, {
+      visible: false,
+      _get: (entity) => entity.points,
+      _set: (entity, value) => {
+        entity.points = value;
+      },
+    });
   }
 
   /**
