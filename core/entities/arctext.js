@@ -143,6 +143,7 @@ export class ArcAlignedText extends Entity {
       type: Property.Type.LIST,
       value: Property.loadValue([data?.styleName, data?.[7]], 'STANDARD'),
       dxfCode: 7,
+      options: () => DesignCore.StyleManager.getItems().map((s) => ({ display: s.name, value: s.name })),
     });
 
     // DXF Groupcode 40 - Radius
@@ -219,21 +220,24 @@ export class ArcAlignedText extends Entity {
 
     // DXF Groupcode 71 - 1 = outward, 2 = inward
     this.properties.add(Property.Names.TEXTORIENTATION, {
-      type: Property.Type.NUMBER,
+      type: Property.Type.LIST,
       value: Property.loadValue([data?.textOrientation, data?.[71]], 1),
       dxfCode: 71,
+      options: () => [{ display: 'Outward', value: 1 }, { display: 'Inward', value: 2 }],
     });
     // DXF Groupcode 72 - 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
     this.properties.add(Property.Names.TEXTALIGNMENT, {
-      type: Property.Type.NUMBER,
+      type: Property.Type.LIST,
       value: Property.loadValue([data?.textAlignment, data?.[72]], 4),
       dxfCode: 72,
+      options: () => [{ display: 'Fit', value: 1 }, { display: 'Left', value: 2 }, { display: 'Right', value: 3 }, { display: 'Center', value: 4 }],
     });
     // DXF Groupcode 73 - Arc Side: convex = 1, concave = 2
     this.properties.add(Property.Names.ARCSIDE, {
-      type: Property.Type.NUMBER,
+      type: Property.Type.LIST,
       value: Property.loadValue([data?.arcSide, data?.[73]], 1),
       dxfCode: 73,
+      options: () => [{ display: 'Convex', value: 1 }, { display: 'Concave', value: 2 }],
     });
 
     // DXF Groupcode 74 - Bold 0 = off, 1 = on
