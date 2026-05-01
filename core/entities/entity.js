@@ -24,41 +24,10 @@ export class Entity {
       writable: true,
     });
 
-    Object.defineProperty(this, 'points', {
-      value: [],
-      writable: true,
-    });
-
-    Object.defineProperty(this, 'colour', {
-      get: this.getColour,
-      set: this.setColour,
-      enumerable: true,
-    });
-
     Object.defineProperty(this, 'entityColour', {
       value: new EntityColour(),
       writable: true,
     });
-
-    this.lineWidth = 1;
-    this.lineType = 'ByLayer';
-    this.layer = '0';
-
-    // DXF Groupcode 5 - Handle
-    Object.defineProperty(this, 'handle', {
-      value: Property.loadValue([data?.handle, data?.[5]]),
-      writable: true,
-    });
-    // DXF Groupcode 6 - lineType
-    this.lineType = Property.loadValue([data?.lineType, data?.[6]], 'ByLayer');
-    // DXF Groupcode 39 - Thickness (lineWidth)
-    this.lineWidth = Property.loadValue([data?.lineWidth, data?.[39]], 1);
-    // DXF Groupcode 8 - layername
-    this.layer = Property.loadValue([data?.layer, data?.[8]], '0');
-
-    if (data?.points) {
-      this.points = data.points;
-    }
 
     // DXF Groupcode 62 (normalised to colourACI by Entity.fromDxf) - ACI colour index
     // DXF Groupcode 420 (normalised to trueColour by Entity.fromDxf) - 24-bit true colour
@@ -123,6 +92,22 @@ export class Entity {
         entity.points = value;
       },
     });
+  }
+
+  /**
+   * Get the entity's geometry points.
+   * @return {Array<Point>}
+   */
+  get points() {
+    return this.properties.get(Property.Names.POINTS, this);
+  }
+
+  /**
+   * Set the entity's geometry points.
+   * @param {Array<Point>} value
+   */
+  set points(value) {
+    this.properties.set(Property.Names.POINTS, value, this);
   }
 
   /**
