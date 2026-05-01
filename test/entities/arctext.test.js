@@ -29,12 +29,12 @@ test.each(arcInputScenarios)('ArcText.execute handles $desc', async (scenario) =
     const arcText = new ArcAlignedText();
     await arcText.execute();
 
-    expect(arcText.styleName).toBe('STANDARD');
-    expect(arcText.height).toBe(expectedTextHeight);
-    expect(arcText.string).toBe(expectedText);
+    expect(arcText.getProperty('styleName')).toBe('STANDARD');
+    expect(arcText.getProperty('height')).toBe(expectedTextHeight);
+    expect(arcText.getProperty('string')).toBe(expectedText);
 
     // arc props
-    expect(arcText.radius).toBe(100);
+    expect(arcText.getProperty('radius')).toBe(100);
     expect(arcText.startAngle()).toBe(0);
     expect(arcText.endAngle()).toBeCloseTo(3.14159);
   }, { selectedItems });
@@ -290,7 +290,21 @@ STANDARD
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newArcAlignedText = new ArcAlignedText(arctext);
+  const newArcAlignedText = new ArcAlignedText({
+    handle: arctext.getProperty('handle'),
+    points: arctext.points,
+    string: arctext.getProperty('string'),
+    styleName: arctext.getProperty('styleName'),
+    radius: arctext.getProperty('radius'),
+    height: arctext.getProperty('height'),
+    characterSpacing: arctext.getProperty('characterSpacing'),
+    offsetFromArc: arctext.getProperty('offsetFromArc'),
+    offsetFromRight: arctext.getProperty('offsetFromRight'),
+    offsetFromLeft: arctext.getProperty('offsetFromLeft'),
+    textOrientation: arctext.getProperty('textOrientation'),
+    textAlignment: arctext.getProperty('textAlignment'),
+    arcSide: arctext.getProperty('arcSide'),
+  });
   file = new File();
   newArcAlignedText.dxf(file);
   expect(file.contents).toEqual(dxfString);
