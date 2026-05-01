@@ -58,12 +58,14 @@ export class Entity {
       type: Property.Type.LIST,
       value: Property.loadValue([data?.layer, data?.[8]], '0'),
       dxfCode: 8,
+      options: () => DesignCore.LayerManager.getItems().map((l) => ({ display: l.name, value: l.name })),
     });
     // DXF Groupcode 6 - Line type
     this.properties.add(Property.Names.LINETYPE, {
       type: Property.Type.LIST,
       value: Property.loadValue([data?.lineType, data?.[6]], 'ByLayer'),
       dxfCode: 6,
+      options: () => DesignCore.LTypeManager.getItems().map((s) => ({ display: s.name, value: s.name })),
     });
     // DXF Groupcode 39 - Thickness (lineWidth)
     this.properties.add(Property.Names.LINEWIDTH, {
