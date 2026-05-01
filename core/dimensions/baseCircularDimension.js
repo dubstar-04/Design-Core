@@ -11,6 +11,7 @@ import { Logging } from '../lib/logging.js';
 import { BaseDimension } from './baseDimension.js';
 
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 
 
 /**
@@ -32,7 +33,7 @@ export class BaseCircularDimension extends BaseDimension {
    */
   async execute() {
     try {
-      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
+      this.setProperty(Property.Names.DIMENSIONSTYLE, DesignCore.DimStyleManager.getCstyle());
 
       let Pt10;
       let Pt15;
