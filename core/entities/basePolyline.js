@@ -76,6 +76,14 @@ export class BasePolyline extends Entity {
 
     this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[70]], 0));
 
+    // DXF Groupcode 70 bit 1 - closed flag exposed via EntityProperties
+    this.properties.add(Property.Names.CLOSED, {
+      type: Property.Type.BOOLEAN,
+      _get: (entity) => entity.flags.hasFlag(1),
+      _set: (entity, value) => value ? entity.flags.addValue(1) : entity.flags.removeValue(1),
+      dxfCode: 70,
+    });
+
     // If the first and last points are the same the polyline should be considered closed.
     // Require at least 4 points so that after removing the duplicate endpoint at least 3 remain.
     if (this.points.length >= 4 && this.points[0].isSame(this.points.at(-1))) {
