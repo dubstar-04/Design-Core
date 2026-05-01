@@ -155,7 +155,7 @@ export function buildHatchGrid(renderer) {
     // AR-* patterns have large inter-line spacing; scale down so lines are visible
     const scale = name.startsWith('AR-') ? 0.1 : 1;
     const hatch = new Hatch({ patternName: name, scale });
-    hatch.childEntities = [hatchBoundary];
+    hatch.setProperty('childEntities', [hatchBoundary]);
     hatch.buildPatternCache();
 
     // Draw hatch fill
