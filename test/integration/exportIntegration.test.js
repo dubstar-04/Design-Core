@@ -113,13 +113,13 @@ beforeAll(() => {
     patternName: 'ANSI31',
     layer: 'HATCH_LAYER',
   });
-  hatch.childEntities = [boundary];
+  hatch.setProperty('childEntities', [boundary]);
   core.scene.entities.add(hatch);
   core.scene.entities.add(new Text({ points: [new Point(15, 205)], string: 'Hatch', height: 4 }));
 
   // Row 2, Col 1: Insert
   const blockLine = new Line({ points: [new Point(0, 0), new Point(40, 40)] });
-  blockLine.handle = DesignCore.HandleManager.next();
+  blockLine.setProperty('handle', DesignCore.HandleManager.next());
   const block = DesignCore.Scene.blockManager.addItem({
     name: 'TEST_BLOCK',
     items: [blockLine],
