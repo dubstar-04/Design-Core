@@ -47,14 +47,14 @@ export class Polyline extends BasePolyline {
     if (file.version < DXFFile.Version.R2000) {
       // POLYLINE/VERTEX/SEQEND format for R12
       file.writeGroupCode('0', 'POLYLINE');
-      file.writeGroupCode('8', this.layer);
-      file.writeGroupCode('6', this.lineType);
+      file.writeGroupCode('8', this.getProperty('layer'));
+      file.writeGroupCode('6', this.getProperty('lineType'));
       file.writeGroupCode('66', 1); // vertices-follow flag
       file.writeGroupCode('70', this.flags.getFlagValue());
 
       for (let i = 0; i < this.points.length; i++) {
         file.writeGroupCode('0', 'VERTEX');
-        file.writeGroupCode('8', this.layer);
+        file.writeGroupCode('8', this.getProperty('layer'));
         file.writeGroupCode('10', this.points[i].x);
         file.writeGroupCode('20', this.points[i].y);
         file.writeGroupCode('30', '0.0');
@@ -62,7 +62,7 @@ export class Polyline extends BasePolyline {
       }
 
       file.writeGroupCode('0', 'SEQEND');
-      file.writeGroupCode('8', this.layer);
+      file.writeGroupCode('8', this.getProperty('layer'));
       return;
     }
 
