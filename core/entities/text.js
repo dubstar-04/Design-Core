@@ -75,19 +75,22 @@ export class Text extends Entity {
       type: Property.Type.LIST,
       value: Property.loadValue([data?.styleName, data?.[7]], 'STANDARD'),
       dxfCode: 7,
+      options: () => DesignCore.StyleManager.getItems().map((s) => ({ display: s.name, value: s.name })),
     });
     // DXF Groupcode 72 - Horizontal Alignment
     const hAlign = Property.loadValue([data?.horizontalAlignment, data?.[72]], 0);
     this.properties.add(Property.Names.HORIZONTALALIGNMENT, {
-      type: Property.Type.NUMBER,
+      type: Property.Type.LIST,
       value: hAlign > 2 ? 1 : hAlign,
       dxfCode: 72,
+      options: () => [{ display: 'Left', value: 0 }, { display: 'Center', value: 1 }, { display: 'Right', value: 2 }],
     });
     // DXF Groupcode 73 - Vertical Alignment (0=Baseline; 1=Bottom; 2=Middle; 3=Top)
     this.properties.add(Property.Names.VERTICALALIGNMENT, {
-      type: Property.Type.NUMBER,
+      type: Property.Type.LIST,
       value: Property.loadValue([data?.verticalAlignment, data?.[73]], 0),
       dxfCode: 73,
+      options: () => [{ display: 'Baseline', value: 0 }, { display: 'Bottom', value: 1 }, { display: 'Middle', value: 2 }, { display: 'Top', value: 3 }],
     });
     // DXF Groupcode 71 - flags (bit-coded): 2=backward, 4=upsideDown
     this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[71]], 0));
