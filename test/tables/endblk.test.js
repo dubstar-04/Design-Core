@@ -3,12 +3,12 @@ import { File } from '../test-helpers/test-helpers.js';
 
 test('Test EndBlock constructor defaults', () => {
   const endblk = new EndBlock();
-  expect(endblk.layer).toBe('0');
+  expect(endblk.getProperty('layer')).toBe('0');
 });
 
 test('Test EndBlock constructor with layer', () => {
   const endblk = new EndBlock({ 8: 'TestLayer' });
-  expect(endblk.layer).toBe('TestLayer');
+  expect(endblk.getProperty('layer')).toBe('TestLayer');
 });
 
 test('Test EndBlock.dxf', () => {
