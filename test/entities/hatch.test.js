@@ -20,7 +20,7 @@ const points = [new Point(100, 100, 1), new Point(200, 100, 1)];
 const boundaryShape = new BasePolyline({ points: points });
 
 const hatch = new Hatch({ handle: '1' });
-hatch.childEntities = [boundaryShape];
+hatch.setProperty('childEntities', [boundaryShape]);
 
 const hatchInputScenarios = [
   {
@@ -66,9 +66,9 @@ test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) =
 
     await hatch.execute();
 
-    expect(hatch.childEntities.length).toBe(1);
+    expect(hatch.getProperty('childEntities').length).toBe(1);
 
-    expect(hatch.childEntities[0].points.length).toBe(pointCount); // closed polyline adds extra point
+    expect(hatch.getProperty('childEntities')[0].points.length).toBe(pointCount); // closed polyline adds extra point
 
     expect(hatch.points.length).toBe(2);
     // hatch first point should be at 0,0
@@ -77,10 +77,9 @@ test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) =
     // hatch last point should be at 1,1
     expect(hatch.points.at(-1).x).toBe(1);
     expect(hatch.points.at(-1).y).toBe(1);
-    expect(hatch.pattern).toBe(expectedPattern);
-    expect(hatch.scale).toBe(expectedScale);
-    expect(hatch.angle).toBe(expectedAngle);
-    expect(hatch.solid).toBe(expectedPattern === 'SOLID');
+    expect(hatch.getProperty('patternName')).toBe(expectedPattern);
+    expect(hatch.getProperty('scale')).toBe(expectedScale);
+    expect(hatch.getProperty('angle')).toBe(expectedAngle);
   });
 });
 
@@ -116,10 +115,9 @@ test('Test Hatch', () => {
 
   const newHatch = new Hatch(data);
 
-  expect(newHatch.patternName).toBe('HONEY');
-  expect(newHatch.angle).toBe(45);
-  expect(newHatch.scale).toBe(2);
-  expect(newHatch.solid).toBe(false);
+  expect(newHatch.getProperty('patternName')).toBe('HONEY');
+  expect(newHatch.getProperty('angle')).toBe(45);
+  expect(newHatch.getProperty('scale')).toBe(2);
 });
 
 test('Test Hatch.getDataValue', () => {
@@ -133,19 +131,20 @@ test('Test Hatch.getDataValue', () => {
   expect(hatch.getDataValue(data, 72)).toBe(0);
 });
 
-test('Test Hatch.getPatternName', () => {
-  expect(hatch.getPatternName()).toBe('ANSI31');
+test('Test Hatch patternName', () => {
+  expect(hatch.getProperty('patternName')).toBe('ANSI31');
+
+  hatch.setProperty('patternName', 'Solid');
+  expect(hatch.getProperty('patternName')).toBe('SOLID');
+
+  hatch.setProperty('patternName', 'Ansi31');
+  expect(hatch.getProperty('patternName')).toBe('ANSI31');
 });
 
-test('Test Hatch.setPatternName', () => {
-  expect(hatch.solid).toBe(false);
-  hatch.setPatternName('Solid');
-  expect(hatch.pattern).toBe('SOLID');
-  expect(hatch.solid).toBe(true);
-
-  hatch.setPatternName('Ansi31');
-  expect(hatch.pattern).toBe('ANSI31');
-  expect(hatch.solid).toBe(false);
+test('Test Hatch dxfCode 70 overrides patternName to SOLID', () => {
+  const data = { '2': 'ANSI31', '70': 1 };
+  const h = new Hatch(data);
+  expect(h.getProperty('patternName')).toBe('SOLID');
 });
 
 test('Test Hatch.closestPoint', () => {
@@ -297,8 +296,8 @@ ANSI31
 
   // Export rotated and scaled
   const rotatedScaleHatch = new Hatch({ handle: '1' });
-  rotatedScaleHatch.angle = 45;
-  rotatedScaleHatch.scale = 2;
+  rotatedScaleHatch.setProperty('angle', 45);
+  rotatedScaleHatch.setProperty('scale', 2);
 
   file = new File();
   rotatedScaleHatch.dxf(file);
@@ -311,7 +310,7 @@ ANSI31
   const boundary = rotatedScaleHatch.processSelection([shape]);
   expect(boundary[0]).toBeInstanceOf(Polyline);
 
-  rotatedScaleHatch.childEntities = boundary;
+  rotatedScaleHatch.setProperty('childEntities', boundary);
   rotatedScaleHatch.dxf(file);
   // console.log(file.contents);
 
@@ -540,7 +539,7 @@ function makeMockCtx() {
 
 test('Test Hatch.draw solid fill renders filled boundary', () => {
   const solidHatch = new Hatch({ patternName: 'SOLID' });
-  solidHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })];
+  solidHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })]);
 
   const ctx = makeMockCtx();
   solidHatch.draw(ctx);
@@ -550,9 +549,9 @@ test('Test Hatch.draw solid fill renders filled boundary', () => {
 
 test('Test Hatch.draw unknown pattern does not stroke pattern lines', () => {
   const unknownHatch = new Hatch({ patternName: 'ANSI31' });
-  unknownHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })];
-  // Override pattern to a nonexistent name without going through setPatternName
-  unknownHatch.pattern = 'NOTAPATTERN';
+  unknownHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })]);
+  // Override pattern to a nonexistent name
+  unknownHatch.setProperty('patternName', 'NOTAPATTERN');
 
   const ctx = makeMockCtx();
   unknownHatch.draw(ctx);
@@ -568,7 +567,7 @@ test('Test Hatch.draw tight bound line count - square boundary', () => {
   // yIncrement = ceil(70.71 / 3.175) = 23 → loop i=-23..22 = 46 raw lines
   // i=-23 (|ly|=73.025 > halfY=70.71) misses the square → 45 clipped segments
   const squareHatch = new Hatch({ patternName: 'ANSI31' });
-  squareHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
+  squareHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
   const ctx = makeMockCtx();
   squareHatch.draw(ctx);
   expect(ctx.getMoveCalls()).toBe(45);
@@ -581,7 +580,7 @@ test('Test Hatch.draw tight bound line count - flat boundary', () => {
   // yIncrement = ceil(38.89 / 3.175) = 13 → loop i=-13..12 = 26 raw lines
   // i=-13 (|ly|=41.275 > halfY=38.89) misses the flat box → 25 clipped segments
   const flatHatch = new Hatch({ patternName: 'ANSI31' });
-  flatHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })];
+  flatHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })]);
   const ctx = makeMockCtx();
   flatHatch.draw(ctx);
   expect(ctx.getMoveCalls()).toBe(25);
@@ -590,10 +589,10 @@ test('Test Hatch.draw tight bound line count - flat boundary', () => {
 test('Test Hatch.draw tight bound produces fewer lines for flat boundary', () => {
   // A flat boundary (100x10) should produce fewer lines than a square (100x100).
   const squareHatch = new Hatch({ patternName: 'ANSI31' });
-  squareHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
+  squareHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
 
   const flatHatch = new Hatch({ patternName: 'ANSI31' });
-  flatHatch.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })];
+  flatHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })]);
 
   const squareCtx = makeMockCtx();
   squareHatch.draw(squareCtx);
@@ -615,15 +614,15 @@ test('Hatch.buildPatternCache no childEntities sets cachedPattern to empty array
 
 test('Hatch.buildPatternCache solid fill sets cachedPattern to empty array', () => {
   const h = new Hatch({ patternName: 'SOLID' });
-  h.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
+  h.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
   h.buildPatternCache();
   expect(h.cachedPattern).toEqual([]);
 });
 
 test('Hatch.buildPatternCache unknown pattern sets cachedPattern to empty array', () => {
   const h = new Hatch({ patternName: 'HONEY' });
-  h.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
-  h.pattern = 'NOTAPATTERN';
+  h.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
+  h.setProperty('patternName', 'NOTAPATTERN');
   h.buildPatternCache();
   expect(h.cachedPattern).toEqual([]);
 });
@@ -645,7 +644,7 @@ const totalSegments = (h) => h.cachedPattern.reduce((s, f) => s + f.segments.len
 
 test('Hatch.buildPatternCache HONEY has 3 families each with dashes and segments', () => {
   const h = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h.childEntities = makeSquare();
+  h.setProperty('childEntities', makeSquare());
   h.buildPatternCache();
 
   expect(h.cachedPattern.length).toBe(3);
@@ -657,11 +656,11 @@ test('Hatch.buildPatternCache HONEY has 3 families each with dashes and segments
 
 test('Hatch.buildPatternCache HONEY scale 2 dashes are 2× scale 1 dashes', () => {
   const h1 = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h1.childEntities = makeSquare();
+  h1.setProperty('childEntities', makeSquare());
   h1.buildPatternCache();
 
   const h2 = new Hatch({ patternName: 'HONEY', scale: 2 });
-  h2.childEntities = makeSquare();
+  h2.setProperty('childEntities', makeSquare());
   h2.buildPatternCache();
 
   for (let i = 0; i < h1.cachedPattern.length; i++) {
@@ -676,11 +675,11 @@ test('Hatch.buildPatternCache HONEY scale 2 dashes are 2× scale 1 dashes', () =
 
 test('Hatch.buildPatternCache HONEY scale 2 produces fewer segments than scale 1', () => {
   const h1 = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h1.childEntities = makeSquare();
+  h1.setProperty('childEntities', makeSquare());
   h1.buildPatternCache();
 
   const h2 = new Hatch({ patternName: 'HONEY', scale: 2 });
-  h2.childEntities = makeSquare();
+  h2.setProperty('childEntities', makeSquare());
   h2.buildPatternCache();
 
   expect(totalSegments(h2)).toBeLessThan(totalSegments(h1));
@@ -688,11 +687,11 @@ test('Hatch.buildPatternCache HONEY scale 2 produces fewer segments than scale 1
 
 test('Hatch.buildPatternCache ANSI31 scale 2 produces fewer segments than scale 1', () => {
   const h1 = new Hatch({ patternName: 'ANSI31', scale: 1 });
-  h1.childEntities = makeSquare();
+  h1.setProperty('childEntities', makeSquare());
   h1.buildPatternCache();
 
   const h2 = new Hatch({ patternName: 'ANSI31', scale: 2 });
-  h2.childEntities = makeSquare();
+  h2.setProperty('childEntities', makeSquare());
   h2.buildPatternCache();
 
   expect(h2.cachedPattern[0].segments.length).toBeLessThan(h1.cachedPattern[0].segments.length);
@@ -700,7 +699,7 @@ test('Hatch.buildPatternCache ANSI31 scale 2 produces fewer segments than scale 
 
 test('Hatch.buildPatternCache HONEY all dashPhase values are non-negative', () => {
   const h = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h.childEntities = makeSquare();
+  h.setProperty('childEntities', makeSquare());
   h.buildPatternCache();
 
   for (const family of h.cachedPattern) {
@@ -712,7 +711,7 @@ test('Hatch.buildPatternCache HONEY all dashPhase values are non-negative', () =
 
 test('Hatch.buildPatternCache scale change invalidates and rebuilds cache with updated dashes', () => {
   const h = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h.childEntities = makeSquare();
+  h.setProperty('childEntities', makeSquare());
   h.buildPatternCache();
 
   const dashes1 = [...h.cachedPattern[0].dashes];
@@ -739,7 +738,7 @@ const makeInnerSquare = () => new BasePolyline({ points: [new Point(40, 40), new
 test('Hatch.buildPatternCache ANSI31 nested boundary: no segment midpoint inside inner hole', () => {
   // Even-odd rule: a ray from inside the hole crosses 2 boundaries → even → not hatched
   const h = new Hatch({ patternName: 'ANSI31', scale: 1 });
-  h.childEntities = [makeSquare()[0], makeInnerSquare()];
+  h.setProperty('childEntities', [makeSquare()[0], makeInnerSquare()]);
   h.buildPatternCache();
 
   for (const family of h.cachedPattern) {
@@ -754,11 +753,11 @@ test('Hatch.buildPatternCache ANSI31 nested boundary: no segment midpoint inside
 test('Hatch.buildPatternCache ANSI31 nested boundary produces more segments than outer-only', () => {
   // Lines that cross the hole are split into two sub-segments, increasing total count
   const outerOnly = new Hatch({ patternName: 'ANSI31', scale: 1 });
-  outerOnly.childEntities = makeSquare();
+  outerOnly.setProperty('childEntities', makeSquare());
   outerOnly.buildPatternCache();
 
   const withHole = new Hatch({ patternName: 'ANSI31', scale: 1 });
-  withHole.childEntities = [makeSquare()[0], makeInnerSquare()];
+  withHole.setProperty('childEntities', [makeSquare()[0], makeInnerSquare()]);
   withHole.buildPatternCache();
 
   expect(withHole.cachedPattern[0].segments.length).toBeGreaterThan(outerOnly.cachedPattern[0].segments.length);
@@ -766,7 +765,7 @@ test('Hatch.buildPatternCache ANSI31 nested boundary produces more segments than
 
 test('Hatch.buildPatternCache HONEY nested boundary: no segment midpoint inside inner hole', () => {
   const h = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h.childEntities = [makeSquare()[0], makeInnerSquare()];
+  h.setProperty('childEntities', [makeSquare()[0], makeInnerSquare()]);
   h.buildPatternCache();
 
   expect(h.cachedPattern.length).toBe(3);
@@ -781,11 +780,11 @@ test('Hatch.buildPatternCache HONEY nested boundary: no segment midpoint inside 
 
 test('Hatch.buildPatternCache HONEY nested boundary produces more segments than outer-only', () => {
   const outerOnly = new Hatch({ patternName: 'HONEY', scale: 1 });
-  outerOnly.childEntities = makeSquare();
+  outerOnly.setProperty('childEntities', makeSquare());
   outerOnly.buildPatternCache();
 
   const withHole = new Hatch({ patternName: 'HONEY', scale: 1 });
-  withHole.childEntities = [makeSquare()[0], makeInnerSquare()];
+  withHole.setProperty('childEntities', [makeSquare()[0], makeInnerSquare()]);
   withHole.buildPatternCache();
 
   expect(totalSegments(withHole)).toBeGreaterThan(totalSegments(outerOnly));
@@ -807,7 +806,7 @@ const makeCircleBoundary = (cx, cy, r) => {
 
 test('Hatch.buildPatternCache HONEY circle boundary has 3 families with dashes and segments', () => {
   const h = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h.setProperty('childEntities', [makeCircleBoundary(50, 50, 40)]);
   h.buildPatternCache();
 
   expect(h.cachedPattern.length).toBe(3);
@@ -819,11 +818,11 @@ test('Hatch.buildPatternCache HONEY circle boundary has 3 families with dashes a
 
 test('Hatch.buildPatternCache HONEY circle scale 2 dashes are 2× scale 1 dashes', () => {
   const h1 = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h1.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h1.setProperty('childEntities', [makeCircleBoundary(50, 50, 40)]);
   h1.buildPatternCache();
 
   const h2 = new Hatch({ patternName: 'HONEY', scale: 2 });
-  h2.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h2.setProperty('childEntities', [makeCircleBoundary(50, 50, 40)]);
   h2.buildPatternCache();
 
   for (let i = 0; i < h1.cachedPattern.length; i++) {
@@ -838,11 +837,11 @@ test('Hatch.buildPatternCache HONEY circle scale 2 dashes are 2× scale 1 dashes
 
 test('Hatch.buildPatternCache HONEY circle scale 2 produces fewer segments than scale 1', () => {
   const h1 = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h1.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h1.setProperty('childEntities', [makeCircleBoundary(50, 50, 40)]);
   h1.buildPatternCache();
 
   const h2 = new Hatch({ patternName: 'HONEY', scale: 2 });
-  h2.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h2.setProperty('childEntities', [makeCircleBoundary(50, 50, 40)]);
   h2.buildPatternCache();
 
   expect(totalSegments(h2)).toBeLessThan(totalSegments(h1));
@@ -850,7 +849,7 @@ test('Hatch.buildPatternCache HONEY circle scale 2 produces fewer segments than 
 
 test('Hatch.buildPatternCache HONEY circle all dashPhase values are non-negative', () => {
   const h = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h.childEntities = [makeCircleBoundary(50, 50, 40)];
+  h.setProperty('childEntities', [makeCircleBoundary(50, 50, 40)]);
   h.buildPatternCache();
 
   for (const family of h.cachedPattern) {
@@ -862,7 +861,7 @@ test('Hatch.buildPatternCache HONEY circle all dashPhase values are non-negative
 
 test('Hatch.buildPatternCache ANSI31 outer square + inner circle hole: no segment midpoint inside circle', () => {
   const h = new Hatch({ patternName: 'ANSI31', scale: 1 });
-  h.childEntities = [makeSquare()[0], makeCircleBoundary(50, 50, 15)];
+  h.setProperty('childEntities', [makeSquare()[0], makeCircleBoundary(50, 50, 15)]);
   h.buildPatternCache();
 
   for (const family of h.cachedPattern) {
@@ -876,7 +875,7 @@ test('Hatch.buildPatternCache ANSI31 outer square + inner circle hole: no segmen
 
 test('Hatch.buildPatternCache HONEY outer square + inner circle hole: no segment midpoint inside circle', () => {
   const h = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h.childEntities = [makeSquare()[0], makeCircleBoundary(50, 50, 15)];
+  h.setProperty('childEntities', [makeSquare()[0], makeCircleBoundary(50, 50, 15)]);
   h.buildPatternCache();
 
   for (const family of h.cachedPattern) {
@@ -890,7 +889,7 @@ test('Hatch.buildPatternCache HONEY outer square + inner circle hole: no segment
 
 test('Hatch.buildPatternCache ANSI31 outer circle + inner circle hole: no segment midpoint inside inner circle', () => {
   const h = new Hatch({ patternName: 'ANSI31', scale: 1 });
-  h.childEntities = [makeCircleBoundary(50, 50, 40), makeCircleBoundary(50, 50, 15)];
+  h.setProperty('childEntities', [makeCircleBoundary(50, 50, 40), makeCircleBoundary(50, 50, 15)]);
   h.buildPatternCache();
 
   expect(h.cachedPattern[0].segments.length).toBeGreaterThan(0);
@@ -905,7 +904,7 @@ test('Hatch.buildPatternCache ANSI31 outer circle + inner circle hole: no segmen
 
 test('Hatch.buildPatternCache HONEY outer circle + inner circle hole: no segment midpoint inside inner circle', () => {
   const h = new Hatch({ patternName: 'HONEY', scale: 1 });
-  h.childEntities = [makeCircleBoundary(50, 50, 40), makeCircleBoundary(50, 50, 15)];
+  h.setProperty('childEntities', [makeCircleBoundary(50, 50, 40), makeCircleBoundary(50, 50, 15)]);
   h.buildPatternCache();
 
   expect(h.cachedPattern.length).toBe(3);
@@ -924,56 +923,55 @@ test('Hatch.setProperty unknown property does nothing', () => {
   const h = new Hatch({ patternName: 'ANSI31', angle: 10 });
   h.setProperty('nonExistentProperty', 99);
   expect(h.hasOwnProperty('nonExistentProperty')).toBe(false);
-  expect(h.angle).toBe(10);
+  expect(h.getProperty('angle')).toBe(10);
 });
 
 test('Hatch.setProperty known property updates value and invalidates cache', () => {
   const h = new Hatch({ patternName: 'ANSI31', angle: 0 });
-  h.childEntities = makeSquare();
+  h.setProperty('childEntities', makeSquare());
   h.buildPatternCache();
   expect(h.cachedPattern).not.toBeNull();
 
   h.setProperty('angle', 45);
 
-  expect(h.angle).toBe(45);
+  expect(h.getProperty('angle')).toBe(45);
   expect(h.cachedPattern).toBeNull();
 });
 
 test('Hatch.setProperty patternName updates pattern and solid flag via setter', () => {
   const h = new Hatch({ patternName: 'ANSI31' });
-  expect(h.solid).toBe(false);
+  expect(h.getProperty('patternName')).toBe('ANSI31');
 
   h.setProperty('patternName', 'SOLID');
 
-  expect(h.pattern).toBe('SOLID');
-  expect(h.solid).toBe(true);
+  expect(h.getProperty('patternName')).toBe('SOLID');
   expect(h.cachedPattern).toBeNull();
 });
 
 test('Hatch.setProperty points translation shifts child entity positions', () => {
   const h = new Hatch({ patternName: 'ANSI31' });
   // h.points = [Point(0,0), Point(1,1)] — 45° angle set by constructor
-  h.childEntities = [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })];
+  h.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })]);
 
   // New points: same 45° angle (delta angle = 0 → no rotation), origin shifted by (5, 0)
   h.setProperty('points', [new Point(5, 0), new Point(6, 1)]);
 
-  expect(h.childEntities[0].points[0].x).toBeCloseTo(5);
-  expect(h.childEntities[0].points[0].y).toBeCloseTo(0);
-  expect(h.childEntities[0].points[1].x).toBeCloseTo(15);
-  expect(h.childEntities[0].points[1].y).toBeCloseTo(0);
+  expect(h.getProperty('childEntities')[0].points[0].x).toBeCloseTo(5);
+  expect(h.getProperty('childEntities')[0].points[0].y).toBeCloseTo(0);
+  expect(h.getProperty('childEntities')[0].points[1].x).toBeCloseTo(15);
+  expect(h.getProperty('childEntities')[0].points[1].y).toBeCloseTo(0);
   expect(h.cachedPattern).toBeNull();
 });
 
 test('Hatch.setProperty points rotation updates hatch angle', () => {
   const h = new Hatch({ patternName: 'ANSI31', angle: 0 });
-  h.childEntities = makeSquare();
+  h.setProperty('childEntities', makeSquare());
   // h.points = [Point(0,0), Point(1,1)] — 45° angle
   // New points: [Point(0,0), Point(1,0)] — 0° angle → theta = -45°
   h.setProperty('points', [new Point(0, 0), new Point(1, 0)]);
 
   // hatch.angle should decrease by 45°
-  expect(h.angle).toBeCloseTo(-45, 1);
+  expect(h.getProperty('angle')).toBeCloseTo(-45, 1);
   expect(h.cachedPattern).toBeNull();
 });
 
@@ -986,13 +984,13 @@ test('Hatch.touched with no childEntities returns false', () => {
 
 test('Hatch.touched returns true when selection overlaps boundary', () => {
   const h = new Hatch({ patternName: 'ANSI31' });
-  h.childEntities = makeSquare(); // 0,0 → 100,100
+  h.setProperty('childEntities', makeSquare()); // 0,0 → 100,100
   expect(h.touched({ min: new Point(-10, -10), max: new Point(50, 50) })).toBe(true);
 });
 
 test('Hatch.touched returns false when selection does not overlap boundary', () => {
   const h = new Hatch({ patternName: 'ANSI31' });
-  h.childEntities = makeSquare(); // 0,0 → 100,100
+  h.setProperty('childEntities', makeSquare()); // 0,0 → 100,100
   expect(h.touched({ min: new Point(200, 200), max: new Point(300, 300) })).toBe(false);
 });
 
@@ -1000,13 +998,13 @@ test('Hatch.touched returns false when selection does not overlap boundary', () 
 
 test('Hatch.draw scale guard resets sub-zero scale to 1 and rebuilds cache', () => {
   const h = new Hatch({ patternName: 'ANSI31' });
-  h.childEntities = makeSquare();
-  h.scale = 0.001; // below guard threshold
+  h.setProperty('childEntities', makeSquare());
+  h.setProperty('scale', 0.001); // below guard threshold
 
   const ctx = makeMockCtx();
   h.draw(ctx);
 
-  expect(h.scale).toBe(1);
+  expect(h.getProperty('scale')).toBe(1);
   expect(h.cachedPattern).not.toBeNull();
 });
 
@@ -1044,7 +1042,7 @@ function makeTrackingCtx() {
 
 test('Hatch.draw ANSI31 solid-line family batches all segments into one stroke call', () => {
   const h = new Hatch({ patternName: 'ANSI31' });
-  h.childEntities = makeSquare();
+  h.setProperty('childEntities', makeSquare());
 
   const ctx = makeTrackingCtx();
   h.draw(ctx);
@@ -1056,7 +1054,7 @@ test('Hatch.draw ANSI31 solid-line family batches all segments into one stroke c
 
 test('Hatch.draw HONEY dashed family sets lineDashOffset and strokes once per segment', () => {
   const h = new Hatch({ patternName: 'HONEY' });
-  h.childEntities = makeSquare();
+  h.setProperty('childEntities', makeSquare());
   h.buildPatternCache();
   const expectedSegs = totalSegments(h);
 
