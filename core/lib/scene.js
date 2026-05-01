@@ -8,7 +8,7 @@ import { Headers } from './headers.js';
 
 import { DesignCore } from '../designCore.js';
 import { BlockManager } from '../tables/blockManager.js';
-import { AddState, StateManager, UpdateState } from './stateManager.js';
+import { AddState, StateManager, UpdateState, ReplaceState } from './stateManager.js';
 
 /**
  * Scene Class
@@ -120,7 +120,7 @@ export class Scene {
       return this.entities.count() - 1;
     } else {
       const existingItem = this.entities.get(index);
-      this.commit([new UpdateState(existingItem, entity)]);
+      this.commit([new ReplaceState(existingItem, entity)]);
       return index;
     }
   }
