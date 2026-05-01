@@ -102,7 +102,7 @@ export class Entity {
    * @return {number} rgb colour object
    */
   getColour() {
-    return this.entityColour.getColour(); ;
+    return this.entityColour.getColour();
   }
 
   /**
