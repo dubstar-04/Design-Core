@@ -87,7 +87,7 @@ AcDbBlockReference
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newInsert = new Insert(insert);
+  const newInsert = new Insert({ handle: insert.getProperty('handle'), points: insert.points });
   file = new File();
   newInsert.dxf(file);
   expect(file.contents).toEqual(dxfString);
@@ -186,7 +186,7 @@ describe('Insert.fromDxf', () => {
     const pt = new Point(5, 10);
     const i1 = new Insert(Insert.fromDxf({ points: [pt], 50: 90 }));
     const i2 = new Insert({ points: [pt], rotation: 90 });
-    expect(i1.rotation).toBeCloseTo(i2.rotation);
+    expect(i1.getProperty('rotation')).toBeCloseTo(i2.getProperty('rotation'));
   });
 
   test('unimplemented codes do not throw', () => {
