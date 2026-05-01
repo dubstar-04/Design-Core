@@ -75,6 +75,9 @@ export class Arc extends Entity {
   static fromDxf(data) {
     const center = data.points?.[0];
     if (!center) return data;
+    // validate required group codes for points-based arc representation are present
+    if (data[40] === undefined || data[50] === undefined || data[51] === undefined) return data;
+
     const radius = data[40];
     return {
       ...data,
