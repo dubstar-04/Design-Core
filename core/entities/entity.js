@@ -150,6 +150,15 @@ export class Entity {
   }
 
   /**
+   * Get a property value by name.
+   * @param {string} name
+   * @return {any}
+   */
+  getProperty(name) {
+    return this.properties.get(name, this);
+  }
+
+  /**
    * get rgb colour
    * @return {number} rgb colour object
    */
