@@ -41,46 +41,37 @@ export class Hatch extends Entity {
       enumerable: false,
     });
 
-    // store the boundary shapes
-    Object.defineProperty(this, 'childEntities', {
+    // Boundary shapes stored in EntityProperties so all entity data lives in one place.
+    this.properties.add(Property.Names.CHILDENTITIES, {
+      type: Property.Type.ENTITIES,
       value: [],
-      writable: true,
+      visible: false,
     });
 
-    Object.defineProperty(this, 'pattern', {
-      value: 'ANSI31',
-      writable: true,
-    });
+    // lineType not applicable to hatch
+    this.properties.remove(Property.Names.LINETYPE);
 
-    Object.defineProperty(this, 'solid', {
-      value: false,
-      writable: true,
-    });
+    const rawPatternName = String(Property.loadValue([data?.[2], data?.patternName], 'ANSI31')).toUpperCase();
+    // DXF Groupcode 70 - Solid Fill Flag (1 = solid, 0 = pattern): if set, override pattern name
+    const resolvedPatternName = data?.[70] === 1 ? 'SOLID' : rawPatternName;
 
-    Object.defineProperty(this, 'patternName', {
-      // value: 'ANSI31',
-      // writable: true,
-      enumerable: true,
-      get: this.getPatternName,
-      set: this.setPatternName,
+    // DXF Groupcode 2 - Hatch pattern name
+    this.properties.add(Property.Names.PATTERNNAME, {
+      type: Property.Type.LIST,
+      value: resolvedPatternName,
+      dxfCode: 2,
     });
-
-    Object.defineProperty(this, 'angle', {
-      value: 0,
-      writable: true,
-      enumerable: true,
+    // DXF Groupcode 41 - Hatch pattern scale
+    this.properties.add(Property.Names.SCALE, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.[41], data?.scale], 1),
+      dxfCode: 41,
     });
-
-    Object.defineProperty(this, 'scale', {
-      value: 1,
-      writable: true,
-      enumerable: true,
-    });
-
-    // hide inherited properties
-    // needs to be enumerable=false to not appear in the object props
-    Object.defineProperty(this, 'lineType', {
-      enumerable: false,
+    // DXF Groupcode 52 - Hatch pattern angle
+    this.properties.add(Property.Names.ANGLE, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.[52], data?.angle], 0),
+      dxfCode: 52,
     });
 
     // add a single point to this.points if no other points exist
@@ -88,24 +79,15 @@ export class Hatch extends Entity {
       this.points.push(new Point());
     }
 
-    // DXF Groupcode 70 - Solid Fill Flag (1 = solid, 0 = pattern)
-    this.solid = Boolean(Property.loadValue([data?.solid, data?.[70]], 0));
-    // DXF Groupcode 2 - Hatch pattern name
-    this.patternName = Property.loadValue([data?.patternName, data?.[2]], 'ANSI31');
-    // DXF Groupcode 41 - Hatch pattern scale
-    this.scale = Property.loadValue([data?.scale, data?.[41]], 1);
-    // DXF Groupcode 52 - Hatch pattern angle
-    this.angle = Property.loadValue([data?.angle, data?.[52]], 0);
-
     if (data) {
       if (data.hasOwnProperty('childEntities')) {
         if (Array.isArray(data.childEntities)) {
-          this.childEntities = data.childEntities;
+          this.setProperty(Property.Names.CHILDENTITIES, data.childEntities);
         }
       } else {
         const shapes = this.processBoundaryData(data);
         if (shapes.length) {
-          this.childEntities = shapes;
+          this.setProperty(Property.Names.CHILDENTITIES, shapes);
         }
       }
     }
@@ -121,37 +103,17 @@ export class Hatch extends Entity {
   }
 
   /**
-   * Get the hatch pattern name
-   * @return {string}
-   */
-  getPatternName() {
-    return this.pattern;
-  }
-
-  /**
-   * Set the hatch pattern name
-   * @param {string} name
-   */
-  setPatternName(name) {
-    const upper = name.toUpperCase();
-    if (this.pattern === upper) return;
-    this.pattern = upper;
-    this.solid = this.pattern === 'SOLID';
-    this.cachedPattern = null;
-  }
-
-  /**
    * Build and cache world-space line segments for the current pattern.
    * For pattern hatches, segments are pre-clipped against the boundary using
    * geometric intersection so draw() requires no ctx.save/clip/restore overhead.
    */
   buildPatternCache() {
-    if (!this.childEntities.length) {
+    if (!this.getProperty(Property.Names.CHILDENTITIES).length) {
       this.cachedPattern = [];
       return;
     }
 
-    if (this.solid || !Patterns.patternExists(this.patternName)) {
+    if (this.getProperty(Property.Names.PATTERNNAME) === 'SOLID' || !Patterns.patternExists(this.getProperty(Property.Names.PATTERNNAME))) {
       this.cachedPattern = [];
       return;
     }
@@ -164,8 +126,9 @@ export class Hatch extends Entity {
     // An intersection point that lands exactly on a junction vertex will be reported
     // by both adjacent segments, doubling the crossing count unless we deduplicate.
     const boundaryVertices = [];
-    for (let i = 0; i < this.childEntities.length; i++) {
-      const shape = this.childEntities[i];
+    const childEntities = this.getProperty(Property.Names.CHILDENTITIES);
+    for (let i = 0; i < childEntities.length; i++) {
+      const shape = childEntities[i];
       if (!shape.points.length) continue;
       const pts = [...shape.points];
       if (!pts[0].isSame(pts.at(-1))) pts.push(pts[0]);
@@ -180,10 +143,10 @@ export class Hatch extends Entity {
     const centerPoint = bb.centerPoint;
     const bbXLength = bb.xLength;
     const bbYLength = bb.yLength;
-    const s = this.scale;
+    const s = this.getProperty(Property.Names.SCALE);
     const lines = [];
 
-    const pattern = Patterns.getPattern(this.patternName);
+    const pattern = Patterns.getPattern(this.getProperty(Property.Names.PATTERNNAME));
     pattern.forEach((patternLine) => {
       let dashLength = bbXLength / 2;
       if (patternLine.dashes.length) {
@@ -202,7 +165,7 @@ export class Hatch extends Entity {
       dashes = dashes.map((x) => (Math.abs(x) + 0.00001) * s);
 
       // Combined rotation: pattern line angle plus the hatch entity angle
-      const rotation = Utils.degrees2radians(patternLine.angle + this.angle);
+      const rotation = Utils.degrees2radians(patternLine.angle + this.getProperty(Property.Names.ANGLE));
 
       // Precomputed rotation components used to transform between pattern-local
       // (line-aligned) space and world space throughout this family's loop.
@@ -522,7 +485,7 @@ export class Hatch extends Entity {
         const boundary = this.processSelection(selectedItems);
 
         if (boundary.length) {
-          this.childEntities = boundary;
+          this.setProperty(Property.Names.CHILDENTITIES, boundary);
           validBoundary = true;
         } else {
         // reset selection
@@ -545,7 +508,7 @@ export class Hatch extends Entity {
     const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
     const shapes = this.processSelection(selectedItems);
     if (shapes.length) {
-      DesignCore.Scene.previewEntities.create(this.type, { points: this.points, childEntities: shapes });
+      DesignCore.Scene.previewEntities.create(this.type, { points: this.points, childEntities: shapes }); // childEntities is passed as plain data here, not via getProperty
     }
   }
 
@@ -639,24 +602,24 @@ export class Hatch extends Entity {
    */
   draw(renderer) {
     // ensure the scale is valid
-    if (this.scale < 0.01) {
-      this.scale = 1;
-      this.cachedPattern = null;
+    if (this.getProperty(Property.Names.SCALE) < 0.01) {
+      this.setProperty(Property.Names.SCALE, 1);
     }
 
-    if (!this.childEntities.length) return;
+    const childEntitiesDraw = this.getProperty(Property.Names.CHILDENTITIES);
+    if (!childEntitiesDraw.length) return;
 
     // Build cache if stale (cachedPattern === null means never built or invalidated)
     if (this.cachedPattern === null) this.buildPatternCache();
 
-    if (this.solid) {
+    if (this.getProperty(Property.Names.PATTERNNAME) === 'SOLID') {
       // Design renders solid hatches with a direct fill() call rather than the
       // dense cross-hatch line pattern used by commercial CAD applications
       // (Commercial CAD's SOLID pattern uses two line families at 0.0001-unit spacing).
       // fill() is resolution-independent, handles curved boundaries exactly,
       // and avoids the cost of generating and clipping thousands of segments.
       renderer.beginPath();
-      for (const shape of this.childEntities) {
+      for (const shape of childEntitiesDraw) {
         if (!shape.points.length) continue;
         renderer.tracePath(shape.toPolylinePoints());
         renderer.closePath();
@@ -675,7 +638,7 @@ export class Hatch extends Entity {
     const isHovered = DesignCore.Scene.hoverEntities.indexOf(this) !== -1;
     if (isSelected || isHovered) {
       renderer.setDash([], 0);
-      for (const shape of this.childEntities) {
+      for (const shape of childEntitiesDraw) {
         if (!shape.points.length) continue;
         renderer.drawShape(shape.toPolylinePoints(), { closed: true });
       }
@@ -688,14 +651,15 @@ export class Hatch extends Entity {
    */
   dxf(file) {
     // skip if no boundary shapes
-    if (!this.childEntities.length) {
+    const childEntitiesDxf = this.getProperty(Property.Names.CHILDENTITIES);
+    if (!childEntitiesDxf.length) {
       return;
     }
 
     file.writeGroupCode('0', 'HATCH');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
     file.writeGroupCode('100', 'AcDbHatch', DXFFile.Version.R2000);
     file.writeGroupCode('10', '0.0');
     file.writeGroupCode('20', '0.0');
@@ -705,15 +669,15 @@ export class Hatch extends Entity {
     file.writeGroupCode('220', '0.0'); // Extrusion Direction Y
     file.writeGroupCode('230', '1.0'); // Extrusion Direction Z
 
-    file.writeGroupCode('2', this.patternName); // Hatch pattern name
-    file.writeGroupCode('70', this.solid ? 1 : 0); // Solid Fill Flag (1 = solid, 0 = pattern)
+    file.writeGroupCode('2', this.getProperty(Property.Names.PATTERNNAME)); // Hatch pattern name
+    file.writeGroupCode('70', this.getProperty(Property.Names.PATTERNNAME) === 'SOLID' ? 1 : 0); // Solid Fill Flag (1 = solid, 0 = pattern)
     file.writeGroupCode('71', '0'); // Associativity flag (associative = 1; non-associative = 0); for MPolygon, solid-fill flag (has solidfill = 1; lacks solid fill = 0)
 
 
-    file.writeGroupCode('91', this.childEntities.length); // Number of boundary path loops
+    file.writeGroupCode('91', childEntitiesDxf.length); // Number of boundary path loops
 
-    for (let i = 0; i < this.childEntities.length; i++) {
-      const shape = this.childEntities[i];
+    for (let i = 0; i < childEntitiesDxf.length; i++) {
+      const shape = childEntitiesDxf[i];
       file.writeGroupCode('92', '7'); // Boundary path type flag (bit coded): 0 = Default; 1 = External; 2 = Polyline 4 = Derived; 8 = Textbox; 16 = Outermost
       file.writeGroupCode('72', '1'); // Edge type (only if boundary is not a polyline): 1 = Line; 2 = Circular arc; 3 = Elliptic arc; 4 = Spline
       file.writeGroupCode('73', '1'); // For MPolygon, boundary annotation flag (boundary is an annotated boundary = 1; boundary is not an annotated boundary = 0)
@@ -731,25 +695,25 @@ export class Hatch extends Entity {
     file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
     file.writeGroupCode('76', '1'); // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
 
-    if (!this.solid) {
-      file.writeGroupCode('52', this.angle); // Hatch Pattern angle
-      file.writeGroupCode('41', this.scale); // Hatch Pattern scale
+    if (this.getProperty(Property.Names.PATTERNNAME) !== 'SOLID') {
+      file.writeGroupCode('52', this.getProperty(Property.Names.ANGLE)); // Hatch Pattern angle
+      file.writeGroupCode('41', this.getProperty(Property.Names.SCALE)); // Hatch Pattern scale
       file.writeGroupCode('77', '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
-      file.writeGroupCode('78', Patterns.getPatternLineCount(this.patternName)); // Number of pattern definition lines
+      file.writeGroupCode('78', Patterns.getPatternLineCount(this.getProperty(Property.Names.PATTERNNAME))); // Number of pattern definition lines
 
       // Pattern data
-      const pattern = Patterns.getPattern(this.patternName);
+      const pattern = Patterns.getPattern(this.getProperty(Property.Names.PATTERNNAME));
       pattern.forEach((patternLine) => {
-        file.writeGroupCode('53', patternLine.angle + this.angle); // Pattern line angle
+        file.writeGroupCode('53', patternLine.angle + this.getProperty(Property.Names.ANGLE)); // Pattern line angle
         file.writeGroupCode('43', patternLine.xOrigin); // Pattern line base X
         file.writeGroupCode('44', patternLine.yOrigin); // Pattern line base y
-        const deltaPoint = new Point(patternLine.xDelta * this.scale, patternLine.yDelta * this.scale);
-        const rotatedDelta = deltaPoint.rotate(new Point(), Utils.degrees2radians(patternLine.angle + this.angle));
+        const deltaPoint = new Point(patternLine.xDelta * this.getProperty(Property.Names.SCALE), patternLine.yDelta * this.getProperty(Property.Names.SCALE));
+        const rotatedDelta = deltaPoint.rotate(new Point(), Utils.degrees2radians(patternLine.angle + this.getProperty(Property.Names.ANGLE)));
         file.writeGroupCode('45', rotatedDelta.x); // Pattern line offset x
         file.writeGroupCode('46', rotatedDelta.y); // Pattern line offset y
         file.writeGroupCode('79', patternLine.dashes.length); // Number of dash length items
         patternLine.dashes.forEach((dash) => {
-          file.writeGroupCode('49', dash * this.scale); // Dash length
+          file.writeGroupCode('49', dash * this.getProperty(Property.Names.SCALE)); // Dash length
         });
       });
     }
@@ -791,8 +755,9 @@ export class Hatch extends Entity {
    */
   isInside(P) {
     // P = P.subtract(this.points[0]);
-    for (let i = 0; i < this.childEntities.length; i++) {
-      const shape = this.childEntities[i];
+    const childEntities = this.getProperty(Property.Names.CHILDENTITIES);
+    for (let i = 0; i < childEntities.length; i++) {
+      const shape = childEntities[i];
 
       if (shape.boundingBox().isInside(P)) {
         const polyline = [...shape.points];
@@ -822,7 +787,8 @@ export class Hatch extends Entity {
    * @return {BoundingBox}
    */
   boundingBox() {
-    if (this.childEntities.length === 0) {
+    const childEntities = this.getProperty(Property.Names.CHILDENTITIES);
+    if (childEntities.length === 0) {
       return new BoundingBox();
     }
 
@@ -831,8 +797,8 @@ export class Hatch extends Entity {
     let ymin = Infinity;
     let ymax = -Infinity;
 
-    for (let i = 0; i < this.childEntities.length; i++) {
-      const shape = this.childEntities[i];
+    for (let i = 0; i < childEntities.length; i++) {
+      const shape = childEntities[i];
 
       const boundingBox = shape.boundingBox();
 
@@ -854,8 +820,9 @@ export class Hatch extends Entity {
    * @return {boolean} true if touched
    */
   touched(selection) {
-    for (let i = 0; i < this.childEntities.length; i++) {
-      if (this.childEntities[i].touched(selection)) {
+    const childEntities = this.getProperty(Property.Names.CHILDENTITIES);
+    for (let i = 0; i < childEntities.length; i++) {
+      if (childEntities[i].touched(selection)) {
         return true;
       }
     }
@@ -869,10 +836,15 @@ export class Hatch extends Entity {
    * @param {any} value
    */
   setProperty(property, value) {
-    if (this.hasOwnProperty(property)) {
-      if (property === 'points') {
+    if (this.properties.has(property)) {
+      if (property === Property.Names.PATTERNNAME) {
+        const upper = String(value).toUpperCase();
+        if (this.getProperty(Property.Names.PATTERNNAME) === upper) return;
+        super.setProperty(property, upper);
+      } else if (property === Property.Names.POINTS) {
         // Special handling for hatch points to move child entities
         // Consider the changes from the hatch points to be an offset and rotation
+        const hatchChildren = this.getProperty(Property.Names.CHILDENTITIES);
         const ang = value[0].angle(value.at(-1));
         const theta = ang - this.points[0].angle(this.points.at(-1));
 
@@ -880,30 +852,30 @@ export class Hatch extends Entity {
           // set rotation center
           const center = this.points[0];
           // apply rotation to child entities points
-          this.childEntities.forEach((child) => {
+          hatchChildren.forEach((child) => {
             const rotatedPoints = child.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
-            child.setProperty('points', rotatedPoints);
+            child.setProperty(Property.Names.POINTS, rotatedPoints);
           });
 
-          this.angle+= Utils.radians2degrees(theta);
+          this.setProperty(Property.Names.ANGLE, this.getProperty(Property.Names.ANGLE) + Utils.radians2degrees(theta));
         }
 
         const delta = value[0].subtract(this.points[0]);
         if (delta.x !== 0 || delta.y !== 0) {
-        // apply translation to child entities points
-          this.childEntities.forEach((child) => {
+          // apply translation to child entities points
+          hatchChildren.forEach((child) => {
             const offsetPoints = child.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-            child.setProperty('points', offsetPoints);
+            child.setProperty(Property.Names.POINTS, offsetPoints);
           });
         }
+
+        super.setProperty(property, value);
+      } else {
+        super.setProperty(property, value);
       }
-
-      // invalidate the pattern cache for any property change — the cache encodes
-      // geometry, scale, angle, and boundary shape, so any update may affect it
+      // invalidate the pattern cache — geometry, scale, angle and boundary
+      // shape are all baked into the cache
       this.cachedPattern = null;
-
-      // other properties as normal
-      this[property] = value;
     }
   }
 }
