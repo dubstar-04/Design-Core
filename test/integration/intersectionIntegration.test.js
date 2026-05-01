@@ -705,7 +705,7 @@ describe('Hatch touched tests', () => {
     const boundary = new Polyline({
       points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100), new Point(0, 0)],
     });
-    hatch.childEntities.push(boundary);
+    hatch.setProperty('childEntities', [boundary]);
 
     // Selection rectangle crossing the boundary
     const sE = selectionExtremes(new Point(-5, 50), new Point(5, 60));
@@ -717,7 +717,7 @@ describe('Hatch touched tests', () => {
     const boundary = new Polyline({
       points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10), new Point(0, 0)],
     });
-    hatch.childEntities.push(boundary);
+    hatch.setProperty('childEntities', [boundary]);
 
     // Selection rectangle far from hatch
     const sE = selectionExtremes(new Point(500, 500), new Point(600, 600));
@@ -732,8 +732,7 @@ describe('Hatch touched tests', () => {
     const boundary2 = new Polyline({
       points: [new Point(50, 50), new Point(60, 50), new Point(60, 60), new Point(50, 60), new Point(50, 50)],
     });
-    hatch.childEntities.push(boundary1);
-    hatch.childEntities.push(boundary2);
+    hatch.setProperty('childEntities', [boundary1, boundary2]);
 
     // Touch only the second boundary
     const sE = selectionExtremes(new Point(48, 55), new Point(52, 58));
