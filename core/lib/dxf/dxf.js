@@ -30,6 +30,7 @@ export class DXF {
     this.reader.read(data);
   }
 
+
   /**
    * Write
    * @param {string} version
@@ -302,10 +303,7 @@ export class DXF {
           const command = child[0];
           // check if the child is a valid entity
           if (DesignCore.CommandManager.isCommand(command)) {
-            // create an instance of the child entity — use createNewFromDxf so that
-            // entity-specific fromDxf() normalisation (e.g. Arc, Circle, Text, Insert)
-            // is applied, matching the treatment of top-level ENTITIES section items.
-            const item = DesignCore.CommandManager.createNewFromDxf(command, child);
+            const item = DesignCore.CommandManager.createNew(command, child);
 
             // Register the child entity handle
             const itemHandle = item?.getProperty?.('handle') ?? item?.handle;
@@ -390,7 +388,7 @@ export class DXF {
 
     const command = item[0];
     if (DesignCore.CommandManager.isCommand(command)) {
-      const entity = DesignCore.CommandManager.createNewFromDxf(command, item);
+      const entity = DesignCore.CommandManager.createNew(command, item);
       DesignCore.Scene.entities.add(entity);
     } else {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
