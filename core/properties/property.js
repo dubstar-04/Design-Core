@@ -13,7 +13,7 @@ export class Property {
    * @param {Function} [options.get] - computed getter: (entity) => value
    * @param {Function} [options.set] - computed setter: (entity, value) => void
    */
-  constructor({ type, value, readOnly = false, visible = true, dxfCode, get, set } = {}) {
+  constructor({ type, value, readOnly = false, visible = true, dxfCode, get, set, options } = {}) {
     this.type = type;
     this._value = value;
     this.readOnly = readOnly;
@@ -21,6 +21,7 @@ export class Property {
     this.dxfCode = dxfCode;
     this.get = get;
     this.set = set;
+    this.options = options;
   }
 
   /** @return {any} current value */
