@@ -40,6 +40,7 @@ export async function withMockInput(scene, inputs, testFn, options = {}) {
         return inputs[callCount++];
       }
     },
+    actionCommand: () => {},
     executeCommand: () => {},
     reset: () => {},
     ...extraMethods,
