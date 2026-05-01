@@ -122,10 +122,15 @@ export class TableManagerBase {
       return this.getItemByName(newItemName);
     }
 
-    if (newItem.handle === undefined) {
-      newItem.handle = DesignCore.HandleManager.next();
+    const existingHandle = newItem.getProperty?.('handle') ?? newItem.handle;
+    if (existingHandle === undefined) {
+      if (newItem.setProperty) {
+        newItem.setProperty('handle', DesignCore.HandleManager.next());
+      } else {
+        newItem.handle = DesignCore.HandleManager.next();
+      }
     } else {
-      DesignCore.HandleManager.checkHandle(newItem.handle);
+      DesignCore.HandleManager.checkHandle(existingHandle);
     }
 
     if (!exists) {
