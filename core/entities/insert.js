@@ -37,14 +37,14 @@ export class Insert extends Entity {
     this.properties.add(Property.Names.ROTATION, {
       type: Property.Type.NUMBER,
       dxfCode: 50,
-      _get: (entity) => entity.getRotation(),
-      _set: (entity, value) => entity.setRotation(value),
+      get: (entity) => entity.getRotation(),
+      set: (entity, value) => entity.setRotation(value),
     });
 
     this.properties.add(Property.Names.BLOCKNAME, {
       type: Property.Type.LABEL,
       readOnly: true,
-      _get: (entity) => entity.block?.name ?? '',
+      get: (entity) => entity.block?.name ?? '',
     });
 
     if (data) {

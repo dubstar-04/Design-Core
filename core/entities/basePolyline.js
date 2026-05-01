@@ -79,8 +79,8 @@ export class BasePolyline extends Entity {
     // DXF Groupcode 70 bit 1 - closed flag exposed via EntityProperties
     this.properties.add(Property.Names.CLOSED, {
       type: Property.Type.BOOLEAN,
-      _get: (entity) => entity.flags.hasFlag(1),
-      _set: (entity, value) => value ? entity.flags.addValue(1) : entity.flags.removeValue(1),
+      get: (entity) => entity.flags.hasFlag(1),
+      set: (entity, value) => value ? entity.flags.addValue(1) : entity.flags.removeValue(1),
       dxfCode: 70,
     });
 

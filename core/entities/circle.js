@@ -28,8 +28,8 @@ export class Circle extends Entity {
     // radius: computed from points — stored in EntityProperties
     this.properties.add(Property.Names.RADIUS, {
       type: Property.Type.NUMBER,
-      _get: (entity) => entity.points[1] ? entity.points[0].distance(entity.points[1]) : 0,
-      _set: (entity, rad) => {
+      get: (entity) => entity.points[1] ? entity.points[0].distance(entity.points[1]) : 0,
+      set: (entity, rad) => {
         entity.points[1] = entity.points[0].project(0, rad);
       },
       dxfCode: 40,

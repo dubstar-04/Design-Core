@@ -95,22 +95,22 @@ export class Text extends Entity {
     // rotation: computed from angle between points[0] and points[1]
     this.properties.add(Property.Names.ROTATION, {
       type: Property.Type.NUMBER,
-      _get: (entity) => entity.getRotation(),
-      _set: (entity, angle) => entity.setRotation(angle),
+      get: (entity) => entity.getRotation(),
+      set: (entity, angle) => entity.setRotation(angle),
       dxfCode: 50,
     });
     // backwards: computed from flags bit 2
     this.properties.add(Property.Names.BACKWARDS, {
       type: Property.Type.BOOLEAN,
-      _get: (entity) => entity.getBackwards(),
-      _set: (entity, bool) => entity.setBackwards(bool),
+      get: (entity) => entity.getBackwards(),
+      set: (entity, bool) => entity.setBackwards(bool),
       dxfCode: 71,
     });
     // upsideDown: computed from flags bit 4
     this.properties.add(Property.Names.UPSIDEDOWN, {
       type: Property.Type.BOOLEAN,
-      _get: (entity) => entity.getUpsideDown(),
-      _set: (entity, bool) => entity.setUpsideDown(bool),
+      get: (entity) => entity.getUpsideDown(),
+      set: (entity, bool) => entity.setUpsideDown(bool),
       dxfCode: 71,
     });
 

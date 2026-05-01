@@ -49,7 +49,7 @@ export class Arc extends Entity {
     // radius: computed from points — stored in EntityProperties
     this.properties.add(Property.Names.RADIUS, {
       type: Property.Type.NUMBER,
-      _get: (entity) => entity.points[1] ? entity.points[0].distance(entity.points[1]) : 1,
+      get: (entity) => entity.points[1] ? entity.points[0].distance(entity.points[1]) : 1,
       dxfCode: 40,
     });
   }

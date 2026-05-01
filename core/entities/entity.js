@@ -74,8 +74,8 @@ export class Entity {
     // DXF Groupcode 62/420 - colour (computed, backed by entityColour)
     this.properties.add(Property.Names.COLOUR, {
       type: Property.Type.COLOUR,
-      _get: (entity) => entity.entityColour.getColour(),
-      _set: (entity, value) => entity.entityColour.setColour(value),
+      get: (entity) => entity.entityColour.getColour(),
+      set: (entity, value) => entity.entityColour.setColour(value),
       dxfCode: 62,
     });
 
