@@ -189,12 +189,12 @@ export class BasePolyline extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'LWPOLYLINE');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbPolyline', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer); // LAYERNAME
-    file.writeGroupCode('6', this.lineType);
-    file.writeGroupCode('39', this.lineWidth);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER)); // LAYERNAME
+    file.writeGroupCode('6', this.getProperty(Property.Names.LINETYPE));
+    file.writeGroupCode('39', this.getProperty(Property.Names.LINEWIDTH));
     file.writeGroupCode('90', this.points.length);
     file.writeGroupCode('70', this.flags.getFlagValue());
     for (let i = 0; i < this.points.length; i++) {
