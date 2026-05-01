@@ -216,7 +216,7 @@ export class Entity {
    * @return {boolean} true if within
    */
   within(selection) {
-    const layer = DesignCore.LayerManager.getItemByName(this.layer);
+    const layer = DesignCore.LayerManager.getItemByName(this.getProperty(Property.Names.LAYER));
 
     if (!layer?.isSelectable) {
       return;
@@ -269,8 +269,8 @@ export class Entity {
    * @param {any} value
    */
   setProperty(property, value) {
-    if (this.hasOwnProperty(property)) {
-      this[property] = value;
+    if (this.properties.has(property)) {
+      this.properties.set(property, value, this);
     }
   }
 }
