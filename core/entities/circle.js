@@ -25,12 +25,14 @@ export class Circle extends Entity {
   constructor(data) {
     super(data);
 
-    // add radius property with getter and setter
-    // needs to be enumerable to appear in the object props
-    Object.defineProperty(this, 'radius', {
-      get: this.getRadius,
-      set: this.setRadius,
-      enumerable: true,
+    // radius: computed from points — stored in EntityProperties
+    this.properties.add(Property.Names.RADIUS, {
+      type: Property.Type.NUMBER,
+      _get: (entity) => entity.points[1] ? entity.points[0].distance(entity.points[1]) : 0,
+      _set: (entity, rad) => {
+        entity.points[1] = entity.points[0].project(0, rad);
+      },
+      dxfCode: 40,
     });
 
     // Named scalar radius (internal API / named prop) — projects points[1] from center.
@@ -184,11 +186,12 @@ export class Circle extends Entity {
    * @return {Array}
    */
   toPolylinePoints() {
-    const startPoint = this.points[0].project(0, this.radius);
+    const radius = this.getProperty(Property.Names.RADIUS);
+    const startPoint = this.points[0].project(0, radius);
     startPoint.bulge = 1;
-    const endPoint = this.points[0].project(0, -this.radius);
+    const endPoint = this.points[0].project(0, -radius);
     endPoint.bulge = 1;
-    const closurePoint = this.points[0].project(0, this.radius);
+    const closurePoint = this.points[0].project(0, radius);
     return [startPoint, endPoint, closurePoint];
   }
 
