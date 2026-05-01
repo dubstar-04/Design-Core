@@ -7,6 +7,7 @@ import { Point } from '../entities/point.js';
 import { BaseLinearDimension } from './baseLinearDimension.js';
 
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 
@@ -43,12 +44,12 @@ export class RotatedDimension extends BaseLinearDimension {
   async execute() {
     try {
       DesignCore.Scene.selectionManager.reset();
-      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
+      this.setProperty(Property.Names.DIMENSIONSTYLE, DesignCore.DimStyleManager.getCstyle());
       this.dimType.setDimType(0); // Rotated dimension
 
       const opAngle = new PromptOptions(Strings.Input.ROTATION, [Input.Type.NUMBER]);
       const angleValue = await DesignCore.Scene.inputManager.requestInput(opAngle);
-      this.linearDimAngle = Number(angleValue) || 0;
+      this.setProperty(Property.Names.LINEARDIMANGLE, Number(angleValue) || 0);
 
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
       const pt13 = await DesignCore.Scene.inputManager.requestInput(op);
@@ -66,7 +67,7 @@ export class RotatedDimension extends BaseLinearDimension {
       this.points.push(pt11);
 
       const tempLine = new Line({ points: [pt13, pt14] });
-      this.points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.linearDimAngle);
+      this.points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.getProperty(Property.Names.LINEARDIMANGLE));
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -125,8 +126,8 @@ export class RotatedDimension extends BaseLinearDimension {
       const pt11 = DesignCore.Mouse.pointOnScene();
       pt11.sequence = 11;
       const tempLine = new Line({ points: [this.points[0], this.points[1]] });
-      const points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.linearDimAngle);
-      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
+      const points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.getProperty(Property.Names.LINEARDIMANGLE));
+      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
     }
   }
 
@@ -141,10 +142,10 @@ export class RotatedDimension extends BaseLinearDimension {
     const Pt14 = this.getPointBySequence(this.points, 14);
 
     file.writeGroupCode('0', 'DIMENSION');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimension', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
     // file.writeGroupCode('2', this.blockName);  // Block not required
     file.writeGroupCode('10', Pt10.x); // X - definition / arrow point
     file.writeGroupCode('20', Pt10.y); // Y
@@ -153,7 +154,7 @@ export class RotatedDimension extends BaseLinearDimension {
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
     file.writeGroupCode('70', this.dimType.getDimType()); // DIMENSION TYPE
-    file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
+    file.writeGroupCode('3', this.getProperty(Property.Names.DIMENSIONSTYLE)); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbAlignedDimension', DXFFile.Version.R2000);
     file.writeGroupCode('13', Pt13.x); // X - start point of first extension line
     file.writeGroupCode('23', Pt13.y); // Y
@@ -161,7 +162,7 @@ export class RotatedDimension extends BaseLinearDimension {
     file.writeGroupCode('14', Pt14.x); // X - start point of second extension line
     file.writeGroupCode('24', Pt14.y); // Y
     file.writeGroupCode('34', '0.0'); // Z
-    file.writeGroupCode('50', this.linearDimAngle); // Utils.radians2degrees(Pt13.angle(Pt14))); // Rotation angle
+    file.writeGroupCode('50', this.getProperty(Property.Names.LINEARDIMANGLE)); // Utils.radians2degrees(Pt13.angle(Pt14))); // Rotation angle
     file.writeGroupCode('100', 'AcDbRotatedDimension', DXFFile.Version.R2000);
   }
 }
