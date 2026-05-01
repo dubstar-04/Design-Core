@@ -27,12 +27,6 @@ export class Arc extends Entity {
   constructor(data) {
     super(data);
 
-    // direction: ccw > 0, cw <= 0 — default counter clockwise
-    Object.defineProperty(this, 'direction', {
-      value: 1,
-      writable: true,
-    });
-
     // If only the center point is present, project start/end from named scalar properties.
     // Full-points data (post-execute or post-fromDxf) skips this block entirely.
     if (data && this.points.length < 2) {
@@ -45,8 +39,19 @@ export class Arc extends Entity {
       }
     }
 
-    this.radius = this.points[1] ? this.points[0].distance(this.points[1]) : 1;
-    this.direction = data?.direction ?? 1;
+    // direction: ccw > 0, cw <= 0
+    this.properties.add(Property.Names.DIRECTION, {
+      type: Property.Type.NUMBER,
+      value: data?.direction ?? 1,
+      dxfCode: 73,
+    });
+
+    // radius: computed from points — stored in EntityProperties
+    this.properties.add(Property.Names.RADIUS, {
+      type: Property.Type.NUMBER,
+      _get: (entity) => entity.points[1] ? entity.points[0].distance(entity.points[1]) : 1,
+      dxfCode: 40,
+    });
   }
 
   /**
@@ -105,7 +110,6 @@ export class Arc extends Entity {
         break;
       }
       this.points.push(pt1);
-      this.radius = this.points[0].distance(pt1);
 
       let pt2;
       while (true) {
