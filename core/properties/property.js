@@ -25,6 +25,58 @@ export class Property {
   };
 
   /**
+   * Canonical property name constants.
+   * Use these instead of raw strings when calling getProperty() / setProperty().
+   */
+  static Names = Object.freeze({
+    // ── Base entity (Entity class) ────────────────────────────────────────────
+    HANDLE: 'handle',
+    LAYER: 'layer',
+    LINETYPE: 'lineType',
+    LINEWIDTH: 'lineWidth',
+    COLOUR: 'colour',
+    // ── Shared (multiple entities) ────────────────────────────────────────────
+    ANGLE: 'angle',
+    BLOCKNAME: 'blockName',
+    DIRECTION: 'direction',
+    HEIGHT: 'height',
+    RADIUS: 'radius',
+    ROTATION: 'rotation',
+    SCALE: 'scale',
+    STRING: 'string',
+    STYLENAME: 'styleName',
+    // ── BasePolyline ──────────────────────────────────────────────────────────
+    CLOSED: 'closed',
+    // ── Hatch ─────────────────────────────────────────────────────────────────
+    CHILDENTITIES: 'childEntities',
+    PATTERNNAME: 'patternName',
+    // ── Text ──────────────────────────────────────────────────────────────────
+    BACKWARDS: 'backwards',
+    HORIZONTALALIGNMENT: 'horizontalAlignment',
+    UPSIDEDOWN: 'upsideDown',
+    VERTICALALIGNMENT: 'verticalAlignment',
+    // ── ArcAlignedText ────────────────────────────────────────────────────────
+    ARCSIDE: 'arcSide',
+    BOLD: 'bold',
+    CHARACTERSPACING: 'characterSpacing',
+    FONTNAME: 'fontName',
+    ITALIC: 'italic',
+    OFFSETFROMARC: 'offsetFromArc',
+    OFFSETFROMLEFT: 'offsetFromLeft',
+    OFFSETFROMRIGHT: 'offsetFromRight',
+    TEXTALIGNMENT: 'textAlignment',
+    TEXTORIENTATION: 'textOrientation',
+    TEXTREVERSED: 'textReversed',
+    UNDERLINE: 'underline',
+    WIDTHFACTOR: 'widthFactor',
+    // ── Dimensions ────────────────────────────────────────────────────────────
+    DIMENSIONSTYLE: 'dimensionStyle',
+    LEADERLENGTH: 'leaderLength',
+    LINEARDIMANGLE: 'linearDimAngle',
+    TEXTOVERRIDE: 'textOverride',
+  });
+
+  /**
    * Parse the input values and return a value
    * @param {Array} values - list of values
    * @param {any} def - default value
