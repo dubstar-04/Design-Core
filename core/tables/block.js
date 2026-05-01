@@ -120,7 +120,7 @@ export class Block extends Entity {
         // remove item from scene
         const copyofitem = Utils.cloneObject(item);
         // assign a fresh handle — the block item is a new entity distinct from the scene entity
-        copyofitem.handle = DesignCore.HandleManager.next();
+        copyofitem.setProperty('handle', DesignCore.HandleManager.next());
         // adjust the items points to reflect the insert point
         const delta = new Point(-insertPoint.x, -insertPoint.y);
         if (item.hasOwnProperty('points')) {
@@ -163,9 +163,9 @@ export class Block extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'BLOCK');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty('handle'), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty('layer'));
     file.writeGroupCode('100', 'AcDbBlockBegin', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.name);
     file.writeGroupCode('70', this.flags.getFlagValue());
