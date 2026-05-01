@@ -2,8 +2,36 @@ import { Flags } from './flags.js';
 
 /** Property Class */
 export class Property {
-  /** Create property */
-  constructor() { }
+  /**
+   * Create a Property descriptor
+   * @param {Object} [options]
+   * @param {string} options.type - Property.Type constant describing the value kind
+   * @param {any} options.value - initial value
+   * @param {boolean} [options.readOnly=false] - when true, set() is a no-op
+   * @param {boolean} [options.visible=true] - controls whether the property appears in listings
+   * @param {number} [options.dxfCode] - associated DXF group code (informational)
+   */
+  constructor({ type, value, readOnly = false, visible = true, dxfCode, get, set } = {}) {
+    this.type = type;
+    this._value = value;
+    this.readOnly = readOnly;
+    this.visible = visible;
+    this.dxfCode = dxfCode;
+    this.get = get;
+    this.set = set;
+  }
+
+  /** @return {any} current value */
+  get value() {
+    return this._value;
+  }
+
+  /** @param {any} val - new value; ignored when readOnly */
+  set value(val) {
+    if (!this.readOnly) {
+      this._value = val;
+    }
+  }
 
   /**
    * Property type constants
@@ -22,6 +50,7 @@ export class Property {
     LIST: 'LIST',
     COLOUR: 'COLOUR',
     LABEL: 'LABEL',
+    ENTITIES: 'ENTITIES',
   };
 
   /**
@@ -35,6 +64,7 @@ export class Property {
     LINETYPE: 'lineType',
     LINEWIDTH: 'lineWidth',
     COLOUR: 'colour',
+    POINTS: 'points',
     // ── Shared (multiple entities) ────────────────────────────────────────────
     ANGLE: 'angle',
     BLOCKNAME: 'blockName',
