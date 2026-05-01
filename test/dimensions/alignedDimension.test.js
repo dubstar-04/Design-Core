@@ -34,7 +34,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
     // check if the text value matches the expected dimension value
     for (const entity of dimensionBlockEntities) {
       if (entity.type === 'Text') {
-        expect(Number(entity.string)).toBeCloseTo(dimensionValue);
+        expect(Number(entity.getProperty('string'))).toBeCloseTo(dimensionValue);
       }
     }
   }, { selectedItems });
@@ -211,7 +211,7 @@ AcDbAlignedDimension
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newDimension = new AlignedDimension(dimension);
+  const newDimension = new AlignedDimension({ handle: dimension.getProperty('handle'), points: dimension.points, ...dimension });
   file = new File();
   newDimension.dxf(file);
   expect(file.contents).toEqual(dxfString);
