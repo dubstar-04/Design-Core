@@ -44,7 +44,7 @@ test('Test Copy.action', () => {
   for (let i = 0; i < 6; i++) {
     const original = core.scene.entities.get(i);
     const copy = core.scene.entities.get(i + 6);
-    expect(copy.handle).toBeDefined();
-    expect(copy.handle).not.toBe(original.handle);
+    expect(copy.getProperty('handle')).toBeDefined();
+    expect(copy.getProperty('handle')).not.toBe(original.getProperty('handle'));
   }
 });
