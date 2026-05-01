@@ -10,7 +10,7 @@ new Core();
 
 test('Test Entity.colour', () => {
   const entity = new Entity();
-  expect(entity.colour).toEqual({ 'r': 1, 'g': 1, 'b': 1 });
+  expect(entity.getProperty('colour')).toEqual({ 'r': 1, 'g': 1, 'b': 1 });
 });
 
 test('Test Entity.getLineType', () => {
@@ -61,16 +61,16 @@ describe('Entity.fromDxf', () => {
 
   test('ACI colour is applied to entity via colourACI', () => {
     const e = new Entity(Entity.fromDxf({ 62: 1 })); // ACI 1 = red
-    expect(e.colour).toEqual({ r: 255, g: 0, b: 0 });
+    expect(e.getProperty('colour')).toEqual({ r: 255, g: 0, b: 0 });
   });
 
   test('true colour overrides ACI when both are present', () => {
     // ACI 1 = red; trueColour = green (0x0000FF00 >> 8 = 255... actually 0x00 00 FF 00)
     // pure green = r:0, g:255, b:0 → 0x0000FF00 = 65280
     const e = new Entity(Entity.fromDxf({ 62: 1, 420: 65280 }));
-    expect(e.colour.g).toBe(255);
-    expect(e.colour.r).toBe(0);
-    expect(e.colour.b).toBe(0);
+    expect(e.getProperty('colour').g).toBe(255);
+    expect(e.getProperty('colour').r).toBe(0);
+    expect(e.getProperty('colour').b).toBe(0);
   });
 
   test('no colour codes leaves entity at default byLayer colour', () => {
