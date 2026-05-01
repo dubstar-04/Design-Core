@@ -60,6 +60,7 @@ export class Hatch extends Entity {
       type: Property.Type.LIST,
       value: resolvedPatternName,
       dxfCode: 2,
+      options: () => Object.keys(Patterns.hatch_patterns).map((name) => ({ display: name, value: name })),
     });
     // DXF Groupcode 41 - Hatch pattern scale
     this.properties.add(Property.Names.SCALE, {
