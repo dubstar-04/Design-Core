@@ -142,44 +142,30 @@ export class CommandManager {
   }
 
   /**
-   * Create a new instance of type using data
-   * @param {string} type
-   * @param {Array} data
-   * @return {Object} instance of type
-   */
-  createNew(type, data) {
-    let newItem;
-    if (this.isCommand(type)) {
-      newItem = new classes[this.getCommand(type)](data);
-    } else {
-      Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
-      return;
-    }
-
-    return newItem;
-  };
-
-  /**
-   * Create a new instance from DXF data, calling fromDxf() to normalise before construction.
+   * Create a new instance of type using data.
+   * When data is a plain object (DXF load path), applies a two-pass normalisation:
+   *   1. Entity.fromDxf()       — resolves group codes shared by all entities (e.g. colour, true colour)
+   *   2. CommandClass.fromDxf() — resolves group codes specific to the entity type (e.g. geometry)
+   * When data is absent or already a canonical object (e.g. an entity instance), it is passed through unchanged.
    * @param {string} type
    * @param {Object} data
    * @return {Object} instance of type
    */
-  createNewFromDxf(type, data) {
-    let newItem;
-    if (this.isCommand(type)) {
-      const Cls = classes[this.getCommand(type)];
-      // Phase 1: entity-level normalisation (colour codes etc.) — always applied
-      const entityData = Entity.fromDxf(data);
-      // Phase 2: class-specific geometric normalisation — only when Cls defines its own fromDxf
-      const normalisedData = Object.prototype.hasOwnProperty.call(Cls, 'fromDxf') ? Cls.fromDxf(entityData) : entityData;
-      newItem = new Cls(normalisedData);
-    } else {
+  createNew(type, data) {
+    if (!this.isCommand(type)) {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
       return;
     }
-
-    return newItem;
+    const CommandClass = classes[this.getCommand(type)];
+    // Skip DXF normalisation when data is absent or is already a canonical object (e.g. an entity instance)
+    if (!data || Object.getPrototypeOf(data) !== Object.prototype) {
+      return new CommandClass(data);
+    }
+    // Resolve group codes shared by all entities (colour, true colour, etc.)
+    const baseNormalised = Entity.fromDxf(data);
+    // Resolve group codes specific to this entity type (geometry, etc.)
+    const classNormalised = Object.prototype.hasOwnProperty.call(CommandClass, 'fromDxf') ? CommandClass.fromDxf(baseNormalised) : baseNormalised;
+    return new CommandClass(classNormalised);
   };
 
   /**
