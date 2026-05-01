@@ -40,7 +40,7 @@ export class StyleManagerBase extends TableManagerBase {
     const selectionSet = [];
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
-      if (DesignCore.Scene.entities.get(i)[this.itemProperty] === style) {
+      if ((DesignCore.Scene.entities.get(i).getProperty?.(this.itemProperty) ?? DesignCore.Scene.entities.get(i)[this.itemProperty]) === style) {
         selectionSet.push(i);
       }
     }
@@ -79,7 +79,8 @@ export class StyleManagerBase extends TableManagerBase {
     this.addStandardItems();
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
-      const style = (DesignCore.Scene.entities.get(i)[this.itemProperty]);
+      const entity = DesignCore.Scene.entities.get(i);
+      const style = entity.getProperty?.(this.itemProperty) ?? entity[this.itemProperty];
       this.addItem({
         'name': style,
       });
