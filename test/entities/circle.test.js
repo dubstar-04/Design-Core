@@ -105,7 +105,7 @@ ByLayer
 
 
   // create new entity from entity data to ensure all props are loaded
-  const newCircle = new Circle(circle);
+  const newCircle = new Circle({ handle: circle.getProperty('handle'), points: circle.points });
   file = new File();
   newCircle.dxf(file);
   expect(file.contents).toEqual(dxfString);
@@ -267,7 +267,7 @@ test('Circle.fromPolylinePoints round-trip preserves centre and radius', () => {
   expect(rebuilt.type).toBe('Circle');
   expect(rebuilt.points[0].x).toBeCloseTo(5, 10);
   expect(rebuilt.points[0].y).toBeCloseTo(10, 10);
-  expect(rebuilt.radius).toBeCloseTo(8, 10);
+  expect(rebuilt.getProperty('radius')).toBeCloseTo(8, 10);
 });
 
 test('Circle.fromPolylinePoints precision drift is negligible', () => {
@@ -277,7 +277,7 @@ test('Circle.fromPolylinePoints precision drift is negligible', () => {
   expect(rebuilt.type).toBe('Circle');
   const drift = Math.hypot(rebuilt.points[0].x - circle.points[0].x, rebuilt.points[0].y - circle.points[0].y);
   expect(drift).toBeLessThan(1e-10);
-  expect(Math.abs(rebuilt.radius - circle.radius)).toBeLessThan(1e-10);
+  expect(Math.abs(rebuilt.getProperty('radius') - circle.getProperty('radius'))).toBeLessThan(1e-10);
 });
 
 test('Circle.snaps returns two tangent snaps from outside', () => {
