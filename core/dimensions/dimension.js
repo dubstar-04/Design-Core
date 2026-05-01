@@ -17,6 +17,7 @@ import { Logging } from '../lib/logging.js';
 import { Intersection } from '../lib/intersect.js';
 
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 import { SingleSelection } from '../lib/selectionManager.js';
 import { Utils } from '../lib/utils.js';
 import { DimType } from '../properties/dimType.js';
@@ -33,18 +34,24 @@ export class Dimension extends BaseDimension {
   constructor(data) {
     super(data);
 
-    // map dimensions type to the class name
-    this.dimensionMap = {
-      0: RotatedDimension,
-      1: AlignedDimension,
-      2: AngularDimension,
-      3: DiametricDimension,
-      4: RadialDimension,
-      5: null, // 5 = Angular 3 point;
-      6: null, // 6 = Ordinate;
-    };
+    // map dimensions type to the class name — non-enumerable: internal workflow state
+    Object.defineProperty(this, 'dimensionMap', {
+      value: {
+        0: RotatedDimension,
+        1: AlignedDimension,
+        2: AngularDimension,
+        3: DiametricDimension,
+        4: RadialDimension,
+        5: null, // 5 = Angular 3 point;
+        6: null, // 6 = Ordinate;
+      },
+      writable: true,
+    });
 
-    this.selectedItems = [];
+    Object.defineProperty(this, 'selectedItems', {
+      value: [],
+      writable: true,
+    });
 
     if (data) {
       const item = new this.dimensionMap[DimType.getBaseType(this.dimType.getBaseDimType())](data);
@@ -80,7 +87,7 @@ export class Dimension extends BaseDimension {
   async execute() {
     try {
       let inputValid = false;
-      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
+      this.setProperty(Property.Names.DIMENSIONSTYLE, DesignCore.DimStyleManager.getCstyle());
 
       while (!inputValid) {
         DesignCore.Scene.selectionManager.reset();
@@ -292,7 +299,7 @@ export class Dimension extends BaseDimension {
       // get the points for the dimension
       const points = dimensionType.getPointsFromSelection(this.selectedItems, Pt11);
       // create the temporary dimension
-      DesignCore.Scene.previewEntities.create(dimensionTypeString, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.previewEntities.create(dimensionTypeString, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
     }
   }
 }
