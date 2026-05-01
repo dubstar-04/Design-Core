@@ -5,7 +5,7 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
-
+import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -108,18 +108,18 @@ export class Line extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'LINE');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbLine', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
-    file.writeGroupCode('6', this.lineType);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
+    file.writeGroupCode('6', this.getProperty(Property.Names.LINETYPE));
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
     file.writeGroupCode('11', this.points[1].x);
     file.writeGroupCode('21', this.points[1].y);
     file.writeGroupCode('31', '0.0');
-    file.writeGroupCode('39', this.lineWidth);
+    file.writeGroupCode('39', this.getProperty(Property.Names.LINEWIDTH));
   }
 
   /**
