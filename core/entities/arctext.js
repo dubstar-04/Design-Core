@@ -116,53 +116,80 @@ export class ArcAlignedText extends Entity {
   constructor(data) {
     super(data);
 
-    // hide inherited properties
-    // needs to be enumerable=false to not appear in the object props
-    Object.defineProperty(this, 'lineType', {
-      enumerable: false,
-    });
-
-    Object.defineProperty(this, 'lineWidth', {
-      enumerable: false,
-    });
+    // lineType and lineWidth not applicable to arc-aligned text
+    this.properties.remove(Property.Names.LINETYPE);
+    this.properties.remove(Property.Names.LINEWIDTH);
 
     // DXF Groupcode 1 - Text String
-    this.string = (Property.loadValue([data?.string, data?.[1]], ''));
+    this.properties.add(Property.Names.STRING, {
+      type: Property.Type.STRING,
+      value: Property.loadValue([data?.string, data?.[1]], ''),
+      dxfCode: 1,
+    });
 
-    // DXF Groupcode 2 - Font name
-    // not implemented - enumerable=false to not appear in the object props
-    // get font from selected style: this.styleName.font
-    Object.defineProperty(this, 'fontName', {
+    // DXF Groupcode 2 - Font name (derived from style, not user-editable)
+    this.properties.add(Property.Names.FONTNAME, {
+      type: Property.Type.STRING,
       value: Property.loadValue([data?.fontName, data?.[2]], 'Arial'),
-      writable: true,
+      dxfCode: 2,
+      visible: false,
     });
 
     // DXF Groupcode 3
     // not implemented - always empty in acad output
 
     // DXF Groupcode 7 - Text style name
-    this.styleName = (Property.loadValue([data?.styleName, data?.[7]], 'STANDARD'));
+    this.properties.add(Property.Names.STYLENAME, {
+      type: Property.Type.LIST,
+      value: Property.loadValue([data?.styleName, data?.[7]], 'STANDARD'),
+      dxfCode: 7,
+    });
 
     // DXF Groupcode 40 - Radius
-    this.radius = Property.loadValue([data?.radius, data?.[40]], 10);
+    this.properties.add(Property.Names.RADIUS, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.radius, data?.[40]], 10),
+      dxfCode: 40,
+    });
 
     // DXF Groupcode 41 - Width Factor
-    // not implemented - enumerable=false to not appear in the object props
-    Object.defineProperty(this, 'widthFactor', {
+    this.properties.add(Property.Names.WIDTHFACTOR, {
+      type: Property.Type.NUMBER,
       value: Property.loadValue([data?.widthFactor, data?.[41]], 1),
-      writable: true,
+      dxfCode: 41,
+      visible: false,
     });
 
     // DXF Groupcode 42 - Text Height
-    this.height = Property.loadValue([data?.height, data?.[42]], 2.5);
+    this.properties.add(Property.Names.HEIGHT, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.height, data?.[42]], 2.5),
+      dxfCode: 42,
+    });
     // DXF Groupcode 43 - Character Spacing
-    this.characterSpacing = Property.loadValue([data?.characterSpacing, data?.[43]], 0.095);
+    this.properties.add(Property.Names.CHARACTERSPACING, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.characterSpacing, data?.[43]], 0.095),
+      dxfCode: 43,
+    });
     // DXF Groupcode 44 - Offset from Arc
-    this.offsetFromArc = Property.loadValue([data?.offsetFromArc, data?.[44]], 0);
+    this.properties.add(Property.Names.OFFSETFROMARC, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.offsetFromArc, data?.[44]], 0),
+      dxfCode: 44,
+    });
     // DXF Groupcode 45 - Offset from right
-    this.offsetFromRight = Property.loadValue([data?.offsetFromRight, data?.[45]], 0);
+    this.properties.add(Property.Names.OFFSETFROMRIGHT, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.offsetFromRight, data?.[45]], 0),
+      dxfCode: 45,
+    });
     // DXF Groupcode 46 - Offset from left
-    this.offsetFromLeft = Property.loadValue([data?.offsetFromLeft, data?.[46]], 0);
+    this.properties.add(Property.Names.OFFSETFROMLEFT, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.offsetFromLeft, data?.[46]], 0),
+      dxfCode: 46,
+    });
 
     // ensure points array has at least one point - the arc center
     if (!this.points.length) {
@@ -173,48 +200,64 @@ export class ArcAlignedText extends Entity {
     // DXF Groupcode 50 - Start Angle in degrees
     const startAngle = Utils.round(Property.loadValue([data?.startAngle, data?.[50]], 0));
     if (this.points[1] === undefined) {
-      this.points[1] = this.points[0].project(Utils.degrees2radians(startAngle), this.radius);
+      this.points[1] = this.points[0].project(Utils.degrees2radians(startAngle), this.getProperty(Property.Names.RADIUS));
     }
 
     // DXF Groupcode 51 - End Angle in degrees
     const endAngle = Utils.round(Property.loadValue([data?.endAngle, data?.[51]], 180));
     if (this.points[2] === undefined) {
-      this.points[2] = this.points[0].project(Utils.degrees2radians(endAngle), this.radius);
+      this.points[2] = this.points[0].project(Utils.degrees2radians(endAngle), this.getProperty(Property.Names.RADIUS));
     }
 
     // DXF Groupcode 70 - Text Direction 0 = forward, 1 = reversed
-    // not implemented - enumerable=false to not appear in the object props
-    Object.defineProperty(this, 'textReversed', {
+    this.properties.add(Property.Names.TEXTREVERSED, {
+      type: Property.Type.BOOLEAN,
       value: Property.loadValue([data?.textReversed, Boolean(parseInt(data?.[70]))], false),
-      writable: true,
+      dxfCode: 70,
+      visible: false,
     });
 
     // DXF Groupcode 71 - 1 = outward, 2 = inward
-    this.textOrientation = Property.loadValue([data?.textOrientation, data?.[71]], 1);
+    this.properties.add(Property.Names.TEXTORIENTATION, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.textOrientation, data?.[71]], 1),
+      dxfCode: 71,
+    });
     // DXF Groupcode 72 - 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
-    this.textAlignment = Property.loadValue([data?.textAlignment, data?.[72]], 4);
+    this.properties.add(Property.Names.TEXTALIGNMENT, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.textAlignment, data?.[72]], 4),
+      dxfCode: 72,
+    });
     // DXF Groupcode 73 - Arc Side: convex = 1, concave = 2
-    this.arcSide = Property.loadValue([data?.arcSide, data?.[73]], 1);
+    this.properties.add(Property.Names.ARCSIDE, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.arcSide, data?.[73]], 1),
+      dxfCode: 73,
+    });
 
     // DXF Groupcode 74 - Bold 0 = off, 1 = on
-    // not implemented - enumerable=false to not appear in the object props
-    Object.defineProperty(this, 'bold', {
+    this.properties.add(Property.Names.BOLD, {
+      type: Property.Type.BOOLEAN,
       value: Property.loadValue([data?.bold, Boolean(parseInt(data?.[74]))], false),
-      writable: true,
+      dxfCode: 74,
+      visible: false,
     });
 
     // DXF Groupcode 75 - Italic 0 = off, 1 = on
-    // not implemented - enumerable=false to not appear in the object props
-    Object.defineProperty(this, 'italic', {
+    this.properties.add(Property.Names.ITALIC, {
+      type: Property.Type.BOOLEAN,
       value: Property.loadValue([data?.italic, Boolean(parseInt(data?.[75]))], false),
-      writable: true,
+      dxfCode: 75,
+      visible: false,
     });
 
     // DXF Groupcode 76 - Underline 0 = off, 1 = on
-    // not implemented - enumerable=false to not appear in the object props
-    Object.defineProperty(this, 'underline', {
+    this.properties.add(Property.Names.UNDERLINE, {
+      type: Property.Type.BOOLEAN,
       value: Property.loadValue([data?.underline, Boolean(parseInt(data?.[76]))], false),
-      writable: true,
+      dxfCode: 76,
+      visible: false,
     });
 
     // Not Implemented:
@@ -265,9 +308,9 @@ export class ArcAlignedText extends Entity {
 
       // Get the arc properties
       // direction: - ccw > 0, cw <= 0
-      this.radius = selectedArc.radius;
-      const startPoint = selectedArc.direction > 0 ? selectedArc.points[1] : selectedArc.points[2];
-      const endPoint = selectedArc.direction > 0 ? selectedArc.points[2] : selectedArc.points[1];
+      this.setProperty(Property.Names.RADIUS, selectedArc.getProperty(Property.Names.RADIUS));
+      const startPoint = selectedArc.getProperty(Property.Names.DIRECTION) > 0 ? selectedArc.points[1] : selectedArc.points[2];
+      const endPoint = selectedArc.getProperty(Property.Names.DIRECTION) > 0 ? selectedArc.points[2] : selectedArc.points[1];
 
       //  set the points
       this.points[0] = new Point(selectedArc.points[0].x, selectedArc.points[0].y);
@@ -276,26 +319,26 @@ export class ArcAlignedText extends Entity {
 
       // set the text style to the current style
       const currentStyle = DesignCore.StyleManager.getCstyle();
-      this.styleName = currentStyle;
+      this.setProperty(Property.Names.STYLENAME, currentStyle);
 
       // get properties from style
-      const style = DesignCore.StyleManager.getItemByName(this.styleName);
+      const style = DesignCore.StyleManager.getItemByName(this.getProperty(Property.Names.STYLENAME));
       if (style?.textHeight) {
-        this.height = style.textHeight;
+        this.setProperty(Property.Names.HEIGHT, style.textHeight);
       }
 
       // Get the font size when standard style is used
-      if (this.styleName.toUpperCase() === 'STANDARD') {
-        const op2 = new PromptOptions(Strings.Input.HEIGHT, [Input.Type.NUMBER], [], this.height);
+      if (this.getProperty(Property.Names.STYLENAME).toUpperCase() === 'STANDARD') {
+        const op2 = new PromptOptions(Strings.Input.HEIGHT, [Input.Type.NUMBER], [], this.getProperty(Property.Names.HEIGHT));
         const height = await DesignCore.Scene.inputManager.requestInput(op2);
         if (height === undefined) return;
-        this.height = height;
+        this.setProperty(Property.Names.HEIGHT, height);
       }
 
       const op4 = new PromptOptions(Strings.Input.STRING, [Input.Type.STRING, Input.Type.NUMBER]);
       const string = await DesignCore.Scene.inputManager.requestInput(op4);
       if (string === undefined) return;
-      this.string = String(string);
+      this.setProperty(Property.Names.STRING, String(string));
 
       DesignCore.Scene.inputManager.executeCommand(this);
     } catch (err) {
@@ -311,11 +354,11 @@ export class ArcAlignedText extends Entity {
       if (DesignCore.Scene.inputManager.promptOption.types.includes(Input.Type.STRING)) {
         const data = {
           points: this.points,
-          height: this.height,
+          height: this.getProperty(Property.Names.HEIGHT),
           rotation: this.rotation,
           startAngle: Utils.radians2degrees(this.startAngle()),
           endAngle: Utils.radians2degrees(this.endAngle()),
-          radius: this.radius,
+          radius: this.getProperty(Property.Names.RADIUS),
           string: DesignCore.CommandLine.command,
         };
 
@@ -386,28 +429,39 @@ export class ArcAlignedText extends Entity {
     // character positions on arc
     const arcAlignedCharacters = [];
 
-    if (this.string.length === 0) {
+    const str = this.getProperty(Property.Names.STRING) ?? '';
+    const arcSide = this.getProperty(Property.Names.ARCSIDE);
+    const radius = this.getProperty(Property.Names.RADIUS);
+    const offsetFromArc = this.getProperty(Property.Names.OFFSETFROMARC);
+    const height = this.getProperty(Property.Names.HEIGHT);
+    const offsetFromRight = this.getProperty(Property.Names.OFFSETFROMRIGHT);
+    const offsetFromLeft = this.getProperty(Property.Names.OFFSETFROMLEFT);
+    const textAlignment = this.getProperty(Property.Names.TEXTALIGNMENT);
+    const textOrientation = this.getProperty(Property.Names.TEXTORIENTATION);
+    const characterSpacing = this.getProperty(Property.Names.CHARACTERSPACING);
+
+    if (str.length === 0) {
       return arcAlignedCharacters;
     }
 
     // calculate the radial distance - Arc Side: convex = 1, concave = 2
-    const radialDistance = this.arcSide === 2 ? this.radius - this.offsetFromArc - this.height * 0.5 : this.radius + this.offsetFromArc + this.height * 0.5;
+    const radialDistance = arcSide === 2 ? radius - offsetFromArc - height * 0.5 : radius + offsetFromArc + height * 0.5;
 
     // calculate start and end offsets using the first and last character widths of the original string
-    const firstCharWidth = Text.getApproximateWidth(this.string[0], this.height);
-    const lastCharWidth = Text.getApproximateWidth(this.string.at(-1), this.height);
-    const startOffsetAngle = this.linearToAngular(this.offsetFromRight, radialDistance) + this.linearToAngular(firstCharWidth * 0.5, radialDistance);
-    const endOffsetAngle = this.linearToAngular(this.offsetFromLeft, radialDistance) + this.linearToAngular(lastCharWidth * 0.5, radialDistance);
+    const firstCharWidth = Text.getApproximateWidth(str[0], height);
+    const lastCharWidth = Text.getApproximateWidth(str.at(-1), height);
+    const startOffsetAngle = this.linearToAngular(offsetFromRight, radialDistance) + this.linearToAngular(firstCharWidth * 0.5, radialDistance);
+    const endOffsetAngle = this.linearToAngular(offsetFromLeft, radialDistance) + this.linearToAngular(lastCharWidth * 0.5, radialDistance);
 
     // default to the arc end position as the string start
     let stringStartPoint = this.points[0].project(this.endAngle() - endOffsetAngle, radialDistance);
     // direction: - ccw > 0, cw <= 0
     let direction = 1; // default to ccw
 
-    let string = this.string.slice(); // make a copy of the string
+    let string = str.slice(); // make a copy of the string
 
     // 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
-    if (this.textAlignment === 3) { // right align
+    if (textAlignment === 3) { // right align
       // start at the arc start position and create the text cw around the arc
       stringStartPoint = this.points[0].project(this.startAngle() + startOffsetAngle, radialDistance);
       direction = -1;
@@ -415,9 +469,9 @@ export class ArcAlignedText extends Entity {
     }
 
     // calculate the text rotation angle: 1 = outward, 2 = inward
-    const textRotationAngle = this.textOrientation === 2 ? -Math.PI*0.5 : Math.PI*0.5;
+    const textRotationAngle = textOrientation === 2 ? -Math.PI*0.5 : Math.PI*0.5;
 
-    if (this.textOrientation === 2) {
+    if (textOrientation === 2) {
       // direction = -direction;
       string = [...string].reverse().join('');
     }
@@ -432,12 +486,12 @@ export class ArcAlignedText extends Entity {
       */
 
     // build per-character widths for the final (possibly reversed) string
-    const charWidths = [...string].map((ch) => Text.getApproximateWidth(ch, this.height));
+    const charWidths = [...string].map((ch) => Text.getApproximateWidth(ch, height));
 
     // build cumulative arc angle offsets from the string start position to each character center
     // step between adjacent centers is the average of their two half-widths plus spacing
     const charOffsetAngles = [0];
-    if (this.textAlignment === 1) { // fit to arc
+    if (textAlignment === 1) { // fit to arc
       if (string.length === 1) {
         // single character: place at arc midpoint — division by zero otherwise
         stringStartPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
@@ -450,11 +504,11 @@ export class ArcAlignedText extends Entity {
       }
     } else {
       for (let i = 0; i < string.length - 1; i++) {
-        const step = (charWidths[i] + charWidths[i + 1]) / 2 + this.characterSpacing;
+        const step = (charWidths[i] + charWidths[i + 1]) / 2 + characterSpacing;
         charOffsetAngles.push(charOffsetAngles[i] + this.linearToAngular(step * 0.5, radialDistance));
       }
 
-      if (this.textAlignment === 4) { // center
+      if (textAlignment === 4) { // center
         const arcMidPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
         stringStartPoint = arcMidPoint.rotate(this.points[0], charOffsetAngles.at(-1) * 0.5);
       }
@@ -464,7 +518,7 @@ export class ArcAlignedText extends Entity {
     for (let index = 0; index < string.length; index++) {
       const charPosition = stringStartPoint.rotate(this.points[0], -charOffsetAngles[index] * direction);
       const charAngle = this.points[0].angle(charPosition) - textRotationAngle;
-      const arcChar = new ArcAlignedCharacter(string[index], charPosition, charAngle, this.height, charWidths[index]);
+      const arcChar = new ArcAlignedCharacter(string[index], charPosition, charAngle, height, charWidths[index]);
       arcAlignedCharacters.push(arcChar);
     }
 
@@ -490,8 +544,8 @@ export class ArcAlignedText extends Entity {
    * @param {Object} renderer
    */
   draw(renderer) {
-    const style = DesignCore.StyleManager.getItemByName(this.styleName);
-    renderer.drawText(this.toCharacters(), style?.font, this.height);
+    const style = DesignCore.StyleManager.getItemByName(this.getProperty(Property.Names.STYLENAME));
+    renderer.drawText(this.toCharacters(), style?.font, this.getProperty(Property.Names.HEIGHT));
   }
 
   /**
@@ -499,36 +553,36 @@ export class ArcAlignedText extends Entity {
    * @param {DXFFile} file
    */
   dxf(file) {
-    const style = DesignCore.StyleManager.getItemByName(this.styleName);
+    const style = DesignCore.StyleManager.getItemByName(this.getProperty(Property.Names.STYLENAME));
 
     file.writeGroupCode('0', 'ARCALIGNEDTEXT');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
     file.writeGroupCode('100', 'AcDbArcAlignedText', DXFFile.Version.R2000);
-    file.writeGroupCode('1', this.string);
+    file.writeGroupCode('1', this.getProperty(Property.Names.STRING));
     file.writeGroupCode('2', style?.font);
     file.writeGroupCode('3', '');
-    file.writeGroupCode('7', this.styleName); // Test style name
+    file.writeGroupCode('7', this.getProperty(Property.Names.STYLENAME)); // Test style name
     file.writeGroupCode('10', this.points[0].x); // x of arc center
     file.writeGroupCode('20', this.points[0].y); // y of arc center
     file.writeGroupCode('30', '0.0'); // z of arc center
-    file.writeGroupCode('40', this.radius);
-    file.writeGroupCode('41', this.widthFactor);
-    file.writeGroupCode('42', this.height);
-    file.writeGroupCode('43', this.characterSpacing);
-    file.writeGroupCode('44', this.offsetFromArc);
-    file.writeGroupCode('45', this.offsetFromRight);
-    file.writeGroupCode('46', this.offsetFromLeft);
+    file.writeGroupCode('40', this.getProperty(Property.Names.RADIUS));
+    file.writeGroupCode('41', this.getProperty(Property.Names.WIDTHFACTOR));
+    file.writeGroupCode('42', this.getProperty(Property.Names.HEIGHT));
+    file.writeGroupCode('43', this.getProperty(Property.Names.CHARACTERSPACING));
+    file.writeGroupCode('44', this.getProperty(Property.Names.OFFSETFROMARC));
+    file.writeGroupCode('45', this.getProperty(Property.Names.OFFSETFROMRIGHT));
+    file.writeGroupCode('46', this.getProperty(Property.Names.OFFSETFROMLEFT));
     file.writeGroupCode('50', Utils.radians2degrees(this.startAngle()));
     file.writeGroupCode('51', Utils.radians2degrees(this.endAngle()));
-    file.writeGroupCode('70', this.textReversed ? 1 : 0); // Text direction
-    file.writeGroupCode('71', this.textOrientation); // Text orientation
-    file.writeGroupCode('72', this.textAlignment); // Text alignment
-    file.writeGroupCode('73', this.arcSide); // Arc side
-    file.writeGroupCode('74', this.bold ? 1 : 0);
-    file.writeGroupCode('75', this.italic ? 1 : 0);
-    file.writeGroupCode('76', this.underline ? 1 : 0);
+    file.writeGroupCode('70', this.getProperty(Property.Names.TEXTREVERSED) ? 1 : 0); // Text direction
+    file.writeGroupCode('71', this.getProperty(Property.Names.TEXTORIENTATION)); // Text orientation
+    file.writeGroupCode('72', this.getProperty(Property.Names.TEXTALIGNMENT)); // Text alignment
+    file.writeGroupCode('73', this.getProperty(Property.Names.ARCSIDE)); // Arc side
+    file.writeGroupCode('74', this.getProperty(Property.Names.BOLD) ? 1 : 0);
+    file.writeGroupCode('75', this.getProperty(Property.Names.ITALIC) ? 1 : 0);
+    file.writeGroupCode('76', this.getProperty(Property.Names.UNDERLINE) ? 1 : 0);
     file.writeGroupCode('77', 0);
     file.writeGroupCode('78', 34);
     file.writeGroupCode('79', 0);
