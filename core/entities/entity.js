@@ -113,7 +113,7 @@ export class Entity {
     let rgb = this.getColour();
 
     if (this.entityColour.byLayer) {
-      const layer = DesignCore.LayerManager.getItemByName(this.layer);
+      const layer = DesignCore.LayerManager.getItemByName(this.getProperty(Property.Names.LAYER));
       rgb = layer?.colour;
     }
 
@@ -133,10 +133,10 @@ export class Entity {
    * @return {LType}
    */
   getLineType() {
-    let lineTypeName = this.lineType;
+    let lineTypeName = this.getProperty(Property.Names.LINETYPE) ?? 'ByLayer';
 
     if (lineTypeName.toUpperCase() === 'BYLAYER') {
-      const layer = DesignCore.LayerManager.getItemByName(this.layer);
+      const layer = DesignCore.LayerManager.getItemByName(this.getProperty(Property.Names.LAYER));
       lineTypeName = layer?.lineType;
     }
 
@@ -154,7 +154,7 @@ export class Entity {
       file.writeGroupCode('62', this.entityColour.aci);
     }
     if (this.entityColour.isTrueColour) {
-      file.writeGroupCode('420', Colours.rgbToTrueColour(this.colour));
+      file.writeGroupCode('420', Colours.rgbToTrueColour(this.getColour()));
     }
   }
 
@@ -188,7 +188,7 @@ export class Entity {
    * @return {boolean} true if touched
    */
   touched(selection) {
-    const layer = DesignCore.LayerManager.getItemByName(this.layer);
+    const layer = DesignCore.LayerManager.getItemByName(this.getProperty(Property.Names.LAYER));
 
     if (!layer?.isSelectable) {
       return;
