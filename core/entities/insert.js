@@ -6,6 +6,7 @@ import { BoundingBox } from '../lib/boundingBox.js';
 import { Point } from './point.js';
 import { Utils } from '../lib/utils.js';
 import { Logging } from '../lib/logging.js';
+import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
 import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
@@ -130,9 +131,9 @@ export class Insert extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'INSERT');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
     this.writeDxfColour(file);
     file.writeGroupCode('100', 'AcDbBlockReference', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.block.name);
@@ -252,7 +253,7 @@ export class Insert extends Entity {
    * @return {boolean} true if touched
    */
   touched(selection) {
-    const layer = DesignCore.LayerManager.getItemByName(this.layer);
+    const layer = DesignCore.LayerManager.getItemByName(this.getProperty(Property.Names.LAYER));
 
     if (!layer?.isSelectable) {
       return;
