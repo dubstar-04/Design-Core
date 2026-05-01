@@ -8,6 +8,7 @@ import { PlotOptions } from './plotOptions.js';
 // import { RendererBase } from './renderers/rendererBase.js';
 
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 
 /** Canvas Class */
 export class Canvas {
@@ -321,7 +322,7 @@ export class Canvas {
     const plotScale = matrix.a;
     this.#paintEntities(
         DesignCore.Scene.entities, renderer, null,
-        (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isPlottable,
+        (entity) => DesignCore.LayerManager.getItemByName(entity.getProperty(Property.Names.LAYER))?.isPlottable,
         null, null,
         plotScale,
     );
@@ -376,7 +377,7 @@ export class Canvas {
     // Hovered entity detected inline: renderer draws glow + entity in a single drawShape call.
     this.#paintEntities(
         DesignCore.Scene.entities, renderer, null,
-        (entity) => DesignCore.LayerManager.getItemByName(entity.layer)?.isVisible,
+        (entity) => DesignCore.LayerManager.getItemByName(entity.getProperty(Property.Names.LAYER))?.isVisible,
         DesignCore.Scene.hoverEntities,
         { colour: hoverHaloColour, lineWidthDelta: selectionLineWidthDelta },
     );
@@ -464,7 +465,7 @@ export class Canvas {
   setContext(item, renderer, block = undefined, overrides = {}, scale = this.getScale()) {
     let colour = item.getDrawColour();
     const lineType = item.getLineType();
-    let lineWidth = item.lineWidth / scale;
+    let lineWidth = item.getProperty(Property.Names.LINEWIDTH) / scale;
     const bg = renderer.getBackgroundColour() ?? { r: 0, g: 0, b: 0 };
 
     if (block && item.entityColour.aci === 0) {
@@ -502,10 +503,10 @@ export class Canvas {
     let colour;
     if (item.entityColour.byBlock && block) {
       colour = block.entityColour.byLayer ?
-        DesignCore.LayerManager.getItemByName(block.layer)?.layerColour :
+        DesignCore.LayerManager.getItemByName(block.getProperty(Property.Names.LAYER))?.layerColour :
         block.entityColour;
     } else if (item.entityColour.byLayer) {
-      colour = DesignCore.LayerManager.getItemByName(item.layer)?.layerColour;
+      colour = DesignCore.LayerManager.getItemByName(item.getProperty(Property.Names.LAYER))?.layerColour;
     } else {
       colour = item.entityColour;
     }
