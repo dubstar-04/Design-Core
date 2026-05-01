@@ -967,9 +967,9 @@ test('Fillet.action arc inherits layer, lineWidth, lineType from first entity', 
   expect(core.scene.entities.count()).toBe(3);
   const arc = core.scene.entities.get(2);
   expect(arc.type).toBe('Arc');
-  expect(arc.layer).toBe('walls');
-  expect(arc.lineWidth).toBe(5);
-  expect(arc.lineType).toBe('DASHED');
+  expect(arc.getProperty('layer')).toBe('walls');
+  expect(arc.getProperty('lineWidth')).toBe(5);
+  expect(arc.getProperty('lineType')).toBe('DASHED');
 });
 
 test('Fillet.preview does not throw', () => {
