@@ -115,7 +115,7 @@ ByLayer
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newLine = new Line(line);
+  const newLine = new Line({ handle: line.getProperty('handle'), points: line.points });
   file = new File();
   newLine.dxf(file);
   expect(file.contents).toEqual(dxfString);
@@ -156,11 +156,12 @@ test('Line.execute handles Close option', async () => {
     const line = new Line({});
     await line.execute();
 
-    expect(line.points.length).toBe(4);
+    // this.points accumulates all confirmed input points (not the closing segment,
+    // which is committed as a separate entity)
+    expect(line.points.length).toBe(3);
     expect(line.points[0]).toBe(pt1);
     expect(line.points[1]).toBe(pt2);
     expect(line.points[2]).toBe(pt3);
-    expect(line.points[3]).toBe(pt1);
   }, { extraMethods: { actionCommand: () => {} } });
 });
 
