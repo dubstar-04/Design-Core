@@ -1,6 +1,7 @@
 
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BaseCircularDimension } from './baseCircularDimension.js';
+import { Property } from '../properties/property.js';
 
 /**
  * Radial Dimension Entity Class
@@ -57,10 +58,10 @@ export class RadialDimension extends BaseCircularDimension {
     const Pt15 = this.getPointBySequence(this.points, 15);
 
     file.writeGroupCode('0', 'DIMENSION');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimension', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
     // file.writeGroupCode('2', this.blockName); // Block not required
     file.writeGroupCode('10', Pt10.x); // X - Start of Dimension Line
     file.writeGroupCode('20', Pt10.y); // Y
@@ -69,7 +70,7 @@ export class RadialDimension extends BaseCircularDimension {
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
     file.writeGroupCode('70', this.dimType.getDimType()); // DIMENSION TYPE
-    file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
+    file.writeGroupCode('3', this.getProperty(Property.Names.DIMENSIONSTYLE)); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbRadialDimension', DXFFile.Version.R2000);
     file.writeGroupCode('15', Pt15.x); // X - End of Dimension Line
     file.writeGroupCode('25', Pt15.y); // Y
