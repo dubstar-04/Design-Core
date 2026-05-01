@@ -208,6 +208,15 @@ class State {
           this.entityManager.update(index, stateChange.properties);
         }
       }
+
+      if (stateChange instanceof ReplaceState) {
+        const index = this.entityManager.indexOf(stateChange.entity);
+        if (index !== -1) {
+          this.entityManager.replace(index, stateChange.replacement);
+          const undoStateChange = new ReplaceState(stateChange.replacement, stateChange.entity);
+          this.undoStateChanges.push(undoStateChange);
+        }
+      }
     }
   }
 
@@ -229,6 +238,13 @@ class State {
         const index = this.entityManager.indexOf(stateChange.entity);
         if (index !== -1) {
           this.entityManager.update(index, stateChange.properties);
+        }
+      }
+
+      if (stateChange instanceof ReplaceState) {
+        const index = this.entityManager.indexOf(stateChange.entity);
+        if (index !== -1) {
+          this.entityManager.replace(index, stateChange.replacement);
         }
       }
     }
@@ -284,5 +300,18 @@ export class UpdateState extends StateChange {
    */
   constructor(entity, properties) {
     super(entity, properties);
+  }
+}
+
+/** Replace State Class */
+export class ReplaceState {
+  /**
+   * Create Replace State
+   * @param {object} entity - the entity to be replaced (used to locate it by reference)
+   * @param {object} replacement - the entity to put in its place
+   */
+  constructor(entity, replacement) {
+    this.entity = entity;
+    this.replacement = replacement;
   }
 }
