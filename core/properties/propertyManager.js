@@ -46,11 +46,13 @@ export class PropertyManager {
       }
 
       // check if the item has the selected property
-      if (!item.hasOwnProperty(property)) {
+      if (!item.properties?.has(property)) {
         continue;
       }
 
-      if (typeof (item[property]) !== typeof (newPropertyValue)) {
+      const currentValue = item.getProperty(property);
+
+      if (typeof (currentValue) !== typeof (newPropertyValue)) {
         DesignCore.Core.notify(Strings.Error.INPUT);
       } else {
         // update the item property
@@ -119,16 +121,15 @@ export class PropertyManager {
     const propertiesList = [];
 
     subset.forEach((el) => {
-      // get list of keys
-      Object.keys(el).forEach((key) => {
-        // check if the key is already in the propertiesList
-        if (propertiesList.includes(key) === false) {
-          // check if all subset items contain the key and the key is enumberable
-          if (subset.every((el) => el.hasOwnProperty(key) && Object.getOwnPropertyDescriptor(el, key).enumerable)) {
-            propertiesList.push(key);
+      if (el.properties) {
+        el.properties.list().forEach((key) => {
+          if (propertiesList.includes(key) === false) {
+            if (subset.every((sub) => sub.properties?.has(key))) {
+              propertiesList.push(key);
+            }
           }
-        }
-      });
+        });
+      }
     });
 
     return propertiesList;
@@ -147,8 +148,8 @@ export class PropertyManager {
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         if (DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]).type === itemType || itemType === 'All') {
-          const prop = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i])[property];
-          propertiesValueList.push(prop);
+          const entity = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
+          propertiesValueList.push(entity.getProperty(property));
         }
       }
     }
