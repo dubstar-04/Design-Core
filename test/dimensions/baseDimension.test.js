@@ -18,11 +18,11 @@ describe('BaseDimension', () => {
   });
 
   test('constructor sets default properties', () => {
-    expect(baseDim.textOverride).toBe('');
-    expect(baseDim.blockName).toBe('');
-    expect(baseDim.dimensionStyle).toBe('STANDARD');
-    expect(baseDim.leaderLength).toBe(0);
-    expect(baseDim.linearDimAngle).toBe(0);
+    expect(baseDim.getProperty('textOverride')).toBe('');
+    expect(baseDim.getProperty('blockName')).toBe('');
+    expect(baseDim.getProperty('dimensionStyle')).toBe('STANDARD');
+    expect(baseDim.getProperty('leaderLength')).toBe(0);
+    expect(baseDim.getProperty('linearDimAngle')).toBe(0);
   });
 
   test('getDimensionValue formats values by dimension type', () => {
@@ -168,17 +168,17 @@ describe('BaseDimension', () => {
   });
 
   test('getDimensionValue uses textOverride', () => {
-    baseDim.textOverride = 'foo <> bar';
+    baseDim.setProperty('textOverride', 'foo <> bar');
     expect(baseDim.getDimensionValue(10)).toBe('foo 10.0000 bar');
   });
 
   test('getDimensionText returns a Text object with correct values', () => {
     const text = baseDim.getDimensionText(10, new Point(1, 2), Math.PI / 4);
     expect(text).toBeInstanceOf(Text);
-    expect(text.height).toBe(0.18);
+    expect(text.getProperty('height')).toBe(0.18);
     expect(text.points[0].x).toBe(1);
     expect(text.points[0].y).toBe(2);
-    expect(typeof text.string).toBe('string');
+    expect(typeof text.getProperty('string')).toBe('string');
   });
 
   test('getTextDirection flips angle in lower half', () => {
