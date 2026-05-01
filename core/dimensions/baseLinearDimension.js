@@ -7,6 +7,7 @@ import { BaseDimension } from './baseDimension.js';
 import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 import { Utils } from '../lib/utils.js';
 import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
@@ -30,7 +31,7 @@ export class BaseLinearDimension extends BaseDimension {
   async execute() {
     try {
       DesignCore.Scene.selectionManager.reset();
-      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
+      this.setProperty(Property.Names.DIMENSIONSTYLE, DesignCore.DimStyleManager.getCstyle());
       this.dimType.setDimType(0); // Rotated dimension
 
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
@@ -71,7 +72,7 @@ export class BaseLinearDimension extends BaseDimension {
       pt11.sequence = 11;
       const tempLine = new Line({ points: [...this.points] });
       const points = this.constructor.getPointsFromSelection([tempLine], pt11);
-      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
     }
   }
 
@@ -155,7 +156,7 @@ export class BaseLinearDimension extends BaseDimension {
     const midPoint = Pt13e.midPoint(Pt14e);
 
     // set the dimension line angle. This is required for rotated dimension dxf definition
-    this.linearDimAngle = Utils.radians2degrees(dimLineAngle);
+    this.setProperty(Property.Names.LINEARDIMANGLE, Utils.radians2degrees(dimLineAngle));
 
     // Approximate text width based on height using the formatted dimension value i.e with units, precision and symbols
     const approxTextWidth = Text.getApproximateWidth(this.getDimensionValue(dimension), DIMTXT);
