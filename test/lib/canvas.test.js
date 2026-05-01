@@ -13,7 +13,11 @@ const canvas = core.canvas;
 
 canvas.setRenderer(MockRenderer);
 
-/** Add getProperty(name) to a mock entity so canvas.setContext/isAci7 can read properties. */
+/**
+ * Add getProperty(name) to a mock entity so canvas.setContext/isAci7 can read properties.
+ * @param {Object} obj - plain object representing a mock entity
+ * @return {Object} the same object with a getProperty method mixed in
+ */
 function withGetProperty(obj) {
   return { ...obj, getProperty(name) {
     return this[name];

@@ -6,7 +6,10 @@ import { Entity } from '../../core/entities/entity.js';
 // initialise core
 new Core();
 
-// Minimal entity-like object for isolated EntityProperties tests
+/**
+ * Minimal entity-like object for isolated EntityProperties tests.
+ * @return {Object} plain object with layer and lineWidth fields
+ */
 function makeTarget() {
   return { layer: '0', lineWidth: 1 };
 }

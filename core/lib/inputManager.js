@@ -3,7 +3,6 @@ import { Snapping } from './snapping.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
-import { AddState } from './stateManager.js';
 import { Point } from '../entities/point.js';
 import { Input, MouseDown, MouseUp } from './input.js';
 

@@ -24,6 +24,8 @@ export class EntityProperties {
    * @param {boolean} [definition.readOnly=false]
    * @param {boolean} [definition.visible=true]
    * @param {number} [definition.dxfCode]
+   * @param {Function} [definition.get] - computed getter: (entity) => value
+   * @param {Function} [definition.set] - computed setter: (entity, value) => void
    */
   add(name, definition) {
     this._store[name] = new Property(definition);

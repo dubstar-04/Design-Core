@@ -10,6 +10,8 @@ export class Property {
    * @param {boolean} [options.readOnly=false] - when true, set() is a no-op
    * @param {boolean} [options.visible=true] - controls whether the property appears in listings
    * @param {number} [options.dxfCode] - associated DXF group code (informational)
+   * @param {Function} [options.get] - computed getter: (entity) => value
+   * @param {Function} [options.set] - computed setter: (entity, value) => void
    */
   constructor({ type, value, readOnly = false, visible = true, dxfCode, get, set } = {}) {
     this.type = type;
