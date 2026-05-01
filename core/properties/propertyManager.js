@@ -137,6 +137,21 @@ export class PropertyManager {
 
 
   /**
+   * Get the Property descriptor for a named property from a representative selected entity.
+   * @param {string} itemType
+   * @param {string} property
+   * @return {Property|undefined}
+   */
+  getItemPropertyDefinition(itemType, property) {
+    const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet.find((i) => {
+      const item = DesignCore.Scene.entities.get(i);
+      return (itemType === 'All' || item.type === itemType) && item.properties?.has(property);
+    });
+    if (index === undefined) return undefined;
+    return DesignCore.Scene.entities.get(index).properties.definition(property);
+  }
+
+  /**
    * Get a list the property values
    * @param {string} itemType
    * @param {string} property
