@@ -53,7 +53,7 @@ export class Copyclip extends Tool {
    */
   action() {
     // generate clipboard data from selected items
-    const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
+    const selectedItems = DesignCore.Scene.selectionManager.selectedEntities;
 
     // create clipboard data
     DesignCore.Clipboard.Entities = selectedItems;
