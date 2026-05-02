@@ -190,7 +190,7 @@ export class BaseLinearDimension extends BaseDimension {
     const outsideOffsetDirection = Pt11.distance(Pt13e) < Pt11.distance(Pt14e) ? reverseDimLineAngle : dimLineAngle;
 
     switch (DIMJUST) {
-      case 0: // 0 = Center-justified between extension lines
+      case 0: // 0 = Centre-justified between extension lines
         if (textOutSide) {
           textPosition = midPoint.project(outsideOffsetDirection, outsideOffsetDistance);
         }
@@ -237,7 +237,7 @@ export class BaseLinearDimension extends BaseDimension {
 
     // DIMTAD - Text vertical position
     switch (DIMTAD) {
-      case 0: // 0 = Centers the dimension text between the extension lines.
+      case 0: // 0 = Centres the dimension text between the extension lines.
         break;
       case 1: // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1).
         textPosition = textPosition.project(textAboveDirection, textAboveDistance);
@@ -301,8 +301,8 @@ export class BaseLinearDimension extends BaseDimension {
         dimLineTwoEnd = Pt14e;
       }
       // get the distance to extend the dimension line
-      // when text is vertically centered trim the dimension line back from the text position
-      // when text is not vertically centered extend the dimension line beyond the text position by half the text width
+      // when text is vertically centred trim the dimension line back from the text position
+      // when text is not vertically centred extend the dimension line beyond the text position by half the text width
       const dimlineExtendDistance = textDimlineIntersection.isSame(textPosition) ? approxTextHalfWidth + DIMGAP : -approxTextHalfWidth;
 
       if (Pt11.distance(Pt13e) < Pt11.distance(Pt14e)) {
@@ -314,7 +314,7 @@ export class BaseLinearDimension extends BaseDimension {
       }
     }
 
-    // split the dimension line when the text is centered vertically
+    // split the dimension line when the text is centred vertically
     if (textIsOnInternalDimLine) {
       dimLineOneEnd = dimLineOneEnd.project(reverseDimLineAngle, approxTextWidth * 0.6);
       dimLineTwoEnd = dimLineTwoEnd.project(dimLineAngle, approxTextWidth * 0.6);
