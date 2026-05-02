@@ -191,7 +191,7 @@ test('Test BasePolyline.boundingBox', () => {
 
 test('Test BasePolyline.getBulgeFromSegment', () => {
   // start point: 100,0
-  // center: 100,50
+  // centre: 100,50
   // radius: 50
   const points = [new Point(), new Point(100, 0)];
   const polyline = new BasePolyline({ points: points });
