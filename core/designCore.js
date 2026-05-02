@@ -11,7 +11,7 @@
    import {Core} from "core.js";
    import {DesignCore} from "designCore.js";
 
-   // Core must be instanciated and activated before use:
+   // Core must be instantiated and activated before use:
    const core = new Core()
    core.activate()
 
