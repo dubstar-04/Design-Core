@@ -16,12 +16,12 @@ export class PolylineUtils {
    */
   static isPointOnSegment(point, A, B) {
     if (A.bulge !== 0 && A.bulge !== undefined) {
-      const center = A.bulgeCentrePoint(B);
-      const radius = center.distance(A);
+      const centre = A.bulgeCentrePoint(B);
+      const radius = centre.distance(A);
       // Point must lie on the circle before checking the angular range.
-      if (Utils.round(center.distance(point)) !== Utils.round(radius)) return false;
+      if (Utils.round(centre.distance(point)) !== Utils.round(radius)) return false;
       const direction = A.bulge > 0 ? 1 : -1;
-      return point.isOnArc(A, B, center, direction);
+      return point.isOnArc(A, B, centre, direction);
     }
     return point.isOnLine(A, B);
   }
@@ -38,9 +38,9 @@ export class PolylineUtils {
     const B = points[segmentIndex % points.length];
 
     if (A.bulge !== 0 && A.bulge !== undefined) {
-      const center = A.bulgeCentrePoint(B);
+      const centre = A.bulgeCentrePoint(B);
       const direction = A.bulge > 0 ? 1 : -1;
-      const closest = point.closestPointOnArc(A, B, center, direction);
+      const closest = point.closestPointOnArc(A, B, centre, direction);
       if (closest) return closest;
       // Point not on arc — return the nearer endpoint
       return point.distance(A) < point.distance(B) ? A : B;
@@ -63,10 +63,10 @@ export class PolylineUtils {
     const B = points[segmentIndex % points.length];
 
     if (A.bulge !== 0 && A.bulge !== undefined) {
-      const center = A.bulgeCentrePoint(B);
+      const centre = A.bulgeCentrePoint(B);
       const direction = A.bulge > 0 ? 1 : -1;
-      const startAngle = center.angle(A);
-      const pointAngle = center.angle(point);
+      const startAngle = centre.angle(A);
+      const pointAngle = centre.angle(point);
       return ((pointAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
     }
 
