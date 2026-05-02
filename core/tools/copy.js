@@ -84,8 +84,8 @@ export class Copy extends Tool {
       const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);
       this.lastMousePoint = mousePoint;
 
-      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedEntities.length; i++) {
+        const item = DesignCore.Scene.selectionManager.selectedEntities[i];
         const offsetPoints = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
         item.setProperty('points', offsetPoints);
       }
