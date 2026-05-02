@@ -37,7 +37,7 @@ export class Matrix {
   };
 
   /**
-   * Apply tranlation to matrix
+   * Apply translation to matrix
    * @param {number} x - translation in x
    * @param {number} y - translation in y
    */
