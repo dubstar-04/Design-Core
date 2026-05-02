@@ -436,11 +436,11 @@ export class BaseDimension extends Entity {
    * @return {Array} block items for the canvas to render recursively
    */
   draw(renderer) {
-    if (this.block.items.length === 0) {
+    if (this.block.entities.length === 0) {
       this.refresh();
     }
 
-    return this.block.items;
+    return this.block.entities;
   }
 
   /**
@@ -496,12 +496,12 @@ export class BaseDimension extends Entity {
     const entities = this.buildDimension();
 
     if (entities) {
-      this.block.clearItems();
+      this.block.clearEntities();
 
       entities.forEach((element) => {
         // For colour BYBLOCK for dimensions
         element.setProperty(Property.Names.COLOUR, 'BYBLOCK');
-        this.block.addItem(element);
+        this.block.addEntity(element);
       });
     }
   }
