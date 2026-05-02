@@ -48,7 +48,7 @@ export class Dimension extends BaseDimension {
       writable: true,
     });
 
-    Object.defineProperty(this, 'selectedItems', {
+    Object.defineProperty(this, 'selectedEntities', {
       value: [],
       writable: true,
     });
@@ -104,7 +104,7 @@ export class Dimension extends BaseDimension {
           if (pt14 === undefined) return;
           // Create a temporary line using the selected points
           const tempLine = new Line({ points: [input1, pt14] });
-          this.selectedItems.push(tempLine);
+          this.selectedEntities.push(tempLine);
         }
 
         if (input1 instanceof SingleSelection) {
@@ -115,19 +115,19 @@ export class Dimension extends BaseDimension {
             // set the dimension type
             if (selectedItem instanceof Line) {
               this.dimType.setDimType(1);
-              this.selectedItems.push(selectedItem);
+              this.selectedEntities.push(selectedItem);
               inputValid = true;
             }
 
             if (selectedItem instanceof Circle) {
               this.dimType.setDimType(3);
-              this.selectedItems.push(selectedItem);
+              this.selectedEntities.push(selectedItem);
               inputValid = true;
             }
 
             if (selectedItem instanceof Arc) {
               this.dimType.setDimType(4);
-              this.selectedItems.push(selectedItem);
+              this.selectedEntities.push(selectedItem);
               inputValid = true;
             }
 
@@ -137,13 +137,13 @@ export class Dimension extends BaseDimension {
 
               if (segment instanceof Line) {
                 this.dimType.setDimType(1);
-                this.selectedItems.push(segment);
+                this.selectedEntities.push(segment);
                 inputValid = true;
               }
 
               if (segment instanceof Arc) {
                 this.dimType.setDimType(4);
-                this.selectedItems.push(segment);
+                this.selectedEntities.push(segment);
                 inputValid = true;
               }
             }
@@ -162,12 +162,12 @@ export class Dimension extends BaseDimension {
         let op2 = new PromptOptions(Strings.Input.DIMENSION, [Input.Type.POINT]);
 
         // Angular dimension prompt: select a second line for an angular dimension or location for the text position
-        if ((this.selectedItems[0] instanceof Line) && this.selectedItems.length < 2) {
+        if ((this.selectedEntities[0] instanceof Line) && this.selectedEntities.length < 2) {
           op2 = new PromptOptions(`${Strings.Input.DIMENSION} or ${Strings.Input.SELECT}`, [Input.Type.POINT, Input.Type.SINGLESELECTION]);
         }
 
         // diametric prompt: select radial or diametric type dimension or location for the the text position
-        if (this.selectedItems[0] instanceof Circle) {
+        if (this.selectedEntities[0] instanceof Circle) {
           const options = this.dimType.getBaseDimType() === 3 ? ['Radius'] : ['Diameter'];
           op2 = new PromptOptions(`${Strings.Input.DIMENSION}`, [Input.Type.POINT], options);
         }
@@ -180,17 +180,17 @@ export class Dimension extends BaseDimension {
 
           // if selected items are available, get the points from the selected items
           // dimensions can be created from point selection only, therefore selected items may not be available
-          if (this.selectedItems.length) {
+          if (this.selectedEntities.length) {
             // for linear dimensions, determine if aligned or rotated based on mouse position
             if (this.dimType.getBaseDimType() === 0 || this.dimType.getBaseDimType() === 1) {
-              const Pt13 = this.selectedItems[0].points[0];
-              const Pt14 = this.selectedItems[0].points[1];
+              const Pt13 = this.selectedEntities[0].points[0];
+              const Pt14 = this.selectedEntities[0].points[1];
               const linearDimTypeNumber = this.getLinearDimensionType(Pt13, Pt14, Pt11);
               this.dimType.setDimType(linearDimTypeNumber);
             }
 
             const dimensionType = this.dimensionMap[this.dimType.getBaseDimType()]; // TODO: use this.dimensionMap.name?
-            this.points.push(...dimensionType.getPointsFromSelection(this.selectedItems, Pt11));
+            this.points.push(...dimensionType.getPointsFromSelection(this.selectedEntities, Pt11));
           }
         }
 
@@ -218,7 +218,7 @@ export class Dimension extends BaseDimension {
               }
             }
             // Check lines intersect
-            const line1 = { start: this.selectedItems[0].points[0], end: this.selectedItems[0].points[1] };
+            const line1 = { start: this.selectedEntities[0].points[0], end: this.selectedEntities[0].points[1] };
             const line2 = { start: selectedItem2.points[0], end: selectedItem2.points[1] };
 
             // Check the lines are not parallel - Can't dimension parallel lines
@@ -229,7 +229,7 @@ export class Dimension extends BaseDimension {
               const intersect = Intersection.intersectSegmentSegment(line1.start, line1.end, line2.start, line2.end, false, true);
               if (intersect.points.length >= 1) {
               // add line to selection
-                this.selectedItems.push(selectedItem2);
+                this.selectedEntities.push(selectedItem2);
                 // Two lines selected - switch to angular dimension
                 this.dimType.setDimType(2);
               }
@@ -280,7 +280,7 @@ export class Dimension extends BaseDimension {
    * Preview the entity during creation
    */
   preview() {
-    if (this.selectedItems.length) {
+    if (this.selectedEntities.length) {
       let dimTypeNumber = this.dimType.getBaseDimType();
 
       const Pt11 = DesignCore.Mouse.pointOnScene();
@@ -288,8 +288,8 @@ export class Dimension extends BaseDimension {
 
       if (dimTypeNumber === 0 || dimTypeNumber === 1) {
         // for linear dimensions, determine if aligned or rotated based on mouse position
-        const Pt13 = this.selectedItems[0].points[0];
-        const Pt14 = this.selectedItems[0].points[1];
+        const Pt13 = this.selectedEntities[0].points[0];
+        const Pt14 = this.selectedEntities[0].points[1];
         dimTypeNumber = this.getLinearDimensionType(Pt13, Pt14, Pt11);
       }
       // get the dimension class
@@ -297,7 +297,7 @@ export class Dimension extends BaseDimension {
       // get the dimension type as a string
       const dimensionTypeString = dimensionType.register().command;
       // get the points for the dimension
-      const points = dimensionType.getPointsFromSelection(this.selectedItems, Pt11);
+      const points = dimensionType.getPointsFromSelection(this.selectedEntities, Pt11);
       // create the temporary dimension
       DesignCore.Scene.previewEntities.create(dimensionTypeString, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
     }
