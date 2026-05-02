@@ -8,12 +8,12 @@ import { jest } from '@jest/globals';
 const core = new Core();
 
 // Add items to scene
-DesignCore.Scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)], layer: 'test' });
-DesignCore.Scene.addItem('Circle', { points: [new Point(10, 0), new Point(20, 0)] });
-DesignCore.Scene.addItem('Polyline', { points: [new Point(10, 0), new Point(20, 0)] });
-DesignCore.Scene.addItem('Arc', { points: [new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
-DesignCore.Scene.addItem('Rectangle', { points: [new Point(10, 0), new Point(0, 10)] });
-DesignCore.Scene.addItem('Text', { points: [new Point(10, 0), new Point(0, 10)], height: 10, rotation: 0, string: 'text test' });
+DesignCore.Scene.addEntity('Line', { points: [new Point(10, 0), new Point(20, 0)], layer: 'test' });
+DesignCore.Scene.addEntity('Circle', { points: [new Point(10, 0), new Point(20, 0)] });
+DesignCore.Scene.addEntity('Polyline', { points: [new Point(10, 0), new Point(20, 0)] });
+DesignCore.Scene.addEntity('Arc', { points: [new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+DesignCore.Scene.addEntity('Rectangle', { points: [new Point(10, 0), new Point(0, 10)] });
+DesignCore.Scene.addEntity('Text', { points: [new Point(10, 0), new Point(0, 10)], height: 10, rotation: 0, string: 'text test' });
 
 test('Test MatchProp.execute requests source and targets and completes', async () => {
   const match = new MatchProp();
