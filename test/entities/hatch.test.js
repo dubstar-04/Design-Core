@@ -56,10 +56,10 @@ test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) =
 
   await withMockInput(DesignCore.Scene, [true], async () => {
     // Manual mock for selected items
-    DesignCore.Scene.selectionManager.selectedItems = [];
+    DesignCore.Scene.selectionManager.selectedEntities = [];
 
     for (let i = 0; i < boundaryItems.length; i++) {
-      DesignCore.Scene.selectionManager.selectedItems.push(boundaryItems[i]);
+      DesignCore.Scene.selectionManager.selectedEntities.push(boundaryItems[i]);
     }
 
     const hatch = new Hatch({ patternName: pattern, scale: scale, angle: angle });
