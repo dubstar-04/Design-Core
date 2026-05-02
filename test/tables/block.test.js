@@ -9,6 +9,11 @@ import { DesignCore } from '../../core/designCore.js';
 import { Utils } from '../../core/lib/utils.js';
 import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
 
+/**
+ * Create a mock requestInput function that returns values from the provided array in order.
+ * @param {Array} inputs
+ * @return {Function}
+ */
 function mockRequestInput(inputs) {
   let i = 0;
   return async () => {
@@ -195,7 +200,7 @@ test('Test Block.dxf succeeds when block items have valid handles', () => {
 });
 
 test('Test Block.execute offsets entity points by the insert point', async () => {
-  const core = new Core();
+  new Core();
 
   // Add a line to the scene at world coordinates (100,200) → (300,400)
   const line = new Line({ points: [new Point(100, 200), new Point(300, 400)] });
