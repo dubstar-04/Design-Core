@@ -122,7 +122,7 @@ beforeAll(() => {
   blockLine.setProperty('handle', DesignCore.HandleManager.next());
   const block = DesignCore.Scene.blockManager.addItem({
     name: 'TEST_BLOCK',
-    items: [blockLine],
+    entities: [blockLine],
   });
   const insert = new Insert({
     points: [new Point(130, 235)],
