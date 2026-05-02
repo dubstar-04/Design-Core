@@ -80,8 +80,8 @@ export class Mirror extends Tool {
 
       // Preview mirrored entities (skip if mirror line has zero length)
       if (!pt1.isSame(pt2)) {
-        for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-          const item = DesignCore.Scene.selectionManager.selectedItems[i];
+        for (let i = 0; i < DesignCore.Scene.selectionManager.selectedEntities.length; i++) {
+          const item = DesignCore.Scene.selectionManager.selectedEntities[i];
           const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
           const originalItem = DesignCore.Scene.entities.get(entityIndex);
           item.setProperty('points', this.getMirroredPoints(originalItem.points, pt1, pt2));
