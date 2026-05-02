@@ -159,7 +159,7 @@ export class Insert extends Entity {
     // blocks are associated with an insert point.
     // Apply the insert location and rotation so block items draw correctly.
     renderer.applyTransform({ x: this.points[0].x, y: this.points[0].y, rotation: Utils.degrees2radians(this.getRotation()) });
-    return this.block.items;
+    return this.block.entities;
   }
 
   /**
