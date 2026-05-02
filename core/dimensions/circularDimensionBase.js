@@ -1,14 +1,14 @@
 import { Strings } from '../lib/strings.js';
 import { Circle } from '../entities/circle.js';
 import { Arc } from '../entities/arc.js';
-import { BasePolyline } from '../entities/basePolyline.js';
+import { PolylineBase } from '../entities/polylineBase.js';
 import { Line } from '../entities/line.js';
 import { Text } from '../entities/text.js';
 import { Point } from '../entities/point.js';
 import { Intersection } from '../lib/intersect.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
-import { BaseDimension } from './baseDimension.js';
+import { DimensionBase } from './dimensionBase.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
@@ -16,9 +16,9 @@ import { Property } from '../properties/property.js';
 
 /**
  * Base Class for Circular Dimensions - Radius and Diameter
- * @extends BaseDimension
+ * @extends DimensionBase
  */
-export class BaseCircularDimension extends BaseDimension {
+export class CircularDimensionBase extends DimensionBase {
   /**
    * Circular Dimension Constructor
    * @param {Array} data
@@ -46,8 +46,8 @@ export class BaseCircularDimension extends BaseDimension {
 
         let selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
 
-        if ([Circle, Arc, BasePolyline].some((entity) => selectedItem instanceof entity)) {
-          if (selectedItem instanceof BasePolyline) {
+        if ([Circle, Arc, PolylineBase].some((entity) => selectedItem instanceof entity)) {
+          if (selectedItem instanceof PolylineBase) {
             // get the segment closest to the mouse point
             const segment = selectedItem.getClosestSegment(selection.selectedPoint);
 

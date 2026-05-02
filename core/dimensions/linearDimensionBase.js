@@ -3,7 +3,7 @@ import { Line } from '../entities/line.js';
 import { Text } from '../entities/text.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
-import { BaseDimension } from './baseDimension.js';
+import { DimensionBase } from './dimensionBase.js';
 import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
@@ -13,9 +13,9 @@ import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 /**
  * Aligned Dimension Entity Class
- * @extends BaseDimension
+ * @extends DimensionBase
  */
-export class BaseLinearDimension extends BaseDimension {
+export class LinearDimensionBase extends DimensionBase {
   /**
    * Create an Aligned Dimension
    * @param {Array} data

@@ -2,12 +2,12 @@
 import { Utils } from '../lib/utils.js';
 import { Strings } from '../lib/strings.js';
 import { Arc } from '../entities/arc.js';
-import { BasePolyline } from '../entities/basePolyline.js';
+import { PolylineBase } from '../entities/polylineBase.js';
 import { Line } from '../entities/line.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
-import { BaseDimension } from './baseDimension.js';
+import { DimensionBase } from './dimensionBase.js';
 import { Intersection } from '../lib/intersect.js';
 import { Point } from '../entities/point.js';
 
@@ -18,9 +18,9 @@ import { Property } from '../properties/property.js';
 
 /**
  * Angular Dimension Entity Class
- * @extends BaseDimension
+ * @extends DimensionBase
  */
-export class AngularDimension extends BaseDimension {
+export class AngularDimension extends DimensionBase {
   /**
    * Create an Angular Dimension
    * @param {Array} data
@@ -64,8 +64,8 @@ export class AngularDimension extends BaseDimension {
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
         let selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
 
-        if ([Line, BasePolyline].some((entity) => selectedItem instanceof entity)) {
-          if (selectedItem instanceof BasePolyline) {
+        if ([Line, PolylineBase].some((entity) => selectedItem instanceof entity)) {
+          if (selectedItem instanceof PolylineBase) {
             // get the segment closest to the mouse point
             const segment = selectedItem.getClosestSegment(selection.selectedPoint);
 
@@ -93,8 +93,8 @@ export class AngularDimension extends BaseDimension {
         const selection2 = await DesignCore.Scene.inputManager.requestInput(op1);
         let selectedItem = DesignCore.Scene.entities.get(selection2.selectedItemIndex);
 
-        if ([Line, BasePolyline].some((entity) => selectedItem instanceof entity)) {
-          if (selectedItem instanceof BasePolyline) {
+        if ([Line, PolylineBase].some((entity) => selectedItem instanceof entity)) {
+          if (selectedItem instanceof PolylineBase) {
             // get the segment closest to the mouse point
             const segment = selectedItem.getClosestSegment(selection2.selectedPoint);
 

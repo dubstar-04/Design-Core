@@ -16,7 +16,7 @@ import { DimType } from '../properties/dimType.js';
  * Base Dimension Entity Class
  * @extends Entity
  */
-export class BaseDimension extends Entity {
+export class DimensionBase extends Entity {
   /**
    * Create a Base Dimension
    * @param {Array} data

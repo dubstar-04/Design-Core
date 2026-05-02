@@ -78,7 +78,7 @@ export class Property {
     SCALE: 'scale',
     STRING: 'string',
     STYLENAME: 'styleName',
-    // ── BasePolyline ──────────────────────────────────────────────────────────
+    // ── PolylineBase ──────────────────────────────────────────────────────────
     CLOSED: 'closed',
     // ── Hatch ─────────────────────────────────────────────────────────────────
     CHILDENTITIES: 'childEntities',

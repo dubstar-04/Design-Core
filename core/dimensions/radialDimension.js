@@ -1,13 +1,13 @@
 
 import { DXFFile } from '../lib/dxf/dxfFile.js';
-import { BaseCircularDimension } from './baseCircularDimension.js';
+import { CircularDimensionBase } from './circularDimensionBase.js';
 import { Property } from '../properties/property.js';
 
 /**
  * Radial Dimension Entity Class
- * @extends BaseCircularDimension
+ * @extends CircularDimensionBase
  */
-export class RadialDimension extends BaseCircularDimension {
+export class RadialDimension extends CircularDimensionBase {
   /**
    * Create a Radial Dimension
    * @param {Array} data

@@ -4,7 +4,7 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { Point } from '../entities/point.js';
-import { BaseLinearDimension } from './baseLinearDimension.js';
+import { LinearDimensionBase } from './linearDimensionBase.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
@@ -13,9 +13,9 @@ import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 /**
  * Rotated Dimension Entity Class
- * @extends BaseLinearDimension
+ * @extends LinearDimensionBase
  */
-export class RotatedDimension extends BaseLinearDimension {
+export class RotatedDimension extends LinearDimensionBase {
   /**
    * Create an Rotated Dimension
    * @param {Array} data

@@ -11,7 +11,7 @@ import { Lwpolyline } from '../../core/entities/lwpolyline.js';
 import { Hatch } from '../../core/entities/hatch.js';
 import { Insert } from '../../core/entities/insert.js';
 // import { ArcAlignedText } from '../../core/entities/arctext.js';
-import { BasePolyline } from '../../core/entities/basePolyline.js';
+import { PolylineBase } from '../../core/entities/polylineBase.js';
 
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -106,7 +106,7 @@ beforeAll(() => {
   // core.scene.entities.add(new Text({ points: [new Point(15, 205)], string: 'Solid', height: 4 }));
 
   // Row 2, Col 0: Hatch
-  const boundary = new BasePolyline({
+  const boundary = new PolylineBase({
     points: [new Point(25, 230), new Point(75, 230), new Point(75, 280), new Point(25, 280)],
   });
   const hatch = new Hatch({

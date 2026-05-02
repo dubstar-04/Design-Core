@@ -479,7 +479,7 @@ test('ChamferFilletBase.validateSelection returns null when findClosestItem retu
   expect(result).toBeNull();
 });
 
-test('ChamferFilletBase.validateSelection returns null when hovered entity is not a Line or BasePolyline', () => {
+test('ChamferFilletBase.validateSelection returns null when hovered entity is not a Line or PolylineBase', () => {
   core.scene.clear();
   core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
   core.scene.addEntity('Circle', { points: [new Point(5, 5), new Point(10, 5)] });

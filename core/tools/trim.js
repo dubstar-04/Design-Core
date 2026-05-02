@@ -150,7 +150,7 @@ export class Trim extends Tool {
    * surrounding the mouse position. Operates entirely in polyline-point space
    * via entity.toPolylinePoints() / entity.fromPolylinePoints(), so it works
    * for any entity that implements that protocol (Line, Arc, Circle,
-   * BasePolyline, and future entities such as Spline or Ellipse).
+   * PolylineBase, and future entities such as Spline or Ellipse).
    * @param {Object} entity
    * @param {Array}  intersectPoints
    * @return {Array}

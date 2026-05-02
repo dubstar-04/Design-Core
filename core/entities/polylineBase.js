@@ -20,8 +20,8 @@ import { RubberBand } from '../lib/auxiliary/rubberBand.js';
  * Base Polyline Entity Class
  * @extends Entity
  */
-export class BasePolyline extends Entity {
-  static type = 'BasePolyline';
+export class PolylineBase extends Entity {
+  static type = 'PolylineBase';
 
   /**
    * Create a Base Polyline
@@ -233,7 +233,7 @@ export class BasePolyline extends Entity {
   /**
    * Set entity points from a polyline point representation
    * @param {Array} points
-   * @return {BasePolyline}
+   * @return {PolylineBase}
    */
   fromPolylinePoints(points) {
     const pts = points.map((p) => new Point(p.x, p.y, p.bulge));

@@ -11,7 +11,7 @@
  * correction.
  *
  * Transform helpers (applyTransform, save, restore) are called by canvas.js
- * when processing container entities (Insert, BaseDimension) that return a
+ * when processing container entities (Insert, DimensionBase) that return a
  * child list from draw().
  */
 export class RendererBase {

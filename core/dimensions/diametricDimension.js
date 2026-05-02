@@ -1,12 +1,12 @@
 import { DXFFile } from '../lib/dxf/dxfFile.js';
-import { BaseCircularDimension } from './baseCircularDimension.js';
+import { CircularDimensionBase } from './circularDimensionBase.js';
 import { Property } from '../properties/property.js';
 
 /**
  * Diametric Dimension Entity Class
- * @extends BaseCircularDimension
+ * @extends CircularDimensionBase
  */
-export class DiametricDimension extends BaseCircularDimension {
+export class DiametricDimension extends CircularDimensionBase {
   /**
    * Create a Diametric Dimension
    * @param {Array} data

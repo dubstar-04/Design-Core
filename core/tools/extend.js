@@ -147,7 +147,7 @@ export class Extend extends Tool {
    * Compute a state change to extend entity to the nearest valid boundary
    * intersection. Operates entirely in polyline-point space via
    * entity.toPolylinePoints() / entity.fromPolylinePoints(), so it works for
-   * any entity that implements that protocol (Line, BasePolyline, and future
+   * any entity that implements that protocol (Line, PolylineBase, and future
    * entities such as Spline or Ellipse).
    * Only straight end-segments (bulge === 0) can be extended.
    * @param {Object} entity

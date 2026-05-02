@@ -1,4 +1,4 @@
-import { BaseDimension } from '../../core/dimensions/baseDimension.js';
+import { DimensionBase } from '../../core/dimensions/dimensionBase.js';
 import { Point } from '../../core/entities/point.js';
 import { Core } from '../../core/core/core.js';
 import { Text } from '../../core/entities/text.js';
@@ -9,11 +9,11 @@ import { jest } from '@jest/globals';
 // initialise core
 new Core();
 
-describe('BaseDimension', () => {
+describe('DimensionBase', () => {
   let baseDim;
 
   beforeEach(() => {
-    baseDim = new BaseDimension({});
+    baseDim = new DimensionBase({});
     baseDim.points = [new Point(1, 2, 0), new Point(3, 4, 0)];
   });
 
@@ -164,7 +164,7 @@ describe('BaseDimension', () => {
   });
 
   test('constructor throws on invalid dimType', () => {
-    expect(() => new BaseDimension({ 70: 999 })).toThrow(/Invalid Dimension Type/);
+    expect(() => new DimensionBase({ 70: 999 })).toThrow(/Invalid Dimension Type/);
   });
 
   test('getDimensionValue uses textOverride', () => {
@@ -241,11 +241,11 @@ describe('BaseDimension', () => {
 
   describe('draw()', () => {
     /**
-     * Return a BaseDimension with a stubbed buildDimension() that produces one Line.
-     * @return {BaseDimension}
+     * Return a DimensionBase with a stubbed buildDimension() that produces one Line.
+     * @return {DimensionBase}
      */
     function makeDim() {
-      const dim = new BaseDimension({});
+      const dim = new DimensionBase({});
       dim.points = [new Point(0, 0), new Point(10, 0)];
       dim.buildDimension = jest.fn(() => {
         return [new Line({ points: [new Point(0, 0), new Point(10, 0)] })];

@@ -843,7 +843,7 @@ test('Fillet.action radius>0 trimMode=false Line + Lwpolyline: standalone arc ad
 //   – lowerTangent = (0,2)  on the closing segment (left edge, y=2)
 //   – upperTangent = (2,0)  on segment 1 (bottom edge, x=2)
 //   – bulge on lowerTangent must be POSITIVE (CCW arc from (0,2) to (2,0) through ≈(0.59,0.59))
-//     (BasePolyline convention: –ve bulge = CW, +ve bulge = CCW)
+//     (PolylineBase convention: –ve bulge = CW, +ve bulge = CCW)
 //
 // Before the fix the lowerTangent/upperTangent assignment was inverted, producing
 // an arc that traversed the exterior of the square.

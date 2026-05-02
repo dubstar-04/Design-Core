@@ -1,4 +1,4 @@
-import { BasePolyline } from '../../core/entities/basePolyline.js';
+import { PolylineBase } from '../../core/entities/polylineBase.js';
 import { Point } from '../../core/entities/point';
 import { Polyline } from '../../core/entities/polyline.js';
 import { Line } from '../../core/entities/line.js';
@@ -30,7 +30,7 @@ test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => 
   const { inputs, expectedPoints } = scenario;
 
   await withMockInput(DesignCore.Scene, inputs, async () => {
-    const polyline = new BasePolyline({});
+    const polyline = new PolylineBase({});
     await polyline.execute();
 
     expect(polyline.points.length).toBe(expectedPoints);
@@ -46,7 +46,7 @@ test.each(inputScenarios)('Polyline.execute handles $desc', async (scenario) => 
   }, { extraMethods: { actionCommand: () => {} } });
 });
 
-test('Test BasePolyline.draw calls renderer.drawShape with toPolylinePoints', () => {
+test('Test PolylineBase.draw calls renderer.drawShape with toPolylinePoints', () => {
   const polyline = new Polyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 5)] });
   let capturedPoints;
   const mockRenderer = {
@@ -58,11 +58,11 @@ test('Test BasePolyline.draw calls renderer.drawShape with toPolylinePoints', ()
   expect(capturedPoints).toEqual(polyline.toPolylinePoints());
 });
 
-test('Test BasePolyline.getClosestSegment', () => {
+test('Test PolylineBase.getClosestSegment', () => {
   // Polyline with a line and an arc segment
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10)];
   points[1].bulge = 1; // Arc from (10,0) to (10,10)
-  const polyline = new BasePolyline({ points });
+  const polyline = new PolylineBase({ points });
 
   // Closest to the line segment
   const testPoint1 = new Point(5, 2);
@@ -77,11 +77,11 @@ test('Test BasePolyline.getClosestSegment', () => {
 
 // ─── closing segment (closed polylines) ──────────────────────────────────────
 
-test('BasePolyline.getClosestSegmentIndex returns closing-segment index for closed polyline', () => {
+test('PolylineBase.getClosestSegmentIndex returns closing-segment index for closed polyline', () => {
   // Square: P0=(0,0) P1=(10,0) P2=(10,10) P3=(0,10), closed flag set.
   // Closing segment is P3→P0. A point near the left edge (0,5) is closest to that segment.
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
-  const poly = new BasePolyline({ points });
+  const poly = new PolylineBase({ points });
   poly.flags.setFlagValue(1);
 
   const closestIdx = poly.getClosestSegmentIndex(new Point(0, 5));
@@ -89,9 +89,9 @@ test('BasePolyline.getClosestSegmentIndex returns closing-segment index for clos
   expect(closestIdx).toBe(4);
 });
 
-test('BasePolyline.getClosestSegment returns closing segment as a Line for closed polyline', () => {
+test('PolylineBase.getClosestSegment returns closing segment as a Line for closed polyline', () => {
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
-  const poly = new BasePolyline({ points });
+  const poly = new PolylineBase({ points });
   poly.flags.setFlagValue(1);
 
   const seg = poly.getClosestSegment(new Point(0, 5));
@@ -103,21 +103,21 @@ test('BasePolyline.getClosestSegment returns closing segment as a Line for close
   expect(seg.points[1].y).toBeCloseTo(0);
 });
 
-test('BasePolyline.areConsecutiveSegments returns false for non-adjacent segments on a closed polyline', () => {
+test('PolylineBase.areConsecutiveSegments returns false for non-adjacent segments on a closed polyline', () => {
   // 4-point closed poly: segments 1 and 3 are NOT adjacent (bug: old code returned true).
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
-  const poly = new BasePolyline({ points });
+  const poly = new PolylineBase({ points });
   poly.flags.setFlagValue(1);
 
   expect(poly.areConsecutiveSegments(1, 3)).toBe(false);
 });
 
-test('BasePolyline.areConsecutiveSegments returns true for closing segment and its neighbours', () => {
+test('PolylineBase.areConsecutiveSegments returns true for closing segment and its neighbours', () => {
   // 4-point closed poly, N=4 (closing segment index).
   // Seg N-1=3 ends at P3, closing seg starts at P3 → consecutive (diff=1).
   // Closing seg ends at P0, seg 1 starts at P0 → consecutive (wrap case).
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
-  const poly = new BasePolyline({ points });
+  const poly = new PolylineBase({ points });
   poly.flags.setFlagValue(1);
 
   expect(poly.areConsecutiveSegments(3, 4)).toBe(true); // diff = 1
@@ -125,11 +125,11 @@ test('BasePolyline.areConsecutiveSegments returns true for closing segment and i
   expect(poly.areConsecutiveSegments(1, 4)).toBe(true); // wrap (order reversed)
 });
 
-test('BasePolyline.closestPointOnSegment handles closing-segment index correctly', () => {
+test('PolylineBase.closestPointOnSegment handles closing-segment index correctly', () => {
   // 4-point square, closing segment = P3=(0,10)→P0=(0,0).  Index = 4.
   // Closest point on that segment to (0, 5) should be (0, 5).
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
-  const poly = new BasePolyline({ points });
+  const poly = new PolylineBase({ points });
   poly.flags.setFlagValue(1);
 
   const closest = poly.closestPointOnSegment(new Point(0, 5), 4);
@@ -138,9 +138,9 @@ test('BasePolyline.closestPointOnSegment handles closing-segment index correctly
 });
 
 
-test('Test BasePolyline.closestPoint', () => {
+test('Test PolylineBase.closestPoint', () => {
   const points = [new Point(100, 100), new Point(200, 100, -1), new Point(200, 50)];
-  const polyline = new BasePolyline({ points: points });
+  const polyline = new PolylineBase({ points: points });
   // line segment
   const point1 = new Point(150, 85);
   const closest1 = polyline.closestPoint(point1);
@@ -156,14 +156,14 @@ test('Test BasePolyline.closestPoint', () => {
   expect(closest2[1]).toBeCloseTo(10.857);
 });
 
-test('Test BasePolyline.boundingBox', () => {
-  let polyline = new BasePolyline({ points: [new Point(101, 102), new Point(201, 202)] });
+test('Test PolylineBase.boundingBox', () => {
+  let polyline = new PolylineBase({ points: [new Point(101, 102), new Point(201, 202)] });
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
   expect(polyline.boundingBox().xMax).toBeCloseTo(201);
   expect(polyline.boundingBox().yMin).toBeCloseTo(102);
   expect(polyline.boundingBox().yMax).toBeCloseTo(202);
 
-  polyline = new BasePolyline({ points: [new Point(101, 102), new Point(-201, 202)] });
+  polyline = new PolylineBase({ points: [new Point(101, 102), new Point(-201, 202)] });
   expect(polyline.boundingBox().xMin).toBeCloseTo(-201);
   expect(polyline.boundingBox().xMax).toBeCloseTo(101);
   expect(polyline.boundingBox().yMin).toBeCloseTo(102);
@@ -173,7 +173,7 @@ test('Test BasePolyline.boundingBox', () => {
   let points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
   // set the bulge
   points[1].bulge = -1;
-  polyline = new BasePolyline({ points: points });
+  polyline = new PolylineBase({ points: points });
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
   expect(polyline.boundingBox().xMax).toBeCloseTo(251);
   expect(polyline.boundingBox().yMin).toBeCloseTo(0);
@@ -182,19 +182,19 @@ test('Test BasePolyline.boundingBox', () => {
   points = [new Point(101, 102), new Point(200, 102), new Point(200, 0)];
   // set the bulge
   points[1].bulge = -1;
-  polyline = new BasePolyline({ points: points });
+  polyline = new PolylineBase({ points: points });
   expect(polyline.boundingBox().xMin).toBeCloseTo(101);
   expect(polyline.boundingBox().xMax).toBeCloseTo(251);
   expect(polyline.boundingBox().yMin).toBeCloseTo(0);
   expect(polyline.boundingBox().yMax).toBeCloseTo(102);
 });
 
-test('Test BasePolyline.getBulgeFromSegment', () => {
+test('Test PolylineBase.getBulgeFromSegment', () => {
   // start point: 100,0
   // centre: 100,50
   // radius: 50
   const points = [new Point(), new Point(100, 0)];
-  const polyline = new BasePolyline({ points: points });
+  const polyline = new PolylineBase({ points: points });
 
   // zero delta angle:
   // bulge: 0
@@ -431,10 +431,10 @@ SEQEND
   expect(file.contents).toEqual(dxfString);
 });
 
-test('Test BasePolyline.toPolylinePoints', () => {
+test('Test PolylineBase.toPolylinePoints', () => {
   const points = [new Point(100, 100), new Point(200, 100), new Point(200, 50)];
   points[1].bulge = -1;
-  const polyline = new BasePolyline({ points: points });
+  const polyline = new PolylineBase({ points: points });
 
   const polylinePoints = polyline.toPolylinePoints();
   expect(polylinePoints[0].x).toBe(100);
@@ -450,10 +450,10 @@ test('Test BasePolyline.toPolylinePoints', () => {
   expect(polylinePoints[2].bulge).toBe(0);
 });
 
-test('Test BasePolyline.toPolylinePoints returns defensive copy for open polyline', () => {
+test('Test PolylineBase.toPolylinePoints returns defensive copy for open polyline', () => {
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10)];
   points[1].bulge = -1;
-  const polyline = new BasePolyline({ points: points });
+  const polyline = new PolylineBase({ points: points });
 
   const result = polyline.toPolylinePoints();
   // Mutate the returned array and one of the returned points
@@ -466,13 +466,13 @@ test('Test BasePolyline.toPolylinePoints returns defensive copy for open polylin
   expect(polyline.points[1].bulge).toBe(-1);
 });
 
-test('Test BasePolyline.toPolylinePoints closed polyline appends closure point', () => {
+test('Test PolylineBase.toPolylinePoints closed polyline appends closure point', () => {
   // A triangle closed via the Close command (flag bit 1 set, no duplicate
   // point stored in this.points).
   const points = [new Point(0, 0), new Point(10, 0), new Point(5, 10)];
   const flags = new Flags();
   flags.addValue(1); // closed flag
-  const polyline = new BasePolyline({ points: points, flags: flags });
+  const polyline = new PolylineBase({ points: points, flags: flags });
 
   const polylinePoints = polyline.toPolylinePoints();
   // Should have 4 points: the 3 vertices plus the closure point
@@ -506,7 +506,7 @@ test('Polyline.execute handles Close option', async () => {
 test('Polyline.execute supports Undo in line mode', async () => {
   const inputs = [new Point(0, 0), new Point(10, 0), new Point(20, 0), 'Undo', new Point(10, 10), 'Close'];
   await withMockInput(DesignCore.Scene, inputs, async () => {
-    const polyline = new BasePolyline({});
+    const polyline = new PolylineBase({});
     await polyline.execute();
     expect(polyline.points.length).toBe(3);
     expect(polyline.points[0]).toEqual(inputs[0]);
@@ -519,7 +519,7 @@ test('Polyline.execute supports Undo in line mode', async () => {
 test('Polyline.execute supports Undo in arc mode', async () => {
   const inputs = [new Point(0, 0), new Point(10, 0), 'Arc', new Point(10, 10), new Point(20, 20), 'Undo', 'Line', new Point(10, 20), 'Close'];
   await withMockInput(DesignCore.Scene, inputs, async () => {
-    const polyline = new BasePolyline({});
+    const polyline = new PolylineBase({});
     await polyline.execute();
     expect(polyline.points.length).toBe(4);
     expect(polyline.points[0]).toEqual(inputs[0]);
@@ -537,7 +537,7 @@ test('Polyline.execute supports Undo in arc mode', async () => {
 test('Polyline.execute supports Arc/Line mode switching', async () => {
   const inputs = [new Point(0, 0), new Point(10, 0), 'Arc', new Point(10, 10), 'Line', new Point(20, 10), 'Close'];
   await withMockInput(DesignCore.Scene, inputs, async () => {
-    const polyline = new BasePolyline({});
+    const polyline = new PolylineBase({});
     await polyline.execute();
     expect(polyline.points.length).toBe(4);
     expect(polyline.points[0]).toEqual(inputs[0]);
@@ -553,29 +553,29 @@ test('Polyline.execute supports Arc/Line mode switching', async () => {
 
 // ─── Auto-close when first and last point are the same ───────────────────────
 
-test('BasePolyline constructor auto-closes when last point matches first', () => {
+test('PolylineBase constructor auto-closes when last point matches first', () => {
   // Simulate a polyline loaded with a redundant closing point (e.g. from DXF data)
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 0)];
-  const polyline = new BasePolyline({ points });
+  const polyline = new PolylineBase({ points });
 
   // Duplicate point should be removed and the closed flag set
   expect(polyline.points.length).toBe(3);
   expect(polyline.flags.hasFlag(1)).toBe(true);
 });
 
-test('BasePolyline constructor does not auto-close when fewer than 3 unique points remain after pop', () => {
+test('PolylineBase constructor does not auto-close when fewer than 3 unique points remain after pop', () => {
   // [A, B, A] — only 2 unique points after removing the duplicate; must not auto-close
   const points = [new Point(0, 0), new Point(10, 0), new Point(0, 0)];
-  const polyline = new BasePolyline({ points });
+  const polyline = new PolylineBase({ points });
 
   expect(polyline.points.length).toBe(3);
   expect(polyline.flags.hasFlag(1)).toBe(false);
 });
 
-test('BasePolyline constructor does not auto-close with only 2 identical points', () => {
+test('PolylineBase constructor does not auto-close with only 2 identical points', () => {
   // Only 2 unique points — not enough to form a closed polygon
   const points = [new Point(0, 0), new Point(0, 0)];
-  const polyline = new BasePolyline({ points });
+  const polyline = new PolylineBase({ points });
 
   expect(polyline.points.length).toBe(2);
   expect(polyline.flags.hasFlag(1)).toBe(false);
@@ -593,14 +593,14 @@ test('Polyline.execute auto-closes when start point is re-entered', async () => 
     // The constructor will have auto-closed the entity when pt4 == pt1
     if (entity.points.length === 4 && entity.points.at(-1).isSame(pt1)) {
       // simulate what the constructor does: a new entity created from this data would auto-close
-      const rebuilt = new BasePolyline({ points: [...entity.points] });
+      const rebuilt = new PolylineBase({ points: [...entity.points] });
       if (rebuilt.flags.hasFlag(1)) autoClosedCount++;
     }
     return 0;
   };
 
   await withMockInput(DesignCore.Scene, [pt1, pt2, pt3, pt4], async () => {
-    const polyline = new BasePolyline({});
+    const polyline = new PolylineBase({});
     await polyline.execute();
     // execute does not exit early — the duplicate point is on the instance
     expect(polyline.points.length).toBe(4);
@@ -609,10 +609,10 @@ test('Polyline.execute auto-closes when start point is re-entered', async () => 
   }, { extraMethods: { actionCommand: mockActionCommand } });
 });
 
-test('BasePolyline.fromPolylinePoints round-trip preserves open polyline', () => {
-  const poly = new BasePolyline({ points: [new Point(0, 0, 0.5), new Point(10, 0), new Point(10, 10)] });
+test('PolylineBase.fromPolylinePoints round-trip preserves open polyline', () => {
+  const poly = new PolylineBase({ points: [new Point(0, 0, 0.5), new Point(10, 0), new Point(10, 10)] });
   const polyPts = poly.toPolylinePoints();
-  const rebuilt = new BasePolyline({});
+  const rebuilt = new PolylineBase({});
   rebuilt.fromPolylinePoints(polyPts);
   expect(rebuilt.points.length).toBe(3);
   expect(rebuilt.points[0].x).toBe(0);
@@ -622,16 +622,16 @@ test('BasePolyline.fromPolylinePoints round-trip preserves open polyline', () =>
   expect(rebuilt.points[2].y).toBe(10);
 });
 
-test('BasePolyline.fromPolylinePoints round-trip strips closure point for closed polyline', () => {
+test('PolylineBase.fromPolylinePoints round-trip strips closure point for closed polyline', () => {
   const flags = new Flags();
   flags.addValue(1);
-  const poly = new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)], flags: flags });
+  const poly = new PolylineBase({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)], flags: flags });
   const polyPts = poly.toPolylinePoints();
   // toPolylinePoints appends a closure copy of the first point
   expect(polyPts.length).toBe(5);
   const flags2 = new Flags();
   flags2.addValue(1);
-  const rebuilt = new BasePolyline({ flags: flags2 });
+  const rebuilt = new PolylineBase({ flags: flags2 });
   rebuilt.fromPolylinePoints(polyPts);
   expect(rebuilt.points.length).toBe(4);
   expect(rebuilt.points[0].x).toBe(0);
@@ -641,12 +641,12 @@ test('BasePolyline.fromPolylinePoints round-trip strips closure point for closed
 
 // ─── closestPoint: closed polyline closing segment ───────────────────────────
 
-test('BasePolyline.closestPoint finds closest point on closing segment of closed polyline', () => {
+test('PolylineBase.closestPoint finds closest point on closing segment of closed polyline', () => {
   // Square: P0=(0,0), P1=(10,0), P2=(10,10), P3=(0,10), closed flag set.
   // Closing segment is P3=(0,10) → P0=(0,0).
   // A test point on the left edge (0, 5) must resolve to (0, 5) on the closing segment.
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
-  const poly = new BasePolyline({ points });
+  const poly = new PolylineBase({ points });
   poly.flags.setFlagValue(1);
 
   const [closest, dist] = poly.closestPoint(new Point(0, 5));
@@ -655,11 +655,11 @@ test('BasePolyline.closestPoint finds closest point on closing segment of closed
   expect(dist).toBeCloseTo(0);
 });
 
-test('BasePolyline.closestPoint closing segment is preferred over other segments', () => {
+test('PolylineBase.closestPoint closing segment is preferred over other segments', () => {
   // The test point (-1, 5) is clearly nearest the closing segment (left edge),
   // not the bottom, right, or top edges.
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
-  const poly = new BasePolyline({ points });
+  const poly = new PolylineBase({ points });
   poly.flags.setFlagValue(1);
 
   const [closest, dist] = poly.closestPoint(new Point(-1, 5));
@@ -668,14 +668,14 @@ test('BasePolyline.closestPoint closing segment is preferred over other segments
   expect(dist).toBeCloseTo(1);
 });
 
-test('BasePolyline.closestPoint for open polyline does not include closing segment', () => {
+test('PolylineBase.closestPoint for open polyline does not include closing segment', () => {
   // For point (-1, 1) on the open square:
   //   – Nearest on seg P0→P1 (y=0): foot (-1,0) clips to (0,0), dist = √2 ≈ 1.41
   //   – Nearest on seg P2→P3 (y=10): foot (-1,10) clips to (0,10), dist ≈ 9.06
   //   – If the closing segment existed (x=0, y∈[0,10]): foot (0,1), dist = 1  ← closer!
   // An open polyline must NOT check the closing segment, so it returns (0,0).
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
-  const poly = new BasePolyline({ points });
+  const poly = new PolylineBase({ points });
   // flag NOT set — open polyline
 
   const [closest] = poly.closestPoint(new Point(-1, 1));
@@ -693,10 +693,10 @@ const lineSegmentCases = [
   { desc: 'collinear beyond end', point: new Point(15, 0), expected: false },
 ];
 
-test.each(lineSegmentCases)('BasePolyline.isPointOnSegment line segment – $desc', ({ point, expected }) => {
+test.each(lineSegmentCases)('PolylineBase.isPointOnSegment line segment – $desc', ({ point, expected }) => {
   const A = new Point(0, 0);
   const B = new Point(10, 0);
-  const poly = new BasePolyline({ points: [A, B] });
+  const poly = new PolylineBase({ points: [A, B] });
   expect(poly.isPointOnSegment(point, A, B)).toBe(expected);
 });
 
@@ -709,11 +709,11 @@ const ccwArcCases = [
   { desc: 'lower semicircle (0,-10)', point: new Point(0, -10), expected: false },
 ];
 
-test.each(ccwArcCases)('BasePolyline.isPointOnSegment CCW arc (bulge=1, 180°) – $desc', ({ point, expected }) => {
+test.each(ccwArcCases)('PolylineBase.isPointOnSegment CCW arc (bulge=1, 180°) – $desc', ({ point, expected }) => {
   const A = new Point(10, 0);
   A.bulge = 1;
   const B = new Point(-10, 0);
-  const poly = new BasePolyline({ points: [A, B] });
+  const poly = new PolylineBase({ points: [A, B] });
   expect(poly.isPointOnSegment(point, A, B)).toBe(expected);
 });
 
@@ -726,11 +726,11 @@ const cwArcCases = [
   { desc: 'upper semicircle (0,10)', point: new Point(0, 10), expected: false },
 ];
 
-test.each(cwArcCases)('BasePolyline.isPointOnSegment CW arc (bulge=-1, 180°) – $desc', ({ point, expected }) => {
+test.each(cwArcCases)('PolylineBase.isPointOnSegment CW arc (bulge=-1, 180°) – $desc', ({ point, expected }) => {
   const A = new Point(10, 0);
   A.bulge = -1;
   const B = new Point(-10, 0);
-  const poly = new BasePolyline({ points: [A, B] });
+  const poly = new PolylineBase({ points: [A, B] });
   expect(poly.isPointOnSegment(point, A, B)).toBe(expected);
 });
 
@@ -744,19 +744,19 @@ const ccwArcWrapCases = [
   { desc: 'right side (10,0) at 0°', point: new Point(10, 0), expected: false },
 ];
 
-test.each(ccwArcWrapCases)('BasePolyline.isPointOnSegment CCW arc wrapping past ±180° (bulge=1, startAngle=90° > endAngle=-90°) – $desc', ({ point, expected }) => {
+test.each(ccwArcWrapCases)('PolylineBase.isPointOnSegment CCW arc wrapping past ±180° (bulge=1, startAngle=90° > endAngle=-90°) – $desc', ({ point, expected }) => {
   const A = new Point(0, 10);
   A.bulge = 1;
   const B = new Point(0, -10);
-  const poly = new BasePolyline({ points: [A, B] });
+  const poly = new PolylineBase({ points: [A, B] });
   expect(poly.isPointOnSegment(point, A, B)).toBe(expected);
 });
 
-test('BasePolyline.closestPoint is consistent with getClosestSegmentIndex for closed polyline', () => {
+test('PolylineBase.closestPoint is consistent with getClosestSegmentIndex for closed polyline', () => {
   // For a closed square, both methods should agree that the closing segment
   // is nearest for a point on the left edge.
   const points = [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)];
-  const poly = new BasePolyline({ points });
+  const poly = new PolylineBase({ points });
   poly.flags.setFlagValue(1);
 
   const testPoint = new Point(-2, 5);
@@ -771,8 +771,8 @@ test('BasePolyline.closestPoint is consistent with getClosestSegmentIndex for cl
 
 // ─── preview ─────────────────────────────────────────────────────────────────
 
-test('BasePolyline.preview - 0 points does nothing', () => {
-  const poly = new BasePolyline({});
+test('PolylineBase.preview - 0 points does nothing', () => {
+  const poly = new PolylineBase({});
   DesignCore.Scene.auxiliaryEntities.clear();
   DesignCore.Scene.previewEntities.clear();
 
@@ -781,8 +781,8 @@ test('BasePolyline.preview - 0 points does nothing', () => {
   expect(DesignCore.Scene.previewEntities.count()).toBe(0);
 });
 
-test('BasePolyline.preview - LINE mode creates temp entity', () => {
-  const poly = new BasePolyline({});
+test('PolylineBase.preview - LINE mode creates temp entity', () => {
+  const poly = new PolylineBase({});
   poly.points.push(new Point(0, 0));
 
   const origCreate = DesignCore.Scene.previewEntities.create;
@@ -799,8 +799,8 @@ test('BasePolyline.preview - LINE mode creates temp entity', () => {
   DesignCore.Scene.previewEntities.create = origCreate;
 });
 
-test('BasePolyline.preview - ARC mode adds rubber band and creates arc temp entity', () => {
-  const poly = new BasePolyline({});
+test('PolylineBase.preview - ARC mode adds rubber band and creates arc temp entity', () => {
+  const poly = new PolylineBase({});
   poly.points.push(new Point(0, 0));
   poly.points.push(new Point(10, 0));
   poly.inputMode = poly.modes.ARC;

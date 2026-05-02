@@ -405,7 +405,7 @@ export class Canvas {
 
   /**
    * Recursively paint a single entity and any children it returns.
-   * Container entities (Insert, BaseDimension) return an array of child items from draw().
+   * Container entities (Insert, DimensionBase) return an array of child items from draw().
    * Leaf entities return undefined. Renderer state is saved/restored around each entity.
    * @param {Object} entity - entity to paint
    * @param {Object} renderer - renderer instance

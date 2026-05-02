@@ -4,7 +4,7 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { Point } from '../entities/point.js';
-import { BaseLinearDimension } from './baseLinearDimension.js';
+import { LinearDimensionBase } from './linearDimensionBase.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
@@ -14,7 +14,7 @@ import { Property } from '../properties/property.js';
  * Aligned Dimension Entity Class
  * @extends LinearDimension
  */
-export class AlignedDimension extends BaseLinearDimension {
+export class AlignedDimension extends LinearDimensionBase {
   /**
    * Create an Aligned Dimension
    * @param {Array} data
