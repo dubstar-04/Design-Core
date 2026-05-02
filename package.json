@@ -17,7 +17,9 @@
   "description": "2D CAD Library",
   "exports": {
     ".": "./core/core/core.js",
-    "./designCore.js": "./core/designCore.js"
+    "./designCore.js": "./core/designCore.js",
+    "./property.js": "./core/properties/property.js",
+    "./canvasRenderer.js": "./core/lib/renderers/canvasRenderer.js"
   },
   "directories": {
     "test": "test"
