@@ -29,9 +29,9 @@ test('Test BoundingBox.yLength', () => {
   expect(bb.yLength).toBe(100);
 });
 
-test('Test BoundingBox.centerPoint', () => {
-  expect(bb.centerPoint.x).toBe(151);
-  expect(bb.centerPoint.y).toBe(152);
+test('Test BoundingBox.centrePoint', () => {
+  expect(bb.centrePoint.x).toBe(151);
+  expect(bb.centrePoint.y).toBe(152);
 });
 
 test('Test BoundingBox.isInside', () => {
