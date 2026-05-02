@@ -47,26 +47,26 @@ export class Utils {
   }
 
   /**
-   * Sort points around an arc center by angular position.
+   * Sort points around an arc centre by angular position.
    * Mutates the points array.
    *
    * @param {Array} points - array of points
    * @param {Point} startPoint - arc start point
    * @param {Point} endPoint - arc end point
-   * @param {Point} centerPoint - arc center point
+   * @param {Point} centrePoint - arc centre point
    * @param {number} direction - arc direction (ccw >0, cw <=0)
    *
    */
-  static sortPointsOnArc(points, startPoint, endPoint, centerPoint, direction = 1) {
+  static sortPointsOnArc(points, startPoint, endPoint, centrePoint, direction = 1) {
     if (!Array.isArray(points)) return;
 
-    const refAngle = direction > 0 ? centerPoint.angle(startPoint) : centerPoint.angle(endPoint);
+    const refAngle = direction > 0 ? centrePoint.angle(startPoint) : centrePoint.angle(endPoint);
     const twoPi = Math.PI * 2;
     const normalize = (ang) => ((ang % twoPi) + twoPi) % twoPi;
 
     // map points to angles
     const mapped = points.map((point) => {
-      const angle = Math.atan2(point.y - centerPoint.y, point.x - centerPoint.x);
+      const angle = Math.atan2(point.y - centrePoint.y, point.x - centrePoint.x);
       const normalizedAngle = normalize(angle - refAngle);
       return { point, normalizedAngle };
     });
