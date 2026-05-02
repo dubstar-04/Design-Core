@@ -9,6 +9,14 @@ import { DesignCore } from '../../core/designCore.js';
 import { Utils } from '../../core/lib/utils.js';
 import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
 
+function mockRequestInput(inputs) {
+  let i = 0;
+  return async () => {
+    if (i < inputs.length) return inputs[i++];
+    throw new Error('cancelled');
+  };
+}
+
 new Core();
 
 test('Test Block', () => {
@@ -184,4 +192,40 @@ test('Test Block.dxf succeeds when block items have valid handles', () => {
   const file = new DXFFile('R2000');
   expect(() => block.dxf(file)).not.toThrow();
   expect(file.contents).toContain(clone.getProperty('handle'));
+});
+
+test('Test Block.execute offsets entity points by the insert point', async () => {
+  const core = new Core();
+
+  // Add a line to the scene at world coordinates (100,200) → (300,400)
+  const line = new Line({ points: [new Point(100, 200), new Point(300, 400)] });
+  DesignCore.Scene.entities.add(line);
+  const lineIndex = DesignCore.Scene.entities.count() - 1;
+
+  // Pre-select the line so Block.execute() skips the selection-set prompt
+  DesignCore.Scene.selectionManager.reset();
+  DesignCore.Scene.selectionManager.addToSelectionSet(lineIndex);
+
+  // Feed: block name, then insert point (50, 75)
+  const insertPoint = new Point(50, 75);
+  const origRequestInput = DesignCore.Scene.inputManager.requestInput.bind(DesignCore.Scene.inputManager);
+  DesignCore.Scene.inputManager.requestInput = mockRequestInput(['TestBlock', insertPoint]);
+
+  await new Block().execute();
+
+  DesignCore.Scene.inputManager.requestInput = origRequestInput;
+
+  // The block should exist in the block manager
+  const block = DesignCore.Scene.blockManager.getItemByName('TestBlock');
+  expect(block).toBeDefined();
+  expect(block.entities).toHaveLength(1);
+
+  // Points inside the block must be offset by -insertPoint so that
+  // when Insert renders them via applyTransform(+insertPoint) they land
+  // back at their original world coordinates.
+  const blockLine = block.entities[0];
+  expect(blockLine.points[0].x).toBeCloseTo(100 - insertPoint.x);
+  expect(blockLine.points[0].y).toBeCloseTo(200 - insertPoint.y);
+  expect(blockLine.points[1].x).toBeCloseTo(300 - insertPoint.x);
+  expect(blockLine.points[1].y).toBeCloseTo(400 - insertPoint.y);
 });
