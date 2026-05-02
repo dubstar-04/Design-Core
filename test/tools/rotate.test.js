@@ -132,7 +132,7 @@ test('Test Rotate.action', () => {
   }
 });
 
-test('Rotate.execute with reference - resets inputPoint to rotation center', async () => {
+test('Rotate.execute with reference - resets inputPoint to rotation centre', async () => {
   const origInputManager = core.scene.inputManager;
 
   const basePoint = new Point(10, 0);
@@ -156,7 +156,7 @@ test('Rotate.execute with reference - resets inputPoint to rotation center', asy
   await rotate.execute();
 
   // After the reference sequence completes, inputPoint must be reset to the
-  // rotation center (points[0]) so the tracking line uses the correct origin.
+  // rotation centre (points[0]) so the tracking line uses the correct origin.
   expect(mockInputManager.inputPoint).toEqual(basePoint);
 
   core.scene.inputManager = origInputManager;
