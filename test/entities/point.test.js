@@ -701,7 +701,7 @@ test('Test Point.bulgeAngle', () => {
 
 test('Test Point.bulgeRadius', () => {
   // start point: 100,0
-  // center: 100,50
+  // centre: 100,50
   // radius: 50
   const point = new Point(100, 0);
 
@@ -771,7 +771,7 @@ test('Test Point.bulgeRadius', () => {
 
 test('Test Point.apothem', () => {
   // start point: 100,0
-  // center: 100,50
+  // centre: 100,50
   // radius: 50
   const point = new Point(100, 0);
 
@@ -829,7 +829,7 @@ test('Test Point.apothem', () => {
 
 test('Test Point.bulgeCentrePoint', () => {
   // start point: 100,0
-  // center: 100,50
+  // centre: 100,50
   // radius: 50
   const point = new Point(100, 0);
 
