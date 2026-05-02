@@ -35,7 +35,7 @@ export class Circle extends Entity {
       dxfCode: 40,
     });
 
-    // Named scalar radius (internal API / named prop) — projects points[1] from center.
+    // Named scalar radius (internal API / named prop) — projects points[1] from centre.
     // Full-points data (post-execute or post-fromDxf) skips this.
     if (data?.radius !== undefined && this.points.length < 2) {
       this.setRadius(data.radius);
@@ -61,11 +61,11 @@ export class Circle extends Entity {
    * @return {Object}
    */
   static fromDxf(data) {
-    const center = data.points?.[0];
-    if (!center || data[40] === undefined) return data;
+    const centre = data.points?.[0];
+    if (!centre || data[40] === undefined) return data;
     return {
       ...data,
-      points: [center, center.project(0, data[40])],
+      points: [centre, centre.project(0, data[40])],
     };
   }
 
@@ -205,9 +205,9 @@ export class Circle extends Entity {
    */
   fromPolylinePoints(points) {
     if (points.length >= 3 && points[0].isSame(points.at(-1))) {
-      const center = points[0].bulgeCentrePoint(points[1]);
-      const radius = center.distance(points[0]);
-      this.points = [center, center.project(0, radius)];
+      const centre = points[0].bulgeCentrePoint(points[1]);
+      const radius = centre.distance(points[0]);
+      this.points = [centre, centre.project(0, radius)];
       return this;
     }
     const arc = DesignCore.CommandManager.createNew('Arc', this);
