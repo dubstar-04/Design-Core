@@ -11,8 +11,8 @@ const core = new Core();
 
 test('ChamferFilletBase.resolveCornerGeometry returns false and notifies when first segment is not a Line', () => {
   core.scene.clear();
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
   const chamfer = new Chamfer();
@@ -28,8 +28,8 @@ test('ChamferFilletBase.resolveCornerGeometry returns false and notifies when fi
 
 test('ChamferFilletBase.resolveCornerGeometry returns false and notifies when second segment is not a Line', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
   const chamfer = new Chamfer();
@@ -45,8 +45,8 @@ test('ChamferFilletBase.resolveCornerGeometry returns false and notifies when se
 
 test('ChamferFilletBase.resolveCornerGeometry returns false and notifies for parallel lines', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 2), new Point(10, 2)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 2), new Point(10, 2)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
   const chamfer = new Chamfer();
@@ -63,8 +63,8 @@ test('ChamferFilletBase.resolveCornerGeometry returns false and notifies for par
 test('ChamferFilletBase.resolveCornerGeometry returns false for collinear overlapping lines', () => {
   core.scene.clear();
   // Two segments on the same line that overlap
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(15, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 0), new Point(15, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
   const chamfer = new Chamfer();
@@ -81,8 +81,8 @@ test('ChamferFilletBase.resolveCornerGeometry returns false for collinear overla
 test('ChamferFilletBase.resolveCornerGeometry returns false for collinear endpoint-sharing lines', () => {
   core.scene.clear();
   // Two collinear segments sharing an endpoint (180° angle)
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(5, 0)] });
-  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 0), new Point(10, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
   const chamfer = new Chamfer();
@@ -99,8 +99,8 @@ test('ChamferFilletBase.resolveCornerGeometry returns false for collinear endpoi
 test('ChamferFilletBase.resolveCornerGeometry returns true and computes intersection for L-corner', () => {
   // Horizontal (-10,0)→(0,0) and vertical (0,0)→(0,10); infinite lines meet at (0,0)
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   const chamfer = new Chamfer();
   chamfer.firstPick.entity = core.scene.entities.get(0);
@@ -125,8 +125,8 @@ test('ChamferFilletBase.resolveCornerGeometry uses polyline activeSeg for first 
   // Polyline [(-10,0),(0,0),(0,10)], click near segment 1 (y=0).
   // Paired with vertical line x=5; lines meet at (5,0).
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Line', { points: [new Point(5, -5), new Point(5, 5)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(5, -5), new Point(5, 5)] });
 
   const polyEntity = core.scene.entities.get(0);
   const lineEntity = core.scene.entities.get(1);
@@ -151,8 +151,8 @@ test('ChamferFilletBase.applySharpTrim trims two Lines to the intersection point
   // Line1: (0,0)→(8,0); Line2: (10,-10)→(10,-2). Infinite lines meet at (10,0).
   // keepEnd for Line1 = (0,0); keepEnd for Line2 = (10,-10).
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(8, 0)] });
-  core.scene.addItem('Line', { points: [new Point(10, -10), new Point(10, -2)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(8, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, -10), new Point(10, -2)] });
   const lineA = core.scene.entities.get(0);
   const lineB = core.scene.entities.get(1);
 
@@ -188,7 +188,7 @@ test('ChamferFilletBase.applySharpTrim poly+poly consecutive segments: replaces 
   // L-shaped polyline [(-10,0),(0,0),(0,10)]; segments 1 and 2 share vertex (0,0).
   // Intersection of infinite lines is also (0,0), so splice replaces vertex with itself.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
 
   const chamfer = new Chamfer();
@@ -212,7 +212,7 @@ test('ChamferFilletBase.applySharpTrim poly+poly open ends: moves both endpoints
   // Seg 1 is on y=2, seg 3 (lastIdx=3) is on x=3 → infinite lines meet at (3,2).
   // Both open endpoints (index 0 and 3) are moved to (3,2).
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-5, 2), new Point(0, 2), new Point(3, 4), new Point(3, 8)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-5, 2), new Point(0, 2), new Point(3, 4), new Point(3, 8)] });
   const polyEntity = core.scene.entities.get(0);
 
   const chamfer = new Chamfer();
@@ -247,7 +247,7 @@ test('ChamferFilletBase.applySharpTrim poly+poly closed polyline seg1+lastIdx: c
   // The shared corner is at index min(1,3)=1, so corner vertex (0,0) is replaced with
   // the intersection point (0,0) — a no-op on coordinates but proves the splice path ran.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1); // mark as closed
 
@@ -275,7 +275,7 @@ test('ChamferFilletBase.applySharpTrim closed poly last-regular-seg + closing-se
   // Corner at (0,10) shared by seg 3 and seg 4. segDiff=1 → corner-splice path.
   // cornerIdx = min(3,4) = 3 → replaces points[3]=(0,10) with intersectionPoint (0,10).
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -303,7 +303,7 @@ test('ChamferFilletBase.applySharpTrim closed poly closing-seg + seg-1: replaces
   // segDiff = |4-1| = 3 (not 1), closing-wrap detected → cornerIdx = 0.
   // Replaces points[0]=(0,0) with intersectionPoint (0,0).
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -336,8 +336,8 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepStart: line co
   // second=Poly, segmentIndex=2 (segment (-10,0)→(0,0)), click left of intersection → keepStart.
   // Result: Poly becomes [(-20,0),(-10,0),(0,0),(0,10)]; Line removed.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
   const lineEntity = core.scene.entities.get(0);
   const polyEntity = core.scene.entities.get(1);
 
@@ -374,8 +374,8 @@ test('ChamferFilletBase.applySharpTrim first=Line second=Poly keepEnd: line cons
   // Same setup, but segmentIndex=3. click right of intersection → keepEnd.
   // Result: Poly becomes [(0,10),(0,0),(10,0)]; Line removed.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
   const lineEntity = core.scene.entities.get(0);
   const polyEntity = core.scene.entities.get(1);
 
@@ -413,8 +413,8 @@ test('ChamferFilletBase.applySharpTrim first=Poly second=Line: poly/line orderin
   // firstIsPolyline=true → [poly, line] = [this.firstPick, this.secondPick].
   // Result should be the same: Poly becomes [(-20,0),(-10,0),(0,0),(0,10)]; Line removed.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   const lineEntity = core.scene.entities.get(1);
 
@@ -454,7 +454,7 @@ test('ChamferFilletBase.validateSelection returns null when firstPick has no ent
 
 test('ChamferFilletBase.validateSelection returns null when firstPick entity is not a Line', () => {
   core.scene.clear();
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
 
   const chamfer = new Chamfer();
   chamfer.firstPick.entity = core.scene.entities.get(0); // Circle — resolveEndpoints fails
@@ -465,7 +465,7 @@ test('ChamferFilletBase.validateSelection returns null when firstPick entity is 
 
 test('ChamferFilletBase.validateSelection returns null when findClosestItem returns undefined', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
 
   const chamfer = new Chamfer();
   chamfer.firstPick.entity = core.scene.entities.get(0);
@@ -481,8 +481,8 @@ test('ChamferFilletBase.validateSelection returns null when findClosestItem retu
 
 test('ChamferFilletBase.validateSelection returns null when hovered entity is not a Line or BasePolyline', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(5, 5), new Point(10, 5)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(5, 5), new Point(10, 5)] });
 
   const chamfer = new Chamfer();
   chamfer.firstPick.entity = core.scene.entities.get(0);
@@ -498,8 +498,8 @@ test('ChamferFilletBase.validateSelection returns null when hovered entity is no
 
 test('ChamferFilletBase.validateSelection returns null when first and second segments are parallel', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 2), new Point(10, 2)] }); // parallel horizontal
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 2), new Point(10, 2)] }); // parallel horizontal
 
   const chamfer = new Chamfer();
   chamfer.firstPick.entity = core.scene.entities.get(0);
@@ -515,8 +515,8 @@ test('ChamferFilletBase.validateSelection returns null when first and second seg
 
 test('ChamferFilletBase.validateSelection returns selection object for valid perpendicular lines', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] }); // horizontal
-  core.scene.addItem('Line', { points: [new Point(5, -5), new Point(5, 5)] }); // vertical at x=5
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] }); // horizontal
+  core.scene.addEntity('Line', { points: [new Point(5, -5), new Point(5, 5)] }); // vertical at x=5
 
   const chamfer = new Chamfer();
   chamfer.firstPick.entity = core.scene.entities.get(0);
