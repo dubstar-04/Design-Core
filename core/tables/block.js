@@ -123,7 +123,7 @@ export class Block extends Entity {
         copyOfItem.setProperty('handle', DesignCore.HandleManager.next());
         // adjust the items points to reflect the insert point
         const delta = new Point(-insertPoint.x, -insertPoint.y);
-        if (item.hasOwnProperty('points')) {
+        if (copyOfItem.points?.length) {
           const points = copyOfItem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
           copyOfItem.setProperty('points', points);
         }
