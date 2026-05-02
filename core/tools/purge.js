@@ -74,17 +74,17 @@ export class Purge extends Tool {
     }
 
     if (this.option === 'Layers' || this.option === 'All') {
-      const intialLayerCount = DesignCore.LayerManager.itemCount();
+      const initialLayerCount = DesignCore.LayerManager.itemCount();
       DesignCore.LayerManager.purge();
       const finalLayerCount = DesignCore.LayerManager.itemCount();
-      purgedCount += (intialLayerCount - finalLayerCount);
+      purgedCount += (initialLayerCount - finalLayerCount);
     }
 
     if (this.option === 'LTypes' || this.option === 'All') {
-      const intialLTypeCount = DesignCore.LTypeManager.itemCount();
+      const initialLTypeCount = DesignCore.LTypeManager.itemCount();
       DesignCore.LTypeManager.purge();
       const finalLTypeCount = DesignCore.LTypeManager.itemCount();
-      purgedCount += (intialLTypeCount - finalLTypeCount);
+      purgedCount += (initialLTypeCount - finalLTypeCount);
     }
 
     DesignCore.Core.notify(`${this.type} - ${this.option}: ${purgedCount} ${Strings.Strings.ITEMS} ${Strings.Strings.REMOVED}`);
