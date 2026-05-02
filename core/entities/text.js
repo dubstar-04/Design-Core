@@ -83,7 +83,7 @@ export class Text extends Entity {
       type: Property.Type.LIST,
       value: hAlign > 2 ? 1 : hAlign,
       dxfCode: 72,
-      options: () => [{ display: 'Left', value: 0 }, { display: 'Center', value: 1 }, { display: 'Right', value: 2 }],
+      options: () => [{ display: 'Left', value: 0 }, { display: 'Centre', value: 1 }, { display: 'Right', value: 2 }],
     });
     // DXF Groupcode 73 - Vertical Alignment (0=Baseline; 1=Bottom; 2=Middle; 3=Top)
     this.properties.add(Property.Names.VERTICALALIGNMENT, {
@@ -354,13 +354,13 @@ export class Text extends Entity {
       case 0:
         return 'left';
       case 1:
-        return 'center';
+        return 'centre';
       case 2:
         return 'right';
       case 3:
         return (this.getProperty(Property.Names.VERTICALALIGNMENT) === 0 ? 'aligned' : 'left');
       case 4:
-        return (this.getProperty(Property.Names.VERTICALALIGNMENT) === 0 ? 'center' : 'left');
+        return (this.getProperty(Property.Names.VERTICALALIGNMENT) === 0 ? 'centre' : 'left');
       case 5:
         return (this.getProperty(Property.Names.VERTICALALIGNMENT) === 0 ? 'fit' : 'left');
       default:
@@ -539,7 +539,7 @@ export class Text extends Entity {
       case 0: // left
         offsetX = 0;
         break;
-      case 1: // center
+      case 1: // centre
         offsetX = -rect.width / 2;
         break;
       case 2: // right
