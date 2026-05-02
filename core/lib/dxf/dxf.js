@@ -311,14 +311,14 @@ export class DXF {
               DesignCore.HandleManager.checkHandle(itemHandle);
             }
 
-            if (block.hasOwnProperty('items') === false) {
-              block.items = [];
+            if (block.hasOwnProperty('entities') === false) {
+              block.entities = [];
             }
 
             // add the child to the block items
             // TODO: create a block instance and add the items.
             // check block is valid before adding to scene
-            block.items.push(item);
+            block.entities.push(item);
           }
         });
       }
@@ -347,7 +347,7 @@ export class DXF {
         entity.points = this.parsePoints(entity.points);
       }
 
-      this.addItem(entity);
+      this.addEntity(entity);
     });
 
     // ensure all layers, ltypes, styles, dimstyles exist
@@ -378,18 +378,18 @@ export class DXF {
   }
 
   /**
-   * Add Item
-   * @param {Object} item
+   * Add Entity
+   * @param {Object} entity
    */
-  addItem(item) {
-    if (item.hasOwnProperty('0') === false) {
+  addEntity(entity) {
+    if (entity.hasOwnProperty('0') === false) {
       return;
     }
 
-    const command = item[0];
+    const command = entity[0];
     if (DesignCore.CommandManager.isCommand(command)) {
-      const entity = DesignCore.CommandManager.createNew(command, item);
-      DesignCore.Scene.entities.add(entity);
+      const newEntity = DesignCore.CommandManager.createNew(command, entity);
+      DesignCore.Scene.entities.add(newEntity);
     } else {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
       this.unsupportedElements = true;
