@@ -14,45 +14,45 @@ const data = {
   colour: { r: 100, g: 100, b: 100 },
 };
 
-DesignCore.Scene.addItem('Line', data);
-DesignCore.Scene.addItem('Circle', data);
-DesignCore.Scene.addItem('Text', data);
+DesignCore.Scene.addEntity('Line', data);
+DesignCore.Scene.addEntity('Circle', data);
+DesignCore.Scene.addEntity('Text', data);
 // Add Arc with a different Colour
-DesignCore.Scene.addItem('Arc', { points: [point1, point2], colour: { r: 130, g: 130, b: 130 } });
+DesignCore.Scene.addEntity('Arc', { points: [point1, point2], colour: { r: 130, g: 130, b: 130 } });
 
-test('Test propertyManager.getItemTypes', () => {
+test('Test propertyManager.getEntityTypes', () => {
   // Add an item to the selectionSet
   DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(0);
-  let types = propertiesManager.getItemTypes();
+  let types = propertiesManager.getEntityTypes();
   expect(types.length).toBe(1);
 
   // Add the same item to the selectionSet - shouldn't change the count
   DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(0);
-  types = propertiesManager.getItemTypes();
+  types = propertiesManager.getEntityTypes();
   expect(types.length).toBe(1);
 
   // Add a new item to the selectionSet - result should include 'All'
   DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(1);
-  types = propertiesManager.getItemTypes();
+  types = propertiesManager.getEntityTypes();
   expect(types.length).toBe(3);
   expect(types[0]).toBe('All');
 });
 
-test('Test propertyManager.setItemProperties', () => {
+test('Test propertyManager.setEntityProperties', () => {
   // clear the selection set
   DesignCore.Scene.reset();
   // add the text entity
   DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(2);
   // set the string attribute of the text entity
   const string = 'test text';
-  propertiesManager.setItemProperties('string', string);
+  propertiesManager.setEntityProperties('string', string);
 
   let text = DesignCore.Scene.entities.get(2);
   expect(text.type).toBe('Text');
   expect(text.getProperty('string')).toBe(string);
 
   // try and set a non-existent property
-  propertiesManager.setItemProperties('faux-prop', string);
+  propertiesManager.setEntityProperties('faux-prop', string);
   text = DesignCore.Scene.entities.get(2);
   expect(text['faux-prop']).toBeUndefined();
 
@@ -63,53 +63,53 @@ test('Test propertyManager.setItemProperties', () => {
   // get the current radius
   const radius = DesignCore.Scene.entities.get(1).getProperty('radius');
   // try and set an incorrect value
-  propertiesManager.setItemProperties('radius', string);
+  propertiesManager.setEntityProperties('radius', string);
   const circle = DesignCore.Scene.entities.get(1);
   expect(circle.getProperty('radius')).toBe(radius);
 });
 
-test('Test propertyManager.getItemProperties', () => {
+test('Test propertyManager.getEntityProperties', () => {
   // clear the selection set
   DesignCore.Scene.reset();
 
   // get props with nothing selected - should be undefined
-  let properties = propertiesManager.getItemProperties();
+  let properties = propertiesManager.getEntityProperties();
   expect(properties).toBeUndefined();
 
   // Add the line entity to the selectionSet
   DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(0);
-  properties = propertiesManager.getItemProperties('Line');
+  properties = propertiesManager.getEntityProperties('Line');
   expect(properties.length).toBeGreaterThan(0);
 
   // check properties for All itemTypes
-  properties = propertiesManager.getItemProperties('All');
+  properties = propertiesManager.getEntityProperties('All');
   expect(properties.length).toBeGreaterThan(0);
 
   // get circle props with a line selected - should be 0
-  properties = propertiesManager.getItemProperties('Circle');
+  properties = propertiesManager.getEntityProperties('Circle');
   expect(properties.length).toBe(0);
 });
 
-test('Test propertyManager.getItemPropertyValue', () => {
+test('Test propertyManager.getEntityPropertyValue', () => {
   // clear the selection set
   DesignCore.Scene.reset();
 
   // get props with nothing selected - should be undefined
-  let propertyValues = propertiesManager.getItemPropertyValue();
+  let propertyValues = propertiesManager.getEntityPropertyValue();
   expect(propertyValues).toBeUndefined();
 
   // Add the line entity to the selectionSet
   DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(0);
   // get the line colour
-  propertyValues = propertiesManager.getItemPropertyValue('Line', 'colour');
+  propertyValues = propertiesManager.getEntityPropertyValue('Line', 'colour');
   expect(propertyValues).toEqual(data.colour);
 
   // get circle props with a line selected - should be undefined
-  propertyValues = propertiesManager.getItemPropertyValue('Circle', 'colour');
+  propertyValues = propertiesManager.getEntityPropertyValue('Circle', 'colour');
   expect(propertyValues).toBeUndefined();
 
   // get props for all selected types - index 0 and 3 colour should be Varies
   DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(3);
-  propertyValues = propertiesManager.getItemPropertyValue('All', 'colour');
+  propertyValues = propertiesManager.getEntityPropertyValue('All', 'colour');
   expect(propertyValues).toBe('Varies');
 });
