@@ -24,9 +24,9 @@ test.each(inputScenarios)('Trim.execute handles $desc', async (scenario) => {
   // clear all scene entities
   core.scene.clear();
   // create line
-  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(), new Point(10, 0)] });
   // create circle
-  core.scene.addItem('Circle', { points: [new Point(), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(), new Point(10, 0)] });
   // select line
   core.scene.selectionManager.selectionSet.selectionSet.push(0);
 
@@ -60,8 +60,8 @@ test('Test Trim.action', () => {
   // clear all scene entities
   core.scene.clear();
   // Add items to scene
-  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
-  core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
+  core.scene.addEntity('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addEntity('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
   trim.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to trim
@@ -91,8 +91,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.clear();
   // Add items to scene
-  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
-  core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
+  core.scene.addEntity('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addEntity('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
   trim.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to trim
@@ -122,8 +122,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.clear();
   // Add items to scene
-  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
-  core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
+  core.scene.addEntity('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addEntity('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   // select item to trim
@@ -155,8 +155,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.clear();
   // Add items to scene
-  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
-  core.scene.addItem('Line', { points: [lineTwoStart, lineTwoEnd] });
+  core.scene.addEntity('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addEntity('Line', { points: [lineTwoStart, lineTwoEnd] });
   // Select boundary item
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   // select item to trim
@@ -189,8 +189,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.clear();
   // Add items to scene
-  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
-  core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
+  core.scene.addEntity('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addEntity('Line', { points: [crossingLineStart, crossingLineEnd] });
   // Select boundary item
   trim.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to trim
@@ -220,8 +220,8 @@ test('Test Trim.action', () => {
   // clear scene items
   core.scene.clear();
   // Add items to scene
-  core.scene.addItem('Line', { points: [lineOneStart, lineOneEnd] });
-  core.scene.addItem('Line', { points: [crossingLineStart, crossingLineEnd] });
+  core.scene.addEntity('Line', { points: [lineOneStart, lineOneEnd] });
+  core.scene.addEntity('Line', { points: [crossingLineStart, crossingLineEnd] });
   // Select boundary item
   trim.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to trim
@@ -253,8 +253,8 @@ test('Test Trim.action polyline - trim end segment', () => {
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0)] });
-  core.scene.addItem('Line', { points: [new Point(75, -50), new Point(75, 50)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(75, -50), new Point(75, 50)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -296,8 +296,8 @@ test('Test Trim.action polyline - trim start segment', () => {
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0)] });
-  core.scene.addItem('Line', { points: [new Point(25, -50), new Point(25, 50)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(25, -50), new Point(25, 50)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -334,9 +334,9 @@ test('Test Trim.action polyline - trim middle segment', () => {
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0), new Point(150, 0)] });
-  core.scene.addItem('Line', { points: [new Point(25, -50), new Point(25, 50)] });
-  core.scene.addItem('Line', { points: [new Point(75, -50), new Point(75, 50)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(50, 0), new Point(100, 0), new Point(150, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(25, -50), new Point(25, 50)] });
+  core.scene.addEntity('Line', { points: [new Point(75, -50), new Point(75, 50)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1), core.scene.entities.get(2)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -385,8 +385,8 @@ test('Test Trim.action polyline - trim bulged arc segment', () => {
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0, 1), new Point(100, 0), new Point(200, 0)] });
-  core.scene.addItem('Line', { points: [new Point(50, -100), new Point(50, 100)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0, 1), new Point(100, 0), new Point(200, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(50, -100), new Point(50, 100)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -434,7 +434,7 @@ test('Trim.preview does not throw', () => {
 
 test('Trim.preview returns early when no boundary items set', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(0, -10), new Point(0, 10)] });
   DesignCore.Scene.previewEntities.clear();
 
   const trim = new Trim();
@@ -446,8 +446,8 @@ test('Trim.preview returns early when no boundary items set', () => {
 
 test('Trim.preview returns early when findClosestItem returns undefined', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] });
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, -10), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
   DesignCore.Scene.previewEntities.clear();
 
   const trim = new Trim();
@@ -463,8 +463,8 @@ test('Trim.preview returns early when findClosestItem returns undefined', () => 
 test('Trim.preview returns early when hovered entity does not implement trim', () => {
   // Text does not override Entity.trim() — preview must not emit a notification.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
-  core.scene.addItem('Text', { points: [new Point(5, 0)], string: 'hello' }); // unsupported
+  core.scene.addEntity('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
+  core.scene.addEntity('Text', { points: [new Point(5, 0)], string: 'hello' }); // unsupported
   DesignCore.Scene.previewEntities.clear();
 
   const notifySpy = jest.spyOn(core, 'notify');
@@ -486,12 +486,12 @@ test('Trim.preview returns early when hovered entity does not implement trim', (
 test('Trim.preview returns early when hovered entity has no intersections with boundary', () => {
   // Two parallel horizontal lines — no intersection with the vertical boundary
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary (vertical)
-  core.scene.addItem('Line', { points: [new Point(-10, 5), new Point(10, 5)] }); // hovered (horizontal, no intersection with boundary)
+  core.scene.addEntity('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary (vertical)
+  core.scene.addEntity('Line', { points: [new Point(-10, 5), new Point(10, 5)] }); // hovered (horizontal, no intersection with boundary)
   DesignCore.Scene.previewEntities.clear();
 
   // Boundary is entity 0; hovered is entity 1 — they are parallel on the y-axis, so no intersection
-  core.scene.addItem('Line', { points: [new Point(-10, 20), new Point(10, 20)] }); // extra line, no intersection
+  core.scene.addEntity('Line', { points: [new Point(-10, 20), new Point(10, 20)] }); // extra line, no intersection
 
   const trim = new Trim();
   trim.selectedBoundaryItems = [core.scene.entities.get(2)]; // horizontal boundary — parallel to hovered
@@ -510,8 +510,8 @@ test('Trim.preview populates previewEntities when entity can be trimmed', () => 
   // Vertical boundary at x=0; horizontal line from (-10,0) to (10,0) is the hovered entity.
   // Mouse at (5,0) → trims the right half, leaving the left half as a preview.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] }); // hovered
+  core.scene.addEntity('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(10, 0)] }); // hovered
   DesignCore.Scene.previewEntities.clear();
 
   const trim = new Trim();
@@ -531,7 +531,7 @@ test('Trim.preview populates previewEntities when entity can be trimmed', () => 
 test('Trim.execute returns early when boundary input is undefined', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(), new Point(10, 0)] });
 
   await withMockInput(core.scene, [undefined], async () => {
     const trim = new Trim();
@@ -543,8 +543,8 @@ test('Trim.execute returns early when boundary input is undefined', async () => 
 test('Trim.execute exits selection loop when selection input is undefined', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(), new Point(5, 0)] });
   // preselect first item as boundary
   core.scene.selectionManager.selectionSet.selectionSet.push(0);
 
@@ -560,9 +560,9 @@ test('Trim.execute exits selection loop when selection input is undefined', asyn
 test('Trim.execute calls actionCommand once per trim selection', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] });
-  core.scene.addItem('Circle', { points: [new Point(-5, 0), new Point(0, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(-5, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, -10), new Point(0, 10)] });
+  core.scene.addEntity('Circle', { points: [new Point(-5, 0), new Point(0, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(-5, 0), new Point(0, 0)] });
   // preselect line as boundary
   core.scene.selectionManager.selectionSet.selectionSet.push(0);
 
@@ -581,7 +581,7 @@ test('Trim.execute calls actionCommand once per trim selection', async () => {
 
 test('Trim.action does nothing when selectedItem is null', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(), new Point(10, 0)] });
   const trim = new Trim();
   trim.selectedItem = null;
   trim.selectedBoundaryItems = [core.scene.entities.get(0)];
@@ -591,7 +591,7 @@ test('Trim.action does nothing when selectedItem is null', () => {
 
 test('Trim.action does nothing when selectedBoundaryItems is empty', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(), new Point(10, 0)] });
   const trim = new Trim();
   trim.selectedItem = core.scene.entities.get(0);
   trim.selectedBoundaryItems = [];
@@ -604,7 +604,7 @@ test('Trim.action notifies NOTRIM when selected entity lacks fromPolylinePoints'
   // Use a stub entity that has toPolylinePoints but no fromPolylinePoints.
   // action() must notify and not throw.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
+  core.scene.addEntity('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
 
   const trim = new Trim();
   trim.selectedBoundaryItems = [core.scene.entities.get(0)];
@@ -626,7 +626,7 @@ test('Trim.preview silently skips entity that lacks fromPolylinePoints', () => {
   // Stub entity implements toPolylinePoints but not fromPolylinePoints.
   // preview() must return early without calling notify.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
+  core.scene.addEntity('Line', { points: [new Point(0, -10), new Point(0, 10)] }); // boundary
   DesignCore.Scene.previewEntities.clear();
 
   const stubEntity = {
@@ -655,8 +655,8 @@ test('Trim.preview silently skips entity that lacks fromPolylinePoints', () => {
 test('Trim.action notifies when no intersection found (parallel lines)', () => {
   core.scene.clear();
   // Two parallel vertical lines - no intersection
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 100)] });
-  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(10, 100)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 100)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 0), new Point(10, 100)] });
 
   const trim = new Trim();
   trim.selectedBoundaryItems = [core.scene.entities.get(0)];
@@ -672,7 +672,7 @@ test('Trim.action notifies when no intersection found (parallel lines)', () => {
 
 test('Trim.action notifies when boundary item equals selected item', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(100, 0)] });
   const entity = core.scene.entities.get(0);
 
   const trim = new Trim();
@@ -695,8 +695,8 @@ test('Trim.action trims an arc', () => {
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+  core.scene.addEntity('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, -20), new Point(0, 20)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -726,8 +726,8 @@ test('Trim.action trims a circle', () => {
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, -20), new Point(0, 20)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -757,10 +757,10 @@ test('Trim.action trims a closed polyline - produces open polyline with closed f
   core.scene.clear();
 
   // Five points where first === last → constructor pops last and sets flag=1
-  core.scene.addItem('Lwpolyline', {
+  core.scene.addEntity('Lwpolyline', {
     points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100), new Point(0, 0)],
   });
-  core.scene.addItem('Line', { points: [new Point(50, -10), new Point(50, 110)] });
+  core.scene.addEntity('Line', { points: [new Point(50, -10), new Point(50, 110)] });
 
   const polyline = core.scene.entities.get(0);
   expect(polyline.flags.hasFlag(1)).toBe(true); // confirm closed before trim
@@ -798,8 +798,8 @@ test('Trim.action trims middle of a line - circle boundary creates two intersect
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(50, 0), new Point(70, 0)] }); // radius 20
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(100, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(50, 0), new Point(70, 0)] }); // radius 20
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -851,8 +851,8 @@ test('Trim.action trims a circle near the seam (right side, mouse at angle 0)', 
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, -20), new Point(0, 20)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -889,10 +889,10 @@ test('Trim.action trims a closed polyline near the seam vertex', () => {
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Lwpolyline', {
+  core.scene.addEntity('Lwpolyline', {
     points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100), new Point(0, 0)],
   });
-  core.scene.addItem('Line', { points: [new Point(-10, 50), new Point(110, 50)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 50), new Point(110, 50)] });
 
   const polyline = core.scene.entities.get(0);
   expect(polyline.flags.hasFlag(1)).toBe(true);
@@ -931,8 +931,8 @@ test('Trim.action trims an open polyline with two consecutive arc segments', () 
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0, 1), new Point(100, 0, 1), new Point(200, 0)] });
-  core.scene.addItem('Line', { points: [new Point(150, -100), new Point(150, 100)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0, 1), new Point(100, 0, 1), new Point(200, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(150, -100), new Point(150, 100)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -964,8 +964,8 @@ test('Trim.action trims an arc from the start (portionOne same-segment bulge)', 
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, -20), new Point(0, 20)] });
+  core.scene.addEntity('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, -20), new Point(0, 20)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -996,9 +996,9 @@ test('Trim.action trims the middle of an arc (two intersections on same arc segm
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(5, -20), new Point(5, 20)] });
-  core.scene.addItem('Line', { points: [new Point(-5, -20), new Point(-5, 20)] });
+  core.scene.addEntity('Arc', { points: [new Point(0, 0), new Point(10, 0), new Point(-10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, -20), new Point(5, 20)] });
+  core.scene.addEntity('Line', { points: [new Point(-5, -20), new Point(-5, 20)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1), core.scene.entities.get(2)];
   trim.selectedItem = core.scene.entities.get(0);
@@ -1036,9 +1036,9 @@ test('Trim.action trims with multiple boundary items', () => {
   const trim = new Trim();
   core.scene.clear();
 
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(200, 0)] });
-  core.scene.addItem('Line', { points: [new Point(50, -20), new Point(50, 20)] });
-  core.scene.addItem('Line', { points: [new Point(150, -20), new Point(150, 20)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(200, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(50, -20), new Point(50, 20)] });
+  core.scene.addEntity('Line', { points: [new Point(150, -20), new Point(150, 20)] });
 
   trim.selectedBoundaryItems = [core.scene.entities.get(1), core.scene.entities.get(2)];
   trim.selectedItem = core.scene.entities.get(0);
