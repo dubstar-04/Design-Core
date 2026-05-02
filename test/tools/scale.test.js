@@ -43,7 +43,7 @@ test.each(inputScenarios)('Scale.execute handles $desc', async (scenario) => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points });
+  core.scene.addEntity('Line', { points });
   core.scene.selectionManager.addToSelectionSet(0);
 
   const origInputManager = core.scene.inputManager;
@@ -76,7 +76,7 @@ test('Scale.execute - cancel at base point does not scale', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 0), new Point(20, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
 
   const origInputManager = core.scene.inputManager;
@@ -100,7 +100,7 @@ test('Scale.execute - cancel at factor prompt does not scale', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 0), new Point(20, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
 
   const origInputManager = core.scene.inputManager;
@@ -130,8 +130,8 @@ test('Scale.execute - entity count unchanged after execute', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(5, 0), new Point(10, 0)] });
 
   const entityCount = core.scene.entities.count();
 
@@ -165,11 +165,11 @@ test('Test Scale.action - scale by factor 2 from origin', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(5, 0), new Point(10, 0)] });
-  core.scene.addItem('Polyline', { points: [new Point(5, 0), new Point(10, 0)] });
-  core.scene.addItem('Arc', { points: [new Point(5, 0), new Point(10, 0), new Point(5, 5)] });
-  core.scene.addItem('Rectangle', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Polyline', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Arc', { points: [new Point(5, 0), new Point(10, 0), new Point(5, 5)] });
+  core.scene.addEntity('Rectangle', { points: [new Point(5, 0), new Point(10, 0)] });
 
   for (let i = 0; i < core.scene.entities.count(); i++) {
     core.scene.selectionManager.addToSelectionSet(i);
@@ -193,7 +193,7 @@ test('Test Scale.action - scale by factor 0.5 from origin', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 0), new Point(20, 0)] });
 
   core.scene.selectionManager.addToSelectionSet(0);
 
@@ -214,7 +214,7 @@ test('Test Scale.action - scale from offset base point', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(10, 10), new Point(20, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 10), new Point(20, 10)] });
 
   core.scene.selectionManager.addToSelectionSet(0);
 
@@ -236,8 +236,8 @@ test('Test Scale.action - entity count unchanged (in-place update)', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(5, 0), new Point(10, 0)] });
 
   const entityCount = core.scene.entities.count();
 
@@ -259,7 +259,7 @@ test('Test Scale.action - scale factor 1 leaves points unchanged', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(10, 20), new Point(30, 40)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 20), new Point(30, 40)] });
 
   core.scene.selectionManager.addToSelectionSet(0);
 
@@ -280,7 +280,7 @@ test('Test Scale.action - scale 2D point (non-axis-aligned)', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(5, 5), new Point(10, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 5), new Point(10, 10)] });
 
   core.scene.selectionManager.addToSelectionSet(0);
 
@@ -301,7 +301,7 @@ test('Test Scale.action - empty selection does not throw', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 0), new Point(10, 0)] });
   // deliberately do not add anything to the selection set
 
   const scale = new Scale();
@@ -361,7 +361,7 @@ test('Scale.execute - requests selection set when none pre-selected', async () =
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 0), new Point(20, 0)] });
   // Intentionally do NOT add to selection set — triggers the SELECTIONSET prompt
 
   const origInputManager = core.scene.inputManager;
@@ -396,7 +396,7 @@ test('Scale.execute - reference with zero length returns without scaling', async
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 0), new Point(20, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
 
   const origInputManager = core.scene.inputManager;
@@ -431,7 +431,7 @@ test('Scale.preview - no points set, adds no temp entities', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 0), new Point(10, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
 
   const scale = new Scale();
@@ -445,7 +445,7 @@ test('Scale.preview - referencePoint set, suppresses preview', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 0), new Point(10, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
 
   const scale = new Scale();
@@ -461,7 +461,7 @@ test('Scale.preview - mouse on base point (distance 0), draws line but skips sca
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(5, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, 0), new Point(10, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
 
   const scale = new Scale();
@@ -475,7 +475,7 @@ test('Scale.preview - mouse on base point (distance 0), draws line but skips sca
   expect(core.scene.previewEntities.count()).toBeGreaterThanOrEqual(1);
 
   // Selected item points should be unchanged (scaling skipped)
-  const previewItem = core.scene.selectionManager.selectedItems[0];
+  const previewItem = core.scene.selectionManager.selectedEntities[0];
   expect(previewItem.points[0].x).toBeCloseTo(5);
 });
 
@@ -483,7 +483,7 @@ test('Scale.preview - one point set, draws temp line and scales selected items',
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(1, 0), new Point(2, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(1, 0), new Point(2, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
 
   const scale = new Scale();
@@ -497,7 +497,7 @@ test('Scale.preview - one point set, draws temp line and scales selected items',
   expect(core.scene.previewEntities.count()).toBeGreaterThanOrEqual(1);
 
   // Preview item should have been scaled (x differs from original 1.0)
-  const previewItem = core.scene.selectionManager.selectedItems[0];
+  const previewItem = core.scene.selectionManager.selectedEntities[0];
   expect(previewItem.points[0].x).not.toBeCloseTo(1);
 });
 
@@ -506,7 +506,7 @@ test('Scale.preview - reference mode uses referenceLength to compute factor', ()
   core.scene.selectionManager.reset();
 
   // Line at x=10..20, y=0
-  core.scene.addItem('Line', { points: [new Point(10, 0), new Point(20, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 0), new Point(20, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
 
   const scale = new Scale();
@@ -524,6 +524,6 @@ test('Scale.preview - reference mode uses referenceLength to compute factor', ()
 
   // The preview item's first point should differ from the original (10,0)
   // because the factor (distance/10) is applied
-  const previewItem = core.scene.selectionManager.selectedItems[0];
+  const previewItem = core.scene.selectionManager.selectedEntities[0];
   expect(previewItem.points[0].x).not.toBeCloseTo(10);
 });
