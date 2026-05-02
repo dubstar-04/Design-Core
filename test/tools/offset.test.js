@@ -311,11 +311,11 @@ test('Test Offset.action - offset arc outward preserves angles', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  const center = new Point(0, 0);
-  const start = center.project(0, 10); // radius 10
-  const end = center.project(Math.PI / 2, 10);
+  const centre = new Point(0, 0);
+  const start = centre.project(0, 10); // radius 10
+  const end = centre.project(Math.PI / 2, 10);
 
-  core.scene.addItem('Arc', { points: [center, start, end] });
+  core.scene.addItem('Arc', { points: [centre, start, end] });
 
   const offset = new Offset();
   offset.selectedItem = core.scene.entities.get(0);
@@ -330,8 +330,8 @@ test('Test Offset.action - offset arc outward preserves angles', () => {
   expect(newRadius).toBeCloseTo(15);
 
   // Start and end angles should be preserved
-  const originalStartAngle = center.angle(start);
-  const originalEndAngle = center.angle(end);
+  const originalStartAngle = centre.angle(start);
+  const originalEndAngle = centre.angle(end);
   const newStartAngle = newArc.points[0].angle(newArc.points[1]);
   const newEndAngle = newArc.points[0].angle(newArc.points[2]);
   expect(newStartAngle).toBeCloseTo(originalStartAngle);
@@ -397,7 +397,7 @@ test('Test Offset.getThroughDistance - circle', () => {
 
 test('Test Offset.getThroughDistance - arc uses same radial distance as circle', () => {
   const offset = new Offset();
-  // Arc: center (0,0), radius 10
+  // Arc: centre (0,0), radius 10
   const entity = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
 
   // Point inside the arc radius
@@ -459,7 +459,7 @@ test('Test Offset.getOffsetPoints - arc inward offset shrinks radius', () => {
   const offset = new Offset();
   const entity = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
 
-  // sidePoint inside the arc (between center and circumference)
+  // sidePoint inside the arc (between centre and circumference)
   const result = offset.getOffsetPoints(entity, new Point(5, 0), 3);
 
   expect(result).not.toBeNull();
@@ -538,7 +538,7 @@ test('Test Offset.getOffsetPolylinePoints - closed rectangle offset outward', ()
 test('Test Offset.getOffsetPolylinePoints - arc segment (bulge) offset outward grows radius', () => {
   const offset = new Offset();
   // CW semicircle (bulge=-1) from (0,0) to (10,0): traces the TOP half through (5,5)
-  // center=(5,0), radius=5
+  // centre=(5,0), radius=5
   const start = new Point(0, 0, -1); // bulge=-1 → CW, arc goes upward
   const end = new Point(10, 0);
   const points = [start, end];
@@ -577,7 +577,7 @@ test('Offset.findJunction - parallel line/line falls back to midpoint', () => {
 
 test('Offset.findJunction - arc/line returns circle-line intersection', () => {
   const offset = new Offset();
-  // Arc: A=(-5,0) B=(5,0) bulge=1 → center (0,0), radius 5 via bulgeCentrePoint
+  // Arc: A=(-5,0) B=(5,0) bulge=1 → centre (0,0), radius 5 via bulgeCentrePoint
   // Line: vertical at x=3 → circle intersects at (3,4) and (3,-4)
   const seg = { A: new Point(-5, 0), B: new Point(5, 0), bulge: 1 };
   const nextSeg = { A: new Point(3, 5), B: new Point(3, 10), bulge: 0 };
@@ -601,7 +601,7 @@ test('Offset.findJunction - line/arc returns line-circle intersection', () => {
 
 test('Offset.findJunction - arc/arc returns circle-circle intersection', () => {
   const offset = new Offset();
-  // Circle 1: A=(-4,0) B=(4,0) bulge=1 → center (0,0), radius 4 via bulgeCentrePoint
+  // Circle 1: A=(-4,0) B=(4,0) bulge=1 → centre (0,0), radius 4 via bulgeCentrePoint
   // Circle 2: A=(0,4) B=(6,4) bulge=1 → center (3,4), radius 3 via bulgeCentrePoint
   // Intersections: (0,4) and (96/25, 28/25)
   const seg = { A: new Point(-4, 0), B: new Point(4, 0), bulge: 1 };
@@ -883,7 +883,7 @@ test('Offset.execute - Through mode offsets circle to the through point', async 
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  // Circle: center (0,0), radius 10
+  // Circle: centre (0,0), radius 10
   core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const origInputManager = core.scene.inputManager;
