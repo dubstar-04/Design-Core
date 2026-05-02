@@ -36,16 +36,16 @@ export class DiametricDimension extends BaseCircularDimension {
    */
   static getPointsFromSelection(items, textPos) {
     const item = items[0];
-    const center = item.points[0];
+    const centre = item.points[0];
 
     const Pt11 = textPos;
     Pt11.sequence = 11;
 
-    const angle = Pt11.angle(center);
-    const Pt10 = center.project(angle, item.getRadius());
+    const angle = Pt11.angle(centre);
+    const Pt10 = centre.project(angle, item.getRadius());
     Pt10.sequence = 10;
     // Pt15 should be closest point to the text position
-    const Pt15 = center.project(angle - Math.PI, item.getRadius());
+    const Pt15 = centre.project(angle - Math.PI, item.getRadius());
     Pt15.sequence = 15;
 
     const points = [Pt10, Pt15, Pt11];
