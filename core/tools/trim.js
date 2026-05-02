@@ -296,10 +296,10 @@ export class Trim extends Tool {
     if (fromLoc.segmentIndex === toLoc.segmentIndex) {
       const startPoint = fromLoc.point.clone();
       if (fromSegStart.bulge !== 0 && fromSegStart.bulge !== undefined) {
-        const center = fromSegStart.bulgeCentrePoint(fromSegEnd);
+        const centre = fromSegStart.bulgeCentrePoint(fromSegEnd);
         const direction = fromSegStart.bulge > 0 ? 1 : -1;
-        const startAngle = center.angle(fromLoc.point);
-        const endAngle = center.angle(toLoc.point);
+        const startAngle = centre.angle(fromLoc.point);
+        const endAngle = centre.angle(toLoc.point);
         const includedAngle = ((endAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
         startPoint.bulge = Math.tan(includedAngle / 4) * direction;
       }
