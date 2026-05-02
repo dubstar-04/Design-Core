@@ -321,11 +321,11 @@ export class DimStyle {
     this.DIMTMOVE = Property.loadValue([data.DIMTMOVE, data[279]], 0);
 
     // DXF Groupcode 280 - Horizontal dimension text position:
-    // 0 = Above dimension line and center-justified between extension lines
+    // 0 = Above dimension line and centre-justified between extension lines
     // 1 = Above dimension line and next to first extension line
     // 2 = Above dimension line and next to second extension line
-    // 3 = Above and center-justified to first extension line
-    // 4 = Above and center-justified to second extension line
+    // 3 = Above and centre-justified to first extension line
+    // 4 = Above and centre-justified to second extension line
     this.DIMJUST = Property.loadValue([data.DIMJUST, data[280]], 0);
 
     // DXF Groupcode 281 - Suppression of first extension line:
@@ -506,7 +506,7 @@ export class DimStyle {
   }
 
   /**
-   * get the DIMCEN property for the center mark size
+   * get the DIMCEN property for the centre mark size
    * @return {Number} DIMCEN value
    * This uses two internal values to define the DIMCEN property
    * DIMCENSTYL & DIMCENVALUE
@@ -604,7 +604,7 @@ export class DimStyle {
     file.writeGroupCode('275', this.DIMAUNIT, DXFFile.Version.R13);
     file.writeGroupCode('276', this.DIMFRAC, DXFFile.Version.R2000);
     file.writeGroupCode('277', this.DIMLUNIT, DXFFile.Version.R2000);
-    // file.writeGroupCode('278', this.DIMDSEP, DXFFile.Version.R14)); - TODO: AutoCAD uses a numberical description
+    // file.writeGroupCode('278', this.DIMDSEP, DXFFile.Version.R14)); - TODO: AutoCAD uses a numerical description
     file.writeGroupCode('279', this.DIMTMOVE, DXFFile.Version.R2000);
     file.writeGroupCode('280', this.DIMJUST, DXFFile.Version.R13);
     file.writeGroupCode('281', this.DIMSD1 ? 1 : 0, DXFFile.Version.R13); // convert bool to int
