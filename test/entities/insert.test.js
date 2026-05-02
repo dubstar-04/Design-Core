@@ -13,10 +13,10 @@ new Core();
 
 const insert = new Insert({ handle: '1', points: [new Point()] });
 const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
-insert.block.addItem(line);
+insert.block.addEntity(line);
 
 const rotatedInsert = new Insert({ points: [new Point()], rotation: 45 });
-rotatedInsert.block.addItem(line);
+rotatedInsert.block.addEntity(line);
 
 test('Test Insert.snaps', () => {
   const point = new Point(100, 100);
@@ -51,7 +51,7 @@ test('Test Insert.boundingBox', () => {
   expect(insert.boundingBox().yMax).toBeCloseTo(202);
 
   const line2 = new Line({ points: [new Point(1001, 1002), new Point(2001, 2002)] });
-  insert.block.addItem(line2);
+  insert.block.addEntity(line2);
 
   expect(insert.boundingBox().xMin).toBeCloseTo(101);
   expect(insert.boundingBox().xMax).toBeCloseTo(2001);
@@ -115,17 +115,17 @@ describe('Test Insert.draw', () => {
   test('draw() returns the block items array', () => {
     const ins = new Insert({ points: [new Point(0, 0)] });
     const line = new Line({ points: [new Point(0, 0), new Point(1, 1)] });
-    ins.block.addItem(line);
+    ins.block.addEntity(line);
 
     const result = ins.draw(makeMockCtx());
-    expect(result).toBe(ins.block.items);
+    expect(result).toBe(ins.block.entities);
   });
 
   test('draw() returns empty array when block has no items', () => {
     const ins = new Insert({ points: [new Point(0, 0)] });
     const result = ins.draw(makeMockCtx());
     expect(result).toEqual([]);
-    expect(result).toBe(ins.block.items);
+    expect(result).toBe(ins.block.entities);
   });
 
   test('draw() calls renderer.applyTransform with the insert point coordinates', () => {
@@ -159,9 +159,9 @@ describe('Test Insert.draw', () => {
   test('draw() returns same items reference regardless of scale', () => {
     const ins = new Insert({ points: [new Point(0, 0)] });
     const line = new Line({ points: [new Point(0, 0), new Point(1, 1)] });
-    ins.block.addItem(line);
-    expect(ins.draw(makeMockCtx())).toBe(ins.block.items);
-    expect(ins.draw(makeMockCtx())).toBe(ins.block.items);
+    ins.block.addEntity(line);
+    expect(ins.draw(makeMockCtx())).toBe(ins.block.entities);
+    expect(ins.draw(makeMockCtx())).toBe(ins.block.entities);
   });
 });
 
