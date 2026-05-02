@@ -2,6 +2,7 @@ import { Tool } from '../tools/tool.js';
 import { Snapping } from './snapping.js';
 
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 import { Point } from '../entities/point.js';
 import { Input, MouseDown, MouseUp } from './input.js';
 
@@ -429,10 +430,10 @@ export class InputManager {
       this.activeCommand.action();
     } else {
       if (item !== undefined) {
-      // set the items layer to the current layer
-        item.layer = DesignCore.LayerManager.getCstyle();
-        // return the item index
-        return DesignCore.Scene.addItem(item.type, item, index);
+        // set the items layer to the current layer
+        item.setProperty(Property.Names.LAYER, DesignCore.LayerManager.getCstyle());
+        // commit the already-constructed entity directly, bypassing createNew
+        return DesignCore.Scene.commitEntity(item, index);
       }
     }
   }

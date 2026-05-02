@@ -5,7 +5,7 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
-
+import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -70,13 +70,18 @@ export class Line extends Entity {
         if (pt2 === undefined) break;
 
         if (Input.getType(pt2) === Input.Type.STRING && pt2 === 'Close') {
-          this.points.push(pt1);
-          DesignCore.Scene.inputManager.executeCommand(this);
+          // Commit a 2-point segment from the last accumulated point back to pt1
+          const segment = new Line({ points: [this.points.at(-1), pt1] });
+          DesignCore.Scene.inputManager.executeCommand(segment);
           return;
         }
 
+        // Commit a fresh 2-point segment; keep this.points as the accumulator
+        // so preview() always draws from the last confirmed point to the mouse.
+        const segStart = this.points.at(-1);
         this.points.push(pt2);
-        DesignCore.Scene.inputManager.actionCommand(this);
+        const segment = new Line({ points: [segStart, pt2] });
+        DesignCore.Scene.inputManager.actionCommand(segment);
       }
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
@@ -108,18 +113,18 @@ export class Line extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'LINE');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbLine', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
-    file.writeGroupCode('6', this.lineType);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
+    file.writeGroupCode('6', this.getProperty(Property.Names.LINETYPE));
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
     file.writeGroupCode('11', this.points[1].x);
     file.writeGroupCode('21', this.points[1].y);
     file.writeGroupCode('31', '0.0');
-    file.writeGroupCode('39', this.lineWidth);
+    file.writeGroupCode('39', this.getProperty(Property.Names.LINEWIDTH));
   }
 
   /**

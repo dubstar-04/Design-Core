@@ -1002,9 +1002,9 @@ test('Chamfer.action chamfer line inherits layer, lineWidth, lineType from first
   expect(core.scene.entities.count()).toBe(3);
   const chamferLine = core.scene.entities.get(2);
   expect(chamferLine.type).toBe('Line');
-  expect(chamferLine.layer).toBe('walls');
-  expect(chamferLine.lineWidth).toBe(5);
-  expect(chamferLine.lineType).toBe('DASHED');
+  expect(chamferLine.getProperty('layer')).toBe('walls');
+  expect(chamferLine.getProperty('lineWidth')).toBe(5);
+  expect(chamferLine.getProperty('lineType')).toBe('DASHED');
 });
 
 test('Chamfer.preview does not throw', () => {

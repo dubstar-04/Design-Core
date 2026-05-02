@@ -69,16 +69,16 @@ test('Test MatchProp.action matches properties from source to targets', () => {
   // Validate that layer property was matched to targets
   for (let i = 0; i < match.destinationSetIndices.length; i++) {
     const tgt = core.scene.entities.get(match.destinationSetIndices[i]);
-    expect(tgt.layer).toBe('test');
+    expect(tgt.getProperty('layer')).toBe('test');
   }
 
   const circle = core.scene.entities.get(1);
-  expect(circle.radius).toBe(10); // original radius
+  expect(circle.getProperty('radius')).toBe(10); // original radius
 
   const arc = core.scene.entities.get(3);
-  expect(arc.radius).toBe(10); // original radius
+  expect(arc.getProperty('radius')).toBe(10); // original radius
 
   const text = core.scene.entities.get(5);
-  expect(text.height).toBe(10); // original height
-  expect(text.string).toBe('text test'); // original string
+  expect(text.getProperty('height')).toBe(10); // original height
+  expect(text.getProperty('string')).toBe('text test'); // original string
 });

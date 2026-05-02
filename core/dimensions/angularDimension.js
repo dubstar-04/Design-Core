@@ -14,6 +14,7 @@ import { Point } from '../entities/point.js';
 import { Text } from '../entities/text.js'; // used to debug the dimension points
 
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 
 /**
  * Angular Dimension Entity Class
@@ -47,7 +48,7 @@ export class AngularDimension extends BaseDimension {
    */
   async execute() {
     try {
-      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
+      this.setProperty(Property.Names.DIMENSIONSTYLE, DesignCore.DimStyleManager.getCstyle());
       this.dimType.setDimType(2); // Angular dimension
 
       let Pt10;
@@ -146,7 +147,7 @@ export class AngularDimension extends BaseDimension {
 
       const points = AngularDimension.getPointsFromSelection([tempLineOne, tempLineTwo], Pt11);
 
-      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.dimensionStyle });
+      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
     }
   }
 
@@ -520,10 +521,10 @@ export class AngularDimension extends BaseDimension {
     const Pt16 = this.getPointBySequence(this.points, 16);
 
     file.writeGroupCode('0', 'DIMENSION');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimension', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
     // file.writeGroupCode('2', this.blockName); // Block not required
     file.writeGroupCode('10', Pt10.x); // X - Start of Dimension Line
     file.writeGroupCode('20', Pt10.y); // Y
@@ -532,7 +533,7 @@ export class AngularDimension extends BaseDimension {
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
     file.writeGroupCode('70', this.dimType.getDimType()); // DIMENSION TYPE
-    file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
+    file.writeGroupCode('3', this.getProperty(Property.Names.DIMENSIONSTYLE)); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDb2LineAngularDimension', DXFFile.Version.R2000);
     file.writeGroupCode('13', Pt13.x); // X
     file.writeGroupCode('23', Pt13.y); // Y

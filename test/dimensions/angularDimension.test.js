@@ -69,9 +69,9 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
     for (const entity of dimensionBlockEntities) {
       if (entity.type === 'Text') {
         // remove all non-numeric characters except . and -
-        const numbersOnly = entity.string.replace(/[^0-9.-]+/g, '');
+        const numbersOnly = entity.getProperty('string').replace(/[^0-9.-]+/g, '');
         expect(Number(numbersOnly)).toBeCloseTo(dimensionValue);
-        expect(entity.string).toContain('°');
+        expect(entity.getProperty('string')).toContain('°');
       }
     }
   }, { selectedItems });
@@ -234,7 +234,7 @@ AcDb2LineAngularDimension
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newDimension = new AngularDimension(dimension);
+  const newDimension = new AngularDimension({ handle: dimension.getProperty('handle'), points: dimension.points, ...dimension });
   file = new File();
   newDimension.dxf(file);
   expect(file.contents).toEqual(dxfString);

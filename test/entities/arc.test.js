@@ -287,7 +287,7 @@ AcDbArc
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newArc = new Arc(arc);
+  const newArc = new Arc({ handle: arc.getProperty('handle'), points: arc.points, direction: arc.getProperty('direction') });
   file = new File();
   newArc.dxf(file);
   expect(file.contents).toEqual(dxfString);
@@ -331,9 +331,9 @@ test('Arc.getRadius returns the arc radius', () => {
   expect(arc.getRadius()).toBe(10);
 });
 
-test('Arc constructor loads from DXF group codes', () => {
-  const arc = new Arc({ points: [new Point(100, 100)], 40: 50, 50: 0, 51: 90 });
-  expect(arc.radius).toBe(50);
+test('Arc constructor loads from DXF group codes via fromDxf', () => {
+  const arc = new Arc(Arc.fromDxf({ points: [new Point(100, 100)], 40: 50, 50: 0, 51: 90 }));
+  expect(arc.getProperty('radius')).toBe(50);
   expect(arc.points[1].x).toBeCloseTo(150);
   expect(arc.points[1].y).toBeCloseTo(100);
   expect(arc.points[2].x).toBeCloseTo(100);
@@ -342,7 +342,7 @@ test('Arc constructor loads from DXF group codes', () => {
 
 test('Arc constructor loads direction from data', () => {
   const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)], direction: -1 });
-  expect(arc.direction).toBe(-1);
+  expect(arc.getProperty('direction')).toBe(-1);
 });
 
 test('Arc.toPolylinePoints handles a full circle (360 degrees)', () => {
@@ -419,7 +419,7 @@ test('Arc.execute handles negative angle (clockwise)', async () => {
     const arc = new Arc({});
     await arc.execute();
     expect(arc.points.length).toBe(3);
-    expect(arc.direction).toBe(-1);
+    expect(arc.getProperty('direction')).toBe(-1);
   });
 });
 
@@ -435,26 +435,24 @@ test('Arc.execute notifies on angle > 360', async () => {
 
 test('Arc.fromPolylinePoints round-trip preserves centre, radius and angles', () => {
   const arc = new Arc({ points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] });
-  arc.radius = 10;
   const polyPts = arc.toPolylinePoints();
   const rebuilt = new Arc({});
   rebuilt.fromPolylinePoints(polyPts);
   expect(rebuilt.points[0].x).toBeCloseTo(0, 10);
   expect(rebuilt.points[0].y).toBeCloseTo(0, 10);
-  expect(rebuilt.radius).toBeCloseTo(10, 10);
+  expect(rebuilt.getProperty('radius')).toBeCloseTo(10, 10);
   expect(rebuilt.startAngle()).toBeCloseTo(arc.startAngle(), 10);
   expect(rebuilt.endAngle()).toBeCloseTo(arc.endAngle(), 10);
 });
 
 test('Arc.fromPolylinePoints precision drift is negligible', () => {
   const arc = new Arc({ points: [new Point(50, 50), new Point(50, 50).project(0.7, 30), new Point(50, 50).project(2.1, 30)] });
-  arc.radius = 30;
   const polyPts = arc.toPolylinePoints();
   const rebuilt = new Arc({});
   rebuilt.fromPolylinePoints(polyPts);
   const centerDrift = Math.hypot(rebuilt.points[0].x - arc.points[0].x, rebuilt.points[0].y - arc.points[0].y);
   expect(centerDrift).toBeLessThan(1e-10);
-  expect(Math.abs(rebuilt.radius - arc.radius)).toBeLessThan(1e-10);
+  expect(Math.abs(rebuilt.getProperty('radius') - arc.getProperty('radius'))).toBeLessThan(1e-10);
 });
 
 test('Arc.snaps nearest does not fire when mouse is too far from arc', () => {
@@ -487,6 +485,47 @@ test('Arc.snaps returns no tangent when fromPoint is inside the arc radius', () 
   const snaps = arc.snaps(new Point(5, 5), 100);
   expect(snaps.filter((s) => s.type === 'tangent').length).toBe(0);
   DesignCore.Scene.inputManager.inputPoint = savedInputPoint;
+});
+
+describe('Arc.fromDxf', () => {
+  test('projects start and end points from DXF angle codes', () => {
+    const center = new Point(0, 0);
+    const result = Arc.fromDxf({ points: [center], 40: 10, 50: 0, 51: 90 });
+    expect(result.points.length).toBe(3);
+    expect(result.points[0]).toBe(center);
+    expect(result.points[1].x).toBeCloseTo(10); // project(0°, 10)
+    expect(result.points[1].y).toBeCloseTo(0);
+    expect(result.points[2].x).toBeCloseTo(0); // project(90°, 10)
+    expect(result.points[2].y).toBeCloseTo(10);
+  });
+
+  test('uses direction from data[73], defaults to 1', () => {
+    const result1 = Arc.fromDxf({ points: [new Point(0, 0)], 40: 10, 50: 0, 51: 90, 73: -1 });
+    expect(result1.direction).toBe(-1);
+
+    const result2 = Arc.fromDxf({ points: [new Point(0, 0)], 40: 10, 50: 0, 51: 90 });
+    expect(result2.direction).toBe(1);
+  });
+
+  test('preserves all other data properties', () => {
+    const result = Arc.fromDxf({ points: [new Point(0, 0)], 40: 10, 50: 0, 51: 90, 8: 'MyLayer', 6: 'ByLayer' });
+    expect(result[8]).toBe('MyLayer');
+    expect(result[6]).toBe('ByLayer');
+  });
+
+  test('returns data unchanged when no center point', () => {
+    const data = { 40: 10, 50: 0, 51: 90 };
+    expect(Arc.fromDxf(data)).toBe(data);
+  });
+
+  test('arc constructed via fromDxf matches arc constructed directly', () => {
+    const center = new Point(100, 100);
+    const fromDxfArc = new Arc(Arc.fromDxf({ points: [center], 40: 50, 50: 0, 51: 90 }));
+    const directArc = new Arc({ points: [center, new Point(150, 100), new Point(100, 150)] });
+    expect(fromDxfArc.getProperty('radius')).toBeCloseTo(directArc.getProperty('radius'));
+    expect(fromDxfArc.startAngle()).toBeCloseTo(directArc.startAngle());
+    expect(fromDxfArc.endAngle()).toBeCloseTo(directArc.endAngle());
+  });
 });
 
 test('Arc.snaps returns perpendicular snap when radial point is on the arc', () => {

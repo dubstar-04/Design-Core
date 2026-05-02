@@ -1,6 +1,7 @@
 
 import { Logging } from './logging.js';
 import { Constants } from './constants.js';
+import { Property } from '../properties/property.js';
 
 /** Utils Class */
 export class Utils {
@@ -114,8 +115,8 @@ export class Utils {
     }
 
     // Clear handle so a fresh unique handle is assigned when added to the scene
-    if (clone.handle !== undefined) {
-      clone.handle = undefined;
+    if (clone.getProperty?.(Property.Names.HANDLE) !== undefined) {
+      clone.setProperty?.(Property.Names.HANDLE, undefined);
     }
 
     return clone;
@@ -132,9 +133,8 @@ export class Utils {
   static cloneProperties(entity, properties = ['colour', 'layer', 'lineType', 'lineWidth', 'height', 'styleName', 'dimensionStyle', 'patternName', 'scale']) {
     const result = {};
     for (const prop of properties) {
-      const descriptor = Object.getOwnPropertyDescriptor(entity, prop);
-      if (descriptor && descriptor.enumerable) {
-        result[prop] = entity[prop];
+      if (entity.properties?.has(prop)) {
+        result[prop] = entity.getProperty(prop);
       }
     }
     return result;

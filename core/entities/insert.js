@@ -5,8 +5,8 @@ import { Block } from '../tables/block.js';
 import { BoundingBox } from '../lib/boundingBox.js';
 import { Point } from './point.js';
 import { Utils } from '../lib/utils.js';
-import { Property } from '../properties/property.js';
 import { Logging } from '../lib/logging.js';
+import { Property } from '../properties/property.js';
 
 import { DesignCore } from '../designCore.js';
 import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
@@ -34,59 +34,29 @@ export class Insert extends Entity {
       writable: true,
     });
 
-    // add rotation property with getter and setter
-    // needs to be enumerable to appear in the object props
-    Object.defineProperty(this, 'rotation', {
-      get: this.getRotation,
-      set: this.setRotation,
-      enumerable: true,
+    this.properties.add(Property.Names.ROTATION, {
+      type: Property.Type.NUMBER,
+      dxfCode: 50,
+      get: (entity) => entity.getRotation(),
+      set: (entity, value) => entity.setRotation(value),
+    });
+
+    this.properties.add(Property.Names.BLOCKNAME, {
+      type: Property.Type.LABEL,
+      readOnly: true,
+      get: (entity) => entity.block?.name ?? '',
     });
 
     if (data) {
-      if (data.hasOwnProperty('blockName') || data.hasOwnProperty('2')) {
-        // DXF Groupcode 2 - Block name
-
-        const blockName = data.blockName || data[2];
-        const block = DesignCore.Scene.blockManager.getItemByName(blockName);
+      // DXF Groupcode 2 - Block name
+      if (data.blockName !== undefined) {
+        const block = DesignCore.Scene.blockManager.getItemByName(data.blockName);
         this.block = block;
       }
 
-      if (data.hasOwnProperty('41')) {
-        // DXF Groupcode 41 - X Scale Factor (optional, default = 1)
-        const err = 'Groupcode 41 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
-      }
-
-      if (data.hasOwnProperty('42')) {
-        // DXF Groupcode 42 - Y Scale Factor (optional, default = 1)
-        const err = 'Groupcode 42 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
-      }
-
-      if (data.hasOwnProperty('43')) {
-        // DXF Groupcode 43 - Z Scale Factor (optional, default = 1)
-        const err = 'Groupcode 43 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
-      }
-
-      if (data.hasOwnProperty('44')) {
-        // DXF Groupcode 44 - Column Spacing (optional, default = 0)
-        const err = 'Groupcode 44 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
-      }
-
-      if (data.hasOwnProperty('45')) {
-        // DXF Groupcode 45 - Row Spacing (optional, default = 0)
-        const err = 'Groupcode 45 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
-      }
-
-      if (data.hasOwnProperty('rotation') || data.hasOwnProperty('50')) {
-        // DXF Groupcode 50 - Text Rotation, angle in degrees
-        // if we get rotation data store this as a point[1] at an angle from point[0]
-        // this allows all the entities to be rotated by rotating the points i.e. not all entities have a rotation property
-
-        this.setRotation(Property.loadValue([data.rotation, data[50]], 0));
+      // Named scalar rotation (internal API); DXF code 50 is handled by fromDxf
+      if (data.rotation !== undefined) {
+        this.setRotation(data.rotation);
       } else {
         // create points[1] used to determine the rotation
         if (this.points[0] === undefined) {
@@ -94,18 +64,6 @@ export class Insert extends Entity {
         }
 
         this.points[1] = this.points[0].add(new Point(10, 0));
-      }
-
-      if (data.hasOwnProperty('70')) {
-        // DXF Groupcode 70 - Column Count (optional, default = 1)
-        const err = 'Groupcode 70 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
-      }
-
-      if (data.hasOwnProperty('71')) {
-        // DXF Groupcode 71 - Row Count(optional, default = 1)
-        const err = 'Groupcode 71 not implemented';
-        Logging.instance.warn(`${this.type} - ${err}`);
       }
     }
   }
@@ -120,6 +78,40 @@ export class Insert extends Entity {
   static register() {
     const command = { command: 'Insert' };
     return command;
+  }
+
+  /**
+   * Normalise raw DXF data before construction
+   * @param {Object} data - raw DXF group code object
+   * @return {Object} normalised data with blockName and rotation encoded as points[1]
+   *
+   * Handles:
+   * - Group code 2: block name
+   * - Group code 50: rotation angle (degrees) encoded into points[1]
+   * - Group codes 41–45, 70, 71: unimplemented — logged as warnings
+   */
+  static fromDxf(data) {
+    const normalised = { ...data };
+
+    // DXF group code 2 - Block name
+    if (data[2] !== undefined) {
+      normalised.blockName = data[2];
+    }
+
+    // DXF group code 50 - rotation angle in degrees; encode into points
+    if (data[50] !== undefined) {
+      normalised.rotation = data[50];
+    }
+
+    // Unimplemented group codes
+    const unimplemented = { 41: 'X Scale Factor', 42: 'Y Scale Factor', 43: 'Z Scale Factor', 44: 'Column Spacing', 45: 'Row Spacing', 70: 'Column Count', 71: 'Row Count' };
+    for (const [code, label] of Object.entries(unimplemented)) {
+      if (data[code] !== undefined) {
+        Logging.instance.warn(`Insert - Groupcode ${code} (${label}) not implemented`);
+      }
+    }
+
+    return normalised;
   }
 
   /**
@@ -144,17 +136,17 @@ export class Insert extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'INSERT');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
     this.writeDxfColour(file);
     file.writeGroupCode('100', 'AcDbBlockReference', DXFFile.Version.R2000);
     file.writeGroupCode('2', this.block.name);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
-    if (this.rotation) {
-      file.writeGroupCode('50', this.rotation);
+    if (this.getProperty(Property.Names.ROTATION)) {
+      file.writeGroupCode('50', this.getProperty(Property.Names.ROTATION));
     }
   }
 
@@ -166,7 +158,7 @@ export class Insert extends Entity {
   draw(renderer) {
     // blocks are associated with an insert point.
     // Apply the insert location and rotation so block items draw correctly.
-    renderer.applyTransform({ x: this.points[0].x, y: this.points[0].y, rotation: Utils.degrees2radians(this.rotation) });
+    renderer.applyTransform({ x: this.points[0].x, y: this.points[0].y, rotation: Utils.degrees2radians(this.getRotation()) });
     return this.block.items;
   }
 
@@ -215,7 +207,7 @@ export class Insert extends Entity {
       // offset the item snap point by the block insert location
       const rotatedPoint = sp.snapPoint.add(this.points[0]);
       // rotate the snap point to match the item positions
-      const adjustedPoint = rotatedPoint.rotate(this.points[0], Utils.degrees2radians(this.rotation));
+      const adjustedPoint = rotatedPoint.rotate(this.points[0], Utils.degrees2radians(this.getRotation()));
       snaps.push(new SnapPoint(adjustedPoint, sp.type));
     }
 
@@ -243,7 +235,7 @@ export class Insert extends Entity {
   closestPoint(P) {
     // get the closest point from the blocks entities
     // rotate P to match the block rotation
-    const rotatedPoint = P.rotate(this.points[0], Utils.degrees2radians(-this.rotation));
+    const rotatedPoint = P.rotate(this.points[0], Utils.degrees2radians(-this.getRotation()));
     // adjust P by the insert position
     const adjustedPoint = rotatedPoint.subtract(this.points[0]);
     return this.block.closestPoint(adjustedPoint);
@@ -266,7 +258,7 @@ export class Insert extends Entity {
    * @return {boolean} true if touched
    */
   touched(selection) {
-    const layer = DesignCore.LayerManager.getItemByName(this.layer);
+    const layer = DesignCore.LayerManager.getItemByName(this.getProperty(Property.Names.LAYER));
 
     if (!layer?.isSelectable) {
       return;

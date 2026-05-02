@@ -30,6 +30,7 @@ export class DXF {
     this.reader.read(data);
   }
 
+
   /**
    * Write
    * @param {string} version
@@ -302,12 +303,12 @@ export class DXF {
           const command = child[0];
           // check if the child is a valid entity
           if (DesignCore.CommandManager.isCommand(command)) {
-            // create an instance of the child entity
             const item = DesignCore.CommandManager.createNew(command, child);
 
             // Register the child entity handle
-            if (item.handle) {
-              DesignCore.HandleManager.checkHandle(item.handle);
+            const itemHandle = item?.getProperty?.('handle') ?? item?.handle;
+            if (itemHandle) {
+              DesignCore.HandleManager.checkHandle(itemHandle);
             }
 
             if (block.hasOwnProperty('items') === false) {

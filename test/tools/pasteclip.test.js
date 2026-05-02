@@ -94,7 +94,7 @@ describe('Pasteclip Tool', () => {
     expect(pasted.points[0].y).toBe(0);
 
     // Verify pasted entity has a unique handle
-    expect(newEntity.handle).toBeDefined();
-    expect(newEntity.handle).not.toBe(line.handle);
+    expect(newEntity.getProperty('handle')).toBeDefined();
+    expect(newEntity.getProperty('handle')).not.toBe(line.getProperty('handle'));
   });
 });

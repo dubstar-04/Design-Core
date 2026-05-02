@@ -87,7 +87,7 @@ AcDbBlockReference
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newInsert = new Insert(insert);
+  const newInsert = new Insert({ handle: insert.getProperty('handle'), points: insert.points });
   file = new File();
   newInsert.dxf(file);
   expect(file.contents).toEqual(dxfString);
@@ -162,5 +162,34 @@ describe('Test Insert.draw', () => {
     ins.block.addItem(line);
     expect(ins.draw(makeMockCtx())).toBe(ins.block.items);
     expect(ins.draw(makeMockCtx())).toBe(ins.block.items);
+  });
+});
+
+describe('Insert.fromDxf', () => {
+  test('maps group code 2 to blockName', () => {
+    const data = Insert.fromDxf({ points: [new Point(0, 0)], 2: 'MYBLOCK' });
+    expect(data.blockName).toBe('MYBLOCK');
+  });
+
+  test('maps group code 50 to rotation', () => {
+    const data = Insert.fromDxf({ points: [new Point(0, 0)], 50: 45 });
+    expect(data.rotation).toBe(45);
+  });
+
+  test('preserves other properties unchanged', () => {
+    const data = Insert.fromDxf({ points: [new Point(1, 2)], layer: 'TEST', 2: 'BLK' });
+    expect(data.layer).toBe('TEST');
+    expect(data.points[0].x).toBe(1);
+  });
+
+  test('result with rotation is equivalent to direct construction', () => {
+    const pt = new Point(5, 10);
+    const i1 = new Insert(Insert.fromDxf({ points: [pt], 50: 90 }));
+    const i2 = new Insert({ points: [pt], rotation: 90 });
+    expect(i1.getProperty('rotation')).toBeCloseTo(i2.getProperty('rotation'));
+  });
+
+  test('unimplemented codes do not throw', () => {
+    expect(() => Insert.fromDxf({ points: [new Point()], 41: 2, 42: 2, 43: 2, 44: 5, 45: 5, 70: 2, 71: 3 })).not.toThrow();
   });
 });

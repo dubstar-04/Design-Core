@@ -7,6 +7,7 @@ import { Point } from '../entities/point.js';
 import { BaseLinearDimension } from './baseLinearDimension.js';
 
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 
 
 /**
@@ -42,7 +43,7 @@ export class AlignedDimension extends BaseLinearDimension {
   async execute() {
     try {
       DesignCore.Scene.selectionManager.reset();
-      this.dimensionStyle = DesignCore.DimStyleManager.getCstyle();
+      this.setProperty(Property.Names.DIMENSIONSTYLE, DesignCore.DimStyleManager.getCstyle());
       this.dimType.setDimType(1); // Aligned dimension
 
       const op = new PromptOptions(Strings.Input.START, [Input.Type.POINT]);
@@ -118,10 +119,10 @@ export class AlignedDimension extends BaseLinearDimension {
     const Pt14 = this.getPointBySequence(this.points, 14);
 
     file.writeGroupCode('0', 'DIMENSION');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbDimension', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
     // file.writeGroupCode('2', this.blockName);  // Block not required
     file.writeGroupCode('10', Pt10.x); // X - definition / arrow point
     file.writeGroupCode('20', Pt10.y); // Y
@@ -130,7 +131,7 @@ export class AlignedDimension extends BaseLinearDimension {
     file.writeGroupCode('21', Pt11.y); // Y
     file.writeGroupCode('31', '0.0'); // Z
     file.writeGroupCode('70', this.dimType.getDimType()); // DIMENSION TYPE
-    file.writeGroupCode('3', this.dimensionStyle); // DIMENSION STYLE
+    file.writeGroupCode('3', this.getProperty(Property.Names.DIMENSIONSTYLE)); // DIMENSION STYLE
     file.writeGroupCode('100', 'AcDbAlignedDimension', DXFFile.Version.R2000);
     file.writeGroupCode('13', Pt13.x); // X - start point of first extension line
     file.writeGroupCode('23', Pt13.y); // Y

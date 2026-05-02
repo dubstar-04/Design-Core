@@ -231,8 +231,8 @@ test('Test Mirror.action - keep source (default)', () => {
   for (let i = 0; i < entityCount; i++) {
     const original = core.scene.entities.get(i);
     const copy = core.scene.entities.get(i + entityCount);
-    expect(copy.handle).toBeDefined();
-    expect(copy.handle).not.toBe(original.handle);
+    expect(copy.getProperty('handle')).toBeDefined();
+    expect(copy.getProperty('handle')).not.toBe(original.getProperty('handle'));
   }
 });
 
@@ -310,8 +310,8 @@ test('Test Mirror.action - arc direction is reversed', () => {
   const original = core.scene.entities.get(0);
   const mirrored = core.scene.entities.get(1);
 
-  expect(original.direction).toBe(1);
-  expect(mirrored.direction).toBe(-1);
+  expect(original.getProperty('direction')).toBe(1);
+  expect(mirrored.getProperty('direction')).toBe(-1);
 });
 
 test('Test Mirror.getMirroredPoints', () => {
@@ -467,9 +467,9 @@ test('Mirror.preview - reverses direction for entities with a direction property
   mirror.preview();
 
   // Original entity direction is unchanged
-  expect(core.scene.entities.get(0).direction).toBe(1);
+  expect(core.scene.entities.get(0).getProperty('direction')).toBe(1);
 
   // Preview copy has direction reversed
   const previewItem = core.scene.selectionManager.selectedItems[0];
-  expect(previewItem.direction).toBe(-1);
+  expect(previewItem.getProperty('direction')).toBe(-1);
 });

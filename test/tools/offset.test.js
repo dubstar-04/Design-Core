@@ -268,7 +268,7 @@ test('Test Offset.action - offset circle outward', () => {
   expect(newCircle.points[0].x).toBeCloseTo(0);
   expect(newCircle.points[0].y).toBeCloseTo(0);
   // New radius should be 15
-  expect(newCircle.radius).toBeCloseTo(15);
+  expect(newCircle.getProperty('radius')).toBeCloseTo(15);
 });
 
 test('Test Offset.action - offset circle inward', () => {
@@ -287,7 +287,7 @@ test('Test Offset.action - offset circle inward', () => {
   const newCircle = core.scene.entities.get(1);
   expect(newCircle.points[0].x).toBeCloseTo(0);
   expect(newCircle.points[0].y).toBeCloseTo(0);
-  expect(newCircle.radius).toBeCloseTo(7);
+  expect(newCircle.getProperty('radius')).toBeCloseTo(7);
 });
 
 test('Test Offset.action - offset circle inward returns null when radius would be zero', () => {
@@ -465,7 +465,7 @@ test('Test Offset.getOffsetPoints - arc inward offset shrinks radius', () => {
   expect(result).not.toBeNull();
   const rebuilt = new Arc({});
   rebuilt.fromPolylinePoints(result);
-  expect(rebuilt.radius).toBeCloseTo(7);
+  expect(rebuilt.getProperty('radius')).toBeCloseTo(7);
 });
 
 test('Test Offset.getOffsetPoints - arc returns null when inward offset collapses radius', () => {
@@ -909,7 +909,7 @@ test('Offset.execute - Through mode offsets circle to the through point', async 
   expect(core.scene.headers.offsetDistance).toBeCloseTo(5);
   expect(core.scene.entities.count()).toBe(2);
   const newCircle = core.scene.entities.get(1);
-  expect(newCircle.radius).toBeCloseTo(15); // original 10 + outward 5
+  expect(newCircle.getProperty('radius')).toBeCloseTo(15); // original 10 + outward 5
 
   core.scene.inputManager = origInputManager;
 });

@@ -362,7 +362,7 @@ ByLayer
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newPolyline = new Polyline(polyline);
+  const newPolyline = new Polyline({ handle: polyline.getProperty('handle'), points: polyline.points });
   file = new File();
   newPolyline.dxf(file);
 

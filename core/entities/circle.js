@@ -5,10 +5,9 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
-import { Property } from '../properties/property.js';
-
 import { DesignCore } from '../designCore.js';
 
+import { Property } from '../properties/property.js';
 import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
 import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
@@ -26,19 +25,20 @@ export class Circle extends Entity {
   constructor(data) {
     super(data);
 
-    // add radius property with getter and setter
-    // needs to be enumerable to appear in the object props
-    Object.defineProperty(this, 'radius', {
-      get: this.getRadius,
-      set: this.setRadius,
-      enumerable: true,
+    // radius: computed from points — stored in EntityProperties
+    this.properties.add(Property.Names.RADIUS, {
+      type: Property.Type.NUMBER,
+      get: (entity) => entity.points[1] ? entity.points[0].distance(entity.points[1]) : 0,
+      set: (entity, rad) => {
+        entity.points[1] = entity.points[0].project(0, rad);
+      },
+      dxfCode: 40,
     });
 
-    if (data) {
-      if (data.hasOwnProperty('radius') || data.hasOwnProperty('40')) {
-        // DXF Groupcode 40 - Radius
-        this.setRadius(Property.loadValue([data.radius, data[40]], 0));
-      }
+    // Named scalar radius (internal API / named prop) — projects points[1] from center.
+    // Full-points data (post-execute or post-fromDxf) skips this.
+    if (data?.radius !== undefined && this.points.length < 2) {
+      this.setRadius(data.radius);
     }
   }
 
@@ -52,6 +52,21 @@ export class Circle extends Entity {
   static register() {
     const command = { command: 'Circle', shortcut: 'C', type: 'Entity' };
     return command;
+  }
+
+  /**
+   * Normalise DXF group codes into the canonical points-based representation.
+   * Called by the DXF loader before construction.
+   * @param {Object} data
+   * @return {Object}
+   */
+  static fromDxf(data) {
+    const center = data.points?.[0];
+    if (!center || data[40] === undefined) return data;
+    return {
+      ...data,
+      points: [center, center.project(0, data[40])],
+    };
   }
 
   /**
@@ -153,17 +168,17 @@ export class Circle extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'CIRCLE');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbCircle', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
-    file.writeGroupCode('6', this.lineType);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
+    file.writeGroupCode('6', this.getProperty(Property.Names.LINETYPE));
     this.writeDxfColour(file);
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');
-    file.writeGroupCode('39', this.lineWidth);
-    file.writeGroupCode('40', this.radius);
+    file.writeGroupCode('39', this.getProperty(Property.Names.LINEWIDTH));
+    file.writeGroupCode('40', this.getProperty(Property.Names.RADIUS));
   }
 
   /**
@@ -171,11 +186,12 @@ export class Circle extends Entity {
    * @return {Array}
    */
   toPolylinePoints() {
-    const startPoint = this.points[0].project(0, this.radius);
+    const radius = this.getProperty(Property.Names.RADIUS);
+    const startPoint = this.points[0].project(0, radius);
     startPoint.bulge = 1;
-    const endPoint = this.points[0].project(0, -this.radius);
+    const endPoint = this.points[0].project(0, -radius);
     endPoint.bulge = 1;
-    const closurePoint = this.points[0].project(0, this.radius);
+    const closurePoint = this.points[0].project(0, radius);
     return [startPoint, endPoint, closurePoint];
   }
 
@@ -195,7 +211,7 @@ export class Circle extends Entity {
       return this;
     }
     const arc = DesignCore.CommandManager.createNew('Arc', this);
-    arc.handle = undefined;
+    arc.setProperty('handle', undefined);
     arc.fromPolylinePoints(points);
     return arc;
   }
@@ -211,13 +227,14 @@ export class Circle extends Entity {
 
     const centre = this.points[0]; // circle centre point
 
+    const radius = this.getProperty(Property.Names.RADIUS);
     snaps.push(new SnapPoint(centre, SnapPoint.Type.CENTRE));
 
     snaps.push(
-        new SnapPoint(new Point(centre.x + this.radius, centre.y), SnapPoint.Type.QUADRANT), // 0°
-        new SnapPoint(new Point(centre.x, centre.y + this.radius), SnapPoint.Type.QUADRANT), // 90°
-        new SnapPoint(new Point(centre.x - this.radius, centre.y), SnapPoint.Type.QUADRANT), // 180°
-        new SnapPoint(new Point(centre.x, centre.y - this.radius), SnapPoint.Type.QUADRANT), // 270°
+        new SnapPoint(new Point(centre.x + radius, centre.y), SnapPoint.Type.QUADRANT), // 0°
+        new SnapPoint(new Point(centre.x, centre.y + radius), SnapPoint.Type.QUADRANT), // 90°
+        new SnapPoint(new Point(centre.x - radius, centre.y), SnapPoint.Type.QUADRANT), // 180°
+        new SnapPoint(new Point(centre.x, centre.y - radius), SnapPoint.Type.QUADRANT), // 270°
     );
 
     if (mousePoint) {
@@ -234,16 +251,16 @@ export class Circle extends Entity {
       const angleFromCentreToInput = centre.angle(fromPoint); // angle from centre toward fromPoint
 
       // Tangent: only possible when fromPoint is outside the circle radius
-      if (distanceToCenter > this.radius) {
-        const tangentHalfAngle = Math.acos(this.radius / distanceToCenter); // half-angle between the two tangent directions
+      if (distanceToCenter > radius) {
+        const tangentHalfAngle = Math.acos(radius / distanceToCenter); // half-angle between the two tangent directions
 
-        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput + tangentHalfAngle, this.radius), SnapPoint.Type.TANGENT));
-        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput - tangentHalfAngle, this.radius), SnapPoint.Type.TANGENT));
+        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput + tangentHalfAngle, radius), SnapPoint.Type.TANGENT));
+        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput - tangentHalfAngle, radius), SnapPoint.Type.TANGENT));
       }
 
       // Perpendicular: point on the circle that lies on the line from fromPoint through the centre
       if (distanceToCenter > 0) {
-        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput, this.radius), SnapPoint.Type.PERPENDICULAR));
+        snaps.push(new SnapPoint(centre.project(angleFromCentreToInput, radius), SnapPoint.Type.PERPENDICULAR));
       }
     }
 
@@ -268,10 +285,11 @@ export class Circle extends Entity {
    * @return {BoundingBox}
    */
   boundingBox() {
-    const xmin = this.points[0].x - this.radius;
-    const xmax = this.points[0].x + this.radius;
-    const ymin = this.points[0].y - this.radius;
-    const ymax = this.points[0].y + this.radius;
+    const radius = this.getProperty(Property.Names.RADIUS);
+    const xmin = this.points[0].x - radius;
+    const xmax = this.points[0].x + radius;
+    const ymin = this.points[0].y - radius;
+    const ymax = this.points[0].y + radius;
 
     const topLeft = new Point(xmin, ymax);
     const bottomRight = new Point(xmax, ymin);

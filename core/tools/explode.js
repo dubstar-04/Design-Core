@@ -92,13 +92,13 @@ export class Explode extends Tool {
       const block = insert.block;
       const blockItems = block.items;
 
-      const rotation = Utils.degrees2radians(insert.rotation);
+      const rotation = Utils.degrees2radians(insert.getProperty('rotation'));
       const origin = new Point(0, 0);
 
       blockItems.forEach((blockItem) => {
         const copyofitem = Utils.cloneObject(blockItem);
         const points = copyofitem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(origin, rotation).add(insertPoint));
-        copyofitem.setProperty('points', points);
+        copyofitem.points = points;
         const stateChange = new AddState(copyofitem);
         stateChanges.push(stateChange);
       });

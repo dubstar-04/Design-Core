@@ -26,46 +26,32 @@ export class Arc extends Entity {
    */
   constructor(data) {
     super(data);
-    this.radius = 1;
 
-    // direction: - ccw > 0, cw <= 0
-    // default to 1 - counter clockwise
-    Object.defineProperty(this, 'direction', {
-      value: 1,
-      writable: true,
-    });
-
-    if (data) {
-      if (data.hasOwnProperty('points') || data.hasOwnProperty('40')) {
-        // DXF Groupcode 40 - Radius
-        // get the radius from the points or the incoming dxf groupcode
-        const radius = this.points[1] ? this.points[0].distance(this.points[1]) : data[40];
-
-        if (radius !== undefined) {
-          this.radius = radius;
-        }
+    // If only the center point is present, project start/end from named scalar properties.
+    // Full-points data (post-execute or post-fromDxf) skips this block entirely.
+    if (data && this.points.length < 2) {
+      const radius = data.radius ?? 1;
+      if (data.hasOwnProperty('startAngle')) {
+        this.points[1] = this.points[0].project(Utils.degrees2radians(data.startAngle), radius);
       }
-
-      if (data.hasOwnProperty('startAngle') || data.hasOwnProperty('50')) {
-        // DXF Groupcode 50 - Start Angle
-
-        const angle = Property.loadValue([data.startAngle, data[50]], 0);
-        const projectionAngle = Utils.degrees2radians(angle);
-        this.points[1] = this.points[0].project(projectionAngle, this.radius);
-      }
-
-      if (data.hasOwnProperty('endAngle') || data.hasOwnProperty('51')) {
-        // DXF Groupcode 51 - End Angle
-        const angle = Property.loadValue([data.endAngle, data[51]], 0);
-        const projectionAngle = Utils.degrees2radians(angle);
-        this.points[2] = this.points[0].project(projectionAngle, this.radius);
-      }
-
-      if (data.hasOwnProperty('direction') || data.hasOwnProperty('73')) {
-        // No DXF Groupcode - Arc Direction
-        this.direction = Property.loadValue([data.direction, data[73]], 1);
+      if (data.hasOwnProperty('endAngle')) {
+        this.points[2] = this.points[0].project(Utils.degrees2radians(data.endAngle), radius);
       }
     }
+
+    // direction: ccw > 0, cw <= 0
+    this.properties.add(Property.Names.DIRECTION, {
+      type: Property.Type.NUMBER,
+      value: data?.direction ?? 1,
+      dxfCode: 73,
+    });
+
+    // radius: computed from points — stored in EntityProperties
+    this.properties.add(Property.Names.RADIUS, {
+      type: Property.Type.NUMBER,
+      get: (entity) => entity.points[1] ? entity.points[0].distance(entity.points[1]) : 1,
+      dxfCode: 40,
+    });
   }
 
   /**
@@ -78,6 +64,30 @@ export class Arc extends Entity {
   static register() {
     const command = { command: 'Arc', shortcut: 'A', type: 'Entity' };
     return command;
+  }
+
+  /**
+   * Normalise DXF group codes into the canonical points-based representation.
+   * Called by the DXF loader before construction.
+   * @param {Object} data
+   * @return {Object}
+   */
+  static fromDxf(data) {
+    const center = data.points?.[0];
+    if (!center) return data;
+    // validate required group codes for points-based arc representation are present
+    if (data[40] === undefined || data[50] === undefined || data[51] === undefined) return data;
+
+    const radius = data[40];
+    return {
+      ...data,
+      points: [
+        center,
+        center.project(Utils.degrees2radians(data[50] ?? 0), radius),
+        center.project(Utils.degrees2radians(data[51] ?? 0), radius),
+      ],
+      direction: data[73] ?? 1,
+    };
   }
 
   /**
@@ -103,7 +113,6 @@ export class Arc extends Entity {
         break;
       }
       this.points.push(pt1);
-      this.radius = this.points[0].distance(pt1);
 
       let pt2;
       while (true) {
@@ -122,7 +131,7 @@ export class Arc extends Entity {
           }
 
           const angle = this.points[0].angle(pt2);
-          const projectedEnd = this.points[0].project(angle, this.radius);
+          const projectedEnd = this.points[0].project(angle, this.getProperty(Property.Names.RADIUS));
           if (projectedEnd.isSame(this.points[1])) {
             DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDPOINT}`);
             continue;
@@ -131,7 +140,7 @@ export class Arc extends Entity {
 
           // Infer arc direction using cross product if we have 3 points
           if (this.points.length === 3) {
-            this.direction = Arc.#inferDirection(this.points[0], this.points[1], this.points[2]);
+            this.setProperty(Property.Names.DIRECTION, Arc.#inferDirection(this.points[0], this.points[1], this.points[2]));
             // Check total angle > 1 degree
             if (Math.abs(this.totalAngle) <= 1) {
               this.points.pop(); // Remove invalid end point
@@ -153,7 +162,7 @@ export class Arc extends Entity {
           const point = startPoint.rotate(basePoint, angle);
           this.points.push(point);
           // Set direction based on sign of angle
-          this.direction = angle >= 0 ? 1 : -1;
+          this.setProperty(Property.Names.DIRECTION, angle >= 0 ? 1 : -1);
           // Check total angle > 1 degree
           if (Math.abs(this.totalAngle) <= 1) {
             this.points.pop(); // Remove invalid end point
@@ -185,7 +194,7 @@ export class Arc extends Entity {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       // const points = [...this.points, mousePoint];
       const center = this.points[0];
-      const endPoint = center.project(center.angle(mousePoint), this.radius);
+      const endPoint = center.project(center.angle(mousePoint), this.getProperty(Property.Names.RADIUS));
       if (endPoint.isSame(this.points[1])) return;
       const points = [...this.points, endPoint];
 
@@ -250,7 +259,7 @@ export class Arc extends Entity {
     let endAngle = this.endAngle();
 
 
-    if (this.direction > 0) {
+    if (this.getProperty(Property.Names.DIRECTION) > 0) {
       if (startAngle > endAngle || startAngle === endAngle) {
         endAngle += (Math.PI * 2);
       }
@@ -267,7 +276,7 @@ export class Arc extends Entity {
    * @return {number} - arc radius
    */
   getRadius() {
-    return this.radius;
+    return this.getProperty(Property.Names.RADIUS);
   }
 
   /**
@@ -289,19 +298,19 @@ export class Arc extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'ARC');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbCircle', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer); // LAYERNAME
-    file.writeGroupCode('6', this.lineType); // LINETYPE
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER)); // LAYERNAME
+    file.writeGroupCode('6', this.getProperty(Property.Names.LINETYPE)); // LINETYPE
     file.writeGroupCode('10', this.points[0].x); // X
     file.writeGroupCode('20', this.points[0].y); // Y
     file.writeGroupCode('30', '0.0'); // Z
-    file.writeGroupCode('39', this.lineWidth); // Line Width
-    file.writeGroupCode('40', this.radius); // Radius
+    file.writeGroupCode('39', this.getProperty(Property.Names.LINEWIDTH)); // Line Width
+    file.writeGroupCode('40', this.getProperty(Property.Names.RADIUS)); // Radius
     file.writeGroupCode('100', 'AcDbArc', DXFFile.Version.R2000);
-    file.writeGroupCode('50', Utils.radians2degrees(this.direction > 0 ? this.startAngle() : this.endAngle())); // Start Angle
-    file.writeGroupCode('51', Utils.radians2degrees(this.direction > 0 ? this.endAngle() : this.startAngle())); // End Angle
+    file.writeGroupCode('50', Utils.radians2degrees(this.getProperty(Property.Names.DIRECTION) > 0 ? this.startAngle() : this.endAngle())); // Start Angle
+    file.writeGroupCode('51', Utils.radians2degrees(this.getProperty(Property.Names.DIRECTION) > 0 ? this.endAngle() : this.startAngle())); // End Angle
   }
 
   /**
@@ -314,19 +323,20 @@ export class Arc extends Entity {
 
     // If the arc forms a complete circle
     // Split into two separate polyline arcs
+    const radius = this.getProperty(Property.Names.RADIUS);
     if (Math.abs(this.totalAngle) === 360) {
-      const startPoint = this.points[0].project(0, this.radius);
+      const startPoint = this.points[0].project(0, radius);
       startPoint.bulge = 1;
-      const endPoint = this.points[0].project(0, -this.radius);
+      const endPoint = this.points[0].project(0, -radius);
       endPoint.bulge = 1;
-      const closurePoint = this.points[0].project(0, this.radius);
+      const closurePoint = this.points[0].project(0, radius);
       return [startPoint, endPoint, closurePoint];
     }
 
-    const startPoint = this.points[0].project(this.startAngle(), this.radius);
+    const startPoint = this.points[0].project(this.startAngle(), radius);
     const bulge = Math.tan(Utils.degrees2radians(-this.totalAngle % 360) / 4);
     startPoint.bulge = bulge;
-    const endPoint = this.points[0].project(this.endAngle(), this.radius);
+    const endPoint = this.points[0].project(this.endAngle(), radius);
     return [startPoint, endPoint];
   }
 
@@ -337,9 +347,7 @@ export class Arc extends Entity {
    */
   fromPolylinePoints(points) {
     const center = points[0].bulgeCentrePoint(points[1]);
-    const radius = center.distance(points[0]);
     this.points = [center, new Point(points[0].x, points[0].y), new Point(points.at(-1).x, points.at(-1).y)];
-    this.radius = radius;
     return this;
   }
 
@@ -374,12 +382,14 @@ export class Arc extends Entity {
       const angleFromCentreToInput = centre.angle(fromPoint); // angle from centre toward fromPoint
 
       // Tangent: only possible when fromPoint is outside the arc radius
-      if (distanceToCenter > this.radius) {
-        const tangentHalfAngle = Math.acos(this.radius / distanceToCenter); // half-angle between the two tangent directions
+      const radius = this.getProperty(Property.Names.RADIUS);
+      const direction = this.getProperty(Property.Names.DIRECTION);
+      if (distanceToCenter > radius) {
+        const tangentHalfAngle = Math.acos(radius / distanceToCenter); // half-angle between the two tangent directions
 
         for (const sign of [1, -1]) {
-          const tangentPoint = centre.project(angleFromCentreToInput + sign * tangentHalfAngle, this.radius);
-          if (tangentPoint.isOnArc(this.points[1], this.points[2], centre, this.direction)) {
+          const tangentPoint = centre.project(angleFromCentreToInput + sign * tangentHalfAngle, radius);
+          if (tangentPoint.isOnArc(this.points[1], this.points[2], centre, direction)) {
             snaps.push(new SnapPoint(tangentPoint, SnapPoint.Type.TANGENT));
           }
         }
@@ -387,8 +397,8 @@ export class Arc extends Entity {
 
       // Perpendicular: point on the arc that lies on the line from fromPoint through the centre
       if (distanceToCenter > 0) {
-        const perpendicularPoint = centre.project(angleFromCentreToInput, this.radius);
-        if (perpendicularPoint.isOnArc(this.points[1], this.points[2], centre, this.direction)) {
+        const perpendicularPoint = centre.project(angleFromCentreToInput, radius);
+        if (perpendicularPoint.isOnArc(this.points[1], this.points[2], centre, direction)) {
           snaps.push(new SnapPoint(perpendicularPoint, SnapPoint.Type.PERPENDICULAR));
         }
       }
@@ -407,7 +417,7 @@ export class Arc extends Entity {
     const endPoint = this.points[2];
     const centerPoint = this.points[0];
 
-    const pnt = P.closestPointOnArc(startPoint, endPoint, centerPoint, this.direction);
+    const pnt = P.closestPointOnArc(startPoint, endPoint, centerPoint, this.getProperty(Property.Names.DIRECTION));
 
     if (pnt !== null) {
       const distance = P.distance(pnt);
@@ -423,6 +433,6 @@ export class Arc extends Entity {
    * @return {BoundingBox}
    */
   boundingBox() {
-    return BoundingBox.arcBoundingBox(this.points[0], this.points[1], this.points[2], this.direction);
+    return BoundingBox.arcBoundingBox(this.points[0], this.points[1], this.points[2], this.getProperty(Property.Names.DIRECTION));
   }
 }

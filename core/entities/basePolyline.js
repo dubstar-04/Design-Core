@@ -76,6 +76,14 @@ export class BasePolyline extends Entity {
 
     this.flags.setFlagValue(Property.loadValue([data?.flags, data?.[70]], 0));
 
+    // DXF Groupcode 70 bit 1 - closed flag exposed via EntityProperties
+    this.properties.add(Property.Names.CLOSED, {
+      type: Property.Type.BOOLEAN,
+      get: (entity) => entity.flags.hasFlag(1),
+      set: (entity, value) => value ? entity.flags.addValue(1) : entity.flags.removeValue(1),
+      dxfCode: 70,
+    });
+
     // If the first and last points are the same the polyline should be considered closed.
     // Require at least 4 points so that after removing the duplicate endpoint at least 3 remain.
     if (this.points.length >= 4 && this.points[0].isSame(this.points.at(-1))) {
@@ -189,12 +197,12 @@ export class BasePolyline extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'LWPOLYLINE');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbPolyline', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer); // LAYERNAME
-    file.writeGroupCode('6', this.lineType);
-    file.writeGroupCode('39', this.lineWidth);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER)); // LAYERNAME
+    file.writeGroupCode('6', this.getProperty(Property.Names.LINETYPE));
+    file.writeGroupCode('39', this.getProperty(Property.Names.LINEWIDTH));
     file.writeGroupCode('90', this.points.length);
     file.writeGroupCode('70', this.flags.getFlagValue());
     for (let i = 0; i < this.points.length; i++) {

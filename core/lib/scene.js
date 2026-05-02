@@ -8,7 +8,7 @@ import { Headers } from './headers.js';
 
 import { DesignCore } from '../designCore.js';
 import { BlockManager } from '../tables/blockManager.js';
-import { AddState, StateManager, UpdateState } from './stateManager.js';
+import { AddState, StateManager, UpdateState, ReplaceState } from './stateManager.js';
 
 /**
  * Scene Class
@@ -87,7 +87,7 @@ export class Scene {
       this.reset();
       return;
     }
-    // Create a new item, send it the points array
+    // Create a new item from plain data
     const item = DesignCore.CommandManager.createNew(type, data);
 
     if (typeof index === 'undefined') {
@@ -104,6 +104,25 @@ export class Scene {
 
     // return the index of the added item
     return index;
+  }
+
+  /**
+   * Add an already-constructed entity to the scene.
+   * Used by the input manager where the entity is built interactively;
+   * skips createNew so EntityProperties values are preserved.
+   * @param {Entity} entity - constructed entity instance
+   * @param {number} index - if provided, replaces the entity at that index
+   * @return {number} index of the added or replaced entity
+   */
+  commitEntity(entity, index = undefined) {
+    if (typeof index === 'undefined') {
+      this.commit([new AddState(entity)]);
+      return this.entities.count() - 1;
+    } else {
+      const existingItem = this.entities.get(index);
+      this.commit([new ReplaceState(existingItem, entity)]);
+      return index;
+    }
   }
 
   /**

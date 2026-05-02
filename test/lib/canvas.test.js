@@ -14,6 +14,17 @@ const canvas = core.canvas;
 canvas.setRenderer(MockRenderer);
 
 /**
+ * Add getProperty(name) to a mock entity so canvas.setContext/isAci7 can read properties.
+ * @param {Object} obj - plain object representing a mock entity
+ * @return {Object} the same object with a getProperty method mixed in
+ */
+function withGetProperty(obj) {
+  return { ...obj, getProperty(name) {
+    return this[name];
+  } };
+}
+
+/**
  * Create a mock canvas rendering context for testing
  * @return {object} mock context
  */
@@ -176,28 +187,28 @@ test('Test Canvas.zoomExtents with no entities', () => {
   expect(emptyCanvas.getScale()).toBe(scaleBefore);
 });
 
-const aci7MockEntity = {
+const aci7MockEntity = withGetProperty({
   getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
   getLineType: () => ({ getPattern: () => [] }),
   lineWidth: 1,
   entityColour: { aci: 7, byLayer: false, byBlock: false },
-};
+});
 
 // An entity with ACI 3 whose draw colour happens to be near-white — NOT ACI 7, should not be recoloured
-const nearWhiteMockEntity = {
+const nearWhiteMockEntity = withGetProperty({
   getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
   getLineType: () => ({ getPattern: () => [] }),
   lineWidth: 1,
   entityColour: { aci: 3, byLayer: false, byBlock: false },
-};
+});
 
 // An entity with a true colour whose aci fell back to 7 (non-ACI-table colour)
-const trueColourFallbackAci7MockEntity = {
+const trueColourFallbackAci7MockEntity = withGetProperty({
   getDrawColour: () => ({ r: 200, g: 100, b: 50 }),
   getLineType: () => ({ getPattern: () => [] }),
   lineWidth: 1,
   entityColour: { aci: 7, isTrueColour: true, byLayer: false, byBlock: false },
-};
+});
 
 describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
   let originalBackground;
@@ -247,13 +258,13 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     const renderer = new MockRenderer();
     renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
-    const byLayerEntity = {
+    const byLayerEntity = withGetProperty({
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       getLineType: () => ({ getPattern: () => [] }),
       lineWidth: 1,
       entityColour: { aci: 256, byLayer: true, byBlock: false },
       layer: '0',
-    };
+    });
     canvas.setContext(byLayerEntity, renderer);
     expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
   });
@@ -262,16 +273,16 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     const renderer = new MockRenderer();
     renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
-    const byBlockItem = {
+    const byBlockItem = withGetProperty({
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       getLineType: () => ({ getPattern: () => [] }),
       lineWidth: 1,
       entityColour: { aci: 0, byLayer: false, byBlock: true },
-    };
-    const block = {
+    });
+    const block = withGetProperty({
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       entityColour: { aci: 7, byLayer: false, byBlock: false },
-    };
+    });
     canvas.setContext(byBlockItem, renderer, block);
     expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
   });
@@ -280,17 +291,17 @@ describe('Test Canvas.setContext ACI 7 background-dependent colour', () => {
     core.settings.canvasbackgroundcolour = { r: 30, g: 30, b: 30 };
     const renderer = new MockRenderer();
     renderer.setBackgroundColour(core.settings.canvasbackgroundcolour);
-    const byBlockItem = {
+    const byBlockItem = withGetProperty({
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       getLineType: () => ({ getPattern: () => [] }),
       lineWidth: 1,
       entityColour: { aci: 0, byLayer: false, byBlock: true },
-    };
-    const block = {
+    });
+    const block = withGetProperty({
       getDrawColour: () => ({ r: 254, g: 254, b: 254 }),
       entityColour: { aci: 256, byLayer: true, byBlock: false },
       layer: '0',
-    };
+    });
     canvas.setContext(byBlockItem, renderer, block);
     expect(renderer.strokeStyle).toBe('rgb(255, 255, 255)');
   });
@@ -310,16 +321,16 @@ describe('Test Canvas.setContext ByBlock colour', () => {
     core.activate();
   });
 
-  const byBlockItem = {
+  const byBlockItem = withGetProperty({
     getDrawColour: () => ({ r: 0, g: 0, b: 0 }),
     getLineType: () => ({ getPattern: () => [] }),
     lineWidth: 1,
     entityColour: { aci: 0, byLayer: false, byBlock: true },
-  };
-  const block = {
+  });
+  const block = withGetProperty({
     getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
     entityColour: { aci: 1, byLayer: false, byBlock: false },
-  };
+  });
 
   test('ByBlock item inherits draw colour from block', () => {
     const renderer = new MockRenderer();
@@ -340,24 +351,24 @@ describe('Test Canvas.setContext ByBlock colour', () => {
 
   test('non-ByBlock item with block keeps its own colour', () => {
     const renderer = new MockRenderer();
-    const directItem = {
+    const directItem = withGetProperty({
       getDrawColour: () => ({ r: 0, g: 255, b: 0 }),
       getLineType: () => ({ getPattern: () => [] }),
       lineWidth: 1,
       entityColour: { aci: 2, byLayer: false, byBlock: false },
-    };
+    });
     canvas.setContext(directItem, renderer, block);
     expect(renderer.strokeStyle).toBe('rgb(0, 255, 0)');
   });
 });
 
 describe('Test Canvas.setContext paint states', () => {
-  const redEntity = {
+  const redEntity = withGetProperty({
     getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
     getLineType: () => ({ getPattern: () => [] }),
     lineWidth: 10,
     entityColour: { aci: 1, byLayer: false, byBlock: false },
-  };
+  });
 
   beforeEach(() => {
     core.activate();
@@ -397,12 +408,12 @@ describe('Test Canvas.setContext paint states', () => {
 
   test('setContext applies line type dash pattern to renderer', () => {
     const renderer = new MockRenderer();
-    const dashedEntity = {
+    const dashedEntity = withGetProperty({
       getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
       getLineType: () => ({ getPattern: () => [5, 5] }),
       lineWidth: 1,
       entityColour: { aci: 1, byLayer: false, byBlock: false },
-    };
+    });
     canvas.setContext(dashedEntity, renderer);
     expect(renderer.dashPattern).toEqual([5, 5]);
   });
@@ -842,13 +853,13 @@ describe('Test Canvas.#paintEntity', () => {
    * @return {Object} mock leaf entity
    */
   function makeLeaf(colour = { r: 255, g: 0, b: 0 }) {
-    return {
+    return withGetProperty({
       getDrawColour: () => colour,
       getLineType: () => ({ getPattern: () => [] }),
       lineWidth: 1,
       entityColour: { aci: 1, byLayer: false, byBlock: false },
       draw: jest.fn(() => undefined),
-    };
+    });
   }
 
   /**
@@ -857,7 +868,7 @@ describe('Test Canvas.#paintEntity', () => {
    * @return {Object} mock container entity
    */
   function makeContainer(children) {
-    return {
+    return withGetProperty({
       getDrawColour: () => ({ r: 0, g: 255, b: 0 }),
       getLineType: () => ({ getPattern: () => [] }),
       lineWidth: 1,
@@ -866,7 +877,7 @@ describe('Test Canvas.#paintEntity', () => {
         ctx.applyTransform({ x: 10, y: 10 });
         return children;
       }),
-    };
+    });
   }
 
   let paintCore;
@@ -1001,7 +1012,7 @@ describe('Test Canvas.#paintEntity', () => {
   });
 
   test('restore() is called even when draw() throws', () => {
-    const throwing = {
+    const throwing = withGetProperty({
       getDrawColour: () => ({ r: 255, g: 0, b: 0 }),
       getLineType: () => ({ getPattern: () => [] }),
       lineWidth: 1,
@@ -1009,7 +1020,7 @@ describe('Test Canvas.#paintEntity', () => {
       draw: jest.fn(() => {
         throw new Error('draw failure');
       }),
-    };
+    });
     paintCore.scene.previewEntities.add(throwing);
 
     const ctx = createSpyContext();

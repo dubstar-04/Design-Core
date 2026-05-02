@@ -164,7 +164,7 @@ test('Test Block.dxf throws when a block item has an undefined handle', () => {
   // cloneObject clears the handle, simulating an item added without a handle assignment
   const line = new Line({ handle: '3', points: [new Point(0, 0), new Point(1, 1)] });
   const clone = Utils.cloneObject(line);
-  expect(clone.handle).toBeUndefined();
+  expect(clone.getProperty('handle')).toBeUndefined();
   block.addItem(clone);
 
   // Use a real DXFFile (R2000+) so the version-gated handle validation fires
@@ -177,11 +177,11 @@ test('Test Block.dxf succeeds when block items have valid handles', () => {
   const line = new Line({ handle: '3', points: [new Point(0, 0), new Point(1, 1)] });
   const clone = Utils.cloneObject(line);
   // simulate the handle assignment done in Block.execute()
-  clone.handle = DesignCore.HandleManager.next();
-  expect(clone.handle).toMatch(/^[0-9A-F]+$/i);
+  clone.setProperty('handle', DesignCore.HandleManager.next());
+  expect(clone.getProperty('handle')).toMatch(/^[0-9A-F]+$/i);
   block.addItem(clone);
 
   const file = new DXFFile('R2000');
   expect(() => block.dxf(file)).not.toThrow();
-  expect(file.contents).toContain(clone.handle);
+  expect(file.contents).toContain(clone.getProperty('handle'));
 });

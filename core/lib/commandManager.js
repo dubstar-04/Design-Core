@@ -1,4 +1,5 @@
 import { Line } from '../entities/line.js';
+import { Entity } from '../entities/entity.js';
 import { Polyline } from '../entities/polyline.js';
 import { Lwpolyline } from '../entities/lwpolyline.js';
 import { Circle } from '../entities/circle.js';
@@ -141,21 +142,30 @@ export class CommandManager {
   }
 
   /**
-   * Create a new instance of type using data
+   * Create a new instance of type using data.
+   * When data is a plain object (DXF load path), applies a two-pass normalisation:
+   *   1. Entity.fromDxf()       — resolves group codes shared by all entities (e.g. colour, true colour)
+   *   2. CommandClass.fromDxf() — resolves group codes specific to the entity type (e.g. geometry)
+   * When data is absent or already a canonical object (e.g. an entity instance), it is passed through unchanged.
    * @param {string} type
-   * @param {Array} data
+   * @param {Object} data
    * @return {Object} instance of type
    */
   createNew(type, data) {
-    let newItem;
-    if (this.isCommand(type)) {
-      newItem = new classes[this.getCommand(type)](data);
-    } else {
+    if (!this.isCommand(type)) {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND}: ${type}`);
       return;
     }
-
-    return newItem;
+    const CommandClass = classes[this.getCommand(type)];
+    // Skip DXF normalisation when data is absent or is already a canonical object (e.g. an entity instance)
+    if (!data || Object.getPrototypeOf(data) !== Object.prototype) {
+      return new CommandClass(data);
+    }
+    // Resolve group codes shared by all entities (colour, true colour, etc.)
+    const baseNormalised = Entity.fromDxf(data);
+    // Resolve group codes specific to this entity type (geometry, etc.)
+    const classNormalised = Object.prototype.hasOwnProperty.call(CommandClass, 'fromDxf') ? CommandClass.fromDxf(baseNormalised) : baseNormalised;
+    return new CommandClass(classNormalised);
   };
 
   /**

@@ -5,6 +5,7 @@ import { Utils } from './utils.js';
 import { SnapPoint } from './auxiliary/snapPoint.js';
 import { TrackingLine } from './auxiliary/trackingLine.js';
 import { DesignCore } from '../designCore.js';
+import { Property } from '../properties/property.js';
 
 /** Snapping Class */
 export class Snapping {
@@ -83,7 +84,7 @@ export class Snapping {
     let delta = snapAperture / DesignCore.Canvas.getScale(); // convert to scene space
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
-      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).layer);
+      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).getProperty(Property.Names.LAYER));
 
       if (!layer?.isVisible) {
         continue;

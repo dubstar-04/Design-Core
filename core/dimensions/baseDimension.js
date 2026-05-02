@@ -24,20 +24,54 @@ export class BaseDimension extends Entity {
   constructor(data) {
     super(data);
 
-    // hide inherited property
-    // needs to be enumerable=false to not appear in the object props
-    Object.defineProperty(this, 'lineType', {
-      enumerable: false,
+    // lineType and lineWidth not applicable to dimensions
+    this.properties.remove(Property.Names.LINETYPE);
+    this.properties.remove(Property.Names.LINEWIDTH);
+
+    // DXF Groupcode 1 - Dimension text override
+    this.properties.add(Property.Names.TEXTOVERRIDE, {
+      type: Property.Type.STRING,
+      value: Property.loadValue([data?.[1], data?.textOverride], ''),
+      dxfCode: 1,
     });
 
-    // hide inherited property
-    Object.defineProperty(this, 'lineWidth', {
-      enumerable: false,
+    // DXF Groupcode 2 - Block name
+    this.properties.add(Property.Names.BLOCKNAME, {
+      type: Property.Type.STRING,
+      value: Property.loadValue([data?.blockName, data?.[2]], ''),
+      dxfCode: 2,
+      visible: false,
     });
 
-    Object.defineProperty(this, 'blockName', {
-      value: '',
-      writable: true,
+    // DXF Groupcode 3 - Dimension Style Name
+    this.properties.add(Property.Names.DIMENSIONSTYLE, {
+      type: Property.Type.LIST,
+      value: Property.loadValue([data?.dimensionStyle, data?.[3]], 'STANDARD'),
+      dxfCode: 3,
+    });
+
+    // DXF Groupcode 40 - Leader length for radius and diameter dimensions
+    this.properties.add(Property.Names.LEADERLENGTH, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.[40], data?.leaderLength], 0),
+      dxfCode: 40,
+      visible: false,
+    });
+
+    // DXF Groupcode 50 - Angle of rotated, horizontal, or vertical dimensions
+    this.properties.add(Property.Names.LINEARDIMANGLE, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.[50], data?.linearDimAngle], 0),
+      dxfCode: 50,
+      visible: false,
+    });
+
+    // DXF Groupcode 53 - Rotation angle of dimension text away from default orientation
+    this.properties.add(Property.Names.ANGLE, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.[53], data?.angle], 0),
+      dxfCode: 53,
+      visible: false,
     });
 
     Object.defineProperty(this, 'block', {
@@ -45,70 +79,12 @@ export class BaseDimension extends Entity {
       writable: true,
     });
 
-    /*
-    Object.defineProperty(this, 'text', {
-      value: new Text(),
-      writable: true,
-    });
-    */
-
-    Object.defineProperty(this, 'textOverride', {
-      value: '',
-      writable: true,
-      enumerable: true,
-    });
-
     Object.defineProperty(this, 'dimType', {
       value: new DimType(),
       writable: true,
     });
 
-    Object.defineProperty(this, 'dimensionStyle', {
-      value: 'STANDARD',
-      writable: true,
-      enumerable: true,
-    });
-
-    Object.defineProperty(this, 'leaderLength', {
-      value: 0,
-      writable: true,
-    });
-
-    Object.defineProperty(this, 'linearDimAngle', {
-      value: 0,
-      writable: true,
-    });
-
     if (data) {
-      if (data.hasOwnProperty('1')) {
-        // DXF Groupcode 1 - Dimension text
-        // The string explicitly entered by the user.
-        // Optional; default is the measurement. If null or “<>”, the dimension measurement is drawn as the text,
-        // if ““ (one blank space), the text is suppressed. Anything else is drawn as the text
-        this.textOverride = Property.loadValue([data[1], data.textOverride], '');
-      }
-
-      /*
-      if (data.hasOwnProperty('block')) {
-        // Reference to block that contains the entities that make up this dimension
-        this.block = data.block;
-      }*/
-
-      if (data.hasOwnProperty('blockName') || data.hasOwnProperty('2')) {
-        // DXF Groupcode 2 - Blockname
-        this.blockName = Property.loadValue([data.blockName, data[2]], '');
-      }
-
-      if (data.hasOwnProperty('dimensionStyle') || data.hasOwnProperty('3')) {
-        // DXF Groupcode 3 - Dimension Style Name
-        this.dimensionStyle = Property.loadValue([data.dimensionStyle, data[3]], 'STANDARD');
-      }
-
-      if (data.hasOwnProperty('40')) {
-        // DXF Groupcode 40 - Leader length for radius and diameter dimensions
-        this.leaderLength = data[40];
-      }
-
       if (data.hasOwnProperty('41')) {
         // DXF Groupcode 41 - Line Spacing Factor
         // Percentage of default (3-on-5) line spacing to be applied.
@@ -124,11 +100,6 @@ export class BaseDimension extends Entity {
         Logging.instance.debug(`${this.type} - ${err}`);
       }
 
-      if (data.hasOwnProperty('50')) {
-        // DXF Groupcode 50 - Angle of rotated, horizontal, or vertical dimensions
-        this.linearDimAngle = Property.loadValue([data[50]], 0);
-      }
-
       if (data.hasOwnProperty('51')) {
         // DXF Groupcode 51 - Horizontal Direction
         // All dimension types have an optional 51 group code, which indicates the horizontal direction
@@ -138,12 +109,6 @@ export class BaseDimension extends Entity {
         // It is always in the XY plane of the OCS
         const err = 'Groupcode 51 not implemented';
         Logging.instance.warn(`${this.type} - ${err}`);
-      }
-
-      if (data.hasOwnProperty('angle') || data.hasOwnProperty('53')) {
-        // DXF Groupcode 53 - Rotation
-        // rotation angle of the dimension text away from its default orientation
-        this.angle = Property.loadValue([data.angle, data[53]], 0);
       }
 
       if (data.hasOwnProperty('dimType') || data.hasOwnProperty('70')) {
@@ -196,10 +161,6 @@ export class BaseDimension extends Entity {
         // 2 = Exact (taller characters will not override)
         const err = 'Groupcode 72 not implemented';
         Logging.instance.debug(`${this.type} - ${err}`);
-      }
-
-      if (data.leaderLength) {
-        this.leaderLength = data.leaderLength;
       }
     }
   }
@@ -280,8 +241,9 @@ export class BaseDimension extends Entity {
     }
 
     // Handle textOverride
-    if (this.textOverride !== '') {
-      formattedDimensionValue = this.textOverride.replace(/<>/g, formattedDimensionValue);
+    const textOverride = this.getProperty(Property.Names.TEXTOVERRIDE);
+    if (textOverride !== '') {
+      formattedDimensionValue = textOverride.replace(/<>/g, formattedDimensionValue);
     }
 
     // TODO: Implement prefix and postsuffix - DIMPOST
@@ -338,13 +300,13 @@ export class BaseDimension extends Entity {
     // get the text height
     const textHeight = this.getDimensionStyle().getValue('DIMTXT');
     // set the text height
-    text.height = textHeight;
+    text.setProperty(Property.Names.HEIGHT, textHeight);
     // Always set text horizontal alignment to center
-    text.horizontalAlignment = 1;
+    text.setProperty(Property.Names.HORIZONTALALIGNMENT, 1);
     // Always set text vertical alignment to middle
-    text.verticalAlignment = 2;
+    text.setProperty(Property.Names.VERTICALALIGNMENT, 2);
     // set the text value
-    text.string = this.getDimensionValue(textValue);
+    text.setProperty(Property.Names.STRING, this.getDimensionValue(textValue));
     // set the text position
     text.points = [textPosition];
     // set the text rotation
@@ -385,7 +347,7 @@ export class BaseDimension extends Entity {
    * @return {Object} - the dimension style object
    */
   getDimensionStyle() {
-    return DesignCore.DimStyleManager.getItemByName(this.dimensionStyle);
+    return DesignCore.DimStyleManager.getItemByName(this.getProperty(Property.Names.DIMENSIONSTYLE));
   }
 
   /**
@@ -538,7 +500,7 @@ export class BaseDimension extends Entity {
 
       entities.forEach((element) => {
         // For colour BYBLOCK for dimensions
-        element.setColour('BYBLOCK');
+        element.setProperty(Property.Names.COLOUR, 'BYBLOCK');
         this.block.addItem(element);
       });
     }
@@ -550,6 +512,10 @@ export class BaseDimension extends Entity {
    * @param {any} value
    */
   setProperty(property, value) {
+    if (this.properties.has(property)) {
+      super.setProperty(property, value);
+      return;
+    }
     if (this.hasOwnProperty(property)) {
       this[property] = value;
       this.refresh();

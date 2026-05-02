@@ -59,7 +59,7 @@ AcDbTrace
   expect(file.contents).toEqual(dxfString);
 
   // create new entity from entity data to ensure all props are loaded
-  const newSolid = new Solid(solid);
+  const newSolid = new Solid({ handle: solid.getProperty('handle'), points: solid.points });
   file = new File();
   newSolid.dxf(file);
   expect(file.contents).toEqual(dxfString);

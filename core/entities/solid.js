@@ -1,6 +1,7 @@
 import { Entity } from './entity.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { BoundingBox } from '../lib/boundingBox.js';
+import { Property } from '../properties/property.js';
 
 /**
  * Solid Entity Class
@@ -31,10 +32,10 @@ export class Solid extends Entity {
    */
   dxf(file) {
     file.writeGroupCode('0', 'SOLID');
-    file.writeGroupCode('5', this.handle, DXFFile.Version.R2000); // Handle
+    file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
     file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
     file.writeGroupCode('100', 'AcDbTrace', DXFFile.Version.R2000);
-    file.writeGroupCode('8', this.layer);
+    file.writeGroupCode('8', this.getProperty(Property.Names.LAYER));
     file.writeGroupCode('10', this.points[0].x);
     file.writeGroupCode('20', this.points[0].y);
     file.writeGroupCode('30', '0.0');

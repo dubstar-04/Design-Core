@@ -132,11 +132,11 @@ export class Fillet extends ChamferFilletBase {
 
     // trimMode: dull the original segments then show the shortened versions + arc
     const firstSeg = Utils.cloneObject(this.firstPick.activeSeg);
-    firstSeg.setColour(Colour.blend(this.firstPick.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
+    firstSeg.setProperty('colour', Colour.blend(this.firstPick.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
     DesignCore.Scene.previewEntities.add(firstSeg);
 
     const secondSeg = Utils.cloneObject(selection.tempSecond.activeSeg);
-    secondSeg.setColour(Colour.blend(selection.tempSecond.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
+    secondSeg.setProperty('colour', Colour.blend(selection.tempSecond.entity.getDrawColour(), DesignCore.Settings.canvasbackgroundcolour, DesignCore.Settings.previewBlendFactor));
     DesignCore.Scene.previewEntities.add(secondSeg);
 
     const firstTrimLine = DesignCore.CommandManager.createNew('Line', {

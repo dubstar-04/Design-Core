@@ -215,7 +215,7 @@ export class SelectionManager {
 
     // Add all selectable items to the selection
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
-      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).layer);
+      const layer = DesignCore.LayerManager.getItemByName(DesignCore.Scene.entities.get(i).getProperty('layer'));
 
       // Only select items on selectable layers
       if (layer?.isSelectable) {

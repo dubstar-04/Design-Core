@@ -171,7 +171,13 @@ export class Clipboard {
    * @return {Object} - simplified object
    */
   #simplify(original) {
-    return Object.getOwnPropertyNames(original).reduce((simplified, property) => {
+    const names = Object.getOwnPropertyNames(original);
+    // 'points' is now stored in EntityProperties and accessed via a prototype accessor,
+    // so it's not an own property — include it explicitly when it's an accessible array.
+    if (!names.includes('points') && Array.isArray(original.points)) {
+      names.push('points');
+    }
+    return names.reduce((simplified, property) => {
       const value = original[property];
       if (Array.isArray(value)) {
         simplified[property] = original[property].map((item) => this.#simplify(item));
