@@ -111,7 +111,7 @@ export class BaseCircularDimension extends BaseDimension {
     const entities = [];
 
     const Pt15 = this.getPointBySequence(this.points, 15); // radius point
-    const Pt10 = this.getPointBySequence(this.points, 10); // center point for radial dim or radial point for diameteric dim
+    const Pt10 = this.getPointBySequence(this.points, 10); // centre point for radial dim or radial point for diameteric dim
     let Pt11 = this.getPointBySequence(this.points, 11); // text position
 
     // Style values
@@ -192,7 +192,7 @@ export class BaseCircularDimension extends BaseDimension {
 
     // DIMTAD - Text vertical position
     switch (DIMTAD) {
-      case 0: // 0 = Centers the dimension text between the extension lines.
+      case 0: // 0 = Centres the dimension text between the extension lines.
         break;
       case 1: // 1 = Places the dimension text above the dimension line except when the dimension line is not horizontal and text inside the extension lines is forced horizontal ( DIMTIH = 1).
         textPosition = textPosition.project(textAboveDirection, textAboveDistance);
@@ -231,13 +231,13 @@ export class BaseCircularDimension extends BaseDimension {
     if (!DIMTOFL) {
     // Add the centre mark for circular dimensions
 
-      let center = Pt10;
+      let centre = Pt10;
 
-      // center point is mid point for diametric dimensions
+      // centre point is mid point for diametric dimensions
       if (this.dimType.getBaseDimType() === 3) {
-        center = Pt10.midPoint(Pt15);
+        centre = Pt10.midPoint(Pt15);
       }
-      entities.push(...this.getCentreMark(center));
+      entities.push(...this.getCentreMark(centre));
     }
 
     return entities;
