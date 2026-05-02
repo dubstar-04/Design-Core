@@ -73,7 +73,7 @@ export class Rotate extends Tool {
           this.baseAngle = refBase.angle(refEnd);
           // set the base point to null
           this.basePoint = null;
-          // restore inputPoint to the rotation center so the tracking line
+          // restore inputPoint to the rotation centre so the tracking line
           // uses the correct origin for the final angle input
           DesignCore.Scene.inputManager.inputPoint = this.points[0];
         } else if (Input.getType(input2) === Input.Type.NUMBER) {
@@ -99,22 +99,22 @@ export class Rotate extends Tool {
     const mousePoint = DesignCore.Mouse.pointOnScene();
 
     if (this.points.length >= 1 && this.baseAngle !== null || this.basePoint !== null) {
-      // Draw a rubber-band line from center to mouse
-      const center = this.basePoint === null ? this.points.at(0) : this.basePoint;
-      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([center, mousePoint]));
+      // Draw a rubber-band line from centre to mouse
+      const centre = this.basePoint === null ? this.points.at(0) : this.basePoint;
+      DesignCore.Scene.auxiliaryEntities.add(new RubberBand([centre, mousePoint]));
     }
 
     if (this.points.length >= 1) {
       const ang = this.points[0].angle(mousePoint);
       const theta = this.baseAngle === null ? 0 : ang - this.baseAngle;
-      const center = this.points[0];
+      const centre = this.points[0];
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
         const item = DesignCore.Scene.selectionManager.selectedItems[i];
         // get the original points from the scene entities
         const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
         const originalItem = DesignCore.Scene.entities.get(entityIndex);
-        item.setProperty('points', this.getRotatedPoints(originalItem.points, center, theta));
+          item.setProperty('points', this.getRotatedPoints(originalItem.points, centre, theta));
       }
     }
   };
@@ -125,13 +125,13 @@ export class Rotate extends Tool {
   action() {
     const ang = this.points[0].angle(this.points[1]);
     const theta = ang - this.baseAngle;
-    const center = this.points[0];
+    const centre = this.points[0];
 
     const stateChanges = [];
 
     for (let index = 0; index < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; index++) {
       const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
-      const stateChange = new UpdateState(item, { points: this.getRotatedPoints(item.points, center, theta) });
+      const stateChange = new UpdateState(item, { points: this.getRotatedPoints(item.points, centre, theta) });
       stateChanges.push(stateChange);
     }
 
@@ -141,12 +141,12 @@ export class Rotate extends Tool {
   /**
  * Get rotated points
  * @param {Array} points
- * @param {Point} center
+ * @param {Point} centre
  * @param {Point} theta
  * @return {Array} rotatedPoints
  */
-  getRotatedPoints(points, center, theta) {
-    const rotatedPoints = points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
+  getRotatedPoints(points, centre, theta) {
+    const rotatedPoints = points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(centre, theta));
     return rotatedPoints;
   }
 }
