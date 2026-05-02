@@ -141,12 +141,12 @@ export class CanvasRenderer extends RendererBase {
       if (!p.bulge) {
         this.#ctx.lineTo(next.x, next.y);
       } else {
-        const center = p.bulgeCentrePoint(next);
+        const centre = p.bulgeCentrePoint(next);
         const radius = p.bulgeRadius(next);
-        const startAngle = center.angle(p);
-        const endAngle = center.angle(next);
+        const startAngle = centre.angle(p);
+        const endAngle = centre.angle(next);
         // Canvas arc: CCW = false (default), CW = true (anticlockwise flag inverted)
-        this.#ctx.arc(center.x, center.y, radius, startAngle, endAngle, p.bulge < 0);
+        this.#ctx.arc(centre.x, centre.y, radius, startAngle, endAngle, p.bulge < 0);
       }
     }
   }
