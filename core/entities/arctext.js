@@ -25,7 +25,7 @@ export class ArcAlignedCharacter {
 
   /**
    * @param {string} character - text character
-   * @param {Point} position - center mid point of character
+   * @param {Point} position - centre mid point of character
    * @param {number} angle - in radians
    * @param {number} height - character height
    * @param {number} width - character width
@@ -192,10 +192,10 @@ export class ArcAlignedText extends Entity {
       dxfCode: 46,
     });
 
-    // ensure points array has at least one point - the arc center
+    // ensure points array has at least one point - the arc centre
     if (!this.points.length) {
       this.points = [];
-      this.points.push(new Point(0, 0)); // center point
+      this.points.push(new Point(0, 0)); // centre point
     }
 
     // DXF Groupcode 50 - Start Angle in degrees
@@ -225,7 +225,7 @@ export class ArcAlignedText extends Entity {
       dxfCode: 71,
       options: () => [{ display: 'Outward', value: 1 }, { display: 'Inward', value: 2 }],
     });
-    // DXF Groupcode 72 - 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
+    // DXF Groupcode 72 - 1 = fit to arc, 2 = left align, 3 = right align, 4 = centre
     this.properties.add(Property.Names.TEXTALIGNMENT, {
       type: Property.Type.LIST,
       value: Property.loadValue([data?.textAlignment, data?.[72]], 4),
@@ -464,7 +464,7 @@ export class ArcAlignedText extends Entity {
 
     let string = str.slice(); // make a copy of the string
 
-    // 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
+    // 1 = fit to arc, 2 = left align, 3 = right align, 4 = centre
     if (textAlignment === 3) { // right align
       // start at the arc start position and create the text cw around the arc
       stringStartPoint = this.points[0].project(this.startAngle() + startOffsetAngle, radialDistance);
@@ -492,8 +492,8 @@ export class ArcAlignedText extends Entity {
     // build per-character widths for the final (possibly reversed) string
     const charWidths = [...string].map((ch) => Text.getApproximateWidth(ch, height));
 
-    // build cumulative arc angle offsets from the string start position to each character center
-    // step between adjacent centers is the average of their two half-widths plus spacing
+    // build cumulative arc angle offsets from the string start position to each character centre
+    // step between adjacent centres is the average of their two half-widths plus spacing
     const charOffsetAngles = [0];
     if (textAlignment === 1) { // fit to arc
       if (string.length === 1) {
@@ -512,7 +512,7 @@ export class ArcAlignedText extends Entity {
         charOffsetAngles.push(charOffsetAngles[i] + this.linearToAngular(step * 0.5, radialDistance));
       }
 
-      if (textAlignment === 4) { // center
+      if (textAlignment === 4) { // centre
         const arcMidPoint = this.points[0].project(this.arcMidAngle(this.startAngle(), this.endAngle()), radialDistance);
         stringStartPoint = arcMidPoint.rotate(this.points[0], charOffsetAngles.at(-1) * 0.5);
       }
@@ -568,9 +568,9 @@ export class ArcAlignedText extends Entity {
     file.writeGroupCode('2', style?.font);
     file.writeGroupCode('3', '');
     file.writeGroupCode('7', this.getProperty(Property.Names.STYLENAME)); // Test style name
-    file.writeGroupCode('10', this.points[0].x); // x of arc center
-    file.writeGroupCode('20', this.points[0].y); // y of arc center
-    file.writeGroupCode('30', '0.0'); // z of arc center
+    file.writeGroupCode('10', this.points[0].x); // x of arc centre
+    file.writeGroupCode('20', this.points[0].y); // y of arc centre
+    file.writeGroupCode('30', '0.0'); // z of arc centre
     file.writeGroupCode('40', this.getProperty(Property.Names.RADIUS));
     file.writeGroupCode('41', this.getProperty(Property.Names.WIDTHFACTOR));
     file.writeGroupCode('42', this.getProperty(Property.Names.HEIGHT));
@@ -607,7 +607,7 @@ export class ArcAlignedText extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    snaps.push(new SnapPoint(this.points[0], SnapPoint.Type.CENTRE)); // arc center
+    snaps.push(new SnapPoint(this.points[0], SnapPoint.Type.CENTRE)); // arc centre
 
     const ArcAlignedCharacters = this.getArcAlignedCharacters();
     for (const arcAlignedChar of ArcAlignedCharacters) {

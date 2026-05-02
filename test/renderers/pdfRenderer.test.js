@@ -110,7 +110,7 @@ describe('PdfRenderer — drawing', () => {
 
   test('90° arc splits into 1 Bézier curve', () => {
     const renderer = new PdfRenderer(100, 100);
-    // start=(100,0) bulge=tan(π/8)≈0.4142 → 90° arc, end=(150,50), center=(100,50), r=50
+    // start=(100,0) bulge=tan(π/8)≈0.4142 → 90° arc, end=(150,50), centre=(100,50), r=50
     const start = new Point(100, 0, Math.tan(Math.PI / 8));
     const end = new Point(150, 50);
     renderer.drawShape([start, end], {});
@@ -121,7 +121,7 @@ describe('PdfRenderer — drawing', () => {
 
   test('full circle (two 180° arcs) emits 4 Bézier curves', () => {
     const renderer = new PdfRenderer(100, 100);
-    // Circle center=(50,50) r=50 — mirrors Circle.toPolylinePoints() output
+    // Circle centre=(50,50) r=50 — mirrors Circle.toPolylinePoints() output
     const p1 = new Point(100, 50, 1);
     const p2 = new Point(0, 50, 1);
     const p3 = new Point(100, 50);

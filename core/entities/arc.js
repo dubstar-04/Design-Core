@@ -27,7 +27,7 @@ export class Arc extends Entity {
   constructor(data) {
     super(data);
 
-    // If only the center point is present, project start/end from named scalar properties.
+    // If only the centre point is present, project start/end from named scalar properties.
     // Full-points data (post-execute or post-fromDxf) skips this block entirely.
     if (data && this.points.length < 2) {
       const radius = data.radius ?? 1;
@@ -73,8 +73,8 @@ export class Arc extends Entity {
    * @return {Object}
    */
   static fromDxf(data) {
-    const center = data.points?.[0];
-    if (!center) return data;
+    const centre = data.points?.[0];
+    if (!centre) return data;
     // validate required group codes for points-based arc representation are present
     if (data[40] === undefined || data[50] === undefined || data[51] === undefined) return data;
 
@@ -82,9 +82,9 @@ export class Arc extends Entity {
     return {
       ...data,
       points: [
-        center,
-        center.project(Utils.degrees2radians(data[50] ?? 0), radius),
-        center.project(Utils.degrees2radians(data[51] ?? 0), radius),
+        centre,
+        centre.project(Utils.degrees2radians(data[50] ?? 0), radius),
+        centre.project(Utils.degrees2radians(data[51] ?? 0), radius),
       ],
       direction: data[73] ?? 1,
     };
@@ -116,16 +116,16 @@ export class Arc extends Entity {
 
       let pt2;
       while (true) {
-        DesignCore.Scene.inputManager.inputPoint = pt; // polar/ortho tracks from center on each attempt
+        DesignCore.Scene.inputManager.inputPoint = pt; // polar/ortho tracks from centre on each attempt
         const op2 = new PromptOptions(`${Strings.Input.END} ${Strings.Strings.OR} ${Strings.Input.ANGLE}`, [Input.Type.POINT, Input.Type.NUMBER]);
         pt2 = await DesignCore.Scene.inputManager.requestInput(op2);
         if (pt2 === undefined) return;
 
         if (Input.getType(pt2) === Input.Type.POINT) {
-          // Must not be same as center or start
-          const center = this.points[0];
+          // Must not be same as centre or start
+          const centre = this.points[0];
           const start = this.points[1];
-          if (pt2.isSame?.(center) || pt2.isSame?.(start)) {
+          if (pt2.isSame?.(centre) || pt2.isSame?.(start)) {
             DesignCore.Core.notify(`${this.type} - ${Strings.Error.INVALIDPOINT}`);
             continue;
           }
@@ -193,8 +193,8 @@ export class Arc extends Entity {
     if (this.points.length >= 2) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       // const points = [...this.points, mousePoint];
-      const center = this.points[0];
-      const endPoint = center.project(center.angle(mousePoint), this.getProperty(Property.Names.RADIUS));
+      const centre = this.points[0];
+      const endPoint = centre.project(centre.angle(mousePoint), this.getProperty(Property.Names.RADIUS));
       if (endPoint.isSame(this.points[1])) return;
       const points = [...this.points, endPoint];
 
@@ -210,22 +210,22 @@ export class Arc extends Entity {
 
   /**
    * Infer arc direction from three points using cross product
-   * @param {Point} center
+   * @param {Point} centre
    * @param {Point} start
    * @param {Point} end
    * @return {number} 1 for ccw, -1 for cw
    */
-  static #inferDirection(center, start, end) {
+  static #inferDirection(centre, start, end) {
     // All points must be defined and distinct
-    if (!center || !start || !end) {
+    if (!centre || !start || !end) {
       return 1; // Default to counterclockwise
     }
-    if (center.isSame?.(start) || center.isSame?.(end) || start.isSame?.(end)) {
+    if (centre.isSame?.(start) || centre.isSame?.(end) || start.isSame?.(end)) {
       return 1;
     }
 
-    const v1 = start.subtract(center);
-    const v2 = end.subtract(center);
+    const v1 = start.subtract(centre);
+    const v2 = end.subtract(centre);
     const cross = v1.cross(v2);
     const direction = cross > 0 ? 1 : -1;
     return direction;
@@ -346,8 +346,8 @@ export class Arc extends Entity {
    * @return {Arc}
    */
   fromPolylinePoints(points) {
-    const center = points[0].bulgeCentrePoint(points[1]);
-    this.points = [center, new Point(points[0].x, points[0].y), new Point(points.at(-1).x, points.at(-1).y)];
+    const centre = points[0].bulgeCentrePoint(points[1]);
+    this.points = [centre, new Point(points[0].x, points[0].y), new Point(points.at(-1).x, points.at(-1).y)];
     return this;
   }
 
@@ -415,9 +415,9 @@ export class Arc extends Entity {
   closestPoint(P) {
     const startPoint = this.points[1];
     const endPoint = this.points[2];
-    const centerPoint = this.points[0];
+    const centrePoint = this.points[0];
 
-    const pnt = P.closestPointOnArc(startPoint, endPoint, centerPoint, this.getProperty(Property.Names.DIRECTION));
+    const pnt = P.closestPointOnArc(startPoint, endPoint, centrePoint, this.getProperty(Property.Names.DIRECTION));
 
     if (pnt !== null) {
       const distance = P.distance(pnt);

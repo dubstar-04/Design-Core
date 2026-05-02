@@ -298,16 +298,16 @@ export class Point {
    * Find the closest point on a arc between start and end points
    * @param {Point} startPoint
    * @param {Point} endPoint
-   * @param {Point} centerPoint
+   * @param {Point} centrePoint
    * @param {number} direction - CCW if > 0
    * @return {Point} the closest point on the arc or null
    */
-  closestPointOnArc(startPoint, endPoint, centerPoint, direction = 0) {
-    const length = this.distance(centerPoint);
-    const radius = centerPoint.distance(startPoint);
+  closestPointOnArc(startPoint, endPoint, centrePoint, direction = 0) {
+    const length = this.distance(centrePoint);
+    const radius = centrePoint.distance(startPoint);
 
-    const Cx = centerPoint.x + radius * (this.x - centerPoint.x) / length;
-    const Cy = centerPoint.y + radius * (this.y - centerPoint.y) / length;
+    const Cx = centrePoint.x + radius * (this.x - centrePoint.x) / length;
+    const Cy = centrePoint.y + radius * (this.y - centrePoint.y) / length;
     const closest = new Point(Cx, Cy);
 
     // circle
@@ -315,7 +315,7 @@ export class Point {
       return closest;
     }
 
-    if (closest.isOnArc(startPoint, endPoint, centerPoint, direction)) {
+    if (closest.isOnArc(startPoint, endPoint, centrePoint, direction)) {
       return closest;
     }
 
@@ -327,15 +327,15 @@ export class Point {
    * Determine if point is on arc segment
    * @param {Point} startPoint
    * @param {Point} endPoint
-   * @param {Point} centerPoint
+   * @param {Point} centrePoint
    * @param {number} direction - CCW if > 0
    * @return {Point} true or false
    */
-  isOnArc(startPoint, endPoint, centerPoint, direction = 0) {
+  isOnArc(startPoint, endPoint, centrePoint, direction = 0) {
     // direction: ccw arc > 0, clockwise arc <= 0
-    const snapAngle = centerPoint.angle(this);
-    const startAngle = centerPoint.angle(startPoint);
-    const endAngle = centerPoint.angle(endPoint);
+    const snapAngle = centrePoint.angle(this);
+    const startAngle = centrePoint.angle(startPoint);
+    const endAngle = centrePoint.angle(endPoint);
 
     if (direction > 0) {
       // Counter Clockwise Arc
@@ -438,7 +438,7 @@ export class Point {
   }
 
   /**
-   * Returns apothem; the distance from arc center to cord midpoint
+   * Returns apothem; the distance from arc centre to cord midpoint
    * @param {Point} nextPoint
    * @return {number} apothem
    */
@@ -465,12 +465,12 @@ export class Point {
 
     let a = this.apothem(nextPoint);
 
-    // check if the center point is inverted. i.e. at 180 it goes inside the arc
+    // check if the centre point is inverted. i.e. at 180 it goes inside the arc
     if (Math.abs(this.bulgeAngle()) > Math.PI) {
       a = -a;
     }
 
-    // get the direction from the midpoint to the center point
+    // get the direction from the midpoint to the centre point
     const direction = this.angle(nextPoint) + (Math.PI / 2) * Math.sign(this.bulge);
     // centre point is the apothem distance from the mid point in the given direction
     const centre = midp.project(direction, a);
@@ -486,12 +486,12 @@ export class Point {
    * @return {number} - the partial bulge value
    */
   partialBulge(nextPoint, splitPoint, afterSplit = false) {
-    const center = this.bulgeCentrePoint(nextPoint);
+    const centre = this.bulgeCentrePoint(nextPoint);
     const direction = this.bulge > 0 ? 1 : -1;
 
-    const startAngle = center.angle(this);
-    const endAngle = center.angle(nextPoint);
-    const splitAngle = center.angle(splitPoint);
+    const startAngle = centre.angle(this);
+    const endAngle = centre.angle(nextPoint);
+    const splitAngle = centre.angle(splitPoint);
 
     let includedAngle;
     if (afterSplit) {

@@ -96,10 +96,10 @@ export class Explode extends Tool {
       const origin = new Point(0, 0);
 
       blockItems.forEach((blockItem) => {
-        const copyofitem = Utils.cloneObject(blockItem);
-        const points = copyofitem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(origin, rotation).add(insertPoint));
-        copyofitem.points = points;
-        const stateChange = new AddState(copyofitem);
+        const copyOfItem = Utils.cloneObject(blockItem);
+        const points = copyOfItem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(origin, rotation).add(insertPoint));
+        copyOfItem.points = points;
+        const stateChange = new AddState(copyOfItem);
         stateChanges.push(stateChange);
       });
 

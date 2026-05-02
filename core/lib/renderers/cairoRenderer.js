@@ -159,14 +159,14 @@ export class CairoRenderer extends RendererBase {
       if (!p.bulge) {
         this.#cr.lineTo(next.x, next.y);
       } else {
-        const center = p.bulgeCentrePoint(next);
+        const centre = p.bulgeCentrePoint(next);
         const radius = p.bulgeRadius(next);
-        const startAngle = center.angle(p);
-        const endAngle = center.angle(next);
+        const startAngle = centre.angle(p);
+        const endAngle = centre.angle(next);
         if (p.bulge > 0) {
-          this.#cr.arc(center.x, center.y, radius, startAngle, endAngle);
+          this.#cr.arc(centre.x, centre.y, radius, startAngle, endAngle);
         } else {
-          this.#cr.arcNegative(center.x, center.y, radius, startAngle, endAngle);
+          this.#cr.arcNegative(centre.x, centre.y, radius, startAngle, endAngle);
         }
       }
     }

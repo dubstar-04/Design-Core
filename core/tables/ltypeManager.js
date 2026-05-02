@@ -48,7 +48,7 @@ export class LTypeManager extends StyleManagerBase {
    */
   dxf(file) {
     // Create table data for ltype styles
-    // The LTYPE Table must preceed the LAYER table
+    // The LTYPE Table must precede the LAYER table
     file.writeGroupCode('0', 'TABLE');
     file.writeGroupCode('2', 'LTYPE');
     file.writeGroupCode('5', this.handle, DXFFile.Version.R2000);

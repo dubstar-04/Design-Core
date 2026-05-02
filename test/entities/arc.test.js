@@ -58,7 +58,7 @@ describe('Arc.execute input validation and notifications', () => {
   test('Notifies on invalid point input (duplicate)', async () => {
     const input1 = new Point(0, 0);
     const input2 = new Point(10, 0);
-    const input3 = new Point(0, 0); // Same as center
+    const input3 = new Point(0, 0); // Same as centre
     await withMockInput(DesignCore.Scene, [input1, input2, input3, new Point(10, 10)], async () => {
       const arc = new Arc({});
       await arc.execute();
@@ -450,8 +450,8 @@ test('Arc.fromPolylinePoints precision drift is negligible', () => {
   const polyPts = arc.toPolylinePoints();
   const rebuilt = new Arc({});
   rebuilt.fromPolylinePoints(polyPts);
-  const centerDrift = Math.hypot(rebuilt.points[0].x - arc.points[0].x, rebuilt.points[0].y - arc.points[0].y);
-  expect(centerDrift).toBeLessThan(1e-10);
+  const centreDrift = Math.hypot(rebuilt.points[0].x - arc.points[0].x, rebuilt.points[0].y - arc.points[0].y);
+  expect(centreDrift).toBeLessThan(1e-10);
   expect(Math.abs(rebuilt.getProperty('radius') - arc.getProperty('radius'))).toBeLessThan(1e-10);
 });
 
@@ -489,10 +489,10 @@ test('Arc.snaps returns no tangent when fromPoint is inside the arc radius', () 
 
 describe('Arc.fromDxf', () => {
   test('projects start and end points from DXF angle codes', () => {
-    const center = new Point(0, 0);
-    const result = Arc.fromDxf({ points: [center], 40: 10, 50: 0, 51: 90 });
+    const centre = new Point(0, 0);
+    const result = Arc.fromDxf({ points: [centre], 40: 10, 50: 0, 51: 90 });
     expect(result.points.length).toBe(3);
-    expect(result.points[0]).toBe(center);
+    expect(result.points[0]).toBe(centre);
     expect(result.points[1].x).toBeCloseTo(10); // project(0°, 10)
     expect(result.points[1].y).toBeCloseTo(0);
     expect(result.points[2].x).toBeCloseTo(0); // project(90°, 10)
@@ -513,15 +513,15 @@ describe('Arc.fromDxf', () => {
     expect(result[6]).toBe('ByLayer');
   });
 
-  test('returns data unchanged when no center point', () => {
+  test('returns data unchanged when no centre point', () => {
     const data = { 40: 10, 50: 0, 51: 90 };
     expect(Arc.fromDxf(data)).toBe(data);
   });
 
   test('arc constructed via fromDxf matches arc constructed directly', () => {
-    const center = new Point(100, 100);
-    const fromDxfArc = new Arc(Arc.fromDxf({ points: [center], 40: 50, 50: 0, 51: 90 }));
-    const directArc = new Arc({ points: [center, new Point(150, 100), new Point(100, 150)] });
+    const centre = new Point(100, 100);
+    const fromDxfArc = new Arc(Arc.fromDxf({ points: [centre], 40: 50, 50: 0, 51: 90 }));
+    const directArc = new Arc({ points: [centre, new Point(150, 100), new Point(100, 150)] });
     expect(fromDxfArc.getProperty('radius')).toBeCloseTo(directArc.getProperty('radius'));
     expect(fromDxfArc.startAngle()).toBeCloseTo(directArc.startAngle());
     expect(fromDxfArc.endAngle()).toBeCloseTo(directArc.endAngle());

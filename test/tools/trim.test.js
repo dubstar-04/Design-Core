@@ -376,7 +376,7 @@ test('Test Trim.action polyline - trim middle segment', () => {
 test('Test Trim.action polyline - trim bulged arc segment', () => {
   // Polyline: (0,0) with bulge=1 -> arc -> (100,0) -> straight -> (200,0)
   // With bulge=1 (CCW) the semicircular arc goes through (50,-50)
-  // Arc center: (50,0), radius: 50
+  // Arc centre: (50,0), radius: 50
   // Boundary: vertical line at x=50
   // Intersection at (50,-50) — bottom of semicircle
   // Mouse at (75,-40) — right of intersection on the arc
@@ -687,7 +687,7 @@ test('Trim.action notifies when boundary item equals selected item', () => {
 });
 
 test('Trim.action trims an arc', () => {
-  // Arc: center (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10)
+  // Arc: centre (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10)
   // Boundary: vertical line at x=0, intersects arc at (0,10)
   // Mouse at (7,7) — in the right half, selects (10,0)→(0,10) segment for removal
   // Expected: original arc removed, shorter arc from (0,10) to (-10,0) added
@@ -718,7 +718,7 @@ test('Trim.action trims an arc', () => {
 });
 
 test('Trim.action trims a circle', () => {
-  // Circle: center (0,0), radius 10
+  // Circle: centre (0,0), radius 10
   // Boundary: vertical line at x=0, intersects circle at (0,10) and (0,-10)
   // Mouse at (8,0) — on the right side
   // Expected: original circle removed, arc covering the right side added
@@ -742,7 +742,7 @@ test('Trim.action trims a circle', () => {
     if (core.scene.entities.get(i).type === 'Arc') arc = core.scene.entities.get(i);
   }
   expect(arc).toBeDefined();
-  // Arc center should match the original circle center
+  // Arc centre should match the original circle centre
   expect(arc.points[0].x).toBeCloseTo(0, 10);
   expect(arc.points[0].y).toBeCloseTo(0, 10);
 });
@@ -791,7 +791,7 @@ test('Trim.action trims middle of a line - circle boundary creates two intersect
   // segment index 1. The sort comparator falls through to the
   // positionAlongSegment comparison (line 179 of trim.js) because the segment
   // indices are equal.
-  // Circle: center (50,0) radius 20 → intersects the x-axis at (30,0) and (70,0)
+  // Circle: centre (50,0) radius 20 → intersects the x-axis at (30,0) and (70,0)
   // Line: (0,0) → (100,0), mouse at (50,0) — inside the circle
   // Expected: original line removed, two shorter lines (0→30) and (70→100) added
 
@@ -838,7 +838,7 @@ test('Trim.execute catches and logs errors thrown during input', async () => {
 });
 
 test('Trim.action trims a circle near the seam (right side, mouse at angle 0)', () => {
-  // Circle: center (0,0), radius 10.
+  // Circle: centre (0,0), radius 10.
   // Circle.toPolylinePoints() always places the seam at angle 0 → vertex (10,0).
   // The old code failed when the mouse was near that seam because both intersections
   // appeared "after" the mouse in linear polyline order, leaving trimBefore=null.
@@ -867,7 +867,7 @@ test('Trim.action trims a circle near the seam (right side, mouse at angle 0)', 
   }
   expect(arc).toBeDefined();
   // Remaining arc is the left half: from (0,10) CCW through (-10,0) to (0,-10)
-  expect(arc.points[0].x).toBeCloseTo(0); // center
+  expect(arc.points[0].x).toBeCloseTo(0); // centre
   expect(arc.points[0].y).toBeCloseTo(0);
   expect(arc.points[1].x).toBeCloseTo(0); // start at (0,10)
   expect(arc.points[1].y).toBeCloseTo(10);
@@ -922,8 +922,8 @@ test('Trim.action trims a closed polyline near the seam vertex', () => {
 
 test('Trim.action trims an open polyline with two consecutive arc segments', () => {
   // Polyline: (0,0,b=1) -> arc1 -> (100,0,b=1) -> arc2 -> (200,0)
-  // arc1 center (50,0) radius 50, through (50,-50)
-  // arc2 center (150,0) radius 50, through (150,-50)
+  // arc1 centre (50,0) radius 50, through (50,-50)
+  // arc2 centre (150,0) radius 50, through (150,-50)
   // Boundary: vertical line at x=150, intersection at (150,-50) on arc2.
   // Mouse at (120,-40): on arc2 BEFORE the intersection (in arc-travel order).
   // Expected: keep right portion = (150,-50) -> (200,0); discard left side.
@@ -955,7 +955,7 @@ test('Trim.action trims an open polyline with two consecutive arc segments', () 
 });
 
 test('Trim.action trims an arc from the start (portionOne same-segment bulge)', () => {
-  // Arc: center (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10).
+  // Arc: centre (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10).
   // Boundary: vertical line at x=0, intersection at (0,10).
   // Mouse at (-7,7) — LEFT of intersection, so trimBefore=(0,10), trimAfter=null.
   // portionOne = startLoc(seg1,(10,0)) → trimBefore(seg1,(0,10)) — same-segment arc split.
@@ -987,7 +987,7 @@ test('Trim.action trims an arc from the start (portionOne same-segment bulge)', 
 });
 
 test('Trim.action trims the middle of an arc (two intersections on same arc segment)', () => {
-  // Arc: center (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10).
+  // Arc: centre (0,0), start (10,0), end (-10,0) — CCW upper semicircle through (0,10).
   // Two boundaries: vertical line at x=-5 and x=5.
   // Intersections at (5,√75)≈(5,8.66) and (-5,√75)≈(-5,8.66), both on segment 1.
   // Mouse at (0,9) — between both intersections at the top.

@@ -23,11 +23,11 @@ Example DXF Entity Pairs:
  value: 100.0       - y position
  */
 
-/** DXF Interator Class */
+/** DXF Iterator Class */
 export class DxfIterator {
   static _instance;
 
-  /** Create DXFInterator */
+  /** Create DXFIterator */
   constructor() {
     this.currentIndex = 0;
     this.lines = [];

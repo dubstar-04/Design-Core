@@ -128,22 +128,22 @@ test('Test Circle.toPolylinePoints', () => {
 });
 
 test('Circle.execute creates circle from diameter input', async () => {
-  const center = new Point(0, 0);
+  const centre = new Point(0, 0);
 
-  await withMockInput(DesignCore.Scene, [center, 'Diameter', 20], async () => {
+  await withMockInput(DesignCore.Scene, [centre, 'Diameter', 20], async () => {
     const circle = new Circle({});
     await circle.execute();
 
-    expect(circle.points[0]).toBe(center);
+    expect(circle.points[0]).toBe(centre);
     expect(circle.getRadius()).toBeCloseTo(10);
   });
 });
 
 test('Circle.execute re-prompts on zero or negative radius', async () => {
-  const center = new Point(0, 0);
+  const centre = new Point(0, 0);
 
   // 0 and -5 are rejected; 10 is accepted
-  await withMockInput(DesignCore.Scene, [center, 0, -5, 10], async () => {
+  await withMockInput(DesignCore.Scene, [centre, 0, -5, 10], async () => {
     const circle = new Circle({});
     await circle.execute();
 
@@ -152,10 +152,10 @@ test('Circle.execute re-prompts on zero or negative radius', async () => {
 });
 
 test('Circle.execute re-prompts on zero or negative diameter', async () => {
-  const center = new Point(0, 0);
+  const centre = new Point(0, 0);
 
   // 'Diameter', then 0 and -20 rejected, then 20 accepted (radius = 10)
-  await withMockInput(DesignCore.Scene, [center, 'Diameter', 0, -20, 20], async () => {
+  await withMockInput(DesignCore.Scene, [centre, 'Diameter', 0, -20, 20], async () => {
     const circle = new Circle({});
     await circle.execute();
 
@@ -175,8 +175,8 @@ test('Circle constructor loads radius from DXF group code 40 via fromDxf', () =>
 });
 
 test('Circle.execute creates circle from numeric radius input', async () => {
-  const center = new Point(0, 0);
-  await withMockInput(DesignCore.Scene, [center, 25], async () => {
+  const centre = new Point(0, 0);
+  await withMockInput(DesignCore.Scene, [centre, 25], async () => {
     const circle = new Circle({});
     await circle.execute();
     expect(circle.getRadius()).toBeCloseTo(25);
@@ -185,8 +185,8 @@ test('Circle.execute creates circle from numeric radius input', async () => {
 
 test('Circle.execute re-prompts on zero-distance point input', async () => {
   const notifySpy = jest.spyOn(DesignCore.Core, 'notify').mockImplementation(() => {});
-  const center = new Point(0, 0);
-  await withMockInput(DesignCore.Scene, [center, new Point(0, 0), new Point(10, 0)], async () => {
+  const centre = new Point(0, 0);
+  await withMockInput(DesignCore.Scene, [centre, new Point(0, 0), new Point(10, 0)], async () => {
     const circle = new Circle({});
     await circle.execute();
     expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Error.NONZERO));
@@ -296,10 +296,10 @@ test('Circle.snaps returns two tangent snaps from outside', () => {
 
 describe('Circle.fromDxf', () => {
   test('projects edge point from DXF radius code', () => {
-    const center = new Point(0, 0);
-    const result = Circle.fromDxf({ points: [center], 40: 10 });
+    const centre = new Point(0, 0);
+    const result = Circle.fromDxf({ points: [centre], 40: 10 });
     expect(result.points.length).toBe(2);
-    expect(result.points[0]).toBe(center);
+    expect(result.points[0]).toBe(centre);
     expect(result.points[1].x).toBeCloseTo(10);
     expect(result.points[1].y).toBeCloseTo(0);
   });
@@ -309,7 +309,7 @@ describe('Circle.fromDxf', () => {
     expect(result[8]).toBe('MyLayer');
   });
 
-  test('returns data unchanged when no center point', () => {
+  test('returns data unchanged when no centre point', () => {
     const data = { 40: 10 };
     expect(Circle.fromDxf(data)).toBe(data);
   });
@@ -320,9 +320,9 @@ describe('Circle.fromDxf', () => {
   });
 
   test('circle constructed via fromDxf matches circle constructed directly', () => {
-    const center = new Point(100, 100);
-    const fromDxfCircle = new Circle(Circle.fromDxf({ points: [center], 40: 50 }));
-    const directCircle = new Circle({ points: [center, new Point(150, 100)] });
+    const centre = new Point(100, 100);
+    const fromDxfCircle = new Circle(Circle.fromDxf({ points: [centre], 40: 50 }));
+    const directCircle = new Circle({ points: [centre, new Point(150, 100)] });
     expect(fromDxfCircle.getRadius()).toBeCloseTo(directCircle.getRadius());
     expect(fromDxfCircle.points[0].x).toBeCloseTo(directCircle.points[0].x);
     expect(fromDxfCircle.points[0].y).toBeCloseTo(directCircle.points[0].y);

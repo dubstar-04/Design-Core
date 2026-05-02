@@ -102,11 +102,11 @@ export class PdfRenderer extends RendererBase {
       if (!p.bulge) {
         this.#emit(`${this.#fmt(next.x)} ${this.#fmt(next.y)} l`);
       } else {
-        const center = p.bulgeCentrePoint(next);
+        const centre = p.bulgeCentrePoint(next);
         const radius = p.bulgeRadius(next);
-        const startAngle = center.angle(p);
+        const startAngle = centre.angle(p);
         const sweepAngle = p.bulgeAngle();
-        for (const curve of this.#arcToBezier(center, radius, startAngle, sweepAngle)) {
+        for (const curve of this.#arcToBezier(centre, radius, startAngle, sweepAngle)) {
           this.#emit(`${this.#fmt(curve.cp1x)} ${this.#fmt(curve.cp1y)} ${this.#fmt(curve.cp2x)} ${this.#fmt(curve.cp2y)} ${this.#fmt(curve.x)} ${this.#fmt(curve.y)} c`);
         }
       }
@@ -321,13 +321,13 @@ export class PdfRenderer extends RendererBase {
   /**
    * Approximate a circular arc as one or more PDF cubic Bezier curves.
    * Arcs larger than 90° are split into ≤90° segments for accuracy.
-   * @param {Point} center - arc centre
+   * @param {Point} centre - arc centre
    * @param {number} radius  - arc radius
    * @param {number} startAngle - angle from positive x-axis to arc start (radians)
    * @param {number} sweepAngle - signed sweep: positive = CCW, negative = CW (radians)
    * @return {Array<{cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number}>}
    */
-  #arcToBezier(center, radius, startAngle, sweepAngle) {
+  #arcToBezier(centre, radius, startAngle, sweepAngle) {
     // Number of ≤90° segments needed to keep Bezier error below ~0.03%
     const steps = Math.max(1, Math.ceil(Math.abs(sweepAngle) / (Math.PI / 2)));
     // Signed angle of each segment (negative for CW arcs)
@@ -340,8 +340,8 @@ export class PdfRenderer extends RendererBase {
       const a1 = startAngle + i * stepAngle;
       const a2 = a1 + stepAngle;
       // Points on the circle at the segment start and end angles
-      const p1 = center.project(a1, radius);
-      const p2 = center.project(a2, radius);
+      const p1 = centre.project(a1, radius);
+      const p2 = centre.project(a2, radius);
       // Control points are offset from p1/p2 along the tangent direction by radius*tangentScale.
       // Tangent at p1 (CCW) is a1 + π/2; tangent at p2 (CW, pointing back) is a2 - π/2.
       // tangentScale is signed, so CW arcs (negative sweepAngle) automatically reverse the offset.

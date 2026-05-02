@@ -187,20 +187,20 @@ export class Offset extends Tool {
           sign = cross >= 0 ? 1 : -1;
         }
       } else {
-        const center = A.bulgeCentrePoint(B);
-        const currentRadius = center.distance(A);
+        const centre = A.bulgeCentrePoint(B);
+        const currentRadius = centre.distance(A);
         const arcDir = A.bulge > 0 ? 1 : -1;
-        const closestPt = sidePoint.closestPointOnArc(A, B, center, arcDir);
+        const closestPt = sidePoint.closestPointOnArc(A, B, centre, arcDir);
         if (closestPt === null) continue;
         const dist = sidePoint.distance(closestPt);
         if (dist < minDist) {
           minDist = dist;
-          const distToCenter = center.distance(sidePoint);
-          // For CCW arc (arcDir>0): left of travel = toward center (smaller radius)
-          // For CW arc (arcDir<0): left of travel = away from center (larger radius)
+          const distToCentre = centre.distance(sidePoint);
+          // For CCW arc (arcDir>0): left of travel = toward centre (smaller radius)
+          // For CW arc (arcDir<0): left of travel = away from centre (larger radius)
           sign = arcDir > 0 ?
-            (distToCenter < currentRadius ? 1 : -1) :
-            (distToCenter >= currentRadius ? 1 : -1);
+            (distToCentre < currentRadius ? 1 : -1) :
+            (distToCentre >= currentRadius ? 1 : -1);
         }
       }
     }
@@ -221,19 +221,19 @@ export class Offset extends Tool {
           bulge: 0,
         });
       } else {
-        const center = A.bulgeCentrePoint(B);
-        const currentRadius = center.distance(A);
+        const centre = A.bulgeCentrePoint(B);
+        const currentRadius = centre.distance(A);
         const arcDir = A.bulge > 0 ? 1 : -1;
         const newRadius = currentRadius - arcDir * distance * sign;
         if (newRadius <= 0) return null;
-        const startAngle = Math.atan2(A.y - center.y, A.x - center.x);
-        const endAngle = Math.atan2(B.y - center.y, B.x - center.x);
+        const startAngle = Math.atan2(A.y - centre.y, A.x - centre.x);
+        const endAngle = Math.atan2(B.y - centre.y, B.x - centre.x);
         offsetSegs.push({
           type: 'arc',
-          A: new Point(center.x + newRadius * Math.cos(startAngle), center.y + newRadius * Math.sin(startAngle)),
-          B: new Point(center.x + newRadius * Math.cos(endAngle), center.y + newRadius * Math.sin(endAngle)),
+          A: new Point(centre.x + newRadius * Math.cos(startAngle), centre.y + newRadius * Math.sin(startAngle)),
+          B: new Point(centre.x + newRadius * Math.cos(endAngle), centre.y + newRadius * Math.sin(endAngle)),
           bulge: A.bulge,
-          center,
+          centre,
           radius: newRadius,
         });
       }
@@ -309,9 +309,9 @@ export class Offset extends Tool {
         const dist = throughPoint.distance(closest);
         if (dist < minDist) minDist = dist;
       } else {
-        const center = A.bulgeCentrePoint(B);
-        const radius = center.distance(A);
-        const dist = Math.abs(center.distance(throughPoint) - radius);
+        const centre = A.bulgeCentrePoint(B);
+        const radius = centre.distance(A);
+        const dist = Math.abs(centre.distance(throughPoint) - radius);
         if (dist < minDist) minDist = dist;
       }
     }

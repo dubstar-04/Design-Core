@@ -114,9 +114,9 @@ test('Test Text.getTextFrameCorners', () => {
   expect(corners[3].y).toBeCloseTo(100);
 
   // Text frame calculation with text alignment
-  // bounding rect is 10x10, so with center/middle alignment the text frame should be offset by 5 in both x and y from the insertion point
+  // bounding rect is 10x10, so with centre/middle alignment the text frame should be offset by 5 in both x and y from the insertion point
   const alignedText = new Text({ points: [new Point(100, 100)] });
-  alignedText.setProperty('horizontalAlignment', 1); // center
+  alignedText.setProperty('horizontalAlignment', 1); // centre
   corners = alignedText.getTextFrameCorners();
 
   expect(corners[0].x).toBeCloseTo(95);
@@ -149,7 +149,7 @@ test('Test Text.getTextFrameCorners', () => {
   expect(corners[3].y).toBeCloseTo(105);
 
 
-  // add rotation of 45 degrees to the center/middle aligned text and ensure the text frame corners are correctly calculated with both alignment and rotation applied
+  // add rotation of 45 degrees to the centre/middle aligned text and ensure the text frame corners are correctly calculated with both alignment and rotation applied
   alignedText.setRotation(45);
   corners = alignedText.getTextFrameCorners();
 
@@ -408,7 +408,7 @@ AcDbText
   // and a second alignment point with groupcode 11,21,31 for the text insertion point
   // bounding rect is 10x10, so second point should be at 100-(10*0.5), 200-(10*0.5) = 95, 195
 
-  const centeredText = new Text({
+  const centredText = new Text({
     handle: text.getProperty('handle'),
     points: text.points,
     string: text.getProperty('string'),
@@ -417,12 +417,12 @@ AcDbText
     horizontalAlignment: text.getProperty('horizontalAlignment'),
     verticalAlignment: text.getProperty('verticalAlignment'),
   });
-  centeredText.setProperty('horizontalAlignment', 1); // center
-  centeredText.setProperty('verticalAlignment', 2); // middle
+  centredText.setProperty('horizontalAlignment', 1); // centre
+  centredText.setProperty('verticalAlignment', 2); // middle
   file = new File();
-  centeredText.dxf(file);
+  centredText.dxf(file);
 
-  const dxfCenteredString = `0
+  const dxfCentredString = `0
 TEXT
 5
 1
@@ -459,21 +459,21 @@ AcDbText
 73
 2
 `;
-  expect(file.contents).toEqual(dxfCenteredString);
+  expect(file.contents).toEqual(dxfCentredString);
 
   // create new entity from entity data to ensure all props are loaded
   const importCenteredText = new Text({
-    handle: centeredText.getProperty('handle'),
-    points: centeredText.points,
-    string: centeredText.getProperty('string'),
-    height: centeredText.getProperty('height'),
-    styleName: centeredText.getProperty('styleName'),
-    horizontalAlignment: centeredText.getProperty('horizontalAlignment'),
-    verticalAlignment: centeredText.getProperty('verticalAlignment'),
+    handle: centredText.getProperty('handle'),
+    points: centredText.points,
+    string: centredText.getProperty('string'),
+    height: centredText.getProperty('height'),
+    styleName: centredText.getProperty('styleName'),
+    horizontalAlignment: centredText.getProperty('horizontalAlignment'),
+    verticalAlignment: centredText.getProperty('verticalAlignment'),
   });
   file = new File();
   importCenteredText.dxf(file);
-  expect(file.contents).toEqual(dxfCenteredString);
+  expect(file.contents).toEqual(dxfCentredString);
 });
 
 test('Text constructor covers all property branches', () => {
@@ -522,13 +522,13 @@ test('Text getHorizontalAlignment covers all cases', () => {
   t.setProperty('horizontalAlignment', 0);
   expect(t.getHorizontalAlignment()).toBe('left');
   t.setProperty('horizontalAlignment', 1);
-  expect(t.getHorizontalAlignment()).toBe('center');
+  expect(t.getHorizontalAlignment()).toBe('centre');
   t.setProperty('horizontalAlignment', 2);
   expect(t.getHorizontalAlignment()).toBe('right');
   t.setProperty('horizontalAlignment', 3); t.setProperty('verticalAlignment', 0);
   expect(t.getHorizontalAlignment()).toBe('aligned');
   t.setProperty('horizontalAlignment', 4); t.setProperty('verticalAlignment', 0);
-  expect(t.getHorizontalAlignment()).toBe('center');
+  expect(t.getHorizontalAlignment()).toBe('centre');
   t.setProperty('horizontalAlignment', 5); t.setProperty('verticalAlignment', 0);
   expect(t.getHorizontalAlignment()).toBe('fit');
   t.setProperty('horizontalAlignment', 99);

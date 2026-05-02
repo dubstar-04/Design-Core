@@ -148,9 +148,9 @@ export class BaseDimension extends Entity {
 
       if (data.hasOwnProperty('71')) {
         // DXF Groupcode 71 - Attachment Point
-        // 1 = Top left; 2 = Top center; 3 = Top right
-        // 4 = Middle left; 5 = Middle center; 6 = Middle right
-        // 7 = Bottom left; 8 = Bottom center; 9 = Bottom right
+        // 1 = Top left; 2 = Top centre; 3 = Top right
+        // 4 = Middle left; 5 = Middle centre; 6 = Middle right
+        // 7 = Bottom left; 8 = Bottom centre; 9 = Bottom right
         const err = 'Groupcode 71 not implemented';
         Logging.instance.debug(`${this.type} - ${err}`);
       }
@@ -301,7 +301,7 @@ export class BaseDimension extends Entity {
     const textHeight = this.getDimensionStyle().getValue('DIMTXT');
     // set the text height
     text.setProperty(Property.Names.HEIGHT, textHeight);
-    // Always set text horizontal alignment to center
+    // Always set text horizontal alignment to centre
     text.setProperty(Property.Names.HORIZONTALALIGNMENT, 1);
     // Always set text vertical alignment to middle
     text.setProperty(Property.Names.VERTICALALIGNMENT, 2);
@@ -391,19 +391,19 @@ export class BaseDimension extends Entity {
 
   /**
    * Get the geometry for the centre mark
-   * @param {Point} point centre point for center mark
-   * @return {Array} array of entities representing the center mark
+   * @param {Point} point centre point for centre mark
+   * @return {Array} array of entities representing the centre mark
    */
   getCentreMark(point) {
     /*
     * DIMCEN value defines the centre mark type and size
-    * 0 = No center marks or lines are drawn
-    * <0 = Centerlines are drawn
-    * >0 = Center marks are drawn
+    * 0 = No centre marks or lines are drawn
+    * <0 = Centrelines are drawn
+    * >0 = Centre marks are drawn
     */
 
     const centreMark = [];
-    // get the center mark style
+    // get the centre mark style
     const markStyle = this.getDimensionStyle().getValue('DIMCENSTYL');
     // get the centre mark size
     const markSize = this.getDimensionStyle().getValue('DIMCENVALUE');
@@ -490,7 +490,7 @@ export class BaseDimension extends Entity {
   }
 
   /**
-   * Refesh the dimension geometry
+   * Refresh the dimension geometry
    */
   refresh() {
     const entities = this.buildDimension();

@@ -152,7 +152,7 @@ export class Clipboard {
     const clipboardData = { basePoint: undefined, Entities: undefined };
     const jsonEntities = [];
 
-    // convert each entity to a simple object - this allows non-enumberable properties (like points) to be copied
+    // convert each entity to a simple object - this allows non-enumerable properties (like points) to be copied
     for (const ent of this.#Entities) {
       const jsonEntity = this.#simplify(ent);
       jsonEntities.push(jsonEntity);

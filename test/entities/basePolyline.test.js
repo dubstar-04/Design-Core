@@ -191,7 +191,7 @@ test('Test BasePolyline.boundingBox', () => {
 
 test('Test BasePolyline.getBulgeFromSegment', () => {
   // start point: 100,0
-  // center: 100,50
+  // centre: 100,50
   // radius: 50
   const points = [new Point(), new Point(100, 0)];
   const polyline = new BasePolyline({ points: points });
@@ -681,6 +681,75 @@ test('BasePolyline.closestPoint for open polyline does not include closing segme
   const [closest] = poly.closestPoint(new Point(-1, 1));
   expect(closest.x).toBeCloseTo(0);
   expect(closest.y).toBeCloseTo(0);
+});
+
+// ─── isPointOnSegment ────────────────────────────────────────────────────────
+
+const lineSegmentCases = [
+  { desc: 'midpoint', point: new Point(5, 0), expected: true },
+  { desc: 'start endpoint', point: new Point(0, 0), expected: true },
+  { desc: 'end endpoint', point: new Point(10, 0), expected: true },
+  { desc: 'perpendicular off-line', point: new Point(5, 5), expected: false },
+  { desc: 'collinear beyond end', point: new Point(15, 0), expected: false },
+];
+
+test.each(lineSegmentCases)('BasePolyline.isPointOnSegment line segment – $desc', ({ point, expected }) => {
+  const A = new Point(0, 0);
+  const B = new Point(10, 0);
+  const poly = new BasePolyline({ points: [A, B] });
+  expect(poly.isPointOnSegment(point, A, B)).toBe(expected);
+});
+
+// CCW 180° semicircle from (10,0) to (-10,0), bulge=1, centre=(0,0), radius=10.
+// Arc spans angles [0°, 180°] — the upper semicircle.
+const ccwArcCases = [
+  { desc: 'arc midpoint (0,10) at 90°', point: new Point(0, 10), expected: true },
+  { desc: 'start endpoint (10,0)', point: new Point(10, 0), expected: true },
+  { desc: 'end endpoint (-10,0)', point: new Point(-10, 0), expected: true },
+  { desc: 'lower semicircle (0,-10)', point: new Point(0, -10), expected: false },
+];
+
+test.each(ccwArcCases)('BasePolyline.isPointOnSegment CCW arc (bulge=1, 180°) – $desc', ({ point, expected }) => {
+  const A = new Point(10, 0);
+  A.bulge = 1;
+  const B = new Point(-10, 0);
+  const poly = new BasePolyline({ points: [A, B] });
+  expect(poly.isPointOnSegment(point, A, B)).toBe(expected);
+});
+
+// CW 180° semicircle from (10,0) to (-10,0), bulge=-1, centre=(0,0), radius=10.
+// Arc spans angles ≤0° or ≥180° — the lower semicircle.
+const cwArcCases = [
+  { desc: 'arc midpoint (0,-10) at -90°', point: new Point(0, -10), expected: true },
+  { desc: 'start endpoint (10,0)', point: new Point(10, 0), expected: true },
+  { desc: 'end endpoint (-10,0)', point: new Point(-10, 0), expected: true },
+  { desc: 'upper semicircle (0,10)', point: new Point(0, 10), expected: false },
+];
+
+test.each(cwArcCases)('BasePolyline.isPointOnSegment CW arc (bulge=-1, 180°) – $desc', ({ point, expected }) => {
+  const A = new Point(10, 0);
+  A.bulge = -1;
+  const B = new Point(-10, 0);
+  const poly = new BasePolyline({ points: [A, B] });
+  expect(poly.isPointOnSegment(point, A, B)).toBe(expected);
+});
+
+// CCW 180° arc from (0,10) to (0,-10), bulge=1, centre=(0,0), radius=10.
+// startAngle=90° > endAngle=-90° so the check wraps: angles ≥90° OR ≤-90°.
+// This covers the left semicircle (through (-10,0)).
+const ccwArcWrapCases = [
+  { desc: 'left midpoint (-10,0) at 180°', point: new Point(-10, 0), expected: true },
+  { desc: 'start endpoint (0,10)', point: new Point(0, 10), expected: true },
+  { desc: 'end endpoint (0,-10)', point: new Point(0, -10), expected: true },
+  { desc: 'right side (10,0) at 0°', point: new Point(10, 0), expected: false },
+];
+
+test.each(ccwArcWrapCases)('BasePolyline.isPointOnSegment CCW arc wrapping past ±180° (bulge=1, startAngle=90° > endAngle=-90°) – $desc', ({ point, expected }) => {
+  const A = new Point(0, 10);
+  A.bulge = 1;
+  const B = new Point(0, -10);
+  const poly = new BasePolyline({ points: [A, B] });
+  expect(poly.isPointOnSegment(point, A, B)).toBe(expected);
 });
 
 test('BasePolyline.closestPoint is consistent with getClosestSegmentIndex for closed polyline', () => {

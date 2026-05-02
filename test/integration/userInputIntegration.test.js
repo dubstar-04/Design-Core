@@ -106,13 +106,13 @@ beforeAll(async () => {
     new Point(90, 50),
   ]);
 
-  // col 1, row 0 — Circle, center (250,50) r=30 → idx 1
+  // col 1, row 0 — Circle, centre (250,50) r=30 → idx 1
   await executeWithInputs(new Circle(), [
     new Point(250, 50),
     30,
   ]);
 
-  // col 2, row 0 — Arc, center (450,50), start (480,50), 270° CCW → idx 2
+  // col 2, row 0 — Arc, centre (450,50), start (480,50), 270° CCW → idx 2
   await executeWithInputs(new Arc(), [
     new Point(450, 50),
     new Point(480, 50),

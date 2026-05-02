@@ -188,8 +188,8 @@ export class SelectionManager {
    * @param  {number} index
    */
   addToSelectedItems(index) {
-    const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(index));
-    this.selectedItems.push(copyofitem);
+    const copyOfItem = Utils.cloneObject(DesignCore.Scene.entities.get(index));
+    this.selectedItems.push(copyOfItem);
   }
 
   /**

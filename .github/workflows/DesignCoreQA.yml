@@ -27,6 +27,9 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    - name: Spell Check
+      run: npx cspell "**/*.{js,md}" --no-progress
+
     - name: Circular Dependency Check
       run: npx madge --circular --extensions js .
 

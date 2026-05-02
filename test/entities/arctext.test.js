@@ -105,7 +105,7 @@ test('ArcText getArcAlignedCharacters', () => {
   // offsetFromLeft 0 - mm
   // textReversed 0 = forward, 1 = reversed
   // textOrientation 1 = outward, 2 = inward
-  // textAlignment 1 = fit to arc, 2 = left align, 3 = right align, 4 = center
+  // textAlignment 1 = fit to arc, 2 = left align, 3 = right align, 4 = centre
   // ArcSide convex = 1, concave = 2
   let chars = [];
 
@@ -387,7 +387,7 @@ test('ArcText snaps with empty string returns only centre snap', () => {
 });
 
 test('ArcText closestPoint returns distance 0.1 when within height * 0.35', () => {
-  // Single char 'T' center-aligned sits at (0, 101.25); height = 2.5, threshold = 0.875
+  // Single char 'T' centre-aligned sits at (0, 101.25); height = 2.5, threshold = 0.875
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'T', radius: 100 });
   const chars = arcText.getArcAlignedCharacters();
   const charPos = chars[0].position;
@@ -408,7 +408,7 @@ test('ArcText getArcAlignedCharacters fit-to-arc single character places at midp
 });
 
 test('ArcText getArcAlignedCharacters single character is placed at arc midpoint', () => {
-  // Single char with center alignment: charOffsetAngles = [0], stringStartPoint = arcMidPoint
+  // Single char with centre alignment: charOffsetAngles = [0], stringStartPoint = arcMidPoint
   // arcMidAngle(0, PI) = PI/2 → project(PI/2, 101.25) = (0, 101.25), angle = PI/2 - PI/2 = 0
   const arcText = new ArcAlignedText({ points: [new Point(0, 0)], string: 'X', radius: 100 });
   const chars = arcText.getArcAlignedCharacters();

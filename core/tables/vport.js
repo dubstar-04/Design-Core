@@ -12,9 +12,9 @@ export class VPort {
     this.handle = Property.loadValue([data?.handle, data?.[5]]);
     // DXF Groupcode 2 - Name
     this.name = Property.loadValue([data?.name, data?.[2]], '*ACTIVE');
-    // DXF Groupcode 12 - View center X
+    // DXF Groupcode 12 - View centre X
     this.viewCenterX = Property.loadValue([data?.viewCenterX, data?.[12]], 0);
-    // DXF Groupcode 22 - View center Y
+    // DXF Groupcode 22 - View centre Y
     this.viewCenterY = Property.loadValue([data?.viewCenterY, data?.[22]], 0);
     // DXF Groupcode 40 - VPort height
     this.height = Property.loadValue([data?.height, data?.[40]], 0);

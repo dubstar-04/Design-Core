@@ -77,14 +77,14 @@ test('constructor sets default properties', () => {
 
 
 test('getPointsFromSelection returns correct sequenced points', () => {
-  const center = new Point(0, 0);
+  const centre = new Point(0, 0);
   const textPos = new Point(10, 0);
   // Mock item with getRadius
-  const item = { points: [center], getRadius: () => 10 };
+  const item = { points: [centre], getRadius: () => 10 };
   const result = RadialDimension.getPointsFromSelection([item], textPos);
   expect(Array.isArray(result)).toBe(true);
   expect(result.length).toBe(3);
-  expect(result[0].sequence).toBe(10); // center
+  expect(result[0].sequence).toBe(10); // centre
   expect(result[1].sequence).toBe(15); // radius point
   expect(result[2].sequence).toBe(11); // text position
 });

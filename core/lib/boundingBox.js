@@ -55,9 +55,9 @@ export class BoundingBox {
   }
 
   /**
-   * return bounding box center point
+   * return bounding box centre point
    */
-  get centerPoint() {
+  get centrePoint() {
     return new Point(this.xMin + this.xLength / 2, this.yMin + this.yLength / 2);
   }
 
@@ -136,16 +136,16 @@ export class BoundingBox {
 
   /**
    * Calculate the boundingbox for an arc
-   * @param {Point} centerPoint
+   * @param {Point} centrePoint
    * @param {Point} startPoint
    * @param {Point} endPoint
    * @param {number} direction - ccw > 0, cw < 0
    * @return {BoundingBox}
    */
-  static arcBoundingBox(centerPoint, startPoint, endPoint, direction = 1) {
-    const startAngle = centerPoint.angle(startPoint);
-    const endAngle = centerPoint.angle(endPoint);
-    const radius = centerPoint.distance(startPoint);
+  static arcBoundingBox(centrePoint, startPoint, endPoint, direction = 1) {
+    const startAngle = centrePoint.angle(startPoint);
+    const endAngle = centrePoint.angle(endPoint);
+    const radius = centrePoint.distance(startPoint);
 
     const cross0 = this.crossesAxis(startAngle, endAngle, 0, direction);
     const cross90 = this.crossesAxis(startAngle, endAngle, Math.PI * 0.5, direction);
@@ -154,10 +154,10 @@ export class BoundingBox {
 
     // if the arc crosses the axis the min or max is where the arc intersects the axis
     // otherwise max/min is the arc endpoint
-    const xmin = cross180 ? centerPoint.x - radius : Math.min(startPoint.x, endPoint.x);
-    const xmax = cross0 ? centerPoint.x + radius : Math.max(startPoint.x, endPoint.x);
-    const ymin = cross270 ? centerPoint.y - radius : Math.min(startPoint.y, endPoint.y);
-    const ymax = cross90 ? centerPoint.y + radius : Math.max(startPoint.y, endPoint.y);
+    const xmin = cross180 ? centrePoint.x - radius : Math.min(startPoint.x, endPoint.x);
+    const xmax = cross0 ? centrePoint.x + radius : Math.max(startPoint.x, endPoint.x);
+    const ymin = cross270 ? centrePoint.y - radius : Math.min(startPoint.y, endPoint.y);
+    const ymax = cross90 ? centrePoint.y + radius : Math.max(startPoint.y, endPoint.y);
 
     const topLeft = new Point(xmin, ymax);
     const bottomRight = new Point(xmax, ymin);
