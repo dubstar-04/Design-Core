@@ -482,7 +482,7 @@ export class Hatch extends Entity {
         const result = await DesignCore.Scene.inputManager.requestInput(op);
         if (result === undefined) return;
 
-        const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
+        const selectedItems = DesignCore.Scene.selectionManager.selectedEntities.slice(0);
         const boundary = this.processSelection(selectedItems);
 
         if (boundary.length) {
@@ -506,7 +506,7 @@ export class Hatch extends Entity {
    * Preview the entity during creation
    */
   preview() {
-    const selectedItems = DesignCore.Scene.selectionManager.selectedItems.slice(0);
+    const selectedItems = DesignCore.Scene.selectionManager.selectedEntities.slice(0);
     const shapes = this.processSelection(selectedItems);
     if (shapes.length) {
       DesignCore.Scene.previewEntities.create(this.type, { points: this.points, childEntities: shapes }); // childEntities is passed as plain data here, not via getProperty
@@ -635,7 +635,7 @@ export class Hatch extends Entity {
     }
 
     // Draw the boundary outline when hovered or selected.
-    const isSelected = DesignCore.Scene.selectionManager.selectedItems.includes(this);
+    const isSelected = DesignCore.Scene.selectionManager.selectedEntities.includes(this);
     const isHovered = DesignCore.Scene.hoverEntities.indexOf(this) !== -1;
     if (isSelected || isHovered) {
       renderer.setDash([], 0);
