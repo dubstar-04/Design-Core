@@ -189,7 +189,7 @@ export class Canvas {
    */
   wheel(delta) {
     if (DesignCore.Mouse.buttonTwoDown) return;
-    // Clamp to [-1, 1] so that high-resolution mice and trackpads don't produce runaway jumps.
+    // Clamp to [-1, 1] so that high-resolution mice and track pads don't produce runaway jumps.
     const clampedDelta = Math.max(-1, Math.min(1, delta));
     const scale = Math.pow(1.2, clampedDelta);
     if (scale < 1 && this.getScale() > this.minScaleFactor || scale > 1 && this.getScale() < this.maxScaleFactor) {
