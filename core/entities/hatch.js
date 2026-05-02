@@ -141,7 +141,7 @@ export class Hatch extends Entity {
       }
     }
 
-    const centerPoint = bb.centerPoint;
+    const centrePoint = bb.centrePoint;
     const bbXLength = bb.xLength;
     const bbYLength = bb.yLength;
     const s = this.getProperty(Property.Names.SCALE);
@@ -175,8 +175,8 @@ export class Hatch extends Entity {
 
       // World-space anchor for this family: bounding-box centre shifted by the
       // pattern line's origin offset (scaled to match the hatch scale).
-      const cx = centerPoint.x + patternLine.xOrigin * s;
-      const cy = centerPoint.y + patternLine.yOrigin * s;
+      const cx = centrePoint.x + patternLine.xOrigin * s;
+      const cy = centrePoint.y + patternLine.yOrigin * s;
 
       // Bounding-box half-extents in pattern-local (unscaled) space.
       const halfW = bbXLength / (2 * s);
@@ -390,13 +390,13 @@ export class Hatch extends Entity {
                 // 10 - X; 20 - Y;  40 - Radius;  50 - Start Angle;  51 - End Angle; 73 - Is Counter Clockwise
                 const shapeData = { points: [] };
 
-                const centerPoint = points.shift();
-                if (centerPoint.sequence !== undefined && centerPoint.sequence !== 10) {
+                const centrePoint = points.shift();
+                if (centrePoint.sequence !== undefined && centrePoint.sequence !== 10) {
                   const msg = 'Invalid point sequence';
                   const err = (`${this.type} - ${msg}`);
                   throw Error(err);
                 }
-                shapeData.points.push(centerPoint);
+                shapeData.points.push(centrePoint);
                 shapeData.radius = this.getDataValue(data, 40);
                 shapeData.startAngle = this.getDataValue(data, 50);
                 shapeData.endAngle = this.getDataValue(data, 51);
@@ -850,11 +850,11 @@ export class Hatch extends Entity {
         const theta = ang - this.points[0].angle(this.points.at(-1));
 
         if (theta !== 0) {
-          // set rotation center
-          const center = this.points[0];
+          // set rotation centre
+          const centre = this.points[0];
           // apply rotation to child entities points
           hatchChildren.forEach((child) => {
-            const rotatedPoints = child.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(center, theta));
+            const rotatedPoints = child.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(centre, theta));
             child.setProperty(Property.Names.POINTS, rotatedPoints);
           });
 
