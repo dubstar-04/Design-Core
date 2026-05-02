@@ -311,10 +311,10 @@ export class BasePolyline extends Entity {
       let closestPoint;
       let candidateSegment;
       if (A.bulge !== 0) {
-        const center = A.bulgeCentrePoint(B);
+        const centre = A.bulgeCentrePoint(B);
         const direction = A.bulge > 0 ? 1 : -1;
-        closestPoint = P.closestPointOnArc(A, B, center, direction);
-        candidateSegment = new Arc({ points: [center, A, B], direction });
+        closestPoint = P.closestPointOnArc(A, B, centre, direction);
+        candidateSegment = new Arc({ points: [centre, A, B], direction });
       } else {
         closestPoint = P.closestPointOnLine(A, B);
         candidateSegment = new Line({ points: [A, B] });
@@ -420,9 +420,9 @@ export class BasePolyline extends Entity {
    */
   isPointOnSegment(point, A, B) {
     if (A.bulge !== 0) {
-      const center = A.bulgeCentrePoint(B);
+      const centre = A.bulgeCentrePoint(B);
       const direction = A.bulge > 0 ? 1 : -1;
-      return point.isOnArc(A, B, center, direction);
+      return point.isOnArc(A, B, centre, direction);
     }
     return point.isOnLine(A, B);
   }
@@ -438,9 +438,9 @@ export class BasePolyline extends Entity {
     const B = this.points[segmentIndex % this.points.length];
 
     if (A.bulge !== 0) {
-      const center = A.bulgeCentrePoint(B);
+      const centre = A.bulgeCentrePoint(B);
       const direction = A.bulge > 0 ? 1 : -1;
-      const closest = point.closestPointOnArc(A, B, center, direction);
+      const closest = point.closestPointOnArc(A, B, centre, direction);
 
       if (closest) {
         return closest;
@@ -464,10 +464,10 @@ export class BasePolyline extends Entity {
     const B = this.points[segmentIndex % this.points.length];
 
     if (A.bulge !== 0) {
-      const center = A.bulgeCentrePoint(B);
+      const centre = A.bulgeCentrePoint(B);
       const direction = A.bulge > 0 ? 1 : -1;
-      const startAngle = center.angle(A);
-      const pointAngle = center.angle(point);
+      const startAngle = centre.angle(A);
+      const pointAngle = centre.angle(point);
       return ((pointAngle - startAngle) * direction + 4 * Math.PI) % (2 * Math.PI);
     }
 
@@ -490,8 +490,8 @@ export class BasePolyline extends Entity {
       let boundingBox = BoundingBox.lineBoundingBox(this.points[i], nextPoint);
 
       if (this.points[i].bulge !== 0) {
-        const centerPoint = this.points[i].bulgeCentrePoint(nextPoint);
-        boundingBox = BoundingBox.arcBoundingBox(centerPoint, this.points[i], nextPoint, this.points[i].bulge);
+        const centrePoint = this.points[i].bulgeCentrePoint(nextPoint);
+        boundingBox = BoundingBox.arcBoundingBox(centrePoint, this.points[i], nextPoint, this.points[i].bulge);
       }
 
       xmin = Math.min(xmin, boundingBox.xMin);
@@ -519,9 +519,9 @@ export class BasePolyline extends Entity {
     // get the angle at the end of the previous segment
     let lastSegAngle;
     if (lastSegIsArc) {
-      const centerPoint = this.points.at(-2).bulgeCentrePoint(this.points.at(-1));
-      // angle is perpendicular to the center-to-end point ray, in the direction of the bulge
-      lastSegAngle = centerPoint.angle(this.points.at(-1)) + (Math.PI / 2) * Math.sign(lastSegBulge);
+      const centrePoint = this.points.at(-2).bulgeCentrePoint(this.points.at(-1));
+      // angle is perpendicular to the centre-to-end point ray, in the direction of the bulge
+      lastSegAngle = centrePoint.angle(this.points.at(-1)) + (Math.PI / 2) * Math.sign(lastSegBulge);
     } else {
       // line segment angle is the angle from point 0 to point 1
       lastSegAngle = this.points.at(-2).angle(this.points.at(-1));
