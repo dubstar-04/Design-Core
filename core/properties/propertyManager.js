@@ -33,7 +33,7 @@ export class PropertyManager {
    * @param {any} newPropertyValue
    * @param {string} itemType
    */
-  setItemProperties(property, newPropertyValue, itemType='All') {
+  setEntityProperties(property, newPropertyValue, itemType='All') {
     const stateChanges = [];
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
@@ -63,14 +63,14 @@ export class PropertyManager {
       }
     }
     DesignCore.Scene.commit(stateChanges);
-    DesignCore.Scene.selectionManager.reloadSelectedItems();
+    DesignCore.Scene.selectionManager.reloadSelectedEntities();
   }
 
   /**
    * Get the types of items selected
    * @return {Array}
    */
-  getItemTypes() {
+  getEntityTypes() {
     // Loop through the items and get a list of item types.
     const itemTypes = [];
 
@@ -98,7 +98,7 @@ export class PropertyManager {
    * @param {string} itemType
    * @return {Array}
    */
-  getItemProperties(itemType) {
+  getEntityProperties(itemType) {
     // Loop through the items and get a list of common properties.
 
     // check for valid itemType and selectionSet
@@ -142,7 +142,7 @@ export class PropertyManager {
    * @param {string} property
    * @return {Property|undefined}
    */
-  getItemPropertyDefinition(itemType, property) {
+  getEntityPropertyDefinition(itemType, property) {
     const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet.find((i) => {
       const item = DesignCore.Scene.entities.get(i);
       return (itemType === 'All' || item.type === itemType) && item.properties?.has(property);
@@ -157,7 +157,7 @@ export class PropertyManager {
    * @param {string} property
    * @return {Array}
    */
-  getItemPropertyValue(itemType, property) {
+  getEntityPropertyValue(itemType, property) {
     // Loop through the items and get a list the property values
     const propertiesValueList = [];
     if (DesignCore.Scene.selectionManager.selectionSet.selectionSet.length > 0) {
