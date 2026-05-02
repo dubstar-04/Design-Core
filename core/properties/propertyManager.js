@@ -94,7 +94,7 @@ export class PropertyManager {
   }
 
   /**
-   * Get a list of common propertie
+   * Get a list of common properties
    * @param {string} itemType
    * @return {Array}
    */
