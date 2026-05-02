@@ -241,7 +241,7 @@ test('onCommandButton with no active command - starts command', () => {
 
 test('starting an entity command from idle clears the selection', () => {
   inputManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
   expect(core.scene.selectionManager.selectionSet.selectionSet.length).toBe(1);
 
@@ -252,7 +252,7 @@ test('starting an entity command from idle clears the selection', () => {
 
 test('starting a tool command from idle preserves the selection', () => {
   inputManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
   expect(core.scene.selectionManager.selectionSet.selectionSet.length).toBe(1);
 
@@ -1183,7 +1183,7 @@ test('highlightEntityUnderMouse returns false when buttonThreeDown is true', () 
 
 test('refreshPreview clears hoverEntities in addition to previewEntities and auxiliaryEntities', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   // Simulate a stale hover glow left by the previous mouseMoved()
   DesignCore.Scene.hoverEntities.add(core.scene.entities.get(0));
