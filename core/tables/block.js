@@ -36,7 +36,7 @@ export class Block extends Entity {
       writable: true,
     });
 
-    Object.defineProperty(this, 'items', {
+    Object.defineProperty(this, 'entities', {
       value: [],
       writable: true,
     });
@@ -47,8 +47,8 @@ export class Block extends Entity {
         this.name = data.name || data[2];
       }
 
-      if (data.hasOwnProperty('items')) {
-        this.items = data.items;
+      if (data.hasOwnProperty('entities')) {
+        this.entities = data.entities;
       }
 
       if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
@@ -127,7 +127,7 @@ export class Block extends Entity {
           const points = copyOfItem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
           copyOfItem.setProperty('points', points);
         }
-        block.items.push(copyOfItem);
+        block.entities.push(copyOfItem);
         const stateChangeRemove = new RemoveState(item);
         stateChanges.push(stateChangeRemove);
       });
@@ -175,8 +175,8 @@ export class Block extends Entity {
     file.writeGroupCode('3', this.name); // Name again
     file.writeGroupCode('1', '');
 
-    for (let i = 0; i < this.items.length; i++) {
-      this.items[i].dxf(file);
+    for (let i = 0; i < this.entities.length; i++) {
+      this.entities[i].dxf(file);
     }
 
     const endblk = new EndBlock({ handle: this.endblkHandle });
@@ -184,18 +184,18 @@ export class Block extends Entity {
   }
 
   /**
-   * Clear items from the block
+   * Clear entities from the block
    */
-  clearItems() {
-    this.items = [];
+  clearEntities() {
+    this.entities = [];
   }
 
   /**
-   * Add an item to the block
-   * @param {Object} item
+   * Add an entity to the block
+   * @param {Object} entity
    */
-  addItem(item) {
-    this.items.push(item);
+  addEntity(entity) {
+    this.entities.push(entity);
   }
 
   /**
@@ -207,14 +207,14 @@ export class Block extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (!this.items.length) {
+    if (!this.entities.length) {
       // nothing to draw
       return snaps;
     }
 
-    for (let item = 0; item < this.items.length; item++) {
+    for (let item = 0; item < this.entities.length; item++) {
       // collect the child item snaps
-      const itemSnaps = this.items[item].snaps(mousePoint, delta);
+      const itemSnaps = this.entities[item].snaps(mousePoint, delta);
       snaps.push(...itemSnaps);
     }
 
@@ -230,13 +230,13 @@ export class Block extends Entity {
     let distance = Infinity;
     let minPnt = P;
 
-    if (!this.items.length) {
+    if (!this.entities.length) {
       // nothing to draw
       return [minPnt, distance];
     }
 
-    for (let idx = 0; idx < this.items.length; idx++) {
-      const itemClosestPoint = this.items[idx].closestPoint(P);
+    for (let idx = 0; idx < this.entities.length; idx++) {
+      const itemClosestPoint = this.entities[idx].closestPoint(P);
       const itemPnt = itemClosestPoint[0];
       const itemDist = itemClosestPoint[1];
 
@@ -259,8 +259,8 @@ export class Block extends Entity {
     let ymin = Infinity;
     let ymax = -Infinity;
 
-    for (let idx = 0; idx < this.items.length; idx++) {
-      const itemBoundingBox = this.items[idx].boundingBox();
+    for (let idx = 0; idx < this.entities.length; idx++) {
+      const itemBoundingBox = this.entities[idx].boundingBox();
 
       xmin = Math.min(xmin, itemBoundingBox.xMin);
       xmax = Math.max(xmax, itemBoundingBox.xMax);
@@ -280,8 +280,8 @@ export class Block extends Entity {
    * @return {boolean} true if touched
    */
   touched(selection) {
-    for (let idx = 0; idx < this.items.length; idx++) {
-      const touched = this.items[idx].touched(selection);
+    for (let idx = 0; idx < this.entities.length; idx++) {
+      const touched = this.entities[idx].touched(selection);
       if (touched) {
         return true;
       }
