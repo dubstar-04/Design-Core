@@ -111,7 +111,7 @@ export class BaseCircularDimension extends BaseDimension {
     const entities = [];
 
     const Pt15 = this.getPointBySequence(this.points, 15); // radius point
-    const Pt10 = this.getPointBySequence(this.points, 10); // centre point for radial dim or radial point for diameteric dim
+    const Pt10 = this.getPointBySequence(this.points, 10); // centre point for radial dim or radial point for diametric dim
     let Pt11 = this.getPointBySequence(this.points, 11); // text position
 
     // Style values

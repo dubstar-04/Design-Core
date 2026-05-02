@@ -60,17 +60,17 @@ export class Purge extends Tool {
     let purgedCount = 0;
 
     if (this.option === 'Blocks' || this.option === 'All') {
-      const intialitemCount = DesignCore.Scene.blockManager.itemCount();
+      const initialItemCount = DesignCore.Scene.blockManager.itemCount();
       DesignCore.Scene.blockManager.purge();
-      const finalitemCount = DesignCore.Scene.blockManager.itemCount();
-      purgedCount += (intialitemCount - finalitemCount);
+      const finalItemCount = DesignCore.Scene.blockManager.itemCount();
+      purgedCount += (initialItemCount - finalItemCount);
     }
 
     if (this.option === 'Dimstyles' || this.option === 'All') {
-      const intialitemCount = DesignCore.DimStyleManager.itemCount();
+      const initialItemCount = DesignCore.DimStyleManager.itemCount();
       DesignCore.DimStyleManager.purge();
-      const finalitemCount = DesignCore.DimStyleManager.itemCount();
-      purgedCount += (intialitemCount - finalitemCount);
+      const finalItemCount = DesignCore.DimStyleManager.itemCount();
+      purgedCount += (initialItemCount - finalItemCount);
     }
 
     if (this.option === 'Layers' || this.option === 'All') {

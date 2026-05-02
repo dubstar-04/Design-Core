@@ -462,7 +462,7 @@ export class Patterns {
 60, 0, 0, 4.7625, 2.749630645, -6.35, 3.175` },
 
     'HOUND': {
-      description: 'Houndstooth check', pattern:
+      description: 'Hounds tooth check', pattern:
                 `0, 0, 0, 6.35, 1.5875, 25.4, -12.7
 90, 0, 0, 6.35, 1.5875, 25.4, -12.7` },
 

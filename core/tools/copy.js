@@ -103,10 +103,10 @@ export class Copy extends Tool {
     const stateChanges = [];
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      const copyofitem = Utils.cloneObject(DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]));
-      const offsetPoints = copyofitem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-      copyofitem.setProperty('points', offsetPoints);
-      const stateChange = new AddState(copyofitem);
+      const copyOfItem = Utils.cloneObject(DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]));
+      const offsetPoints = copyOfItem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+      copyOfItem.setProperty('points', offsetPoints);
+      const stateChange = new AddState(copyOfItem);
       stateChanges.push(stateChange);
     }
 

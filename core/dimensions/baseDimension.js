@@ -398,8 +398,8 @@ export class BaseDimension extends Entity {
     /*
     * DIMCEN value defines the centre mark type and size
     * 0 = No centre marks or lines are drawn
-    * <0 = Centerlines are drawn
-    * >0 = Center marks are drawn
+    * <0 = Centrelines are drawn
+    * >0 = Centre marks are drawn
     */
 
     const centreMark = [];

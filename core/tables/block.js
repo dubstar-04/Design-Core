@@ -118,16 +118,16 @@ export class Block extends Entity {
       selections.forEach((index) => {
         const item = DesignCore.Scene.entities.get(index);
         // remove item from scene
-        const copyofitem = Utils.cloneObject(item);
+        const copyOfItem = Utils.cloneObject(item);
         // assign a fresh handle — the block item is a new entity distinct from the scene entity
-        copyofitem.setProperty('handle', DesignCore.HandleManager.next());
+        copyOfItem.setProperty('handle', DesignCore.HandleManager.next());
         // adjust the items points to reflect the insert point
         const delta = new Point(-insertPoint.x, -insertPoint.y);
         if (item.hasOwnProperty('points')) {
-          const points = copyofitem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-          copyofitem.setProperty('points', points);
+          const points = copyOfItem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+          copyOfItem.setProperty('points', points);
         }
-        block.items.push(copyofitem);
+        block.items.push(copyOfItem);
         const stateChangeRemove = new RemoveState(item);
         stateChanges.push(stateChangeRemove);
       });
