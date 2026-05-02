@@ -130,8 +130,8 @@ export class Scale extends Tool {
 
       const factor = this.referenceLength !== null ? distance / this.referenceLength : distance;
 
-      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedEntities.length; i++) {
+        const item = DesignCore.Scene.selectionManager.selectedEntities[i];
         const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
         const originalItem = DesignCore.Scene.entities.get(entityIndex);
         item.setProperty('points', this.getScaledPoints(originalItem.points, base, factor));
