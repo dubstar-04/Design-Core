@@ -74,8 +74,8 @@ export class Move extends Tool {
       const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);
       this.lastMousePoint = mousePoint;
 
-      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedEntities.length; i++) {
+        const item = DesignCore.Scene.selectionManager.selectedEntities[i];
         item.setProperty('points', this.getOffsetPoints(item.points, delta));
       }
     }
