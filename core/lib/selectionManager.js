@@ -41,8 +41,8 @@ export class SelectionSet {
 export class SelectionManager {
   /** Create a SelectionManager */
   constructor() {
-    this.selectionSet = new SelectionSet(); // store a list of selected items indices
-    this.selectedEntities = []; // store a copy of selected items
+    this.selectionSet = new SelectionSet(); // store a list of selected entities indices
+    this.selectedEntities = []; // store a copy of selected entities
   }
 
   /**
@@ -55,7 +55,7 @@ export class SelectionManager {
   }
 
   /**
-   * Remove the last selection from the selected items
+   * Remove the last selection from the selected entities
    */
   removeLastSelection() {
     this.selectedEntities.pop();

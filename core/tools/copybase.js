@@ -56,7 +56,7 @@ export class Copybase extends Tool {
    * Perform the command
    */
   action() {
-    // generate clipboard data from selected items
+    // generate clipboard data from selected entities
     const selectedEntities = DesignCore.Scene.selectionManager.selectedEntities;
 
     // create clipboard data

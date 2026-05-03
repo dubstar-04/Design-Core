@@ -116,7 +116,7 @@ export class Block extends Entity {
       // array to hold state changes
       const stateChanges = [];
 
-      // move selected items from scene to block
+      // move selected entities from scene to block
       selections.forEach((index) => {
         const item = DesignCore.Scene.entities.get(index);
         // remove item from scene

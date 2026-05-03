@@ -178,8 +178,8 @@ export class Dimension extends DimensionBase {
         if (Input.getType(input2) === Input.Type.POINT) {
           const Pt11 = input2;
 
-          // if selected items are available, get the points from the selected items
-          // dimensions can be created from point selection only, therefore selected items may not be available
+          // if selected entities are available, get the points from the selected entities
+          // dimensions can be created from point selection only, therefore selected entities may not be available
           if (this.selectedEntities.length) {
             // for linear dimensions, determine if aligned or rotated based on mouse position
             if (this.dimType.getBaseDimType() === 0 || this.dimType.getBaseDimType() === 1) {

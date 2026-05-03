@@ -534,10 +534,10 @@ export class Hatch extends Entity {
       lastIndexCount = selectedEntities.length;
 
       for (let i = 0; i < selectedEntities.length; i++) {
-        // no points collected - get the first index from selected items
+        // no points collected - get the first index from selected entities
 
         const currentItem = selectedEntities[i];
-        // if the item can't be converted to polyline points, remove from selected items and go again
+        // if the item can't be converted to polyline points, remove from selected entities and go again
         if (typeof currentItem.toPolylinePoints === 'undefined' || currentItem.type === 'Text' || currentItem.type === 'ArcAlignedText') {
           selectedEntities.splice(i, 1);
           break;
@@ -575,7 +575,7 @@ export class Hatch extends Entity {
             iterationPoints.push(...currentPoints);
           }
 
-          // remove the index from selected items
+          // remove the index from selected entities
           selectedEntities = selectedEntities.filter((index) => index !== selectedEntities[i]);
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1))) {

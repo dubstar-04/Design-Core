@@ -49,7 +49,7 @@ export class Trim extends Tool {
         if (boundary === undefined) return;
       }
 
-      // add all selected items to boundary items
+      // add all selected entities to boundary items
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
         const boundaryItem = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
         this.selectedBoundaryItems.push(boundaryItem);
