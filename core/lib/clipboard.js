@@ -69,7 +69,7 @@ export class Clipboard {
       return;
     }
 
-    // copy the item to avoid mutation of originals
+    // copy the entity to avoid mutation of originals
     this.#Entities = entities.map((entity) => Utils.cloneObject(entity));
     // set basepoint to bottom left of selection bounding box
     const bbox = BoundingBox.fromEntities(entities);
