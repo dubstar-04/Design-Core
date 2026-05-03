@@ -774,7 +774,7 @@ export class Hatch extends Entity {
         const intersect = Intersection.intersectPolylinePolyline(polyline, line);
         const intersects = intersect.points.length;
         // P is inside shape if there is a odd number of intersects
-        if (Math.abs(intersects % 2) == 1) {
+        if (Math.abs(intersects % 2) === 1) {
           return true;
         }
       }

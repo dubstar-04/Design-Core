@@ -83,7 +83,7 @@ export class Explode extends Tool {
 
       // check the insert has a block and
       // check the block has items
-      if (insert.block === undefined || insert.block.entities.length == 0) {
+      if (insert.block === undefined || insert.block.entities.length === 0) {
         counter++;
         continue;
       }
