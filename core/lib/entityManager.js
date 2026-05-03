@@ -92,11 +92,11 @@ export class EntityManager {
   }
 
   /**
-   * Find entitys in scene
+   * Find entities  in scene
    * @param {string} type - entity type or "ANY"
    * @param {string} prop - object of entity parameters
    * @param {any} value - value of the property
-   * @return {number} - index of entitys
+   * @return {number} - index of entities
    */
   find(type, prop, value) {
     const filteredEntities = [];
@@ -133,7 +133,7 @@ export class EntityManager {
     let closestEntityIndex;
 
     for (let i = 0; i < this.#entities.length; i++) {
-      // check the entitys layer is selectable - i.e. on, thawed, etc...
+      // check the entities  layer is selectable - i.e. on, thawed, etc...
       const layer = DesignCore.LayerManager.getItemByName(this.#entities[i].getProperty(Property.Names.LAYER));
 
       if (!layer?.isSelectable) {
