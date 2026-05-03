@@ -10,6 +10,8 @@ import { Arc } from '../../core/entities/arc.js';
 import { Text } from '../../core/entities/text.js';
 
 import { File, withMockInput } from '../test-helpers/test-helpers.js';
+import { Logging } from '../../core/lib/logging.js';
+import { jest } from '@jest/globals';
 
 import { Core } from '../../core/core/core.js';
 
@@ -1064,6 +1066,40 @@ test('Hatch.draw HONEY dashed family sets lineDashOffset and strokes once per se
   // Every dashed segment gets its own setDash offset and stroke call
   expect(ctx.getLineDashOffsets().length).toBe(expectedSegs);
   expect(ctx.getStrokeCalls()).toBe(expectedSegs);
+});
+
+// ── unknown pattern ───────────────────────────────────────────────────────────
+
+describe('unknown hatch pattern', () => {
+  test('logs a warning when pattern name is not recognised', () => {
+    const warnSpy = jest.spyOn(Logging.instance, 'warn').mockImplementation(() => {});
+    try {
+      new Hatch({ patternName: 'NOTAPATTERN' });
+      expect(warnSpy).toHaveBeenCalledWith("Hatch: pattern 'NOTAPATTERN' not found");
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  test('retains the original pattern name when pattern is not recognised', () => {
+    const warnSpy = jest.spyOn(Logging.instance, 'warn').mockImplementation(() => {});
+    try {
+      const h = new Hatch({ patternName: 'NOTAPATTERN' });
+      expect(h.getProperty('patternName')).toBe('NOTAPATTERN');
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  test('does not log a warning for a known pattern', () => {
+    const warnSpy = jest.spyOn(Logging.instance, 'warn').mockImplementation(() => {});
+    try {
+      new Hatch({ patternName: 'ANSI31' });
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
 });
 
 // ── processSelection: uncloseable items ──────────────────────────────────────
