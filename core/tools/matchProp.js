@@ -48,7 +48,7 @@ export class MatchProp extends Tool {
         const sourceSelection = new PromptOptions(Strings.Input.SOURCE, [Input.Type.SINGLESELECTION], []);
         const input = await DesignCore.Scene.inputManager.requestInput(sourceSelection);
         if (input === undefined) return;
-        this.sourceIndex = input.selectedItemIndex;
+        this.sourceIndex = input.selectedEntityIndex;
       }
 
       const destinationSelection = new PromptOptions(Strings.Input.DESTINATIONSET, [Input.Type.SELECTIONSET]);

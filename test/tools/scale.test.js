@@ -516,7 +516,7 @@ test('Scale.preview - reference mode uses referenceLength to compute factor', ()
 
   // The default mouse scene position will give some distance from (0,0).
   // We can't control the mouse, so just verify the factor applied is
-  // distance/referenceLength rather than raw distance: reload the selectedItems
+  // distance/referenceLength rather than raw distance: reload the selectedEntitys
   // before and after with a known referenceLength to confirm scaling occurred.
   scale.preview();
 

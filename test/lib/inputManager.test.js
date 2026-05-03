@@ -388,7 +388,7 @@ test('onLeftClick with POINT prompt and no nearby entity - responds with the giv
 
 test('onLeftClick with entity found and no active command - delegates to onSelection', () => {
   inputManager.reset();
-  const mockSelection = { selectedItemIndex: 0 };
+  const mockSelection = { selectedEntityIndex: 0 };
   jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(0);
   jest.spyOn(core.scene.selectionManager, 'singleSelect').mockReturnValue(mockSelection);
   const onSelectionSpy = jest.spyOn(inputManager, 'onSelection').mockImplementation(() => {});

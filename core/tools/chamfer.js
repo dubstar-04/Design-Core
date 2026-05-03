@@ -98,7 +98,7 @@ export class Chamfer extends ChamferFilletBase {
         }
 
         // input1 is a selection — validate and store first entity
-        const firstEntity = DesignCore.Scene.entities.get(input1.selectedItemIndex);
+        const firstEntity = DesignCore.Scene.entities.get(input1.selectedEntityIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
         if (!(firstEntity instanceof Line) && !(firstEntity instanceof PolylineBase)) {
           DesignCore.Core.notify(`${firstEntity.type} - ${Strings.Message.NOCHAMFER}`);
@@ -112,7 +112,7 @@ export class Chamfer extends ChamferFilletBase {
           const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
           if (input2 === undefined) return;
 
-          const candidate = DesignCore.Scene.entities.get(input2.selectedItemIndex);
+          const candidate = DesignCore.Scene.entities.get(input2.selectedEntityIndex);
           DesignCore.Scene.selectionManager.removeLastSelection();
           if (!(candidate instanceof Line) && !(candidate instanceof PolylineBase)) {
             DesignCore.Core.notify(`${this.type} - ${candidate.type} ${Strings.Message.NOCHAMFER}`);

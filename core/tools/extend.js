@@ -19,7 +19,7 @@ export class Extend extends Tool {
   /** Create an Extend command */
   constructor() {
     super();
-    this.selectedItem = null;
+    this.selectedEntity = null;
     this.selectedBoundaryItems = [];
   }
 
@@ -58,7 +58,7 @@ export class Extend extends Tool {
       while (true) {
         const selection = await DesignCore.Scene.inputManager.requestInput(op2);
         if (selection === undefined) break;
-        this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+        this.selectedEntity = DesignCore.Scene.entities.get(selection.selectedEntityIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
         DesignCore.Scene.inputManager.actionCommand();
       }
@@ -99,28 +99,28 @@ export class Extend extends Tool {
    * Perform the command
    */
   action() {
-    if (this.selectedItem && this.selectedBoundaryItems.length) {
-      if (typeof this.selectedItem.fromPolylinePoints !== 'function') {
-        DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOEXTEND}`);
-        this.selectedItem = null;
+    if (this.selectedEntity && this.selectedBoundaryItems.length) {
+      if (typeof this.selectedEntity.fromPolylinePoints !== 'function') {
+        DesignCore.Core.notify(`${this.type} - ${this.selectedEntity.type} ${Strings.Message.NOEXTEND}`);
+        this.selectedEntity = null;
         return;
       }
 
-      const intersectPoints = this.#collectIntersectPoints(this.selectedItem);
+      const intersectPoints = this.#collectIntersectPoints(this.selectedEntity);
 
       if (intersectPoints.length) {
-        const stateChanges = this.#extendEntity(this.selectedItem, intersectPoints);
+        const stateChanges = this.#extendEntity(this.selectedEntity, intersectPoints);
         if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
         } else {
-          DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOEXTEND}`);
+          DesignCore.Core.notify(`${this.type} - ${this.selectedEntity.type} ${Strings.Message.NOEXTEND}`);
         }
       } else {
-        DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOEXTEND}`);
+        DesignCore.Core.notify(`${this.type} - ${this.selectedEntity.type} ${Strings.Message.NOEXTEND}`);
       }
     }
 
-    this.selectedItem = null;
+    this.selectedEntity = null;
   }
 
   /**

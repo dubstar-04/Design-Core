@@ -35,7 +35,7 @@ test.each(inputScenarios)('Trim.execute handles $desc', async (scenario) => {
     await extend.execute();
 
     expect(extend.selectedBoundaryItems[0]).toEqual(core.scene.entities.get(0));
-    expect(extend.selectedItem).toBe(core.scene.entities.get(1));
+    expect(extend.selectedEntity).toBe(core.scene.entities.get(1));
     expect(actionSpy).toHaveBeenCalled();
   }, { extraMethods: { actionCommand: () => actionSpy() } });
 });
@@ -68,7 +68,7 @@ test('Test Extend.action', () => {
   // Select boundary item
   extend.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to trim
-  extend.selectedItem = core.scene.entities.get(1);
+  extend.selectedEntity = core.scene.entities.get(1);
   // set mouse location - required for Extend
   core.mouse.setPosFromScenePoint(new Point(40, 50));
   // Perform Extend
@@ -100,7 +100,7 @@ test('Test Extend.action', () => {
   // Select boundary item
   extend.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to extend
-  extend.selectedItem = core.scene.entities.get(1);
+  extend.selectedEntity = core.scene.entities.get(1);
   // set mouse location - required for Extend
   core.mouse.setPosFromScenePoint(new Point(0, 20));
   // Perform Extend
@@ -131,7 +131,7 @@ test('Test Extend.action', () => {
   // Select boundary item
   extend.selectedBoundaryItems = [core.scene.entities.get(0)];
   // select item to extend
-  extend.selectedItem = core.scene.entities.get(1);
+  extend.selectedEntity = core.scene.entities.get(1);
   // set mouse location - required for Extend
   core.mouse.setPosFromScenePoint(new Point(35, 35));
   // Perform Extend
@@ -171,7 +171,7 @@ test('Test Extend.action line - endpoint coincident with intersection', () => {
   const expected = [50, 100, 150, 200];
   for (const ex of expected) {
     extend.selectedBoundaryItems = [boundary];
-    extend.selectedItem = line;
+    extend.selectedEntity = line;
     core.mouse.setPosFromScenePoint(new Point(line.points[1].x - 5, 50));
     extend.action();
     expect(line.points[1].x).toBe(ex);
@@ -192,7 +192,7 @@ test('Test Extend.action polyline - endpoint coincident with intersection', () =
   core.scene.addEntity('Line', { points: [new Point(100, 0), new Point(100, 100)] });
 
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(45, 45));
   extend.action();
 
@@ -214,7 +214,7 @@ test('Test Extend.action polyline - 2-point polyline extend start', () => {
   core.scene.addEntity('Line', { points: [new Point(0, -50), new Point(0, 50)] });
 
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(55, 0));
   extend.action();
 
@@ -238,7 +238,7 @@ test('Test Extend.action polyline - extend end segment', () => {
   core.scene.addEntity('Line', { points: [new Point(100, -50), new Point(100, 50)] });
 
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(80, 0));
   extend.action();
 
@@ -265,7 +265,7 @@ test('Test Extend.action polyline - extend start segment', () => {
   core.scene.addEntity('Line', { points: [new Point(0, -50), new Point(0, 50)] });
 
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(20, 0));
   extend.action();
 
@@ -292,7 +292,7 @@ test('Test Extend.action polyline - reject arc end segment', () => {
   core.scene.addEntity('Line', { points: [new Point(125, -50), new Point(125, 50)] });
 
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(100, 0));
   extend.action();
 
@@ -320,7 +320,7 @@ test('Test Extend.action polyline - reject intersection behind endpoint', () => 
   core.scene.addEntity('Line', { points: [new Point(25, -50), new Point(25, 50)] });
 
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(95, 0));
   extend.action();
 
@@ -343,7 +343,7 @@ test('Test Extend.action polyline - reject shortening intersection', () => {
   core.scene.addEntity('Line', { points: [new Point(75, -50), new Point(75, 50)] });
 
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(95, 0));
   extend.action();
 
@@ -366,7 +366,7 @@ test('Test Extend.action polyline - extend with arc start segment', () => {
   core.scene.addEntity('Line', { points: [new Point(125, -50), new Point(125, 50)] });
 
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(110, 0));
   extend.action();
 
@@ -387,7 +387,7 @@ test('Test Extend.action polyline - no intersections', () => {
   core.scene.addEntity('Line', { points: [new Point(0, 50), new Point(100, 50)] });
 
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(45, 0));
   extend.action();
 
@@ -548,11 +548,11 @@ test('Extend.execute calls actionCommand once per extend selection', async () =>
   );
 });
 
-test('Extend.action does nothing when selectedItem is null', () => {
+test('Extend.action does nothing when selectedEntity is null', () => {
   core.scene.clear();
   core.scene.addEntity('Line', { points: [new Point(), new Point(10, 0)] });
   const extend = new Extend();
-  extend.selectedItem = null;
+  extend.selectedEntity = null;
   extend.selectedBoundaryItems = [core.scene.entities.get(0)];
 
   expect(() => extend.action()).not.toThrow();
@@ -562,11 +562,11 @@ test('Extend.action does nothing when selectedBoundaryItems is empty', () => {
   core.scene.clear();
   core.scene.addEntity('Line', { points: [new Point(), new Point(10, 0)] });
   const extend = new Extend();
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   extend.selectedBoundaryItems = [];
 
   expect(() => extend.action()).not.toThrow();
-  expect(extend.selectedItem).toBeNull();
+  expect(extend.selectedEntity).toBeNull();
 });
 
 test('Extend.action notifies NOEXTEND when selected entity lacks fromPolylinePoints', () => {
@@ -577,7 +577,7 @@ test('Extend.action notifies NOEXTEND when selected entity lacks fromPolylinePoi
 
   const extend = new Extend();
   extend.selectedBoundaryItems = [core.scene.entities.get(0)];
-  extend.selectedItem = {
+  extend.selectedEntity = {
     type: 'FakeEntity',
     toPolylinePoints: () => [new Point(0, 0), new Point(50, 0)],
     // deliberately no fromPolylinePoints
@@ -588,7 +588,7 @@ test('Extend.action notifies NOEXTEND when selected entity lacks fromPolylinePoi
   extend.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
-  expect(extend.selectedItem).toBeNull();
+  expect(extend.selectedEntity).toBeNull();
   notifySpy.mockRestore();
 });
 
@@ -604,14 +604,14 @@ test('Extend.action notifies NOEXTEND when selected entity is a closed polyline'
 
   const extend = new Extend();
   extend.selectedBoundaryItems = [core.scene.entities.get(0)];
-  extend.selectedItem = core.scene.entities.get(1);
+  extend.selectedEntity = core.scene.entities.get(1);
   core.mouse.setPosFromScenePoint(new Point(95, 0));
 
   const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
   extend.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
-  expect(extend.selectedItem).toBeNull();
+  expect(extend.selectedEntity).toBeNull();
   notifySpy.mockRestore();
 });
 
@@ -653,14 +653,14 @@ test('Extend.action notifies when no intersection found (parallel lines)', () =>
 
   const extend = new Extend();
   extend.selectedBoundaryItems = [core.scene.entities.get(0)];
-  extend.selectedItem = core.scene.entities.get(1);
+  extend.selectedEntity = core.scene.entities.get(1);
   core.mouse.setPosFromScenePoint(new Point(40, 50));
 
   const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
   extend.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
-  expect(extend.selectedItem).toBeNull();
+  expect(extend.selectedEntity).toBeNull();
   notifySpy.mockRestore();
 });
 
@@ -671,7 +671,7 @@ test('Extend.action notifies when boundary item equals selected item', () => {
 
   const extend = new Extend();
   extend.selectedBoundaryItems = [entity];
-  extend.selectedItem = entity;
+  extend.selectedEntity = entity;
   core.mouse.setPosFromScenePoint(new Point(40, 0));
 
   const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
@@ -691,7 +691,7 @@ test('Extend.action extends the start of a line', () => {
 
   const extend = new Extend();
   extend.selectedBoundaryItems = [core.scene.entities.get(0)];
-  extend.selectedItem = core.scene.entities.get(1);
+  extend.selectedEntity = core.scene.entities.get(1);
   core.mouse.setPosFromScenePoint(new Point(55, 50));
   extend.action();
 
@@ -714,13 +714,13 @@ test('Extend.action notifies NOEXTEND when end segment of an Arc is curved', () 
 
   const extend = new Extend();
   extend.selectedBoundaryItems = [core.scene.entities.get(1)];
-  extend.selectedItem = core.scene.entities.get(0);
+  extend.selectedEntity = core.scene.entities.get(0);
   core.mouse.setPosFromScenePoint(new Point(9, 1)); // near arc start (10,0)
 
   const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
   extend.action();
 
   expect(notifySpy).toHaveBeenCalledWith(expect.stringContaining(Strings.Message.NOEXTEND));
-  expect(extend.selectedItem).toBeNull();
+  expect(extend.selectedEntity).toBeNull();
   notifySpy.mockRestore();
 });

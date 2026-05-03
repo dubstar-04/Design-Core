@@ -108,32 +108,32 @@ export class Dimension extends DimensionBase {
         }
 
         if (input1 instanceof SingleSelection) {
-          const selectedItem = DesignCore.Scene.entities.get(input1.selectedItemIndex);
+          const selectedEntity = DesignCore.Scene.entities.get(input1.selectedEntityIndex);
 
           // check the selected entity is supported
-          if ([Line, Circle, Arc, PolylineBase].some((entity) => selectedItem instanceof entity)) {
+          if ([Line, Circle, Arc, PolylineBase].some((entity) => selectedEntity instanceof entity)) {
             // set the dimension type
-            if (selectedItem instanceof Line) {
+            if (selectedEntity instanceof Line) {
               this.dimType.setDimType(1);
-              this.selectedEntities.push(selectedItem);
+              this.selectedEntities.push(selectedEntity);
               inputValid = true;
             }
 
-            if (selectedItem instanceof Circle) {
+            if (selectedEntity instanceof Circle) {
               this.dimType.setDimType(3);
-              this.selectedEntities.push(selectedItem);
+              this.selectedEntities.push(selectedEntity);
               inputValid = true;
             }
 
-            if (selectedItem instanceof Arc) {
+            if (selectedEntity instanceof Arc) {
               this.dimType.setDimType(4);
-              this.selectedEntities.push(selectedItem);
+              this.selectedEntities.push(selectedEntity);
               inputValid = true;
             }
 
-            if (selectedItem instanceof PolylineBase) {
+            if (selectedEntity instanceof PolylineBase) {
               // get the segment closest to the mouse point
-              const segment = selectedItem.getClosestSegment(input1.selectedPoint);
+              const segment = selectedEntity.getClosestSegment(input1.selectedPoint);
 
               if (segment instanceof Line) {
                 this.dimType.setDimType(1);
@@ -148,7 +148,7 @@ export class Dimension extends DimensionBase {
               }
             }
           } else {
-            const msg = `${this.type} - ${Strings.Error.INVALIDTYPE}: ${selectedItem.type}`;
+            const msg = `${this.type} - ${Strings.Error.INVALIDTYPE}: ${selectedEntity.type}`;
             DesignCore.Core.notify(msg);
             DesignCore.Scene.selectionManager.reset();
           }
@@ -206,20 +206,20 @@ export class Dimension extends DimensionBase {
         }
 
         if (Input.getType(input2) === Input.Type.SINGLESELECTION) {
-          let selectedItem2 = DesignCore.Scene.entities.get(input2.selectedItemIndex);
-          if ([Line, PolylineBase].some((entity) => selectedItem2 instanceof entity)) {
+          let selectedEntity2 = DesignCore.Scene.entities.get(input2.selectedEntityIndex);
+          if ([Line, PolylineBase].some((entity) => selectedEntity2 instanceof entity)) {
             // if a polyline is selected, get the segment closest to the mouse point
-            if (selectedItem2 instanceof PolylineBase) {
+            if (selectedEntity2 instanceof PolylineBase) {
               // get the segment closest to the mouse point
-              const segment = selectedItem2.getClosestSegment(input2.selectedPoint);
+              const segment = selectedEntity2.getClosestSegment(input2.selectedPoint);
 
               if (segment instanceof Line) {
-                selectedItem2 = segment;
+                selectedEntity2 = segment;
               }
             }
             // Check lines intersect
             const line1 = { start: this.selectedEntities[0].points[0], end: this.selectedEntities[0].points[1] };
-            const line2 = { start: selectedItem2.points[0], end: selectedItem2.points[1] };
+            const line2 = { start: selectedEntity2.points[0], end: selectedEntity2.points[1] };
 
             // Check the lines are not parallel - Can't dimension parallel lines
             const lineOneSlope = (line1.end.y - line1.start.y) / (line1.end.x - line1.start.x);
@@ -229,7 +229,7 @@ export class Dimension extends DimensionBase {
               const intersect = Intersection.intersectSegmentSegment(line1.start, line1.end, line2.start, line2.end, false, true);
               if (intersect.points.length >= 1) {
               // add line to selection
-                this.selectedEntities.push(selectedItem2);
+                this.selectedEntities.push(selectedEntity2);
                 // Two lines selected - switch to angular dimension
                 this.dimType.setDimType(2);
               }
@@ -239,7 +239,7 @@ export class Dimension extends DimensionBase {
               DesignCore.Scene.selectionManager.removeLastSelection();
             }
           } else {
-            const msg = `${this.type} - ${Strings.Error.INVALIDTYPE}: ${selectedItem2.type}`;
+            const msg = `${this.type} - ${Strings.Error.INVALIDTYPE}: ${selectedEntity2.type}`;
             DesignCore.Core.notify(msg);
             DesignCore.Scene.selectionManager.reset();
           }

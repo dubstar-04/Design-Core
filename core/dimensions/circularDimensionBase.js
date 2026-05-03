@@ -44,25 +44,25 @@ export class CircularDimensionBase extends DimensionBase {
         const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
 
-        let selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+        let selectedEntity = DesignCore.Scene.entities.get(selection.selectedEntityIndex);
 
-        if ([Circle, Arc, PolylineBase].some((entity) => selectedItem instanceof entity)) {
-          if (selectedItem instanceof PolylineBase) {
+        if ([Circle, Arc, PolylineBase].some((entity) => selectedEntity instanceof entity)) {
+          if (selectedEntity instanceof PolylineBase) {
             // get the segment closest to the mouse point
-            const segment = selectedItem.getClosestSegment(selection.selectedPoint);
+            const segment = selectedEntity.getClosestSegment(selection.selectedPoint);
 
             if (segment instanceof Arc) {
               // update the selected item to be the polyline arc segment
-              selectedItem = segment;
+              selectedEntity = segment;
             }
           }
 
-          if (selectedItem instanceof Circle || selectedItem instanceof Arc) {
-            Pt15 = selectedItem.points[1];
+          if (selectedEntity instanceof Circle || selectedEntity instanceof Arc) {
+            Pt15 = selectedEntity.points[1];
             Pt15.sequence = 15;
             this.points.push(Pt15);
 
-            Pt10 = selectedItem.points[0];
+            Pt10 = selectedEntity.points[0];
             Pt10.sequence = 10;
             this.points.push(Pt10);
           }

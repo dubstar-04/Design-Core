@@ -13,7 +13,7 @@ export class SingleSelection {
    * @param {Point} point
    */
   constructor(index, point) {
-    this.selectedItemIndex = index;
+    this.selectedEntityIndex = index;
     this.selectedPoint = point;
   }
 }

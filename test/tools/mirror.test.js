@@ -428,7 +428,7 @@ test('Mirror.preview - two distinct points, draws mirror line and mirrors select
   // Rubber-band mirror line should exist
   expect(core.scene.auxiliaryEntities.count()).toBeGreaterThanOrEqual(1);
 
-  // The selectedItems copy should have its points mirrored (y negated)
+  // The selectedEntitys copy should have its points mirrored (y negated)
   const previewItem = core.scene.selectionManager.selectedEntities[0];
   expect(previewItem.points[0].y).toBeCloseTo(-5);
 });

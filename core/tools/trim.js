@@ -20,7 +20,7 @@ export class Trim extends Tool {
   /** Create a Trim command */
   constructor() {
     super();
-    this.selectedItem = null;
+    this.selectedEntity = null;
     this.selectedBoundaryItems = [];
   }
 
@@ -59,7 +59,7 @@ export class Trim extends Tool {
       while (true) {
         const selection = await DesignCore.Scene.inputManager.requestInput(selectOp);
         if (selection === undefined) break;
-        this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+        this.selectedEntity = DesignCore.Scene.entities.get(selection.selectedEntityIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
         DesignCore.Scene.inputManager.actionCommand();
       }
@@ -103,26 +103,26 @@ export class Trim extends Tool {
    * Perform the command
    */
   action() {
-    if (this.selectedItem && this.selectedBoundaryItems.length) {
-      if (typeof this.selectedItem.fromPolylinePoints !== 'function') {
-        DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOTRIM}`);
-        this.selectedItem = null;
+    if (this.selectedEntity && this.selectedBoundaryItems.length) {
+      if (typeof this.selectedEntity.fromPolylinePoints !== 'function') {
+        DesignCore.Core.notify(`${this.type} - ${this.selectedEntity.type} ${Strings.Message.NOTRIM}`);
+        this.selectedEntity = null;
         return;
       }
 
-      const intersectPoints = this.#collectIntersectPoints(this.selectedItem);
+      const intersectPoints = this.#collectIntersectPoints(this.selectedEntity);
 
       if (intersectPoints.length) {
-        const stateChanges = this.#trimEntity(this.selectedItem, intersectPoints);
+        const stateChanges = this.#trimEntity(this.selectedEntity, intersectPoints);
         if (stateChanges?.length) {
           DesignCore.Scene.commit(stateChanges);
         }
       } else {
-        DesignCore.Core.notify(`${this.type} - ${this.selectedItem.type} ${Strings.Message.NOTRIM}`);
+        DesignCore.Core.notify(`${this.type} - ${this.selectedEntity.type} ${Strings.Message.NOTRIM}`);
       }
     }
 
-    this.selectedItem = null;
+    this.selectedEntity = null;
   }
 
   /**
