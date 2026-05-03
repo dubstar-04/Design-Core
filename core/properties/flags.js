@@ -29,6 +29,18 @@ export class Flags {
   }
 
   /**
+   * Serialise as a plain number so JSON.stringify produces e.g. `"flags":1`
+   * instead of `"flags":{"flags":1}`. Without this, the round-trip through
+   * clipboard stringify/parse loses the flag value (e.g. the closed flag on a
+   * polyline), because the reconstructed plain object is not a Flags instance
+   * and Property.loadValue cannot extract the numeric value from it.
+   * @return {number}
+   */
+  toJSON() {
+    return this.flags;
+  }
+
+  /**
    * Get the backwards value
    * @param {number} flagValue
    * @return {boolean} true if flags contains the flagValue
