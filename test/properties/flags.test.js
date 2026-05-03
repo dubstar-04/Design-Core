@@ -162,3 +162,27 @@ test('Test flags.removeValue', () => {
   // 2 shouldn't exist again
   expect(flags.hasFlag(2)).toBe(false);
 });
+
+test('Test flags.toJSON returns the numeric flag value', () => {
+  const flags = new Flags();
+  expect(flags.toJSON()).toBe(0);
+
+  flags.setFlagValue(7);
+  expect(flags.toJSON()).toBe(7);
+});
+
+test('Test flags.toJSON round-trips through JSON.stringify/parse', () => {
+  const flags = new Flags();
+  flags.setFlagValue(1);
+
+  // JSON.stringify should produce the plain number, not a nested object
+  const json = JSON.stringify({ flags });
+  expect(json).toBe('{"flags":1}');
+
+  // The parsed value is a plain number — Flags constructor accepts it via setFlagValue
+  const parsed = JSON.parse(json);
+  const restored = new Flags();
+  restored.setFlagValue(parsed.flags);
+  expect(restored.getFlagValue()).toBe(1);
+  expect(restored.hasFlag(1)).toBe(true);
+});
