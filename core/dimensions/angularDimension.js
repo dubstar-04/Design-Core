@@ -99,7 +99,7 @@ export class AngularDimension extends DimensionBase {
             const segment = selectedEntity.getClosestSegment(selection2.selectedPoint);
 
             if (segment instanceof Line) {
-              // update the selected item to be the polyline arc segment
+              // update the selected entity to be the polyline arc segment
               selectedEntity = segment;
             }
           }
@@ -153,23 +153,23 @@ export class AngularDimension extends DimensionBase {
 
   /**
    * Get sequenced points from user selection
-   * @param {any} items
+   * @param {any} entities
    * @param {Point} textPos
    * @return {Array} array of points
    */
-  static getPointsFromSelection(items, textPos) {
-  // Transform the items into points
-  // Do nothing more than transform the items into points
+  static getPointsFromSelection(entities, textPos) {
+  // Transform the entities into points
+  // Do nothing more than transform the entities into points
 
     const points = [];
-    const item1 = items[0];
-    const item2 = items[1];
+    const entity1 = entities[0];
+    const entity2 = entities[1];
 
-    const tempPt15 = item1.points[0];
-    const tempPt10 = item1.points[1];
+    const tempPt15 = entity1.points[0];
+    const tempPt10 = entity1.points[1];
 
-    const tempPt13 = item2.points[0];
-    const tempPt14 = item2.points[1];
+    const tempPt13 = entity2.points[0];
+    const tempPt14 = entity2.points[1];
 
     // Check the lines intersect
     const intersect = Intersection.intersectSegmentSegment(tempPt15, tempPt10, tempPt13, tempPt14, false, true);
