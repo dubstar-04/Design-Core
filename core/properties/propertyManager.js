@@ -28,7 +28,7 @@ export class PropertyManager {
   }
 
   /**
-   * Set item properties
+   * Set entity properties
    * @param {string} property
    * @param {any} newPropertyValue
    * @param {string} itemType
