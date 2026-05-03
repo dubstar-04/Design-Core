@@ -4,6 +4,8 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Logging } from '../../core/lib/logging.js';
 import { jest } from '@jest/globals';
+import { Polyline } from '../../core/entities/polyline.js';
+import { Text } from '../../core/entities/text.js';
 
 // Initialize core (sets DesignCore.Core)
 new Core();
@@ -66,5 +68,76 @@ describe('Clipboard', () => {
     expect(errorSpy).toHaveBeenCalled();
     expect(fresh.Entities).toHaveLength(0);
     errorSpy.mockRestore();
+  });
+
+  describe('stringify/parse flag survival', () => {
+    test('closed Polyline retains closed flag after stringify/parse roundtrip', () => {
+      // Create a closed polyline (flags bit 1 = closed)
+      const poly = new Polyline({
+        points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)],
+        flags: 1,
+      });
+      expect(poly.getProperty('closed')).toBe(true);
+
+      DesignCore.Clipboard.Entities = [poly];
+      const json = DesignCore.Clipboard.stringify();
+
+      const fresh = new Clipboard();
+      fresh.parse(json);
+
+      expect(fresh.Entities).toHaveLength(1);
+      expect(fresh.Entities[0].getProperty('closed')).toBe(true);
+    });
+
+    test('closed Polyline retains correct point count after stringify/parse roundtrip', () => {
+      // A closed polyline stores 4 points (not 5 — the closing duplicate is removed)
+      const poly = new Polyline({
+        points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)],
+        flags: 1,
+      });
+      expect(poly.points).toHaveLength(4);
+
+      DesignCore.Clipboard.Entities = [poly];
+      const json = DesignCore.Clipboard.stringify();
+
+      const fresh = new Clipboard();
+      fresh.parse(json);
+
+      expect(fresh.Entities[0].points).toHaveLength(4);
+    });
+
+    test('backwards (mirrored) Text retains backwards flag after stringify/parse roundtrip', () => {
+      // Text flags bit 2 = backwards
+      const text = new Text({
+        points: [new Point(0, 0), new Point(10, 0)],
+        textValue: 'hello',
+        flags: 2,
+      });
+      expect(text.getBackwards()).toBe(true);
+
+      DesignCore.Clipboard.Entities = [text];
+      const json = DesignCore.Clipboard.stringify();
+
+      const fresh = new Clipboard();
+      fresh.parse(json);
+
+      expect(fresh.Entities).toHaveLength(1);
+      expect(fresh.Entities[0].getBackwards()).toBe(true);
+    });
+
+    test('non-flagged entities are unaffected', () => {
+      const poly = new Polyline({
+        points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)],
+      });
+      expect(poly.getProperty('closed')).toBe(false);
+
+      DesignCore.Clipboard.Entities = [poly];
+      const json = DesignCore.Clipboard.stringify();
+
+      const fresh = new Clipboard();
+      fresh.parse(json);
+
+      expect(fresh.Entities[0].getProperty('closed')).toBe(false);
+    });
   });
 });
