@@ -83,14 +83,14 @@ export class Explode extends Tool {
 
       // check the insert has a block and
       // check the block has items
-      if (insert.block === undefined || insert.block.items.length == 0) {
+      if (insert.block === undefined || insert.block.entities.length === 0) {
         counter++;
         continue;
       }
 
       const insertPoint = insert.points[0];
       const block = insert.block;
-      const blockItems = block.items;
+      const blockItems = block.entities;
 
       const rotation = Utils.degrees2radians(insert.getProperty('rotation'));
       const origin = new Point(0, 0);

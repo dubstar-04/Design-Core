@@ -56,11 +56,11 @@ export class Copybase extends Tool {
    * Perform the command
    */
   action() {
-    // generate clipboard data from selected items
-    const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
+    // generate clipboard data from selected entities
+    const selectedEntities = DesignCore.Scene.selectionManager.selectedEntities;
 
     // create clipboard data
-    DesignCore.Clipboard.Entities = selectedItems;
+    DesignCore.Clipboard.Entities = selectedEntities;
     // set base point
     DesignCore.Clipboard.BasePoint = this.points[0];
   }

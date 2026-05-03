@@ -18,61 +18,61 @@ const scenarios = [
 
   { desc: 'Rotated dimension from line selection',
     input: [new SingleSelection(0, new Point()), new Point(5, 5)],
-    selectedItems: [new Line({ points: [new Point(), new Point(10, 0)] })],
+    selectedEntities: [new Line({ points: [new Point(), new Point(10, 0)] })],
     expectedDimType: 0,
   },
   { desc: 'Aligned dimension from line selection',
     input: [new SingleSelection(0, new Point()), new Point(6.5, 3.5)],
-    selectedItems: [new Line({ points: [new Point(), new Point(10, 10)] })],
+    selectedEntities: [new Line({ points: [new Point(), new Point(10, 10)] })],
     expectedDimType: 1,
   },
   { desc: 'Rotated dimension from point selection',
     input: [new Point(), new Point(10, 0), new Point(5, 5)],
-    selectedItems: [],
+    selectedEntities: [],
     expectedDimType: 0,
   },
   { desc: 'Diametric dimension from circle selection',
     input: [new SingleSelection(0, new Point()), new Point(20, 10)],
-    selectedItems: [new Circle({ points: [new Point(), new Point(10, 0)] })],
+    selectedEntities: [new Circle({ points: [new Point(), new Point(10, 0)] })],
     expectedDimType: 3,
   },
   { desc: 'Radial dimension from arc selection',
     input: [new SingleSelection(0, new Point()), new Point(20, 10)],
-    selectedItems: [new Arc({ points: [new Point(), new Point(10, 0), new Point(10, 10)] })],
+    selectedEntities: [new Arc({ points: [new Point(), new Point(10, 0), new Point(10, 10)] })],
     expectedDimType: 4,
   },
   { desc: 'Angular dimension from line selection',
     input: [new SingleSelection(0, new Point()), new SingleSelection(1, new Point()), new Point(5, 5)],
-    selectedItems: [new Line({ points: [new Point(), new Point(10, 0)] }), new Line({ points: [new Point(), new Point(10, 10)] })],
+    selectedEntities: [new Line({ points: [new Point(), new Point(10, 0)] }), new Line({ points: [new Point(), new Point(10, 10)] })],
     expectedDimType: 2,
   },
   { desc: 'Aligned dimension from polyline selection',
     input: [new SingleSelection(0, new Point()), new SingleSelection(1, new Point()), new Point(5, 5)],
-    selectedItems: [new Polyline({ points: [new Point(), new Point(10, 0)] })],
+    selectedEntities: [new Polyline({ points: [new Point(), new Point(10, 0)] })],
     expectedDimType: 1,
   },
   { desc: 'Radial dimension from polyline selection',
     input: [new SingleSelection(0, new Point(16, 5)), new Point(20, 5)],
-    selectedItems: [new Polyline({ points: [new Point(), new Point(10, 0, 1), new Point(10, 10)] })],
+    selectedEntities: [new Polyline({ points: [new Point(), new Point(10, 0, 1), new Point(10, 10)] })],
     expectedDimType: 4,
   },
   { desc: 'Angular dimension from polyline selection',
     input: [new SingleSelection(0, new Point(5, 0)), new SingleSelection(1, new Point(5, 5)), new Point(5, 5)],
-    selectedItems: [new Polyline({ points: [new Point(), new Point(10, 0)] }), new Polyline({ points: [new Point(), new Point(10, 10)] })],
+    selectedEntities: [new Polyline({ points: [new Point(), new Point(10, 0)] }), new Polyline({ points: [new Point(), new Point(10, 10)] })],
     expectedDimType: 2,
   },
 
 ];
 
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
-  const { input, selectedItems, expectedDimType } = scenario;
+  const { input, selectedEntities, expectedDimType } = scenario;
 
   await withMockInput(DesignCore.Scene, input, async () => {
     const dim = new Dimension();
     await dim.execute();
 
     expect(dim.dimType.getBaseDimType()).toBe(expectedDimType);
-  }, { selectedItems });
+  }, { selectedEntities });
 });
 
 test('constructor instantiates correct dimension type', () => {
@@ -95,7 +95,7 @@ test('get linear dimension type', () => {
 
 test('preview calls createTempItem with correct args', () => {
   const dim = new Dimension({ 70: 1 });
-  dim.selectedItems = [1];
+  dim.selectedEntities = [1];
   dim.points = [{}, {}];
   // Should not throw
   expect(() => dim.preview()).not.toThrow();

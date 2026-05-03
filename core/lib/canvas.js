@@ -388,8 +388,8 @@ export class Canvas {
     this.#paintEntities(DesignCore.Scene.previewEntities, renderer);
 
     // Paint the selected scene items: single pass — renderer handles glow + entity internally.
-    const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
-    this.#paintEntities(selectedItems, renderer, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
+    const selectedEntities = DesignCore.Scene.selectionManager.selectedEntities;
+    this.#paintEntities(selectedEntities, renderer, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
 
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
@@ -405,7 +405,7 @@ export class Canvas {
 
   /**
    * Recursively paint a single entity and any children it returns.
-   * Container entities (Insert, BaseDimension) return an array of child items from draw().
+   * Container entities (Insert, DimensionBase) return an array of child items from draw().
    * Leaf entities return undefined. Renderer state is saved/restored around each entity.
    * @param {Object} entity - entity to paint
    * @param {Object} renderer - renderer instance

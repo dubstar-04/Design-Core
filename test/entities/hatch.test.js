@@ -2,7 +2,7 @@ import { Hatch } from '../../core/entities/hatch.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 
-import { BasePolyline } from '../../core/entities/basePolyline.js';
+import { PolylineBase } from '../../core/entities/polylineBase.js';
 import { Circle } from '../../core/entities/circle.js';
 import { Line } from '../../core/entities/line.js';
 import { Polyline } from '../../core/entities/polyline.js';
@@ -17,7 +17,7 @@ import { Core } from '../../core/core/core.js';
 new Core();
 
 const points = [new Point(100, 100, 1), new Point(200, 100, 1)];
-const boundaryShape = new BasePolyline({ points: points });
+const boundaryShape = new PolylineBase({ points: points });
 
 const hatch = new Hatch({ handle: '1' });
 hatch.setProperty('childEntities', [boundaryShape]);
@@ -56,10 +56,10 @@ test.each(hatchInputScenarios)('Hatch.execute handles $desc', async (scenario) =
 
   await withMockInput(DesignCore.Scene, [true], async () => {
     // Manual mock for selected items
-    DesignCore.Scene.selectionManager.selectedItems = [];
+    DesignCore.Scene.selectionManager.selectedEntities = [];
 
     for (let i = 0; i < boundaryItems.length; i++) {
-      DesignCore.Scene.selectionManager.selectedItems.push(boundaryItems[i]);
+      DesignCore.Scene.selectionManager.selectedEntities.push(boundaryItems[i]);
     }
 
     const hatch = new Hatch({ patternName: pattern, scale: scale, angle: angle });
@@ -448,60 +448,60 @@ test('Test Hatch.processBoundaryData', () => {
 
 test('Test Hatch.processSelection', () => {
   // create selected items defining a square
-  let selectedItems = [];
-  selectedItems.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
-  selectedItems.push(new Line({ points: [new Point(200, 100), new Point(200, 200)] }));
-  selectedItems.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
-  selectedItems.push(new Line({ points: [new Point(100, 200), new Point(100, 100)] }));
+  let selectedEntities = [];
+  selectedEntities.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities.push(new Line({ points: [new Point(200, 100), new Point(200, 200)] }));
+  selectedEntities.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
+  selectedEntities.push(new Line({ points: [new Point(100, 200), new Point(100, 100)] }));
 
   let hatch = new Hatch();
-  let boundaryData = hatch.processSelection(selectedItems);
+  let boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   expect(boundaryData[0].points.length).toEqual(4);
 
 
   // create selected items defining a circle
-  selectedItems = [];
-  selectedItems.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities = [];
+  selectedEntities.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
 
   hatch = new Hatch();
-  boundaryData = hatch.processSelection(selectedItems);
+  boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   expect(boundaryData[0].points.length).toEqual(2);
 
   // create selected items defining a square (polyline)
-  selectedItems = [];
-  selectedItems.push(new Polyline({
+  selectedEntities = [];
+  selectedEntities.push(new Polyline({
     points: [new Point(100, 100), new Point(200, 100), new Point(200, 200),
       new Point(100, 200), new Point(100, 100)],
   }));
 
   hatch = new Hatch();
-  boundaryData = hatch.processSelection(selectedItems);
+  boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   expect(boundaryData[0].points.length).toEqual(4);
 
   // create selected items defining a pill shape
-  selectedItems = [];
-  selectedItems.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
-  selectedItems.push(new Arc({ points: [new Point(200, 150), new Point(200, 100), new Point(200, 200)] }));
-  selectedItems.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
-  selectedItems.push(new Arc({ points: [new Point(100, 150), new Point(100, 200), new Point(100, 100)] }));
+  selectedEntities = [];
+  selectedEntities.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities.push(new Arc({ points: [new Point(200, 150), new Point(200, 100), new Point(200, 200)] }));
+  selectedEntities.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
+  selectedEntities.push(new Arc({ points: [new Point(100, 150), new Point(100, 200), new Point(100, 100)] }));
 
   hatch = new Hatch();
-  boundaryData = hatch.processSelection(selectedItems);
+  boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   // 2 lines + 2 arcs: each shared connection point is merged (not duplicated),
   // so the result is 4 unique vertices, not 5
   expect(boundaryData[0].points.length).toEqual(4);
 
   // Test a selection with invalid items
-  selectedItems = [];
-  selectedItems.push(new Text({ points: [new Point(100, 100), new Point(200, 100)] }));
-  selectedItems.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities = [];
+  selectedEntities.push(new Text({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
 
   hatch = new Hatch();
-  boundaryData = hatch.processSelection(selectedItems);
+  boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   expect(boundaryData[0].points.length).toEqual(2);
 });
@@ -539,7 +539,7 @@ function makeMockCtx() {
 
 test('Test Hatch.draw solid fill renders filled boundary', () => {
   const solidHatch = new Hatch({ patternName: 'SOLID' });
-  solidHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })]);
+  solidHatch.setProperty('childEntities', [new PolylineBase({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })]);
 
   const ctx = makeMockCtx();
   solidHatch.draw(ctx);
@@ -549,7 +549,7 @@ test('Test Hatch.draw solid fill renders filled boundary', () => {
 
 test('Test Hatch.draw unknown pattern does not stroke pattern lines', () => {
   const unknownHatch = new Hatch({ patternName: 'ANSI31' });
-  unknownHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })]);
+  unknownHatch.setProperty('childEntities', [new PolylineBase({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })]);
   // Override pattern to a nonexistent name
   unknownHatch.setProperty('patternName', 'NOTAPATTERN');
 
@@ -567,7 +567,7 @@ test('Test Hatch.draw tight bound line count - square boundary', () => {
   // yIncrement = ceil(70.71 / 3.175) = 23 → loop i=-23..22 = 46 raw lines
   // i=-23 (|ly|=73.025 > halfY=70.71) misses the square → 45 clipped segments
   const squareHatch = new Hatch({ patternName: 'ANSI31' });
-  squareHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
+  squareHatch.setProperty('childEntities', [new PolylineBase({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
   const ctx = makeMockCtx();
   squareHatch.draw(ctx);
   expect(ctx.getMoveCalls()).toBe(45);
@@ -580,7 +580,7 @@ test('Test Hatch.draw tight bound line count - flat boundary', () => {
   // yIncrement = ceil(38.89 / 3.175) = 13 → loop i=-13..12 = 26 raw lines
   // i=-13 (|ly|=41.275 > halfY=38.89) misses the flat box → 25 clipped segments
   const flatHatch = new Hatch({ patternName: 'ANSI31' });
-  flatHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })]);
+  flatHatch.setProperty('childEntities', [new PolylineBase({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })]);
   const ctx = makeMockCtx();
   flatHatch.draw(ctx);
   expect(ctx.getMoveCalls()).toBe(25);
@@ -589,10 +589,10 @@ test('Test Hatch.draw tight bound line count - flat boundary', () => {
 test('Test Hatch.draw tight bound produces fewer lines for flat boundary', () => {
   // A flat boundary (100x10) should produce fewer lines than a square (100x100).
   const squareHatch = new Hatch({ patternName: 'ANSI31' });
-  squareHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
+  squareHatch.setProperty('childEntities', [new PolylineBase({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
 
   const flatHatch = new Hatch({ patternName: 'ANSI31' });
-  flatHatch.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })]);
+  flatHatch.setProperty('childEntities', [new PolylineBase({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 10), new Point(0, 10)] })]);
 
   const squareCtx = makeMockCtx();
   squareHatch.draw(squareCtx);
@@ -614,14 +614,14 @@ test('Hatch.buildPatternCache no childEntities sets cachedPattern to empty array
 
 test('Hatch.buildPatternCache solid fill sets cachedPattern to empty array', () => {
   const h = new Hatch({ patternName: 'SOLID' });
-  h.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
+  h.setProperty('childEntities', [new PolylineBase({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
   h.buildPatternCache();
   expect(h.cachedPattern).toEqual([]);
 });
 
 test('Hatch.buildPatternCache unknown pattern sets cachedPattern to empty array', () => {
   const h = new Hatch({ patternName: 'HONEY' });
-  h.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
+  h.setProperty('childEntities', [new PolylineBase({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })]);
   h.setProperty('patternName', 'NOTAPATTERN');
   h.buildPatternCache();
   expect(h.cachedPattern).toEqual([]);
@@ -631,9 +631,9 @@ test('Hatch.buildPatternCache unknown pattern sets cachedPattern to empty array'
 
 /**
  * Build a 100×100 square boundary
- * @return {Array} array containing one BasePolyline boundary
+ * @return {Array} array containing one PolylineBase boundary
  */
-const makeSquare = () => [new BasePolyline({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
+const makeSquare = () => [new PolylineBase({ points: [new Point(0, 0), new Point(100, 0), new Point(100, 100), new Point(0, 100)] })];
 
 /**
  * Sum all segment counts across all families in a cached hatch
@@ -731,9 +731,9 @@ test('Hatch.buildPatternCache scale change invalidates and rebuilds cache with u
 
 /**
  * A 20×20 inner square hole centred in the 100×100 outer square
- * @return {BasePolyline} inner boundary polyline
+ * @return {PolylineBase} inner boundary polyline
  */
-const makeInnerSquare = () => new BasePolyline({ points: [new Point(40, 40), new Point(60, 40), new Point(60, 60), new Point(40, 60)] });
+const makeInnerSquare = () => new PolylineBase({ points: [new Point(40, 40), new Point(60, 40), new Point(60, 60), new Point(40, 60)] });
 
 test('Hatch.buildPatternCache ANSI31 nested boundary: no segment midpoint inside inner hole', () => {
   // Even-odd rule: a ray from inside the hole crosses 2 boundaries → even → not hatched
@@ -951,7 +951,7 @@ test('Hatch.setProperty patternName updates pattern and solid flag via setter', 
 test('Hatch.setProperty points translation shifts child entity positions', () => {
   const h = new Hatch({ patternName: 'ANSI31' });
   // h.points = [Point(0,0), Point(1,1)] — 45° angle set by constructor
-  h.setProperty('childEntities', [new BasePolyline({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })]);
+  h.setProperty('childEntities', [new PolylineBase({ points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] })]);
 
   // New points: same 45° angle (delta angle = 0 → no rotation), origin shifted by (5, 0)
   h.setProperty('points', [new Point(5, 0), new Point(6, 1)]);

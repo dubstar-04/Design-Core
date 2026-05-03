@@ -38,7 +38,7 @@ test('CornerEntity.direction returns lineEnd minus lineStart', () => {
 
 test('CornerEntity.resolveEndpoints returns true and sets lineStart/lineEnd for a Line', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   const line = core.scene.entities.get(0);
 
   const corner = new CornerEntity();
@@ -51,7 +51,7 @@ test('CornerEntity.resolveEndpoints returns true and sets lineStart/lineEnd for 
 
 test('CornerEntity.resolveEndpoints returns false and leaves endpoints null for a non-Line', () => {
   core.scene.clear();
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
   const circle = core.scene.entities.get(0);
 
   const corner = new CornerEntity();
@@ -66,7 +66,7 @@ test('CornerEntity.resolveEndpoints returns false and leaves endpoints null for 
 
 test('CornerEntity.setEntity returns true and clears segment for a plain Line entity', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   const line = core.scene.entities.get(0);
 
   const corner = new CornerEntity();
@@ -77,7 +77,7 @@ test('CornerEntity.setEntity returns true and clears segment for a plain Line en
 
 test('CornerEntity.setEntity sets segment and segmentIndex for a polyline straight segment', () => {
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
   const poly = core.scene.entities.get(0);
 
   const corner = new CornerEntity();
@@ -93,7 +93,7 @@ test('CornerEntity.setEntity notifies and returns false for a polyline arc segme
   // bulge on the start point makes the segment an arc
   const arcStart = new Point(0, 0);
   arcStart.bulge = 1;
-  core.scene.addItem('Lwpolyline', { points: [arcStart, new Point(10, 0)] });
+  core.scene.addEntity('Lwpolyline', { points: [arcStart, new Point(10, 0)] });
   const poly = core.scene.entities.get(0);
 
   const errorMsg = 'arc segment error';
@@ -150,7 +150,7 @@ test('CornerEntity.keepStart returns true when segment start is on the click sid
   // Polyline: (0,0)→(10,0)→(10,10), click at (3,2), intersection=(10,0)
   // clickOnLine=(3,0), clickDir=(−7,0) → points toward start side
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
   const poly = core.scene.entities.get(0);
 
   const corner = new CornerEntity();
@@ -167,7 +167,7 @@ test('CornerEntity.keepStart returns false when segment end is on the click side
   // Same polyline, click at (8,2), intersection=(0,0)
   // clickOnLine=(8,0), clickDir=(8,0) → points toward end side
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
   const poly = core.scene.entities.get(0);
 
   const corner = new CornerEntity();
@@ -186,7 +186,7 @@ test('CornerEntity.keepStart handles closing segment of closed polyline (segment
   // lineStart=(10,10), lineEnd=(0,0), click at (9,9), intersection=(10,0)
   // clickOnLine=(10,9.something...) but we just need keepStart not to throw
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
   const poly = core.scene.entities.get(0);
 
   const corner = new CornerEntity();

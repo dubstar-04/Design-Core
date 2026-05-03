@@ -14,7 +14,7 @@ const inputScenarios = [
     desc: 'offset line to the left by distance 5',
     entityType: 'Line',
     entityData: { points: [new Point(0, 0), new Point(10, 0)] },
-    inputs: [5, { selectedItemIndex: 0 }, new Point(5, 5)],
+    inputs: [5, { selectedEntityIndex: 0 }, new Point(5, 5)],
     checkIndex: 1,
     expectedPoints: [new Point(0, 5), new Point(10, 5)],
   },
@@ -22,7 +22,7 @@ const inputScenarios = [
     desc: 'offset line to the right by distance 5',
     entityType: 'Line',
     entityData: { points: [new Point(0, 0), new Point(10, 0)] },
-    inputs: [5, { selectedItemIndex: 0 }, new Point(5, -5)],
+    inputs: [5, { selectedEntityIndex: 0 }, new Point(5, -5)],
     checkIndex: 1,
     expectedPoints: [new Point(0, -5), new Point(10, -5)],
   },
@@ -30,7 +30,7 @@ const inputScenarios = [
     desc: 'offset circle outward by distance 5',
     entityType: 'Circle',
     entityData: { points: [new Point(0, 0), new Point(10, 0)] },
-    inputs: [5, { selectedItemIndex: 0 }, new Point(20, 0)],
+    inputs: [5, { selectedEntityIndex: 0 }, new Point(20, 0)],
     checkIndex: 1,
     checkRadius: 15,
   },
@@ -38,7 +38,7 @@ const inputScenarios = [
     desc: 'offset circle inward by distance 3',
     entityType: 'Circle',
     entityData: { points: [new Point(0, 0), new Point(10, 0)] },
-    inputs: [3, { selectedItemIndex: 0 }, new Point(5, 0)],
+    inputs: [3, { selectedEntityIndex: 0 }, new Point(5, 0)],
     checkIndex: 1,
     checkRadius: 7,
   },
@@ -46,7 +46,7 @@ const inputScenarios = [
     desc: 'offset arc outward by distance 5',
     entityType: 'Arc',
     entityData: { points: [new Point(0, 0), new Point(10, 0), new Point(0, 10)] },
-    inputs: [5, { selectedItemIndex: 0 }, new Point(20, 0)],
+    inputs: [5, { selectedEntityIndex: 0 }, new Point(20, 0)],
     checkIndex: 1,
     checkRadius: 15,
   },
@@ -58,7 +58,7 @@ test.each(inputScenarios)('Offset.execute handles $desc', async (scenario) => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem(entityType, entityData);
+  core.scene.addEntity(entityType, entityData);
 
   const origInputManager = core.scene.inputManager;
   let callCount = 0;
@@ -100,7 +100,7 @@ test('Offset.execute - cancel at distance prompt does not offset', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const origInputManager = core.scene.inputManager;
   core.scene.inputManager = {
@@ -121,7 +121,7 @@ test('Offset.execute - cancel at entity selection does not offset', async () => 
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const origInputManager = core.scene.inputManager;
   let callCount = 0;
@@ -148,11 +148,11 @@ test('Offset.execute - cancel at side point does not offset', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const origInputManager = core.scene.inputManager;
   let callCount = 0;
-  const inputs = [5, { selectedItemIndex: 0 }]; // distance + selection, then undefined
+  const inputs = [5, { selectedEntityIndex: 0 }]; // distance + selection, then undefined
   core.scene.inputManager = {
     requestInput: async () => {
       if (callCount < inputs.length) {
@@ -167,8 +167,8 @@ test('Offset.execute - cancel at side point does not offset', async () => {
   await offset.execute();
 
   expect(core.scene.entities.count()).toBe(1);
-  // selectedItem must be cleared so a stale action() call cannot create an unintended entity
-  expect(offset.selectedItem).toBeNull();
+  // selectedEntity must be cleared so a stale action() call cannot create an unintended entity
+  expect(offset.selectedEntity).toBeNull();
 
   core.scene.inputManager = origInputManager;
 });
@@ -177,14 +177,14 @@ test('Offset.execute - entity count increases by one per offset', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const entityCount = core.scene.entities.count();
 
   const origInputManager = core.scene.inputManager;
   let callCount = 0;
-  const inputs = [5, { selectedItemIndex: 0 }, new Point(5, 5)];
+  const inputs = [5, { selectedEntityIndex: 0 }, new Point(5, 5)];
   core.scene.inputManager = {
     requestInput: async () => {
       if (callCount < inputs.length) {
@@ -210,10 +210,10 @@ test('Test Offset.action - offset line perpendicular', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   core.scene.headers.offsetDistance = 5;
   offset.points = [new Point(5, 5)]; // side point above line
 
@@ -232,10 +232,10 @@ test('Test Offset.action - offset vertical line', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   core.scene.headers.offsetDistance = 3;
   offset.points = [new Point(5, 5)]; // side point to the right
 
@@ -252,10 +252,10 @@ test('Test Offset.action - offset circle outward', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   core.scene.headers.offsetDistance = 5;
   offset.points = [new Point(20, 0)]; // outside the circle
 
@@ -275,10 +275,10 @@ test('Test Offset.action - offset circle inward', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   core.scene.headers.offsetDistance = 3;
   offset.points = [new Point(5, 0)]; // inside the circle
 
@@ -294,10 +294,10 @@ test('Test Offset.action - offset circle inward returns null when radius would b
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   core.scene.headers.offsetDistance = 15; // larger than radius
   offset.points = [new Point(5, 0)]; // inside
 
@@ -315,10 +315,10 @@ test('Test Offset.action - offset arc outward preserves angles', () => {
   const start = centre.project(0, 10); // radius 10
   const end = centre.project(Math.PI / 2, 10);
 
-  core.scene.addItem('Arc', { points: [centre, start, end] });
+  core.scene.addEntity('Arc', { points: [centre, start, end] });
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   core.scene.headers.offsetDistance = 5;
   offset.points = [new Point(20, 0)]; // outside
 
@@ -342,10 +342,10 @@ test('Test Offset.action - unsupported entity type does not create new entity', 
   core.scene.clear();
   core.scene.selectionManager.reset();
 
-  core.scene.addItem('Rectangle', { points: [new Point(0, 0), new Point(10, 10)] });
+  core.scene.addEntity('Rectangle', { points: [new Point(0, 0), new Point(10, 10)] });
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   core.scene.headers.offsetDistance = 5;
   offset.points = [new Point(20, 20)];
 
@@ -409,7 +409,7 @@ test('Test Offset.getThroughDistance - arc uses same radial distance as circle',
 test('Test Offset.getThroughDistance - polyline uses closestPoint distance', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Polyline', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Polyline', { points: [new Point(0, 0), new Point(10, 0)] });
   const entity = core.scene.entities.get(0);
 
   const offset = new Offset();
@@ -426,13 +426,13 @@ test('Test Offset.getThroughDistance - unsupported entity returns 0', () => {
 
 // ─── action edge cases ────────────────────────────────────────────────────────
 
-test('Test Offset.action - returns early when selectedItem is null', () => {
+test('Test Offset.action - returns early when selectedEntity is null', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const offset = new Offset();
-  offset.selectedItem = null;
+  offset.selectedEntity = null;
   core.scene.headers.offsetDistance = 5;
   offset.action();
 
@@ -442,10 +442,10 @@ test('Test Offset.action - returns early when selectedItem is null', () => {
 test('Test Offset.action - returns early when offsetDistance is 0', () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   core.scene.headers.offsetDistance = 0;
   offset.points = [new Point(5, 5)];
   offset.action();
@@ -629,7 +629,7 @@ test('Offset.findJunction - non-intersecting arc/arc falls back to midpoint', ()
 test('Offset.execute - single preselection skips entity selection prompt', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   // Preselect the entity
   core.scene.selectionManager.addToSelectionSet(0);
 
@@ -658,8 +658,8 @@ test('Offset.execute - single preselection skips entity selection prompt', async
 test('Offset.execute - multi-preselection clears selection and prompts', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 5), new Point(10, 5)] });
   // Preselect two entities
   core.scene.selectionManager.addToSelectionSet(0);
   core.scene.selectionManager.addToSelectionSet(1);
@@ -667,7 +667,7 @@ test('Offset.execute - multi-preselection clears selection and prompts', async (
   const origInputManager = core.scene.inputManager;
   let callCount = 0;
   // After clearing, distance + selection + side-point
-  const inputs = [5, { selectedItemIndex: 0 }, new Point(5, 5)];
+  const inputs = [5, { selectedEntityIndex: 0 }, new Point(5, 5)];
   const offset = new Offset();
   core.scene.inputManager = {
     requestInput: async () => {
@@ -691,7 +691,7 @@ test('Offset.execute - multi-preselection clears selection and prompts', async (
 test('Offset.execute - distance <= 0 notifies and does not offset', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify').mockImplementation(() => {});
 
@@ -715,12 +715,12 @@ test('Offset.execute - distance <= 0 notifies and does not offset', async () => 
 test('Offset.execute - Through mode offsets entity to the through point distance', async () => {
   core.scene.clear();
   core.scene.selectionManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const origInputManager = core.scene.inputManager;
   let callCount = 0;
   // 'Through' → select entity at index 0 → through point at (5, 7) → undefined exits loop
-  const inputs = ['Through', { selectedItemIndex: 0 }, new Point(5, 7)];
+  const inputs = ['Through', { selectedEntityIndex: 0 }, new Point(5, 7)];
 
   const offset = new Offset();
   core.scene.inputManager = {
@@ -758,20 +758,20 @@ test('Offset.register returns correct metadata', () => {
 
 // ─── preview ──────────────────────────────────────────────────────────────────
 
-test('Offset.preview does not add preview entity when selectedItem is null', () => {
+test('Offset.preview does not add preview entity when selectedEntity is null', () => {
   core.scene.clear();
   DesignCore.Scene.previewEntities.clear();
   core.scene.headers.offsetDistance = 5;
 
   const offset = new Offset();
-  offset.selectedItem = null;
+  offset.selectedEntity = null;
   expect(() => offset.preview()).not.toThrow();
   expect(DesignCore.Scene.previewEntities.count()).toBe(0);
 });
 
 test('Offset.preview does not add preview entity when offsetDistance is 0', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   DesignCore.Scene.previewEntities.clear();
   core.scene.headers.offsetDistance = 0;
 
@@ -779,7 +779,7 @@ test('Offset.preview does not add preview entity when offsetDistance is 0', () =
   DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   offset.preview();
 
   DesignCore.Mouse.pointOnScene = savedPointOnScene;
@@ -788,7 +788,7 @@ test('Offset.preview does not add preview entity when offsetDistance is 0', () =
 
 test('Offset.preview adds entity to previewEntities for a valid line', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   DesignCore.Scene.previewEntities.clear();
   core.scene.headers.offsetDistance = 5;
 
@@ -796,7 +796,7 @@ test('Offset.preview adds entity to previewEntities for a valid line', () => {
   DesignCore.Mouse.pointOnScene = () => new Point(5, 5);
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   offset.preview();
 
   DesignCore.Mouse.pointOnScene = savedPointOnScene;
@@ -811,10 +811,10 @@ test('Test Offset.action - offset open Lwpolyline', () => {
   core.scene.selectionManager.reset();
 
   // L-shape: (0,0) → (10,0) → (10,10)
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10)] });
 
   const offset = new Offset();
-  offset.selectedItem = core.scene.entities.get(0);
+  offset.selectedEntity = core.scene.entities.get(0);
   core.scene.headers.offsetDistance = 1;
   offset.points = [new Point(5, 2)]; // above the bottom segment → offset upward/left
 
@@ -833,7 +833,7 @@ test('Test Offset.action - offset closed Lwpolyline outward', () => {
   core.scene.selectionManager.reset();
 
   // Closed square: 5 points where first === last → constructor sets flag=1
-  core.scene.addItem('Lwpolyline', {
+  core.scene.addEntity('Lwpolyline', {
     points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10), new Point(0, 0)],
   });
 
@@ -841,7 +841,7 @@ test('Test Offset.action - offset closed Lwpolyline outward', () => {
   expect(polyline.flags.hasFlag(1)).toBe(true); // confirm closed
 
   const offset = new Offset();
-  offset.selectedItem = polyline;
+  offset.selectedEntity = polyline;
   core.scene.headers.offsetDistance = 1;
   offset.points = [new Point(-5, 5)]; // outside the left edge
 
@@ -884,12 +884,12 @@ test('Offset.execute - Through mode offsets circle to the through point', async 
   core.scene.selectionManager.reset();
 
   // Circle: centre (0,0), radius 10
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const origInputManager = core.scene.inputManager;
   let callCount = 0;
   // Through → select circle → through point at (15,0) → undefined exits loop
-  const inputs = ['Through', { selectedItemIndex: 0 }, new Point(15, 0)];
+  const inputs = ['Through', { selectedEntityIndex: 0 }, new Point(15, 0)];
 
   const offset = new Offset();
   core.scene.inputManager = {

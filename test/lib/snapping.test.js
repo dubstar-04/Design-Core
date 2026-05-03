@@ -9,7 +9,7 @@ const core = new Core();
 const snapping = new Snapping();
 
 // Add a valid item to scene
-core.scene.addItem('Line', { points: [new Point(10, 10), new Point(100, 10)] });
+core.scene.addEntity('Line', { points: [new Point(10, 10), new Point(100, 10)] });
 
 afterEach(() => {
   // Reset all mouse button states so tests don't affect each other via

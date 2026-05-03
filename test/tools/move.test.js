@@ -40,7 +40,7 @@ test.each(inputScenarios)('Move.execute handles $desc', async (scenario) => {
   // create line
   const pointOne = new Point(10, 0);
   const pointTwo = new Point(20, 0);
-  core.scene.addItem('Line', { points: [pointOne, pointTwo] });
+  core.scene.addEntity('Line', { points: [pointOne, pointTwo] });
 
   // select line
   core.scene.selectionManager.addToSelectionSet(0);
@@ -62,12 +62,12 @@ test.each(inputScenarios)('Move.execute handles $desc', async (scenario) => {
 test('Test Move.action', () => {
   // Add items to scene
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(), new Point(0, 10)] });
-  core.scene.addItem('Circle', { points: [new Point(), new Point(0, 10)] });
-  core.scene.addItem('Polyline', { points: [new Point(), new Point(0, 10)] });
-  core.scene.addItem('Arc', { points: [new Point(), new Point(0, 10), new Point(10, 0)] });
-  core.scene.addItem('Rectangle', { points: [new Point(), new Point(0, 10)] });
-  core.scene.addItem('Text', { points: [new Point(), new Point(0, 10)], height: 10, rotation: 0, string: 'text test' });
+  core.scene.addEntity('Line', { points: [new Point(), new Point(0, 10)] });
+  core.scene.addEntity('Circle', { points: [new Point(), new Point(0, 10)] });
+  core.scene.addEntity('Polyline', { points: [new Point(), new Point(0, 10)] });
+  core.scene.addEntity('Arc', { points: [new Point(), new Point(0, 10), new Point(10, 0)] });
+  core.scene.addEntity('Rectangle', { points: [new Point(), new Point(0, 10)] });
+  core.scene.addEntity('Text', { points: [new Point(), new Point(0, 10)], height: 10, rotation: 0, string: 'text test' });
 
   // Add items to selection set
   for (let i = 0; i < core.scene.entities.count(); i++) {

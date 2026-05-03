@@ -21,7 +21,7 @@ test('Chamfer.register returns correct command object', () => {
 
 test('Chamfer.action does nothing when entities are not set', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   const countBefore = core.scene.entities.count();
 
   const chamfer = new Chamfer();
@@ -32,8 +32,8 @@ test('Chamfer.action does nothing when entities are not set', () => {
 
 test('Chamfer.action notifies when first entity type is not supported', () => {
   core.scene.clear();
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -50,8 +50,8 @@ test('Chamfer.action notifies when first entity type is not supported', () => {
 
 test('Chamfer.action notifies when second entity type is not supported', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -68,8 +68,8 @@ test('Chamfer.action notifies when second entity type is not supported', () => {
 
 test('Chamfer.action notifies for parallel lines', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 5), new Point(10, 5)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -90,8 +90,8 @@ test('Chamfer.action dist=0 trimMode=true trims both lines to intersection', () 
   // Lines only touching when extended: horizontal (0,0)→(8,0), vertical (10,-10)→(10,-2)
   // Infinite extensions meet at (10, 0).
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(8, 0)] });
-  core.scene.addItem('Line', { points: [new Point(10, -10), new Point(10, -2)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(8, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, -10), new Point(10, -2)] });
 
   core.scene.headers.chamferDistanceA = 0;
   core.scene.headers.chamferDistanceB = 0;
@@ -122,8 +122,8 @@ test('Chamfer.action dist=0 trimMode=true trims both lines to intersection', () 
 
 test('Chamfer.action dist=0 trimMode=false makes no changes', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(8, 0)] });
-  core.scene.addItem('Line', { points: [new Point(10, -10), new Point(10, -2)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(8, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, -10), new Point(10, -2)] });
 
   core.scene.headers.chamferDistanceA = 0;
   core.scene.headers.chamferDistanceB = 0;
@@ -146,8 +146,8 @@ test('Chamfer.action distance method trimMode=true adds chamfer line and trims',
   // Perpendicular L-corner at origin: horizontal (-10,0)→(0,0), vertical (0,0)→(0,10)
   // Equal distances of 2 → chamfer endpoints at (-2,0) and (0,2)
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -191,8 +191,8 @@ test('Chamfer.action distance method trimMode=true adds chamfer line and trims',
 test('Chamfer.action distance method asymmetric distances', () => {
   // L-corner at origin, distA=3 along horizontal, distB=1 along vertical
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferDistanceA = 3;
   core.scene.headers.chamferDistanceB = 1;
@@ -216,8 +216,8 @@ test('Chamfer.action distance method asymmetric distances', () => {
 
 test('Chamfer.action distance method trimMode=false adds chamfer line only', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -245,8 +245,8 @@ test('Chamfer.action distance method trimMode=false adds chamfer line only', () 
 test('Chamfer.action notifies when distance is too large for the segments', () => {
   // Lines only 5 units long from intersection — distance 10 won't fit
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-5, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 5)] });
+  core.scene.addEntity('Line', { points: [new Point(-5, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 5)] });
 
   core.scene.headers.chamferDistanceA = 10;
   core.scene.headers.chamferDistanceB = 10;
@@ -273,8 +273,8 @@ test('Chamfer.action angle method 45° on perpendicular lines matches distance m
   // With perpendicular lines and 45°, the chamfer endpoint on line2 should also be 2 units
   // from the intersection — matching a symmetric distance chamfer.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferLength = 2;
   core.scene.headers.chamferAngle = 45; // degrees
@@ -307,8 +307,8 @@ test('Chamfer.action notifies when click coincides with intersection', () => {
   // L-corner at origin. Clicking firstClickPoint exactly at (0,0) makes
   // firstClickDistance = 0, triggering the "Selected corner cannot be chamfered" guard.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -333,8 +333,8 @@ test('Chamfer.action notifies when click coincides with intersection', () => {
 
 test('Chamfer.action angle method notifies INVALIDNUMBER when angle is zero', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferLength = 2;
   core.scene.headers.chamferAngle = 0; // alpha = 0 * π/180 = 0, fails alpha <= 0 guard
@@ -362,8 +362,8 @@ test('Chamfer.action angle method notifies PARALLELLINES when chamfer direction 
   // candidate1 = rotate(-1,0) by +π/2 = (0,-1); dot with secondClickUnit (0,1) = -1 < 0.
   // candidate2 = rotate(-1,0) by -π/2 = (0, 1) → parallel to secondLineDirection (0,1) → cross = 0.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferLength = 2;
   core.scene.headers.chamferAngle = 90; // degrees
@@ -397,8 +397,8 @@ test('Chamfer.execute returns early when first input is undefined', async () => 
 
 test('Chamfer.execute selects two lines and calls executeCommand', async () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   const executeCommandSpy = jest.fn();
 
@@ -544,7 +544,7 @@ test('Chamfer.execute sets chamferMode to true via Method=Angle option', async (
 
 test('Chamfer.execute re-prompts and notifies when first selected entity is not a Line', async () => {
   core.scene.clear();
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -563,8 +563,8 @@ test('Chamfer.execute re-prompts and notifies when first selected entity is not 
 
 test('Chamfer.execute re-prompts and notifies when second selected entity is not a Line', async () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -594,8 +594,8 @@ test('Chamfer.execute re-prompts and notifies when second selected entity is not
 test('Chamfer.action dist>0 trimMode=true Line first + Lwpolyline second keepStart: chamfer embedded in polyline', () => {
   // Click polyline near (-15,0) → segment 1. keepStart keeps the start portion.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -635,8 +635,8 @@ test('Chamfer.action dist>0 trimMode=true Line first + Lwpolyline second keepSta
 
 test('Chamfer.action dist>0 trimMode=true Lwpolyline first + Line second keepStart: same result with entities reversed', () => {
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -676,8 +676,8 @@ test('Chamfer.action dist>0 trimMode=true Line + Lwpolyline keepEnd: keeps end p
   // Click polyline near (8,0) → segment 3 (right of intersection). keepEnd.
   // polyChamfer = (2,0), lineChamfer = (0,2).
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -720,7 +720,7 @@ test('Chamfer.action dist>0 trimMode=true same Lwpolyline consecutive segments: 
   // Segment 1: (-10,0)→(0,0), Segment 2: (0,0)→(0,10). Corner at (0,0).
   // dist=2 → chamfer at (-2,0) and (0,2).
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -763,7 +763,7 @@ test('Chamfer.action dist>0 trimMode=true same Lwpolyline open ends: separate ch
   // dist=2, clicks at (-3,0) and (1,3):
   //   firstChamfer = (-1,0), secondChamfer = (1,2).
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-5, 0), new Point(0, 0), new Point(1, 0), new Point(1, 5)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-5, 0), new Point(0, 0), new Point(1, 0), new Point(1, 5)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -809,7 +809,7 @@ test('Chamfer.action dist>0 trimMode=true closed Lwpolyline seg3+closing-seg: co
   // Closing segment (idx=4) goes (0,10)→(0,0); seg 3 goes (10,10)→(0,10).
   // Corner at (0,10) — chamfer dist=2 trims to (2,10) on seg3 and (0,8) on closing seg.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -847,7 +847,7 @@ test('Chamfer.action dist>0 trimMode=true closed Lwpolyline closing-wrap (seg4+s
   // Bug: old code had no closed-poly guard, so closing-wrap was treated as open-ends.
   // Fix: closed poly must NOT enter the open-ends path → corner-splice at index 0.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -892,7 +892,7 @@ test('Chamfer.action dist>0 trimMode=true closed Lwpolyline closing-wrap (seg4+s
 test('Chamfer.action dist>0 trimMode=false closed Lwpolyline closing-wrap: standalone chamfer Line only', () => {
   // Same square, closed, trimMode=false. No polyline mutation; only chamfer Line added.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -922,7 +922,7 @@ test('Chamfer.action dist>0 trimMode=true open Lwpolyline seg1+lastIdx still tak
   // Open 4-point polyline (no flags). Seg 1 and seg 3 (lastIdx=3) → open-ends path still fires.
   // Regression guard: the closed-poly fix must not break the open-poly open-ends case.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-5, 0), new Point(0, 0), new Point(1, 0), new Point(1, 5)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-5, 0), new Point(0, 0), new Point(1, 0), new Point(1, 5)] });
   const polyEntity = core.scene.entities.get(0);
   // No flags set — open polyline
 
@@ -949,8 +949,8 @@ test('Chamfer.action dist>0 trimMode=true open Lwpolyline seg1+lastIdx still tak
 
 test('Chamfer.action dist>0 trimMode=false Line + Lwpolyline: standalone chamfer Line added, entities unchanged', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -984,8 +984,8 @@ test('Chamfer.action dist>0 trimMode=false Line + Lwpolyline: standalone chamfer
 test('Chamfer.action chamfer line inherits layer, lineWidth, lineType from first entity', () => {
   // Perpendicular L-corner at origin; first entity on a non-default layer.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)], layer: 'walls', lineWidth: 5, lineType: 'DASHED' });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)], layer: 'walls', lineWidth: 5, lineType: 'DASHED' });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferDistanceA = 2;
   core.scene.headers.chamferDistanceB = 2;
@@ -1014,7 +1014,7 @@ test('Chamfer.preview does not throw', () => {
 
 test('Chamfer.preview returns early when findClosestItem returns undefined', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
   DesignCore.Scene.previewEntities.clear();
 
   const chamfer = new Chamfer();
@@ -1031,8 +1031,8 @@ test('Chamfer.preview returns early when findClosestItem returns undefined', () 
 
 test('Chamfer.preview adds chamfer line to previewEntities in no-trim mode', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
   DesignCore.Scene.previewEntities.clear();
 
   core.scene.headers.chamferDistanceA = 2;
@@ -1054,8 +1054,8 @@ test('Chamfer.preview adds chamfer line to previewEntities in no-trim mode', () 
 
 test('Chamfer.preview skips chamfer line in no-trim mode when distances are both 0 (sharp corner)', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
   DesignCore.Scene.previewEntities.clear();
 
   core.scene.headers.chamferDistanceA = 0;
@@ -1077,8 +1077,8 @@ test('Chamfer.preview skips chamfer line in no-trim mode when distances are both
 
 test('Chamfer.preview adds 5 entities to previewEntities in trim mode', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
   DesignCore.Scene.previewEntities.clear();
 
   core.scene.headers.chamferDistanceA = 2;
@@ -1101,8 +1101,8 @@ test('Chamfer.preview adds 5 entities to previewEntities in trim mode', () => {
 
 test('Chamfer.execute returns early when second-entity input is undefined (inner loop)', async () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   const executeCommandSpy = jest.fn();
   await withMockInput(
@@ -1121,7 +1121,7 @@ test('Chamfer.execute notifies NONCONSECUTIVESEGMENTS for non-adjacent polyline 
   // 5-point polyline → 4 segments. Pick segment 1 (near -15,0) then segment 3 (near 5,0).
   // Neither consecutive nor open-ends → NONCONSECUTIVESEGMENTS, then undefined to exit.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0), new Point(20, 0)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0), new Point(20, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
   await withMockInput(
@@ -1169,8 +1169,8 @@ test('Chamfer.execute Trim→Trim keeps trimMode=true', async () => {
 test('Chamfer.action angle method angle=180 notifies INVALIDNUMBER', () => {
   // alpha = 180 * π/180 = π; checks alpha >= Math.PI → INVALIDNUMBER
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.chamferLength = 2;
   core.scene.headers.chamferAngle = 180;

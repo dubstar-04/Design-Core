@@ -53,11 +53,11 @@ export class Cutclip extends Tool {
    * Perform the command
    */
   action() {
-    // generate clipboard data from selected items
-    const selectedItems = DesignCore.Scene.selectionManager.selectedItems;
+    // generate clipboard data from selected entities
+    const selectedEntities = DesignCore.Scene.selectionManager.selectedEntities;
 
     // create clipboard data
-    DesignCore.Clipboard.Entities = selectedItems;
+    DesignCore.Clipboard.Entities = selectedEntities;
     // get a copy of the selection set
     const selections = DesignCore.Scene.selectionManager.selectionSet.selectionSet.slice();
     // create state changes for each of the selections

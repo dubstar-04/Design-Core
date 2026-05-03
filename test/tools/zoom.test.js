@@ -84,8 +84,8 @@ test('Test Zoom.action - Window mode with single point (should not zoom)', () =>
 
 test('Test Zoom.action - All mode (calls zoomExtents)', () => {
   // Add items to scene so extents exist
-  DesignCore.Scene.addItem('Line', { points: [new Point(10, 10), new Point(100, 100)] });
-  DesignCore.Scene.addItem('Circle', { points: [new Point(50, 50), new Point(60, 60)] });
+  DesignCore.Scene.addEntity('Line', { points: [new Point(10, 10), new Point(100, 100)] });
+  DesignCore.Scene.addEntity('Circle', { points: [new Point(50, 50), new Point(60, 60)] });
 
   core.canvas.width = 800;
   core.canvas.height = 600;
@@ -237,7 +237,7 @@ test('Test Canvas.zoomToWindow - same point (should not zoom)', () => {
 
 test('Test Zoom.action - Object mode', () => {
   // Add an object to the scene
-  const obj = DesignCore.Scene.addItem('Circle', { points: [new Point(20, 20), new Point(40, 40)] });
+  const obj = DesignCore.Scene.addEntity('Circle', { points: [new Point(20, 20), new Point(40, 40)] });
 
   core.canvas.width = 800;
   core.canvas.height = 600;
@@ -281,7 +281,7 @@ test('Zoom.action - Extents mode calls zoomExtents', () => {
   core.canvas.height = 600;
   core.canvas.matrix.scale(1, 1);
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(10, 10), new Point(50, 50)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 10), new Point(50, 50)] });
 
   const initialScale = core.canvas.getScale();
 
@@ -444,7 +444,7 @@ test('Zoom.execute Extents mode: calls executeCommand without extra point prompt
 
 test('Zoom.execute Object mode: with existing selection calls executeCommand without prompting', async () => {
   core.scene.clear();
-  const idx = core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 10)] });
+  const idx = core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 10)] });
   core.scene.selectionManager.reset();
   core.scene.selectionManager.addToSelectionSet(idx);
 

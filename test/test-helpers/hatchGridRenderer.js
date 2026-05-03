@@ -15,7 +15,7 @@
 
 import { Core } from '../../core/core/core.js';
 import { Hatch } from '../../core/entities/hatch.js';
-import { BasePolyline } from '../../core/entities/basePolyline.js';
+import { PolylineBase } from '../../core/entities/polylineBase.js';
 import { Point } from '../../core/entities/point.js';
 import { Text } from '../../core/entities/text.js';
 
@@ -136,7 +136,7 @@ export function buildHatchGrid(renderer) {
     let outlinePoints;
 
     if (i % 2 === 0) {
-      hatchBoundary = new BasePolyline({ points: [
+      hatchBoundary = new PolylineBase({ points: [
         new Point(cx - SHAPE_R, cy - SHAPE_R),
         new Point(cx + SHAPE_R, cy - SHAPE_R),
         new Point(cx + SHAPE_R, cy + SHAPE_R),
@@ -145,7 +145,7 @@ export function buildHatchGrid(renderer) {
       outlinePoints = hatchBoundary.toPolylinePoints();
     } else {
       // Two exact semicircle arcs (bulge = 1) for clipping; polygon for visible outline
-      hatchBoundary = new BasePolyline({ points: [
+      hatchBoundary = new PolylineBase({ points: [
         new Point(cx + SHAPE_R, cy, 1),
         new Point(cx - SHAPE_R, cy, 1),
       ] });

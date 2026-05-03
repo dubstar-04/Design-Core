@@ -302,7 +302,7 @@ export class ArcAlignedText extends Entity {
 
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
         if (selection === undefined) return;
-        selectedArc = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+        selectedArc = DesignCore.Scene.entities.get(selection.selectedEntityIndex);
 
         if (selectedArc instanceof Arc === false) {
           const msg = `${this.type} - ${Strings.Error.INVALIDTYPE}: ${selectedArc.type}`;

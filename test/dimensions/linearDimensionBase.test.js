@@ -1,5 +1,5 @@
 import { AlignedDimension } from '../../core/dimensions/alignedDimension.js';
-import { BaseLinearDimension } from '../../core/dimensions/baseLinearDimension.js';
+import { LinearDimensionBase } from '../../core/dimensions/linearDimensionBase.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Core } from '../../core/core/core.js';
@@ -9,16 +9,16 @@ new Core();
 
 // ─── constructor ─────────────────────────────────────────────────────────────
 
-test('BaseLinearDimension can be instantiated', () => {
-  const dim = new BaseLinearDimension();
-  expect(dim).toBeInstanceOf(BaseLinearDimension);
+test('LinearDimensionBase can be instantiated', () => {
+  const dim = new LinearDimensionBase();
+  expect(dim).toBeInstanceOf(LinearDimensionBase);
   expect(dim.points).toBeDefined();
   expect(Array.isArray(dim.points)).toBe(true);
 });
 
 // ─── preview ─────────────────────────────────────────────────────────────────
 
-test('BaseLinearDimension.preview - 0 points does nothing', () => {
+test('LinearDimensionBase.preview - 0 points does nothing', () => {
   const dim = new AlignedDimension();
   DesignCore.Scene.auxiliaryEntities.clear();
   DesignCore.Scene.previewEntities.clear();
@@ -28,7 +28,7 @@ test('BaseLinearDimension.preview - 0 points does nothing', () => {
   expect(DesignCore.Scene.previewEntities.count()).toBe(0);
 });
 
-test('BaseLinearDimension.preview - 1 point adds RubberBand to auxiliaryEntities', () => {
+test('LinearDimensionBase.preview - 1 point adds RubberBand to auxiliaryEntities', () => {
   const dim = new AlignedDimension();
   dim.points = [new Point(0, 0)];
 
@@ -44,7 +44,7 @@ test('BaseLinearDimension.preview - 1 point adds RubberBand to auxiliaryEntities
   DesignCore.Scene.auxiliaryEntities.add = origAdd;
 });
 
-test('BaseLinearDimension.preview - >1 points creates temp entity', () => {
+test('LinearDimensionBase.preview - >1 points creates temp entity', () => {
   const dim = new AlignedDimension();
   dim.points = [new Point(0, 0), new Point(10, 0)];
 

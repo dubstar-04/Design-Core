@@ -9,25 +9,38 @@ import { DesignCore } from '../../core/designCore.js';
 import { Utils } from '../../core/lib/utils.js';
 import { DXFFile } from '../../core/lib/dxf/dxfFile.js';
 
+/**
+ * Create a mock requestInput function that returns values from the provided array in order.
+ * @param {Array} inputs
+ * @return {Function}
+ */
+function mockRequestInput(inputs) {
+  let i = 0;
+  return async () => {
+    if (i < inputs.length) return inputs[i++];
+    throw new Error('cancelled');
+  };
+}
+
 new Core();
 
 test('Test Block', () => {
   const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
   const flags = new Flags();
   flags.addValue(1);
-  const block = new Block({ items: [line], flags: flags });
+  const block = new Block({ entities: [line], flags: flags });
 
-  expect(block.items.length).toBe(1);
+  expect(block.entities.length).toBe(1);
   expect(block.flags.getFlagValue()).toBe(1);
 });
 
 test('Test Block.clearItems', () => {
   const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
-  const block = new Block({ items: [line] });
-  expect(block.items.length).toBe(1);
+  const block = new Block({ entities: [line] });
+  expect(block.entities.length).toBe(1);
 
-  block.clearItems();
-  expect(block.items.length).toBe(0);
+  block.clearEntities();
+  expect(block.entities.length).toBe(0);
 });
 
 test('Test Block.snaps', () => {
@@ -36,7 +49,7 @@ test('Test Block.snaps', () => {
   expect(block.snaps()).toHaveLength(0);
 
   const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
-  block.addItem(line);
+  block.addEntity(line);
   expect(block.snaps()).toBeInstanceOf(Array);
   expect(block.snaps()).not.toHaveLength(0);
 });
@@ -45,9 +58,9 @@ test('Test Block', () => {
   const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
   const flags = new Flags();
   flags.addValue(1);
-  const block = new Block({ items: [line], flags: flags });
+  const block = new Block({ entities: [line], flags: flags });
 
-  expect(block.items.length).toBe(1);
+  expect(block.entities.length).toBe(1);
   expect(block.flags.getFlagValue()).toBe(1);
 });
 
@@ -63,7 +76,7 @@ test('Test Block.closestPoint', () => {
   expect(block.closestPoint(point)[1]).toBe(Infinity);
 
   const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
-  block.addItem(line);
+  block.addEntity(line);
   expect(block.closestPoint(point)).toBeInstanceOf(Array);
   expect(block.closestPoint(point)).toHaveLength(2);
   expect(block.closestPoint(point)[0]).toBeInstanceOf(Point);
@@ -75,7 +88,7 @@ test('Test Block.closestPoint', () => {
 test('Test Block.dxf', () => {
   const block = new Block({ handle: '1', endblkHandle: '1' });
   const line = new Line({ handle: '1', points: [new Point(101, 102), new Point(201, 202)] });
-  block.addItem(line);
+  block.addEntity(line);
 
   const file = new File();
   block.dxf(file);
@@ -154,7 +167,7 @@ test('Test Block.touched', () => {
   expect(block.touched(selectionExtremesTrue)).toBe(false);
 
   const line = new Line({ points: [new Point(101, 102), new Point(201, 202)] });
-  block.addItem(line);
+  block.addEntity(line);
   expect(block.touched(selectionExtremesTrue)).toBe(true);
   expect(block.touched(selectionExtremesFalse)).toBe(false);
 });
@@ -165,7 +178,7 @@ test('Test Block.dxf throws when a block item has an undefined handle', () => {
   const line = new Line({ handle: '3', points: [new Point(0, 0), new Point(1, 1)] });
   const clone = Utils.cloneObject(line);
   expect(clone.getProperty('handle')).toBeUndefined();
-  block.addItem(clone);
+  block.addEntity(clone);
 
   // Use a real DXFFile (R2000+) so the version-gated handle validation fires
   const file = new DXFFile('R2000');
@@ -179,9 +192,45 @@ test('Test Block.dxf succeeds when block items have valid handles', () => {
   // simulate the handle assignment done in Block.execute()
   clone.setProperty('handle', DesignCore.HandleManager.next());
   expect(clone.getProperty('handle')).toMatch(/^[0-9A-F]+$/i);
-  block.addItem(clone);
+  block.addEntity(clone);
 
   const file = new DXFFile('R2000');
   expect(() => block.dxf(file)).not.toThrow();
   expect(file.contents).toContain(clone.getProperty('handle'));
+});
+
+test('Test Block.execute offsets entity points by the insert point', async () => {
+  new Core();
+
+  // Add a line to the scene at world coordinates (100,200) → (300,400)
+  const line = new Line({ points: [new Point(100, 200), new Point(300, 400)] });
+  DesignCore.Scene.entities.add(line);
+  const lineIndex = DesignCore.Scene.entities.count() - 1;
+
+  // Pre-select the line so Block.execute() skips the selection-set prompt
+  DesignCore.Scene.selectionManager.reset();
+  DesignCore.Scene.selectionManager.addToSelectionSet(lineIndex);
+
+  // Feed: block name, then insert point (50, 75)
+  const insertPoint = new Point(50, 75);
+  const origRequestInput = DesignCore.Scene.inputManager.requestInput.bind(DesignCore.Scene.inputManager);
+  DesignCore.Scene.inputManager.requestInput = mockRequestInput(['TestBlock', insertPoint]);
+
+  await new Block().execute();
+
+  DesignCore.Scene.inputManager.requestInput = origRequestInput;
+
+  // The block should exist in the block manager
+  const block = DesignCore.Scene.blockManager.getItemByName('TestBlock');
+  expect(block).toBeDefined();
+  expect(block.entities).toHaveLength(1);
+
+  // Points inside the block must be offset by -insertPoint so that
+  // when Insert renders them via applyTransform(+insertPoint) they land
+  // back at their original world coordinates.
+  const blockLine = block.entities[0];
+  expect(blockLine.points[0].x).toBeCloseTo(100 - insertPoint.x);
+  expect(blockLine.points[0].y).toBeCloseTo(200 - insertPoint.y);
+  expect(blockLine.points[1].x).toBeCloseTo(300 - insertPoint.x);
+  expect(blockLine.points[1].y).toBeCloseTo(400 - insertPoint.y);
 });

@@ -2,7 +2,7 @@ import { Tool } from './tool.js';
 import { Strings } from '../lib/strings.js';
 import { Constants } from '../lib/constants.js';
 import { Line } from '../entities/line.js';
-import { BasePolyline } from '../entities/basePolyline.js';
+import { PolylineBase } from '../entities/polylineBase.js';
 import { AddState, RemoveState, UpdateState } from '../lib/stateManager.js';
 import { CornerEntity } from './cornerEntity.js';
 import { Intersection } from '../lib/intersect.js';
@@ -104,7 +104,7 @@ export class ChamferFilletBase extends Tool {
     if (index === undefined) return null;
 
     const candidate = DesignCore.Scene.entities.get(index);
-    if (!(candidate instanceof Line) && !(candidate instanceof BasePolyline)) return null;
+    if (!(candidate instanceof Line) && !(candidate instanceof PolylineBase)) return null;
 
     const tempSecond = new CornerEntity();
     if (!tempSecond.setPick(candidate, mousePoint, '')) return null;
@@ -143,8 +143,8 @@ export class ChamferFilletBase extends Tool {
    */
   applyCornerTrim(firstCornerPoint, secondCornerPoint, newEntity) {
     const isSharpTrim = newEntity === null;
-    const firstIsPolyline = this.firstPick.entity instanceof BasePolyline;
-    const secondIsPolyline = this.secondPick.entity instanceof BasePolyline;
+    const firstIsPolyline = this.firstPick.entity instanceof PolylineBase;
+    const secondIsPolyline = this.secondPick.entity instanceof PolylineBase;
 
     // Two standalone entities: update both, optionally add the new entity.
     if (!firstIsPolyline && !secondIsPolyline) {

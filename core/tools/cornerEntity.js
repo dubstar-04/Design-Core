@@ -1,5 +1,5 @@
 import { Line } from '../entities/line.js';
-import { BasePolyline } from '../entities/basePolyline.js';
+import { PolylineBase } from '../entities/polylineBase.js';
 
 import { DesignCore } from '../designCore.js';
 
@@ -61,7 +61,7 @@ export class CornerEntity {
   setPick(entity, clickPoint, arcSegmentErrorMsg) {
     this.entity = entity;
     this.clickPoint = clickPoint;
-    if (!(this.entity instanceof BasePolyline)) {
+    if (!(this.entity instanceof PolylineBase)) {
       this.segment = null;
       this.segmentIndex = null;
       return true;

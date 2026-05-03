@@ -13,14 +13,14 @@ const scenarios = [
 
   { desc: 'Aligned dimension from point selection',
     input: [new Point(), new Point(10, 0), new Point(5, 5)],
-    selectedItems: [],
+    selectedEntities: [],
     expectedDimType: 1,
     dimensionValue: 10,
   },
 ];
 
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
-  const { input, selectedItems, expectedDimType, dimensionValue } = scenario;
+  const { input, selectedEntities, expectedDimType, dimensionValue } = scenario;
 
   await withMockInput(DesignCore.Scene, input, async () => {
     const dim = new AlignedDimension();
@@ -37,7 +37,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
         expect(Number(entity.getProperty('string'))).toBeCloseTo(dimensionValue);
       }
     }
-  }, { selectedItems });
+  }, { selectedEntities });
 });
 
 test('constructor sets default properties', () => {

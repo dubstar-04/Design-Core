@@ -169,7 +169,7 @@ test('Test Canvas.getSceneOffset returns extents', () => {
 });
 
 test('Test Canvas.zoomExtents with entities', () => {
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(500, 500)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(500, 500)] });
   canvas.matrix = new Matrix();
   canvas.width = 800;
   canvas.height = 600;
@@ -496,7 +496,7 @@ test('Test Canvas.doubleClick left and right buttons do not throw', () => {
 test('Test Canvas.doubleClick middle button triggers zoomExtents', () => {
   const testCore = new Core();
   testCore.activate();
-  testCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(500, 500)] });
+  testCore.scene.addEntity('Line', { points: [new Point(0, 0), new Point(500, 500)] });
   testCore.canvas.width = 800;
   testCore.canvas.height = 600;
   testCore.canvas.matrix = new Matrix();
@@ -1138,13 +1138,13 @@ describe('Canvas.exportTo', () => {
   });
 
   test('returns true when scene has entities', () => {
-    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    exportCore.scene.addEntity('Line', { points: [new Point(0, 0), new Point(100, 100)] });
     const options = new PlotOptions(595, 842);
     expect(exportCanvas.exportTo(renderer, options)).toBe(true);
   });
 
   test('calls renderer.setTransform with a valid matrix', () => {
-    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    exportCore.scene.addEntity('Line', { points: [new Point(0, 0), new Point(100, 100)] });
     let receivedMatrix;
     renderer.setTransform = (m) => {
       receivedMatrix = m;
@@ -1157,7 +1157,7 @@ describe('Canvas.exportTo', () => {
   });
 
   test('calls renderer.setBackgroundColour with white', () => {
-    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    exportCore.scene.addEntity('Line', { points: [new Point(0, 0), new Point(100, 100)] });
     let bgColour;
     renderer.setBackgroundColour = (c) => {
       bgColour = c;
@@ -1168,7 +1168,7 @@ describe('Canvas.exportTo', () => {
   });
 
   test('calls renderer.setStyle with the plotOptions style', () => {
-    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    exportCore.scene.addEntity('Line', { points: [new Point(0, 0), new Point(100, 100)] });
     const options = new PlotOptions(595, 842);
     const spyCalls = [];
     renderer.setStyle = (fn) => {
@@ -1179,7 +1179,7 @@ describe('Canvas.exportTo', () => {
   });
 
   test('EXTENTS uses Scene.boundingBox regardless of viewport', () => {
-    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(500, 500)] });
+    exportCore.scene.addEntity('Line', { points: [new Point(0, 0), new Point(500, 500)] });
     // Pan far away so viewport does not contain the entity
     exportCanvas.matrix.translate(-10000, -10000);
     let receivedMatrix;
@@ -1195,7 +1195,7 @@ describe('Canvas.exportTo', () => {
   });
 
   test('DISPLAY uses current viewport instead of entity extents', () => {
-    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(500, 500)] });
+    exportCore.scene.addEntity('Line', { points: [new Point(0, 0), new Point(500, 500)] });
     let extentsMatrix;
     let displayMatrix;
 
@@ -1222,7 +1222,7 @@ describe('Canvas.exportTo', () => {
   });
 
   test('explicit plotScale is forwarded to buildExportMatrix', () => {
-    exportCore.scene.addItem('Line', { points: [new Point(0, 0), new Point(100, 100)] });
+    exportCore.scene.addEntity('Line', { points: [new Point(0, 0), new Point(100, 100)] });
     let receivedMatrix;
     renderer.setTransform = (m) => {
       receivedMatrix = m;

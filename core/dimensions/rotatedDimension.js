@@ -4,7 +4,7 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { Point } from '../entities/point.js';
-import { BaseLinearDimension } from './baseLinearDimension.js';
+import { LinearDimensionBase } from './linearDimensionBase.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
@@ -13,9 +13,9 @@ import { RubberBand } from '../lib/auxiliary/rubberBand.js';
 
 /**
  * Rotated Dimension Entity Class
- * @extends BaseLinearDimension
+ * @extends LinearDimensionBase
  */
-export class RotatedDimension extends BaseLinearDimension {
+export class RotatedDimension extends LinearDimensionBase {
   /**
    * Create an Rotated Dimension
    * @param {Array} data
@@ -77,20 +77,20 @@ export class RotatedDimension extends BaseLinearDimension {
 
   /**
      * Get sequenced points from user selection
-     * @param {any} items
+     * @param {any} entities
      * @param {Point} textPos
      * @param {number} angle - rotation angle in degrees (default 0 = horizontal)
      * @return {Array} array of points
      */
-  static getPointsFromSelection(items, textPos, angle = 0) {
+  static getPointsFromSelection(entities, textPos, angle = 0) {
     const points = [];
-    const item = items[0];
+    const entity = entities[0];
 
-    const Pt13 = item.points[0];
+    const Pt13 = entity.points[0];
     Pt13.sequence = 13;
     points.push(Pt13);
 
-    const Pt14 = item.points[1];
+    const Pt14 = entity.points[1];
     Pt14.sequence = 14;
     points.push(Pt14);
 

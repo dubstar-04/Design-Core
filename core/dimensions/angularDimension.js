@@ -2,12 +2,12 @@
 import { Utils } from '../lib/utils.js';
 import { Strings } from '../lib/strings.js';
 import { Arc } from '../entities/arc.js';
-import { BasePolyline } from '../entities/basePolyline.js';
+import { PolylineBase } from '../entities/polylineBase.js';
 import { Line } from '../entities/line.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DXFFile } from '../lib/dxf/dxfFile.js';
-import { BaseDimension } from './baseDimension.js';
+import { DimensionBase } from './dimensionBase.js';
 import { Intersection } from '../lib/intersect.js';
 import { Point } from '../entities/point.js';
 
@@ -18,9 +18,9 @@ import { Property } from '../properties/property.js';
 
 /**
  * Angular Dimension Entity Class
- * @extends BaseDimension
+ * @extends DimensionBase
  */
-export class AngularDimension extends BaseDimension {
+export class AngularDimension extends DimensionBase {
   /**
    * Create an Angular Dimension
    * @param {Array} data
@@ -62,25 +62,25 @@ export class AngularDimension extends BaseDimension {
 
         const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
-        let selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+        let selectedEntity = DesignCore.Scene.entities.get(selection.selectedEntityIndex);
 
-        if ([Line, BasePolyline].some((entity) => selectedItem instanceof entity)) {
-          if (selectedItem instanceof BasePolyline) {
+        if ([Line, PolylineBase].some((entity) => selectedEntity instanceof entity)) {
+          if (selectedEntity instanceof PolylineBase) {
             // get the segment closest to the mouse point
-            const segment = selectedItem.getClosestSegment(selection.selectedPoint);
+            const segment = selectedEntity.getClosestSegment(selection.selectedPoint);
 
             if (segment instanceof Line) {
-              // update the selected item to be the polyline arc segment
-              selectedItem = segment;
+              // update the selected entity to be the polyline arc segment
+              selectedEntity = segment;
             }
           }
 
-          if (selectedItem instanceof Line) {
-            Pt15 = selectedItem.points[0];
+          if (selectedEntity instanceof Line) {
+            Pt15 = selectedEntity.points[0];
             Pt15.sequence = 15;
             this.points.push(Pt15);
 
-            Pt10 = selectedItem.points[1];
+            Pt10 = selectedEntity.points[1];
             Pt10.sequence = 10;
             this.points.push(Pt10);
           }
@@ -91,24 +91,24 @@ export class AngularDimension extends BaseDimension {
         DesignCore.Scene.selectionManager.reset();
         const op1 = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         const selection2 = await DesignCore.Scene.inputManager.requestInput(op1);
-        let selectedItem = DesignCore.Scene.entities.get(selection2.selectedItemIndex);
+        let selectedEntity = DesignCore.Scene.entities.get(selection2.selectedEntityIndex);
 
-        if ([Line, BasePolyline].some((entity) => selectedItem instanceof entity)) {
-          if (selectedItem instanceof BasePolyline) {
+        if ([Line, PolylineBase].some((entity) => selectedEntity instanceof entity)) {
+          if (selectedEntity instanceof PolylineBase) {
             // get the segment closest to the mouse point
-            const segment = selectedItem.getClosestSegment(selection2.selectedPoint);
+            const segment = selectedEntity.getClosestSegment(selection2.selectedPoint);
 
             if (segment instanceof Line) {
-              // update the selected item to be the polyline arc segment
-              selectedItem = segment;
+              // update the selected entity to be the polyline arc segment
+              selectedEntity = segment;
             }
           }
-          if (selectedItem instanceof Line) {
-            Pt13 = selectedItem.points[0];
+          if (selectedEntity instanceof Line) {
+            Pt13 = selectedEntity.points[0];
             Pt13.sequence = 13;
             this.points.push(Pt13);
 
-            Pt14 = selectedItem.points[1];
+            Pt14 = selectedEntity.points[1];
             Pt14.sequence = 14;
             this.points.push(Pt14);
           }
@@ -153,23 +153,23 @@ export class AngularDimension extends BaseDimension {
 
   /**
    * Get sequenced points from user selection
-   * @param {any} items
+   * @param {any} entities
    * @param {Point} textPos
    * @return {Array} array of points
    */
-  static getPointsFromSelection(items, textPos) {
-  // Transform the items into points
-  // Do nothing more than transform the items into points
+  static getPointsFromSelection(entities, textPos) {
+  // Transform the entities into points
+  // Do nothing more than transform the entities into points
 
     const points = [];
-    const item1 = items[0];
-    const item2 = items[1];
+    const entity1 = entities[0];
+    const entity2 = entities[1];
 
-    const tempPt15 = item1.points[0];
-    const tempPt10 = item1.points[1];
+    const tempPt15 = entity1.points[0];
+    const tempPt10 = entity1.points[1];
 
-    const tempPt13 = item2.points[0];
-    const tempPt14 = item2.points[1];
+    const tempPt13 = entity2.points[0];
+    const tempPt14 = entity2.points[1];
 
     // Check the lines intersect
     const intersect = Intersection.intersectSegmentSegment(tempPt15, tempPt10, tempPt13, tempPt14, false, true);

@@ -17,28 +17,28 @@ const scenarios = [
 
   { desc: 'Diametric dimension from circle selection - Text outside circle',
     input: [new SingleSelection(0, new Point()), new Point(20, 0)],
-    selectedItems: [new Circle({ points: [new Point(0, 0), new Point(10, 0)] })],
+    selectedEntities: [new Circle({ points: [new Point(0, 0), new Point(10, 0)] })],
     expectedDimType: 3,
     dimensionValue: 20,
     dimensionEntities: 6,
   },
   { desc: 'Diametric dimension from circle selection - Text inside circle',
     input: [new SingleSelection(0, new Point()), new Point(0, 0)],
-    selectedItems: [new Circle({ points: [new Point(0, 0), new Point(10, 0)] })],
+    selectedEntities: [new Circle({ points: [new Point(0, 0), new Point(10, 0)] })],
     expectedDimType: 3,
     dimensionValue: 20,
     dimensionEntities: 5,
   },
   { desc: 'Diametric dimension from arc selection',
     input: [new SingleSelection(0, new Point()), new Point(20, 10)],
-    selectedItems: [new Arc({ points: [new Point(0, 0), new Point(20, 0), new Point(20, 20)] })],
+    selectedEntities: [new Arc({ points: [new Point(0, 0), new Point(20, 0), new Point(20, 20)] })],
     expectedDimType: 3,
     dimensionValue: 40,
     dimensionEntities: 6,
   },
   { desc: 'Diametric dimension from polyline selection',
     input: [new SingleSelection(0, new Point(30, 10)), new Point(30, 10)],
-    selectedItems: [new Polyline({ points: [new Point(0, 0), new Point(20, 0, 1), new Point(20, 20)] })],
+    selectedEntities: [new Polyline({ points: [new Point(0, 0), new Point(20, 0, 1), new Point(20, 20)] })],
     expectedDimType: 3,
     dimensionValue: 20,
     dimensionEntities: 6,
@@ -46,7 +46,7 @@ const scenarios = [
 ];
 
 test.each(scenarios)('DiametricDimension.execute handles $desc', async (scenario) => {
-  const { input, selectedItems, expectedDimType, dimensionValue, dimensionEntities } = scenario;
+  const { input, selectedEntities, expectedDimType, dimensionValue, dimensionEntities } = scenario;
 
   await withMockInput(DesignCore.Scene, input, async () => {
     const dim = new DiametricDimension();
@@ -66,7 +66,7 @@ test.each(scenarios)('DiametricDimension.execute handles $desc', async (scenario
         expect(entity.getProperty('string')).toContain('Ø');
       }
     }
-  }, { selectedItems });
+  }, { selectedEntities });
 });
 
 test('constructor sets default properties', () => {

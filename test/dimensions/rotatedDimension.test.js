@@ -13,20 +13,20 @@ const scenarios = [
 
   { desc: 'Rotated dimension from point selection (angle 0)',
     input: [0, new Point(), new Point(10, 0), new Point(5, 5)],
-    selectedItems: [],
+    selectedEntities: [],
     expectedDimType: 0,
     dimensionValue: 10,
   },
   { desc: 'Rotated dimension from point selection (angle 90)',
     input: [90, new Point(), new Point(0, 10), new Point(5, 5)],
-    selectedItems: [],
+    selectedEntities: [],
     expectedDimType: 0,
     dimensionValue: 10,
   },
 ];
 
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
-  const { input, selectedItems, expectedDimType, dimensionValue } = scenario;
+  const { input, selectedEntities, expectedDimType, dimensionValue } = scenario;
 
   await withMockInput(DesignCore.Scene, input, async () => {
     const dim = new RotatedDimension();
@@ -43,7 +43,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
         expect(Number(entity.getProperty('string'))).toBeCloseTo(dimensionValue);
       }
     }
-  }, { selectedItems });
+  }, { selectedEntities });
 });
 
 test('constructor sets default properties', () => {

@@ -5,7 +5,7 @@ import { Logging } from '../lib/logging.js';
 import { Constants } from '../lib/constants.js';
 import { Utils } from '../lib/utils.js';
 import { Line } from '../entities/line.js';
-import { BasePolyline } from '../entities/basePolyline.js';
+import { PolylineBase } from '../entities/polylineBase.js';
 import { AddState } from '../lib/stateManager.js';
 import { Colour } from '../lib/colour.js';
 
@@ -65,9 +65,9 @@ export class Fillet extends ChamferFilletBase {
         }
 
         // input1 is a selection — validate and store first entity
-        const firstEntity = DesignCore.Scene.entities.get(input1.selectedItemIndex);
+        const firstEntity = DesignCore.Scene.entities.get(input1.selectedEntityIndex);
         DesignCore.Scene.selectionManager.removeLastSelection();
-        if (!(firstEntity instanceof Line) && !(firstEntity instanceof BasePolyline)) {
+        if (!(firstEntity instanceof Line) && !(firstEntity instanceof PolylineBase)) {
           DesignCore.Core.notify(`${this.type} - ${firstEntity.type} ${Strings.Message.NOFILLET}`);
           continue;
         }
@@ -79,16 +79,16 @@ export class Fillet extends ChamferFilletBase {
           const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
           if (input2 === undefined) return;
 
-          const candidate = DesignCore.Scene.entities.get(input2.selectedItemIndex);
+          const candidate = DesignCore.Scene.entities.get(input2.selectedEntityIndex);
           DesignCore.Scene.selectionManager.removeLastSelection();
-          if (!(candidate instanceof Line) && !(candidate instanceof BasePolyline)) {
+          if (!(candidate instanceof Line) && !(candidate instanceof PolylineBase)) {
             DesignCore.Core.notify(`${this.type} - ${candidate.type} ${Strings.Message.NOFILLET}`);
             continue;
           }
           if (!this.secondPick.setPick(candidate, input2.selectedPoint, `${Strings.Strings.ARC} - ${Strings.Message.NOFILLET}`)) continue;
           // If both selections are the same polyline, segments must be consecutive
           // or they must be the open-end segments of an open polyline.
-          if (candidate === firstEntity && firstEntity instanceof BasePolyline) {
+          if (candidate === firstEntity && firstEntity instanceof PolylineBase) {
             const isConsecutive = firstEntity.areConsecutiveSegments(this.firstPick.segmentIndex, this.secondPick.segmentIndex);
             const lastIdx = firstEntity.points.length - 1;
             const isOpenEnds = !firstEntity.flags.hasFlag(1) &&

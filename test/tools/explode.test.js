@@ -7,12 +7,12 @@ const core = new Core();
 
 test('Test Explode.action', () => {
   const insertPoint = new Point(100, 100);
-  const insertIndex = core.scene.addItem('Insert', { points: [insertPoint] });
+  const insertIndex = core.scene.addEntity('Insert', { points: [insertPoint] });
   const insert = core.scene.entities.get(insertIndex);
 
   for (let i = 0; i < 5; i++) {
     const line = new Line({ points: [new Point(0, i * 10), new Point(100, i * 10)] });
-    insert.block.addItem(line);
+    insert.block.addEntity(line);
   }
 
   expect(core.scene.entities.count()).toBe(1);

@@ -92,26 +92,26 @@ export class EntityManager {
   }
 
   /**
-   * Find items in scene
+   * Find entities  in scene
    * @param {string} type - entity type or "ANY"
    * @param {string} prop - object of entity parameters
    * @param {any} value - value of the property
-   * @return {number} - index of items
+   * @return {number} - index of entities
    */
   find(type, prop, value) {
-    const filteredItems = [];
+    const filteredEntities = [];
 
-    this.#entities.forEach((item, index) => {
-      if (type.toUpperCase() === 'ANY' || item.type.toUpperCase() === type.toUpperCase()) {
-        const inStore = item.properties?.has(prop);
-        const propValue = inStore ? item.getProperty(prop) : (Object.prototype.hasOwnProperty.call(item, prop) ? item[prop] : undefined);
+    this.#entities.forEach((entity, index) => {
+      if (type.toUpperCase() === 'ANY' || entity.type.toUpperCase() === type.toUpperCase()) {
+        const inStore = entity.properties?.has(prop);
+        const propValue = inStore ? entity.getProperty(prop) : (Object.prototype.hasOwnProperty.call(entity, prop) ? entity[prop] : undefined);
         if (propValue !== undefined && propValue === value) {
-          filteredItems.push(index);
+          filteredEntities.push(index);
         }
       }
     });
 
-    return filteredItems;
+    return filteredEntities;
   }
 
   /** Get index of entity
@@ -124,16 +124,16 @@ export class EntityManager {
 
 
   /**
-   * Find closest item to point
+   * Find closest entity to point
    * @param  {Point} point
-   * @return {number} - return index of closest item or undefined
+   * @return {number} - return index of closest entity or undefined
    */
   findClosest(point) {
     let delta = 1.65 / DesignCore.Core.canvas.getScale(); // find a more suitable starting value
-    let closestItemIndex;
+    let closestEntityIndex;
 
     for (let i = 0; i < this.#entities.length; i++) {
-      // check the items layer is selectable - i.e. on, thawed, etc...
+      // check the entities  layer is selectable - i.e. on, thawed, etc...
       const layer = DesignCore.LayerManager.getItemByName(this.#entities[i].getProperty(Property.Names.LAYER));
 
       if (!layer?.isSelectable) {
@@ -144,11 +144,11 @@ export class EntityManager {
 
       if (distance < delta) {
         delta = distance;
-        closestItemIndex = i;
+        closestEntityIndex = i;
       }
     }
 
-    return closestItemIndex;
+    return closestEntityIndex;
   }
 
   /**
@@ -157,14 +157,14 @@ export class EntityManager {
    * @param {object} data
    */
   update(index, data) {
-    const item = this.get(index);
+    const entity = this.get(index);
 
-    if (!item) {
-      throw Error('Item not found in scene');
+    if (!entity) {
+      throw Error('Entity not found in scene');
     }
 
     for (const property of Object.keys(data)) {
-      item.setProperty(property, data[property]);
+      entity.setProperty(property, data[property]);
     }
   }
 

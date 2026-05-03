@@ -1,14 +1,14 @@
 import { Strings } from '../lib/strings.js';
 import { Circle } from '../entities/circle.js';
 import { Arc } from '../entities/arc.js';
-import { BasePolyline } from '../entities/basePolyline.js';
+import { PolylineBase } from '../entities/polylineBase.js';
 import { Line } from '../entities/line.js';
 import { Text } from '../entities/text.js';
 import { Point } from '../entities/point.js';
 import { Intersection } from '../lib/intersect.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
-import { BaseDimension } from './baseDimension.js';
+import { DimensionBase } from './dimensionBase.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
@@ -16,9 +16,9 @@ import { Property } from '../properties/property.js';
 
 /**
  * Base Class for Circular Dimensions - Radius and Diameter
- * @extends BaseDimension
+ * @extends DimensionBase
  */
-export class BaseCircularDimension extends BaseDimension {
+export class CircularDimensionBase extends DimensionBase {
   /**
    * Circular Dimension Constructor
    * @param {Array} data
@@ -44,25 +44,25 @@ export class BaseCircularDimension extends BaseDimension {
         const op = new PromptOptions(Strings.Input.SELECT, [Input.Type.SINGLESELECTION]);
         const selection = await DesignCore.Scene.inputManager.requestInput(op);
 
-        let selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+        let selectedEntity = DesignCore.Scene.entities.get(selection.selectedEntityIndex);
 
-        if ([Circle, Arc, BasePolyline].some((entity) => selectedItem instanceof entity)) {
-          if (selectedItem instanceof BasePolyline) {
+        if ([Circle, Arc, PolylineBase].some((entity) => selectedEntity instanceof entity)) {
+          if (selectedEntity instanceof PolylineBase) {
             // get the segment closest to the mouse point
-            const segment = selectedItem.getClosestSegment(selection.selectedPoint);
+            const segment = selectedEntity.getClosestSegment(selection.selectedPoint);
 
             if (segment instanceof Arc) {
-              // update the selected item to be the polyline arc segment
-              selectedItem = segment;
+              // update the selected entity to be the polyline arc segment
+              selectedEntity = segment;
             }
           }
 
-          if (selectedItem instanceof Circle || selectedItem instanceof Arc) {
-            Pt15 = selectedItem.points[1];
+          if (selectedEntity instanceof Circle || selectedEntity instanceof Arc) {
+            Pt15 = selectedEntity.points[1];
             Pt15.sequence = 15;
             this.points.push(Pt15);
 
-            Pt10 = selectedItem.points[0];
+            Pt10 = selectedEntity.points[0];
             Pt10.sequence = 10;
             this.points.push(Pt10);
           }

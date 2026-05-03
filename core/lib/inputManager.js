@@ -392,7 +392,7 @@ export class InputManager {
     }
 
     if (Input.getType(selection) === Input.Type.SINGLESELECTION) {
-      DesignCore.Scene.selectionManager.addToSelectionSet(selection.selectedItemIndex);
+      DesignCore.Scene.selectionManager.addToSelectionSet(selection.selectedEntityIndex);
     }
   }
 

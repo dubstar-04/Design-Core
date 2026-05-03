@@ -241,7 +241,7 @@ test('onCommandButton with no active command - starts command', () => {
 
 test('starting an entity command from idle clears the selection', () => {
   inputManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
   expect(core.scene.selectionManager.selectionSet.selectionSet.length).toBe(1);
 
@@ -252,7 +252,7 @@ test('starting an entity command from idle clears the selection', () => {
 
 test('starting a tool command from idle preserves the selection', () => {
   inputManager.reset();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   core.scene.selectionManager.addToSelectionSet(0);
   expect(core.scene.selectionManager.selectionSet.selectionSet.length).toBe(1);
 
@@ -388,7 +388,7 @@ test('onLeftClick with POINT prompt and no nearby entity - responds with the giv
 
 test('onLeftClick with entity found and no active command - delegates to onSelection', () => {
   inputManager.reset();
-  const mockSelection = { selectedItemIndex: 0 };
+  const mockSelection = { selectedEntityIndex: 0 };
   jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(0);
   jest.spyOn(core.scene.selectionManager, 'singleSelect').mockReturnValue(mockSelection);
   const onSelectionSpy = jest.spyOn(inputManager, 'onSelection').mockImplementation(() => {});
@@ -1183,7 +1183,7 @@ test('highlightEntityUnderMouse returns false when buttonThreeDown is true', () 
 
 test('refreshPreview clears hoverEntities in addition to previewEntities and auxiliaryEntities', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   // Simulate a stale hover glow left by the previous mouseMoved()
   DesignCore.Scene.hoverEntities.add(core.scene.entities.get(0));

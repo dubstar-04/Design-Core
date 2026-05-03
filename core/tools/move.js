@@ -74,9 +74,9 @@ export class Move extends Tool {
       const delta = mousePoint.subtract(this.lastMousePoint || this.points[0]);
       this.lastMousePoint = mousePoint;
 
-      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        const item = DesignCore.Scene.selectionManager.selectedItems[i];
-        item.setProperty('points', this.getOffsetPoints(item.points, delta));
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedEntities.length; i++) {
+        const entity = DesignCore.Scene.selectionManager.selectedEntities[i];
+        entity.setProperty('points', this.getOffsetPoints(entity.points, delta));
       }
     }
   }
@@ -94,8 +94,8 @@ export class Move extends Tool {
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
-      const item = DesignCore.Scene.entities.get(index);
-      const stateChange = new UpdateState(item, { points: this.getOffsetPoints(item.points, delta) });
+      const entity = DesignCore.Scene.entities.get(index);
+      const stateChange = new UpdateState(entity, { points: this.getOffsetPoints(entity.points, delta) });
       stateChanges.push(stateChange);
     }
 

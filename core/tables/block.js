@@ -8,9 +8,11 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
 import { AddState, RemoveState } from '../lib/stateManager.js';
+import { Logging } from '../lib/logging.js';
+import { Utils } from '../lib/utils.js';
 
 import { DesignCore } from '../designCore.js';
-import { Utils } from '../lib/utils.js';
+
 
 /**
  * Block Entity Class
@@ -36,7 +38,7 @@ export class Block extends Entity {
       writable: true,
     });
 
-    Object.defineProperty(this, 'items', {
+    Object.defineProperty(this, 'entities', {
       value: [],
       writable: true,
     });
@@ -47,8 +49,8 @@ export class Block extends Entity {
         this.name = data.name || data[2];
       }
 
-      if (data.hasOwnProperty('items')) {
-        this.items = data.items;
+      if (data.hasOwnProperty('entities')) {
+        this.entities = data.entities;
       }
 
       if (data.hasOwnProperty('flags') || data.hasOwnProperty('70')) {
@@ -114,21 +116,21 @@ export class Block extends Entity {
       // array to hold state changes
       const stateChanges = [];
 
-      // move selected items from scene to block
+      // move selected entities from scene to block
       selections.forEach((index) => {
-        const item = DesignCore.Scene.entities.get(index);
-        // remove item from scene
-        const copyOfItem = Utils.cloneObject(item);
-        // assign a fresh handle — the block item is a new entity distinct from the scene entity
-        copyOfItem.setProperty('handle', DesignCore.HandleManager.next());
-        // adjust the items points to reflect the insert point
+        const entity = DesignCore.Scene.entities.get(index);
+        // remove entity from scene
+        const copyOfEntity = Utils.cloneObject(entity);
+        // assign a fresh handle — the block entity is a new entity distinct from the scene entity
+        copyOfEntity.setProperty('handle', DesignCore.HandleManager.next());
+        // adjust the entity's points to reflect the insert point
         const delta = new Point(-insertPoint.x, -insertPoint.y);
-        if (item.hasOwnProperty('points')) {
-          const points = copyOfItem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-          copyOfItem.setProperty('points', points);
+        if (copyOfEntity.points?.length) {
+          const points = copyOfEntity.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+          copyOfEntity.setProperty('points', points);
         }
-        block.items.push(copyOfItem);
-        const stateChangeRemove = new RemoveState(item);
+        block.entities.push(copyOfEntity);
+        const stateChangeRemove = new RemoveState(entity);
         stateChanges.push(stateChangeRemove);
       });
 
@@ -175,8 +177,8 @@ export class Block extends Entity {
     file.writeGroupCode('3', this.name); // Name again
     file.writeGroupCode('1', '');
 
-    for (let i = 0; i < this.items.length; i++) {
-      this.items[i].dxf(file);
+    for (let i = 0; i < this.entities.length; i++) {
+      this.entities[i].dxf(file);
     }
 
     const endblk = new EndBlock({ handle: this.endblkHandle });
@@ -184,18 +186,18 @@ export class Block extends Entity {
   }
 
   /**
-   * Clear items from the block
+   * Clear entities from the block
    */
-  clearItems() {
-    this.items = [];
+  clearEntities() {
+    this.entities = [];
   }
 
   /**
-   * Add an item to the block
-   * @param {Object} item
+   * Add an entity to the block
+   * @param {Object} entity
    */
-  addItem(item) {
-    this.items.push(item);
+  addEntity(entity) {
+    this.entities.push(entity);
   }
 
   /**
@@ -207,15 +209,15 @@ export class Block extends Entity {
   snaps(mousePoint, delta) {
     const snaps = [];
 
-    if (!this.items.length) {
+    if (!this.entities.length) {
       // nothing to draw
       return snaps;
     }
 
-    for (let item = 0; item < this.items.length; item++) {
-      // collect the child item snaps
-      const itemSnaps = this.items[item].snaps(mousePoint, delta);
-      snaps.push(...itemSnaps);
+    for (let entity = 0; entity < this.entities.length; entity++) {
+      // collect the child entity snaps
+      const entitySnaps = this.entities[entity].snaps(mousePoint, delta);
+      snaps.push(...entitySnaps);
     }
 
     return snaps;
@@ -230,19 +232,19 @@ export class Block extends Entity {
     let distance = Infinity;
     let minPnt = P;
 
-    if (!this.items.length) {
+    if (!this.entities.length) {
       // nothing to draw
       return [minPnt, distance];
     }
 
-    for (let idx = 0; idx < this.items.length; idx++) {
-      const itemClosestPoint = this.items[idx].closestPoint(P);
-      const itemPnt = itemClosestPoint[0];
-      const itemDist = itemClosestPoint[1];
+    for (let idx = 0; idx < this.entities.length; idx++) {
+      const entityClosestPoint = this.entities[idx].closestPoint(P);
+      const entityPnt = entityClosestPoint[0];
+      const entityDist = entityClosestPoint[1];
 
-      if (itemDist < distance) {
-        distance = itemDist;
-        minPnt = itemPnt;
+      if (entityDist < distance) {
+        distance = entityDist;
+        minPnt = entityPnt;
       }
     }
 
@@ -259,13 +261,13 @@ export class Block extends Entity {
     let ymin = Infinity;
     let ymax = -Infinity;
 
-    for (let idx = 0; idx < this.items.length; idx++) {
-      const itemBoundingBox = this.items[idx].boundingBox();
+    for (let idx = 0; idx < this.entities.length; idx++) {
+      const entityBoundingBox = this.entities[idx].boundingBox();
 
-      xmin = Math.min(xmin, itemBoundingBox.xMin);
-      xmax = Math.max(xmax, itemBoundingBox.xMax);
-      ymin = Math.min(ymin, itemBoundingBox.yMin);
-      ymax = Math.max(ymax, itemBoundingBox.yMax);
+      xmin = Math.min(xmin, entityBoundingBox.xMin);
+      xmax = Math.max(xmax, entityBoundingBox.xMax);
+      ymin = Math.min(ymin, entityBoundingBox.yMin);
+      ymax = Math.max(ymax, entityBoundingBox.yMax);
     }
 
     const topLeft = new Point(xmin, ymax);
@@ -280,8 +282,8 @@ export class Block extends Entity {
    * @return {boolean} true if touched
    */
   touched(selection) {
-    for (let idx = 0; idx < this.items.length; idx++) {
-      const touched = this.items[idx].touched(selection);
+    for (let idx = 0; idx < this.entities.length; idx++) {
+      const touched = this.entities[idx].touched(selection);
       if (touched) {
         return true;
       }

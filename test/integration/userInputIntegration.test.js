@@ -149,10 +149,10 @@ beforeAll(async () => {
   // col 0, row 1 — Hatch using the rectangle boundary (idx 6) → idx 7
   {
     const hatchBoundary = DesignCore.Scene.entities.get(6);
-    const origSelectedItems = DesignCore.Scene.selectionManager.selectedItems;
-    DesignCore.Scene.selectionManager.selectedItems = [hatchBoundary];
+    const origSelectedEntities = DesignCore.Scene.selectionManager.selectedEntities;
+    DesignCore.Scene.selectionManager.selectedEntities = [hatchBoundary];
     await executeWithInputs(new Hatch(), ['accept']);
-    DesignCore.Scene.selectionManager.selectedItems = origSelectedItems;
+    DesignCore.Scene.selectionManager.selectedEntities = origSelectedEntities;
   }
 
   // col 1, row 1 — Arc for ArcAlignedText, in its own cell → idx 8

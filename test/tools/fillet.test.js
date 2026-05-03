@@ -17,8 +17,8 @@ test('Fillet.register returns correct command object', () => {
 
 test('Fillet.execute selects two entities and calls executeCommand', async () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(5, -5), new Point(5, 5)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(5, -5), new Point(5, 5)] });
 
   const executeCommandSpy = jest.fn();
 
@@ -45,7 +45,7 @@ test('Fillet.execute returns early when first input is undefined', async () => {
 
 test('Fillet.action does nothing when entities are not set', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
   const entityCountBefore = core.scene.entities.count();
 
   const fillet = new Fillet();
@@ -56,8 +56,8 @@ test('Fillet.action does nothing when entities are not set', () => {
 
 test('Fillet.action notifies when entity type is not supported', () => {
   core.scene.clear();
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -75,8 +75,8 @@ test('Fillet.action notifies when entity type is not supported', () => {
 test('Fillet.action notifies for parallel lines', () => {
   core.scene.clear();
   // Two horizontal parallel lines
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 5), new Point(10, 5)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 5), new Point(10, 5)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -98,8 +98,8 @@ test('Fillet.action radius=0 trimMode=true trims both lines to intersection', ()
   // Horizontal: (0,0)→(8,0), Vertical: (10,-10)→(10,-2)
   // Their infinite extensions meet at (10, 0).
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(8, 0)] });
-  core.scene.addItem('Line', { points: [new Point(10, -10), new Point(10, -2)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(8, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, -10), new Point(10, -2)] });
 
   core.scene.headers.filletRadius = 0;
   core.scene.headers.trimMode = true;
@@ -129,8 +129,8 @@ test('Fillet.action radius=0 trimMode=true trims both lines to intersection', ()
 
 test('Fillet.action radius=0 trimMode=false makes no changes', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(8, 0)] });
-  core.scene.addItem('Line', { points: [new Point(10, -10), new Point(10, -2)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(8, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(10, -10), new Point(10, -2)] });
 
   core.scene.headers.filletRadius = 0;
   core.scene.headers.trimMode = false;
@@ -153,8 +153,8 @@ test('Fillet.action radius>0 trimMode=true adds arc and trims lines', () => {
   // Horizontal: (-10,0)→(0,0)  Vertical: (0,0)→(0,10)
   // With radius 2, tangent points are at (-2,0) and (0,2)
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = true;
@@ -190,8 +190,8 @@ test('Fillet.action radius>0 trimMode=true adds arc and trims lines', () => {
 
 test('Fillet.action radius>0 trimMode=false adds arc only, lines unchanged', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = false;
@@ -217,8 +217,8 @@ test('Fillet.action radius>0 trimMode=false adds arc only, lines unchanged', () 
 test('Fillet.action notifies when radius is too large for the segments', () => {
   // Lines only 5 units long from intersection — radius 10 won't fit
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-5, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 5)] });
+  core.scene.addEntity('Line', { points: [new Point(-5, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 5)] });
 
   core.scene.headers.filletRadius = 10;
   core.scene.headers.trimMode = true;
@@ -241,8 +241,8 @@ test('Fillet.action notifies when radius is too large for the segments', () => {
 test('Fillet.action arc centre is at correct position for 90° corner', () => {
   // 90° corner at origin, radius 3 → arc centre at (-3, 3)
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.filletRadius = 3;
   core.scene.headers.trimMode = false;
@@ -272,8 +272,8 @@ test('Fillet.action selects correct corner when lines form a cross', () => {
   // Full cross: horizontal (-10,0)→(10,0), vertical (0,-10)→(0,10)
   // Click on the top-right quadrant → fillet should be in that quadrant
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, -10), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, -10), new Point(0, 10)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = false;
@@ -297,8 +297,8 @@ test('Fillet.action selects correct corner when lines form a cross', () => {
 
 test('Fillet.action notifies when second entity type is not supported', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -319,8 +319,8 @@ test('Fillet.action notifies when click coincides with intersection', () => {
   // L-corner at origin. Clicking firstClickPoint exactly at (0,0) makes
   // firstClickDistance = 0, triggering the invalid-selection guard.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = true;
@@ -343,8 +343,8 @@ test('Fillet.action radius=0 notifies and makes no changes when click coincides 
   // Click at exactly the intersection point — clickDistance = 0.
   // The guard must fire before applySharpTrim() runs.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.filletRadius = 0;
   core.scene.headers.trimMode = true;
@@ -415,7 +415,7 @@ test('Fillet.execute sets trimMode to false when No trim option is selected', as
 
 test('Fillet.execute re-prompts and notifies when first selected entity is not a Line', async () => {
   core.scene.clear();
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -434,8 +434,8 @@ test('Fillet.execute re-prompts and notifies when first selected entity is not a
 
 test('Fillet.execute re-prompts and notifies when second selected entity is not a Line', async () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
-  core.scene.addItem('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
+  core.scene.addEntity('Circle', { points: [new Point(0, 0), new Point(5, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
 
@@ -466,8 +466,8 @@ test('Fillet.execute re-prompts and notifies when second selected entity is not 
 test('Fillet.action radius>0 trimMode=true Line first + Lwpolyline second keepStart: arc embedded as bulge', () => {
   // Click polyline near (-15,0) → segment 1. keepStart keeps the start portion.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = true;
@@ -507,8 +507,8 @@ test('Fillet.action radius>0 trimMode=true Line first + Lwpolyline second keepSt
 test('Fillet.action radius>0 trimMode=true Lwpolyline first + Line second keepStart: arc direction correct', () => {
   // Same geometry but entity order reversed — tests the polyToLineDir arc direction fix.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = true;
@@ -548,8 +548,8 @@ test('Fillet.action radius>0 trimMode=true Line + Lwpolyline keepEnd: keeps end 
   // Click polyline near (8,0) → segment 3 (right of intersection). keepEnd.
   // arc centre = (2,2), polyTangent = (2,0), lineTangent = (0,2).
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = true;
@@ -589,8 +589,8 @@ test('Fillet.action radius>0 trimMode=true Line + Lwpolyline keepEnd: keeps end 
 test('Fillet.action radius=0 trimMode=true Line + Lwpolyline keepStart: line consumed to sharp corner', () => {
   // radius=0 → sharp intersection at (0,0), no arc.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
 
   core.scene.headers.filletRadius = 0;
   core.scene.headers.trimMode = true;
@@ -629,7 +629,7 @@ test('Fillet.action radius>0 trimMode=true same Lwpolyline consecutive segments:
   // Segment 1: (-10,0)→(0,0), Segment 2: (0,0)→(0,10). Corner at (0,0).
   // radius=2 → arc centre (-2,2), tangents at (-2,0) and (0,2).
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-10, 0), new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = true;
@@ -671,7 +671,7 @@ test('Fillet.action radius>0 trimMode=true same Lwpolyline open ends: separate A
   // radius=2, clicks at (-3,0) and (1,3):
   //   arc centre = (-1,2), firstTangent = (-1,0), secondTangent = (1,2).
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-5, 0), new Point(0, 0), new Point(1, 0), new Point(1, 5)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-5, 0), new Point(0, 0), new Point(1, 0), new Point(1, 5)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = true;
@@ -713,7 +713,7 @@ test('Fillet.action radius>0 trimMode=true closed Lwpolyline seg3+closing-seg: c
   // Closing segment (idx=4) goes (0,10)→(0,0); seg 3 goes (10,10)→(0,10).
   // Corner at (0,10) — radius=2 replaces the shared vertex with arc bulge points.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -745,7 +745,7 @@ test('Fillet.action radius>0 trimMode=true closed Lwpolyline closing-wrap (seg4+
   // Corner at (0,0) shared by closing seg (idx=4) and seg 1.
   // Bug: without the closed-poly guard, this was treated as open-ends → wrong path.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -777,7 +777,7 @@ test('Fillet.action radius>0 trimMode=true closed Lwpolyline closing-wrap (seg4+
 test('Fillet.action radius>0 trimMode=false closed Lwpolyline closing-wrap: standalone Arc only', () => {
   // trimMode=false: no polyline mutation; only Arc entity added.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -803,8 +803,8 @@ test('Fillet.action radius>0 trimMode=false closed Lwpolyline closing-wrap: stan
 
 test('Fillet.action radius>0 trimMode=false Line + Lwpolyline: standalone arc added, entities unchanged', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = false;
@@ -843,14 +843,14 @@ test('Fillet.action radius>0 trimMode=false Line + Lwpolyline: standalone arc ad
 //   – lowerTangent = (0,2)  on the closing segment (left edge, y=2)
 //   – upperTangent = (2,0)  on segment 1 (bottom edge, x=2)
 //   – bulge on lowerTangent must be POSITIVE (CCW arc from (0,2) to (2,0) through ≈(0.59,0.59))
-//     (BasePolyline convention: –ve bulge = CW, +ve bulge = CCW)
+//     (PolylineBase convention: –ve bulge = CW, +ve bulge = CCW)
 //
 // Before the fix the lowerTangent/upperTangent assignment was inverted, producing
 // an arc that traversed the exterior of the square.
 
 test('Fillet.action closing-wrap: lowerTangent is on closing segment (left edge)', () => {
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -889,7 +889,7 @@ test('Fillet.action closing-wrap: arc bulge sign is positive (CCW, fillet inside
   // Before the fix the lowerTangent/upperTangent were swapped, producing an arc
   // that traversed the exterior of the square.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -915,7 +915,7 @@ test('Fillet.action closing-wrap: arc bulge sign is positive (CCW, fillet inside
 test('Fillet.action closing-wrap reversed pick order: arc bulge sign and tangent positions are correct', () => {
   // Swap firstPick/secondPick — should produce the same geometry.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10)] });
   const polyEntity = core.scene.entities.get(0);
   polyEntity.flags.setFlagValue(1);
 
@@ -951,8 +951,8 @@ test('Fillet.action closing-wrap reversed pick order: arc bulge sign and tangent
 test('Fillet.action arc inherits layer, lineWidth, lineType from first entity', () => {
   // Perpendicular L-corner at origin; first entity on a non-default layer.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)], layer: 'walls', lineWidth: 5, lineType: 'DASHED' });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)], layer: 'walls', lineWidth: 5, lineType: 'DASHED' });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   core.scene.headers.filletRadius = 2;
   core.scene.headers.trimMode = false;
@@ -979,7 +979,7 @@ test('Fillet.preview does not throw', () => {
 
 test('Fillet.preview returns early when findClosestItem returns undefined', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
   DesignCore.Scene.previewEntities.clear();
 
   const fillet = new Fillet();
@@ -996,8 +996,8 @@ test('Fillet.preview returns early when findClosestItem returns undefined', () =
 
 test('Fillet.preview adds fillet arc to previewEntities in no-trim mode', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
   DesignCore.Scene.previewEntities.clear();
 
   core.scene.headers.filletRadius = 2;
@@ -1017,8 +1017,8 @@ test('Fillet.preview adds fillet arc to previewEntities in no-trim mode', () => 
 
 test('Fillet.preview adds dulled segments and arc to previewEntities in trim mode', () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
   DesignCore.Scene.previewEntities.clear();
 
   core.scene.headers.filletRadius = 2;
@@ -1039,8 +1039,8 @@ test('Fillet.preview adds dulled segments and arc to previewEntities in trim mod
 
 test('Fillet.execute returns early when second-entity input is undefined (inner loop)', async () => {
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
-  core.scene.addItem('Line', { points: [new Point(0, 0), new Point(0, 10)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(0, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(0, 0), new Point(0, 10)] });
 
   const executeCommandSpy = jest.fn();
   // Only one input: the first selection. Second requestInput returns undefined → inner loop returns.
@@ -1060,7 +1060,7 @@ test('Fillet.execute notifies NONCONSECUTIVESEGMENTS for non-adjacent polyline s
   // 5-point polyline → 4 segments. Pick segment 1 (near -15,0) then segment 3 (near 5,0).
   // Neither consecutive nor open-ends → NONCONSECUTIVESEGMENTS, then undefined to exit.
   core.scene.clear();
-  core.scene.addItem('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0), new Point(20, 0)] });
+  core.scene.addEntity('Lwpolyline', { points: [new Point(-20, 0), new Point(-10, 0), new Point(0, 0), new Point(10, 0), new Point(20, 0)] });
 
   const notifySpy = jest.spyOn(core, 'notify');
   await withMockInput(
@@ -1100,9 +1100,9 @@ test('Fillet.action two fillets on the same line: trimmed endpoints have bulge =
   // arc.toPolylinePoints() sets bulge on the start point;
   // that value must not bleed onto the Line endpoints.
   core.scene.clear();
-  core.scene.addItem('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
-  core.scene.addItem('Line', { points: [new Point(-10, 2), new Point(-10, -2)] });
-  core.scene.addItem('Line', { points: [new Point(10, 2), new Point(10, -2)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 0), new Point(10, 0)] });
+  core.scene.addEntity('Line', { points: [new Point(-10, 2), new Point(-10, -2)] });
+  core.scene.addEntity('Line', { points: [new Point(10, 2), new Point(10, -2)] });
 
   core.scene.headers.filletRadius = 1;
   core.scene.headers.trimMode = true;

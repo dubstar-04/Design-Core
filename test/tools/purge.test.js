@@ -29,10 +29,10 @@ beforeEach(() => {
 
   const data = { points: [point1, point2], layer: 'layerWithItems', lineType: 'ltypeWithItems' };
 
-  DesignCore.Scene.addItem('Insert', { blockName: 'blockWithItems' });
-  DesignCore.Scene.addItem('Line', data);
-  DesignCore.Scene.addItem('Circle', data);
-  DesignCore.Scene.addItem('Text', data);
+  DesignCore.Scene.addEntity('Insert', { blockName: 'blockWithItems' });
+  DesignCore.Scene.addEntity('Line', data);
+  DesignCore.Scene.addEntity('Circle', data);
+  DesignCore.Scene.addEntity('Text', data);
 });
 
 test('Test purge.action', () => {

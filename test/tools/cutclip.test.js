@@ -27,7 +27,7 @@ describe('Cutclip Tool', () => {
     // Select both
     DesignCore.Scene.selectionManager.addToSelectionSet(0);
     DesignCore.Scene.selectionManager.addToSelectionSet(1);
-    expect(DesignCore.Scene.selectionManager.selectedItems).toHaveLength(2);
+    expect(DesignCore.Scene.selectionManager.selectedEntities).toHaveLength(2);
 
     const tool = new Cutclip();
     tool.action();
@@ -45,7 +45,7 @@ describe('Cutclip Tool', () => {
     const line = DesignCore.CommandManager.createNew('Line', { layer: '0', points: [new Point(0, 0), new Point(10, 0)] });
     DesignCore.Scene.entities.add(line);
     DesignCore.Scene.selectionManager.addToSelectionSet(0);
-    const originalClonePoints = DesignCore.Scene.selectionManager.selectedItems[0].points.map((p) => ({ x: p.x, y: p.y }));
+    const originalClonePoints = DesignCore.Scene.selectionManager.selectedEntities[0].points.map((p) => ({ x: p.x, y: p.y }));
 
     const tool = new Cutclip();
     tool.action();

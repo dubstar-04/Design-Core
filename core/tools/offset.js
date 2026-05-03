@@ -19,7 +19,7 @@ export class Offset extends Tool {
   /** Create an Offset command */
   constructor() {
     super();
-    this.selectedItem = null;
+    this.selectedEntity = null;
   }
 
   /**
@@ -67,28 +67,28 @@ export class Offset extends Tool {
       while (true) {
         const preselected = DesignCore.Scene.selectionManager.selectionSet.selectionSet;
         if (preselected.length === 1) {
-          this.selectedItem = DesignCore.Scene.entities.get(preselected[0]);
+          this.selectedEntity = DesignCore.Scene.entities.get(preselected[0]);
           DesignCore.Scene.selectionManager.reset();
         } else {
           DesignCore.Scene.selectionManager.reset();
           const selection = await DesignCore.Scene.inputManager.requestInput(op2);
           if (selection === undefined) break;
-          this.selectedItem = DesignCore.Scene.entities.get(selection.selectedItemIndex);
+          this.selectedEntity = DesignCore.Scene.entities.get(selection.selectedEntityIndex);
           DesignCore.Scene.selectionManager.removeLastSelection();
         }
 
         const point = await DesignCore.Scene.inputManager.requestInput(op3);
         if (point === undefined) {
-          this.selectedItem = null;
+          this.selectedEntity = null;
           break;
         }
 
         if (throughMode) {
-          DesignCore.Scene.headers.offsetDistance = this.getThroughDistance(this.selectedItem, point);
+          DesignCore.Scene.headers.offsetDistance = this.getThroughDistance(this.selectedEntity, point);
         }
         this.points = [point];
         DesignCore.Scene.inputManager.actionCommand();
-        this.selectedItem = null;
+        this.selectedEntity = null;
       }
 
       DesignCore.Scene.inputManager.reset();
@@ -102,12 +102,12 @@ export class Offset extends Tool {
    */
   preview() {
     const offsetDistance = DesignCore.Scene.headers.offsetDistance;
-    if (this.selectedItem && offsetDistance > 0) {
+    if (this.selectedEntity && offsetDistance > 0) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
-      const offsetPoints = this.getOffsetPoints(this.selectedItem, mousePoint, offsetDistance);
+      const offsetPoints = this.getOffsetPoints(this.selectedEntity, mousePoint, offsetDistance);
 
       if (offsetPoints) {
-        const previewEntity = Utils.cloneObject(this.selectedItem).fromPolylinePoints(offsetPoints);
+        const previewEntity = Utils.cloneObject(this.selectedEntity).fromPolylinePoints(offsetPoints);
         DesignCore.Scene.previewEntities.add(previewEntity);
       }
     }
@@ -118,10 +118,10 @@ export class Offset extends Tool {
    */
   action() {
     const offsetDistance = DesignCore.Scene.headers.offsetDistance;
-    if (!this.selectedItem || offsetDistance <= 0) return;
+    if (!this.selectedEntity || offsetDistance <= 0) return;
 
     const sidePoint = this.points[0];
-    const entity = this.selectedItem;
+    const entity = this.selectedEntity;
     const offsetPoints = this.getOffsetPoints(entity, sidePoint, offsetDistance);
 
     if (!offsetPoints) {

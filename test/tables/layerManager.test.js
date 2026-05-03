@@ -91,7 +91,7 @@ test('Test LayerManager.checkStyles', () => {
     layer: newItemName,
   };
 
-  core.scene.addItem('Line', data);
+  core.scene.addEntity('Line', data);
 
   layerManager.checkStyles();
   const layers = layerManager.getItems();
@@ -115,7 +115,7 @@ test('Test LayerManager.checkItems', () => {
     layer: newItemName,
   };
 
-  core.scene.addItem('Line', data);
+  core.scene.addEntity('Line', data);
 
   layerManager.checkItems();
   const layers = layerManager.getItems();

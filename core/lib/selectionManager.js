@@ -13,7 +13,7 @@ export class SingleSelection {
    * @param {Point} point
    */
   constructor(index, point) {
-    this.selectedItemIndex = index;
+    this.selectedEntityIndex = index;
     this.selectedPoint = point;
   }
 }
@@ -41,24 +41,24 @@ export class SelectionSet {
 export class SelectionManager {
   /** Create a SelectionManager */
   constructor() {
-    this.selectionSet = new SelectionSet(); // store a list of selected items indices
-    this.selectedItems = []; // store a copy of selected items
+    this.selectionSet = new SelectionSet(); // store a list of selected entities indices
+    this.selectedEntities = []; // store a copy of selected entities
   }
 
   /**
    * Reset the selection state
    */
   reset() {
-    this.selectedItems = [];
+    this.selectedEntities = [];
     this.selectionSet = new SelectionSet();
     this.selectionSetChanged();
   }
 
   /**
-   * Remove the last selection from the selected items
+   * Remove the last selection from the selected entities
    */
   removeLastSelection() {
-    this.selectedItems.pop();
+    this.selectedEntities.pop();
     this.selectionSet.removeLastSelection();
     this.selectionSetChanged();
   }
@@ -157,19 +157,19 @@ export class SelectionManager {
   }
 
   /**
-  * Remove the item at index from the selectionSet and selectedItems
+  * Remove the item at index from the selectionSet and selectedEntities
   * @param  {number} index - index of the item
   */
   removeFromSelectionSet(index) {
     const itemIndex = this.selectionSet.selectionSet.indexOf(index);
     if (itemIndex !== -1) {
       this.selectionSet.selectionSet.splice(itemIndex, 1);
-      this.selectedItems.splice(itemIndex, 1);
+      this.selectedEntities.splice(itemIndex, 1);
     }
   }
 
   /**
-  * Add the item at index to the selectionSet and selectedItems
+  * Add the item at index to the selectionSet and selectedEntities
   * @param  {number} index
   */
   addToSelectionSet(index) {
@@ -179,28 +179,28 @@ export class SelectionManager {
     // only store selections once
     if (this.selectionSet.selectionSet.indexOf(index) === -1) {
       this.selectionSet.selectionSet.push(index);
-      this.addToSelectedItems(index);
+      this.addToSelectedEntities(index);
     }
   }
 
   /**
-   * Duplicate the item at index and add to selectedItems
+   * Duplicate the item at index and add to selectedEntities
    * @param  {number} index
    */
-  addToSelectedItems(index) {
+  addToSelectedEntities(index) {
     const copyOfItem = Utils.cloneObject(DesignCore.Scene.entities.get(index));
-    this.selectedItems.push(copyOfItem);
+    this.selectedEntities.push(copyOfItem);
   }
 
   /**
-   * Reload the selectedItems
+   * Reload the selectedEntities
    * This is required following changes to selected item properties
    */
-  reloadSelectedItems() {
-    this.selectedItems = [];
+  reloadSelectedEntities() {
+    this.selectedEntities = [];
 
     for (let i = 0; i < this.selectionSet.selectionSet.length; i++) {
-      this.addToSelectedItems(this.selectionSet.selectionSet[i]);
+      this.addToSelectedEntities(this.selectionSet.selectionSet[i]);
     }
 
     DesignCore.Core.canvas.requestPaint();

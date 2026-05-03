@@ -16,7 +16,7 @@ import { DimType } from '../properties/dimType.js';
  * Base Dimension Entity Class
  * @extends Entity
  */
-export class BaseDimension extends Entity {
+export class DimensionBase extends Entity {
   /**
    * Create a Base Dimension
    * @param {Array} data
@@ -433,14 +433,14 @@ export class BaseDimension extends Entity {
   /**
    * Draw the entity
    * @param {Object} renderer
-   * @return {Array} block items for the canvas to render recursively
+   * @return {Array} block entities for the canvas to render recursively
    */
   draw(renderer) {
-    if (this.block.items.length === 0) {
+    if (this.block.entities.length === 0) {
       this.refresh();
     }
 
-    return this.block.items;
+    return this.block.entities;
   }
 
   /**
@@ -496,12 +496,12 @@ export class BaseDimension extends Entity {
     const entities = this.buildDimension();
 
     if (entities) {
-      this.block.clearItems();
+      this.block.clearEntities();
 
       entities.forEach((element) => {
         // For colour BYBLOCK for dimensions
         element.setProperty(Property.Names.COLOUR, 'BYBLOCK');
-        this.block.addItem(element);
+        this.block.addEntity(element);
       });
     }
   }

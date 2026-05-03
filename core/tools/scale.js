@@ -130,11 +130,11 @@ export class Scale extends Tool {
 
       const factor = this.referenceLength !== null ? distance / this.referenceLength : distance;
 
-      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-        const item = DesignCore.Scene.selectionManager.selectedItems[i];
+      for (let i = 0; i < DesignCore.Scene.selectionManager.selectedEntities.length; i++) {
+        const entity = DesignCore.Scene.selectionManager.selectedEntities[i];
         const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
-        const originalItem = DesignCore.Scene.entities.get(entityIndex);
-        item.setProperty('points', this.getScaledPoints(originalItem.points, base, factor));
+        const originalEntity = DesignCore.Scene.entities.get(entityIndex);
+        entity.setProperty('points', this.getScaledPoints(originalEntity.points, base, factor));
       }
     }
   }
@@ -147,8 +147,8 @@ export class Scale extends Tool {
     const stateChanges = [];
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
-      const stateChange = new UpdateState(item, { points: this.getScaledPoints(item.points, base, this.scaleFactor) });
+      const entity = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]);
+      const stateChange = new UpdateState(entity, { points: this.getScaledPoints(entity.points, base, this.scaleFactor) });
       stateChanges.push(stateChange);
     }
 

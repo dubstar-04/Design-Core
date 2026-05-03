@@ -80,13 +80,13 @@ export class Mirror extends Tool {
 
       // Preview mirrored entities (skip if mirror line has zero length)
       if (!pt1.isSame(pt2)) {
-        for (let i = 0; i < DesignCore.Scene.selectionManager.selectedItems.length; i++) {
-          const item = DesignCore.Scene.selectionManager.selectedItems[i];
+        for (let i = 0; i < DesignCore.Scene.selectionManager.selectedEntities.length; i++) {
+          const entity = DesignCore.Scene.selectionManager.selectedEntities[i];
           const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
-          const originalItem = DesignCore.Scene.entities.get(entityIndex);
-          item.setProperty('points', this.getMirroredPoints(originalItem.points, pt1, pt2));
-          if (originalItem.properties?.has('direction')) {
-            item.setProperty('direction', -originalItem.getProperty('direction'));
+          const originalEntity = DesignCore.Scene.entities.get(entityIndex);
+          entity.setProperty('points', this.getMirroredPoints(originalEntity.points, pt1, pt2));
+          if (originalEntity.properties?.has('direction')) {
+            entity.setProperty('direction', -originalEntity.getProperty('direction'));
           }
         }
       }
@@ -109,18 +109,18 @@ export class Mirror extends Tool {
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
       const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
-      const item = DesignCore.Scene.entities.get(entityIndex);
-      const mirroredPoints = this.getMirroredPoints(item.points, pt1, pt2);
+      const entity = DesignCore.Scene.entities.get(entityIndex);
+      const mirroredPoints = this.getMirroredPoints(entity.points, pt1, pt2);
 
       if (this.eraseSource) {
         // Replace the original with its mirrored version
         const updates = { points: mirroredPoints };
-        if (item.properties?.has('direction')) updates.direction = -item.getProperty('direction');
-        const stateChange = new UpdateState(item, updates);
+        if (entity.properties?.has('direction')) updates.direction = -entity.getProperty('direction');
+        const stateChange = new UpdateState(entity, updates);
         stateChanges.push(stateChange);
       } else {
         // Keep the original and add a mirrored copy
-        const copyOfItem = Utils.cloneObject(item);
+        const copyOfItem = Utils.cloneObject(entity);
         copyOfItem.setProperty('points', mirroredPoints);
         if (copyOfItem.properties?.has('direction')) copyOfItem.setProperty('direction', -copyOfItem.getProperty('direction'));
         const stateChange = new AddState(copyOfItem);

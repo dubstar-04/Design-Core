@@ -1,12 +1,12 @@
 import { DXFFile } from '../lib/dxf/dxfFile.js';
-import { BasePolyline } from './basePolyline.js';
+import { PolylineBase } from './polylineBase.js';
 import { Point } from './point.js';
 
 /**
  * Polyline Entity Class
- * @extends BasePolyline
+ * @extends PolylineBase
  */
-export class Polyline extends BasePolyline {
+export class Polyline extends PolylineBase {
   static type = 'Polyline';
 
   /**
