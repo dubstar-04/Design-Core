@@ -62,7 +62,7 @@ export class LinearDimensionBase extends DimensionBase {
    * Preview the entity during creation
    */
   preview() {
-    if (this.points.length == 1) {
+    if (this.points.length === 1) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       DesignCore.Scene.auxiliaryEntities.add(new RubberBand([this.points.at(0), mousePoint]));
     }
