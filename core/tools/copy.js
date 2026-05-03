@@ -85,9 +85,9 @@ export class Copy extends Tool {
       this.lastMousePoint = mousePoint;
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedEntities.length; i++) {
-        const item = DesignCore.Scene.selectionManager.selectedEntities[i];
-        const offsetPoints = item.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-        item.setProperty('points', offsetPoints);
+        const entity = DesignCore.Scene.selectionManager.selectedEntities[i];
+        const offsetPoints = entity.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+        entity.setProperty('points', offsetPoints);
       }
     }
   }
@@ -103,10 +103,10 @@ export class Copy extends Tool {
     const stateChanges = [];
 
     for (let i = 0; i < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; i++) {
-      const copyOfItem = Utils.cloneObject(DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]));
-      const offsetPoints = copyOfItem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-      copyOfItem.setProperty('points', offsetPoints);
-      const stateChange = new AddState(copyOfItem);
+      const copyOfEntity = Utils.cloneObject(DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[i]));
+      const offsetPoints = copyOfEntity.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+      copyOfEntity.setProperty('points', offsetPoints);
+      const stateChange = new AddState(copyOfEntity);
       stateChanges.push(stateChange);
     }
 

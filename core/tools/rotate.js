@@ -110,11 +110,11 @@ export class Rotate extends Tool {
       const centre = this.points[0];
 
       for (let i = 0; i < DesignCore.Scene.selectionManager.selectedEntities.length; i++) {
-        const item = DesignCore.Scene.selectionManager.selectedEntities[i];
+        const entity = DesignCore.Scene.selectionManager.selectedEntities[i];
         // get the original points from the scene entities
         const entityIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet[i];
-        const originalItem = DesignCore.Scene.entities.get(entityIndex);
-        item.setProperty('points', this.getRotatedPoints(originalItem.points, centre, theta));
+        const originalEntity = DesignCore.Scene.entities.get(entityIndex);
+        entity.setProperty('points', this.getRotatedPoints(originalEntity.points, centre, theta));
       }
     }
   };
@@ -130,8 +130,8 @@ export class Rotate extends Tool {
     const stateChanges = [];
 
     for (let index = 0; index < DesignCore.Scene.selectionManager.selectionSet.selectionSet.length; index++) {
-      const item = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
-      const stateChange = new UpdateState(item, { points: this.getRotatedPoints(item.points, centre, theta) });
+      const entity = DesignCore.Scene.entities.get(DesignCore.Scene.selectionManager.selectionSet.selectionSet[index]);
+      const stateChange = new UpdateState(entity, { points: this.getRotatedPoints(entity.points, centre, theta) });
       stateChanges.push(stateChange);
     }
 

@@ -118,19 +118,19 @@ export class Block extends Entity {
 
       // move selected entities from scene to block
       selections.forEach((index) => {
-        const item = DesignCore.Scene.entities.get(index);
-        // remove item from scene
-        const copyOfItem = Utils.cloneObject(item);
-        // assign a fresh handle — the block item is a new entity distinct from the scene entity
-        copyOfItem.setProperty('handle', DesignCore.HandleManager.next());
-        // adjust the items points to reflect the insert point
+        const entity = DesignCore.Scene.entities.get(index);
+        // remove entity from scene
+        const copyOfEntity = Utils.cloneObject(entity);
+        // assign a fresh handle — the block entity is a new entity distinct from the scene entity
+        copyOfEntity.setProperty('handle', DesignCore.HandleManager.next());
+        // adjust the entity's points to reflect the insert point
         const delta = new Point(-insertPoint.x, -insertPoint.y);
-        if (copyOfItem.points?.length) {
-          const points = copyOfItem.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
-          copyOfItem.setProperty('points', points);
+        if (copyOfEntity.points?.length) {
+          const points = copyOfEntity.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
+          copyOfEntity.setProperty('points', points);
         }
-        block.entities.push(copyOfItem);
-        const stateChangeRemove = new RemoveState(item);
+        block.entities.push(copyOfEntity);
+        const stateChangeRemove = new RemoveState(entity);
         stateChanges.push(stateChangeRemove);
       });
 
@@ -214,10 +214,10 @@ export class Block extends Entity {
       return snaps;
     }
 
-    for (let item = 0; item < this.entities.length; item++) {
-      // collect the child item snaps
-      const itemSnaps = this.entities[item].snaps(mousePoint, delta);
-      snaps.push(...itemSnaps);
+    for (let entity = 0; entity < this.entities.length; entity++) {
+      // collect the child entity snaps
+      const entitySnaps = this.entities[entity].snaps(mousePoint, delta);
+      snaps.push(...entitySnaps);
     }
 
     return snaps;
@@ -238,13 +238,13 @@ export class Block extends Entity {
     }
 
     for (let idx = 0; idx < this.entities.length; idx++) {
-      const itemClosestPoint = this.entities[idx].closestPoint(P);
-      const itemPnt = itemClosestPoint[0];
-      const itemDist = itemClosestPoint[1];
+      const entityClosestPoint = this.entities[idx].closestPoint(P);
+      const entityPnt = entityClosestPoint[0];
+      const entityDist = entityClosestPoint[1];
 
-      if (itemDist < distance) {
-        distance = itemDist;
-        minPnt = itemPnt;
+      if (entityDist < distance) {
+        distance = entityDist;
+        minPnt = entityPnt;
       }
     }
 
@@ -262,12 +262,12 @@ export class Block extends Entity {
     let ymax = -Infinity;
 
     for (let idx = 0; idx < this.entities.length; idx++) {
-      const itemBoundingBox = this.entities[idx].boundingBox();
+      const entityBoundingBox = this.entities[idx].boundingBox();
 
-      xmin = Math.min(xmin, itemBoundingBox.xMin);
-      xmax = Math.max(xmax, itemBoundingBox.xMax);
-      ymin = Math.min(ymin, itemBoundingBox.yMin);
-      ymax = Math.max(ymax, itemBoundingBox.yMax);
+      xmin = Math.min(xmin, entityBoundingBox.xMin);
+      xmax = Math.max(xmax, entityBoundingBox.xMax);
+      ymin = Math.min(ymin, entityBoundingBox.yMin);
+      ymax = Math.max(ymax, entityBoundingBox.yMax);
     }
 
     const topLeft = new Point(xmin, ymax);
