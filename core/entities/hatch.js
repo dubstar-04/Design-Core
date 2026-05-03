@@ -54,6 +54,9 @@ export class Hatch extends Entity {
     const rawPatternName = String(Property.loadValue([data?.[2], data?.patternName], 'ANSI31')).toUpperCase();
     // DXF Groupcode 70 - Solid Fill Flag (1 = solid, 0 = pattern): if set, override pattern name
     const resolvedPatternName = data?.[70] === 1 ? 'SOLID' : rawPatternName;
+    if (!Patterns.patternExists(resolvedPatternName)) {
+      Logging.instance.warn(`Hatch: pattern '${resolvedPatternName}' not found`);
+    }
 
     // DXF Groupcode 2 - Hatch pattern name
     this.properties.add(Property.Names.PATTERNNAME, {
