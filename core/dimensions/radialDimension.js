@@ -31,17 +31,17 @@ export class RadialDimension extends CircularDimensionBase {
 
   /**
    * Get sequenced points from user selection
-   * @param {any} items
+   * @param {any} entities
    * @param {Point} textPos
    * @return {Array} array of points
    */
-  static getPointsFromSelection(items, textPos) {
-    const item = items[0];
+  static getPointsFromSelection(entities, textPos) {
+    const entity = entities[0];
     const Pt11 = textPos;
     Pt11.sequence = 11;
-    const Pt10 = item.points[0]; // Centre
+    const Pt10 = entity.points[0]; // Centre
     Pt10.sequence = 10;
-    const Pt15 = Pt10.project(Pt10.angle(Pt11), item.getRadius());// Radius
+    const Pt15 = Pt10.project(Pt10.angle(Pt11), entity.getRadius());// Radius
     Pt15.sequence = 15;
 
     const points = [Pt10, Pt15, Pt11];

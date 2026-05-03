@@ -30,22 +30,22 @@ export class DiametricDimension extends CircularDimensionBase {
 
   /**
    * Get sequenced points from user selection
-   * @param {any} items
+   * @param {any} entities
    * @param {Point} textPos
    * @return {Array} array of points
    */
-  static getPointsFromSelection(items, textPos) {
-    const item = items[0];
-    const centre = item.points[0];
+  static getPointsFromSelection(entities, textPos) {
+    const entity = entities[0];
+    const centre = entity.points[0];
 
     const Pt11 = textPos;
     Pt11.sequence = 11;
 
     const angle = Pt11.angle(centre);
-    const Pt10 = centre.project(angle, item.getRadius());
+    const Pt10 = centre.project(angle, entity.getRadius());
     Pt10.sequence = 10;
     // Pt15 should be closest point to the text position
-    const Pt15 = centre.project(angle - Math.PI, item.getRadius());
+    const Pt15 = centre.project(angle - Math.PI, entity.getRadius());
     Pt15.sequence = 15;
 
     const points = [Pt10, Pt15, Pt11];

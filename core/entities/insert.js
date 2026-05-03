@@ -153,11 +153,11 @@ export class Insert extends Entity {
   /**
    * Draw the entity
    * @param {Object} renderer
-   * @return {Array} block items for the canvas to render recursively
+   * @return {Array} block entities for the canvas to render recursively
    */
   draw(renderer) {
     // blocks are associated with an insert point.
-    // Apply the insert location and rotation so block items draw correctly.
+    // Apply the insert location and rotation so block entities draw correctly.
     renderer.applyTransform({ x: this.points[0].x, y: this.points[0].y, rotation: Utils.degrees2radians(this.getRotation()) });
     return this.block.entities;
   }
@@ -204,9 +204,9 @@ export class Insert extends Entity {
 
     for (let snap = 0; snap < blockSnaps.length; snap++) {
       const sp = blockSnaps[snap];
-      // offset the item snap point by the block insert location
+      // offset the entity snap point by the block insert location
       const rotatedPoint = sp.snapPoint.add(this.points[0]);
-      // rotate the snap point to match the item positions
+      // rotate the snap point to match the entity positions
       const adjustedPoint = rotatedPoint.rotate(this.points[0], Utils.degrees2radians(this.getRotation()));
       snaps.push(new SnapPoint(adjustedPoint, sp.type));
     }

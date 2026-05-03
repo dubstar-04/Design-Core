@@ -70,7 +70,7 @@ export class AngularDimension extends DimensionBase {
             const segment = selectedEntity.getClosestSegment(selection.selectedPoint);
 
             if (segment instanceof Line) {
-              // update the selected item to be the polyline arc segment
+              // update the selected entity to be the polyline arc segment
               selectedEntity = segment;
             }
           }

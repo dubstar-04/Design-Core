@@ -433,7 +433,7 @@ export class DimensionBase extends Entity {
   /**
    * Draw the entity
    * @param {Object} renderer
-   * @return {Array} block items for the canvas to render recursively
+   * @return {Array} block entities for the canvas to render recursively
    */
   draw(renderer) {
     if (this.block.entities.length === 0) {

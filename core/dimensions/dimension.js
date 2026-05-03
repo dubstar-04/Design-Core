@@ -54,7 +54,7 @@ export class Dimension extends DimensionBase {
     });
 
     if (data) {
-      const item = new this.dimensionMap[DimType.getBaseType(this.dimType.getBaseDimType())](data);
+      const entity = new this.dimensionMap[DimType.getBaseType(this.dimType.getBaseDimType())](data);
 
       // find the block linked to this dimension
       const linkedBlockIndex = DesignCore.Scene.entities.find('BLOCK', 'name', data[2]);
@@ -64,7 +64,7 @@ export class Dimension extends DimensionBase {
         DesignCore.Scene.entities.remove(linkedBlockIndex[0]);
       }
 
-      return item;
+      return entity;
     }
   }
 
