@@ -448,60 +448,60 @@ test('Test Hatch.processBoundaryData', () => {
 
 test('Test Hatch.processSelection', () => {
   // create selected items defining a square
-  let selectedItems = [];
-  selectedItems.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
-  selectedItems.push(new Line({ points: [new Point(200, 100), new Point(200, 200)] }));
-  selectedItems.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
-  selectedItems.push(new Line({ points: [new Point(100, 200), new Point(100, 100)] }));
+  let selectedEntities = [];
+  selectedEntities.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities.push(new Line({ points: [new Point(200, 100), new Point(200, 200)] }));
+  selectedEntities.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
+  selectedEntities.push(new Line({ points: [new Point(100, 200), new Point(100, 100)] }));
 
   let hatch = new Hatch();
-  let boundaryData = hatch.processSelection(selectedItems);
+  let boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   expect(boundaryData[0].points.length).toEqual(4);
 
 
   // create selected items defining a circle
-  selectedItems = [];
-  selectedItems.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities = [];
+  selectedEntities.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
 
   hatch = new Hatch();
-  boundaryData = hatch.processSelection(selectedItems);
+  boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   expect(boundaryData[0].points.length).toEqual(2);
 
   // create selected items defining a square (polyline)
-  selectedItems = [];
-  selectedItems.push(new Polyline({
+  selectedEntities = [];
+  selectedEntities.push(new Polyline({
     points: [new Point(100, 100), new Point(200, 100), new Point(200, 200),
       new Point(100, 200), new Point(100, 100)],
   }));
 
   hatch = new Hatch();
-  boundaryData = hatch.processSelection(selectedItems);
+  boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   expect(boundaryData[0].points.length).toEqual(4);
 
   // create selected items defining a pill shape
-  selectedItems = [];
-  selectedItems.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
-  selectedItems.push(new Arc({ points: [new Point(200, 150), new Point(200, 100), new Point(200, 200)] }));
-  selectedItems.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
-  selectedItems.push(new Arc({ points: [new Point(100, 150), new Point(100, 200), new Point(100, 100)] }));
+  selectedEntities = [];
+  selectedEntities.push(new Line({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities.push(new Arc({ points: [new Point(200, 150), new Point(200, 100), new Point(200, 200)] }));
+  selectedEntities.push(new Line({ points: [new Point(200, 200), new Point(100, 200)] }));
+  selectedEntities.push(new Arc({ points: [new Point(100, 150), new Point(100, 200), new Point(100, 100)] }));
 
   hatch = new Hatch();
-  boundaryData = hatch.processSelection(selectedItems);
+  boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   // 2 lines + 2 arcs: each shared connection point is merged (not duplicated),
   // so the result is 4 unique vertices, not 5
   expect(boundaryData[0].points.length).toEqual(4);
 
   // Test a selection with invalid items
-  selectedItems = [];
-  selectedItems.push(new Text({ points: [new Point(100, 100), new Point(200, 100)] }));
-  selectedItems.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities = [];
+  selectedEntities.push(new Text({ points: [new Point(100, 100), new Point(200, 100)] }));
+  selectedEntities.push(new Circle({ points: [new Point(100, 100), new Point(200, 100)] }));
 
   hatch = new Hatch();
-  boundaryData = hatch.processSelection(selectedItems);
+  boundaryData = hatch.processSelection(selectedEntities);
   expect(boundaryData.length).toEqual(1);
   expect(boundaryData[0].points.length).toEqual(2);
 });

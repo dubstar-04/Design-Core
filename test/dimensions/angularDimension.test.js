@@ -18,35 +18,35 @@ const scenarios = [
 
   { desc: 'Angular dimension from line selection - 45 degrees',
     input: [new SingleSelection(0, new Point()), new SingleSelection(1, new Point()), new Point(5, 5)],
-    selectedItems: [new Line({ points: [new Point(0, 0), new Point(10, 0)] }), new Line({ points: [new Point(0, 0), new Point(10, 10)] })],
+    selectedEntities: [new Line({ points: [new Point(0, 0), new Point(10, 0)] }), new Line({ points: [new Point(0, 0), new Point(10, 10)] })],
     expectedDimType: 2,
     dimensionValue: 45,
     dimensionEntities: 5,
   },
   { desc: 'Angular dimension from line selection - 135 degrees',
     input: [new SingleSelection(0, new Point()), new SingleSelection(1, new Point()), new Point(-5, 5)],
-    selectedItems: [new Line({ points: [new Point(0, 0), new Point(10, 0)] }), new Line({ points: [new Point(0, 0), new Point(10, 10)] })],
+    selectedEntities: [new Line({ points: [new Point(0, 0), new Point(10, 0)] }), new Line({ points: [new Point(0, 0), new Point(10, 10)] })],
     expectedDimType: 2,
     dimensionValue: 135,
     dimensionEntities: 6,
   },
   { desc: 'Angular dimension from line selection - 45 degrees',
     input: [new SingleSelection(0, new Point()), new SingleSelection(1, new Point()), new Point(-5, -5)],
-    selectedItems: [new Line({ points: [new Point(0, 0), new Point(10, 0)] }), new Line({ points: [new Point(0, 0), new Point(10, 10)] })],
+    selectedEntities: [new Line({ points: [new Point(0, 0), new Point(10, 0)] }), new Line({ points: [new Point(0, 0), new Point(10, 10)] })],
     expectedDimType: 2,
     dimensionValue: 45,
     dimensionEntities: 7,
   },
   { desc: 'Angular dimension from line selection - 135 degrees',
     input: [new SingleSelection(0, new Point()), new SingleSelection(1, new Point()), new Point(5, -5)],
-    selectedItems: [new Line({ points: [new Point(0, 0), new Point(10, 0)] }), new Line({ points: [new Point(0, 0), new Point(10, 10)] })],
+    selectedEntities: [new Line({ points: [new Point(0, 0), new Point(10, 0)] }), new Line({ points: [new Point(0, 0), new Point(10, 10)] })],
     expectedDimType: 2,
     dimensionValue: 135,
     dimensionEntities: 6,
   },
   { desc: 'Angular dimension from polyline selection - 45 degrees',
     input: [new SingleSelection(0, new Point(5, 0)), new SingleSelection(1, new Point(5, 5)), new Point(5, 5)],
-    selectedItems: [new Polyline({ points: [new Point(0, 0), new Point(10, 0)] }), new Polyline({ points: [new Point(0, 0), new Point(10, 10)] })],
+    selectedEntities: [new Polyline({ points: [new Point(0, 0), new Point(10, 0)] }), new Polyline({ points: [new Point(0, 0), new Point(10, 10)] })],
     expectedDimType: 2,
     dimensionValue: 45,
     dimensionEntities: 5,
@@ -54,7 +54,7 @@ const scenarios = [
 ];
 
 test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
-  const { input, selectedItems, expectedDimType, dimensionValue, dimensionEntities } = scenario;
+  const { input, selectedEntities, expectedDimType, dimensionValue, dimensionEntities } = scenario;
 
   await withMockInput(DesignCore.Scene, input, async () => {
     const dim = new AngularDimension();
@@ -74,7 +74,7 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
         expect(entity.getProperty('string')).toContain('°');
       }
     }
-  }, { selectedItems });
+  }, { selectedEntities });
 });
 
 test('constructor sets default properties', () => {

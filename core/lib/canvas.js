@@ -388,8 +388,8 @@ export class Canvas {
     this.#paintEntities(DesignCore.Scene.previewEntities, renderer);
 
     // Paint the selected scene items: single pass — renderer handles glow + entity internally.
-    const selectedItems = DesignCore.Scene.selectionManager.selectedEntities;
-    this.#paintEntities(selectedItems, renderer, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
+    const selectedEntities = DesignCore.Scene.selectionManager.selectedEntities;
+    this.#paintEntities(selectedEntities, renderer, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
 
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc

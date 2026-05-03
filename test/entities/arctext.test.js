@@ -16,14 +16,14 @@ const arcInputScenarios = [
   {
     desc: 'two points and an angle',
     input: [new SingleSelection(0, new Point(5, 0)), 2.5, 'Test Arc'],
-    selectedItems: [new Arc({ points: [new Point(), new Point(100, 0), new Point(-100, 0)] })],
+    selectedEntities: [new Arc({ points: [new Point(), new Point(100, 0), new Point(-100, 0)] })],
     expectedTextHeight: 2.5,
     expectedText: 'Test Arc',
   },
 ];
 
 test.each(arcInputScenarios)('ArcText.execute handles $desc', async (scenario) => {
-  const { input, selectedItems, expectedTextHeight, expectedText } = scenario;
+  const { input, selectedEntities, expectedTextHeight, expectedText } = scenario;
 
   await withMockInput(DesignCore.Scene, input, async () => {
     const arcText = new ArcAlignedText();
@@ -37,7 +37,7 @@ test.each(arcInputScenarios)('ArcText.execute handles $desc', async (scenario) =
     expect(arcText.getProperty('radius')).toBe(100);
     expect(arcText.startAngle()).toBe(0);
     expect(arcText.endAngle()).toBeCloseTo(3.14159);
-  }, { selectedItems });
+  }, { selectedEntities });
 });
 
 test('ArcAlignedCharacter', () => {

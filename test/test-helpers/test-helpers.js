@@ -27,10 +27,10 @@ export class File {
  * @param {Function} testFn - async function to run with the mock active
  * @param {object} [options] - optional configuration
  * @param {object} [options.extraMethods] - additional methods to add to the mock inputManager
- * @param {Array} [options.selectedItems] - sequential values returned by entities.get
+ * @param {Array} [options.selectedEntities] - sequential values returned by entities.get
  */
 export async function withMockInput(scene, inputs, testFn, options = {}) {
-  const { extraMethods = {}, selectedItems } = options;
+  const { extraMethods = {}, selectedEntities } = options;
   const origInputManager = scene.inputManager;
   let callCount = 0;
 
@@ -47,11 +47,11 @@ export async function withMockInput(scene, inputs, testFn, options = {}) {
   };
 
   let origGetItem;
-  if (selectedItems) {
+  if (selectedEntities) {
     origGetItem = scene.entities.get;
-    let selectedItemsCallCount = 0;
+    let selectedEntitiesCallCount = 0;
     scene.entities.get = () => {
-      return selectedItems[selectedItemsCallCount++];
+      return selectedEntities[selectedEntitiesCallCount++];
     };
   }
 
@@ -59,7 +59,7 @@ export async function withMockInput(scene, inputs, testFn, options = {}) {
     await testFn();
   } finally {
     scene.inputManager = origInputManager;
-    if (selectedItems) {
+    if (selectedEntities) {
       scene.entities.get = origGetItem;
     }
   }

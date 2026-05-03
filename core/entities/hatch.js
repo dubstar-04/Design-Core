@@ -482,8 +482,8 @@ export class Hatch extends Entity {
         const result = await DesignCore.Scene.inputManager.requestInput(op);
         if (result === undefined) return;
 
-        const selectedItems = DesignCore.Scene.selectionManager.selectedEntities.slice(0);
-        const boundary = this.processSelection(selectedItems);
+        const selectedEntities = DesignCore.Scene.selectionManager.selectedEntities.slice(0);
+        const boundary = this.processSelection(selectedEntities);
 
         if (boundary.length) {
           this.setProperty(Property.Names.CHILDENTITIES, boundary);
@@ -506,8 +506,8 @@ export class Hatch extends Entity {
    * Preview the entity during creation
    */
   preview() {
-    const selectedItems = DesignCore.Scene.selectionManager.selectedEntities.slice(0);
-    const shapes = this.processSelection(selectedItems);
+    const selectedEntities = DesignCore.Scene.selectionManager.selectedEntities.slice(0);
+    const shapes = this.processSelection(selectedEntities);
     if (shapes.length) {
       DesignCore.Scene.previewEntities.create(this.type, { points: this.points, childEntities: shapes }); // childEntities is passed as plain data here, not via getProperty
     }
@@ -515,31 +515,31 @@ export class Hatch extends Entity {
 
   /**
    * Convert the selection to boundary items
-   * @param {Array} selectedItems
+   * @param {Array} selectedEntities
    * @return {Array} - Array of boundary items
    */
-  processSelection(selectedItems) {
+  processSelection(selectedEntities) {
     const selectedchildEntities = [];
 
     let iterationPoints = [];
 
     // track the last index count to make sure the loop is closed
-    let lastIndexCount = selectedItems.length + 1;
+    let lastIndexCount = selectedEntities.length + 1;
 
-    while (selectedItems.length) {
-      if (selectedItems.length === lastIndexCount) {
+    while (selectedEntities.length) {
+      if (selectedEntities.length === lastIndexCount) {
         return [];
       }
 
-      lastIndexCount = selectedItems.length;
+      lastIndexCount = selectedEntities.length;
 
-      for (let i = 0; i < selectedItems.length; i++) {
+      for (let i = 0; i < selectedEntities.length; i++) {
         // no points collected - get the first index from selected items
 
-        const currentItem = selectedItems[i];
+        const currentItem = selectedEntities[i];
         // if the item can't be converted to polyline points, remove from selected items and go again
         if (typeof currentItem.toPolylinePoints === 'undefined' || currentItem.type === 'Text' || currentItem.type === 'ArcAlignedText') {
-          selectedItems.splice(i, 1);
+          selectedEntities.splice(i, 1);
           break;
         }
 
@@ -576,7 +576,7 @@ export class Hatch extends Entity {
           }
 
           // remove the index from selected items
-          selectedItems = selectedItems.filter((index) => index !== selectedItems[i]);
+          selectedEntities = selectedEntities.filter((index) => index !== selectedEntities[i]);
 
           if (iterationPoints.at(0).isSame(iterationPoints.at(-1))) {
             const shape = new Polyline();
