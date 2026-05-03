@@ -8,9 +8,11 @@ import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
 import { AddState, RemoveState } from '../lib/stateManager.js';
+import { Logging } from '../lib/logging.js';
+import { Utils } from '../lib/utils.js';
 
 import { DesignCore } from '../designCore.js';
-import { Utils } from '../lib/utils.js';
+
 
 /**
  * Block Entity Class
