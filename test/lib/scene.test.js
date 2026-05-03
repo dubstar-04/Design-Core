@@ -11,7 +11,7 @@ test('Test Scene.boundingBox', () => {
   expect(scene.boundingBox()).toBeUndefined();
 
   const line1 = new Line({ points: [new Point(-102, -102), new Point(201, 202)] });
-  // add to scene (bypass scene.addEntity())
+  // add to scene
   scene.addEntity('Line', line1);
   expect(scene.boundingBox().xMin).toBeCloseTo(-102);
   expect(scene.boundingBox().xMax).toBeCloseTo(201);
@@ -19,7 +19,7 @@ test('Test Scene.boundingBox', () => {
   expect(scene.boundingBox().yMax).toBeCloseTo(202);
 
   const line2 = new Line({ points: [new Point(1001, -2002), new Point(-2001, 2002)] });
-  // add to scene (bypass scene.addEntity())
+  // add to scene
   scene.addEntity('Line', line2);
   expect(scene.boundingBox().xMin).toBeCloseTo(-2001);
   expect(scene.boundingBox().xMax).toBeCloseTo(1001);
