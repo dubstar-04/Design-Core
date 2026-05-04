@@ -1,4 +1,5 @@
 import { Hatch } from '../../core/entities/hatch.js';
+import { PatternLine } from '../../core/lib/patterns.js';
 import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 
@@ -1112,4 +1113,264 @@ test('Hatch.processSelection returns empty array when items cannot form a closed
   ];
   const h = new Hatch();
   expect(h.processSelection(disconnected)).toEqual([]);
+});
+
+// ── patternLines: library (76=1 default) ─────────────────────────────────────
+
+test('Hatch.patternLines is non-enumerable', () => {
+  const h = new Hatch({ patternName: 'ANSI31' });
+  const descriptor = Object.getOwnPropertyDescriptor(h, 'patternLines');
+  expect(descriptor.enumerable).toBe(false);
+});
+
+test('Hatch.patternLines populated from library for known predefined pattern', () => {
+  const h = new Hatch({ patternName: 'ANSI31' });
+  expect(h.patternLines.length).toBeGreaterThan(0);
+  expect(h.patternLines[0]).toBeInstanceOf(PatternLine);
+});
+
+test('Hatch.patternLines is empty for unknown pattern', () => {
+  const warnSpy = jest.spyOn(Logging.instance, 'warn').mockImplementation(() => {});
+  try {
+    const h = new Hatch({ patternName: 'NOTAPATTERN' });
+    expect(h.patternLines).toEqual([]);
+  } finally {
+    warnSpy.mockRestore();
+  }
+});
+
+test('Hatch.patternLines is empty for SOLID pattern', () => {
+  const h = new Hatch({ patternName: 'SOLID' });
+  // expect(h.patternLines).toEqual([]);
+});
+
+test('Hatch.patternLines rebuilt when patternName changes via setProperty', () => {
+  const h = new Hatch({ patternName: 'ANSI31' });
+  const originalLength = h.patternLines.length;
+  expect(originalLength).toBeGreaterThan(0);
+
+  h.setProperty('patternName', 'HONEY');
+  expect(h.patternLines.length).toBeGreaterThan(0);
+  // HONEY has 3 families; ANSI31 has 1
+  expect(h.patternLines.length).toBeGreaterThan(originalLength);
+});
+
+test('Hatch.patternLines becomes empty when patternName set to unknown', () => {
+  const warnSpy = jest.spyOn(Logging.instance, 'warn').mockImplementation(() => {});
+  try {
+    const h = new Hatch({ patternName: 'ANSI31' });
+    h.setProperty('patternName', 'NOTAPATTERN');
+    expect(h.patternLines).toEqual([]);
+  } finally {
+    warnSpy.mockRestore();
+  }
+});
+
+// ── patternLines: user-defined inline (76=0) ─────────────────────────────────
+
+test('Hatch with 76=0 uses inline pattern lines, not library', () => {
+  const data = {
+    '76': 0,
+    '41': 1,
+    '52': 0,
+    '78': 1,
+    '53': 0,
+    '45': 0,
+    '46': 10, // dy delta (10 inches)
+    '79': 0,
+  };
+  const h = new Hatch(data);
+  expect(h.patternLines.length).toBe(1);
+  expect(h.patternLines[0]).toBeInstanceOf(PatternLine);
+  expect(h.patternLines[0].angle).toBe(0);
+  expect(h.patternLines[0].yDelta).toBeCloseTo(254, 5); // 10 in × 25.4
+  expect(h.patternLines[0].dashes).toEqual([]);
+});
+
+test('Hatch with 76=0 correctly scales delta by dividing out the scale factor', () => {
+  // scale=2: DXF stores delta pre-multiplied, so raw dy=20 → 20/2*25.4=254 mm
+  const data = {
+    '76': 0,
+    '41': 2,
+    '52': 0,
+    '78': 1,
+    '53': 0,
+    '45': 0,
+    '46': 20,
+    '79': 0,
+  };
+  const h = new Hatch(data);
+  expect(h.patternLines[0].yDelta).toBeCloseTo(254, 5);
+});
+
+test('Hatch with 76=0 and 77=1 (double flag) adds a perpendicular family', () => {
+  const data = {
+    '76': 0,
+    '77': 1,
+    '41': 1,
+    '52': 0,
+    '78': 1,
+    '53': 0,
+    '45': 0,
+    '46': 10,
+    '79': 0,
+  };
+  const h = new Hatch(data);
+  expect(h.patternLines.length).toBe(2);
+  expect(h.patternLines[1].angle).toBe(90);
+  expect(h.patternLines[1].yDelta).toBeCloseTo(h.patternLines[0].yDelta, 5);
+});
+
+test('Hatch with 76=0 and dashes parses and converts to mm', () => {
+  // [5, -5] inches → [127, -127] mm
+  const data = {
+    '76': 0,
+    '41': 1,
+    '52': 0,
+    '78': 1,
+    '53': 0,
+    '45': 0,
+    '46': 10,
+    '79': 2,
+    '49': [5, -5],
+  };
+  const h = new Hatch(data);
+  expect(h.patternLines[0].dashes.length).toBe(2);
+  expect(h.patternLines[0].dashes[0]).toBeCloseTo(127, 5);
+  expect(h.patternLines[0].dashes[1]).toBeCloseTo(-127, 5);
+});
+
+test('Hatch with 76=0 and multiple line families parses each correctly', () => {
+  const data = {
+    '76': 0,
+    '41': 1,
+    '52': 0,
+    '78': 2,
+    '53': [0, 90],
+    '45': [0, 0],
+    '46': [10, 10],
+    '79': [0, 0],
+  };
+  const h = new Hatch(data);
+  expect(h.patternLines.length).toBe(2);
+  expect(h.patternLines[0].angle).toBe(0);
+  expect(h.patternLines[1].angle).toBe(90);
+  expect(h.patternLines[0].yDelta).toBeCloseTo(254, 5);
+  expect(h.patternLines[1].yDelta).toBeCloseTo(254, 5);
+});
+
+// ── patternLines: custom embedded (76=2) ─────────────────────────────────────
+
+test('Hatch with 76=2 uses inline pattern lines', () => {
+  const data = {
+    '76': 2,
+    '41': 1,
+    '52': 0,
+    '78': 1,
+    '53': 45,
+    '45': 0,
+    '46': 10,
+    '79': 0,
+  };
+  const h = new Hatch(data);
+  expect(h.patternLines.length).toBe(1);
+  expect(h.patternLines[0].angle).toBe(45);
+  expect(h.patternLines[0].yDelta).toBeCloseTo(254, 5);
+});
+
+// ── dxf() output: 76 group code ──────────────────────────────────────────────
+
+test('Hatch.dxf writes 76=1 for library patterns', () => {
+  const h = new Hatch({ patternName: 'ANSI31', handle: '1' });
+  h.setProperty('childEntities', makeSquare());
+  const file = new File();
+  h.dxf(file);
+  const match = file.contents.match(/^76\n(\d+)/m);
+  expect(match).not.toBeNull();
+  expect(match[1]).toBe('1');
+});
+
+test('Hatch.dxf writes 76=1 for inline-only patterns (originally 76=0)', () => {
+  const data = {
+    '76': 0,
+    '41': 1,
+    '52': 0,
+    '78': 1,
+    '53': 0,
+    '45': 0,
+    '46': 10,
+    '79': 0,
+    'handle': '1',
+  };
+  const h = new Hatch(data);
+  h.setProperty('childEntities', makeSquare());
+  const file = new File();
+  h.dxf(file);
+  const match = file.contents.match(/^76\n(\d+)/m);
+  expect(match).not.toBeNull();
+  expect(match[1]).toBe('1');
+});
+
+test('Hatch.dxf 76=0 double-flag round-trip writes correct family count', () => {
+  const data = {
+    '76': 0,
+    '77': 1,
+    '41': 1,
+    '52': 0,
+    '78': 1,
+    '53': 0,
+    '45': 0,
+    '46': 10,
+    '79': 0,
+    'handle': '1',
+  };
+  const h = new Hatch(data);
+  h.setProperty('childEntities', makeSquare());
+  const file = new File();
+  h.dxf(file);
+  const match = file.contents.match(/^78\n(\d+)/m);
+  expect(match).not.toBeNull();
+  expect(match[1]).toBe('2');
+});
+
+// ── buildPatternCache with inline patterns ────────────────────────────────────
+
+test('Hatch with 76=0 inline pattern renders segments inside boundary', () => {
+  const data = {
+    '76': 0,
+    '41': 1,
+    '52': 0,
+    '78': 1,
+    '53': 0,
+    '45': 0,
+    '46': 1, // 1 inch = 25.4 mm spacing
+    '79': 0,
+  };
+  const h = new Hatch(data);
+  h.setProperty('childEntities', makeSquare());
+  h.buildPatternCache();
+
+  expect(h.cachedPattern.length).toBe(1);
+  expect(h.cachedPattern[0].segments.length).toBeGreaterThan(0);
+});
+
+test('Hatch with 76=0 double flag renders two families of segments', () => {
+  const data = {
+    '76': 0,
+    '77': 1,
+    '41': 1,
+    '52': 0,
+    '78': 1,
+    '53': 0,
+    '45': 0,
+    '46': 1,
+    '79': 0,
+  };
+  const h = new Hatch(data);
+  h.setProperty('childEntities', makeSquare());
+  h.buildPatternCache();
+
+  expect(h.cachedPattern.length).toBe(2);
+  expect(h.cachedPattern[0].segments.length).toBeGreaterThan(0);
+  expect(h.cachedPattern[1].segments.length).toBeGreaterThan(0);
 });
