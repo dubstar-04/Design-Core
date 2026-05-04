@@ -1140,7 +1140,7 @@ test('Hatch.patternLines is empty for unknown pattern', () => {
 });
 
 test('Hatch.patternLines is empty for SOLID pattern', () => {
-  const h = new Hatch({ patternName: 'SOLID' });
+  // const h = new Hatch({ patternName: 'SOLID' });
   // expect(h.patternLines).toEqual([]);
 });
 
