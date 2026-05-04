@@ -1075,7 +1075,7 @@ describe('unknown hatch pattern', () => {
     const warnSpy = jest.spyOn(Logging.instance, 'warn').mockImplementation(() => {});
     try {
       new Hatch({ patternName: 'NOTAPATTERN' });
-      expect(warnSpy).toHaveBeenCalledWith("Hatch: pattern 'NOTAPATTERN' not found");
+      expect(warnSpy).toHaveBeenCalledWith('Hatch: pattern \'NOTAPATTERN\' not found');
     } finally {
       warnSpy.mockRestore();
     }
