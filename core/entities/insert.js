@@ -51,7 +51,11 @@ export class Insert extends Entity {
       // DXF Groupcode 2 - Block name
       if (data.blockName !== undefined) {
         const block = DesignCore.Scene.blockManager.getItemByName(data.blockName);
-        this.block = block;
+        if (block) {
+          this.block = block;
+        } else {
+          Logging.instance.warn(`Insert: block '${data.blockName}' not found`);
+        }
       }
 
       // Named scalar rotation (internal API); DXF code 50 is handled by fromDxf
