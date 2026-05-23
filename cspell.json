@@ -141,6 +141,8 @@
         "EXTMIN",
         "FILLETRAD",
         "FONTNAME",
+        "HATCHDOUBLE",
+        "HATCHSPACING",
         "groupcode",
         "groupcodes",
         "groupvalue",

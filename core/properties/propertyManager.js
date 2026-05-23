@@ -152,6 +152,21 @@ export class PropertyManager {
   }
 
   /**
+   * Get the representative entity for a named property from the selection set.
+   * Used alongside getEntityPropertyDefinition when readOnly callbacks need an entity.
+   * @param {string} entityType
+   * @param {string} property
+   * @return {Object|undefined}
+   */
+  getEntityForProperty(entityType, property) {
+    const index = DesignCore.Scene.selectionManager.selectionSet.selectionSet.find((i) => {
+      const entity = DesignCore.Scene.entities.get(i);
+      return (entityType === 'All' || entity.type === entityType) && entity.properties?.has(property);
+    });
+    return index !== undefined ? DesignCore.Scene.entities.get(index) : undefined;
+  }
+
+  /**
    * Get a list the property values
    * @param {string} entityType
    * @param {string} property

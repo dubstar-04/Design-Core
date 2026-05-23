@@ -29,9 +29,12 @@ export class Property {
     return this._value;
   }
 
-  /** @param {any} val - new value; ignored when readOnly */
+  /** @param {any} val - new value; ignored when readOnly is true.
+   * Callable readOnly is evaluated by the caller (entityProperties.set) with
+   * the entity in scope; treat it as writable here to avoid stale closure issues. */
   set value(val) {
-    if (!this.readOnly) {
+    const isReadOnly = typeof this.readOnly === 'function' ? false : this.readOnly;
+    if (!isReadOnly) {
       this._value = val;
     }
   }
@@ -83,6 +86,8 @@ export class Property {
     // ── Hatch ─────────────────────────────────────────────────────────────────
     CHILDENTITIES: 'childEntities',
     PATTERNNAME: 'patternName',
+    HATCHSPACING: 'hatchSpacing',
+    HATCHDOUBLE: 'hatchDouble',
     // ── Text ──────────────────────────────────────────────────────────────────
     BACKWARDS: 'backwards',
     HORIZONTALALIGNMENT: 'horizontalAlignment',

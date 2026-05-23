@@ -232,6 +232,8 @@ export class Canvas {
     const targetScale = Math.min((this.width / width), (this.height / height));
     const scaleDelta = targetScale / this.getScale() * 0.9;
 
+    if (!isFinite(scaleDelta) || scaleDelta <= 0) return;
+
     this.matrix.scale(scaleDelta, scaleDelta);
     this.matrix.translate((selectionCenter.x / scaleDelta) - selectionCenter.x, (selectionCenter.y / scaleDelta) - selectionCenter.y);
     this.matrix.translate(translateDelta.x / scaleDelta, translateDelta.y / scaleDelta);

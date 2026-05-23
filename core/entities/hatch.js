@@ -19,6 +19,7 @@ import { Line } from './line.js';
 import { Arc } from './arc.js';
 import { Polyline } from './polyline.js';
 import { Property } from '../properties/property.js';
+import { PatternLine } from '../lib/patterns.js';
 
 /**
  * Hatch Entity Class
@@ -41,6 +42,14 @@ export class Hatch extends Entity {
       enumerable: false,
     });
 
+    // resolved PatternLine array — populated at construction from inline DXF
+    // data (type 0/2) or from the Patterns library (type 1)
+    Object.defineProperty(this, 'patternLines', {
+      value: [],
+      writable: true,
+      enumerable: false,
+    });
+
     // Boundary shapes stored in EntityProperties so all entity data lives in one place.
     this.properties.add(Property.Names.CHILDENTITIES, {
       type: Property.Type.ENTITIES,
@@ -53,14 +62,24 @@ export class Hatch extends Entity {
 
     const rawPatternName = String(Property.loadValue([data?.[2], data?.patternName], 'ANSI31')).toUpperCase();
     // DXF Groupcode 70 - Solid Fill Flag (1 = solid, 0 = pattern): if set, override pattern name
-    const resolvedPatternName = data?.[70] === 1 ? 'SOLID' : rawPatternName;
+    // DXF Groupcode 76 - Hatch pattern type: 0 = User-defined ('U'); 1 = Predefined; 2 = Custom
+    const patternType = data?.[76] ?? 1;
+    // User-defined hatches (76=0) are normalised to the sentinel name 'U'
+    // so the pattern type is implied by the name rather than stored separately.
+    const resolvedPatternName = data?.[70] === 1 ? 'SOLID' : patternType === 0 ? 'U' : rawPatternName;
+    if (patternType === 1 && resolvedPatternName !== 'SOLID' && !Patterns.patternExists(resolvedPatternName)) {
+      Logging.instance.warn(`Hatch: pattern '${resolvedPatternName}' not found`);
+    }
 
     // DXF Groupcode 2 - Hatch pattern name
     this.properties.add(Property.Names.PATTERNNAME, {
       type: Property.Type.LIST,
       value: resolvedPatternName,
       dxfCode: 2,
-      options: () => Object.keys(Patterns.hatch_patterns).map((name) => ({ display: name, value: name })),
+      options: () => [
+        { display: 'User Defined', value: 'U' },
+        ...Object.keys(Patterns.hatch_patterns).map((name) => ({ display: name, value: name })),
+      ],
     });
     // DXF Groupcode 41 - Hatch pattern scale
     this.properties.add(Property.Names.SCALE, {
@@ -74,6 +93,28 @@ export class Hatch extends Entity {
       value: Property.loadValue([data?.[52], data?.angle], 0),
       dxfCode: 52,
     });
+    // DXF Groupcode 47 - Line spacing (user-defined hatches only)
+    this.properties.add(Property.Names.HATCHSPACING, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.[47]], 1),
+      dxfCode: 47,
+      readOnly: (entity) => entity.getProperty(Property.Names.PATTERNNAME) !== 'U',
+    });
+    // DXF Groupcode 77 - Double flag (user-defined hatches only): 0 = not double; 1 = double
+    this.properties.add(Property.Names.HATCHDOUBLE, {
+      type: Property.Type.BOOLEAN,
+      value: (data?.[77] ?? 0) === 1,
+      dxfCode: 77,
+      readOnly: (entity) => entity.getProperty(Property.Names.PATTERNNAME) !== 'U',
+    });
+
+    // Populate patternLines: inline data for user-defined (76=0) and custom
+    // (76=2) patterns; Patterns library for predefined (76=1, default).
+    if ((patternType === 0 || patternType === 2) && data) {
+      this.patternLines = this.#buildInlinePatternLines(data);
+    } else if (resolvedPatternName !== 'SOLID' && Patterns.patternExists(resolvedPatternName)) {
+      this.patternLines = this._copyLibraryPattern(resolvedPatternName);
+    }
 
     // add a single point to this.points if no other points exist
     if (!this.points.length) {
@@ -104,6 +145,116 @@ export class Hatch extends Entity {
   }
 
   /**
+   * Return unfrozen copies of library PatternLine objects for a named pattern.
+   * Patterns.getPattern() returns frozen objects (shared cache); cloneObject()
+   * uses Reflect.ownKeys and would fail writing into frozen instances.
+   * @param {string} name - upper-case pattern name
+   * @return {Array<PatternLine>} array of mutable PatternLine copies
+   */
+  _copyLibraryPattern(name) {
+    return Patterns.getPattern(name).map((pl) => {
+      const copy = new PatternLine();
+      copy.angle = pl.angle;
+      copy.xOrigin = pl.xOrigin;
+      copy.yOrigin = pl.yOrigin;
+      copy.xDelta = pl.xDelta;
+      copy.yDelta = pl.yDelta;
+      copy.dashes = [...pl.dashes];
+      return copy;
+    });
+  }
+
+  /**
+   * Synthesise PatternLine objects for a user-defined hatch from line spacing.
+   * Used when the pattern name is 'U' and the pattern has no explicit family data.
+   * @param {number} spacing - perpendicular distance between parallel lines
+   * @param {boolean} isDouble - when true, add a second family at 90° to the first
+   * @return {Array<PatternLine>}
+   */
+  _buildSpacingPatternLines(spacing, isDouble) {
+    const pl = new PatternLine();
+    pl.angle = 0;
+    pl.xOrigin = 0;
+    pl.yOrigin = 0;
+    pl.xDelta = 0;
+    pl.yDelta = spacing;
+    pl.dashes = [];
+    const result = [pl];
+    if (isDouble) {
+      const pl2 = new PatternLine();
+      pl2.angle = 90;
+      pl2.xOrigin = 0;
+      pl2.yOrigin = 0;
+      pl2.xDelta = 0;
+      pl2.yDelta = spacing;
+      pl2.dashes = [];
+      result.push(pl2);
+    }
+    return result;
+  }
+
+  /**
+   * Build PatternLine objects from inline DXF pattern data (group code 76 = 0 or 2).
+   * DXF stores deltas pre-multiplied by scale; we divide by scale to recover the
+   * normalised (scale=1) values that buildPatternCache expects.
+   * @param {Object} data - raw DXF group-code data for the HATCH entity
+   * @return {Array<PatternLine>} array of PatternLine objects
+   */
+  #buildInlinePatternLines(data) {
+    const scale = data[41] ?? 1;
+    // DXF group code 53 per-family angles are written by AutoCAD as absolute
+    // angles that already include the entity rotation (group code 52). Subtract
+    // the entity angle here so that buildPatternCache's addition of ANGLE
+    // restores the correct absolute rotation without doubling it.
+    const entityAngle = data[52] ?? 0;
+    const angles = [].concat(data[53] ?? []);
+    const dxDeltas = [].concat(data[45] ?? []);
+    const dyDeltas = [].concat(data[46] ?? []);
+    const dashCounts = [].concat(data[79] ?? []);
+    const allDashes = [].concat(data[49] ?? []);
+
+    // Pure user-defined hatch (76=0): no inline family data — synthesise
+    // from group code 47 (line spacing) and 77 (double flag).
+    if (!angles.length) {
+      return this._buildSpacingPatternLines((data[47] ?? 1) / scale, data[77] === 1);
+    }
+
+    const patternLines = [];
+    let dashIdx = 0;
+
+    angles.forEach((angle, i) => {
+      const pl = new PatternLine();
+      pl.angle = angle - entityAngle;
+      pl.xOrigin = 0;
+      pl.yOrigin = 0;
+      // DXF deltas are already in drawing units, pre-multiplied by scale; divide out.
+      pl.xDelta = (dxDeltas[i] ?? 0) / scale;
+      pl.yDelta = (dyDeltas[i] ?? 0) / scale;
+
+      const count = dashCounts[i] ?? 0;
+      pl.dashes = allDashes.slice(dashIdx, dashIdx + count).map((d) => d / scale);
+      dashIdx += count;
+
+      patternLines.push(pl);
+    });
+
+    // DXF group code 77: double flag — add a perpendicular family
+    if (data[77] === 1 && patternLines.length > 0) {
+      const first = patternLines[0];
+      const pl = new PatternLine();
+      pl.angle = first.angle + 90;
+      pl.xOrigin = 0;
+      pl.yOrigin = 0;
+      pl.xDelta = first.xDelta;
+      pl.yDelta = first.yDelta;
+      pl.dashes = [...first.dashes];
+      patternLines.push(pl);
+    }
+
+    return patternLines;
+  }
+
+  /**
    * Build and cache world-space line segments for the current pattern.
    * For pattern hatches, segments are pre-clipped against the boundary using
    * geometric intersection so draw() requires no ctx.save/clip/restore overhead.
@@ -114,7 +265,7 @@ export class Hatch extends Entity {
       return;
     }
 
-    if (this.getProperty(Property.Names.PATTERNNAME) === 'SOLID' || !Patterns.patternExists(this.getProperty(Property.Names.PATTERNNAME))) {
+    if (!this.patternLines.length) {
       this.cachedPattern = [];
       return;
     }
@@ -147,7 +298,7 @@ export class Hatch extends Entity {
     const s = this.getProperty(Property.Names.SCALE);
     const lines = [];
 
-    const pattern = Patterns.getPattern(this.getProperty(Property.Names.PATTERNNAME));
+    const pattern = this.patternLines;
     pattern.forEach((patternLine) => {
       let dashLength = bbXLength / 2;
       if (patternLine.dashes.length) {
@@ -613,7 +764,7 @@ export class Hatch extends Entity {
     // Build cache if stale (cachedPattern === null means never built or invalidated)
     if (this.cachedPattern === null) this.buildPatternCache();
 
-    if (this.getProperty(Property.Names.PATTERNNAME) === 'SOLID') {
+    if (this.cachedPattern.length === 0 && this.getProperty(Property.Names.PATTERNNAME) === 'SOLID') {
       // Design renders solid hatches with a direct fill() call rather than the
       // dense cross-hatch line pattern used by commercial CAD applications
       // (Commercial CAD's SOLID pattern uses two line families at 0.0001-unit spacing).
@@ -694,17 +845,20 @@ export class Hatch extends Entity {
       file.writeGroupCode('97', '0'); // Number of source boundary objects
     }
     file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
-    file.writeGroupCode('76', '1'); // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
+    // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
+    const patternName = this.getProperty(Property.Names.PATTERNNAME);
+    const isUserDefined = patternName === 'U';
+    const isLibraryPattern = !isUserDefined && patternName !== 'SOLID' && Patterns.patternExists(patternName);
+    file.writeGroupCode('76', isUserDefined ? '0' : isLibraryPattern ? '1' : '2');
 
-    if (this.getProperty(Property.Names.PATTERNNAME) !== 'SOLID') {
+    if (patternName !== 'SOLID') {
       file.writeGroupCode('52', this.getProperty(Property.Names.ANGLE)); // Hatch Pattern angle
       file.writeGroupCode('41', this.getProperty(Property.Names.SCALE)); // Hatch Pattern scale
-      file.writeGroupCode('77', '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
-      file.writeGroupCode('78', Patterns.getPatternLineCount(this.getProperty(Property.Names.PATTERNNAME))); // Number of pattern definition lines
+      file.writeGroupCode('77', this.getProperty(Property.Names.HATCHDOUBLE) ? '1' : '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
+      file.writeGroupCode('78', this.patternLines.length); // Number of pattern definition lines
 
       // Pattern data
-      const pattern = Patterns.getPattern(this.getProperty(Property.Names.PATTERNNAME));
-      pattern.forEach((patternLine) => {
+      this.patternLines.forEach((patternLine) => {
         file.writeGroupCode('53', patternLine.angle + this.getProperty(Property.Names.ANGLE)); // Pattern line angle
         file.writeGroupCode('43', patternLine.xOrigin); // Pattern line base X
         file.writeGroupCode('44', patternLine.yOrigin); // Pattern line base y
@@ -719,7 +873,7 @@ export class Hatch extends Entity {
       });
     }
 
-    file.writeGroupCode('47', '0.5'); // pixel size
+    file.writeGroupCode('47', isUserDefined ? this.getProperty(Property.Names.HATCHSPACING) : '0.5'); // line spacing (user-defined) / pixel size
     file.writeGroupCode('98', '1'); // Number of seed points
     // seed points
     file.writeGroupCode('10', '1');
@@ -842,6 +996,22 @@ export class Hatch extends Entity {
         const upper = String(value).toUpperCase();
         if (this.getProperty(Property.Names.PATTERNNAME) === upper) return;
         super.setProperty(property, upper);
+        if (upper === 'U') {
+          this.patternLines = this._buildSpacingPatternLines(
+              this.getProperty(Property.Names.HATCHSPACING),
+              this.getProperty(Property.Names.HATCHDOUBLE),
+          );
+        } else {
+          this.patternLines = (upper !== 'SOLID' && Patterns.patternExists(upper)) ? this._copyLibraryPattern(upper) : [];
+        }
+      } else if (property === Property.Names.HATCHSPACING || property === Property.Names.HATCHDOUBLE) {
+        super.setProperty(property, value);
+        if (this.getProperty(Property.Names.PATTERNNAME) === 'U') {
+          this.patternLines = this._buildSpacingPatternLines(
+              this.getProperty(Property.Names.HATCHSPACING),
+              this.getProperty(Property.Names.HATCHDOUBLE),
+          );
+        }
       } else if (property === Property.Names.POINTS) {
         // Special handling for hatch points to move child entities
         // Consider the changes from the hatch points to be an offset and rotation

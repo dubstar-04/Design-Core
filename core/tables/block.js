@@ -256,6 +256,8 @@ export class Block extends Entity {
    * @return {BoundingBox}
    */
   boundingBox() {
+    if (!this.entities.length) return null;
+
     let xmin = Infinity;
     let xmax = -Infinity;
     let ymin = Infinity;
