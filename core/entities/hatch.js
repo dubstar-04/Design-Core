@@ -145,6 +145,55 @@ export class Hatch extends Entity {
   }
 
   /**
+   * Return unfrozen copies of library PatternLine objects for a named pattern.
+   * Patterns.getPattern() returns frozen objects (shared cache); cloneObject()
+   * uses Reflect.ownKeys and would fail writing into frozen instances.
+   * @param {string} name - upper-case pattern name
+   * @return {Array<PatternLine>} array of mutable PatternLine copies
+   */
+  _copyLibraryPattern(name) {
+    return Patterns.getPattern(name).map((pl) => {
+      const copy = new PatternLine();
+      copy.angle = pl.angle;
+      copy.xOrigin = pl.xOrigin;
+      copy.yOrigin = pl.yOrigin;
+      copy.xDelta = pl.xDelta;
+      copy.yDelta = pl.yDelta;
+      copy.dashes = [...pl.dashes];
+      return copy;
+    });
+  }
+
+  /**
+   * Synthesise PatternLine objects for a user-defined hatch from line spacing.
+   * Used when the pattern name is 'U' and the pattern has no explicit family data.
+   * @param {number} spacing - perpendicular distance between parallel lines
+   * @param {boolean} isDouble - when true, add a second family at 90° to the first
+   * @return {Array<PatternLine>}
+   */
+  _buildSpacingPatternLines(spacing, isDouble) {
+    const pl = new PatternLine();
+    pl.angle = 0;
+    pl.xOrigin = 0;
+    pl.yOrigin = 0;
+    pl.xDelta = 0;
+    pl.yDelta = spacing;
+    pl.dashes = [];
+    const result = [pl];
+    if (isDouble) {
+      const pl2 = new PatternLine();
+      pl2.angle = 90;
+      pl2.xOrigin = 0;
+      pl2.yOrigin = 0;
+      pl2.xDelta = 0;
+      pl2.yDelta = spacing;
+      pl2.dashes = [];
+      result.push(pl2);
+    }
+    return result;
+  }
+
+  /**
    * Build PatternLine objects from inline DXF pattern data (group code 76 = 0 or 2).
    * DXF stores deltas pre-multiplied by scale; we divide by scale and convert
    * inches→mm (×25.4) to match the library's mm-based PatternLine format.
@@ -153,26 +202,37 @@ export class Hatch extends Entity {
    */
   #buildInlinePatternLines(data) {
     const scale = data[41] ?? 1;
+    // DXF group code 53 per-family angles are written by AutoCAD as absolute
+    // angles that already include the entity rotation (group code 52). Subtract
+    // the entity angle here so that buildPatternCache's addition of ANGLE
+    // restores the correct absolute rotation without doubling it.
+    const entityAngle = data[52] ?? 0;
     const angles = [].concat(data[53] ?? []);
     const dxDeltas = [].concat(data[45] ?? []);
     const dyDeltas = [].concat(data[46] ?? []);
     const dashCounts = [].concat(data[79] ?? []);
     const allDashes = [].concat(data[49] ?? []);
 
+    // Pure user-defined hatch (76=0): no inline family data — synthesise
+    // from group code 47 (line spacing) and 77 (double flag).
+    if (!angles.length) {
+      return this._buildSpacingPatternLines((data[47] ?? 1) / scale, data[77] === 1);
+    }
+
     const patternLines = [];
     let dashIdx = 0;
 
     angles.forEach((angle, i) => {
       const pl = new PatternLine();
-      pl.angle = angle;
+      pl.angle = angle - entityAngle;
       pl.xOrigin = 0;
       pl.yOrigin = 0;
-      // Deltas in DXF are scaled; convert to mm (imperial drawing: ×25.4 / scale)
-      pl.xDelta = ((dxDeltas[i] ?? 0) / scale) * 25.4;
-      pl.yDelta = ((dyDeltas[i] ?? 0) / scale) * 25.4;
+      // DXF deltas are already in drawing units, pre-multiplied by scale; divide out.
+      pl.xDelta = (dxDeltas[i] ?? 0) / scale;
+      pl.yDelta = (dyDeltas[i] ?? 0) / scale;
 
       const count = dashCounts[i] ?? 0;
-      pl.dashes = allDashes.slice(dashIdx, dashIdx + count).map((d) => (d / scale) * 25.4);
+      pl.dashes = allDashes.slice(dashIdx, dashIdx + count).map((d) => d / scale);
       dashIdx += count;
 
       patternLines.push(pl);
@@ -205,7 +265,7 @@ export class Hatch extends Entity {
       return;
     }
 
-    if (this.getProperty(Property.Names.PATTERNNAME) === 'SOLID' || !this.patternLines.length) {
+    if (!this.patternLines.length) {
       this.cachedPattern = [];
       return;
     }
@@ -704,7 +764,7 @@ export class Hatch extends Entity {
     // Build cache if stale (cachedPattern === null means never built or invalidated)
     if (this.cachedPattern === null) this.buildPatternCache();
 
-    if (this.getProperty(Property.Names.PATTERNNAME) === 'SOLID') {
+    if (this.cachedPattern.length === 0 && this.getProperty(Property.Names.PATTERNNAME) === 'SOLID') {
       // Design renders solid hatches with a direct fill() call rather than the
       // dense cross-hatch line pattern used by commercial CAD applications
       // (Commercial CAD's SOLID pattern uses two line families at 0.0001-unit spacing).
