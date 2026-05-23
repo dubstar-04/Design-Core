@@ -251,6 +251,7 @@ export class Insert extends Entity {
    */
   boundingBox() {
     const blockBB = this.block.boundingBox();
+    if (!blockBB) return null;
     const topLeft = blockBB.pt1.add(this.points[0]);
     const bottomRight = blockBB.pt2.add(this.points[0]);
     return new BoundingBox(topLeft, bottomRight);
