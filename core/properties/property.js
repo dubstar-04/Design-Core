@@ -86,6 +86,8 @@ export class Property {
     // ── Hatch ─────────────────────────────────────────────────────────────────
     CHILDENTITIES: 'childEntities',
     PATTERNNAME: 'patternName',
+    HATCHSPACING: 'hatchSpacing',
+    HATCHDOUBLE: 'hatchDouble',
     // ── Text ──────────────────────────────────────────────────────────────────
     BACKWARDS: 'backwards',
     HORIZONTALALIGNMENT: 'horizontalAlignment',
