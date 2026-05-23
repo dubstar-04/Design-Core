@@ -787,13 +787,14 @@ export class Hatch extends Entity {
     file.writeGroupCode('75', '1'); // Hatch style: 0 = Hatch “odd parity” area (Normal style) 1 = Hatch outermost area only (Outer style) 2 = Hatch through entire area (Ignore style)
     // Hatch pattern type: 0 = User-defined; 1 = Predefined; 2 = Custom
     const patternName = this.getProperty(Property.Names.PATTERNNAME);
-    const isLibraryPattern = patternName !== 'SOLID' && Patterns.patternExists(patternName);
-    file.writeGroupCode('76', isLibraryPattern ? '1' : '2');
+    const isUserDefined = patternName === 'U';
+    const isLibraryPattern = !isUserDefined && patternName !== 'SOLID' && Patterns.patternExists(patternName);
+    file.writeGroupCode('76', isUserDefined ? '0' : isLibraryPattern ? '1' : '2');
 
     if (patternName !== 'SOLID') {
       file.writeGroupCode('52', this.getProperty(Property.Names.ANGLE)); // Hatch Pattern angle
       file.writeGroupCode('41', this.getProperty(Property.Names.SCALE)); // Hatch Pattern scale
-      file.writeGroupCode('77', '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
+      file.writeGroupCode('77', this.getProperty(Property.Names.HATCHDOUBLE) ? '1' : '0'); // Hatch pattern double flag(pattern fill only): 0 = not double; 1 = double
       file.writeGroupCode('78', this.patternLines.length); // Number of pattern definition lines
 
       // Pattern data
