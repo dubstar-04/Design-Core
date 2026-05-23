@@ -168,7 +168,9 @@ test('Test propertyManager.getEntityForProperty', () => {
 
 test('Test propertyManager.setPropertyCallbackFunction and selectionSetChanged', () => {
   let callCount = 0;
-  const callback = () => { callCount++; };
+  const callback = () => {
+    callCount++;
+  };
 
   // selectionSetChanged with no callback set should not throw
   propertiesManager.selectionSetChanged();
