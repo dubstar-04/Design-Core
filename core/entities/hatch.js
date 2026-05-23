@@ -195,8 +195,8 @@ export class Hatch extends Entity {
 
   /**
    * Build PatternLine objects from inline DXF pattern data (group code 76 = 0 or 2).
-   * DXF stores deltas pre-multiplied by scale; we divide by scale and convert
-   * inches→mm (×25.4) to match the library's mm-based PatternLine format.
+   * DXF stores deltas pre-multiplied by scale; we divide by scale to recover the
+   * normalised (scale=1) values that buildPatternCache expects.
    * @param {Object} data - raw DXF group-code data for the HATCH entity
    * @return {Array<PatternLine>} array of PatternLine objects
    */
