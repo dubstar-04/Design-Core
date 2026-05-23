@@ -62,8 +62,12 @@ export class Hatch extends Entity {
 
     const rawPatternName = String(Property.loadValue([data?.[2], data?.patternName], 'ANSI31')).toUpperCase();
     // DXF Groupcode 70 - Solid Fill Flag (1 = solid, 0 = pattern): if set, override pattern name
-    const resolvedPatternName = data?.[70] === 1 ? 'SOLID' : rawPatternName;
-    if (!Patterns.patternExists(resolvedPatternName)) {
+    // DXF Groupcode 76 - Hatch pattern type: 0 = User-defined ('U'); 1 = Predefined; 2 = Custom
+    const patternType = data?.[76] ?? 1;
+    // User-defined hatches (76=0) are normalised to the sentinel name 'U'
+    // so the pattern type is implied by the name rather than stored separately.
+    const resolvedPatternName = data?.[70] === 1 ? 'SOLID' : patternType === 0 ? 'U' : rawPatternName;
+    if (resolvedPatternName !== 'U' && !Patterns.patternExists(resolvedPatternName)) {
       Logging.instance.warn(`Hatch: pattern '${resolvedPatternName}' not found`);
     }
 
@@ -72,7 +76,10 @@ export class Hatch extends Entity {
       type: Property.Type.LIST,
       value: resolvedPatternName,
       dxfCode: 2,
-      options: () => Object.keys(Patterns.hatch_patterns).map((name) => ({ display: name, value: name })),
+      options: () => [
+        { display: 'User Defined', value: 'U' },
+        ...Object.keys(Patterns.hatch_patterns).map((name) => ({ display: name, value: name })),
+      ],
     });
     // DXF Groupcode 41 - Hatch pattern scale
     this.properties.add(Property.Names.SCALE, {
@@ -103,11 +110,10 @@ export class Hatch extends Entity {
 
     // Populate patternLines: inline data for user-defined (76=0) and custom
     // (76=2) patterns; Patterns library for predefined (76=1, default).
-    const patternType = data?.[76] ?? 1;
     if ((patternType === 0 || patternType === 2) && data) {
       this.patternLines = this.#buildInlinePatternLines(data);
-    } else if (Patterns.patternExists(resolvedPatternName)) {
-      this.patternLines = Patterns.getPattern(resolvedPatternName);
+    } else if (resolvedPatternName !== 'SOLID' && Patterns.patternExists(resolvedPatternName)) {
+      this.patternLines = this._copyLibraryPattern(resolvedPatternName);
     }
 
     // add a single point to this.points if no other points exist
