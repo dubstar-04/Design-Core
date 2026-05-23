@@ -86,6 +86,20 @@ export class Hatch extends Entity {
       value: Property.loadValue([data?.[52], data?.angle], 0),
       dxfCode: 52,
     });
+    // DXF Groupcode 47 - Line spacing (user-defined hatches only)
+    this.properties.add(Property.Names.HATCHSPACING, {
+      type: Property.Type.NUMBER,
+      value: Property.loadValue([data?.[47]], 1),
+      dxfCode: 47,
+      readOnly: (entity) => entity.getProperty(Property.Names.PATTERNNAME) !== 'U',
+    });
+    // DXF Groupcode 77 - Double flag (user-defined hatches only): 0 = not double; 1 = double
+    this.properties.add(Property.Names.HATCHDOUBLE, {
+      type: Property.Type.BOOLEAN,
+      value: (data?.[77] ?? 0) === 1,
+      dxfCode: 77,
+      readOnly: (entity) => entity.getProperty(Property.Names.PATTERNNAME) !== 'U',
+    });
 
     // Populate patternLines: inline data for user-defined (76=0) and custom
     // (76=2) patterns; Patterns library for predefined (76=1, default).
