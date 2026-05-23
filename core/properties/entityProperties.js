@@ -58,7 +58,8 @@ export class EntityProperties {
   set(name, value, entity) {
     const prop = this._store[name];
     if (!prop) return;
-    if (prop.readOnly) return;
+    const isReadOnly = typeof prop.readOnly === 'function' ? prop.readOnly(entity) : prop.readOnly;
+    if (isReadOnly) return;
     if (prop.set) {
       prop.set(entity, value);
     } else {
