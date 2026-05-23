@@ -1140,8 +1140,8 @@ test('Hatch.patternLines is empty for unknown pattern', () => {
 });
 
 test('Hatch.patternLines is empty for SOLID pattern', () => {
-  // const h = new Hatch({ patternName: 'SOLID' });
-  // expect(h.patternLines).toEqual([]);
+  const h = new Hatch({ patternName: 'SOLID' });
+  expect(h.patternLines).toEqual([]);
 });
 
 test('Hatch.patternLines rebuilt when patternName changes via setProperty', () => {
@@ -1183,12 +1183,12 @@ test('Hatch with 76=0 uses inline pattern lines, not library', () => {
   expect(h.patternLines.length).toBe(1);
   expect(h.patternLines[0]).toBeInstanceOf(PatternLine);
   expect(h.patternLines[0].angle).toBe(0);
-  expect(h.patternLines[0].yDelta).toBeCloseTo(254, 5); // 10 in × 25.4
+  expect(h.patternLines[0].yDelta).toBeCloseTo(10, 5); // 10 (drawing units)
   expect(h.patternLines[0].dashes).toEqual([]);
 });
 
 test('Hatch with 76=0 correctly scales delta by dividing out the scale factor', () => {
-  // scale=2: DXF stores delta pre-multiplied, so raw dy=20 → 20/2*25.4=254 mm
+  // scale=2: DXF stores delta pre-multiplied, so raw dy=20 → 20/2=10 (drawing units)
   const data = {
     '76': 0,
     '41': 2,
@@ -1200,7 +1200,7 @@ test('Hatch with 76=0 correctly scales delta by dividing out the scale factor', 
     '79': 0,
   };
   const h = new Hatch(data);
-  expect(h.patternLines[0].yDelta).toBeCloseTo(254, 5);
+  expect(h.patternLines[0].yDelta).toBeCloseTo(10, 5);
 });
 
 test('Hatch with 76=0 and 77=1 (double flag) adds a perpendicular family', () => {
@@ -1222,7 +1222,7 @@ test('Hatch with 76=0 and 77=1 (double flag) adds a perpendicular family', () =>
 });
 
 test('Hatch with 76=0 and dashes parses and converts to mm', () => {
-  // [5, -5] inches → [127, -127] mm
+  // [5, -5] → [5, -5] (drawing units)
   const data = {
     '76': 0,
     '41': 1,
@@ -1236,8 +1236,8 @@ test('Hatch with 76=0 and dashes parses and converts to mm', () => {
   };
   const h = new Hatch(data);
   expect(h.patternLines[0].dashes.length).toBe(2);
-  expect(h.patternLines[0].dashes[0]).toBeCloseTo(127, 5);
-  expect(h.patternLines[0].dashes[1]).toBeCloseTo(-127, 5);
+  expect(h.patternLines[0].dashes[0]).toBeCloseTo(5, 5);
+  expect(h.patternLines[0].dashes[1]).toBeCloseTo(-5, 5);
 });
 
 test('Hatch with 76=0 and multiple line families parses each correctly', () => {
@@ -1255,8 +1255,34 @@ test('Hatch with 76=0 and multiple line families parses each correctly', () => {
   expect(h.patternLines.length).toBe(2);
   expect(h.patternLines[0].angle).toBe(0);
   expect(h.patternLines[1].angle).toBe(90);
-  expect(h.patternLines[0].yDelta).toBeCloseTo(254, 5);
-  expect(h.patternLines[1].yDelta).toBeCloseTo(254, 5);
+  expect(h.patternLines[0].yDelta).toBeCloseTo(10, 5);
+  expect(h.patternLines[1].yDelta).toBeCloseTo(10, 5);
+});
+
+test('Hatch with 76=0 and no inline families synthesises from spacing (47)', () => {
+  const data = { '76': 0, '41': 1, '52': 45, '47': 5 };
+  const h = new Hatch(data);
+  expect(h.patternLines.length).toBe(1);
+  expect(h.patternLines[0].angle).toBe(0);
+  expect(h.patternLines[0].yDelta).toBeCloseTo(5, 5);
+  expect(h.patternLines[0].dashes).toEqual([]);
+});
+
+test('Hatch with 76=0 explicit families: data[53] absolute angle is stored relative to entity angle', () => {
+  // AutoCAD writes data[53]=45 as the absolute line angle when entity angle (52) is 45.
+  // Subtracting entityAngle makes it 0 so buildPatternCache's addition yields the correct 45°.
+  const data = { '76': 0, '41': 1, '52': 45, '78': 1, '53': 45, '45': 0, '46': 10, '79': 0 };
+  const h = new Hatch(data);
+  expect(h.patternLines[0].angle).toBeCloseTo(0, 5); // 45 - 45 = 0 (relative)
+});
+
+test('Hatch with 76=0, no inline families, double flag (77=1) synthesises two families', () => {
+  const data = { '76': 0, '77': 1, '41': 1, '52': 0, '47': 5 };
+  const h = new Hatch(data);
+  expect(h.patternLines.length).toBe(2);
+  expect(h.patternLines[0].angle).toBe(0);
+  expect(h.patternLines[1].angle).toBe(90);
+  expect(h.patternLines[1].yDelta).toBeCloseTo(5, 5);
 });
 
 // ── patternLines: custom embedded (76=2) ─────────────────────────────────────
@@ -1275,7 +1301,7 @@ test('Hatch with 76=2 uses inline pattern lines', () => {
   const h = new Hatch(data);
   expect(h.patternLines.length).toBe(1);
   expect(h.patternLines[0].angle).toBe(45);
-  expect(h.patternLines[0].yDelta).toBeCloseTo(254, 5);
+  expect(h.patternLines[0].yDelta).toBeCloseTo(10, 5);
 });
 
 // ── dxf() output: 76 group code ──────────────────────────────────────────────
@@ -1290,7 +1316,7 @@ test('Hatch.dxf writes 76=1 for library patterns', () => {
   expect(match[1]).toBe('1');
 });
 
-test('Hatch.dxf writes 76=1 for inline-only patterns (originally 76=0)', () => {
+test('Hatch.dxf writes 76=0 for user-defined patterns', () => {
   const data = {
     '76': 0,
     '41': 1,
@@ -1308,7 +1334,7 @@ test('Hatch.dxf writes 76=1 for inline-only patterns (originally 76=0)', () => {
   h.dxf(file);
   const match = file.contents.match(/^76\n(\d+)/m);
   expect(match).not.toBeNull();
-  expect(match[1]).toBe('1');
+  expect(match[1]).toBe('0');
 });
 
 test('Hatch.dxf 76=0 double-flag round-trip writes correct family count', () => {
@@ -1343,7 +1369,7 @@ test('Hatch with 76=0 inline pattern renders segments inside boundary', () => {
     '78': 1,
     '53': 0,
     '45': 0,
-    '46': 1, // 1 inch = 25.4 mm spacing
+    '46': 1, // 1 (drawing unit) spacing
     '79': 0,
   };
   const h = new Hatch(data);
