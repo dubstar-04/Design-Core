@@ -113,3 +113,72 @@ test('Test propertyManager.getEntityPropertyValue', () => {
   propertyValues = propertiesManager.getEntityPropertyValue('All', 'colour');
   expect(propertyValues).toBe('Varies');
 });
+
+test('Test propertyManager.getEntityPropertyDefinition', () => {
+  // clear the selection set
+  DesignCore.Scene.reset();
+
+  // returns undefined when nothing is selected
+  let def = propertiesManager.getEntityPropertyDefinition('All', 'colour');
+  expect(def).toBeUndefined();
+
+  // select the line entity
+  DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(0);
+
+  // returns a Property descriptor for a valid property
+  def = propertiesManager.getEntityPropertyDefinition('All', 'colour');
+  expect(def).toBeDefined();
+  expect(typeof def.type).toBe('string');
+
+  // returns undefined for a property the entity does not have
+  def = propertiesManager.getEntityPropertyDefinition('All', 'non-existent-prop');
+  expect(def).toBeUndefined();
+
+  // filters by entityType — Circle not selected, so returns undefined
+  def = propertiesManager.getEntityPropertyDefinition('Circle', 'colour');
+  expect(def).toBeUndefined();
+});
+
+test('Test propertyManager.getEntityForProperty', () => {
+  // clear the selection set
+  DesignCore.Scene.reset();
+
+  // returns undefined when nothing is selected
+  let entity = propertiesManager.getEntityForProperty('All', 'colour');
+  expect(entity).toBeUndefined();
+
+  // select the line (index 0) and circle (index 1)
+  DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(0);
+  DesignCore.Scene.selectionManager.selectionSet.selectionSet.push(1);
+
+  // returns an entity for 'All' and a known property
+  entity = propertiesManager.getEntityForProperty('All', 'colour');
+  expect(entity).toBeDefined();
+  expect(entity.type === 'Line' || entity.type === 'Circle').toBe(true);
+
+  // filters by entityType — only Circle entities
+  entity = propertiesManager.getEntityForProperty('Circle', 'colour');
+  expect(entity).toBeDefined();
+  expect(entity.type).toBe('Circle');
+
+  // returns undefined when the property does not exist on any selected entity
+  entity = propertiesManager.getEntityForProperty('All', 'non-existent-prop');
+  expect(entity).toBeUndefined();
+});
+
+test('Test propertyManager.setPropertyCallbackFunction and selectionSetChanged', () => {
+  let callCount = 0;
+  const callback = () => { callCount++; };
+
+  // selectionSetChanged with no callback set should not throw
+  propertiesManager.selectionSetChanged();
+
+  propertiesManager.setPropertyCallbackFunction(callback);
+
+  // callback is invoked when selectionSetChanged is called
+  propertiesManager.selectionSetChanged();
+  expect(callCount).toBe(1);
+
+  propertiesManager.selectionSetChanged();
+  expect(callCount).toBe(2);
+});
