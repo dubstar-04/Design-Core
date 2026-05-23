@@ -873,7 +873,7 @@ export class Hatch extends Entity {
       });
     }
 
-    file.writeGroupCode('47', '0.5'); // pixel size
+    file.writeGroupCode('47', isUserDefined ? this.getProperty(Property.Names.HATCHSPACING) : '0.5'); // line spacing (user-defined) / pixel size
     file.writeGroupCode('98', '1'); // Number of seed points
     // seed points
     file.writeGroupCode('10', '1');
