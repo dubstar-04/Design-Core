@@ -936,8 +936,22 @@ export class Hatch extends Entity {
         const upper = String(value).toUpperCase();
         if (this.getProperty(Property.Names.PATTERNNAME) === upper) return;
         super.setProperty(property, upper);
-        // Rebuild patternLines from the library for the new predefined pattern
-        this.patternLines = Patterns.patternExists(upper) ? Patterns.getPattern(upper) : [];
+        if (upper === 'U') {
+          this.patternLines = this._buildSpacingPatternLines(
+              this.getProperty(Property.Names.HATCHSPACING),
+              this.getProperty(Property.Names.HATCHDOUBLE),
+          );
+        } else {
+          this.patternLines = (upper !== 'SOLID' && Patterns.patternExists(upper)) ? this._copyLibraryPattern(upper) : [];
+        }
+      } else if (property === Property.Names.HATCHSPACING || property === Property.Names.HATCHDOUBLE) {
+        super.setProperty(property, value);
+        if (this.getProperty(Property.Names.PATTERNNAME) === 'U') {
+          this.patternLines = this._buildSpacingPatternLines(
+              this.getProperty(Property.Names.HATCHSPACING),
+              this.getProperty(Property.Names.HATCHDOUBLE),
+          );
+        }
       } else if (property === Property.Names.POINTS) {
         // Special handling for hatch points to move child entities
         // Consider the changes from the hatch points to be an offset and rotation
