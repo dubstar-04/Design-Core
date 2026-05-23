@@ -67,7 +67,7 @@ export class Hatch extends Entity {
     // User-defined hatches (76=0) are normalised to the sentinel name 'U'
     // so the pattern type is implied by the name rather than stored separately.
     const resolvedPatternName = data?.[70] === 1 ? 'SOLID' : patternType === 0 ? 'U' : rawPatternName;
-    if (resolvedPatternName !== 'U' && !Patterns.patternExists(resolvedPatternName)) {
+    if (patternType === 1 && resolvedPatternName !== 'SOLID' && !Patterns.patternExists(resolvedPatternName)) {
       Logging.instance.warn(`Hatch: pattern '${resolvedPatternName}' not found`);
     }
 
