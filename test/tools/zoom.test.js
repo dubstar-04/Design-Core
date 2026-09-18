@@ -181,40 +181,38 @@ test('Test Canvas.zoomToWindow - reversed points', () => {
   expect(finalScale).not.toBe(initialScale);
 });
 
-test('Test Canvas.zoomToWindow - zero width (should not zoom)', () => {
+test('Test Canvas.zoomToWindow - zero width (zooms using height)', () => {
   core.canvas.width = 800;
   core.canvas.height = 600;
   core.canvas.matrix.scale(1, 1);
 
-  const initialScale = core.canvas.getScale();
-
-  // Points with same x coordinate (zero width)
+  // Points with same x coordinate (zero width, i.e. a vertical line)
   const pt1 = new Point(50, 0);
   const pt2 = new Point(50, 100);
 
   core.canvas.zoomToWindow(pt1, pt2);
 
-  // Should not change scale
+  // Resulting scale depends only on the window size, not the prior scale,
+  // so assert the expected value rather than comparing against initialScale
   const finalScale = core.canvas.getScale();
-  expect(finalScale).toBe(initialScale);
+  expect(finalScale).toBeCloseTo((core.canvas.height / 100) * 0.9);
 });
 
-test('Test Canvas.zoomToWindow - zero height (should not zoom)', () => {
+test('Test Canvas.zoomToWindow - zero height (zooms using width)', () => {
   core.canvas.width = 800;
   core.canvas.height = 600;
   core.canvas.matrix.scale(1, 1);
 
-  const initialScale = core.canvas.getScale();
-
-  // Points with same y coordinate (zero height)
+  // Points with same y coordinate (zero height, i.e. a horizontal line)
   const pt1 = new Point(0, 50);
   const pt2 = new Point(100, 50);
 
   core.canvas.zoomToWindow(pt1, pt2);
 
-  // Should not change scale
+  // Resulting scale depends only on the window size, not the prior scale,
+  // so assert the expected value rather than comparing against initialScale
   const finalScale = core.canvas.getScale();
-  expect(finalScale).toBe(initialScale);
+  expect(finalScale).toBeCloseTo((core.canvas.width / 100) * 0.9);
 });
 
 test('Test Canvas.zoomToWindow - same point (should not zoom)', () => {
