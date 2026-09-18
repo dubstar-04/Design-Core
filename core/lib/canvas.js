@@ -222,14 +222,17 @@ export class Canvas {
     const width = xMax - xMin;
     const height = yMax - yMin;
 
-    if (width === 0 || height === 0) {
+    if (width === 0 && height === 0) {
       return;
     }
 
     const selectionCenter = new Point(xMin + width / 2, yMin + height / 2);
     const screenCenter = new Point(this.width / 2, this.height / 2);
     const translateDelta = DesignCore.Mouse.transformToScene(screenCenter).subtract(selectionCenter);
-    const targetScale = Math.min((this.width / width), (this.height / height));
+    // fall back to the non-zero axis when the window is a single line
+    const targetScale = width === 0 ? this.height / height :
+      height === 0 ? this.width / width :
+      Math.min((this.width / width), (this.height / height));
     const scaleDelta = targetScale / this.getScale() * 0.9;
 
     if (!isFinite(scaleDelta) || scaleDelta <= 0) return;
