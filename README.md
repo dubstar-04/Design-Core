@@ -14,10 +14,23 @@ Design-Core uses the industry standard Drawing Exchange Format (DXF) to read and
 * Design-Web: https://github.com/dubstar-04/Design-Web
 * HTML Canvas: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
 * Cairo: https://www.cairographics.org/
+* npm package: https://www.npmjs.com/package/@design-core/core
 
 
 ## Publishing
 
-npm login
+Releases are published to npm automatically by the [Publish to npm](.github/workflows/publish.yml) workflow whenever a `v*.*.*` tag is pushed:
 
+```bash
+npm version patch   # or minor / major, bumps package.json and creates a git tag
+git push --follow-tags
+```
+
+The workflow runs the test suite and linter, verifies the tag matches `package.json`'s version, then publishes.
+
+To publish manually instead:
+
+```bash
+npm login
 npm publish --access public
+```
