@@ -24,6 +24,7 @@ export class PlotOptions {
     this.plotScale = null;
     this.plotArea = PlotOptions.Area.EXTENTS;
     this.windowArea = null;
+    this.margin = 40;
     this.style = RendererBase.Styles.NONE;
     this.fileType = 'pdf';
   }

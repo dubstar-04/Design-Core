@@ -320,6 +320,7 @@ export class Canvas {
       pageWidth: plotOptions.pageWidth,
       pageHeight: plotOptions.pageHeight,
       plotScale: plotOptions.plotScale,
+      margin: plotOptions.margin,
     });
     if (!matrix) return false;
 
