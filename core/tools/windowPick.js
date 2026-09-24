@@ -7,15 +7,15 @@ import { Point } from '../entities/point.js';
 import { DesignCore } from '../designCore.js';
 
 /**
- * PlotWindowPick Command Class
- * Internal tool used to interactively pick the two corners of a plot window.
- * Not shown in any toolbar; invoked programmatically (e.g. from the Plot dialog).
+ * WindowPick Command Class
+ * Internal tool used to interactively pick two corner points defining a rectangular window (e.g. for the plot window area).
+ * Not shown in any toolbar; invoked programmatically.
  * @extends Tool
  */
-export class PlotWindowPick extends Tool {
-  static type = 'PlotWindowPick';
+export class WindowPick extends Tool {
+  static type = 'WindowPick';
 
-  /** Create a PlotWindowPick command */
+  /** Create a WindowPick command */
   constructor() {
     super();
     // called with (point1, point2) once both corners are picked
@@ -26,10 +26,9 @@ export class PlotWindowPick extends Tool {
    * Register the command
    * @return {Object}
    * command = name of the command
-   * shortcut = shortcut for the command
    */
   static register() {
-    const command = { command: 'PlotWindowPick', shortcut: 'PLOTWINDOWPICK' };
+    const command = { command: 'WindowPick' };
     return command;
   }
 

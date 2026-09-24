@@ -44,7 +44,7 @@ import { Pan } from '../tools/pan.js';
 import { Zoom } from '../tools/zoom.js';
 
 // Internal tools (not shown in any toolbar, invoked programmatically)
-import { PlotWindowPick } from '../tools/plotWindowPick.js';
+import { WindowPick } from '../tools/windowPick.js';
 
 // Clipboard tools
 import { Copybase } from '../tools/copybase.js';
@@ -102,7 +102,7 @@ const classes = {
   Zoom,
   Pan,
 
-  PlotWindowPick,
+  WindowPick,
 
   Copybase,
   Copyclip,
