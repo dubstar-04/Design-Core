@@ -110,6 +110,8 @@ export class Strings {
     DESTINATIONSET: 'Select destination object(s)',
     MIRRORFIRST: 'Specify first point of mirror line',
     MIRRORSECOND: 'Specify second point of mirror line',
+    FIRSTCORNER: 'Specify first corner',
+    SECONDCORNER: 'Specify second corner',
     ERASESOURCE: 'Erase source objects?',
     SCALEFACTOR: 'Specify scale factor',
     REFERENCELENGTH: 'Specify reference length',

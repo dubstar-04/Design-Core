@@ -9,6 +9,7 @@ export class PlotOptions {
   static Area = {
     EXTENTS: 'Extents',
     DISPLAY: 'Display',
+    WINDOW: 'Window',
   };
 
   static #fileTypes = ['pdf', 'svg'];
@@ -22,6 +23,8 @@ export class PlotOptions {
     this.setOption('pageHeight', pageHeight);
     this.plotScale = null;
     this.plotArea = PlotOptions.Area.EXTENTS;
+    this.windowArea = null;
+    this.margin = 40;
     this.style = RendererBase.Styles.NONE;
     this.fileType = 'pdf';
   }
@@ -47,6 +50,17 @@ export class PlotOptions {
       case 'plotArea':
         if (!Object.values(PlotOptions.Area).includes(value)) {
           throw new Error(`PlotOptions: plotArea must be one of: ${Object.values(PlotOptions.Area).join(', ')}`);
+        }
+        break;
+      case 'windowArea':
+        // required when plotArea is WINDOW - two points defining the plot window, e.g. { point1, point2 }
+        if (value !== null && (!value || value.point1 === undefined || value.point2 === undefined)) {
+          throw new Error('PlotOptions: windowArea must be null or an object with point1 and point2');
+        }
+        break;
+      case 'margin':
+        if (typeof value !== 'number' || value < 0) {
+          throw new Error('PlotOptions: margin must be a non-negative number');
         }
         break;
       case 'style':

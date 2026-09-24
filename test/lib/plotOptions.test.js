@@ -130,7 +130,7 @@ test('setOption accepts PlotOptions.Area.DISPLAY for plotArea', () => {
 
 test('setOption throws for an unknown plotArea value', () => {
   const po = new PlotOptions(595, 842);
-  expect(() => po.setOption('plotArea', 'Window')).toThrow('plotArea');
+  expect(() => po.setOption('plotArea', 'Unknown')).toThrow('plotArea');
 });
 
 // ─── setOption — style ────────────────────────────────────────────────────────
