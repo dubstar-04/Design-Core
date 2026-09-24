@@ -15,7 +15,12 @@ const ORIENTATIONS = {
   Landscape: (size) => ({ pageWidth: size.height, pageHeight: size.width }),
 };
 
-// closed 4-corner loop, mirroring Rectangle.rectPoints()
+/**
+ * Build a closed 4-corner loop, mirroring Rectangle.rectPoints()
+ * @param {Point} pt1
+ * @param {Point} pt2
+ * @return {Array}
+ */
 function rectPoints(pt1, pt2) {
   return [
     new Point(pt1.x, pt1.y),
