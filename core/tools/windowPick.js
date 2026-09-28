@@ -18,8 +18,6 @@ export class WindowPick extends Tool {
   /** Create a WindowPick command */
   constructor() {
     super();
-    // called with (point1, point2) once both corners are picked
-    this.onComplete = undefined;
   }
 
   /**
@@ -72,16 +70,6 @@ export class WindowPick extends Tool {
       ];
 
       DesignCore.Scene.previewEntities.create('Polyline', { points: points });
-    }
-  }
-
-  /**
-   * Perform the command
-   * invokes the completion callback with the two picked points
-   */
-  action() {
-    if (this.points.length === 2 && this.onComplete) {
-      this.onComplete(this.points[0], this.points[1]);
     }
   }
 }
