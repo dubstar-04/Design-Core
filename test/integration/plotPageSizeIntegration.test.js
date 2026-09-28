@@ -4,6 +4,7 @@ import { Constants } from '../../core/lib/constants.js';
 import { PlotOptions } from '../../core/lib/plotOptions.js';
 import { BoundingBox } from '../../core/lib/boundingBox.js';
 import { SvgRenderer } from '../../core/lib/renderers/svgRenderer.js';
+import { jest } from '@jest/globals';
 
 // smallest -> largest; each rectangle fully contains all previous ones when aligned at the origin
 const PAGE_NAMES_ASC = ['A4', 'A3', 'A2', 'A1', 'A0'];
@@ -94,7 +95,19 @@ describe.each(Object.keys(ORIENTATIONS))('%s orientation', (orientation) => {
       plotOptions.setOption('margin', 0);
 
       const renderer = new SvgRenderer(pageWidth, pageHeight);
+      const setTransformSpy = jest.spyOn(renderer, 'setTransform');
       expect(core.canvas.exportTo(renderer, plotOptions)).toBe(true);
+
+      // with plotScale 1 and margin 0, the matrix must map exactly this rectangle's
+      // own bounds onto the page - a full-scene (A0) fallback would produce a very
+      // different translation since every rect shares the same (0,0) origin
+      const matrix = setTransformSpy.mock.calls[0][0];
+      expect(matrix.a).toBe(1);
+      expect(matrix.d).toBe(1);
+      expect(matrix.e).toBeCloseTo(0, 5);
+      expect(matrix.f).toBeCloseTo(0, 5);
+
+      setTransformSpy.mockRestore();
     }
   });
 });
