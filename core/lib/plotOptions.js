@@ -59,8 +59,11 @@ export class PlotOptions {
         }
         break;
       case 'margin':
-        if (typeof value !== 'number' || value < 0) {
-          throw new Error('PlotOptions: margin must be a non-negative number');
+        if (!Number.isFinite(value) || value < 0) {
+          throw new Error('PlotOptions: margin must be a non-negative finite number');
+        }
+        if (this.pageWidth - 2 * value <= 0 || this.pageHeight - 2 * value <= 0) {
+          throw new Error('PlotOptions: margin leaves no usable page area');
         }
         break;
       case 'style':
