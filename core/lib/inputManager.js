@@ -39,6 +39,7 @@ export class InputManager {
     }
 
     this.promptOption = undefined;
+    DesignCore.Mouse.reset();
     DesignCore.Scene.reset();
     DesignCore.Canvas.setCursorForInputTypes([]);
   }

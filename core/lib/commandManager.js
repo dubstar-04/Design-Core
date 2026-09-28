@@ -43,6 +43,9 @@ import { Purge } from '../tools/purge.js';
 import { Pan } from '../tools/pan.js';
 import { Zoom } from '../tools/zoom.js';
 
+// Internal tools (not shown in any toolbar, invoked programmatically)
+import { WindowPick } from '../tools/windowPick.js';
+
 // Clipboard tools
 import { Copybase } from '../tools/copybase.js';
 import { Copyclip } from '../tools/copyclip.js';
@@ -98,6 +101,8 @@ const classes = {
 
   Zoom,
   Pan,
+
+  WindowPick,
 
   Copybase,
   Copyclip,

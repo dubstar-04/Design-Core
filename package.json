@@ -1,6 +1,6 @@
 {
   "name": "@design-core/core",
-  "version": "51.1.0",
+  "version": "51.2.0",
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
@@ -19,7 +19,12 @@
     ".": "./core/core/core.js",
     "./designCore.js": "./core/designCore.js",
     "./property.js": "./core/properties/property.js",
-    "./canvasRenderer.js": "./core/lib/renderers/canvasRenderer.js"
+    "./canvasRenderer.js": "./core/lib/renderers/canvasRenderer.js",
+    "./constants.js": "./core/lib/constants.js",
+    "./plotOptions.js": "./core/lib/plotOptions.js",
+    "./rendererBase.js": "./core/lib/renderers/rendererBase.js",
+    "./svgRenderer.js": "./core/lib/renderers/svgRenderer.js",
+    "./pdfRenderer.js": "./core/lib/renderers/pdfRenderer.js"
   },
   "directories": {
     "test": "test"

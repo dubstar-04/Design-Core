@@ -305,7 +305,9 @@ export class Canvas {
    */
   exportTo(renderer, plotOptions) {
     let area;
-    if (plotOptions.plotArea === PlotOptions.Area.DISPLAY) {
+    if (plotOptions.plotArea === PlotOptions.Area.WINDOW) {
+      area = new BoundingBox(plotOptions.windowArea.point1, plotOptions.windowArea.point2);
+    } else if (plotOptions.plotArea === PlotOptions.Area.DISPLAY) {
       const viewport = this.getSceneOffset();
       area = new BoundingBox(new Point(viewport.xmin, viewport.ymin), new Point(viewport.xmax, viewport.ymax));
     } else {
@@ -318,6 +320,7 @@ export class Canvas {
       pageWidth: plotOptions.pageWidth,
       pageHeight: plotOptions.pageHeight,
       plotScale: plotOptions.plotScale,
+      margin: plotOptions.margin,
     });
     if (!matrix) return false;
 

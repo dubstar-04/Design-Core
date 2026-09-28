@@ -16,6 +16,16 @@ export class Mouse {
   }
 
   /**
+   * Clear button state - guards against a stuck button when a mouseUp
+   * never reaches the canvas (e.g. focus stolen by another window mid-click)
+   */
+  reset() {
+    this.buttonOneDown = false;
+    this.buttonTwoDown = false;
+    this.buttonThreeDown = false;
+  }
+
+  /**
    * Returns the point on the design canvas
    * @return {Point}
    */

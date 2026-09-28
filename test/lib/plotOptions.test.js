@@ -130,7 +130,7 @@ test('setOption accepts PlotOptions.Area.DISPLAY for plotArea', () => {
 
 test('setOption throws for an unknown plotArea value', () => {
   const po = new PlotOptions(595, 842);
-  expect(() => po.setOption('plotArea', 'Window')).toThrow('plotArea');
+  expect(() => po.setOption('plotArea', 'Unknown')).toThrow('plotArea');
 });
 
 // ─── setOption — style ────────────────────────────────────────────────────────
@@ -150,6 +150,63 @@ test('setOption accepts RendererBase.Styles.MONOCHROME for style', () => {
 test('setOption throws when style is not a function', () => {
   const po = new PlotOptions(595, 842);
   expect(() => po.setOption('style', 'monochrome')).toThrow('style');
+});
+
+// ─── setOption — margin ───────────────────────────────────────────────────────
+
+test('setOption accepts a valid margin', () => {
+  const po = new PlotOptions(595, 842);
+  po.setOption('margin', 40);
+  expect(po.margin).toBe(40);
+});
+
+test('setOption accepts zero margin', () => {
+  const po = new PlotOptions(595, 842);
+  po.setOption('margin', 0);
+  expect(po.margin).toBe(0);
+});
+
+test('setOption throws for negative margin', () => {
+  const po = new PlotOptions(595, 842);
+  expect(() => po.setOption('margin', -1)).toThrow('margin');
+});
+
+test('setOption throws for non-numeric margin', () => {
+  const po = new PlotOptions(595, 842);
+  expect(() => po.setOption('margin', '40')).toThrow('margin');
+});
+
+test('setOption throws for NaN margin', () => {
+  const po = new PlotOptions(595, 842);
+  expect(() => po.setOption('margin', NaN)).toThrow('margin');
+});
+
+test('setOption throws for Infinity margin', () => {
+  const po = new PlotOptions(595, 842);
+  expect(() => po.setOption('margin', Infinity)).toThrow('margin');
+});
+
+test('setOption throws when margin leaves zero usable width', () => {
+  const po = new PlotOptions(595, 842);
+  // 297.5 * 2 === pageWidth -> usable width would be exactly 0
+  expect(() => po.setOption('margin', 297.5)).toThrow('usable page area');
+});
+
+test('setOption throws when margin leaves zero usable height', () => {
+  const po = new PlotOptions(842, 595);
+  expect(() => po.setOption('margin', 297.5)).toThrow('usable page area');
+});
+
+test('setOption throws when margin exceeds half the narrower page dimension only', () => {
+  const po = new PlotOptions(595, 842);
+  // exceeds half of pageWidth (297.5) but not half of pageHeight (421)
+  expect(() => po.setOption('margin', 300)).toThrow('usable page area');
+});
+
+test('setOption accepts a margin just under half the narrower page dimension', () => {
+  const po = new PlotOptions(595, 842);
+  po.setOption('margin', 297);
+  expect(po.margin).toBe(297);
 });
 
 // ─── setOption — fileType ─────────────────────────────────────────────────────
