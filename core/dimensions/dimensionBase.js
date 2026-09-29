@@ -431,14 +431,23 @@ export class DimensionBase extends Entity {
   }
 
   /**
+   * Refresh the block geometry if it hasn't been built yet.
+   * Needed because block delegates (draw, boundingBox, within, touched, closestPoint)
+   * can run before the first draw() call (e.g. a window-select immediately after creation).
+   */
+  ensureRefreshed() {
+    if (this.block.entities.length === 0) {
+      this.refresh();
+    }
+  }
+
+  /**
    * Draw the entity
    * @param {Object} renderer
    * @return {Array} block entities for the canvas to render recursively
    */
   draw(renderer) {
-    if (this.block.entities.length === 0) {
-      this.refresh();
-    }
+    this.ensureRefreshed();
 
     return this.block.entities;
   }
@@ -460,6 +469,7 @@ export class DimensionBase extends Entity {
    * @return {Array} - [Point, distance]
    */
   closestPoint(P) {
+    this.ensureRefreshed();
     return this.block.closestPoint(P);
   }
 
@@ -468,6 +478,7 @@ export class DimensionBase extends Entity {
    * @return {BoundingBox}
    */
   boundingBox() {
+    this.ensureRefreshed();
     return this.block.boundingBox();
   }
 
@@ -477,6 +488,7 @@ export class DimensionBase extends Entity {
    * @return {boolean} true if within
    */
   within(selection) {
+    this.ensureRefreshed();
     return this.block.within(selection);
   }
 
@@ -486,6 +498,7 @@ export class DimensionBase extends Entity {
    * @return {boolean} true if touched
    */
   touched(selection) {
+    this.ensureRefreshed();
     return this.block.touched(selection);
   }
 
@@ -493,7 +506,13 @@ export class DimensionBase extends Entity {
    * Refresh the dimension geometry
    */
   refresh() {
-    const entities = this.buildDimension();
+    let entities;
+    try {
+      entities = this.buildDimension();
+    } catch (err) {
+      // geometry can't be built yet (e.g. incomplete points during interactive creation) - skip this refresh
+      return;
+    }
 
     if (entities) {
       this.block.clearEntities();
@@ -514,6 +533,9 @@ export class DimensionBase extends Entity {
   setProperty(property, value) {
     if (this.properties.has(property)) {
       super.setProperty(property, value);
+      // geometry is derived from properties (points, style, angle, etc.) - rebuild it,
+      // e.g. so tools like Rotate/Move that update 'points' are reflected visually
+      this.refresh();
       return;
     }
     if (this.hasOwnProperty(property)) {
