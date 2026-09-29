@@ -246,7 +246,11 @@ export class Dimension extends DimensionBase {
         }
       }
 
-      DesignCore.Scene.inputManager.executeCommand(this);
+      // Dimension is a router entity with no buildDimension() of its own -
+      // commit an instance of the resolved subtype (e.g. RotatedDimension), not this
+      const DimensionType = this.dimensionMap[this.dimType.getBaseDimType()];
+      const entity = new DimensionType({ points: this.points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
+      DesignCore.Scene.inputManager.executeCommand(entity);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
     }
