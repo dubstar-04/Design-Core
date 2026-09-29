@@ -506,12 +506,21 @@ export class DimensionBase extends Entity {
    * Refresh the dimension geometry
    */
   refresh() {
+    // buildDimension() can itself call setProperty() (e.g. LINEARDIMANGLE) which would
+    // otherwise re-enter refresh() recursively - skip while already refreshing
+    if (this.refreshing) {
+      return;
+    }
+
+    this.refreshing = true;
     let entities;
     try {
       entities = this.buildDimension();
     } catch (err) {
       // geometry can't be built yet (e.g. incomplete points during interactive creation) - skip this refresh
       return;
+    } finally {
+      this.refreshing = false;
     }
 
     if (entities) {
