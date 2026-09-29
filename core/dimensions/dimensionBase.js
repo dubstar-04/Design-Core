@@ -541,6 +541,22 @@ export class DimensionBase extends Entity {
    */
   setProperty(property, value) {
     if (this.properties.has(property)) {
+      if (property === Property.Names.POINTS && this.dimType.getBaseDimType() === 0) {
+        // Rotated dimension: LINEARDIMANGLE is a fixed angle independent of the points,
+        // so a rigid rotation of the points (e.g. via the Rotate tool) must also rotate
+        // this stored angle by the same amount - mirrors Hatch's points -> angle handling
+        const oldPt13 = this.getPointBySequence(this.points, 13);
+        const oldPt14 = this.getPointBySequence(this.points, 14);
+        const newPt13 = this.getPointBySequence(value, 13);
+        const newPt14 = this.getPointBySequence(value, 14);
+
+        if (oldPt13 && oldPt14 && newPt13 && newPt14) {
+          const theta = newPt13.angle(newPt14) - oldPt13.angle(oldPt14);
+          if (theta !== 0) {
+            this.setProperty(Property.Names.LINEARDIMANGLE, this.getProperty(Property.Names.LINEARDIMANGLE) + Utils.radians2degrees(theta));
+          }
+        }
+      }
       super.setProperty(property, value);
       // geometry is derived from properties (points, style, angle, etc.) - rebuild it,
       // e.g. so tools like Rotate/Move that update 'points' are reflected visually

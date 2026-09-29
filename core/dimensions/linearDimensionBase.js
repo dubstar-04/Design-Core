@@ -116,34 +116,19 @@ export class LinearDimensionBase extends DimensionBase {
     let Pt13e = new Point();
     const Pt14e = Pt10;
 
-    // generate the x and y delta values
-    const dx = Pt14.x - Pt13.x;
-    const dy = Pt14.y - Pt13.y;
-
-    // check if Line Pt13 -> P14 is perpendicular to Line Pt14 -> Pt10
-    const m1 = (Pt14.y - Pt13.y) / (Pt14.x - Pt13.x);
-    const m2 = (Pt14.y - Pt10.y) / (Pt14.x - Pt10.x);
-    const perpendicular = Number((m1 * m2).toFixed(1));
-
-    const isAligned = perpendicular !== -1.0 ? false : true;
-
-    if (isAligned || Utils.round(dx) === 0 || Utils.round(dy) === 0) {
+    if (this.dimType.getBaseDimType() === 0) {
+      // Rotated dimension: the dimension line direction is a fixed, user-specified angle
+      // (LINEARDIMANGLE) independent of the measured points - project both extension
+      // line origins onto that fixed line, so it stays correct at any rotation, not just 0/90/180/270
+      const dimLineAngleRad = Utils.degrees2radians(this.getProperty(Property.Names.LINEARDIMANGLE));
+      const linePt2 = Pt10.project(dimLineAngleRad, 1);
+      Pt13e = Pt13.perpendicular(Pt10, linePt2);
+      dimension = Pt13e.distance(Pt14e);
+    } else {
+      // Aligned dimension: the dimension line is parallel to the measured edge (Pt13 -> Pt14),
+      // derived dynamically from the points rather than a fixed angle
       Pt13e = Pt13.project(Pt14.angle(Pt10), Pt14.distance(Pt10));
       dimension = Pt13.distance(Pt14);
-    } else {
-      // Not perpendicular to the selected line: get the primary axis (x or y) and calculate the dimension
-      const iX = ((Math.abs(Pt10.x - Pt13.x) + Math.abs(Pt14.x - Pt10.x)) - Math.abs(dx));
-      const iY = ((Math.abs(Pt10.y - Pt13.y) + Math.abs(Pt14.y - Pt10.y)) - Math.abs(dy));
-
-      if (iX >= iY && dy !== 0) {
-        Pt13e.x = Pt10.x;
-        Pt13e.y = Pt13.y;
-        dimension = dy;
-      } else if (iX < iY && dx !== 0) {
-        Pt13e.x = Pt13.x;
-        Pt13e.y = Pt10.y;
-        dimension = dx;
-      }
     }
 
     // ensure dimension is positive
@@ -154,9 +139,6 @@ export class LinearDimensionBase extends DimensionBase {
     const dimLineAngle = Pt13e.angle(Pt14e);
     const reverseDimLineAngle = Pt14e.angle(Pt13e);
     const midPoint = Pt13e.midPoint(Pt14e);
-
-    // set the dimension line angle. This is required for rotated dimension dxf definition
-    this.setProperty(Property.Names.LINEARDIMANGLE, Utils.radians2degrees(dimLineAngle));
 
     // Approximate text width based on height using the formatted dimension value i.e with units, precision and symbols
     const approxTextWidth = Text.getApproximateWidth(this.getDimensionValue(dimension), DIMTXT);
