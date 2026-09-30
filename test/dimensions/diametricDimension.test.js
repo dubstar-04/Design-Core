@@ -7,6 +7,7 @@ import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 import { Circle } from '../../core/entities/circle.js';
 import { Polyline } from '../../core/entities/polyline.js';
+import { Utils } from '../../core/lib/utils.js';
 
 
 // initialise core
@@ -27,7 +28,7 @@ const scenarios = [
     selectedEntities: [new Circle({ points: [new Point(0, 0), new Point(10, 0)] })],
     expectedDimType: 3,
     dimensionValue: 20,
-    dimensionEntities: 5,
+    dimensionEntities: 6,
   },
   { desc: 'Diametric dimension from arc selection',
     input: [new SingleSelection(0, new Point()), new Point(20, 10)],
@@ -67,6 +68,29 @@ test.each(scenarios)('DiametricDimension.execute handles $desc', async (scenario
       }
     }
   }, { selectedEntities });
+});
+
+// Regression test: Pt11 (text position) not lying on the Pt10-Pt15 segment used to be
+// snapped back onto the dimension line via a world-horizontal ray intersection, which
+// silently fails (no intersection) whenever the dimension line itself is near-horizontal -
+// perpendicular projection has no such degenerate case at any rotation angle
+test.each([0, 30, 45, 90, 135, 180, 270])('off-segment text stays connected at %s degree dimension line rotation', (rotationDeg) => {
+  const centre = new Point(0, 0);
+  const circle = new Circle({ points: [centre, new Point(10, 0)] });
+  // text placed off to the side, not on the Pt10-Pt15 line
+  const textPos = new Point(20, 15);
+
+  const theta = Utils.degrees2radians(rotationDeg);
+  const points = DiametricDimension.getPointsFromSelection([circle], textPos)
+      .map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(centre, theta));
+
+  const dim = new DiametricDimension({ points });
+  const entities = dim.buildDimension();
+
+  expect(entities.length).toBeGreaterThan(0);
+  const text = entities.find((e) => e.type === 'Text');
+  expect(text).toBeDefined();
+  expect(Number(text.getProperty('string').replace(/[^0-9.-]+/g, ''))).toBeCloseTo(20);
 });
 
 test('constructor sets default properties', () => {

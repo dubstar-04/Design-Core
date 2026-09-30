@@ -5,7 +5,6 @@ import { PolylineBase } from '../entities/polylineBase.js';
 import { Line } from '../entities/line.js';
 import { Text } from '../entities/text.js';
 import { Point } from '../entities/point.js';
-import { Intersection } from '../lib/intersect.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DimensionBase } from './dimensionBase.js';
@@ -130,15 +129,9 @@ export class CircularDimensionBase extends DimensionBase {
     // Ensure points are aligned Pt10 > Pt15 > Pt11
     // This resets the points to a known state to allow application of the dimstyle
     if (Pt15.isOnLine(Pt10, Pt11) === false) {
-      // Find the intersection between Pt10 > Pt15 and a horizontal ray from Pt11
-      const line2 = { start: Pt10, end: Pt15 };
-      const line1 = { start: Pt11, end: new Point(Pt10.x, Pt11.y) };
-      const intersect = Intersection.intersectSegmentSegment(line1.start, line1.end, line2.start, line2.end, false, true);
-      // Reset Pt11 - This should be the same as the originally selected Pt11
-      // Pt11 position can be changed depending on the dimstyle
-      if (intersect.points[0]) {
-        Pt11 = intersect.points[0];
-      }
+      // Snap Pt11 onto the (extended) dimension line through Pt10/Pt15 via perpendicular
+      // projection - rotation-invariant, unlike a world-axis-aligned ray intersection
+      Pt11 = Pt11.perpendicular(Pt10, Pt15);
     }
 
     // set a minimum position for the text
