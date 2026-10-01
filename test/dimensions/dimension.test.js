@@ -92,6 +92,82 @@ test('get linear dimension type', () => {
   expect(dim.getLinearDimensionType(new Point(0, 0), new Point(10, 10), new Point(12.5, 8.5))).toBe(0);
 });
 
+test('get rotated dimension angle', () => {
+  const dim = new Dimension();
+  // vertical edge - only a vertical dimension is non-degenerate
+  expect(dim.getRotatedDimensionAngle(new Point(0, 0), new Point(0, 100), new Point(50, 50))).toBe(90);
+  // horizontal edge - only a horizontal dimension is non-degenerate
+  expect(dim.getRotatedDimensionAngle(new Point(0, 0), new Point(100, 0), new Point(50, 50))).toBe(0);
+  // diagonal edge, pick point deviates mostly in x - vertical dimension
+  expect(dim.getRotatedDimensionAngle(new Point(0, 0), new Point(100, 100), new Point(300, 50))).toBe(90);
+  // diagonal edge, pick point deviates mostly in y - horizontal dimension
+  expect(dim.getRotatedDimensionAngle(new Point(0, 0), new Point(100, 100), new Point(50, 300))).toBe(0);
+});
+
+test.each([
+  { desc: 'vertical', line: new Line({ points: [new Point(0, 0), new Point(0, 100)] }), textPos: new Point(50, 50), expectedAngle: 90 },
+  { desc: 'horizontal', line: new Line({ points: [new Point(0, 0), new Point(100, 0)] }), textPos: new Point(50, 50), expectedAngle: 0 },
+])('Dimension.execute commits a non-degenerate Rotated dimension for a $desc edge', async (scenario) => {
+  const { line, textPos, expectedAngle } = scenario;
+  let committed;
+
+  await withMockInput(DesignCore.Scene, [new SingleSelection(0, new Point()), textPos], async () => {
+    const dim = new Dimension();
+    await dim.execute();
+  }, {
+    selectedEntities: [line],
+    extraMethods: { executeCommand: (entity) => {
+      committed = entity;
+    } },
+  });
+
+  expect(committed.getProperty('linearDimAngle')).toBe(expectedAngle);
+  const box = committed.boundingBox();
+  expect(box.xLength).toBeGreaterThan(0);
+  expect(box.yLength).toBeGreaterThan(0);
+});
+
+test.each([
+  { desc: 'pick far to the right picks a vertical dimension', line: new Line({ points: [new Point(0, 0), new Point(100, 100)] }), textPos: new Point(300, 50), expectedAngle: 90 },
+  { desc: 'pick far above picks a horizontal dimension', line: new Line({ points: [new Point(0, 0), new Point(100, 100)] }), textPos: new Point(50, 300), expectedAngle: 0 },
+])('Dimension.execute allows $desc for a diagonal edge', async (scenario) => {
+  const { line, textPos, expectedAngle } = scenario;
+  let committed;
+
+  await withMockInput(DesignCore.Scene, [new SingleSelection(0, new Point()), textPos], async () => {
+    const dim = new Dimension();
+    await dim.execute();
+  }, {
+    selectedEntities: [line],
+    extraMethods: { executeCommand: (entity) => {
+      committed = entity;
+    } },
+  });
+
+  expect(committed.dimType.getBaseDimType()).toBe(0);
+  expect(committed.getProperty('linearDimAngle')).toBe(expectedAngle);
+  const box = committed.boundingBox();
+  expect(box.xLength).toBeGreaterThan(0);
+  expect(box.yLength).toBeGreaterThan(0);
+});
+
+test('Dimension.execute still allows an Aligned dimension for a diagonal edge', async () => {
+  const line = new Line({ points: [new Point(0, 0), new Point(100, 100)] });
+  let committed;
+
+  await withMockInput(DesignCore.Scene, [new SingleSelection(0, new Point()), new Point(60, 40)], async () => {
+    const dim = new Dimension();
+    await dim.execute();
+  }, {
+    selectedEntities: [line],
+    extraMethods: { executeCommand: (entity) => {
+      committed = entity;
+    } },
+  });
+
+  expect(committed.dimType.getBaseDimType()).toBe(1);
+});
+
 
 test('preview calls createTempItem with correct args', () => {
   const dim = new Dimension({ 70: 1 });
