@@ -187,10 +187,16 @@ export class Dimension extends DimensionBase {
               const Pt14 = this.selectedEntities[0].points[1];
               const linearDimTypeNumber = this.getLinearDimensionType(Pt13, Pt14, Pt11);
               this.dimType.setDimType(linearDimTypeNumber);
+
+              // Rotated dimensions use a fixed angle - choose horizontal or vertical based on the pick point
+              if (linearDimTypeNumber === 0) {
+                this.setProperty(Property.Names.LINEARDIMANGLE, this.getRotatedDimensionAngle(Pt13, Pt14, Pt11));
+              }
             }
 
             const dimensionType = this.dimensionMap[this.dimType.getBaseDimType()]; // TODO: use this.dimensionMap.name?
-            this.points.push(...dimensionType.getPointsFromSelection(this.selectedEntities, Pt11));
+            const angle = this.getProperty(Property.Names.LINEARDIMANGLE);
+            this.points.push(...dimensionType.getPointsFromSelection(this.selectedEntities, Pt11, angle));
           }
         }
 
@@ -249,7 +255,11 @@ export class Dimension extends DimensionBase {
       // Dimension is a router entity with no buildDimension() of its own -
       // commit an instance of the resolved subtype (e.g. RotatedDimension), not this
       const DimensionType = this.dimensionMap[this.dimType.getBaseDimType()];
-      const entity = new DimensionType({ points: this.points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
+      const entity = new DimensionType({
+        points: this.points,
+        dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE),
+        linearDimAngle: this.getProperty(Property.Names.LINEARDIMANGLE),
+      });
       DesignCore.Scene.inputManager.executeCommand(entity);
     } catch (err) {
       Logging.instance.error(`${this.type} - ${err}`);
@@ -281,6 +291,28 @@ export class Dimension extends DimensionBase {
   }
 
   /**
+   * Determine the fixed dimension line angle for a Rotated dimension (horizontal or vertical)
+   * @param {Point} Pt13 - start point
+   * @param {Point} Pt14 - end point
+   * @param {Point} Pt11 - pick point used to choose the axis
+   * @return {number} angle in degrees - 0 = horizontal, 90 = vertical
+   */
+  getRotatedDimensionAngle(Pt13, Pt14, Pt11) {
+    const dx = Pt14.x - Pt13.x;
+    const dy = Pt14.y - Pt13.y;
+
+    // axis-aligned edges only have one non-degenerate orientation
+    if (Utils.round(dx) === 0) return 90;
+    if (Utils.round(dy) === 0) return 0;
+
+    // Diagonal edge: pick the axis the pick point deviates from the edge the most along
+    const iX = (Math.abs(Pt11.x - Pt13.x) + Math.abs(Pt14.x - Pt11.x)) - Math.abs(dx);
+    const iY = (Math.abs(Pt11.y - Pt13.y) + Math.abs(Pt14.y - Pt11.y)) - Math.abs(dy);
+
+    return iX >= iY ? 90 : 0;
+  }
+
+  /**
    * Preview the entity during creation
    */
   preview() {
@@ -290,20 +322,26 @@ export class Dimension extends DimensionBase {
       const Pt11 = DesignCore.Mouse.pointOnScene();
       Pt11.sequence = 11;
 
+      let angle;
       if (dimTypeNumber === 0 || dimTypeNumber === 1) {
         // for linear dimensions, determine if aligned or rotated based on mouse position
         const Pt13 = this.selectedEntities[0].points[0];
         const Pt14 = this.selectedEntities[0].points[1];
         dimTypeNumber = this.getLinearDimensionType(Pt13, Pt14, Pt11);
+
+        // Rotated dimensions use a fixed angle - choose horizontal or vertical based on the pick point
+        if (dimTypeNumber === 0) {
+          angle = this.getRotatedDimensionAngle(Pt13, Pt14, Pt11);
+        }
       }
       // get the dimension class
       const dimensionType = this.dimensionMap[dimTypeNumber];
       // get the dimension type as a string
       const dimensionTypeString = dimensionType.register().command;
       // get the points for the dimension
-      const points = dimensionType.getPointsFromSelection(this.selectedEntities, Pt11);
+      const points = dimensionType.getPointsFromSelection(this.selectedEntities, Pt11, angle);
       // create the temporary dimension
-      DesignCore.Scene.previewEntities.create(dimensionTypeString, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
+      DesignCore.Scene.previewEntities.create(dimensionTypeString, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE), linearDimAngle: angle });
     }
   }
 }
