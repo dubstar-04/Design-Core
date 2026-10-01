@@ -6,6 +6,7 @@ import { Polyline } from '../../core/entities/polyline.js';
 import { Core } from '../../core/core/core.js';
 import { DesignCore } from '../../core/designCore.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
+import { Utils } from '../../core/lib/utils.js';
 
 import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
@@ -75,6 +76,29 @@ test.each(scenarios)('Dimension.execute handles $desc', async (scenario) => {
       }
     }
   }, { selectedEntities });
+});
+
+// Regression test: rigidly rotating an AngularDimension (points, as the Rotate tool
+// does) must not change the measured angle - buildDimension() derives everything from
+// relative angles between the points, not world-axis alignment, so this should already
+// be rotation-invariant (confirms it, mirroring the RotatedDimension/DiametricDimension checks)
+test.each([0, 30, 45, 90, 137, 200])('measured angle is rotation-invariant at %s degrees', (rotationDeg) => {
+  const line1 = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+  const line2 = new Line({ points: [new Point(0, 0), new Point(10, 10)] }); // 45 degree angle
+  const textPos = new Point(5, 5);
+
+  const points = AngularDimension.getPointsFromSelection([line1, line2], textPos);
+  const dim = new AngularDimension({ points });
+
+  const theta = Utils.degrees2radians(rotationDeg);
+  const centre = new Point(0, 0);
+  const rotatedPoints = dim.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(centre, theta));
+  const rotatedDim = new AngularDimension({ points: rotatedPoints });
+
+  const entities = rotatedDim.buildDimension();
+  const text = entities.find((e) => e.type === 'Text');
+  expect(text).toBeDefined();
+  expect(Number(text.getProperty('string').replace(/[^0-9.-]+/g, ''))).toBeCloseTo(45);
 });
 
 test('constructor sets default properties', () => {
