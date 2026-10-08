@@ -100,6 +100,8 @@ export class Dimension extends DimensionBase {
           this.dimType.setDimType(1);
           // select a second point to define the dimension
           const op1 = new PromptOptions(Strings.Input.END, [Input.Type.POINT]);
+          // avoid polar/ortho tracking a line from the first point while picking the second
+          DesignCore.Scene.inputManager.inputPoint = null;
           const pt14 = await DesignCore.Scene.inputManager.requestInput(op1);
           if (pt14 === undefined) return;
           // Create a temporary line using the selected points
@@ -172,6 +174,8 @@ export class Dimension extends DimensionBase {
           op2 = new PromptOptions(`${Strings.Input.DIMENSION}`, [Input.Type.POINT], options);
         }
 
+        // avoid polar/ortho tracking a line from the last defining point while placing the dimension
+        DesignCore.Scene.inputManager.inputPoint = null;
         const input2 = await DesignCore.Scene.inputManager.requestInput(op2);
         if (input2 === undefined) return;
 

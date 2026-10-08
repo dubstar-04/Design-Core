@@ -69,6 +69,8 @@ export class CircularDimensionBase extends DimensionBase {
       }
 
       const op1 = new PromptOptions(Strings.Input.DIMENSION, [Input.Type.POINT]);
+      // avoid polar/ortho tracking a line from the last defining point while placing the dimension
+      DesignCore.Scene.inputManager.inputPoint = null;
       const Pt11 = await DesignCore.Scene.inputManager.requestInput(op1);
       Pt11.sequence = 11;
       this.points.push(Pt11);
