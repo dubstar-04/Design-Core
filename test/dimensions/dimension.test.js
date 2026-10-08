@@ -168,6 +168,60 @@ test('Dimension.execute still allows an Aligned dimension for a diagonal edge', 
   expect(committed.dimType.getBaseDimType()).toBe(1);
 });
 
+test('Dimension.execute does not show a polar tracking line while picking pt14 or the text position', async () => {
+  const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+  const hoverAt = (point) => {
+    DesignCore.Mouse.setPosFromScenePoint(point);
+    DesignCore.Canvas.mouseMoved();
+  };
+  const clickAt = (point) => {
+    DesignCore.Mouse.setPosFromScenePoint(point);
+    DesignCore.Canvas.mouseDown(0);
+    DesignCore.Canvas.mouseUp(0);
+  };
+
+  const prevEndSnap = DesignCore.Settings.endsnap;
+  const prevMidSnap = DesignCore.Settings.midsnap;
+  const prevCentreSnap = DesignCore.Settings.centresnap;
+  const prevPolar = DesignCore.Settings.polar;
+  DesignCore.Settings.endsnap = false;
+  DesignCore.Settings.midsnap = false;
+  DesignCore.Settings.centresnap = false;
+  DesignCore.Settings.polar = true;
+
+  try {
+    const dim = new Dimension();
+    DesignCore.Scene.inputManager.activeCommand = dim;
+    const execPromise = dim.execute();
+    await flush();
+
+    // pick pt13 directly (point path, not selecting an existing entity)
+    clickAt(new Point(0, 0));
+    await flush();
+
+    // hover to pick pt14 - should not draw a polar tracking line from pt13
+    hoverAt(new Point(100, 1));
+    expect(DesignCore.Scene.auxiliaryEntities.count()).toBe(0);
+
+    clickAt(new Point(100, 0));
+    await flush();
+
+    // hover to pick the text position - should not draw a polar tracking line from pt14
+    hoverAt(new Point(50, 50));
+    expect(DesignCore.Scene.auxiliaryEntities.count()).toBe(0);
+
+    clickAt(new Point(50, 50));
+    await flush();
+    await execPromise;
+  } finally {
+    DesignCore.Settings.endsnap = prevEndSnap;
+    DesignCore.Settings.midsnap = prevMidSnap;
+    DesignCore.Settings.centresnap = prevCentreSnap;
+    DesignCore.Settings.polar = prevPolar;
+    DesignCore.Scene.inputManager.reset();
+  }
+});
+
 
 test('preview calls createTempItem with correct args', () => {
   const dim = new Dimension({ 70: 1 });
