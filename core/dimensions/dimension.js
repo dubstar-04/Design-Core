@@ -54,7 +54,14 @@ export class Dimension extends DimensionBase {
     });
 
     if (data) {
-      const entity = new this.dimensionMap[DimType.getBaseType(this.dimType.getBaseDimType())](data);
+      const DimensionType = this.dimensionMap[DimType.getBaseType(this.dimType.getBaseDimType())];
+
+      if (!DimensionType) {
+        // dimType 5 (Angular 3 point) and 6 (Ordinate) are valid DXF types but not yet implemented
+        throw new Error(`${this.type} - ${Strings.Error.INVALIDTYPE}: ${this.dimType.getBaseDimType()}`);
+      }
+
+      const entity = new DimensionType(data);
 
       // find the block linked to this dimension
       const linkedBlockIndex = DesignCore.Scene.entities.find('BLOCK', 'name', data[2]);
