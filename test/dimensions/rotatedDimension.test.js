@@ -3,6 +3,7 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Core } from '../../core/core/core.js';
 import { Line } from '../../core/entities/line.js';
+import { Utils } from '../../core/lib/utils.js';
 import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
@@ -228,4 +229,50 @@ AcDbRotatedDimension
   file = new File();
   newDimension.dxf(file);
   expect(file.contents).toEqual(dxfString);
+});
+
+// Regression test: rigidly rotating a RotatedDimension (points + linearDimAngle, as the
+// Rotate tool does) must not change the measured value - the dimension line direction is
+// a fixed angle relative to the geometry, not derived from world-axis alignment
+test.each([0, 30, 45, 90, 137, 200])('measured value is rotation-invariant at %s degrees', (rotationDeg) => {
+  const pt13 = new Point(0, 0);
+  const pt14 = new Point(30, 40); // 3-4-5 triangle x10, diagonal edge
+  const pt11 = new Point(60, 20);
+
+  const angleDeg = 90; // vertical dimension line - measures the Y-extent (40)
+  const points = RotatedDimension.getPointsFromSelection([new Line({ points: [pt13, pt14] })], pt11, angleDeg);
+  const dim = new RotatedDimension({ points, linearDimAngle: angleDeg });
+
+  const theta = Utils.degrees2radians(rotationDeg);
+  const centre = new Point(0, 0);
+  const rotatedPoints = dim.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(centre, theta));
+  const rotated = new RotatedDimension({ points: rotatedPoints, linearDimAngle: angleDeg + rotationDeg });
+
+  const entities = rotated.buildDimension();
+  const text = entities.find((e) => e.type === 'Text');
+  expect(Number(text.getProperty('string'))).toBeCloseTo(40);
+});
+
+// Regression test: the Rotate tool only calls entity.setProperty('points', rotatedPoints) -
+// it never touches linearDimAngle directly, so DimensionBase.setProperty() must detect
+// the implied rotation from the points themselves and keep linearDimAngle in sync
+test.each([30, 45, 90, 137, 200])('setProperty(points) alone keeps the measured value correct after a %s degree rotation', (rotationDeg) => {
+  const pt13 = new Point(0, 0);
+  const pt14 = new Point(30, 40);
+  const pt11 = new Point(60, 20);
+
+  const angleDeg = 90;
+  const points = RotatedDimension.getPointsFromSelection([new Line({ points: [pt13, pt14] })], pt11, angleDeg);
+  const dim = new RotatedDimension({ points, linearDimAngle: angleDeg });
+
+  const theta = Utils.degrees2radians(rotationDeg);
+  const centre = new Point(0, 0);
+  const rotatedPoints = dim.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).rotate(centre, theta));
+
+  // exactly what Rotate.action()/preview() call - nothing else
+  dim.setProperty('points', rotatedPoints);
+
+  expect(dim.getProperty('linearDimAngle')).toBeCloseTo(angleDeg + rotationDeg);
+  const text = dim.buildDimension().find((e) => e.type === 'Text');
+  expect(Number(text.getProperty('string'))).toBeCloseTo(40);
 });

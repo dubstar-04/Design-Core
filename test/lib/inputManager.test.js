@@ -877,6 +877,45 @@ test('mouseMoved skips highlightEntityUnderMouse when snapping is active and sna
   inputManager.reset();
 });
 
+test('mouseMoved still calls highlightEntityUnderMouse when a command preview exists but the prompt also accepts SINGLESELECTION', () => {
+  // Reproduces the DIM command's second selection prompt: a candidate dimension preview is
+  // shown (from the first selected entity) while the prompt still accepts a second selection.
+  inputManager.reset();
+  inputManager.activeCommand = new Line();
+  const po = new PromptOptions('', [Input.Type.POINT, Input.Type.SINGLESELECTION]);
+  inputManager.requestInput(po);
+  jest.spyOn(inputManager.snapping, 'snap').mockReturnValue(undefined);
+  jest.spyOn(DesignCore.Scene.previewEntities, 'count').mockReturnValue(1);
+  jest.spyOn(core.scene.selectionManager, 'findClosestItem').mockReturnValue(0);
+  jest.spyOn(core.scene.entities, 'get').mockReturnValue(new Line());
+  core.mouse.buttonOneDown = false;
+
+  inputManager.mouseMoved();
+
+  expect(core.scene.hoverEntities.count()).toBe(1);
+  jest.restoreAllMocks();
+  po.cancel();
+  inputManager.reset();
+});
+
+test('mouseMoved skips highlightEntityUnderMouse when a command preview exists and the prompt only accepts POINT', () => {
+  inputManager.reset();
+  inputManager.activeCommand = new Line();
+  const po = new PromptOptions('', [Input.Type.POINT]);
+  inputManager.requestInput(po);
+  jest.spyOn(inputManager.snapping, 'snap').mockReturnValue(undefined);
+  jest.spyOn(DesignCore.Scene.previewEntities, 'count').mockReturnValue(1);
+  const highlightSpy = jest.spyOn(inputManager, 'highlightEntityUnderMouse');
+  core.mouse.buttonOneDown = false;
+
+  inputManager.mouseMoved();
+
+  expect(highlightSpy).not.toHaveBeenCalled();
+  jest.restoreAllMocks();
+  po.cancel();
+  inputManager.reset();
+});
+
 // ─── mouseDown – no MOUSEDOWN prompt ─────────────────────────────────────────
 
 test('mouseDown case 0 without MOUSEDOWN prompt does not attempt to resolve a prompt', () => {

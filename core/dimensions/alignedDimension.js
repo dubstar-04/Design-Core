@@ -57,6 +57,8 @@ export class AlignedDimension extends LinearDimensionBase {
       this.points.push(pt14);
 
       const op2 = new PromptOptions(Strings.Input.DIMENSION, [Input.Type.POINT]);
+      // avoid polar/ortho tracking a line from pt14 while placing the dimension
+      DesignCore.Scene.inputManager.inputPoint = null;
       const pt11 = await DesignCore.Scene.inputManager.requestInput(op2);
       pt11.sequence = 11;
       this.points.push(pt11);

@@ -220,23 +220,81 @@ describe('DimensionBase', () => {
   });
 
   test('closestPoint delegates to block', () => {
-    baseDim.block = { closestPoint: () => 'foo' };
+    baseDim.block = { entities: ['dummy'], closestPoint: () => 'foo' };
     expect(baseDim.closestPoint(new Point(0, 0))).toBe('foo');
   });
 
   test('boundingBox delegates to block', () => {
-    baseDim.block = { boundingBox: () => 'box' };
+    baseDim.block = { entities: ['dummy'], boundingBox: () => 'box' };
     expect(baseDim.boundingBox()).toBe('box');
   });
 
   test('within delegates to block', () => {
-    baseDim.block = { within: () => true };
+    baseDim.block = { entities: ['dummy'], within: () => true };
     expect(baseDim.within({})).toBe(true);
   });
 
   test('touched delegates to block', () => {
-    baseDim.block = { touched: () => false };
+    baseDim.block = { entities: ['dummy'], touched: () => false };
     expect(baseDim.touched({})).toBe(false);
+  });
+
+  /**
+   * Return a DimensionBase with a stubbed buildDimension() that produces one Line,
+   * with an empty (unrefreshed) block - mirrors a freshly created dimension that
+   * hasn't been drawn yet.
+   * @return {DimensionBase}
+   */
+  function makeUnrefreshedDim() {
+    const dim = new DimensionBase({});
+    dim.buildDimension = jest.fn(() => {
+      return [new Line({ points: [new Point(0, 0), new Point(10, 0)] })];
+    });
+    return dim;
+  }
+
+  test('boundingBox refreshes an empty block before delegating (fixes crash on unpainted dimension)', () => {
+    const dim = makeUnrefreshedDim();
+    expect(dim.block.entities).toHaveLength(0);
+    const box = dim.boundingBox();
+    expect(dim.buildDimension).toHaveBeenCalledTimes(1);
+    expect(box).toBeDefined();
+  });
+
+  test('within refreshes an empty block before delegating (fixes window-select crash before first draw)', () => {
+    const dim = makeUnrefreshedDim();
+    expect(dim.block.entities).toHaveLength(0);
+    const result = dim.within({ min: new Point(-100, -100), max: new Point(100, 100) });
+    expect(dim.buildDimension).toHaveBeenCalledTimes(1);
+    expect(result).toBe(true);
+  });
+
+  test('touched refreshes an empty block before delegating', () => {
+    const dim = makeUnrefreshedDim();
+    expect(dim.block.entities).toHaveLength(0);
+    dim.touched({ min: new Point(-100, -100), max: new Point(100, 100) });
+    expect(dim.buildDimension).toHaveBeenCalledTimes(1);
+  });
+
+  test('repeated delegate calls only refresh once the block is populated', () => {
+    const dim = makeUnrefreshedDim();
+    dim.boundingBox();
+    dim.within({ min: new Point(-100, -100), max: new Point(100, 100) });
+    dim.touched({ min: new Point(-100, -100), max: new Point(100, 100) });
+    dim.closestPoint(new Point(0, 0));
+    dim.draw({});
+    expect(dim.buildDimension).toHaveBeenCalledTimes(1);
+  });
+
+  test('setProperty("points", ...) refreshes geometry (fixes Rotate tool not updating dimension display)', () => {
+    const dim = makeUnrefreshedDim();
+    dim.draw({}); // populate block.entities once so we can detect a rebuild
+    const before = dim.block.entities;
+
+    dim.setProperty('points', [new Point(5, 5), new Point(15, 5)]);
+
+    expect(dim.buildDimension).toHaveBeenCalledTimes(2);
+    expect(dim.block.entities).not.toBe(before);
   });
 
   describe('draw()', () => {

@@ -388,8 +388,14 @@ export class DXF {
 
     const command = entity[0];
     if (DesignCore.CommandManager.isCommand(command)) {
-      const newEntity = DesignCore.CommandManager.createNew(command, entity);
-      DesignCore.Scene.entities.add(newEntity);
+      try {
+        const newEntity = DesignCore.CommandManager.createNew(command, entity);
+        DesignCore.Scene.entities.add(newEntity);
+      } catch (err) {
+        // a recognised command can still fail to build (e.g. unsupported dimension subtype) - skip it, don't abort the rest of the file
+        Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}: ${err}`);
+        this.unsupportedElements = true;
+      }
     } else {
       Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${command}`);
       this.unsupportedElements = true;

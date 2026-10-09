@@ -62,6 +62,8 @@ export class RotatedDimension extends LinearDimensionBase {
       this.points.push(pt14);
 
       const op2 = new PromptOptions(Strings.Input.DIMENSION, [Input.Type.POINT]);
+      // avoid polar/ortho tracking a line from pt14 while placing the dimension
+      DesignCore.Scene.inputManager.inputPoint = null;
       const pt11 = await DesignCore.Scene.inputManager.requestInput(op2);
       pt11.sequence = 11;
       this.points.push(pt11);
@@ -126,8 +128,9 @@ export class RotatedDimension extends LinearDimensionBase {
       const pt11 = DesignCore.Mouse.pointOnScene();
       pt11.sequence = 11;
       const tempLine = new Line({ points: [this.points[0], this.points[1]] });
-      const points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.getProperty(Property.Names.LINEARDIMANGLE));
-      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
+      const angle = this.getProperty(Property.Names.LINEARDIMANGLE);
+      const points = RotatedDimension.getPointsFromSelection([tempLine], pt11, angle);
+      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE), linearDimAngle: angle });
     }
   }
 

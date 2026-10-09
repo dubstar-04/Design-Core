@@ -282,8 +282,14 @@ export class InputManager {
       this.activeCommand.preview();
     }
 
-    // Only show hover glow when no command preview is occupying previewEntities
-    if (!snapped && DesignCore.Scene.previewEntities.count() === 0) {
+    // a command preview can coexist with an active selection prompt (e.g. a dimension
+    // previewing a point-based result while still accepting a second entity selection)
+    const canSelectEntity = this.promptOption?.types.includes(Input.Type.SINGLESELECTION) ||
+      this.promptOption?.types.includes(Input.Type.SELECTIONSET);
+
+    // Only show hover glow when no command preview is occupying previewEntities,
+    // unless the active prompt also accepts an entity selection
+    if (!snapped && (DesignCore.Scene.previewEntities.count() === 0 || canSelectEntity)) {
       this.highlightEntityUnderMouse();
     }
 

@@ -12,7 +12,7 @@ import { Text } from '../entities/text.js';
 import { Block } from '../tables/block.js';
 import { Insert } from '../entities/insert.js';
 import { Hatch } from '../entities/hatch.js';
-/*
+
 import { Dimension } from '../dimensions/dimension.js';
 import { AlignedDimension } from '../dimensions/alignedDimension.js';
 import { AngularDimension } from '../dimensions/angularDimension.js';
@@ -20,7 +20,7 @@ import { LinearDimension } from '../dimensions/linearDimension.js';
 import { DiametricDimension } from '../dimensions/diametricDimension.js';
 import { RadialDimension } from '../dimensions/radialDimension.js';
 import { RotatedDimension } from '../dimensions/rotatedDimension.js';
-*/
+
 
 // import { Point } from "../entities/point.js"
 
@@ -70,7 +70,7 @@ const classes = {
   // Spline,
   ArcAlignedText,
   Text,
-  /*
+
   Dimension,
   AngularDimension,
   AlignedDimension,
@@ -78,7 +78,7 @@ const classes = {
   LinearDimension,
   RadialDimension,
   RotatedDimension,
-  */
+
   Block,
   Insert,
   Hatch,
