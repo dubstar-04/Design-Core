@@ -128,8 +128,9 @@ export class RotatedDimension extends LinearDimensionBase {
       const pt11 = DesignCore.Mouse.pointOnScene();
       pt11.sequence = 11;
       const tempLine = new Line({ points: [this.points[0], this.points[1]] });
-      const points = RotatedDimension.getPointsFromSelection([tempLine], pt11, this.getProperty(Property.Names.LINEARDIMANGLE));
-      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
+      const angle = this.getProperty(Property.Names.LINEARDIMANGLE);
+      const points = RotatedDimension.getPointsFromSelection([tempLine], pt11, angle);
+      DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE), linearDimAngle: angle });
     }
   }
 
