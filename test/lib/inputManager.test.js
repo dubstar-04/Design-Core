@@ -1153,6 +1153,50 @@ test('onLeftClick drops an active grip, committing the new point to the real ent
   inputManager.reset();
 });
 
+// Regression test: the grip drop commits only 'points' via UpdateState, but DimensionBase's
+// points setter also flips dimType.userPositionedText as a side effect. Since State.do() only
+// snapshots the properties explicitly listed in the commit, undo used to restore the old points
+// while leaving the flag true - reverting the points but not the (now stale) automatic-placement
+// text layout. userPositionedText must now be committed explicitly alongside points so its
+// pre-drag value (false, for an initially auto-positioned dimension) is captured for undo too
+test('undo after a grip drop restores both points and the original auto-positioned state', () => {
+  inputManager.reset();
+  const entityIndex = selectDimensionWithGrip(10, 10);
+  const entity = core.scene.entities.get(entityIndex);
+  expect(entity.dimType.hasUserPositionedText()).toBe(false);
+
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
+  inputManager.onLeftClick(new Point(10, 10));
+
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(50, 60));
+  inputManager.onLeftClick(new Point(50, 60));
+
+  const draggedEntity = core.scene.entities.get(entityIndex);
+  expect(draggedEntity.dimType.hasUserPositionedText()).toBe(true);
+  const draggedPt11 = draggedEntity.getPointBySequence(draggedEntity.points, 11);
+  expect(draggedPt11.x).toBe(50);
+  expect(draggedPt11.y).toBe(60);
+
+  core.scene.undo();
+
+  const restoredEntity = core.scene.entities.get(entityIndex);
+  const restoredPt11 = restoredEntity.getPointBySequence(restoredEntity.points, 11);
+  expect(restoredPt11.x).toBe(10);
+  expect(restoredPt11.y).toBe(10);
+  expect(restoredEntity.dimType.hasUserPositionedText()).toBe(false);
+
+  core.scene.redo();
+
+  const redoneEntity = core.scene.entities.get(entityIndex);
+  expect(redoneEntity.dimType.hasUserPositionedText()).toBe(true);
+  const redonePt11 = redoneEntity.getPointBySequence(redoneEntity.points, 11);
+  expect(redonePt11.x).toBe(50);
+  expect(redonePt11.y).toBe(60);
+
+  jest.restoreAllMocks();
+  inputManager.reset();
+});
+
 // ─── onEnterPressed – SELECTIONSET already accepted ──────────────────────────
 
 test('onEnterPressed with SELECTIONSET prompt already accepted - resets', () => {
