@@ -1,5 +1,6 @@
 import { Tool } from '../tools/tool.js';
 import { Snapping } from './snapping.js';
+import { UpdateState } from './stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
@@ -23,6 +24,9 @@ export class InputManager {
     this.inputPoint = null;
 
     this.snapping = new Snapping();
+
+    // grip being dragged (stuck to the mouse), or null when idle - { entityIndex, grip }
+    this.activeGrip = null;
   }
 
   /**
@@ -31,6 +35,7 @@ export class InputManager {
   reset() {
     this.snapping.reset();
     this.inputPoint = null;
+    this.activeGrip = null;
     DesignCore.CommandLine.resetPrompt();
     this.activeCommand = undefined;
 
@@ -196,6 +201,27 @@ export class InputManager {
    * @param {Point} point
    */
   onLeftClick(point) {
+    // Dragging a grip takes priority over everything else - this click drops it
+    if (this.activeGrip !== null) {
+      const entity = DesignCore.Scene.entities.get(this.activeGrip.entityIndex);
+      const newPoints = this.activeGrip.grip.apply(DesignCore.Mouse.pointOnScene());
+      DesignCore.Scene.commit([new UpdateState(entity, { points: newPoints })]);
+      this.activeGrip = null;
+      DesignCore.Scene.selectionManager.reloadSelectedEntities();
+      DesignCore.Canvas.requestPaint();
+      return;
+    }
+
+    // Grip hit-test takes priority over normal entity selection when idle,
+    // so clicking a grip doesn't also reselect/deselect the underlying entity
+    if (this.activeCommand === undefined) {
+      const grabbedGrip = this.findGripUnderMouse();
+      if (grabbedGrip) {
+        this.activeGrip = grabbedGrip;
+        return;
+      }
+    }
+
     // left clicks are used for selection of entities and points
     // Selection of entities can only occur if there is no active snap available
     // Selection of entities can only occur if the mouse is over an entity
@@ -227,6 +253,35 @@ export class InputManager {
   }
 
   /**
+   * Find the grip closest to the mouse, within tolerance, across all selected entities.
+   * Hit-tests against the real scene entities (not the selection preview clones) so a
+   * grip's apply() always recomputes from the last-committed geometry.
+   * @return {Object|undefined} { entityIndex, grip } or undefined if no grip is close enough
+   */
+  findGripUnderMouse() {
+    const gripAperture = 25; // capture radius in pixels (screen space), matches Snapping's snapAperture
+    const delta = gripAperture / DesignCore.Canvas.getScale();
+    const mousePoint = DesignCore.Mouse.pointOnScene();
+
+    let closestGrip;
+    let closestDistance = delta;
+
+    const selectionSet = DesignCore.Scene.selectionManager.selectionSet.selectionSet;
+    for (const entityIndex of selectionSet) {
+      const entity = DesignCore.Scene.entities.get(entityIndex);
+      for (const grip of entity.getGrips()) {
+        const distance = grip.point.distance(mousePoint);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestGrip = { entityIndex, grip };
+        }
+      }
+    }
+
+    return closestGrip;
+  }
+
+  /**
    * Clears preview entities and re-runs the active command preview
    */
   refreshPreview() {
@@ -245,6 +300,18 @@ export class InputManager {
     DesignCore.Scene.previewEntities.clear();
     DesignCore.Scene.hoverEntities.clear();
     DesignCore.Scene.auxiliaryEntities.clear();
+
+    // While a grip is stuck to the mouse, only update its live preview - suppress
+    // snapping/hover/command-preview side effects until it's dropped
+    if (this.activeGrip !== null) {
+      const newPoints = this.activeGrip.grip.apply(DesignCore.Mouse.pointOnScene());
+      const previewIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet.indexOf(this.activeGrip.entityIndex);
+      if (previewIndex !== -1) {
+        DesignCore.Scene.selectionManager.selectedEntities[previewIndex].setProperty('points', newPoints);
+      }
+      DesignCore.Canvas.requestPaint();
+      return;
+    }
 
     if (DesignCore.Mouse.buttonOneDown) {
       const windowSelect = (this.activeCommand === undefined && !this.promptOption) ||
