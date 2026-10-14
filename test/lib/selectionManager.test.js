@@ -1,5 +1,6 @@
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
+import { DimensionBase } from '../../core/dimensions/dimensionBase.js';
 
 const core = new Core();
 const selectionManager = core.scene.selectionManager;
@@ -70,4 +71,45 @@ test('Test SelectionManager.selectAll()', () => {
   // The indices should match all scene items
   expect(selectionManager.selectionSet.selectionSet).toEqual([0, 1, 2]);
 });
+
+// ─── findGripUnderMouse ───────────────────────────────────────────────────────
+
+/**
+ * Select a fresh DimensionBase with a Pt11 (text position) grip at the given coordinates.
+ * @param {number} x
+ * @param {number} y
+ * @return {number} index of the entity in core.scene.entities
+ */
+function selectDimensionWithGrip(x, y) {
+  selectionManager.reset();
+  const dim = new DimensionBase({});
+  dim.points = [
+    Object.assign(new Point(0, 0), { sequence: 13 }),
+    Object.assign(new Point(x, y), { sequence: 11 }),
+  ];
+  core.scene.entities.add(dim);
+  const entityIndex = core.scene.entities.count() - 1;
+  selectionManager.addToSelectionSet(entityIndex);
+  return entityIndex;
+}
+
+test('findGripUnderMouse returns undefined when no entity is selected', () => {
+  selectionManager.reset();
+  expect(selectionManager.findGripUnderMouse(new Point(0, 0))).toBeUndefined();
+});
+
+test('findGripUnderMouse returns the grip when the point is within tolerance', () => {
+  const entityIndex = selectDimensionWithGrip(10, 10);
+  const found = selectionManager.findGripUnderMouse(new Point(10, 10));
+  expect(found).toBeDefined();
+  expect(found.entityIndex).toBe(entityIndex);
+  expect(found.grip.point.x).toBe(10);
+  expect(found.grip.point.y).toBe(10);
+});
+
+test('findGripUnderMouse returns undefined when the point is far from any grip', () => {
+  selectDimensionWithGrip(10, 10);
+  expect(selectionManager.findGripUnderMouse(new Point(1000, 1000))).toBeUndefined();
+});
+
 
