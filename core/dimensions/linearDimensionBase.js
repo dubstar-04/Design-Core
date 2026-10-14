@@ -78,6 +78,30 @@ export class LinearDimensionBase extends DimensionBase {
     }
   }
 
+  /**
+   * Get the grip points for interactive editing on the canvas.
+   * Pt10 (the dimension line's far end) is derived from Pt11 via getPointsFromSelection() -
+   * it must be recomputed, not left stale, when the Pt11 grip moves.
+   * @return {Array<{point: Point, apply: Function}>} grips
+   */
+  getGrips() {
+    const Pt13 = this.getPointBySequence(this.points, 13);
+    const Pt14 = this.getPointBySequence(this.points, 14);
+    const Pt11 = this.getPointBySequence(this.points, 11);
+
+    if (!Pt13 || !Pt14 || !Pt11) {
+      return [];
+    }
+
+    const apply = (newPoint) => {
+      const tempLine = new Line({ points: [Pt13, Pt14] });
+      const angle = this.getProperty(Property.Names.LINEARDIMANGLE);
+      return this.constructor.getPointsFromSelection([tempLine], newPoint, angle);
+    };
+
+    return [{ point: Pt11, apply: apply }];
+  }
+
 
   /**
    * Build the dimension

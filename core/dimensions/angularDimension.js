@@ -154,6 +154,32 @@ export class AngularDimension extends DimensionBase {
   }
 
   /**
+   * Get the grip points for interactive editing on the canvas.
+   * Pt16 (the dimension arc's radial position) is derived from Pt11 via getPointsFromSelection() -
+   * must be recomputed from the two unchanged defining lines, not left stale.
+   * @return {Array<{point: Point, apply: Function}>} grips
+   */
+  getGrips() {
+    const Pt15 = this.getPointBySequence(this.points, 15);
+    const Pt10 = this.getPointBySequence(this.points, 10);
+    const Pt13 = this.getPointBySequence(this.points, 13);
+    const Pt14 = this.getPointBySequence(this.points, 14);
+    const Pt11 = this.getPointBySequence(this.points, 11);
+
+    if (!Pt15 || !Pt10 || !Pt13 || !Pt14 || !Pt11) {
+      return [];
+    }
+
+    const apply = (newPoint) => {
+      const tempLineOne = new Line({ points: [Pt15, Pt10] });
+      const tempLineTwo = new Line({ points: [Pt13, Pt14] });
+      return AngularDimension.getPointsFromSelection([tempLineOne, tempLineTwo], newPoint);
+    };
+
+    return [{ point: Pt11, apply: apply }];
+  }
+
+  /**
    * Get sequenced points from user selection
    * @param {any} entities
    * @param {Point} textPos

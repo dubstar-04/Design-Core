@@ -351,6 +351,30 @@ export class DimensionBase extends Entity {
   }
 
   /**
+   * Get the grip points for interactive editing on the canvas.
+   * Only the text position (Pt11) is exposed - it's never a dependency for any other point.
+   * @return {Array<{point: Point, apply: Function}>} grips
+   */
+  getGrips() {
+    const Pt11 = this.getPointBySequence(this.points, 11);
+
+    if (!Pt11) {
+      return [];
+    }
+
+    const apply = (newPoint) => {
+      return this.points.map((point) => {
+        if (point.sequence === 11) {
+          return new Point(newPoint.x, newPoint.y, point.bulge, point.sequence);
+        }
+        return point;
+      });
+    };
+
+    return [{ point: Pt11, apply: apply }];
+  }
+
+  /**
    * Get the point for the sequence number
    * @param {Array} points - array of points to search
    * @param {number} sequenceNumber

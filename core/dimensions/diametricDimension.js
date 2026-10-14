@@ -53,6 +53,34 @@ export class DiametricDimension extends CircularDimensionBase {
   }
 
   /**
+   * Get the grip points for interactive editing on the canvas.
+   * Pt10/Pt15 are the two diametrically-opposite circle attach points (NOT the centre -
+   * unlike RadialDimension, getPointsFromSelection() reassigns both when Pt11 moves), derived
+   * from Pt11 via getPointsFromSelection() - must be recomputed from the unchanged centre/radius
+   * (reconstructed as their midpoint/half-distance), not left stale.
+   * @return {Array<{point: Point, apply: Function}>} grips
+   */
+  getGrips() {
+    const Pt10 = this.getPointBySequence(this.points, 10); // circle attach point
+    const Pt15 = this.getPointBySequence(this.points, 15); // opposite circle attach point
+    const Pt11 = this.getPointBySequence(this.points, 11); // text position
+
+    if (!Pt10 || !Pt15 || !Pt11) {
+      return [];
+    }
+
+    const centre = Pt10.midPoint(Pt15);
+    const radius = centre.distance(Pt10);
+
+    const apply = (newPoint) => {
+      const tempEntity = { points: [centre], getRadius: () => radius };
+      return this.constructor.getPointsFromSelection([tempEntity], newPoint);
+    };
+
+    return [{ point: Pt11, apply: apply }];
+  }
+
+  /**
    * Write the entity to file in the dxf format
    * @param {DXFFile} file
    */
