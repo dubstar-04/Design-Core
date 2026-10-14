@@ -169,7 +169,7 @@ export class InputManager {
    * Handle enter / return presses
    */
   onEnterPressed() {
-    if (this.activeCommand !== undefined && !(this.activeCommand instanceof GripStretch)) {
+    if (this.activeCommand !== undefined) {
       if (this.promptOption?.types.includes(Input.Type.SELECTIONSET) && DesignCore.Scene.selectionManager.selectionSet.accepted !== true) {
         DesignCore.Scene.selectionManager.selectionSet.accepted = true;
         this.promptOption.respond(DesignCore.Scene.selectionManager.selectionSet);

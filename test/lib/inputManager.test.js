@@ -1269,14 +1269,10 @@ test('startCommand cancels an active grip and reloads the selection previews', (
   inputManager.reset();
 });
 
-// Regression test: commands repeated via Enter also go through startCommand(), so an active
-// grip must be cancelled there too
-test('onEnterPressed repeating the last command cancels an active grip too', () => {
+// Regression test: pressing Enter while a grip is active ends GripStretch via the normal
+// reset() path, deselecting the entity - this matches ending any other command on Enter
+test('onEnterPressed ends an active grip and deselects the entity', () => {
   inputManager.reset();
-  core.commandLine.lastCommand = ['Move'];
-  const Move = DesignCore.CommandManager.createNew('Move').constructor;
-  jest.spyOn(Move.prototype, 'execute').mockImplementation(() => {});
-
   selectDimensionWithGrip(10, 10);
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
   inputManager.onLeftClick(new Point(10, 10));
@@ -1284,7 +1280,8 @@ test('onEnterPressed repeating the last command cancels an active grip too', () 
 
   inputManager.onEnterPressed();
 
-  expect(inputManager.activeCommand).toBeInstanceOf(Move);
+  expect(inputManager.activeCommand).toBeUndefined();
+  expect(core.scene.selectionManager.selectionSet.selectionSet.length).toBe(0);
 
   jest.restoreAllMocks();
   inputManager.reset();
