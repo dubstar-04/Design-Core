@@ -205,7 +205,13 @@ export class InputManager {
     if (this.activeGrip !== null) {
       const entity = DesignCore.Scene.entities.get(this.activeGrip.entityIndex);
       const newPoints = this.activeGrip.grip.apply(DesignCore.Mouse.pointOnScene());
-      DesignCore.Scene.commit([new UpdateState(entity, { points: newPoints })]);
+      const properties = { points: newPoints };
+      // all grips currently implemented reposition dimension text - record the flag
+      // explicitly so its pre-drag value is captured by the UpdateState undo snapshot too
+      if (entity.dimType) {
+        properties.userPositionedText = true;
+      }
+      DesignCore.Scene.commit([new UpdateState(entity, properties)]);
       this.activeGrip = null;
       DesignCore.Scene.selectionManager.reloadSelectedEntities();
       DesignCore.Canvas.requestPaint();
