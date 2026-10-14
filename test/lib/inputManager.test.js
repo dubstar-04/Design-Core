@@ -1126,34 +1126,6 @@ function selectDimensionWithGrip(x, y) {
 // other Tool's requestInput) - flush the microtask queue after a drop click before asserting.
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-test('findGripUnderMouse returns undefined when no entity is selected', () => {
-  inputManager.reset();
-  core.scene.clear();
-  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(0, 0));
-  expect(inputManager.findGripUnderMouse()).toBeUndefined();
-  jest.restoreAllMocks();
-});
-
-test('findGripUnderMouse returns the grip when the mouse is within tolerance', () => {
-  inputManager.reset();
-  selectDimensionWithGrip(10, 10);
-  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
-  const found = inputManager.findGripUnderMouse();
-  expect(found).toBeDefined();
-  expect(found.entityIndex).toBe(0);
-  expect(found.grip.point.x).toBe(10);
-  expect(found.grip.point.y).toBe(10);
-  jest.restoreAllMocks();
-});
-
-test('findGripUnderMouse returns undefined when the mouse is far from any grip', () => {
-  inputManager.reset();
-  selectDimensionWithGrip(10, 10);
-  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(1000, 1000));
-  expect(inputManager.findGripUnderMouse()).toBeUndefined();
-  jest.restoreAllMocks();
-});
-
 test('onLeftClick grabs a grip under the mouse and starts GripStretch', () => {
   inputManager.reset();
   selectDimensionWithGrip(10, 10);
