@@ -565,6 +565,27 @@ export class DimensionBase extends Entity {
    */
   setProperty(property, value) {
     if (this.properties.has(property)) {
+      if (property === Property.Names.POINTS) {
+        // Dragging the Pt11 grip independently of the anchor points (Pt13/Pt14) - as opposed
+        // to a rigid whole-dimension Move/Rotate, which moves them together - means the user
+        // has explicitly repositioned the text; record that via the DXF bit 128 flag so
+        // buildDimension() uses Pt11 directly instead of auto-placing it (DIMJUST/DIMTAD)
+        const oldPt11 = this.getPointBySequence(this.points, 11);
+        const oldPt13 = this.getPointBySequence(this.points, 13);
+        const oldPt14 = this.getPointBySequence(this.points, 14);
+        const newPt11 = this.getPointBySequence(value, 11);
+        const newPt13 = this.getPointBySequence(value, 13);
+        const newPt14 = this.getPointBySequence(value, 14);
+
+        if (oldPt11 && newPt11 && oldPt13 && newPt13 && oldPt14 && newPt14) {
+          const pt11Moved = !oldPt11.isSame(newPt11);
+          const anchorsUnchanged = oldPt13.isSame(newPt13) && oldPt14.isSame(newPt14);
+          if (pt11Moved && anchorsUnchanged) {
+            this.dimType.userPositionedText = true;
+          }
+        }
+      }
+
       if (property === Property.Names.POINTS && this.dimType.getBaseDimType() === 0) {
         // Rotated dimension: LINEARDIMANGLE is a fixed angle independent of the points,
         // so a rigid rotation of the points (e.g. via the Rotate tool) must also rotate

@@ -229,6 +229,12 @@ export class LinearDimensionBase extends DimensionBase {
         break;
     }
 
+    // A grip-dragged text position overrides the DIMJUST auto-placement above with Pt11 as
+    // the anchor - DIMTAD's vertical offset below still applies on top, matching AutoCAD
+    if (this.dimType.hasUserPositionedText()) {
+      textPosition = Pt11;
+    }
+
     // Check if the text is aligned with the dimension line
     const textAndDimlineAligned = this.alignedOrOpposite(textRotation, dimLineAngle);
 
