@@ -1,3 +1,5 @@
+import { DesignCore } from '../designCore.js';
+
 /**
  * Tool Class
  */
@@ -27,6 +29,14 @@ export class Tool {
    */
   action() {
     // action function to be overridden by implementation
+  };
+
+  /**
+   * Cancel this command while it is active - overridden by implementations that need to
+   * clean up differently to the default full reset (e.g. GripStretch, which must not deselect)
+   */
+  cancel() {
+    DesignCore.Scene.inputManager.reset();
   };
 }
 
