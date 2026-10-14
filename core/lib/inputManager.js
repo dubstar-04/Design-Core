@@ -132,15 +132,8 @@ export class InputManager {
    * @param {string} command - command name or shortcut
    */
   startCommand(command) {
-    if (this.activeCommand instanceof GripStretch) {
-      // GripStretch is a real Tool awaiting a POINT prompt, so cancelling it must go through
-      // promptOption.cancel() to end its suspended execute() cleanly - but not the full reset()
-      // below, which would wipe the selection before the new command (e.g. a Tool consuming
-      // preselection) gets to use it
-      this.promptOption?.cancel();
-      this.promptOption = undefined;
-      this.activeCommand = undefined;
-      DesignCore.Scene.selectionManager.reloadSelectedEntities();
+    if (this.activeCommand instanceof Tool) {
+      this.activeCommand.cancel();
     } else if (this.activeCommand !== undefined) {
       this.reset();
     }
@@ -176,9 +169,6 @@ export class InputManager {
    * Handle enter / return presses
    */
   onEnterPressed() {
-    // GripStretch marks grip editing as the active command, but Enter must still repeat the
-    // last real command (and cancel the grip via startCommand()) rather than treating the
-    // grip marker as a command with its own prompt to resolve
     if (this.activeCommand !== undefined && !(this.activeCommand instanceof GripStretch)) {
       if (this.promptOption?.types.includes(Input.Type.SELECTIONSET) && DesignCore.Scene.selectionManager.selectionSet.accepted !== true) {
         DesignCore.Scene.selectionManager.selectionSet.accepted = true;
