@@ -9,11 +9,6 @@ import { DesignCore } from '../designCore.js';
 
 /**
  * GripStretch Command Class
- * Mirrors AutoCAD's GRIP_STRETCH - InputManager starts this when a grip is grabbed. Follows the
- * same execute()/preview()/action() split as every other Tool: execute() requests the stretch
- * point (gaining the same object snapping and polar/ortho tracking as any other point pick),
- * preview() live-updates the selected-entity preview clone while dragging, and action() commits
- * the drop via UpdateState.
  * Not shown in any toolbar and never started via the command line - only InputManager creates it.
  * @extends Tool
  */
@@ -29,6 +24,19 @@ export class GripStretch extends Tool {
     super();
     this.entityIndex = entityIndex;
     this.grip = grip;
+  }
+
+  /**
+   * Cancel the in-progress stretch - unlike Tool's default (full reset), this must not deselect
+   * the entity, and must resolve the suspended execute()'s pending requestInput() promise so it
+   * doesn't stay forever awaiting a prompt nobody can respond to or cancel again
+   */
+  cancel() {
+    const inputManager = DesignCore.Scene.inputManager;
+    inputManager.promptOption?.cancel();
+    inputManager.promptOption = undefined;
+    inputManager.activeCommand = undefined;
+    DesignCore.Scene.selectionManager.reloadSelectedEntities();
   }
 
   /**
