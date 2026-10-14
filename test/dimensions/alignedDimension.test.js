@@ -3,6 +3,8 @@ import { Point } from '../../core/entities/point.js';
 import { DesignCore } from '../../core/designCore.js';
 import { Core } from '../../core/core/core.js';
 import { Line } from '../../core/entities/line.js';
+import { DxfIterator } from '../../core/lib/dxf/dxfIterator.js';
+import { Entities } from '../../core/lib/dxf/sections/entities.js';
 import { File, withMockInput } from '../test-helpers/test-helpers.js';
 
 // initialise core
@@ -195,6 +197,43 @@ test('DIMTAD vertical offset still applies on top of a user-positioned text', ()
   // anchored at the user-positioned Pt11 (x=5, y=30), then offset below by DIMTAD=4
   expect(text.points[0].x).toBeCloseTo(5);
   expect(text.points[0].y).toBeCloseTo(30 - (DIMTXT * 0.5 + DIMGAP));
+});
+
+// Regression test: userPositionedText (DXF group 70 bit 128) must survive a real write -> parse ->
+// reconstruct DXF round-trip. AlignedDimension's constructor used to call dimType.setDimType(1) after
+// super(data), which clobbered the flags super(data) had just loaded from group 70, reverting a
+// grip-edited dimension back to automatic text placement when the file was reopened
+test('grip-edited dimension preserves userPositionedText through a DXF round-trip', () => {
+  const pt13 = new Point(0, 0);
+  const pt14 = new Point(10, 0);
+  const points = AlignedDimension.getPointsFromSelection([new Line({ points: [pt13, pt14] })], new Point(5, 5));
+  const dim = new AlignedDimension({ points, handle: '1' });
+
+  // grip-drag Pt11 away from the DIMJUST-computed anchor
+  const grip = dim.getGrips()[0];
+  const newPoints = grip.apply(new Point(5, 30));
+  dim.setProperty('points', newPoints);
+  expect(dim.dimType.hasUserPositionedText()).toBe(true);
+
+  // write the grip-edited dimension to DXF text
+  const file = new File();
+  dim.dxf(file);
+
+  // parse the written text back through the real DXF entity reader (not an object-spread shortcut)
+  const iterator = new DxfIterator();
+  iterator.loadFile(`0\nENTITIES\n${file.contents}0\nENDSEC\n0\nEOF`);
+  const [rawEntity] = new Entities().read(iterator);
+  rawEntity.points = rawEntity.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence));
+
+  // reconstruct through the same command dispatch path used when loading a DXF file
+  const reloaded = DesignCore.CommandManager.createNew(rawEntity[0], rawEntity);
+
+  expect(reloaded).toBeInstanceOf(AlignedDimension);
+  expect(reloaded.dimType.hasUserPositionedText()).toBe(true);
+
+  const text = reloaded.buildDimension().find((e) => e.type === 'Text');
+  expect(text.points[0].x).toBeCloseTo(5);
+  expect(text.points[0].y).toBeCloseTo(30);
 });
 
 // Regression test: a rigid whole-dimension Move (all points translated together, including Pt11)
