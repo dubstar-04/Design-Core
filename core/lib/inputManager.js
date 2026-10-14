@@ -1,6 +1,6 @@
 import { Tool } from '../tools/tool.js';
+import { GripStretch } from '../tools/gripStretch.js';
 import { Snapping } from './snapping.js';
-import { UpdateState } from './stateManager.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
@@ -24,9 +24,6 @@ export class InputManager {
     this.inputPoint = null;
 
     this.snapping = new Snapping();
-
-    // grip being dragged (stuck to the mouse), or null when idle - { entityIndex, grip }
-    this.activeGrip = null;
   }
 
   /**
@@ -35,7 +32,6 @@ export class InputManager {
   reset() {
     this.snapping.reset();
     this.inputPoint = null;
-    this.activeGrip = null;
     DesignCore.CommandLine.resetPrompt();
     this.activeCommand = undefined;
 
@@ -136,16 +132,17 @@ export class InputManager {
    * @param {string} command - command name or shortcut
    */
   startCommand(command) {
-    if (this.activeCommand !== undefined) {
-      this.reset();
-    }
-
-    if (this.activeGrip !== null) {
-      // a grip can only be grabbed while idle (no active command), so this is mutually
-      // exclusive with the reset() above - without this, the grip stays stuck to the
-      // mouse and the new command's next click drops it instead of answering its prompt
-      this.activeGrip = null;
+    if (this.activeCommand instanceof GripStretch) {
+      // GripStretch is a real Tool awaiting a POINT prompt, so cancelling it must go through
+      // promptOption.cancel() to end its suspended execute() cleanly - but not the full reset()
+      // below, which would wipe the selection before the new command (e.g. a Tool consuming
+      // preselection) gets to use it
+      this.promptOption?.cancel();
+      this.promptOption = undefined;
+      this.activeCommand = undefined;
       DesignCore.Scene.selectionManager.reloadSelectedEntities();
+    } else if (this.activeCommand !== undefined) {
+      this.reset();
     }
 
     const resolvedCommand = DesignCore.CommandManager.getCommand(command);
@@ -179,7 +176,10 @@ export class InputManager {
    * Handle enter / return presses
    */
   onEnterPressed() {
-    if (this.activeCommand !== undefined) {
+    // GripStretch marks grip editing as the active command, but Enter must still repeat the
+    // last real command (and cancel the grip via startCommand()) rather than treating the
+    // grip marker as a command with its own prompt to resolve
+    if (this.activeCommand !== undefined && !(this.activeCommand instanceof GripStretch)) {
       if (this.promptOption?.types.includes(Input.Type.SELECTIONSET) && DesignCore.Scene.selectionManager.selectionSet.accepted !== true) {
         DesignCore.Scene.selectionManager.selectionSet.accepted = true;
         this.promptOption.respond(DesignCore.Scene.selectionManager.selectionSet);
@@ -209,29 +209,13 @@ export class InputManager {
    * @param {Point} point
    */
   onLeftClick(point) {
-    // Dragging a grip takes priority over everything else - this click drops it
-    if (this.activeGrip !== null) {
-      const entity = DesignCore.Scene.entities.get(this.activeGrip.entityIndex);
-      const newPoints = this.activeGrip.grip.apply(DesignCore.Mouse.pointOnScene());
-      const properties = { points: newPoints };
-      // all grips currently implemented reposition dimension text - record the flag
-      // explicitly so its pre-drag value is captured by the UpdateState undo snapshot too
-      if (entity.dimType) {
-        properties.userPositionedText = true;
-      }
-      DesignCore.Scene.commit([new UpdateState(entity, properties)]);
-      this.activeGrip = null;
-      DesignCore.Scene.selectionManager.reloadSelectedEntities();
-      DesignCore.Canvas.requestPaint();
-      return;
-    }
-
-    // Grip hit-test takes priority over normal entity selection when idle,
-    // so clicking a grip doesn't also reselect/deselect the underlying entity
+    // Grip hit-test takes priority over normal entity selection when idle, so clicking a grip
+    // starts GripStretch (which requests the stretch point itself) instead of reselecting it
     if (this.activeCommand === undefined) {
       const grabbedGrip = this.findGripUnderMouse();
       if (grabbedGrip) {
-        this.activeGrip = grabbedGrip;
+        this.activeCommand = new GripStretch(grabbedGrip.entityIndex, grabbedGrip.grip);
+        this.activeCommand.execute();
         return;
       }
     }
@@ -314,18 +298,6 @@ export class InputManager {
     DesignCore.Scene.previewEntities.clear();
     DesignCore.Scene.hoverEntities.clear();
     DesignCore.Scene.auxiliaryEntities.clear();
-
-    // While a grip is stuck to the mouse, only update its live preview - suppress
-    // snapping/hover/command-preview side effects until it's dropped
-    if (this.activeGrip !== null) {
-      const newPoints = this.activeGrip.grip.apply(DesignCore.Mouse.pointOnScene());
-      const previewIndex = DesignCore.Scene.selectionManager.selectionSet.selectionSet.indexOf(this.activeGrip.entityIndex);
-      if (previewIndex !== -1) {
-        DesignCore.Scene.selectionManager.selectedEntities[previewIndex].setProperty('points', newPoints);
-      }
-      DesignCore.Canvas.requestPaint();
-      return;
-    }
 
     if (DesignCore.Mouse.buttonOneDown) {
       const windowSelect = (this.activeCommand === undefined && !this.promptOption) ||
