@@ -198,6 +198,7 @@
         "SCALEFACTOR",
         "SECONDCORNER",
         "selectedchild",
+        "STRETCHPOINT",
         "SELECTIONSET",
         "SEQEND",
         "SINGLESELECTION",
