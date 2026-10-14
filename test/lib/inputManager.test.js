@@ -271,6 +271,30 @@ test('starting a tool command from idle preserves the selection', () => {
   inputManager.reset();
 });
 
+// Regression test: startCommand() generalises cancelling a previously active command to
+// `activeCommand.cancel()` for any Tool, instead of special-casing GripStretch - Tool's default
+// cancel() just delegates to the same reset() the old `else` branch called directly, so this
+// must behave identically for every other Tool (Move, Erase, Offset, etc.)
+test('starting a new command calls cancel() on a previously active Tool', () => {
+  inputManager.reset();
+  const Erase = DesignCore.CommandManager.createNew('Erase').constructor;
+  jest.spyOn(Erase.prototype, 'execute').mockImplementation(() => {});
+  inputManager.onCommand('E');
+  expect(inputManager.activeCommand).toBeInstanceOf(Erase);
+
+  const cancelSpy = jest.spyOn(inputManager.activeCommand, 'cancel');
+  const resetSpy = jest.spyOn(inputManager, 'reset');
+
+  inputManager.onCommand('M');
+
+  expect(cancelSpy).toHaveBeenCalledTimes(1);
+  // Tool's default cancel() delegates to the very same reset()
+  expect(resetSpy).toHaveBeenCalled();
+
+  jest.restoreAllMocks();
+  inputManager.reset();
+});
+
 // ─── onCommand - command shortcut while non-accepting prompt is active ─────────
 
 test('onCommand with valid shortcut while POINT prompt active - switches command without notifying', () => {
