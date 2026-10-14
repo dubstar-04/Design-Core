@@ -116,5 +116,6 @@ export class Strings {
     SCALEFACTOR: 'Specify scale factor',
     REFERENCELENGTH: 'Specify reference length',
     NEWLENGTH: 'Specify new length',
+    STRETCHPOINT: 'Specify stretch point',
   };
 };
