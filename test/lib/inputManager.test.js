@@ -7,6 +7,7 @@ import { PromptOptions } from '../../core/lib/inputManager.js';
 import { Input, MouseDown, MouseUp } from '../../core/lib/inputManager.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
 import { DimensionBase } from '../../core/dimensions/dimensionBase.js';
+import { GripStretch } from '../../core/tools/gripStretch.js';
 import { expect, jest } from '@jest/globals';
 
 const core = new Core();
@@ -969,6 +970,37 @@ test('mouseUp case 0 with no prompt and no active command and mouse not moved - 
   windowSelectSpy.mockRestore();
 });
 
+// Regression test: grip editing has neither an active command nor a prompt of its own, so
+// mouseUp(0)'s (promptOption || activeCommand) guard used to skip over it and call windowSelect()
+// whenever the mouse moved since mousedown - i.e. every click-drag-release used to grab a grip
+// (mousedown grabs it, drag moves it, mouseup released over a different point) also started a
+// crossing/window selection. GripStretch now marks grip editing as the active command, so the
+// existing guard correctly skips window-select during an in-progress drag too
+test('mouseUp case 0 does not call windowSelect while GripStretch is active', () => {
+  inputManager.reset();
+  selectDimensionWithGrip(10, 10);
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
+  inputManager.onLeftClick(new Point(10, 10));
+  expect(inputManager.activeCommand).toBeInstanceOf(GripStretch);
+
+  const windowSelectSpy = jest.spyOn(inputManager, 'windowSelect').mockImplementation(() => {});
+  core.mouse.mouseDownCanvasPoint = new Point(0, 0);
+  core.mouse.x = 50;
+  core.mouse.y = 50;
+
+  inputManager.mouseUp(0);
+
+  expect(windowSelectSpy).not.toHaveBeenCalled();
+  // the grip is still stuck to the mouse - mouseUp must not interfere with the in-progress drag
+  expect(inputManager.activeCommand).toBeInstanceOf(GripStretch);
+
+  windowSelectSpy.mockRestore();
+  core.mouse.x = 0;
+  core.mouse.y = 0;
+  jest.restoreAllMocks();
+  inputManager.reset();
+});
+
 // ─── highlightEntityUnderMouse – selection prompts ───────────────────────────
 
 test('highlightEntityUnderMouse returns true with SINGLESELECTION prompt and entity found', () => {
@@ -1066,6 +1098,10 @@ function selectDimensionWithGrip(x, y) {
   return 0;
 }
 
+// GripStretch's execute() resolves its "stretch point" prompt asynchronously (same as any
+// other Tool's requestInput) - flush the microtask queue after a drop click before asserting.
+const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
+
 test('findGripUnderMouse returns undefined when no entity is selected', () => {
   inputManager.reset();
   core.scene.clear();
@@ -1094,7 +1130,7 @@ test('findGripUnderMouse returns undefined when the mouse is far from any grip',
   jest.restoreAllMocks();
 });
 
-test('onLeftClick grabs a grip under the mouse without reselecting the entity', () => {
+test('onLeftClick grabs a grip under the mouse and starts GripStretch', () => {
   inputManager.reset();
   selectDimensionWithGrip(10, 10);
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
@@ -1102,19 +1138,19 @@ test('onLeftClick grabs a grip under the mouse without reselecting the entity', 
 
   inputManager.onLeftClick(new Point(10, 10));
 
-  expect(inputManager.activeGrip).toBeDefined();
-  expect(inputManager.activeGrip.entityIndex).toBe(0);
+  expect(inputManager.activeCommand).toBeInstanceOf(GripStretch);
+  expect(inputManager.activeCommand.entityIndex).toBe(0);
   expect(singleSelectSpy).not.toHaveBeenCalled();
   jest.restoreAllMocks();
   inputManager.reset();
 });
 
-test('mouseMoved updates the selected-entity preview clone while a grip is active', () => {
+test('mouseMoved updates the selected-entity preview clone while GripStretch is active', () => {
   inputManager.reset();
   selectDimensionWithGrip(10, 10);
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
   inputManager.onLeftClick(new Point(10, 10));
-  expect(inputManager.activeGrip).toBeDefined();
+  expect(inputManager.activeCommand).toBeInstanceOf(GripStretch);
 
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(50, 60));
   inputManager.mouseMoved();
@@ -1133,17 +1169,18 @@ test('mouseMoved updates the selected-entity preview clone while a grip is activ
   inputManager.reset();
 });
 
-test('onLeftClick drops an active grip, committing the new point to the real entity', () => {
+test('onLeftClick drops an active grip, committing the new point to the real entity', async () => {
   inputManager.reset();
   selectDimensionWithGrip(10, 10);
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
   inputManager.onLeftClick(new Point(10, 10));
-  expect(inputManager.activeGrip).toBeDefined();
+  expect(inputManager.activeCommand).toBeInstanceOf(GripStretch);
 
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(50, 60));
   inputManager.onLeftClick(new Point(50, 60));
+  await flushPromises();
 
-  expect(inputManager.activeGrip).toBeNull();
+  expect(inputManager.activeCommand).toBeUndefined();
   const realEntity = core.scene.entities.get(0);
   const realPt11 = realEntity.getPointBySequence(realEntity.points, 11);
   expect(realPt11.x).toBe(50);
@@ -1159,7 +1196,7 @@ test('onLeftClick drops an active grip, committing the new point to the real ent
 // while leaving the flag true - reverting the points but not the (now stale) automatic-placement
 // text layout. userPositionedText must now be committed explicitly alongside points so its
 // pre-drag value (false, for an initially auto-positioned dimension) is captured for undo too
-test('undo after a grip drop restores both points and the original auto-positioned state', () => {
+test('undo after a grip drop restores both points and the original auto-positioned state', async () => {
   inputManager.reset();
   const entityIndex = selectDimensionWithGrip(10, 10);
   const entity = core.scene.entities.get(entityIndex);
@@ -1170,6 +1207,7 @@ test('undo after a grip drop restores both points and the original auto-position
 
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(50, 60));
   inputManager.onLeftClick(new Point(50, 60));
+  await flushPromises();
 
   const draggedEntity = core.scene.entities.get(entityIndex);
   expect(draggedEntity.dimType.hasUserPositionedText()).toBe(true);
@@ -1208,7 +1246,7 @@ test('startCommand cancels an active grip and reloads the selection previews', (
 
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
   inputManager.onLeftClick(new Point(10, 10));
-  expect(inputManager.activeGrip).toBeDefined();
+  expect(inputManager.activeCommand).toBeInstanceOf(GripStretch);
 
   // drag the grip - this mutates only the live preview clone's Pt11, not the real entity
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(80, 90));
@@ -1223,7 +1261,6 @@ test('startCommand cancels an active grip and reloads the selection previews', (
 
   inputManager.startCommand('Move');
 
-  expect(inputManager.activeGrip).toBeNull();
   expect(inputManager.activeCommand).toBeInstanceOf(Move);
 
   // the preview clone must be reloaded from the real (undragged) entity, not left dragged
@@ -1247,11 +1284,10 @@ test('onEnterPressed repeating the last command cancels an active grip too', () 
   selectDimensionWithGrip(10, 10);
   jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
   inputManager.onLeftClick(new Point(10, 10));
-  expect(inputManager.activeGrip).toBeDefined();
+  expect(inputManager.activeCommand).toBeInstanceOf(GripStretch);
 
   inputManager.onEnterPressed();
 
-  expect(inputManager.activeGrip).toBeNull();
   expect(inputManager.activeCommand).toBeInstanceOf(Move);
 
   jest.restoreAllMocks();
