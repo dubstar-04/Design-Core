@@ -139,6 +139,81 @@ test('getGrips recomputes Pt10 (not stale) when the Pt11 grip moves', () => {
   expect(Number(text.getProperty('string'))).toBeCloseTo(10);
 });
 
+// Regression test: committing a grip-dragged Pt11 (the InputManager drop path - setProperty('points', ...))
+// must actually move the rendered text, not just the stored point. DIMJUST=0 (the default) hardcodes
+// textPosition to the midpoint when text fits inside the extension lines, ignoring Pt11 entirely -
+// unless the dimension is flagged as user-positioned (DXF bit 128), which setProperty() must now detect
+test('dragging the Pt11 grip via setProperty moves the rendered text, not just the stored point', () => {
+  const pt13 = new Point(0, 0);
+  const pt14 = new Point(10, 0);
+  const points = AlignedDimension.getPointsFromSelection([new Line({ points: [pt13, pt14] })], new Point(5, 1));
+  const dim = new AlignedDimension({ points });
+
+  // sanity check: with the default DIMJUST=0 and short text fitting inside, text starts at the midpoint
+  const textBefore = dim.buildDimension().find((e) => e.type === 'Text');
+  expect(textBefore.points[0].x).toBeCloseTo(5);
+
+  expect(dim.dimType.hasUserPositionedText()).toBe(false);
+
+  const grip = dim.getGrips()[0];
+  const newPoints = grip.apply(new Point(5, 30));
+
+  // exactly what InputManager's drop handler does: entity.setProperty('points', newPoints)
+  dim.setProperty('points', newPoints);
+
+  expect(dim.dimType.hasUserPositionedText()).toBe(true);
+
+  const textAfter = dim.buildDimension().find((e) => e.type === 'Text');
+  expect(textAfter.points[0].x).toBeCloseTo(5);
+  expect(textAfter.points[0].y).toBeCloseTo(30);
+});
+
+// Regression test: DIMTAD's vertical offset must still apply on top of a user-positioned
+// (grip-dragged) text anchor - user-positioning only replaces the DIMJUST auto-anchor, it
+// doesn't bypass DIMTAD entirely
+test('DIMTAD vertical offset still applies on top of a user-positioned text', () => {
+  const pt13 = new Point(0, 0);
+  const pt14 = new Point(10, 0);
+  const points = AlignedDimension.getPointsFromSelection([new Line({ points: [pt13, pt14] })], new Point(5, 5));
+  const dim = new AlignedDimension({ points });
+
+  const realStyle = dim.getDimensionStyle();
+  const DIMTXT = realStyle.getValue('DIMTXT');
+  const DIMGAP = realStyle.getValue('DIMGAP');
+  // DIMTAD = 4: places the dimension text below the dimension line
+  dim.getDimensionStyle = () => ({
+    getValue: (prop) => (prop === 'DIMTAD' ? 4 : realStyle.getValue(prop)),
+  });
+
+  const grip = dim.getGrips()[0];
+  const newPoints = grip.apply(new Point(5, 30));
+  dim.setProperty('points', newPoints);
+
+  expect(dim.dimType.hasUserPositionedText()).toBe(true);
+
+  const text = dim.buildDimension().find((e) => e.type === 'Text');
+  // anchored at the user-positioned Pt11 (x=5, y=30), then offset below by DIMTAD=4
+  expect(text.points[0].x).toBeCloseTo(5);
+  expect(text.points[0].y).toBeCloseTo(30 - (DIMTXT * 0.5 + DIMGAP));
+});
+
+// Regression test: a rigid whole-dimension Move (all points translated together, including Pt11)
+// must NOT be mistaken for a grip-drag - auto text placement should keep working normally
+test('a rigid Move (all points translated together) does not set userPositionedText', () => {
+  const pt13 = new Point(0, 0);
+  const pt14 = new Point(10, 0);
+  const points = AlignedDimension.getPointsFromSelection([new Line({ points: [pt13, pt14] })], new Point(5, 5));
+  const dim = new AlignedDimension({ points });
+
+  const delta = new Point(100, 100);
+  const movedPoints = dim.points.map((p) => new Point(p.x + delta.x, p.y + delta.y, p.bulge, p.sequence));
+
+  dim.setProperty('points', movedPoints);
+
+  expect(dim.dimType.hasUserPositionedText()).toBe(false);
+});
+
+
 test('AlignedDimension.preview runs without error and calls createTempItem', () => {
   const origAddAux = DesignCore.Scene.auxiliaryEntities.add;
   const origCreateTempItem = DesignCore.Scene.previewEntities.create;
