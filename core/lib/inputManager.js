@@ -202,7 +202,7 @@ export class InputManager {
     // Grip hit-test takes priority over normal entity selection when idle, so clicking a grip
     // starts GripStretch (which requests the stretch point itself) instead of reselecting it
     if (this.activeCommand === undefined) {
-      const grabbedGrip = this.findGripUnderMouse();
+      const grabbedGrip = DesignCore.Scene.selectionManager.findGripUnderMouse(DesignCore.Mouse.pointOnScene());
       if (grabbedGrip) {
         this.activeCommand = new GripStretch(grabbedGrip.entityIndex, grabbedGrip.grip);
         this.activeCommand.execute();
@@ -238,35 +238,6 @@ export class InputManager {
     } else if (this.promptOption !== undefined && this.promptOption.types.includes(Input.Type.POINT)) {
       this.promptOption.respond(point);
     }
-  }
-
-  /**
-   * Find the grip closest to the mouse, within tolerance, across all selected entities.
-   * Hit-tests against the real scene entities (not the selection preview clones) so a
-   * grip's apply() always recomputes from the last-committed geometry.
-   * @return {Object|undefined} { entityIndex, grip } or undefined if no grip is close enough
-   */
-  findGripUnderMouse() {
-    const gripAperture = 25; // capture radius in pixels (screen space), matches Snapping's snapAperture
-    const delta = gripAperture / DesignCore.Canvas.getScale();
-    const mousePoint = DesignCore.Mouse.pointOnScene();
-
-    let closestGrip;
-    let closestDistance = delta;
-
-    const selectionSet = DesignCore.Scene.selectionManager.selectionSet.selectionSet;
-    for (const entityIndex of selectionSet) {
-      const entity = DesignCore.Scene.entities.get(entityIndex);
-      for (const grip of entity.getGrips()) {
-        const distance = grip.point.distance(mousePoint);
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestGrip = { entityIndex, grip };
-        }
-      }
-    }
-
-    return closestGrip;
   }
 
   /**

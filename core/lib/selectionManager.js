@@ -157,6 +157,34 @@ export class SelectionManager {
   }
 
   /**
+   * Find the grip closest to point, within tolerance, across all selected entities.
+   * Hit-tests against the real scene entities (not the selectedEntities preview clones) so a
+   * grip's apply() always recomputes from the last-committed geometry.
+   * @param {Point} point
+   * @return {Object|undefined} { entityIndex, grip } or undefined if no grip is close enough
+   */
+  findGripUnderMouse(point) {
+    const gripAperture = 25; // capture radius in pixels (screen space), matches Snapping's snapAperture
+    const delta = gripAperture / DesignCore.Canvas.getScale();
+
+    let closestGrip;
+    let closestDistance = delta;
+
+    for (const entityIndex of this.selectionSet.selectionSet) {
+      const entity = DesignCore.Scene.entities.get(entityIndex);
+      for (const grip of entity.getGrips()) {
+        const distance = grip.point.distance(point);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestGrip = { entityIndex, grip };
+        }
+      }
+    }
+
+    return closestGrip;
+  }
+
+  /**
   * Remove the item at index from the selectionSet and selectedEntities
   * @param  {number} index - index of the item
   */
