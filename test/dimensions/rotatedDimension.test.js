@@ -276,3 +276,36 @@ test.each([30, 45, 90, 137, 200])('setProperty(points) alone keeps the measured 
   const text = dim.buildDimension().find((e) => e.type === 'Text');
   expect(Number(text.getProperty('string'))).toBeCloseTo(40);
 });
+
+// Regression test: dragging the Pt11 (text) grip must recompute Pt10 (the dimension line's
+// far end) from the unchanged Pt13/Pt14 - Pt10 is derived from Pt11 at creation time via
+// getPointsFromSelection() and must not be left stale when only Pt11 moves
+test('getGrips recomputes Pt10 (not stale) when the Pt11 grip moves', () => {
+  const pt13 = new Point(0, 0);
+  const pt14 = new Point(10, 0);
+  const points = RotatedDimension.getPointsFromSelection([new Line({ points: [pt13, pt14] })], new Point(5, 5), 0);
+  const dim = new RotatedDimension({ points, linearDimAngle: 0 });
+
+  const originalPt10 = dim.getPointBySequence(dim.points, 10);
+
+  const grips = dim.getGrips();
+  expect(grips).toHaveLength(1);
+  expect(grips[0].point.x).toBeCloseTo(5);
+  expect(grips[0].point.y).toBeCloseTo(5);
+
+  const newPoints = grips[0].apply(new Point(5, 20));
+  const newPt11 = newPoints.find((p) => p.sequence === 11);
+  const newPt10 = newPoints.find((p) => p.sequence === 10);
+
+  expect(newPt11.x).toBeCloseTo(5);
+  expect(newPt11.y).toBeCloseTo(20);
+  // Pt10 must track the moved Pt11, not stay frozen at its original position
+  expect(newPt10.y).not.toBeCloseTo(originalPt10.y);
+  expect(newPt10.y).toBeCloseTo(20);
+
+  // the measured value (driven by Pt13/Pt14, unchanged) must still be correct
+  const rebuilt = new RotatedDimension({ points: newPoints, linearDimAngle: 0 });
+  const text = rebuilt.buildDimension().find((e) => e.type === 'Text');
+  expect(Number(text.getProperty('string'))).toBeCloseTo(10);
+});
+

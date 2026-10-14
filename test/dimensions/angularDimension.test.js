@@ -123,6 +123,38 @@ test('getPointsFromSelection returns correct sequenced points', () => {
   expect(result.length).toBeGreaterThanOrEqual(4);
 });
 
+// Regression test: dragging the Pt11 (text) grip must recompute Pt16 (the dimension arc's
+// radial position) from the unchanged defining lines - previously Pt16 was a frozen copy of
+// Pt11 taken at creation time, so the arc stayed at its original radius when only Pt11 moved
+test('getGrips recomputes Pt16 (not stale) when the Pt11 grip moves', () => {
+  const lineOne = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+  const lineTwo = new Line({ points: [new Point(0, 0), new Point(10, 10)] });
+  const points = AngularDimension.getPointsFromSelection([lineOne, lineTwo], new Point(5, 5));
+  const dim = new AngularDimension({ points });
+
+  const originalPt16 = dim.getPointBySequence(dim.points, 16);
+
+  const grips = dim.getGrips();
+  expect(grips).toHaveLength(1);
+  expect(grips[0].point.x).toBeCloseTo(5);
+  expect(grips[0].point.y).toBeCloseTo(5);
+
+  const newPoints = grips[0].apply(new Point(20, 20));
+  const newPt11 = newPoints.find((p) => p.sequence === 11);
+  const newPt16 = newPoints.find((p) => p.sequence === 16);
+
+  expect(newPt11.x).toBeCloseTo(20);
+  expect(newPt11.y).toBeCloseTo(20);
+  // Pt16 must track the moved Pt11 (further out along the angle), not stay at its original radius
+  expect(newPt16.x).not.toBeCloseTo(originalPt16.x);
+  expect(newPt16.y).not.toBeCloseTo(originalPt16.y);
+
+  // the measured angle (driven by the two defining lines, unchanged) must still be correct
+  const rebuilt = new AngularDimension({ points: newPoints });
+  const text = rebuilt.buildDimension().find((e) => e.type === 'Text');
+  expect(Number(text.getProperty('string').replace(/[^0-9.-]+/g, ''))).toBeCloseTo(45);
+});
+
 test('AngularDimension.preview runs without error and calls createTempItem', () => {
   const origCreateTempItem = DesignCore.Scene.previewEntities.create;
   const origPointOnScene = DesignCore.Mouse.pointOnScene;

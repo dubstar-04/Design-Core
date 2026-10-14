@@ -113,6 +113,39 @@ test('getPointsFromSelection returns correct sequenced points', () => {
   expect(result[2].sequence).toBe(11); // text position
 });
 
+// Regression test: dragging the Pt11 (text) grip must recompute Pt10/Pt15 (the circle attach
+// points) from the unchanged centre/radius - previously they were left frozen at their
+// creation-time angle, so the leader line tracked the new Pt11 but attached to a stale point
+test('getGrips recomputes Pt10/Pt15 (not stale) when the Pt11 grip moves', () => {
+  const centre = new Point(0, 0);
+  const item = { points: [centre], getRadius: () => 10 };
+  const points = DiametricDimension.getPointsFromSelection([item], new Point(10, 0));
+  const dim = new DiametricDimension({ points });
+
+  const originalPt15 = dim.getPointBySequence(dim.points, 15);
+
+  const grips = dim.getGrips();
+  expect(grips).toHaveLength(1);
+  expect(grips[0].point.x).toBeCloseTo(10);
+  expect(grips[0].point.y).toBeCloseTo(0);
+
+  const newPoints = grips[0].apply(new Point(0, -10));
+  const newPt11 = newPoints.find((p) => p.sequence === 11);
+  const newPt15 = newPoints.find((p) => p.sequence === 15);
+
+  expect(newPt11.x).toBeCloseTo(0);
+  expect(newPt11.y).toBeCloseTo(-10);
+  // Pt15 must track the moved Pt11 around the circle, not stay frozen at its original angle
+  expect(newPt15.x).not.toBeCloseTo(originalPt15.x);
+  expect(newPt15.y).not.toBeCloseTo(originalPt15.y);
+  expect(centre.distance(newPt15)).toBeCloseTo(10);
+
+  // the measured value (the diameter, driven by radius, unchanged) must still be correct
+  const rebuilt = new DiametricDimension({ points: newPoints });
+  const text = rebuilt.buildDimension().find((e) => e.type === 'Text');
+  expect(Number(text.getProperty('string').replace(/[^0-9.-]+/g, ''))).toBeCloseTo(20);
+});
+
 test('DiametricDimension.preview runs without error and calls createTempItem', () => {
   const origCreateTempItem = DesignCore.Scene.previewEntities.create;
   const origPointOnScene = DesignCore.Mouse.pointOnScene;

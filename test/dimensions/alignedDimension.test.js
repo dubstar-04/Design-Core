@@ -103,6 +103,42 @@ describe('AlignedDimension.getPointsFromSelection', () => {
   });
 });
 
+// Regression test: dragging the Pt11 (text) grip must recompute Pt10 (the dimension line's
+// far end) from the unchanged Pt13/Pt14 - previously Pt10 was left frozen at its creation-time
+// value, so moving Pt11 alone produced no visible change (text falls back to the midpoint,
+// and the dimension line/value are driven entirely by the stale Pt10)
+test('getGrips recomputes Pt10 (not stale) when the Pt11 grip moves', () => {
+  const pt13 = new Point(0, 0);
+  const pt14 = new Point(10, 0);
+  const points = AlignedDimension.getPointsFromSelection([new Line({ points: [pt13, pt14] })], new Point(5, 5));
+  const dim = new AlignedDimension({ points });
+
+  const originalPt10 = dim.getPointBySequence(dim.points, 10);
+  expect(originalPt10.x).toBeCloseTo(10);
+  expect(originalPt10.y).toBeCloseTo(5);
+
+  const grips = dim.getGrips();
+  expect(grips).toHaveLength(1);
+  expect(grips[0].point.x).toBeCloseTo(5);
+  expect(grips[0].point.y).toBeCloseTo(5);
+
+  const newPoints = grips[0].apply(new Point(5, 20));
+  const newPt11 = newPoints.find((p) => p.sequence === 11);
+  const newPt10 = newPoints.find((p) => p.sequence === 10);
+
+  expect(newPt11.x).toBeCloseTo(5);
+  expect(newPt11.y).toBeCloseTo(20);
+  // Pt10 must track the moved Pt11, not stay frozen at its original position
+  expect(newPt10.y).not.toBeCloseTo(originalPt10.y);
+  expect(newPt10.x).toBeCloseTo(10);
+  expect(newPt10.y).toBeCloseTo(20);
+
+  // the measured value (driven by Pt13/Pt14, unchanged) must still be correct
+  const rebuilt = new AlignedDimension({ points: newPoints });
+  const text = rebuilt.buildDimension().find((e) => e.type === 'Text');
+  expect(Number(text.getProperty('string'))).toBeCloseTo(10);
+});
+
 test('AlignedDimension.preview runs without error and calls createTempItem', () => {
   const origAddAux = DesignCore.Scene.auxiliaryEntities.add;
   const origCreateTempItem = DesignCore.Scene.previewEntities.create;

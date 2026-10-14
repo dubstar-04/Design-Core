@@ -6,6 +6,7 @@ import { Point } from '../../core/entities/point.js';
 import { PromptOptions } from '../../core/lib/inputManager.js';
 import { Input, MouseDown, MouseUp } from '../../core/lib/inputManager.js';
 import { SingleSelection } from '../../core/lib/selectionManager.js';
+import { DimensionBase } from '../../core/dimensions/dimensionBase.js';
 import { expect, jest } from '@jest/globals';
 
 const core = new Core();
@@ -1042,6 +1043,113 @@ test('onLeftClick with SINGLESELECTION prompt and entity nearby - selects the en
   expect(onSelectionSpy).toHaveBeenCalledWith(mockSelection);
   jest.restoreAllMocks();
   po.cancel();
+  inputManager.reset();
+});
+
+// ─── grip editing ─────────────────────────────────────────────────────────────
+
+/**
+ * Select a fresh DimensionBase with a Pt11 (text position) grip at the given coordinates.
+ * @param {number} x
+ * @param {number} y
+ * @return {number} index of the entity in DesignCore.Scene.entities
+ */
+function selectDimensionWithGrip(x, y) {
+  core.scene.clear();
+  const dim = new DimensionBase({});
+  dim.points = [
+    Object.assign(new Point(0, 0), { sequence: 13 }),
+    Object.assign(new Point(x, y), { sequence: 11 }),
+  ];
+  DesignCore.Scene.entities.add(dim);
+  core.scene.selectionManager.addToSelectionSet(0);
+  return 0;
+}
+
+test('findGripUnderMouse returns undefined when no entity is selected', () => {
+  inputManager.reset();
+  core.scene.clear();
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(0, 0));
+  expect(inputManager.findGripUnderMouse()).toBeUndefined();
+  jest.restoreAllMocks();
+});
+
+test('findGripUnderMouse returns the grip when the mouse is within tolerance', () => {
+  inputManager.reset();
+  selectDimensionWithGrip(10, 10);
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
+  const found = inputManager.findGripUnderMouse();
+  expect(found).toBeDefined();
+  expect(found.entityIndex).toBe(0);
+  expect(found.grip.point.x).toBe(10);
+  expect(found.grip.point.y).toBe(10);
+  jest.restoreAllMocks();
+});
+
+test('findGripUnderMouse returns undefined when the mouse is far from any grip', () => {
+  inputManager.reset();
+  selectDimensionWithGrip(10, 10);
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(1000, 1000));
+  expect(inputManager.findGripUnderMouse()).toBeUndefined();
+  jest.restoreAllMocks();
+});
+
+test('onLeftClick grabs a grip under the mouse without reselecting the entity', () => {
+  inputManager.reset();
+  selectDimensionWithGrip(10, 10);
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
+  const singleSelectSpy = jest.spyOn(core.scene.selectionManager, 'singleSelect');
+
+  inputManager.onLeftClick(new Point(10, 10));
+
+  expect(inputManager.activeGrip).toBeDefined();
+  expect(inputManager.activeGrip.entityIndex).toBe(0);
+  expect(singleSelectSpy).not.toHaveBeenCalled();
+  jest.restoreAllMocks();
+  inputManager.reset();
+});
+
+test('mouseMoved updates the selected-entity preview clone while a grip is active', () => {
+  inputManager.reset();
+  selectDimensionWithGrip(10, 10);
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
+  inputManager.onLeftClick(new Point(10, 10));
+  expect(inputManager.activeGrip).toBeDefined();
+
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(50, 60));
+  inputManager.mouseMoved();
+
+  const previewEntity = core.scene.selectionManager.selectedEntities[0];
+  const previewPt11 = previewEntity.getPointBySequence(previewEntity.points, 11);
+  expect(previewPt11.x).toBe(50);
+  expect(previewPt11.y).toBe(60);
+
+  // the real scene entity is untouched until drop
+  const realPt11 = core.scene.entities.get(0).getPointBySequence(core.scene.entities.get(0).points, 11);
+  expect(realPt11.x).toBe(10);
+  expect(realPt11.y).toBe(10);
+
+  jest.restoreAllMocks();
+  inputManager.reset();
+});
+
+test('onLeftClick drops an active grip, committing the new point to the real entity', () => {
+  inputManager.reset();
+  selectDimensionWithGrip(10, 10);
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
+  inputManager.onLeftClick(new Point(10, 10));
+  expect(inputManager.activeGrip).toBeDefined();
+
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(50, 60));
+  inputManager.onLeftClick(new Point(50, 60));
+
+  expect(inputManager.activeGrip).toBeNull();
+  const realEntity = core.scene.entities.get(0);
+  const realPt11 = realEntity.getPointBySequence(realEntity.points, 11);
+  expect(realPt11.x).toBe(50);
+  expect(realPt11.y).toBe(60);
+
+  jest.restoreAllMocks();
   inputManager.reset();
 });
 
