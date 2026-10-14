@@ -84,6 +84,17 @@ export class DimensionBase extends Entity {
       writable: true,
     });
 
+    // DXF Groupcode 70 bit 128 - user-positioned text flag, exposed as a property so a grip-drop
+    // commit can include it explicitly in the UpdateState snapshot, alongside points, for undo/redo
+    this.properties.add(Property.Names.USERPOSITIONEDTEXT, {
+      type: Property.Type.BOOLEAN,
+      visible: false,
+      get: (entity) => entity.dimType.hasUserPositionedText(),
+      set: (entity, value) => {
+        entity.dimType.userPositionedText = value;
+      },
+    });
+
     if (data) {
       if (data.hasOwnProperty('41')) {
         // DXF Groupcode 41 - Line Spacing Factor
