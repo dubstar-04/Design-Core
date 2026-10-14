@@ -45,6 +45,7 @@
         "dimstyles",
         "dimline",
         "DIMENSIONSTYLE",
+        "USERPOSITIONEDTEXT",
         "DIMADEC",
         "DIMALI",
         "DIMALT",
