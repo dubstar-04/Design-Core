@@ -140,6 +140,14 @@ export class InputManager {
       this.reset();
     }
 
+    if (this.activeGrip !== null) {
+      // a grip can only be grabbed while idle (no active command), so this is mutually
+      // exclusive with the reset() above - without this, the grip stays stuck to the
+      // mouse and the new command's next click drops it instead of answering its prompt
+      this.activeGrip = null;
+      DesignCore.Scene.selectionManager.reloadSelectedEntities();
+    }
+
     const resolvedCommand = DesignCore.CommandManager.getCommand(command);
     DesignCore.CommandLine.addToCommandHistory(resolvedCommand);
     this.activeCommand = DesignCore.CommandManager.createNew(resolvedCommand);
