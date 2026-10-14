@@ -27,7 +27,7 @@ export class AngularDimension extends DimensionBase {
    */
   constructor(data) {
     super(data);
-    this.dimType.setDimType(2); // Angular dimension
+    this.dimType.setBaseType(2); // Angular dimension - preserve flags loaded from DXF group 70
   }
 
   /**

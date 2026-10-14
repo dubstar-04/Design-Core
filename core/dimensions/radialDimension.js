@@ -14,7 +14,7 @@ export class RadialDimension extends CircularDimensionBase {
    */
   constructor(data) {
     super(data);
-    this.dimType.setDimType(4); // Radial dimension
+    this.dimType.setBaseType(4); // Radial dimension - preserve flags loaded from DXF group 70
   }
 
   /**

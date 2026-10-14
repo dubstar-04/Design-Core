@@ -22,7 +22,7 @@ export class RotatedDimension extends LinearDimensionBase {
    */
   constructor(data) {
     super(data);
-    this.dimType.setDimType(0); // Rotated dimension
+    this.dimType.setBaseType(0); // Rotated dimension - preserve flags loaded from DXF group 70
   }
 
   /**

@@ -13,7 +13,7 @@ export class DiametricDimension extends CircularDimensionBase {
    */
   constructor(data) {
     super(data);
-    this.dimType.setDimType(3); // Diametric dimension
+    this.dimType.setBaseType(3); // Diametric dimension - preserve flags loaded from DXF group 70
   }
 
   /**

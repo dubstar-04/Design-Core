@@ -21,7 +21,7 @@ export class AlignedDimension extends LinearDimensionBase {
    */
   constructor(data) {
     super(data);
-    this.dimType.setDimType(1); // Aligned dimension
+    this.dimType.setBaseType(1); // Aligned dimension - preserve flags loaded from DXF group 70
   }
 
   /**
