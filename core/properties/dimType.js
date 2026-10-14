@@ -100,6 +100,20 @@ export class DimType {
   }
 
   /**
+   * Set only the base dimension type (0-6), leaving the block reference, ordinate and
+   * user-positioned-text flags untouched - used by subclass constructors to pin their type
+   * without clobbering flags already loaded from a DXF group 70 value
+   * @param {number} baseType
+   */
+  setBaseType(baseType) {
+    if (!DimType.isValidDimensionType(baseType)) {
+      baseType = 0;
+    }
+
+    this.dimType = DimType.getBaseType(baseType);
+  }
+
+  /**
    * Check if the dimension has a block reference
    * @return {boolean} true if the dimension has a block reference
    */
