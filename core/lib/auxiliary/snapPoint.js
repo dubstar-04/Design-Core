@@ -13,6 +13,7 @@ export class SnapPoint {
     TANGENT: 'tangent',
     NODE: 'node',
     PERPENDICULAR: 'perpendicular',
+    GRIP: 'grip',
   });
 
   /**
@@ -56,6 +57,14 @@ export class SnapPoint {
           new Point(x + size, y + size),
           new Point(x - size, y + size),
         ], { closed: true });
+        break;
+      case SnapPoint.Type.GRIP: // filled square
+        renderer.drawShape([
+          new Point(x - size, y - size),
+          new Point(x + size, y - size),
+          new Point(x + size, y + size),
+          new Point(x - size, y + size),
+        ], { closed: true, fill: true });
         break;
       case SnapPoint.Type.MID: // triangle
         renderer.drawShape([
