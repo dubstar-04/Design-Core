@@ -27,19 +27,6 @@ export class GripStretch extends Tool {
   }
 
   /**
-   * Cancel the in-progress stretch - unlike Tool's default (full reset), this must not deselect
-   * the entity, and must resolve the suspended execute()'s pending requestInput() promise so it
-   * doesn't stay forever awaiting a prompt nobody can respond to or cancel again
-   */
-  cancel() {
-    const inputManager = DesignCore.Scene.inputManager;
-    inputManager.promptOption?.cancel();
-    inputManager.promptOption = undefined;
-    inputManager.activeCommand = undefined;
-    DesignCore.Scene.selectionManager.reloadSelectedEntities();
-  }
-
-  /**
    * Execute method
    * requests the stretch point, then commits it - keeping the entity selected afterwards
    * (with its grips still visible), unlike most commands which deselect on completion
@@ -58,6 +45,9 @@ export class GripStretch extends Tool {
       // entity via Scene.reset() - grip editing must leave it selected (grips still visible)
       inputManager.activeCommand = undefined;
       inputManager.promptOption = undefined;
+      // reset() normally clears this - without it the next command's first point (or the next
+      // grip drag's tracking line) would stay anchored to this drop, not start fresh
+      inputManager.inputPoint = null;
       DesignCore.CommandLine.resetPrompt();
       DesignCore.Scene.selectionManager.reloadSelectedEntities();
       DesignCore.Canvas.requestPaint();
@@ -90,5 +80,18 @@ export class GripStretch extends Tool {
       properties.userPositionedText = true;
     }
     DesignCore.Scene.commit([new UpdateState(entity, properties)]);
+  }
+
+  /**
+   * Cancel the in-progress stretch - unlike Tool's default (full reset), this must not deselect
+   * the entity, and must resolve the suspended execute()'s pending requestInput() promise so it
+   * doesn't stay forever awaiting a prompt nobody can respond to or cancel again
+   */
+  cancel() {
+    const inputManager = DesignCore.Scene.inputManager;
+    inputManager.promptOption?.cancel();
+    inputManager.promptOption = undefined;
+    inputManager.activeCommand = undefined;
+    DesignCore.Scene.selectionManager.reloadSelectedEntities();
   }
 }

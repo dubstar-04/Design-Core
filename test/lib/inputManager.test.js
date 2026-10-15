@@ -1186,6 +1186,26 @@ test('onLeftClick drops an active grip, committing the new point to the real ent
   inputManager.reset();
 });
 
+// Regression test: requestInput() sets inputManager.inputPoint to the dropped point (needed for
+// polar/ortho tracking), but GripStretch's completion path bypasses the standard reset() that
+// normally clears it - leaving the next command's first point (or the next grip drag's tracking
+// line) anchored to this stale drop position instead of starting fresh
+test('onLeftClick drops an active grip clears inputPoint, not just activeCommand', async () => {
+  inputManager.reset();
+  selectDimensionWithGrip(10, 10);
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(10, 10));
+  inputManager.onLeftClick(new Point(10, 10));
+
+  jest.spyOn(DesignCore.Mouse, 'pointOnScene').mockReturnValue(new Point(50, 60));
+  inputManager.onLeftClick(new Point(50, 60));
+  await flushPromises();
+
+  expect(inputManager.inputPoint).toBeNull();
+
+  jest.restoreAllMocks();
+  inputManager.reset();
+});
+
 // Regression test: the grip drop commits only 'points' via UpdateState, but DimensionBase's
 // points setter also flips dimType.userPositionedText as a side effect. Since State.do() only
 // snapshots the properties explicitly listed in the commit, undo used to restore the old points
