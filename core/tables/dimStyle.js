@@ -1,5 +1,6 @@
 
 import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { DesignCore } from '../designCore.js';
 import { Logging } from '../lib/logging.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
@@ -545,6 +546,22 @@ export class DimStyle {
   }
 
   /**
+   * Get the handle of the text style referenced by DIMTXSTY
+   * DIMTXSTY holds a style name, or a style handle when loaded from a dxf file
+   * @return {string} handle or undefined if no matching style exists
+   */
+  getTextStyleHandle() {
+    const styles = DesignCore.StyleManager.getItems();
+    const reference = String(this.DIMTXSTY).toUpperCase();
+
+    const style = styles.find((item) => item.name.toUpperCase() === reference) ??
+      styles.find((item) => String(item.handle).toUpperCase() === reference) ??
+      styles.find((item) => item.name.toUpperCase() === 'STANDARD');
+
+    return style?.handle;
+  }
+
+  /**
    * Write the entity to file in the dxf format
    * @param {DXFFile} file
    */
@@ -616,8 +633,15 @@ export class DimStyle {
     file.writeGroupCode('287', this.DIMFIT);
     file.writeGroupCode('288', this.DIMUPT, DXFFile.Version.R13);
     file.writeGroupCode('289', this.DIMATFIT, DXFFile.Version.R2000);
-    file.writeGroupCode('340', this.DIMTXSTY, DXFFile.Version.R13);
-    file.writeGroupCode('341', this.DIMLDRBLK, DXFFile.Version.R2000);
+    // 340 and 341 are handles - writing a name leaves AutoCAD unable to resolve the text style (dimension text is not shown)
+    const textStyleHandle = this.getTextStyleHandle();
+    if (textStyleHandle !== undefined) {
+      file.writeGroupCode('340', textStyleHandle, DXFFile.Version.R13);
+    }
+    // 'ClosedFilled' is the default leader arrowhead and has no block handle, omitting the group selects it
+    if (this.DIMLDRBLK !== 'ClosedFilled') {
+      file.writeGroupCode('341', this.DIMLDRBLK, DXFFile.Version.R2000);
+    }
     // file.writeGroupCode('342', this.DIMBLK);
     // file.writeGroupCode('343', this.DIMBLK1);
     // file.writeGroupCode('344', this.DIMBLK2);
