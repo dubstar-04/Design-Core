@@ -384,6 +384,8 @@ export class DimStyle {
 
     // DXF Groupcode 340 - (handle of referenced STYLE)
     this.DIMTXSTY = Property.loadValue([data.DIMTXSTY, data[340]], 'Standard');
+    // internal - true when DIMTXSTY holds a style handle (loaded from group 340) rather than a style name
+    this.DIMTXSTYISHANDLE = Property.loadValue([data.DIMTXSTYISHANDLE, data.DIMTXSTY === undefined && data[340] !== undefined], false);
 
     // DXF Groupcode 341 - (handle of referenced BLOCK)
     this.DIMLDRBLK = Property.loadValue([data.DIMLDRBLK, data[341]], 'ClosedFilled');
@@ -476,6 +478,9 @@ export class DimStyle {
 
     if (this.hasOwnProperty(valueName)) {
       this[valueName] = value;
+      if (valueName === 'DIMTXSTY') {
+        this.DIMTXSTYISHANDLE = false;
+      }
     } else {
       const err = `Setting Value - Property does not exist: ${valueName}`;
       Logging.instance.warn(`${this.type} - ${err}`);
@@ -547,15 +552,16 @@ export class DimStyle {
 
   /**
    * Get the handle of the text style referenced by DIMTXSTY
-   * DIMTXSTY holds a style name, or a style handle when loaded from a dxf file
+   * DIMTXSTY holds a style name, or a style handle when DIMTXSTYISHANDLE is set (loaded from a dxf file)
    * @return {string} handle or undefined if no matching style exists
    */
   getTextStyleHandle() {
     const styles = DesignCore.StyleManager.getItems();
     const reference = String(this.DIMTXSTY).toUpperCase();
 
-    const style = styles.find((item) => item.name.toUpperCase() === reference) ??
-      styles.find((item) => String(item.handle).toUpperCase() === reference) ??
+    const style = styles.find((item) => this.DIMTXSTYISHANDLE ?
+      String(item.handle).toUpperCase() === reference :
+      item.name.toUpperCase() === reference) ??
       styles.find((item) => item.name.toUpperCase() === 'STANDARD');
 
     return style?.handle;
