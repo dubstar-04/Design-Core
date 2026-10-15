@@ -1211,7 +1211,9 @@ test('onLeftClick drops an active grip clears inputPoint, not just activeCommand
 // snapshots the properties explicitly listed in the commit, undo used to restore the old points
 // while leaving the flag true - reverting the points but not the (now stale) automatic-placement
 // text layout. userPositionedText must now be committed explicitly alongside points so its
-// pre-drag value (false, for an initially auto-positioned dimension) is captured for undo too
+// pre-drag value (false, for an initially auto-positioned dimension) is captured for undo too.
+// Also covers Scene.undo()/redo() reloading the retained selection preview clone, which used to
+// stay stuck at the dropped position while findGripUnderMouse() hit-tested the restored geometry
 test('undo after a grip drop restores both points and the original auto-positioned state', async () => {
   inputManager.reset();
   const entityIndex = selectDimensionWithGrip(10, 10);
@@ -1239,6 +1241,14 @@ test('undo after a grip drop restores both points and the original auto-position
   expect(restoredPt11.y).toBe(10);
   expect(restoredEntity.dimType.hasUserPositionedText()).toBe(false);
 
+  // the retained selection preview clone must be reloaded too, not just the real entity -
+  // otherwise Canvas keeps drawing the dropped clone while the grip hit-test uses the restored one
+  const restoredClone = core.scene.selectionManager.selectedEntities[0];
+  const restoredClonePt11 = restoredClone.getPointBySequence(restoredClone.points, 11);
+  expect(restoredClonePt11.x).toBe(10);
+  expect(restoredClonePt11.y).toBe(10);
+  expect(core.scene.selectionManager.findGripUnderMouse(new Point(10, 10))).toBeDefined();
+
   core.scene.redo();
 
   const redoneEntity = core.scene.entities.get(entityIndex);
@@ -1246,6 +1256,12 @@ test('undo after a grip drop restores both points and the original auto-position
   const redonePt11 = redoneEntity.getPointBySequence(redoneEntity.points, 11);
   expect(redonePt11.x).toBe(50);
   expect(redonePt11.y).toBe(60);
+
+  const redoneClone = core.scene.selectionManager.selectedEntities[0];
+  const redoneClonePt11 = redoneClone.getPointBySequence(redoneClone.points, 11);
+  expect(redoneClonePt11.x).toBe(50);
+  expect(redoneClonePt11.y).toBe(60);
+  expect(core.scene.selectionManager.findGripUnderMouse(new Point(50, 60))).toBeDefined();
 
   jest.restoreAllMocks();
   inputManager.reset();
