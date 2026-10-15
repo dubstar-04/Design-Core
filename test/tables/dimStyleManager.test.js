@@ -59,3 +59,18 @@ test('Test DimStyleManager.deleteStyle keeps indelible styles and their dimensio
   expect(dimStyleManager.itemExists('STANDARD')).toBe(true);
   expect(core.scene.entities.count()).toBe(1);
 });
+
+test('Test DimStyleManager.renameStyle updates dimensions through the property API', () => {
+  dimStyleManager.addItem({ name: 'OLDNAME' });
+  core.scene.addEntity('Line', { points: [new Point(), new Point(10, 10)] });
+  core.scene.addEntity('RotatedDimension', dimensionData('OLDNAME'));
+  core.scene.addEntity('RotatedDimension', dimensionData('STANDARD'));
+
+  dimStyleManager.renameStyle(dimStyleManager.getItemIndex('OLDNAME'), 'NEWNAME');
+
+  const dimension = core.scene.entities.get(1);
+  expect(dimension.getProperty('dimensionStyle')).toBe('NEWNAME');
+  expect(Object.hasOwn(dimension, 'dimensionStyle')).toBe(false);
+  expect(core.scene.entities.get(2).getProperty('dimensionStyle')).toBe('STANDARD');
+  expect(dimension.getDimensionStyle()?.name).toBe('NEWNAME');
+});
