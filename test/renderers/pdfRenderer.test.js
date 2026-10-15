@@ -190,6 +190,20 @@ describe('PdfRenderer — drawing', () => {
     expect(output).toContain('(\\330)');
     expect(output).not.toMatch(/[^\x00-\x7f]/);
   });
+
+  test.each([
+    ['\u2019', '\\222'], // right single quote
+    ['\u201C', '\\223'], // left double quote
+    ['\u2013', '\\226'], // en dash
+    ['\u2014', '\\227'], // em dash
+    ['\u20AC', '\\200'], // euro sign
+    ['\u2122', '\\231'], // trademark
+    ['\u4E2D', '\\077'], // unsupported, replaced with ?
+  ])('drawText maps %s to WinAnsi %s', (char, escape) => {
+    const renderer = new PdfRenderer(100, 100);
+    renderer.drawText([{ char, x: 0, y: 0, rotation: 0 }], 'Helvetica', 5);
+    expect(renderer.getOutput()).toContain(`(${escape})`);
+  });
 });
 
 describe('PdfRenderer — state methods', () => {
