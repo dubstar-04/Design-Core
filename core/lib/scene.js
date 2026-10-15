@@ -139,6 +139,7 @@ export class Scene {
   undo() {
     if (this.stateManager.canUndo()) {
       this.stateManager.undo();
+      this.selectionManager.reloadSelectedEntities();
       DesignCore.Canvas.requestPaint();
     } else {
       DesignCore.Core.notify(Strings.Message.NOUNDO);
@@ -151,6 +152,7 @@ export class Scene {
   redo() {
     if (this.stateManager.canRedo()) {
       this.stateManager.redo();
+      this.selectionManager.reloadSelectedEntities();
       DesignCore.Canvas.requestPaint();
     } else {
       DesignCore.Core.notify(Strings.Message.NOREDO);
