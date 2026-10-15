@@ -14,7 +14,7 @@ export class RadialDimension extends CircularDimensionBase {
    */
   constructor(data) {
     super(data);
-    this.dimType.setDimType(4); // Radial dimension
+    this.dimType.setBaseType(4); // Radial dimension - preserve flags loaded from DXF group 70
   }
 
   /**
@@ -46,6 +46,31 @@ export class RadialDimension extends CircularDimensionBase {
 
     const points = [Pt10, Pt15, Pt11];
     return points;
+  }
+
+  /**
+   * Get the grip points for interactive editing on the canvas.
+   * Pt15 (the circle attach point) is derived from Pt11 via getPointsFromSelection() -
+   * must be recomputed from the unchanged centre (Pt10) and radius, not left stale.
+   * @return {Array<{point: Point, apply: Function}>} grips
+   */
+  getGrips() {
+    const Pt10 = this.getPointBySequence(this.points, 10); // centre
+    const Pt15 = this.getPointBySequence(this.points, 15); // point on circle
+    const Pt11 = this.getPointBySequence(this.points, 11); // text position
+
+    if (!Pt10 || !Pt15 || !Pt11) {
+      return [];
+    }
+
+    const radius = Pt10.distance(Pt15);
+
+    const apply = (newPoint) => {
+      const tempEntity = { points: [Pt10], getRadius: () => radius };
+      return this.constructor.getPointsFromSelection([tempEntity], newPoint);
+    };
+
+    return [{ point: Pt11, apply: apply }];
   }
 
   /**

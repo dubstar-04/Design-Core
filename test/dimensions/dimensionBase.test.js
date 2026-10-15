@@ -219,6 +219,41 @@ describe('DimensionBase', () => {
     expect(baseDim.snaps(new Point(0, 0), 1)).toEqual([]);
   });
 
+  describe('getGrips', () => {
+    test('returns no grips when there is no sequence 11 point', () => {
+      baseDim.points = [Object.assign(new Point(1, 2), { sequence: 13 })];
+      expect(baseDim.getGrips()).toEqual([]);
+    });
+
+    test('returns the text position (Pt11) grip', () => {
+      baseDim.points = [
+        Object.assign(new Point(1, 2), { sequence: 13 }),
+        Object.assign(new Point(5, 6), { sequence: 11 }),
+      ];
+      const grips = baseDim.getGrips();
+      expect(grips.length).toBe(1);
+      expect(grips[0].point.x).toBe(5);
+      expect(grips[0].point.y).toBe(6);
+    });
+
+    test('apply() replaces only the Pt11 point, preserving others and the sequence tag', () => {
+      baseDim.points = [
+        Object.assign(new Point(1, 2), { sequence: 13 }),
+        Object.assign(new Point(5, 6), { sequence: 11 }),
+      ];
+      const grip = baseDim.getGrips()[0];
+      const newPoints = grip.apply(new Point(9, 9));
+
+      expect(newPoints.length).toBe(2);
+      expect(newPoints[0].x).toBe(1);
+      expect(newPoints[0].y).toBe(2);
+      expect(newPoints[0].sequence).toBe(13);
+      expect(newPoints[1].x).toBe(9);
+      expect(newPoints[1].y).toBe(9);
+      expect(newPoints[1].sequence).toBe(11);
+    });
+  });
+
   test('closestPoint delegates to block', () => {
     baseDim.block = { entities: ['dummy'], closestPoint: () => 'foo' };
     expect(baseDim.closestPoint(new Point(0, 0))).toBe('foo');

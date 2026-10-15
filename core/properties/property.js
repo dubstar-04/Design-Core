@@ -112,6 +112,7 @@ export class Property {
     LEADERLENGTH: 'leaderLength',
     LINEARDIMANGLE: 'linearDimAngle',
     TEXTOVERRIDE: 'textOverride',
+    USERPOSITIONEDTEXT: 'userPositionedText',
   });
 
   /**

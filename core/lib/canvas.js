@@ -5,6 +5,7 @@ import { Point } from '../entities/point.js';
 import { Input } from './input.js';
 import { Logging } from './logging.js';
 import { PlotOptions } from './plotOptions.js';
+import { SnapPoint } from './auxiliary/snapPoint.js';
 // import { RendererBase } from './renderers/rendererBase.js';
 
 import { DesignCore } from '../designCore.js';
@@ -399,6 +400,11 @@ export class Canvas {
     const selectedEntities = DesignCore.Scene.selectionManager.selectedEntities;
     this.#paintEntities(selectedEntities, renderer, { colour: selectionHaloColour, lineWidthDelta: selectionLineWidthDelta });
 
+    // Paint grips for selected entities - only when idle (no active command)
+    if (DesignCore.Scene.inputManager.activeCommand === undefined) {
+      this.#paintGrips(selectedEntities, renderer, scale);
+    }
+
     // Paint the auxiliary scene items
     // auxiliary items include things like the selection window, snap points etc
     // these items have their own draw routine
@@ -459,6 +465,22 @@ export class Canvas {
       if (filter && !filter(entity)) continue;
       const isHovered = hoverCollection !== null && hoverCollection.indexOf(entity) !== -1;
       this.#paintEntity(entity, renderer, undefined, isHovered ? hoverOverrides : (overrides ?? {}), scale);
+    }
+  }
+
+  /**
+   * Draw grip markers for every grip exposed by the given entities.
+   * @param {Array} entities - selected entities to draw grips for
+   * @param {Object} renderer - renderer instance
+   * @param {number} scale - current canvas scale
+   */
+  #paintGrips(entities, renderer, scale) {
+    for (const entity of entities) {
+      for (const grip of entity.getGrips()) {
+        renderer.save();
+        new SnapPoint(grip.point, SnapPoint.Type.GRIP).draw(renderer, scale);
+        renderer.restore();
+      }
     }
   }
 

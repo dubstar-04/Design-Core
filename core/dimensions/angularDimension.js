@@ -27,7 +27,7 @@ export class AngularDimension extends DimensionBase {
    */
   constructor(data) {
     super(data);
-    this.dimType.setDimType(2); // Angular dimension
+    this.dimType.setBaseType(2); // Angular dimension - preserve flags loaded from DXF group 70
   }
 
   /**
@@ -151,6 +151,32 @@ export class AngularDimension extends DimensionBase {
 
       DesignCore.Scene.previewEntities.create(this.type, { points: points, dimensionStyle: this.getProperty(Property.Names.DIMENSIONSTYLE) });
     }
+  }
+
+  /**
+   * Get the grip points for interactive editing on the canvas.
+   * Pt16 (the dimension arc's radial position) is derived from Pt11 via getPointsFromSelection() -
+   * must be recomputed from the two unchanged defining lines, not left stale.
+   * @return {Array<{point: Point, apply: Function}>} grips
+   */
+  getGrips() {
+    const Pt15 = this.getPointBySequence(this.points, 15);
+    const Pt10 = this.getPointBySequence(this.points, 10);
+    const Pt13 = this.getPointBySequence(this.points, 13);
+    const Pt14 = this.getPointBySequence(this.points, 14);
+    const Pt11 = this.getPointBySequence(this.points, 11);
+
+    if (!Pt15 || !Pt10 || !Pt13 || !Pt14 || !Pt11) {
+      return [];
+    }
+
+    const apply = (newPoint) => {
+      const tempLineOne = new Line({ points: [Pt15, Pt10] });
+      const tempLineTwo = new Line({ points: [Pt13, Pt14] });
+      return AngularDimension.getPointsFromSelection([tempLineOne, tempLineTwo], newPoint);
+    };
+
+    return [{ point: Pt11, apply: apply }];
   }
 
   /**
@@ -391,7 +417,7 @@ export class AngularDimension extends DimensionBase {
     let textPosition = arcMiddle;
     let textRotation = this.getTextDirection(horizontalText ? 0 : arrow1pos.angle(arrow2pos));
     let textAboveDirection = textRotation + Math.PI / 2;
-    let textAboveDistance = DIMTXT * 0.5 + DIMGAP;
+    const textAboveDistance = DIMTXT * 0.5 + DIMGAP;
     const outsideOffsetDirection = Pt11.distance(arrow1pos) < Pt11.distance(arrow2pos) ? -1 : 1;
     const textPositionOffsetAngle = arrowRadians * 3;
     const internalPositionAdjustmentAngle = dimension * 0.5 > textPositionOffsetAngle ? dimension * 0.5 - textPositionOffsetAngle : 0;
@@ -430,10 +456,19 @@ export class AngularDimension extends DimensionBase {
         break;
     }
 
-    // Text vertical position
-    const textAndDimlineAligned = this.alignedOrOpposite(textRotation, (intersectPt.angle(textPosition) + Math.PI / 2));
-    const textIsOnExtensionLine = textPosition.perpendicular(intersectPt, arrow1pos).isSame(textPosition) || textPosition.perpendicular(intersectPt, arrow2pos).isSame(textPosition);
-    if (!textAndDimlineAligned && !textIsOnExtensionLine) textAboveDistance = 0;
+    // A grip-dragged text position overrides the DIMJUST auto-placement above with Pt11 as
+    // the anchor - DIMTAD's vertical offset below still applies on top, matching AutoCAD.
+    // Rotation must be recomputed from Pt11's own tangent too, otherwise it's stuck at the
+    // DIMJUST-computed (pre-drag) rotation, which is wrong once the text has moved elsewhere
+    if (this.dimType.hasUserPositionedText()) {
+      textPosition = Pt11;
+      textRotation = this.getTextDirection(horizontalText ? 0 : (intersectPt.angle(Pt11) + Math.PI / 2));
+      textAboveDirection = textRotation + Math.PI / 2;
+    }
+
+    // DIMTAD applies unconditionally (matching CircularDimensionBase) - forced-horizontal text
+    // (DIMTIH/DIMTOH) rarely aligns with the arc's tangent, so gating the offset on that
+    // alignment suppressed DIMTAD for nearly every angular dimension
     switch (DIMTAD) {
       case 1:
       case 2:

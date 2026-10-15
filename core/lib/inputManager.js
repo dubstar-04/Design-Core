@@ -1,4 +1,5 @@
 import { Tool } from '../tools/tool.js';
+import { GripStretch } from '../tools/gripStretch.js';
 import { Snapping } from './snapping.js';
 
 import { DesignCore } from '../designCore.js';
@@ -131,7 +132,9 @@ export class InputManager {
    * @param {string} command - command name or shortcut
    */
   startCommand(command) {
-    if (this.activeCommand !== undefined) {
+    if (this.activeCommand instanceof Tool) {
+      this.activeCommand.cancel();
+    } else if (this.activeCommand !== undefined) {
       this.reset();
     }
 
@@ -196,6 +199,17 @@ export class InputManager {
    * @param {Point} point
    */
   onLeftClick(point) {
+    // Grip hit-test takes priority over normal entity selection when idle, so clicking a grip
+    // starts GripStretch (which requests the stretch point itself) instead of reselecting it
+    if (this.activeCommand === undefined) {
+      const grabbedGrip = DesignCore.Scene.selectionManager.findGripUnderMouse(DesignCore.Mouse.pointOnScene());
+      if (grabbedGrip) {
+        this.activeCommand = new GripStretch(grabbedGrip.entityIndex, grabbedGrip.grip);
+        this.activeCommand.execute();
+        return;
+      }
+    }
+
     // left clicks are used for selection of entities and points
     // Selection of entities can only occur if there is no active snap available
     // Selection of entities can only occur if the mouse is over an entity

@@ -110,6 +110,15 @@ export class Entity {
   }
 
   /**
+   * Get the grip points for interactive editing on the canvas.
+   * Overridden by entities that expose editable grips (e.g. DimensionBase).
+   * @return {Array<{point: Point, apply: Function}>} grips - apply(newPoint) returns a new points array
+   */
+  getGrips() {
+    return [];
+  }
+
+  /**
    * Normalise entity-level DXF group codes before construction.
    * Subclasses override this for geometric transformation; they receive data
    * that has already passed through this method via CommandManager.
