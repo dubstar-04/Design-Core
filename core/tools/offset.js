@@ -151,7 +151,13 @@ export class Offset extends Tool {
     const isClosed = polyPts.length >= 3 && polyPts[0].isSame(polyPts.at(-1));
     const points = isClosed ? polyPts.slice(0, -1) : polyPts;
 
-    return this.getOffsetPolylinePoints(points, isClosed, sidePoint, distance);
+    const offsetPoints = this.getOffsetPolylinePoints(points, isClosed, sidePoint, distance);
+    if (offsetPoints && isClosed) {
+      // restore the closing point so closed entities (e.g. Circle) are rebuilt as closed, not as an Arc
+      offsetPoints.push(new Point(offsetPoints[0].x, offsetPoints[0].y));
+    }
+
+    return offsetPoints;
   }
 
   /**
