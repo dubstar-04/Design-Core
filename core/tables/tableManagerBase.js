@@ -307,9 +307,24 @@ export class TableManagerBase {
    * @param {string} newItemName
    */
   updateSceneItem(oldItemName, newItemName) {
+    const target = typeof oldItemName === 'string' ? oldItemName.toUpperCase() : undefined;
+    if (target === undefined) {
+      return;
+    }
+
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
-      if (DesignCore.Scene.entities.get(i)[this.itemProperty] === oldItemName) {
-        DesignCore.Scene.entities.get(i)[this.itemProperty] = newItemName;
+      const entity = DesignCore.Scene.entities.get(i);
+      const isProperty = entity.properties?.has(this.itemProperty) ?? false;
+      const value = isProperty ? entity.getProperty(this.itemProperty) : entity[this.itemProperty];
+
+      if (typeof value !== 'string' || value.toUpperCase() !== target) {
+        continue;
+      }
+
+      if (isProperty) {
+        entity.setProperty(this.itemProperty, newItemName);
+      } else {
+        entity[this.itemProperty] = newItemName;
       }
     }
   }
