@@ -366,3 +366,18 @@ AcDbAlignedDimension
   newDimension.dxf(file);
   expect(file.contents).toEqual(dxfString);
 });
+
+test('snaps returns END snaps at the dimension line endpoints', () => {
+  const points = AlignedDimension.getPointsFromSelection([new Line({ points: [new Point(0, 0), new Point(10, 0)] })], new Point(5, 5));
+  const dim = new AlignedDimension({ points });
+  const snaps = dim.snaps(new Point(), 1);
+
+  expect(snaps.length).toBe(2);
+  expect(snaps.every((snap) => snap.type === 'end')).toBe(true);
+  expect(snaps[0].snapPoint.isSame(new Point(0, 5))).toBe(true);
+  expect(snaps[1].snapPoint.isSame(new Point(10, 5))).toBe(true);
+});
+
+test('snaps returns no snaps when the dimension has no points', () => {
+  expect(new AlignedDimension().snaps(new Point(), 1)).toEqual([]);
+});
