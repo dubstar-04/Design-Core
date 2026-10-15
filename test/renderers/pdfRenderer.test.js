@@ -178,6 +178,18 @@ describe('PdfRenderer — drawing', () => {
     // cos(π/4) ≈ 0.7071, sin(π/4) ≈ 0.7071
     expect(output).toContain('0.7071');
   });
+
+  test('drawText encodes non-ASCII characters as WinAnsi octal escapes', () => {
+    const renderer = new PdfRenderer(100, 100);
+    renderer.drawText([
+      { char: '\u00B0', x: 0, y: 0, rotation: 0 },
+      { char: '\u00D8', x: 0, y: 0, rotation: 0 },
+    ], 'Helvetica', 5);
+    const output = renderer.getOutput();
+    expect(output).toContain('(\\260)');
+    expect(output).toContain('(\\330)');
+    expect(output).not.toMatch(/[^\x00-\x7f]/);
+  });
 });
 
 describe('PdfRenderer — state methods', () => {
