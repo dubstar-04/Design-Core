@@ -10,6 +10,7 @@ import { DXFFile } from '../lib/dxf/dxfFile.js';
 import { DimensionBase } from './dimensionBase.js';
 import { Intersection } from '../lib/intersect.js';
 import { Point } from '../entities/point.js';
+import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
 
 import { Text } from '../entities/text.js'; // used to debug the dimension points
 
@@ -327,6 +328,79 @@ export class AngularDimension extends DimensionBase {
   }
 
   /**
+   * Get the dimension arc end points (arrow positions) and the extension line extents
+   * @param {Point} Pt10 - sorted point 10
+   * @param {Point} Pt13 - sorted point 13
+   * @param {Point} Pt14 - sorted point 14
+   * @param {Point} Pt15 - sorted point 15
+   * @param {Point} Pt16 - dimension arc position
+   * @return {Object} {intersectPt, radius, arrow1pos, arrow2pos, line1Extents, line2Extents}
+   */
+  getDimensionArcGeometry(Pt10, Pt13, Pt14, Pt15, Pt16) {
+    const intersectPt = Intersection.intersectSegmentSegment(Pt15, Pt10, Pt13, Pt14, false, true).points[0];
+    const radius = intersectPt.distance(Pt16);
+
+    const quadOneStart = Pt14;
+    const quadOneEnd = Pt10;
+    const quadTwoStart = Pt14.rotate(intersectPt, Math.PI);
+    const quadTwoEnd = Pt10.rotate(intersectPt, Math.PI);
+    let arrow1pos = intersectPt;
+    let arrow2pos = intersectPt;
+    let line1Extents = Pt14;
+    let line2Extents = Pt10;
+    if (Pt16.isOnArc(quadOneStart, quadOneEnd, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
+      line1Extents = Pt14;
+      line2Extents = Pt10;
+    } else if (Pt16.isOnArc(quadOneEnd, quadTwoStart, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
+      line1Extents = Pt10;
+      line2Extents = Pt13;
+    } else if (Pt16.isOnArc(quadTwoStart, quadTwoEnd, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
+      line1Extents = Pt13;
+      line2Extents = Pt15;
+    } else if (Pt16.isOnArc(quadTwoEnd, quadOneStart, intersectPt, 1)) {
+      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
+      arrow2pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
+      line1Extents = Pt15;
+      line2Extents = Pt14;
+    }
+
+    return { intersectPt, radius, arrow1pos, arrow2pos, line1Extents, line2Extents };
+  }
+
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
+  snaps(mousePoint, delta) {
+    if (!this.getPointBySequence(this.points, 16) || this.points.length < 6) {
+      return [];
+    }
+
+    const sortedPoints = this.sortDimensionPoints();
+    const Pt10 = this.getPointBySequence(sortedPoints, 10);
+    const Pt13 = this.getPointBySequence(sortedPoints, 13);
+    const Pt14 = this.getPointBySequence(sortedPoints, 14);
+    const Pt15 = this.getPointBySequence(sortedPoints, 15);
+    const Pt16 = this.getPointBySequence(this.points, 16);
+
+    const { radius, arrow1pos, arrow2pos } = this.getDimensionArcGeometry(Pt10, Pt13, Pt14, Pt15, Pt16);
+
+    if (radius === 0) {
+      return [];
+    }
+
+    return [arrow1pos, arrow2pos].map((point) => new SnapPoint(point, SnapPoint.Type.END));
+  }
+
+  /**
    * Build the dimension
    * @param {Object} style
    * @return {Array} - Array of entities that compose the dimension
@@ -365,36 +439,7 @@ export class AngularDimension extends DimensionBase {
       return;
     }
 
-    // Inline quadrant/arrow/line logic
-    const quadOneStart = Pt14;
-    const quadOneEnd = Pt10;
-    const quadTwoStart = Pt14.rotate(intersectPt, Math.PI);
-    const quadTwoEnd = Pt10.rotate(intersectPt, Math.PI);
-    let arrow1pos = intersectPt;
-    let arrow2pos = intersectPt;
-    let line1Extents = Pt14;
-    let line2Extents = Pt10;
-    if (Pt16.isOnArc(quadOneStart, quadOneEnd, intersectPt, 1)) {
-      arrow1pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
-      arrow2pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
-      line1Extents = Pt14;
-      line2Extents = Pt10;
-    } else if (Pt16.isOnArc(quadOneEnd, quadTwoStart, intersectPt, 1)) {
-      arrow1pos = intersectPt.project(intersectPt.angle(quadOneEnd), radius);
-      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
-      line1Extents = Pt10;
-      line2Extents = Pt13;
-    } else if (Pt16.isOnArc(quadTwoStart, quadTwoEnd, intersectPt, 1)) {
-      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoStart), radius);
-      arrow2pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
-      line1Extents = Pt13;
-      line2Extents = Pt15;
-    } else if (Pt16.isOnArc(quadTwoEnd, quadOneStart, intersectPt, 1)) {
-      arrow1pos = intersectPt.project(intersectPt.angle(quadTwoEnd), radius);
-      arrow2pos = intersectPt.project(intersectPt.angle(quadOneStart), radius);
-      line1Extents = Pt15;
-      line2Extents = Pt14;
-    }
+    const { arrow1pos, arrow2pos, line1Extents, line2Extents } = this.getDimensionArcGeometry(Pt10, Pt13, Pt14, Pt15, Pt16);
 
     const line1Angle = intersectPt.angle(arrow1pos);
     const line2Angle = intersectPt.angle(arrow2pos);

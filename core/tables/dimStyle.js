@@ -1,5 +1,6 @@
 
 import { DXFFile } from '../lib/dxf/dxfFile.js';
+import { DesignCore } from '../designCore.js';
 import { Logging } from '../lib/logging.js';
 import { Flags } from '../properties/flags.js';
 import { Property } from '../properties/property.js';
@@ -383,6 +384,8 @@ export class DimStyle {
 
     // DXF Groupcode 340 - (handle of referenced STYLE)
     this.DIMTXSTY = Property.loadValue([data.DIMTXSTY, data[340]], 'Standard');
+    // internal - true when DIMTXSTY holds a style handle (loaded from group 340) rather than a style name
+    this.DIMTXSTYISHANDLE = Property.loadValue([data.DIMTXSTYISHANDLE, data.DIMTXSTY === undefined && data[340] !== undefined], false);
 
     // DXF Groupcode 341 - (handle of referenced BLOCK)
     this.DIMLDRBLK = Property.loadValue([data.DIMLDRBLK, data[341]], 'ClosedFilled');
@@ -475,6 +478,9 @@ export class DimStyle {
 
     if (this.hasOwnProperty(valueName)) {
       this[valueName] = value;
+      if (valueName === 'DIMTXSTY') {
+        this.DIMTXSTYISHANDLE = false;
+      }
     } else {
       const err = `Setting Value - Property does not exist: ${valueName}`;
       Logging.instance.warn(`${this.type} - ${err}`);
@@ -542,6 +548,23 @@ export class DimStyle {
     }
 
     this.DIMCENVALUE = Math.abs(value);
+  }
+
+  /**
+   * Get the handle of the text style referenced by DIMTXSTY
+   * DIMTXSTY holds a style name, or a style handle when DIMTXSTYISHANDLE is set (loaded from a dxf file)
+   * @return {string} handle or undefined if no matching style exists
+   */
+  getTextStyleHandle() {
+    const styles = DesignCore.StyleManager.getItems();
+    const reference = String(this.DIMTXSTY).toUpperCase();
+
+    const style = styles.find((item) => this.DIMTXSTYISHANDLE ?
+      String(item.handle).toUpperCase() === reference :
+      item.name.toUpperCase() === reference) ??
+      styles.find((item) => item.name.toUpperCase() === 'STANDARD');
+
+    return style?.handle;
   }
 
   /**
@@ -616,8 +639,15 @@ export class DimStyle {
     file.writeGroupCode('287', this.DIMFIT);
     file.writeGroupCode('288', this.DIMUPT, DXFFile.Version.R13);
     file.writeGroupCode('289', this.DIMATFIT, DXFFile.Version.R2000);
-    file.writeGroupCode('340', this.DIMTXSTY, DXFFile.Version.R13);
-    file.writeGroupCode('341', this.DIMLDRBLK, DXFFile.Version.R2000);
+    // 340 and 341 are handles - writing a name leaves AutoCAD unable to resolve the text style (dimension text is not shown)
+    const textStyleHandle = this.getTextStyleHandle();
+    if (textStyleHandle !== undefined) {
+      file.writeGroupCode('340', textStyleHandle, DXFFile.Version.R13);
+    }
+    // 'ClosedFilled' is the default leader arrowhead and has no block handle, omitting the group selects it
+    if (this.DIMLDRBLK !== 'ClosedFilled') {
+      file.writeGroupCode('341', this.DIMLDRBLK, DXFFile.Version.R2000);
+    }
     // file.writeGroupCode('342', this.DIMBLK);
     // file.writeGroupCode('343', this.DIMBLK1);
     // file.writeGroupCode('344', this.DIMBLK2);

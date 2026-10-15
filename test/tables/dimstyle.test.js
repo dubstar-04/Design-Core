@@ -1,4 +1,5 @@
 import { DimStyle } from '../../core/tables/dimStyle';
+import { DesignCore } from '../../core/designCore.js';
 
 describe('DimStyle', () => {
   let style;
@@ -66,6 +67,37 @@ describe('DimStyle', () => {
     expect(style.getValue('DIMTXT')).toBe(42);
     style.setValue('customProp', 'hello');
     expect(style.customProp).toBeUndefined();
+  });
+
+  describe('getTextStyleHandle', () => {
+    beforeEach(() => {
+      DesignCore.Core = {
+        styleManager: {
+          getItems: () => [
+            { name: 'STANDARD', handle: '19' },
+            { name: '19', handle: '2A' },
+          ],
+        },
+      };
+    });
+
+    test('resolves a style name by name', () => {
+      expect(new DimStyle({ DIMTXSTY: '19' }).getTextStyleHandle()).toBe('2A');
+    });
+
+    test('resolves an imported group 340 value strictly as a handle', () => {
+      expect(new DimStyle({ 340: '19' }).getTextStyleHandle()).toBe('19');
+    });
+
+    test('falls back to the Standard style when the reference is unknown', () => {
+      expect(new DimStyle({ 340: 'FF' }).getTextStyleHandle()).toBe('19');
+    });
+
+    test('setValue switches DIMTXSTY back to a name reference', () => {
+      const dimStyle = new DimStyle({ 340: '19' });
+      dimStyle.setValue('DIMTXSTY', '19');
+      expect(dimStyle.getTextStyleHandle()).toBe('2A');
+    });
   });
 });
 

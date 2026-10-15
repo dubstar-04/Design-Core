@@ -4,12 +4,12 @@ import { Text } from '../entities/text.js';
 import { Input, PromptOptions } from '../lib/inputManager.js';
 import { Logging } from '../lib/logging.js';
 import { DimensionBase } from './dimensionBase.js';
-import { Point } from '../entities/point.js';
 
 import { DesignCore } from '../designCore.js';
 import { Property } from '../properties/property.js';
 import { Utils } from '../lib/utils.js';
 import { RubberBand } from '../lib/auxiliary/rubberBand.js';
+import { SnapPoint } from '../lib/auxiliary/snapPoint.js';
 
 /**
  * Aligned Dimension Entity Class
@@ -102,6 +102,46 @@ export class LinearDimensionBase extends DimensionBase {
     return [{ point: Pt11, apply: apply }];
   }
 
+  /**
+   * Get the points where the extension lines meet the dimension line
+   * @return {Array<Point>} [Pt13e, Pt14e]
+   */
+  getDimensionLineEndPoints() {
+    const Pt10 = this.getPointBySequence(this.points, 10);
+    const Pt13 = this.getPointBySequence(this.points, 13);
+    const Pt14 = this.getPointBySequence(this.points, 14);
+
+    if (this.dimType.getBaseDimType() === 0) {
+      // Rotated dimension: the dimension line direction is a fixed, user-specified angle
+      // (LINEARDIMANGLE) independent of the measured points - project the extension
+      // line origin onto that fixed line, so it stays correct at any rotation, not just 0/90/180/270
+      const dimLineAngleRad = Utils.degrees2radians(this.getProperty(Property.Names.LINEARDIMANGLE));
+      const linePt2 = Pt10.project(dimLineAngleRad, 1);
+      return [Pt13.perpendicular(Pt10, linePt2), Pt10];
+    }
+
+    // Aligned dimension: the dimension line is parallel to the measured edge (Pt13 -> Pt14),
+    // derived dynamically from the points rather than a fixed angle
+    return [Pt13.project(Pt14.angle(Pt10), Pt14.distance(Pt10)), Pt10];
+  }
+
+  /**
+   * Get snap points
+   * @param {Point} mousePoint
+   * @param {number} delta
+   * @return {Array} - array of snap points
+   */
+  snaps(mousePoint, delta) {
+    const Pt10 = this.getPointBySequence(this.points, 10);
+    const Pt13 = this.getPointBySequence(this.points, 13);
+    const Pt14 = this.getPointBySequence(this.points, 14);
+
+    if (!Pt10 || !Pt13 || !Pt14) {
+      return [];
+    }
+
+    return this.getDimensionLineEndPoints().map((point) => new SnapPoint(point, SnapPoint.Type.END));
+  }
 
   /**
    * Build the dimension
@@ -112,7 +152,6 @@ export class LinearDimensionBase extends DimensionBase {
     let dimension = 0;
     const entities = [];
 
-    const Pt10 = this.getPointBySequence(this.points, 10);
     const Pt13 = this.getPointBySequence(this.points, 13);
     const Pt14 = this.getPointBySequence(this.points, 14);
     const Pt11 = this.getPointBySequence(this.points, 11);
@@ -139,23 +178,8 @@ export class LinearDimensionBase extends DimensionBase {
       return;
     }
 
-    let Pt13e = new Point();
-    const Pt14e = Pt10;
-
-    if (this.dimType.getBaseDimType() === 0) {
-      // Rotated dimension: the dimension line direction is a fixed, user-specified angle
-      // (LINEARDIMANGLE) independent of the measured points - project both extension
-      // line origins onto that fixed line, so it stays correct at any rotation, not just 0/90/180/270
-      const dimLineAngleRad = Utils.degrees2radians(this.getProperty(Property.Names.LINEARDIMANGLE));
-      const linePt2 = Pt10.project(dimLineAngleRad, 1);
-      Pt13e = Pt13.perpendicular(Pt10, linePt2);
-      dimension = Pt13e.distance(Pt14e);
-    } else {
-      // Aligned dimension: the dimension line is parallel to the measured edge (Pt13 -> Pt14),
-      // derived dynamically from the points rather than a fixed angle
-      Pt13e = Pt13.project(Pt14.angle(Pt10), Pt14.distance(Pt10));
-      dimension = Pt13.distance(Pt14);
-    }
+    const [Pt13e, Pt14e] = this.getDimensionLineEndPoints();
+    dimension = this.dimType.getBaseDimType() === 0 ? Pt13e.distance(Pt14e) : Pt13.distance(Pt14);
 
     // ensure dimension is positive
     dimension = Math.abs(dimension);

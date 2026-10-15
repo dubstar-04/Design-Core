@@ -373,3 +373,20 @@ AcDb2LineAngularDimension
 });
 
 
+test('snaps returns END snaps at the dimension arc end points', () => {
+  const lineOne = new Line({ points: [new Point(0, 0), new Point(10, 0)] });
+  const lineTwo = new Line({ points: [new Point(0, 0), new Point(0, 10)] });
+  const points = AngularDimension.getPointsFromSelection([lineOne, lineTwo], new Point(5, 5));
+  const dim = new AngularDimension({ points });
+  const snaps = dim.snaps(new Point(), 1);
+  const radius = Math.hypot(5, 5);
+
+  expect(snaps.length).toBe(2);
+  expect(snaps.every((snap) => snap.type === 'end')).toBe(true);
+  expect(snaps.some((snap) => snap.snapPoint.isSame(new Point(radius, 0)))).toBe(true);
+  expect(snaps.some((snap) => snap.snapPoint.isSame(new Point(0, radius)))).toBe(true);
+});
+
+test('snaps returns no snaps when the dimension has no points', () => {
+  expect(new AngularDimension().snaps(new Point(), 1)).toEqual([]);
+});

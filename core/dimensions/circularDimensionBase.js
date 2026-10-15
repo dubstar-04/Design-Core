@@ -211,12 +211,37 @@ export class CircularDimensionBase extends DimensionBase {
     if (DIMTAD !== 0 && textAndDimlineAligned) {
       lineLength = lineLength + approxTextWidth + DIMTXT; // Add text offset to line length
     }
-    const startPoint = DIMTOFL ? Pt10 : Pt15;
-    const endPoint = Pt15.project(Pt10.angle(Pt15), isInside ? -lineLength : lineLength);
+    const isDiametric = this.dimType.getBaseDimType() === 3;
+    // inside diametric dimensions start at Pt15 so the arrow stays connected to the text
+    const startPoint = isDiametric ? (isInside ? Pt15 : Pt10) : (DIMTOFL ? Pt10 : Pt15);
+    let endPoint = Pt15.project(Pt10.angle(Pt15), isInside ? -lineLength : lineLength);
+    const textOnLine = DIMTAD === 0 && textAndDimlineAligned;
+    const insideDiametric = isDiametric && isInside;
+
+    // text is not on the dimension line, so the line continues to the opposite arrow
+    if (insideDiametric && !textOnLine) {
+      endPoint = Pt10;
+    }
+
     const line = new Line({ points: [startPoint, endPoint] });
     const arrowDirection = isInside ? Pt15.angle(Pt10) : Pt10.angle(Pt15);
     const arrowHead = this.getArrowHead(Pt15, arrowDirection);
     entities.push(line, arrowHead);
+
+    if (insideDiametric && textOnLine) {
+      // opposite side segment, starting after the text and its gap
+      const dirToPt10 = Pt15.angle(Pt10);
+      const oppositeStart = textPosition.project(dirToPt10, approxTextWidth * 0.5 + DIMGAP);
+      if (Pt15.distance(oppositeStart) < Pt15.distance(Pt10)) {
+        entities.push(new Line({ points: [oppositeStart, Pt10] }));
+      }
+    }
+
+    if (isDiametric) {
+      // diametric dimensions have an arrow at both ends of the diameter
+      const oppositeDirection = isInside ? Pt10.angle(Pt15) : Pt15.angle(Pt10);
+      entities.push(this.getArrowHead(Pt10, oppositeDirection));
+    }
 
     // Get the dimension text using the value, position and rotation
     const text = this.getDimensionText(dimension, textPosition, textRotation);

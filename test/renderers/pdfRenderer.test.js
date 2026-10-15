@@ -178,6 +178,32 @@ describe('PdfRenderer — drawing', () => {
     // cos(π/4) ≈ 0.7071, sin(π/4) ≈ 0.7071
     expect(output).toContain('0.7071');
   });
+
+  test('drawText encodes non-ASCII characters as WinAnsi octal escapes', () => {
+    const renderer = new PdfRenderer(100, 100);
+    renderer.drawText([
+      { char: '\u00B0', x: 0, y: 0, rotation: 0 },
+      { char: '\u00D8', x: 0, y: 0, rotation: 0 },
+    ], 'Helvetica', 5);
+    const output = renderer.getOutput();
+    expect(output).toContain('(\\260)');
+    expect(output).toContain('(\\330)');
+    expect(output).not.toMatch(/[^\x00-\x7f]/);
+  });
+
+  test.each([
+    ['\u2019', '\\222'], // right single quote
+    ['\u201C', '\\223'], // left double quote
+    ['\u2013', '\\226'], // en dash
+    ['\u2014', '\\227'], // em dash
+    ['\u20AC', '\\200'], // euro sign
+    ['\u2122', '\\231'], // trademark
+    ['\u4E2D', '\\077'], // unsupported, replaced with ?
+  ])('drawText maps %s to WinAnsi %s', (char, escape) => {
+    const renderer = new PdfRenderer(100, 100);
+    renderer.drawText([{ char, x: 0, y: 0, rotation: 0 }], 'Helvetica', 5);
+    expect(renderer.getOutput()).toContain(`(${escape})`);
+  });
 });
 
 describe('PdfRenderer — state methods', () => {

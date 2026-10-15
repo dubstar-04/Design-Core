@@ -128,6 +128,7 @@
         "DIMTSZ",
         "DIMTVP",
         "DIMTXSTY",
+        "DIMTXSTYISHANDLE",
         "DIMTXT",
         "DIMTXTDIRECTION",
         "DIMTZIN",
