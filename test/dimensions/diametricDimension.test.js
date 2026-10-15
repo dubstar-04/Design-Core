@@ -28,7 +28,7 @@ const scenarios = [
     selectedEntities: [new Circle({ points: [new Point(0, 0), new Point(10, 0)] })],
     expectedDimType: 3,
     dimensionValue: 20,
-    dimensionEntities: 7,
+    dimensionEntities: 8,
   },
   { desc: 'Diametric dimension from arc selection',
     input: [new SingleSelection(0, new Point()), new Point(20, 10)],
@@ -257,4 +257,19 @@ AcDbDiametricDimension
   file = new File();
   newDimension.dxf(file);
   expect(file.contents).toEqual(dxfString);
+});
+
+test('inside text keeps the Pt15 arrow connected to the text and adds an opposite segment', () => {
+  const dim = new DiametricDimension({
+    points: [new Point(-10, 0, 0, 10), new Point(10, 0, 0, 15), new Point(2, 0, 0, 11)],
+  });
+  const lines = dim.buildDimension().filter((e) => e.type === 'Line');
+  const segments = lines.map((l) => l.points.map((p) => p.x).sort((a, b) => a - b));
+
+  // Pt15 to text position
+  expect(segments.some(([a, b]) => a === 2 && b === 10)).toBe(true);
+  // opposite side segment ends at Pt10 and leaves a gap for the text
+  const toPt10 = segments.find(([a]) => a === -10);
+  expect(toPt10).toBeDefined();
+  expect(toPt10[1]).toBeLessThan(2);
 });
