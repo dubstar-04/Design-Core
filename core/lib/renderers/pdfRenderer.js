@@ -361,6 +361,11 @@ export class PdfRenderer extends RendererBase {
     return str
         .replace(/\\/g, '\\\\')
         .replace(/\(/g, '\\(')
-        .replace(/\)/g, '\\)');
+        .replace(/\)/g, '\\)')
+        // Keep output ASCII: Latin-1 chars match WinAnsi codes, others are unsupported by the font
+        .replace(/[^\x00-\x7f]/g, (c) => {
+          const code = c.charCodeAt(0);
+          return '\\' + (code <= 0xff ? code : 0x3f).toString(8).padStart(3, '0');
+        });
   }
 }
