@@ -269,6 +269,7 @@ test('Test Offset.action - offset circle outward', () => {
   expect(newCircle.points[0].y).toBeCloseTo(0);
   // New radius should be 15
   expect(newCircle.getProperty('radius')).toBeCloseTo(15);
+  expect(newCircle.type).toBe('Circle'); // not an Arc
 });
 
 test('Test Offset.action - offset circle inward', () => {
@@ -288,6 +289,7 @@ test('Test Offset.action - offset circle inward', () => {
   expect(newCircle.points[0].x).toBeCloseTo(0);
   expect(newCircle.points[0].y).toBeCloseTo(0);
   expect(newCircle.getProperty('radius')).toBeCloseTo(7);
+  expect(newCircle.type).toBe('Circle'); // not an Arc
 });
 
 test('Test Offset.action - offset circle inward returns null when radius would be zero', () => {
