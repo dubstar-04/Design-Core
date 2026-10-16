@@ -23,12 +23,17 @@ export class StyleManagerBase extends TableManagerBase {
    * @param {boolean} showWarning
    */
   deleteStyle(itemIndex, showWarning = true) {
-    // call the super class delete
-    const deletedItem = this.deleteItem(itemIndex, showWarning);
+    // deleteItem returns the spliced array, or undefined when nothing was deleted
+    const deletedItem = this.deleteItem(itemIndex, showWarning)?.[0];
 
     if (deletedItem) {
       // delete all item using the selected style
       this.deleteStyleFromScene(deletedItem.name);
+
+      // the current style no longer exists, fall back to the first available style
+      if (this.currentstyle?.toUpperCase() === deletedItem.name.toUpperCase()) {
+        this.currentstyle = this.items[0]?.name;
+      }
     }
   }
 
@@ -37,10 +42,19 @@ export class StyleManagerBase extends TableManagerBase {
    * @param {string} style
    */
   deleteStyleFromScene(style) {
+    if (typeof style !== 'string') {
+      return;
+    }
+
+    const target = style.toUpperCase();
     const selectionSet = [];
 
     for (let i = 0; i < DesignCore.Scene.entities.count(); i++) {
-      if ((DesignCore.Scene.entities.get(i).getProperty?.(this.itemProperty) ?? DesignCore.Scene.entities.get(i)[this.itemProperty]) === style) {
+      const entity = DesignCore.Scene.entities.get(i);
+      // entities without the property (e.g. a line has no dimensionStyle) are not dependent
+      const value = entity.getProperty?.(this.itemProperty) ?? entity[this.itemProperty];
+
+      if (typeof value === 'string' && value.toUpperCase() === target) {
         selectionSet.push(i);
       }
     }
