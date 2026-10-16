@@ -48,6 +48,7 @@ export class DimensionBase extends Entity {
       type: Property.Type.LIST,
       value: Property.loadValue([data?.dimensionStyle, data?.[3]], 'STANDARD'),
       dxfCode: 3,
+      options: () => DesignCore.DimStyleManager.getItems().map((s) => ({ display: s.name, value: s.name })),
     });
 
     // DXF Groupcode 40 - Leader length for radius and diameter dimensions
