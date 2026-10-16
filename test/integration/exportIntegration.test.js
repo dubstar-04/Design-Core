@@ -24,6 +24,7 @@ let core;
 
 beforeAll(() => {
   core = new Core();
+  core.dimStyleManager.setCstyle('STANDARD');
 
   // Entities are arranged in a 3x3 grid of 100x100 cells:
   //
