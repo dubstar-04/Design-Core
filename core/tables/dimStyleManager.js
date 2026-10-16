@@ -13,6 +13,8 @@ export class DimStyleManager extends StyleManagerBase {
 
     this.indelibleItems.push('STANDARD');
     this.itemProperty = 'dimensionStyle';
+
+    this.setCstyle('ISO-25');
   }
 
   /** Get the item class */

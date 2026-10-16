@@ -11,6 +11,7 @@ import { Polyline } from '../../core/entities/polyline.js';
 
 // initialise core
 new Core();
+DesignCore.DimStyleManager.setCstyle('STANDARD');
 
 // Test cases for user input
 const scenarios = [

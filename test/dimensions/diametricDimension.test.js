@@ -12,6 +12,7 @@ import { Utils } from '../../core/lib/utils.js';
 
 // initialise core
 new Core();
+DesignCore.DimStyleManager.setCstyle('STANDARD');
 
 // Test cases for user input
 const scenarios = [

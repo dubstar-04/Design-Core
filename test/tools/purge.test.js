@@ -46,7 +46,9 @@ test('Test purge.action', () => {
   expect(dimStyleManager.itemCount()).toBe(4);
   purge.option = 'Dimstyles';
   purge.action();
-  expect(dimStyleManager.itemCount()).toBe(1);
+  // STANDARD is indelible and ISO-25 is the current style
+  expect(dimStyleManager.itemCount()).toBe(2);
+  expect(dimStyleManager.itemExists('ISO-25')).toBe(true);
 
   expect(layerManager.itemCount()).toBe(4);
   purge.option = 'Layers';

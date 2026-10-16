@@ -359,7 +359,14 @@ export class TableManagerBase {
   /** Purge unused items */
   purge() {
     const itemsToPurge = [];
+    // only style managers have a current style
+    const currentStyle = this.getCstyle?.()?.toUpperCase();
+
     this.items.forEach((item, index) => {
+      if (item.name.toUpperCase() === currentStyle) {
+        return;
+      }
+
       const searchTerm = this.itemProperty === 'block' ? item : item.name;
       const items = DesignCore.Scene.entities.find('ANY', this.itemProperty, searchTerm);
       if (items.length === 0) {

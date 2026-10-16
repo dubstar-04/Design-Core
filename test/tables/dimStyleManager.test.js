@@ -74,3 +74,17 @@ test('Test DimStyleManager.renameStyle updates dimensions through the property A
   expect(core.scene.entities.get(2).getProperty('dimensionStyle')).toBe('STANDARD');
   expect(dimension.getDimensionStyle()?.name).toBe('NEWNAME');
 });
+
+test('Test DimStyleManager defaults to the ISO-25 current style', () => {
+  expect(new Core().dimStyleManager.getCstyle()).toBe('ISO-25');
+});
+
+test('Test DimStyleManager.purge keeps the current style', () => {
+  dimStyleManager.setCstyle('ISO-25');
+
+  dimStyleManager.purge();
+
+  expect(dimStyleManager.itemExists('ISO-25')).toBe(true);
+  expect(dimStyleManager.getCstyle()).toBe('ISO-25');
+  expect(dimStyleManager.itemExists('ANNOTATIVE')).toBe(false);
+});
