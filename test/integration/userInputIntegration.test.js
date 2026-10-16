@@ -95,6 +95,7 @@ async function executeToolWithInputs(tool, selectionIndices, inputs) {
 
 beforeAll(async () => {
   core = new Core();
+  core.dimStyleManager.setCstyle('STANDARD');
 
   // =====================================================================
   // Phase 1: Showcase entities  (idx 0–7)
