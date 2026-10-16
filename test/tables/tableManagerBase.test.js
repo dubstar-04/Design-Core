@@ -1,5 +1,7 @@
 import { Core } from '../../core/core/core.js';
 import { TableManagerBase } from '../../core/tables/tableManagerBase.js';
+import { DesignCore } from '../../core/designCore.js';
+import { Point } from '../../core/entities/point.js';
 
 // initialise core
 new Core();
@@ -191,4 +193,169 @@ test('Test tableManagerBase.updateItem', () => {
   // update item text height
   tableManagerBase.updateItem(0, 'textHeight', 20);
   expect(tableManagerBase.getItemByIndex(0).textHeight).toBe(20);
+});
+
+describe('tableManagerBase deleteItem return contract', () => {
+  beforeEach(() => {
+    tableManagerBase.items = [{ name: 'itemOne' }, { name: 'Standard' }];
+    tableManagerBase.indelibleItems = ['Standard'];
+  });
+
+  test('returns the spliced array containing the deleted item', () => {
+    const deleted = tableManagerBase.deleteItem(0);
+
+    expect(Array.isArray(deleted)).toBe(true);
+    expect(deleted).toEqual([{ name: 'itemOne' }]);
+    expect(tableManagerBase.itemExists('itemOne')).toBe(false);
+  });
+
+  test('returns undefined for an invalid index', () => {
+    expect(tableManagerBase.deleteItem(10)).toBeUndefined();
+    expect(tableManagerBase.itemCount()).toBe(2);
+  });
+
+  test('returns undefined and keeps indelible items, ignoring case', () => {
+    tableManagerBase.indelibleItems = ['STANDARD'];
+
+    expect(tableManagerBase.deleteItem(1, false)).toBeUndefined();
+    expect(tableManagerBase.itemExists('Standard')).toBe(true);
+  });
+
+  test('invalidates the name lookup cache', () => {
+    expect(tableManagerBase.getItemByName('itemOne')).toBeDefined();
+
+    tableManagerBase.deleteItem(0);
+
+    expect(tableManagerBase.getItemByName('itemOne')).toBeUndefined();
+  });
+});
+
+describe('tableManagerBase lookups', () => {
+  beforeEach(() => {
+    tableManagerBase.items = [{ name: 'itemOne' }, { name: 'itemTwo' }];
+  });
+
+  test('getItemIndex is case-insensitive and returns -1 when missing', () => {
+    expect(tableManagerBase.getItemIndex('ITEMTWO')).toBe(1);
+    expect(tableManagerBase.getItemIndex('missing')).toBe(-1);
+  });
+
+  test('itemExists and getItemByName are case-insensitive', () => {
+    expect(tableManagerBase.itemExists('ITEMONE')).toBe(true);
+    expect(tableManagerBase.getItemByName('itemone').name).toBe('itemOne');
+  });
+
+  test('getItemByName cache is refreshed after addItem and rename', () => {
+    expect(tableManagerBase.getItemByName('itemOne')).toBeDefined();
+
+    tableManagerBase.addItem({ name: 'itemThree' });
+    expect(tableManagerBase.getItemByName('itemThree')).toBeDefined();
+
+    tableManagerBase.renameItem(0, 'itemRenamed');
+    expect(tableManagerBase.getItemByName('itemOne')).toBeUndefined();
+    expect(tableManagerBase.getItemByName('itemRenamed')).toBeDefined();
+  });
+
+  test('clearItems removes all items', () => {
+    tableManagerBase.clearItems();
+
+    expect(tableManagerBase.itemCount()).toBe(0);
+    expect(tableManagerBase.getItemByName('itemOne')).toBeUndefined();
+  });
+
+  test('addItem returns the existing item when not overwriting', () => {
+    const existing = tableManagerBase.getItemByName('itemOne');
+
+    expect(tableManagerBase.addItem({ name: 'ITEMONE' })).toBe(existing);
+  });
+});
+
+describe('tableManagerBase renameItem', () => {
+  beforeEach(() => {
+    tableManagerBase.items = [{ name: 'itemOne' }, { name: 'itemTwo' }, { name: 'Standard' }];
+    tableManagerBase.indelibleItems = ['Standard'];
+  });
+
+  test('returns the new name', () => {
+    expect(tableManagerBase.renameItem(0, 'renamed')).toBe('renamed');
+  });
+
+  test('returns undefined when the name is unchanged apart from case', () => {
+    expect(tableManagerBase.renameItem(0, 'ITEMONE')).toBeUndefined();
+    expect(tableManagerBase.getItemByIndex(0).name).toBe('itemOne');
+  });
+
+  test('cannot rename an indelible item', () => {
+    expect(tableManagerBase.renameItem(2, 'other')).toBeUndefined();
+    expect(tableManagerBase.getItemByIndex(2).name).toBe('Standard');
+  });
+
+  test('makes a clashing name unique', () => {
+    expect(tableManagerBase.renameItem(0, 'itemTwo')).toBe('itemTwo_1');
+  });
+});
+
+describe('tableManagerBase scene references', () => {
+  const originalProperty = tableManagerBase.itemProperty;
+
+  const addLine = (layer) => {
+    const line = DesignCore.Scene.addEntity('Line', { points: [new Point(), new Point(10, 10)], layer: layer });
+    return line;
+  };
+
+  beforeEach(() => {
+    tableManagerBase.itemProperty = 'layer';
+    tableManagerBase.items = [{ name: 'itemOne' }, { name: 'itemTwo' }];
+    tableManagerBase.indelibleItems = [];
+    while (DesignCore.Scene.entities.count() > 0) {
+      DesignCore.Scene.entities.remove(0);
+    }
+  });
+
+  afterAll(() => {
+    tableManagerBase.itemProperty = originalProperty;
+  });
+
+  test('updateSceneItem renames references through the property API', () => {
+    addLine('itemOne');
+    addLine('itemTwo');
+
+    tableManagerBase.updateSceneItem('itemOne', 'renamed');
+
+    expect(DesignCore.Scene.entities.get(0).getProperty('layer')).toBe('renamed');
+    expect(DesignCore.Scene.entities.get(1).getProperty('layer')).toBe('itemTwo');
+  });
+
+  test('updateSceneItem matches names case-insensitively', () => {
+    addLine('ITEMONE');
+
+    tableManagerBase.updateSceneItem('itemOne', 'renamed');
+
+    expect(DesignCore.Scene.entities.get(0).getProperty('layer')).toBe('renamed');
+  });
+
+  test('updateSceneItem ignores an undefined name', () => {
+    addLine('itemOne');
+
+    tableManagerBase.updateSceneItem(undefined, 'renamed');
+
+    expect(DesignCore.Scene.entities.get(0).getProperty('layer')).toBe('itemOne');
+  });
+
+  test('renameItem updates dependent entities', () => {
+    addLine('itemOne');
+
+    tableManagerBase.renameItem(0, 'renamed');
+
+    expect(DesignCore.Scene.entities.get(0).getProperty('layer')).toBe('renamed');
+  });
+
+  test('purge removes only unused items', () => {
+    addLine('itemOne');
+
+    tableManagerBase.purge();
+
+    expect(tableManagerBase.itemExists('itemOne')).toBe(true);
+    expect(tableManagerBase.itemExists('itemTwo')).toBe(false);
+  });
 });
