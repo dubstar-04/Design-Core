@@ -1,4 +1,5 @@
 import { Core } from '../../core/core/core.js';
+import { DesignCore } from '../../core/designCore.js';
 import { Point } from '../../core/entities/point.js';
 
 const core = new Core();
@@ -87,4 +88,14 @@ test('Test DimStyleManager.purge keeps the current style', () => {
   expect(dimStyleManager.itemExists('ISO-25')).toBe(true);
   expect(dimStyleManager.getCstyle()).toBe('ISO-25');
   expect(dimStyleManager.itemExists('ANNOTATIVE')).toBe(false);
+});
+
+test('Test dimension style property lists the available dim styles', () => {
+  core.scene.addEntity('RotatedDimension', dimensionData('STANDARD'));
+  const definition = core.scene.entities.get(0).properties.definition('dimensionStyle');
+
+  const options = definition.options();
+
+  expect(options.map((o) => o.value)).toEqual(DesignCore.DimStyleManager.getItems().map((s) => s.name));
+  expect(options.find((o) => o.value === 'STANDARD')).toEqual({ display: 'STANDARD', value: 'STANDARD' });
 });
