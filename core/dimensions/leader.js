@@ -339,9 +339,23 @@ export class Leader extends DimensionBase {
     file.writeGroupCode('233', '0.0');
 
     if (text) {
-      text.setProperty(Property.Names.HANDLE, this.textHandle);
-      text.setProperty(Property.Names.LAYER, layer);
-      text.dxf(file);
+      // AutoCAD only associates MTEXT annotations, so the text is written as MTEXT
+      file.writeGroupCode('0', 'MTEXT');
+      file.writeGroupCode('5', this.textHandle, DXFFile.Version.R2000);
+      file.writeGroupCode('102', '{ACAD_REACTORS', DXFFile.Version.R2000);
+      file.writeGroupCode('330', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000);
+      file.writeGroupCode('102', '}', DXFFile.Version.R2000);
+      file.writeGroupCode('100', 'AcDbEntity', DXFFile.Version.R2000);
+      file.writeGroupCode('8', layer);
+      file.writeGroupCode('100', 'AcDbMText', DXFFile.Version.R2000);
+      file.writeGroupCode('10', layout.textPosition.x);
+      file.writeGroupCode('20', layout.textPosition.y);
+      file.writeGroupCode('30', '0.0');
+      file.writeGroupCode('40', textHeight);
+      file.writeGroupCode('41', '0.0'); // No word wrap
+      file.writeGroupCode('71', layout.direction > 0 ? 4 : 6); // Attachment - middle left or middle right
+      file.writeGroupCode('72', 1); // Drawing direction - left to right
+      file.writeGroupCode('1', this.getProperty(Property.Names.STRING).replace(/[\\{}]/g, '\\$&'));
     }
   }
 }
