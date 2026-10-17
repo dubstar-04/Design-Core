@@ -109,6 +109,8 @@ export class Property {
     WIDTHFACTOR: 'widthFactor',
     // ── Dimensions ────────────────────────────────────────────────────────────
     DIMENSIONSTYLE: 'dimensionStyle',
+    ARROWHEAD: 'arrowHead',
+    HOOKLINE: 'hookline',
     LEADERLENGTH: 'leaderLength',
     LINEARDIMANGLE: 'linearDimAngle',
     TEXTOVERRIDE: 'textOverride',
