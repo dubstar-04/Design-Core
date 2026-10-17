@@ -20,6 +20,7 @@ import { LinearDimension } from '../dimensions/linearDimension.js';
 import { DiametricDimension } from '../dimensions/diametricDimension.js';
 import { RadialDimension } from '../dimensions/radialDimension.js';
 import { RotatedDimension } from '../dimensions/rotatedDimension.js';
+import { Leader } from '../dimensions/leader.js';
 
 
 // import { Point } from "../entities/point.js"
@@ -78,6 +79,7 @@ const classes = {
   LinearDimension,
   RadialDimension,
   RotatedDimension,
+  Leader,
 
   Block,
   Insert,
