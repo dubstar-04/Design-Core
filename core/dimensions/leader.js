@@ -72,18 +72,32 @@ export class Leader extends DimensionBase {
   }
 
   /**
-   * Normalise raw DXF data before construction
+   * Resolve and incorporate the annotation record referenced by group code 340.
    * @param {Object} data - raw DXF group code object
+   * @param {Object} context - DXF reference lookup and consumption operations
+   * @return {Object} data with annotation content
+   */
+  static resolveDxfReferences(data, context) {
+    const text = context.resolve(data[340]);
+    let annotation = data.annotation ?? '';
+    if (text && (text[0] === 'TEXT' || text[0] === 'MTEXT')) {
+      annotation = text[1] !== undefined ? String(text[1]) : '';
+      if (text[0] === 'MTEXT') {
+        // Strip MTEXT formatting codes and unescape.
+        annotation = annotation.replace(/\\[A-Za-z][^;]*;/g, '').replace(/\\P/g, ' ').replace(/\\([\\{}])/g, '$1');
+      }
+      context.consume(text);
+    }
+    return { ...data, annotation };
+  }
+
+  /**
+   * Normalise raw DXF data before construction.
+   * @param {Object} data - raw DXF group code object with any linked annotation
    * @return {Object} normalised data
-   *
-   * Handles:
-   * - Group code 71: arrowhead flag
-   * - Group code 75: hookline flag
-   * - Group code 340: annotation handle (the annotation text is merged in by the dxf loader as data.annotation)
    */
   static fromDxf(data) {
     const toBoolean = (value) => (value === undefined ? undefined : Number(value) !== 0);
-
     return {
       ...data,
       string: data.string ?? data.annotation ?? '',

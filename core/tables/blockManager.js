@@ -30,7 +30,7 @@ export class BlockManager extends TableManagerBase {
   }
 
   /**
-   * Add a block to the list of items and assign a block record handle
+   * Add a block and assign its block record, end block and child companion handles.
    * @param {Object} item
    * @param {boolean} overwrite
    * @return {Object}
@@ -43,6 +43,7 @@ export class BlockManager extends TableManagerBase {
     if (newItem.endblkHandle === undefined) {
       newItem.endblkHandle = DesignCore.HandleManager.next();
     }
+    newItem.entities.forEach((entity) => entity.assignHandles?.());
     return newItem;
   }
 }

@@ -282,7 +282,7 @@ export class DXF {
       }
 
       if (block.hasOwnProperty('children')) {
-        block.children.forEach((child) => {
+        this.linkReferences(block.children).forEach((child) => {
           // check the child has a command type
           if (child.hasOwnProperty('0') === false) {
             return;
@@ -295,15 +295,11 @@ export class DXF {
             return;
           }
 
-          // Convert child points to design points
-          if (child.hasOwnProperty('points')) {
-            child.points = this.parsePoints(child.points);
-          }
-
           const command = child[0];
           // check if the child is a valid entity
           if (DesignCore.CommandManager.isCommand(command)) {
-            const item = DesignCore.CommandManager.createNew(command, child);
+            const data = child.hasOwnProperty('points') ? { ...child, points: this.parsePoints(child.points) } : child;
+            const item = DesignCore.CommandManager.createNew(command, data);
 
             // Register the child entity handle
             const itemHandle = item?.getProperty?.('handle') ?? item?.handle;
@@ -336,17 +332,13 @@ export class DXF {
    * Load Entities
    */
   loadEntities() {
-    const entities = this.reader.entities;
+    const entities = this.linkReferences(this.reader.entities);
 
-    if (entities.length) {
+    if (this.reader.entities.length) {
       DesignCore.Scene.entities.clear();
     }
 
     entities.forEach((entity) => {
-      if (entity.hasOwnProperty('points')) {
-        entity.points = this.parsePoints(entity.points);
-      }
-
       this.addEntity(entity);
     });
 
@@ -355,6 +347,39 @@ export class DXF {
     DesignCore.LTypeManager.checkItems();
     DesignCore.StyleManager.checkItems();
     DesignCore.DimStyleManager.checkItems();
+  }
+
+  /**
+   * Link raw records through optional entity hooks before constructing any entities.
+   * Records incorporated by another entity are registered but not created separately.
+   * @param {Array} entities - raw entities from the reader
+   * @return {Array} linked entities without consumed records
+   */
+  linkReferences(entities) {
+    const byHandle = new Map();
+    entities.forEach((entity) => {
+      if (entity[5] !== undefined) {
+        byHandle.set(String(entity[5]).toUpperCase(), entity);
+      }
+    });
+
+    const consumed = new Set();
+    const context = {
+      resolve: (handle) => byHandle.get(String(handle).toUpperCase()),
+      consume: (entity) => consumed.add(entity),
+    };
+    const linked = entities.map((entity) => {
+      try {
+        return DesignCore.CommandManager.resolveDxfReferences(entity[0], entity, context);
+      } catch (err) {
+        Logging.instance.warn(`${Strings.Message.UNKNOWNCOMMAND} ${entity[0]}: ${err}`);
+        this.unsupportedElements = true;
+        return undefined;
+      }
+    });
+
+    consumed.forEach((entity) => DesignCore.HandleManager.checkHandle(entity[5]));
+    return linked.filter((entity, index) => entity !== undefined && !consumed.has(entities[index]));
   }
 
   /**
@@ -389,7 +414,8 @@ export class DXF {
     const command = entity[0];
     if (DesignCore.CommandManager.isCommand(command)) {
       try {
-        const newEntity = DesignCore.CommandManager.createNew(command, entity);
+        const data = entity.hasOwnProperty('points') ? { ...entity, points: this.parsePoints(entity.points) } : entity;
+        const newEntity = DesignCore.CommandManager.createNew(command, data);
         DesignCore.Scene.entities.add(newEntity);
       } catch (err) {
         // a recognised command can still fail to build (e.g. unsupported dimension subtype) - skip it, don't abort the rest of the file

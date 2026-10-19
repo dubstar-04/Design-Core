@@ -149,6 +149,19 @@ export class CommandManager {
   }
 
   /**
+   * Resolve references through an optional entity-specific hook.
+   * @param {string} type
+   * @param {Object} data
+   * @param {Object} context - DXF reference lookup and consumption operations
+   * @return {Object} linked data, or the original data when no hook exists
+   */
+  resolveDxfReferences(type, data, context) {
+    if (!this.isCommand(type)) return data;
+    const CommandClass = classes[this.getCommand(type)];
+    return CommandClass.resolveDxfReferences ? CommandClass.resolveDxfReferences(data, context) : data;
+  }
+
+  /**
    * Create a new instance of type using data.
    * When data is a plain object (DXF load path), applies a two-pass normalisation:
    *   1. Entity.fromDxf()       — resolves group codes shared by all entities (e.g. colour, true colour)
