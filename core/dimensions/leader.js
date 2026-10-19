@@ -269,12 +269,24 @@ export class Leader extends DimensionBase {
   }
 
   /**
-   * Reserve the handle for the annotation text, must be called before the dxf header is written
-   * so the handseed is beyond every handle in the file
+   * Assign the annotation handle when the leader is added, before DXF export.
+   * Existing handles remain assigned for undo and repeated saves.
    */
-  reserveHandles() {
+  assignHandles() {
     if (this.hasAnnotation() && this.textHandle === undefined) {
       this.textHandle = DesignCore.HandleManager.next();
+    }
+  }
+
+  /**
+   * Set a property and assign an annotation handle if text is added to an existing leader.
+   * @param {string} property
+   * @param {any} value
+   */
+  setProperty(property, value) {
+    super.setProperty(property, value);
+    if (property === Property.Names.STRING && this.getProperty(Property.Names.HANDLE) !== undefined) {
+      this.assignHandles();
     }
   }
 
@@ -290,10 +302,6 @@ export class Leader extends DimensionBase {
     const text = this.getAnnotationText(layout);
     const textHeight = this.getDimensionStyle().getValue('DIMTXT');
     const layer = this.getProperty(Property.Names.LAYER);
-
-    if (text) {
-      this.reserveHandles();
-    }
 
     file.writeGroupCode('0', 'LEADER');
     file.writeGroupCode('5', this.getProperty(Property.Names.HANDLE), DXFFile.Version.R2000); // Handle
