@@ -358,23 +358,24 @@ test('Leader save has unique handles and a handseed beyond the annotation handle
   expectValidHandles(output);
 });
 
-describe('DXF leader annotation merge', () => {
+describe('DXF leader reference resolution', () => {
   const loadEntities = (entities) => {
     const dxf = new DXF();
-    return dxf.linkLeaderAnnotations(entities);
+    return dxf.linkReferences(entities);
   };
 
   test('missing annotation gives empty text', () => {
     const leader = { 0: 'LEADER', 340: 'AAAA' };
     const result = loadEntities([leader]);
     expect(result.length).toBe(1);
-    expect(leader.annotation).toBe('');
+    expect(result[0].annotation).toBe('');
+    expect(result[0][340]).toBe('AAAA');
   });
 
   test('leader without 340 gives empty text', () => {
     const leader = { 0: 'LEADER' };
-    loadEntities([leader]);
-    expect(leader.annotation).toBe('');
+    const result = loadEntities([leader]);
+    expect(result[0].annotation).toBe('');
   });
 
   test('text referenced by two leaders is merged into both and consumed once', () => {
@@ -382,9 +383,76 @@ describe('DXF leader annotation merge', () => {
     const one = { 0: 'LEADER', 340: 'AA' };
     const two = { 0: 'LEADER', 340: 'AA' };
     const other = { 0: 'TEXT', 5: 'BB', 1: 'Free' };
+    const size = DesignCore.HandleManager.usedHandles.size;
     const result = loadEntities([text, one, two, other]);
-    expect(one.annotation).toBe('Shared');
-    expect(two.annotation).toBe('Shared');
-    expect(result).toEqual([one, two, other]);
+    expect(result).toHaveLength(3);
+    expect(result[0].annotation).toBe('Shared');
+    expect(result[1].annotation).toBe('Shared');
+    expect(result[2][5]).toBe('BB');
+    expect(DesignCore.HandleManager.usedHandles.size).toBe(size + 1);
+    expect(DesignCore.HandleManager.usedHandles.has('AA')).toBe(true);
+    expect(one).not.toHaveProperty('annotation');
+    expect(text[1]).toBe('Shared');
+  });
+
+  test.each([
+    ['TEXT', true],
+    ['TEXT', false],
+    ['MTEXT', true],
+    ['MTEXT', false],
+  ])('%s annotation resolves with text first: %s', (type, textFirst) => {
+    const text = { 0: type, 5: 'AA', 1: type === 'MTEXT' ? '{\\H2;Note}\\PNext' : 'Note' };
+    const leader = { 0: 'LEADER', 5: 'AB', 340: 'aa', points: [{ x: 0, y: 0 }, { x: 10, y: 10 }] };
+    const records = textFirst ? [text, leader] : [leader, text];
+    const result = loadEntities(records);
+    expect(result).toHaveLength(1);
+    expect(result[0].annotation).toBe(type === 'MTEXT' ? '{Note} Next' : 'Note');
+    expect(result[0].points).toBe(leader.points);
+    expect(result[0].points[0]).not.toBeInstanceOf(Point);
+
+    const dxf = new DXF();
+    dxf.reader = { entities: records };
+    // Linking registers consumed handles; use a fresh core for the actual load.
+    new Core();
+    dxf.loadEntities();
+    expect(DesignCore.Scene.entities.count()).toBe(1);
+    const loaded = DesignCore.Scene.entities.get(0);
+    expect(loaded).toBeInstanceOf(Leader);
+    expect(loaded.getProperty(Property.Names.STRING)).toBe(result[0].annotation);
+    expectValidHandles(DesignCore.Core.saveFile('R2018'));
+  });
+
+  test('unsupported reference types are not consumed', () => {
+    const line = { 0: 'LINE', 5: 'AA', points: [{ x: 0, y: 0 }, { x: 1, y: 1 }] };
+    const leader = { 0: 'LEADER', 340: 'AA' };
+    const result = loadEntities([leader, line]);
+    expect(result).toHaveLength(2);
+    expect(result[0].annotation).toBe('');
+    expect(result[1][0]).toBe('LINE');
+    expect(DesignCore.HandleManager.usedHandles.has('AA')).toBe(false);
+  });
+
+  test('normalisation without an import context still accepts canonical annotation data', () => {
+    const data = Leader.fromDxf({ annotation: 'Note', 340: 'AA', 71: 0, 75: 1 });
+    expect(data.string).toBe('Note');
+    expect(data.textHandle).toBe('AA');
+    expect(data.arrowHead).toBe(false);
+    expect(data.hookline).toBe(true);
+  });
+
+  test.each([true, false])('block annotation resolves with text first: %s', (textFirst) => {
+    const text = { 0: 'MTEXT', 5: 'AA', 1: 'Block note' };
+    const leader = { 0: 'LEADER', 5: 'AB', 340: 'AA', points: [{ x: 0, y: 0 }, { x: 10, y: 10 }] };
+    const children = textFirst ? [text, leader] : [leader, text];
+    const dxf = new DXF();
+    dxf.reader = { blocks: [{ 0: 'BLOCK', 2: 'LeaderBlock', children }] };
+    dxf.loadBlocks();
+
+    const block = DesignCore.Scene.blockManager.getItemByName('LeaderBlock');
+    expect(block.entities).toHaveLength(1);
+    expect(block.entities[0]).toBeInstanceOf(Leader);
+    expect(block.entities[0].getProperty(Property.Names.STRING)).toBe('Block note');
+    expect(block.entities[0].textHandle).toBe('AA');
+    expectValidHandles(core.saveFile('R2018'));
   });
 });
