@@ -30,7 +30,7 @@ export class EntityManager {
   }
 
   /**
-   * Add entity to manager
+   * Add entity to manager, assigning main and optional companion handles when tracking handles.
    * @param {object} entity
    */
   add(entity) {
@@ -45,6 +45,7 @@ export class EntityManager {
       } else {
         DesignCore.HandleManager.checkHandle(existingHandle);
       }
+      entity.assignHandles?.();
     }
 
     this.#entities.push(entity);

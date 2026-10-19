@@ -1,6 +1,9 @@
 
 import { Core } from '../../core/core/core.js';
 import { Point } from '../../core/entities/point.js';
+import { Circle } from '../../core/entities/circle.js';
+import { Leader } from '../../core/dimensions/leader.js';
+import { jest } from '@jest/globals';
 
 const core = new Core();
 const commandManager = core.commandManager;
@@ -15,6 +18,38 @@ test('Test CommandManager.createNew', () => {
 
   const test = commandManager.createNew('test', { points: points });
   expect(typeof test).toBe('undefined');
+});
+
+test('reference linking leaves ordinary normalisation in createNew', () => {
+  const fromDxf = jest.spyOn(Circle, 'fromDxf');
+  try {
+    const data = { 0: 'CIRCLE', 40: 5, points: [new Point(2, 3)] };
+    const linked = commandManager.resolveDxfReferences('Circle', data, {});
+    expect(linked).toBe(data);
+    expect(fromDxf).not.toHaveBeenCalled();
+
+    const circle = commandManager.createNew('Circle', linked);
+    expect(circle).toBeInstanceOf(Circle);
+    expect(circle.getRadius()).toBe(5);
+    expect(fromDxf).toHaveBeenCalledTimes(1);
+  } finally {
+    fromDxf.mockRestore();
+  }
+});
+
+test('reference linking dispatches to an optional entity-specific hook', () => {
+  const text = { 0: 'TEXT', 5: 'AA', 1: 'Note' };
+  const context = { resolve: jest.fn(() => text), consume: jest.fn() };
+  const hook = jest.spyOn(Leader, 'resolveDxfReferences');
+  try {
+    const data = { 0: 'LEADER', 340: 'AA' };
+    const linked = commandManager.resolveDxfReferences('Leader', data, context);
+    expect(hook).toHaveBeenCalledWith(data, context);
+    expect(linked.annotation).toBe('Note');
+    expect(context.consume).toHaveBeenCalledWith(text);
+  } finally {
+    hook.mockRestore();
+  }
 });
 
 test('Test CommandManager.isCommandOrShortcut', () => {
@@ -53,4 +88,3 @@ test('Test CommandManager.getFuzzyMatch', () => {
   expect(commandManager.getFuzzyMatch('li')).toBe('Line');
   expect(commandManager.getFuzzyMatch('ci')).toBe('Circle');
 });
-

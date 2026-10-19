@@ -129,7 +129,7 @@ export class Block extends Entity {
           const points = copyOfEntity.points.map((p) => new Point(p.x, p.y, p.bulge, p.sequence).add(delta));
           copyOfEntity.setProperty('points', points);
         }
-        block.entities.push(copyOfEntity);
+        block.addEntity(copyOfEntity);
         const stateChangeRemove = new RemoveState(entity);
         stateChanges.push(stateChangeRemove);
       });
@@ -197,6 +197,7 @@ export class Block extends Entity {
    * @param {Object} entity
    */
   addEntity(entity) {
+    entity.assignHandles?.();
     this.entities.push(entity);
   }
 

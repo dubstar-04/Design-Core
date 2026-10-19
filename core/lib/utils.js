@@ -84,7 +84,7 @@ export class Utils {
   }
 
   /**
-   * Deep clone object
+   * Deep clone object, clearing entity and leader annotation handles for new copies.
    * @param {Object} obj - object to clone
    * @return {Object} - new cloned object
    */
@@ -117,6 +117,9 @@ export class Utils {
     // Clear handle so a fresh unique handle is assigned when added to the scene
     if (clone.getProperty?.(Property.Names.HANDLE) !== undefined) {
       clone.setProperty?.(Property.Names.HANDLE, undefined);
+    }
+    if (Object.prototype.hasOwnProperty.call(clone, 'textHandle')) {
+      clone.textHandle = undefined;
     }
 
     return clone;

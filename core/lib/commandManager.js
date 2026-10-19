@@ -20,6 +20,7 @@ import { LinearDimension } from '../dimensions/linearDimension.js';
 import { DiametricDimension } from '../dimensions/diametricDimension.js';
 import { RadialDimension } from '../dimensions/radialDimension.js';
 import { RotatedDimension } from '../dimensions/rotatedDimension.js';
+import { Leader } from '../dimensions/leader.js';
 
 
 // import { Point } from "../entities/point.js"
@@ -78,6 +79,7 @@ const classes = {
   LinearDimension,
   RadialDimension,
   RotatedDimension,
+  Leader,
 
   Block,
   Insert,
@@ -144,6 +146,19 @@ export class CommandManager {
    */
   getCommands() {
     return this.commands;
+  }
+
+  /**
+   * Resolve references through an optional entity-specific hook.
+   * @param {string} type
+   * @param {Object} data
+   * @param {Object} context - DXF reference lookup and consumption operations
+   * @return {Object} linked data, or the original data when no hook exists
+   */
+  resolveDxfReferences(type, data, context) {
+    if (!this.isCommand(type)) return data;
+    const CommandClass = classes[this.getCommand(type)];
+    return CommandClass.resolveDxfReferences ? CommandClass.resolveDxfReferences(data, context) : data;
   }
 
   /**

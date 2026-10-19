@@ -149,6 +149,7 @@
         "groupcodes",
         "groupvalue",
         "handseed",
+        "hookline",
         "HORIZONTALALIGNMENT",
         "INSBASE",
         "inputprompt",
