@@ -22,6 +22,7 @@ export class Strings {
     INVALIDCLIPBOARD: 'Invalid Clipboard Data',
     INVALIDBOUNDARY: 'Invalid Boundary Item',
     NONZERO: 'Value must be positive and nonzero',
+    NONNEGATIVE: 'Value must be zero or positive',
     MINVALUE: 'Value is too small',
     MAXVALUE: 'Value is too large',
     ZEROLENGTH: 'Cannot define a zero length line',
@@ -31,6 +32,9 @@ export class Strings {
   static Warning = {
     WARNING: 'Warning',
     UNSUPPORTEDENTITIES: 'File contains unsupported entities',
+    MTEXTFORMATTING: 'MTEXT formatting is preserved in DXF but displayed as plain text',
+    MTEXTLAYOUT: 'MTEXT columns, background fill, non-horizontal planes and non-left-to-right flow are not supported',
+    MTEXTROTATION: 'MTEXT contains both an angle and a direction vector; using the direction vector',
   };
 
   // Message Strings
@@ -95,6 +99,7 @@ export class Strings {
     DIAMETER: 'Specify diameter',
     POSITION: 'Specify position',
     HEIGHT: 'Specify height',
+    WIDTH: 'Specify text width (0 for no wrapping)',
     STRING: 'Specify text',
     NAME: 'Specify name',
     OPTION: 'Specify option',

@@ -689,7 +689,7 @@ export class Hatch extends Entity {
 
         const currentItem = selectedEntities[i];
         // if the item can't be converted to polyline points, remove from selected entities and go again
-        if (typeof currentItem.toPolylinePoints === 'undefined' || currentItem.type === 'Text' || currentItem.type === 'ArcAlignedText') {
+        if (typeof currentItem.toPolylinePoints === 'undefined' || currentItem.type === 'Text' || currentItem.type === 'MText' || currentItem.type === 'ArcAlignedText') {
           selectedEntities.splice(i, 1);
           break;
         }

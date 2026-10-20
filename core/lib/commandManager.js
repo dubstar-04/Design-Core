@@ -9,6 +9,7 @@ import { Rectangle } from '../entities/rectangle.js';
 // import {Spline} from '../entities/spline.js';
 import { ArcAlignedText } from '../entities/arctext.js';
 import { Text } from '../entities/text.js';
+import { MText } from '../entities/mtext.js';
 import { Block } from '../tables/block.js';
 import { Insert } from '../entities/insert.js';
 import { Hatch } from '../entities/hatch.js';
@@ -70,6 +71,7 @@ const classes = {
   // Spline,
   ArcAlignedText,
   Text,
+  MText,
 
   Dimension,
   AngularDimension,

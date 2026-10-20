@@ -17,6 +17,20 @@ export class Section {
   parseValue(iterator, object) {
     const currentPair = iterator.currentPair();
 
+    if (currentPair.code === '101') {
+      const embedded = { 101: currentPair.value };
+      object.embeddedObjects ??= [];
+      object.embeddedObjects.push(embedded);
+      let pair = iterator.nextPair();
+      while (pair && !['0', '101', '1001'].includes(pair.code)) {
+        this.parseValue(iterator, embedded);
+        pair = iterator.nextPair();
+      }
+      if (!pair) iterator.dxfError(Strings.Error.INVALIDDXFFORMAT);
+      iterator.prevPair();
+      return;
+    }
+
     // parse point values
     if (['10', '11', '12', '13', '14', '15', '16'].includes(currentPair.code)) {
       const point = this.parsePoint(iterator);

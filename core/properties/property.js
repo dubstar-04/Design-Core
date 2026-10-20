@@ -93,6 +93,11 @@ export class Property {
     HORIZONTALALIGNMENT: 'horizontalAlignment',
     UPSIDEDOWN: 'upsideDown',
     VERTICALALIGNMENT: 'verticalAlignment',
+    // ── MText ─────────────────────────────────────────────────────────────────
+    WIDTH: 'width',
+    ATTACHMENTPOINT: 'attachmentPoint',
+    LINESPACINGFACTOR: 'lineSpacingFactor',
+    LINESPACINGSTYLE: 'lineSpacingStyle',
     // ── ArcAlignedText ────────────────────────────────────────────────────────
     ARCSIDE: 'arcSide',
     BOLD: 'bold',
