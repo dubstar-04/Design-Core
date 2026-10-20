@@ -98,6 +98,36 @@ EOF`;
   }).toThrow();
 });
 
+test('embedded objects keep repeated fields and geometry separate from the entity', () => {
+  const iterator = new DxfIterator();
+  iterator.loadFile('0\nTEST\n40\n2.5\n10\n20\n20\n30\n101\nEmbedded Object\n40\n40\n10\n0\n20\n1\n101\nEmbedded Object\n40\n99\n1001\nTEST_APP\n1000\nMetadata\n0\nLINE\n0\nEOF');
+  const object = section.parseChild(iterator);
+  expect(object[40]).toBe(2.5);
+  expect(object.points).toEqual([{ x: 20, y: 30, sequence: 10 }]);
+  expect(object.embeddedObjects).toHaveLength(2);
+  expect(object.embeddedObjects[0][101]).toBe('Embedded Object');
+  expect(object.embeddedObjects[0][40]).toBe(40);
+  expect(object.embeddedObjects[0].points).toEqual([{ x: 0, y: 1, sequence: 10 }]);
+  expect(object.embeddedObjects[1][40]).toBe(99);
+  expect(object[1001]).toBe('TEST_APP');
+  expect(object[1000]).toBe('Metadata');
+  expect(iterator.nextPair()).toEqual({ code: '0', value: 'LINE' });
+});
+
+test('an embedded object may end immediately at the next entity', () => {
+  const iterator = new DxfIterator();
+  iterator.loadFile('0\nTEST\n101\nEmbedded Object\n0\nLINE\n0\nEOF');
+  const object = section.parseChild(iterator);
+  expect(object.embeddedObjects).toEqual([{ 101: 'Embedded Object' }]);
+  expect(iterator.nextPair()).toEqual({ code: '0', value: 'LINE' });
+});
+
+test('unterminated embedded objects report an invalid DXF instead of overrunning the iterator', () => {
+  const iterator = new DxfIterator();
+  iterator.loadFile('0\nTEST\n101\nEmbedded Object\n40\n2.5\n1\nEOF');
+  expect(() => section.parseChild(iterator)).toThrow('Invalid DXF Format');
+});
+
 test('Test Section.parseFloat', () => {
   expect(section.parseFloat('  0')).toBe(0.0);
   expect(section.parseFloat('  10 ')).toBe(10.0);
